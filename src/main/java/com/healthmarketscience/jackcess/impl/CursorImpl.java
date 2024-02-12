@@ -26,6 +26,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import java.io.IOException;
+import java.io.UncheckedIOException;
 import java.util.*;
 import java.util.function.Predicate;
 
@@ -777,7 +778,7 @@ public abstract class CursorImpl implements Cursor {
                     _hasNext = _validRow = true;
                 }
             } catch (IOException e) {
-                throw new RuntimeIOException(e);
+                throw new UncheckedIOException(e);
             }
         }
 
@@ -788,7 +789,7 @@ public abstract class CursorImpl implements Cursor {
                     _hasNext = findNext();
                     _validRow = _hasNext;
                 } catch (IOException e) {
-                    throw new RuntimeIOException(e);
+                    throw new UncheckedIOException(e);
                 }
             }
             return _hasNext;
@@ -804,7 +805,7 @@ public abstract class CursorImpl implements Cursor {
                 _hasNext = null;
                 return rtn;
             } catch (IOException e) {
-                throw new RuntimeIOException(e);
+                throw new UncheckedIOException(e);
             }
         }
 
@@ -815,7 +816,7 @@ public abstract class CursorImpl implements Cursor {
                     deleteCurrentRow();
                     _validRow = false;
                 } catch (IOException e) {
-                    throw new RuntimeIOException(e);
+                    throw new UncheckedIOException(e);
                 }
             } else {
                 throw new IllegalStateException("Not at valid row");

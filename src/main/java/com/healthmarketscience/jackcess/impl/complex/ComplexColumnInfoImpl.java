@@ -239,13 +239,9 @@ public abstract class ComplexColumnInfoImpl<V extends ComplexValue>
     public void deleteAllValues(int complexValueFk) throws IOException {
         Iterator<Row> entryIter =
             getComplexValFkIter(complexValueFk, Collections.<String> emptySet());
-        try {
-            while (entryIter.hasNext()) {
-                entryIter.next();
-                entryIter.remove();
-            }
-        } catch (RuntimeIOException e) {
-            throw (IOException) e.getCause();
+        while (entryIter.hasNext()) {
+            entryIter.next();
+            entryIter.remove();
         }
     }
 
@@ -274,8 +270,7 @@ public abstract class ComplexColumnInfoImpl<V extends ComplexValue>
             ((TableImpl) _flatTable).getRowId(row));
     }
 
-    protected Object[] asRow(Object[] row, V value)
-        throws IOException {
+    protected Object[] asRow(Object[] row, V value) throws IOException {
         ComplexValue.Id id = value.getId();
         _pkCol.setRowValue(
             row, id != INVALID_ID ? id : Column.AUTO_NUMBER);

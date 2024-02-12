@@ -18,11 +18,11 @@ limitations under the License.
 package com.healthmarketscience.jackcess.util;
 
 import com.healthmarketscience.jackcess.DataType;
-import com.healthmarketscience.jackcess.RuntimeIOException;
 import com.healthmarketscience.jackcess.Table;
 import com.healthmarketscience.jackcess.impl.ColumnImpl;
 
 import java.io.IOException;
+import java.io.UncheckedIOException;
 
 /**
  * Concrete implementation of ColumnMatcher which tests textual columns case-insensitively ({@link DataType#TEXT} and
@@ -54,7 +54,7 @@ public class CaseInsensitiveColumnMatcher implements ColumnMatcher {
                 cs1 != null && cs2 != null &&
                     cs1.toString().equalsIgnoreCase(cs2.toString());
         } catch (IOException e) {
-            throw new RuntimeIOException("Could not read column " + columnName
+            throw new UncheckedIOException("Could not read column " + columnName
                 + " value", e);
         }
     }

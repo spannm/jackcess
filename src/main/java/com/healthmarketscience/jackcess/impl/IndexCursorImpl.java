@@ -19,7 +19,6 @@ package com.healthmarketscience.jackcess.impl;
 import com.healthmarketscience.jackcess.Index;
 import com.healthmarketscience.jackcess.IndexCursor;
 import com.healthmarketscience.jackcess.Row;
-import com.healthmarketscience.jackcess.RuntimeIOException;
 import com.healthmarketscience.jackcess.impl.TableImpl.RowState;
 import com.healthmarketscience.jackcess.util.CaseInsensitiveColumnMatcher;
 import com.healthmarketscience.jackcess.util.ColumnMatcher;
@@ -29,6 +28,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import java.io.IOException;
+import java.io.UncheckedIOException;
 import java.util.*;
 
 /**
@@ -499,7 +499,7 @@ public class IndexCursorImpl extends CursorImpl implements IndexCursor {
                 _hasNext = findFirstRowByEntryImpl(rowValues, true, _columnMatcher);
                 _validRow = _hasNext;
             } catch (IOException e) {
-                throw new RuntimeIOException(e);
+                throw new UncheckedIOException(e);
             }
         }
 

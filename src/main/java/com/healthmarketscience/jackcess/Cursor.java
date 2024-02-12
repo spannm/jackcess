@@ -124,7 +124,7 @@ public interface Cursor extends Iterable<Row> {
      * <p>
      * For more flexible iteration see {@link #newIterable}.
      *
-     * @throws RuntimeIOException if an IOException is thrown by one of the operations, the actual exception will be
+     * @throws UncheckedIOException if an IOException is thrown by one of the operations, the actual exception will be
      *             contained within
      */
     @Override

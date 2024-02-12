@@ -32,6 +32,7 @@ import com.healthmarketscience.jackcess.util.RowFilterTest;
 import com.healthmarketscience.jackcess.util.SimpleColumnMatcher;
 import junit.framework.TestCase;
 
+import java.io.UncheckedIOException;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -1269,8 +1270,8 @@ public class CursorTest extends TestCase {
                     .addMatchPattern("value", "val-9")
                     .addMatchPattern("memo", "anything")
                     .iterator().hasNext();
-                fail("RuntimeIOException should have been thrown");
-            } catch (RuntimeIOException ignored) {
+                fail("UncheckedIOException should have been thrown");
+            } catch (UncheckedIOException ignored) {
                 // success
             }
 

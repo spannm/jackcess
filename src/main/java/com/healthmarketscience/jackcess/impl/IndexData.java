@@ -21,13 +21,13 @@ import static com.healthmarketscience.jackcess.impl.IndexCodes.*;
 import com.healthmarketscience.jackcess.ConstraintViolationException;
 import com.healthmarketscience.jackcess.Index;
 import com.healthmarketscience.jackcess.IndexBuilder;
-import com.healthmarketscience.jackcess.RuntimeIOException;
 import com.healthmarketscience.jackcess.impl.ByteUtil.ByteStream;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import java.io.IOException;
+import java.io.UncheckedIOException;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.util.*;
@@ -1083,7 +1083,7 @@ public class IndexData {
             try {
                 sb.append("entryCount", getEntryCount());
             } catch (IOException e) {
-                throw new RuntimeIOException(e);
+                throw new UncheckedIOException(e);
             }
         }
         sb.append("pageCache", _pageCache);

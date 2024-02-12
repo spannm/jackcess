@@ -26,10 +26,7 @@ import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
 import java.lang.ref.ReferenceQueue;
 import java.lang.ref.WeakReference;
 import java.nio.ByteBuffer;
@@ -1000,7 +997,7 @@ public class DatabaseImpl implements Database, DateTimeContext {
         try {
             return new TableIterator(getTableNames());
         } catch (IOException e) {
-            throw new RuntimeIOException(e);
+            throw new UncheckedIOException(e);
         }
     }
 
@@ -1010,7 +1007,7 @@ public class DatabaseImpl implements Database, DateTimeContext {
                 builder.isIncludeSystemTables(),
                 builder.isIncludeLinkedTables()));
         } catch (IOException e) {
-            throw new RuntimeIOException(e);
+            throw new UncheckedIOException(e);
         }
     }
 
@@ -1025,7 +1022,7 @@ public class DatabaseImpl implements Database, DateTimeContext {
             try {
                 return _tableFinder.iterateTableMetaData();
             } catch (IOException e) {
-                throw new RuntimeIOException(e);
+                throw new UncheckedIOException(e);
             }
         };
     }
@@ -2381,7 +2378,7 @@ public class DatabaseImpl implements Database, DateTimeContext {
             try {
                 return getTable(_tableNameIter.next(), true);
             } catch (IOException e) {
-                throw new RuntimeIOException(e);
+                throw new UncheckedIOException(e);
             }
         }
     }

@@ -16,7 +16,6 @@ limitations under the License.
 
 package com.healthmarketscience.jackcess.impl;
 
-import com.healthmarketscience.jackcess.RuntimeIOException;
 import com.healthmarketscience.jackcess.impl.OleUtil.CompoundPackageFactory;
 import com.healthmarketscience.jackcess.impl.OleUtil.ContentImpl;
 import com.healthmarketscience.jackcess.impl.OleUtil.EmbeddedPackageContentImpl;
@@ -160,7 +159,7 @@ public class CompoundOleUtil implements CompoundPackageFactory {
                 return getEntries(new ArrayList<>(), getFileSystem().getRoot(),
                     ENTRY_SEPARATOR).iterator();
             } catch (IOException e) {
-                throw new RuntimeIOException(e);
+                throw new UncheckedIOException(e);
             }
         }
 
