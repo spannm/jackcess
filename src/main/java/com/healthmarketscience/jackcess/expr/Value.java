@@ -28,7 +28,7 @@ import java.time.LocalDateTime;
  */
 public interface Value {
     /** the types supported within the expression evaluation engine */
-    public enum Type {
+    enum Type {
         NULL,
         STRING,
         DATE,

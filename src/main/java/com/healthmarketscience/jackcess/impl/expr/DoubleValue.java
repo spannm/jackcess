@@ -48,7 +48,7 @@ public class DoubleValue extends BaseNumericValue {
 
     @Override
     public boolean getAsBoolean(LocaleContext ctx) {
-        return _val.doubleValue() != 0.0d;
+        return _val != 0.0d;
     }
 
     @Override

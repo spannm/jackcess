@@ -748,7 +748,7 @@ public class ColumnImpl implements Column, Comparable<ColumnImpl>, DateTimeConte
     }
 
     public Object readFromNullMask(boolean isNull) {
-        return Boolean.valueOf(!isNull);
+        return !isNull;
     }
 
     /**
@@ -777,15 +777,15 @@ public class ColumnImpl implements Column, Comparable<ColumnImpl>, DateTimeConte
             case BOOLEAN:
                 throw new IOException(withErrorContext("Tried to read a boolean from data instead of null mask."));
             case BYTE:
-                return Byte.valueOf(buffer.get());
+                return buffer.get();
             case INT:
-                return Short.valueOf(buffer.getShort());
+                return buffer.getShort();
             case LONG:
-                return Integer.valueOf(buffer.getInt());
+                return buffer.getInt();
             case DOUBLE:
-                return Double.valueOf(buffer.getDouble());
+                return buffer.getDouble();
             case FLOAT:
-                return Float.valueOf(buffer.getFloat());
+                return buffer.getFloat();
             case SHORT_DATE_TIME:
                 return readDateValue(buffer);
             case BINARY:
@@ -807,7 +807,7 @@ public class ColumnImpl implements Column, Comparable<ColumnImpl>, DateTimeConte
             case COMPLEX_TYPE:
                 return new ComplexValueForeignKeyImpl(this, buffer.getInt());
             case BIG_INT:
-                return Long.valueOf(buffer.getLong());
+                return buffer.getLong();
             default:
                 throw new IOException(withErrorContext("Unrecognized data type: " + _type));
         }
@@ -1776,13 +1776,7 @@ public class ColumnImpl implements Column, Comparable<ColumnImpl>, DateTimeConte
      */
     @Override
     public int compareTo(ColumnImpl other) {
-        if (_columnNumber > other.getColumnNumber()) {
-            return 1;
-        } else if (_columnNumber < other.getColumnNumber()) {
-            return -1;
-        } else {
-            return 0;
-        }
+        return Short.compare(_columnNumber, other.getColumnNumber());
     }
 
     /**
@@ -1925,7 +1919,7 @@ public class ColumnImpl implements Column, Comparable<ColumnImpl>, DateTimeConte
         if (obj == null) {
             return false;
         } else if (obj instanceof Boolean) {
-            return ((Boolean) obj).booleanValue();
+            return (Boolean) obj;
         } else if (obj instanceof Number) {
             // Access considers 0 as "false"
             if (obj instanceof BigDecimal) {
@@ -2336,7 +2330,7 @@ public class ColumnImpl implements Column, Comparable<ColumnImpl>, DateTimeConte
      *
      * @usage _advanced_class_
      */
-    public abstract class AutoNumberGenerator {
+    public abstract static class AutoNumberGenerator {
         protected AutoNumberGenerator() {
         }
 

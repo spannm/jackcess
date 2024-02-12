@@ -347,13 +347,13 @@ public interface Cursor extends Iterable<Row> {
      * Identifier for a cursor. Will be equal to any other cursor of the same type for the same table. Primarily used to
      * check the validity of a Savepoint.
      */
-    public interface Id {
+    interface Id {
     }
 
     /**
      * Value object which maintains the current position of the cursor.
      */
-    public interface Position {
+    interface Position {
         /**
          * Returns the unique RowId of the position of the cursor.
          */
@@ -365,7 +365,7 @@ public interface Cursor extends Iterable<Row> {
      * {@link Cursor#getSavepoint} and used by calling {@link Cursor#restoreSavepoint} to return the the cursor state at
      * the time the Savepoint was created.
      */
-    public interface Savepoint {
+    interface Savepoint {
         Id getCursorId();
 
         Position getCurrentPosition();

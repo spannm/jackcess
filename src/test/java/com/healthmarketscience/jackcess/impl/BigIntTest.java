@@ -26,7 +26,6 @@ import com.healthmarketscience.jackcess.*;
 import junit.framework.TestCase;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -75,7 +74,7 @@ public class BigIntTest extends TestCase {
                     "num1", lng));
             }
 
-            Collections.sort(expectedTable, (r1, r2) -> {
+            expectedTable.sort((r1, r2) -> {
                 Long l1 = (Long) r1.get("num1");
                 Long l2 = (Long) r2.get("num1");
                 return l1.compareTo(l2);

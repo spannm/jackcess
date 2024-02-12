@@ -64,7 +64,7 @@ final class FKEnforcer {
                 }
             }
         }
-        _cols = !cols.isEmpty() ? Collections.unmodifiableList(new ArrayList<>(cols)) : Collections.<ColumnImpl> emptyList();
+        _cols = !cols.isEmpty() ? List.copyOf(cols) : Collections.<ColumnImpl> emptyList();
     }
 
     /**

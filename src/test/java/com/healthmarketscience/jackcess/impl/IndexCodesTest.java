@@ -184,6 +184,7 @@ public class IndexCodesTest extends TestCase {
         db.close();
     }
 
+    @SuppressWarnings("unused")
     public void x_testWriteAllCodesMdb() throws Exception {
         Database db = create(Database.FileFormat.V2000, true);
 
@@ -282,7 +283,7 @@ public class IndexCodesTest extends TestCase {
         return rowNum;
     }
 
-    private void writeChars(int hibyte, Table t) throws Exception {
+    void writeChars(int hibyte, Table t) throws Exception {
         char other = (char) (hibyte | 0x41);
         for (int i = 0; i < 0xFF; ++i) {
             char c = (char) (hibyte | i);

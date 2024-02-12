@@ -47,12 +47,7 @@ public class DefaultFunctions {
         DefaultFinancialFunctions.init();
     }
 
-    public static final FunctionLookup LOOKUP = new FunctionLookup() {
-        @Override
-        public Function getFunction(String name) {
-            return FUNCS.get(DatabaseImpl.toLookupName(name));
-        }
-    };
+    public static final FunctionLookup LOOKUP = name -> FUNCS.get(DatabaseImpl.toLookupName(name));
 
     private DefaultFunctions() {
     }

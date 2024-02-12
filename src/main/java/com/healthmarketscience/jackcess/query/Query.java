@@ -28,7 +28,7 @@ import java.util.List;
  */
 public interface Query {
 
-    public enum Type {
+    enum Type {
         SELECT(SELECT_QUERY_OBJECT_FLAG, 1),
         MAKE_TABLE(MAKE_TABLE_QUERY_OBJECT_FLAG, 2),
         APPEND(APPEND_QUERY_OBJECT_FLAG, 3),

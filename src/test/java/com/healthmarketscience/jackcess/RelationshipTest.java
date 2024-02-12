@@ -30,12 +30,7 @@ import java.util.*;
  */
 public class RelationshipTest extends TestCase {
 
-    private static final Comparator<Relationship> REL_COMP = new Comparator<>() {
-        @Override
-        public int compare(Relationship r1, Relationship r2) {
-            return String.CASE_INSENSITIVE_ORDER.compare(r1.getName(), r2.getName());
-        }
-    };
+    private static final Comparator<Relationship> REL_COMP = (r1, r2) -> String.CASE_INSENSITIVE_ORDER.compare(r1.getName(), r2.getName());
 
     public RelationshipTest(String name) throws Exception {
         super(name);
@@ -127,8 +122,8 @@ public class RelationshipTest extends TestCase {
         List<Relationship> expected, List<Relationship> found, boolean ordered) {
         assertEquals(expected.size(), found.size());
         if (!ordered) {
-            Collections.sort(expected, REL_COMP);
-            Collections.sort(found, REL_COMP);
+            expected.sort(REL_COMP);
+            found.sort(REL_COMP);
         }
         for (int i = 0; i < expected.size(); ++i) {
             Relationship eRel = expected.get(i);

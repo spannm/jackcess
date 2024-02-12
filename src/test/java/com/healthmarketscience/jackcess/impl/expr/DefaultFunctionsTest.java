@@ -66,14 +66,13 @@ public class DefaultFunctionsTest {
         assertEval(13, "=CByte(\"13\")");
         assertEval(14, "=CByte(\"13.7\")");
         assertEval(new BigDecimal("57.1235"), "=CCur(\"57.12346\")");
-        assertEval(new Double("57.12345"), "=CDbl(\"57.12345\")");
+        assertEval(Double.parseDouble("57.12345"), "=CDbl(\"57.12345\")");
         assertEval(new BigDecimal("57.123456789"), "=CDec(\"57.123456789\")");
         assertEval(513, "=CInt(\"513\")");
         assertEval(514, "=CInt(\"513.7\")");
         assertEval(345513, "=CLng(\"345513\")");
         assertEval(345514, "=CLng(\"345513.7\")");
-        assertEquals(new Float("57.12345").doubleValue(),
-            eval("=CSng(\"57.12345\")"));
+        assertEquals(Float.valueOf("57.12345").doubleValue(), eval("=CSng(\"57.12345\")"));
         assertEval("9786", "=CStr(9786)");
         assertEval("-42", "=CStr(-42)");
         assertEval(LocalDateTime.of(2003, 1, 2, 0, 0), "=CDate('01/02/2003')");

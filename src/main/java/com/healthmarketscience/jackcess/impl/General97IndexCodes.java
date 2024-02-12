@@ -21,6 +21,7 @@ import com.healthmarketscience.jackcess.impl.ByteUtil.ByteStream;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
 
 /**
  * Various constants used for creating "general" (access 1997) sort order text index entries.
@@ -181,7 +182,7 @@ public class General97IndexCodes extends GeneralLegacyIndexCodes {
 
             reader = new BufferedReader(
                 new InputStreamReader(
-                    DatabaseImpl.getResourceAsStream(mappingsFilePath), "US-ASCII"));
+                    DatabaseImpl.getResourceAsStream(mappingsFilePath), StandardCharsets.US_ASCII));
 
             // this is a sparse file with entries like <fromCode>,<toCode>
             String mappingLine = null;

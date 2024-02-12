@@ -60,6 +60,7 @@ public class SqlHelper {
         // java.sql classes. if that fails, use this fallback instance instead.
         try {
             return (SqlHelper) Class.forName("com.healthmarketscience.jackcess.impl.SqlHelperImpl")
+                .getDeclaredConstructor()
                 .newInstance();
         } catch (Throwable ignored) {}
         return new SqlHelper();

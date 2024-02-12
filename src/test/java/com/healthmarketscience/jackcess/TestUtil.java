@@ -393,12 +393,9 @@ public class TestUtil {
         throws IOException {
         // FIXME should really be using commons io FileUtils here, but don't want
         // to add dep for one simple test method
-        OutputStream ostream = new FileOutputStream(dstFile);
-        InputStream istream = new FileInputStream(srcFile);
-        try {
+        try (OutputStream ostream = new FileOutputStream(dstFile)) {
+            InputStream istream = new FileInputStream(srcFile);
             copyStream(istream, ostream);
-        } finally {
-            ostream.close();
         }
     }
 
@@ -442,13 +439,11 @@ public class TestUtil {
         throws IOException {
         // FIXME should really be using commons io IOUtils here, but don't want
         // to add dep for one simple test method
-        try {
+        try (in) {
             DataInputStream din = new DataInputStream(in);
             byte[] bytes = new byte[(int) length];
             din.readFully(bytes);
             return bytes;
-        } finally {
-            in.close();
         }
     }
 
@@ -456,10 +451,10 @@ public class TestUtil {
         throws IOException {
         Assert.assertEquals("testDB: " + testDB + "; table: " + table, "abcdefg", row.get("A"));
         Assert.assertEquals("hijklmnop", row.get("B"));
-        Assert.assertEquals(new Byte((byte) 2), row.get("C"));
-        Assert.assertEquals(new Short((short) 222), row.get("D"));
-        Assert.assertEquals(new Integer(333333333), row.get("E"));
-        Assert.assertEquals(new Double(444.555d), row.get("F"));
+        Assert.assertEquals((byte) 2, row.get("C"));
+        Assert.assertEquals((short) 222, row.get("D"));
+        Assert.assertEquals(333333333, row.get("E"));
+        Assert.assertEquals(444.555d, row.get("F"));
         final Calendar cal = Calendar.getInstance();
         cal.setTime(row.getDate("G"));
         Assert.assertEquals(Calendar.SEPTEMBER, cal.get(Calendar.MONTH));
@@ -476,10 +471,10 @@ public class TestUtil {
         throws IOException {
         Assert.assertEquals("testDB: " + testDB + "; table: " + table, "a", row.get("A"));
         Assert.assertEquals("b", row.get("B"));
-        Assert.assertEquals(new Byte((byte) 0), row.get("C"));
-        Assert.assertEquals(new Short((short) 0), row.get("D"));
-        Assert.assertEquals(new Integer(0), row.get("E"));
-        Assert.assertEquals(new Double(0d), row.get("F"));
+        Assert.assertEquals((byte) 0, row.get("C"));
+        Assert.assertEquals((short) 0, row.get("D"));
+        Assert.assertEquals(0, row.get("E"));
+        Assert.assertEquals(0d, row.get("F"));
         final Calendar cal = Calendar.getInstance();
         cal.setTime(row.getDate("G"));
         Assert.assertEquals(Calendar.DECEMBER, cal.get(Calendar.MONTH));

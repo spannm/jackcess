@@ -18,8 +18,6 @@ package com.healthmarketscience.jackcess.impl;
 
 import static com.healthmarketscience.jackcess.impl.IndexData.*;
 
-import com.healthmarketscience.jackcess.impl.IndexData.DataPage;
-import com.healthmarketscience.jackcess.impl.IndexData.Entry;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 
 import java.io.IOException;

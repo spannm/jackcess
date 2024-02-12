@@ -21,12 +21,10 @@ import static com.healthmarketscience.jackcess.TestUtil.*;
 import com.healthmarketscience.jackcess.impl.DatabaseImpl;
 import com.healthmarketscience.jackcess.impl.JetFormatTest.Basename;
 import com.healthmarketscience.jackcess.impl.JetFormatTest.TestDB;
-import com.healthmarketscience.jackcess.util.LinkResolver;
 import junit.framework.TestCase;
 
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 
@@ -64,13 +62,9 @@ public class LinkedTableTest extends TestCase {
 
             final String linkeeDbName = "Z:\\jackcess_test\\linkeeTest.accdb";
             final File linkeeFile = new File("src/test/data/linkeeTest.accdb");
-            db.setLinkResolver(new LinkResolver() {
-                @Override
-                public Database resolveLinkedDatabase(Database linkerdb, String dbName)
-                    throws IOException {
-                    assertEquals(linkeeDbName, dbName);
-                    return DatabaseBuilder.open(linkeeFile);
-                }
+            db.setLinkResolver((linkerdb, dbName) -> {
+                assertEquals(linkeeDbName, dbName);
+                return DatabaseBuilder.open(linkeeFile);
             });
 
             Table t2 = db.getTable("Table2");

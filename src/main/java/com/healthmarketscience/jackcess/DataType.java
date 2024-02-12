@@ -409,7 +409,7 @@ public enum DataType {
         if (_sqlType != null) {
             return _sqlType;
         }
-        throw new JackcessException("Unsupported data type: " + toString());
+        throw new JackcessException("Unsupported data type: " + this);
     }
 
     public int getMinScale() {
@@ -508,7 +508,7 @@ public enum DataType {
     }
 
     private static int toValidRange(int value, int minValue, int maxValue) {
-        return value > maxValue ? maxValue : value < minValue ? minValue : value;
+        return value > maxValue ? maxValue : Math.max(value, minValue);
     }
 
     public static DataType fromByte(byte b) throws IOException {

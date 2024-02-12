@@ -636,11 +636,7 @@ public abstract class QueryImpl implements Query {
         }
 
         public List<Row> filter(List<Row> list) {
-            for (Iterator<Row> iter = list.iterator(); iter.hasNext();) {
-                if (!keep(iter.next())) {
-                    iter.remove();
-                }
-            }
+            list.removeIf(row -> !keep(row));
             return list;
         }
 

@@ -25,7 +25,6 @@ import static com.healthmarketscience.jackcess.impl.JetFormatTest.*;
 
 import com.healthmarketscience.jackcess.Database.FileFormat;
 import com.healthmarketscience.jackcess.impl.DatabaseImpl;
-import com.healthmarketscience.jackcess.impl.JetFormatTest.TestDB;
 import com.healthmarketscience.jackcess.impl.PropertyMapImpl;
 import com.healthmarketscience.jackcess.impl.PropertyMaps;
 import com.healthmarketscience.jackcess.impl.TableImpl;

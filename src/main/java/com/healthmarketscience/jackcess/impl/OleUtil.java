@@ -78,6 +78,7 @@ public class OleUtil {
         CompoundPackageFactory compoundFactory = null;
         try {
             compoundFactory = (CompoundPackageFactory) Class.forName("com.healthmarketscience.jackcess.impl.CompoundOleUtil")
+                .getDeclaredConstructor()
                 .newInstance();
         } catch (Throwable t) {
             // must not have poi, will load compound ole data as "other"

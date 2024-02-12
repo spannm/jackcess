@@ -25,7 +25,7 @@ import java.util.List;
  * @usage _general_class_
  */
 public interface Relationship {
-    public enum JoinType {
+    enum JoinType {
         INNER,
         LEFT_OUTER,
         RIGHT_OUTER;

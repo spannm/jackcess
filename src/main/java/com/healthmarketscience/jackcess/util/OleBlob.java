@@ -96,7 +96,7 @@ public interface OleBlob extends Blob, Closeable {
     /**
      * Enum describing the types of blob contents which are currently supported/understood
      */
-    public enum ContentType {
+    enum ContentType {
         /**
          * the blob contents are a link (file path) to some external content. Content will be an instance of LinkContent
          */
@@ -138,7 +138,7 @@ public interface OleBlob extends Blob, Closeable {
      */
     Content getContent() throws IOException;
 
-    public interface Content {
+    interface Content {
         /**
          * Returns the type of this content.
          */
@@ -153,7 +153,7 @@ public interface OleBlob extends Blob, Closeable {
     /**
      * Intermediate sub-interface for Content which has a nested package.
      */
-    public interface PackageContent extends Content {
+    interface PackageContent extends Content {
         String getPrettyName() throws IOException;
 
         String getClassName() throws IOException;
@@ -164,7 +164,7 @@ public interface OleBlob extends Blob, Closeable {
     /**
      * Intermediate sub-interface for Content which has embedded content.
      */
-    public interface EmbeddedContent extends Content {
+    interface EmbeddedContent extends Content {
         long length();
 
         InputStream getStream() throws IOException;
@@ -176,7 +176,7 @@ public interface OleBlob extends Blob, Closeable {
      * Sub-interface for Content which has the {@link ContentType#LINK} type. The actual content is external to the
      * access database and can be found at {@link #getLinkPath}.
      */
-    public interface LinkContent extends PackageContent {
+    interface LinkContent extends PackageContent {
         String getFileName();
 
         String getLinkPath();
@@ -190,7 +190,7 @@ public interface OleBlob extends Blob, Closeable {
      * Sub-interface for Content which has the {@link ContentType#SIMPLE_PACKAGE} type. The actual content is embedded
      * within the access database (but the original file source path can also be found at {@link #getFilePath}).
      */
-    public interface SimplePackageContent
+    interface SimplePackageContent
         extends PackageContent, EmbeddedContent {
         String getFileName();
 
@@ -208,7 +208,7 @@ public interface OleBlob extends Blob, Closeable {
      * that the CompoundContent type will only be available if the POI library is in the classpath, otherwise compound
      * content will be returned as OtherContent.
      */
-    public interface CompoundContent extends PackageContent, EmbeddedContent,
+    interface CompoundContent extends PackageContent, EmbeddedContent,
         Iterable<CompoundContent.Entry> {
         Entry getEntry(String entryName) throws IOException;
 
@@ -226,7 +226,7 @@ public interface OleBlob extends Blob, Closeable {
         /**
          * A document entry in the compound storage.
          */
-        public interface Entry extends EmbeddedContent {
+        interface Entry extends EmbeddedContent {
             String getName();
 
             /**
@@ -240,13 +240,13 @@ public interface OleBlob extends Blob, Closeable {
      * Sub-interface for Content which has the {@link ContentType#OTHER} type. This may be a simple embedded file or
      * some other, currently not understood complex type.
      */
-    public interface OtherContent extends PackageContent, EmbeddedContent {
+    interface OtherContent extends PackageContent, EmbeddedContent {
     }
 
     /**
      * Builder style class for constructing an OleBlob. See {@link OleBlob} for example usage.
      */
-    public class Builder {
+    class Builder {
         public static final String PACKAGE_PRETTY_NAME = "Packager Shell Object";
         public static final String PACKAGE_TYPE_NAME   = "Package";
 

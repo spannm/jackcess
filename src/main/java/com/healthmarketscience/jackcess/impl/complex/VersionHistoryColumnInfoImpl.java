@@ -199,7 +199,7 @@ public class VersionHistoryColumnInfoImpl extends ComplexColumnInfoImpl<Version>
             }
             id1 = getComplexValueForeignKey().get();
             id2 = o.getComplexValueForeignKey().get();
-            return id1 > id2 ? -1 : id1 < id2 ? 1 : 0;
+            return Integer.compare(id2, id1);
         }
 
         @SuppressWarnings("unchecked")

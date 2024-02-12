@@ -118,30 +118,27 @@ public class IndexData {
     }
 
     public static final Comparator<byte[]> BYTE_CODE_COMPARATOR =
-        new Comparator<>() {
-                                                                        @Override
-                                                                        public int compare(byte[] left, byte[] right) {
-                                                                            if (left == right) {
-                                                                                return 0;
-                                                                            }
-                                                                            if (left == null) {
-                                                                                return -1;
-                                                                            }
-                                                                            if (right == null) {
-                                                                                return 1;
-                                                                            }
+        (left, right) -> {
+            if (left == right) {
+                return 0;
+            }
+            if (left == null) {
+                return -1;
+            }
+            if (right == null) {
+                return 1;
+            }
 
-                                                                            int len = Math.min(left.length, right.length);
-                                                                            int pos = 0;
-                                                                            while (pos < len && left[pos] == right[pos]) {
-                                                                                ++pos;
-                                                                            }
-                                                                            if (pos < len) {
-                                                                                return ByteUtil.asUnsignedByte(left[pos]) < ByteUtil.asUnsignedByte(right[pos]) ? -1 : 1;
-                                                                            }
-                                                                            return left.length < right.length ? -1 : left.length > right.length ? 1 : 0;
-                                                                        }
-                                                                    };
+            int len = Math.min(left.length, right.length);
+            int pos = 0;
+            while (pos < len && left[pos] == right[pos]) {
+                ++pos;
+            }
+            if (pos < len) {
+                return ByteUtil.asUnsignedByte(left[pos]) < ByteUtil.asUnsignedByte(right[pos]) ? -1 : 1;
+            }
+            return left.length < right.length ? -1 : left.length > right.length ? 1 : 0;
+        };
 
     /** name, generated on demand */
     private String                         _name;

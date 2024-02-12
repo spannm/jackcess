@@ -36,17 +36,12 @@ public interface ErrorHandler {
      *
      * @usage _general_field_
      */
-    ErrorHandler DEFAULT = new ErrorHandler() {
-        @Override
-        public Object handleRowError(Column column, byte[] columnData,
-            Location location, Exception error)
-            throws IOException {
-            // really can only be RuntimeException or IOException
-            if (error instanceof IOException) {
-                throw (IOException) error;
-            }
-            throw (RuntimeException) error;
+    ErrorHandler DEFAULT = (column, columnData, location, error) -> {
+        // really can only be RuntimeException or IOException
+        if (error instanceof IOException) {
+            throw (IOException) error;
         }
+        throw (RuntimeException) error;
     };
 
     /**
@@ -71,7 +66,7 @@ public interface ErrorHandler {
     /**
      * Provides location information for an error.
      */
-    public interface Location {
+    interface Location {
         /**
          * @return the table in which the error occurred
          */

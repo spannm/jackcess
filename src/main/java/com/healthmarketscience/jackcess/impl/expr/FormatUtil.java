@@ -142,7 +142,7 @@ public class FormatUtil {
     }
 
     private static final Fmt    NULL_FMT             = args -> ValueSupport.EMPTY_STR_VAL;
-    private static final Fmt    DUMMY_FMT            = args -> args.getNonNullExpr();
+    private static final Fmt    DUMMY_FMT            = Args::getNonNullExpr;
 
     private static final char   QUOTE_CHAR           = '"';
     private static final char   ESCAPE_CHAR          = '\\';
@@ -1132,13 +1132,13 @@ public class FormatUtil {
 
         if (numGroupDigits > 0) {
             fmt.append("#,");
-            DefaultTextFunctions.nchars(fmt, numGroupDigits - 1, '#');
+            fmt.append("#".repeat(Math.max(0, numGroupDigits - 1)));
         }
 
         fmt.append(incLeadDigit ? "0" : "#");
         if (numDecDigits > 0) {
             fmt.append(".");
-            DefaultTextFunctions.nchars(fmt, numDecDigits, '0');
+            fmt.append("0".repeat(Math.max(0, numDecDigits)));
         }
 
         numPatType.appendSuffix(fmt);
@@ -1409,7 +1409,7 @@ public class FormatUtil {
             CharSource cs = new CharSource(args.getAsString(), _numPlaceholders,
                 _rightAligned, _textCase);
             StringBuilder sb = new StringBuilder();
-            _subFmts.stream().forEach(fmt -> fmt.accept(sb, cs));
+            _subFmts.forEach(fmt -> fmt.accept(sb, cs));
             cs.appendRemaining(sb);
             return ValueSupport.toValue(sb.toString());
         }

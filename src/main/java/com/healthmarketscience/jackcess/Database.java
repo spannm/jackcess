@@ -154,7 +154,7 @@ public interface Database extends Iterable<Table>, Closeable, Flushable {
      *
      * @usage _general_class_
      */
-    public enum FileFormat {
+    enum FileFormat {
 
         /** A database which was created by MS Access 97 */
         V1997(".mdb"),

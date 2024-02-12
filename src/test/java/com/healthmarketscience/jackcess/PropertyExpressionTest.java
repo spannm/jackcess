@@ -284,21 +284,18 @@ public class PropertyExpressionTest extends TestCase {
         }
     }
 
-    public static void testCustomEvalConfig() throws Exception {
+    public void testCustomEvalConfig() throws Exception {
         TemporalConfig tempConf = new TemporalConfig("[uuuu/]M/d",
             "uuuu-MMM-d",
             "hh.mm.ss a",
             "HH.mm.ss", '/', '.',
             Locale.US);
 
-        FunctionLookup lookup = new FunctionLookup() {
-            @Override
-            public Function getFunction(String name) {
-                if ("FooFunc".equalsIgnoreCase(name)) {
-                    return FOO;
-                }
-                return DefaultFunctions.LOOKUP.getFunction(name);
+        FunctionLookup lookup = name -> {
+            if ("FooFunc".equalsIgnoreCase(name)) {
+                return FOO;
             }
+            return DefaultFunctions.LOOKUP.getFunction(name);
         };
 
         Bindings bindings = new SimpleBindings();

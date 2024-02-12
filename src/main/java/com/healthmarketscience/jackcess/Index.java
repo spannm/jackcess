@@ -81,7 +81,7 @@ public interface Index {
     /**
      * Information about a Column in an Index
      */
-    public interface Column {
+    interface Column {
 
         com.healthmarketscience.jackcess.Column getColumn();
 

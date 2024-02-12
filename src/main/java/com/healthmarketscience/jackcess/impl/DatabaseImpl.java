@@ -1021,14 +1021,11 @@ public class DatabaseImpl implements Database, DateTimeContext {
 
     @Override
     public Iterable<TableMetaData> newTableMetaDataIterable() {
-        return new Iterable<>() {
-            @Override
-            public Iterator<TableMetaData> iterator() {
-                try {
-                    return _tableFinder.iterateTableMetaData();
-                } catch (IOException e) {
-                    throw new RuntimeIOException(e);
-                }
+        return () -> {
+            try {
+                return _tableFinder.iterateTableMetaData();
+            } catch (IOException e) {
+                throw new RuntimeIOException(e);
             }
         };
     }
@@ -1165,7 +1162,7 @@ public class DatabaseImpl implements Database, DateTimeContext {
         String linkedDbName, String linkedTableName)
         throws IOException {
         // Add this table to our internal list.
-        addTable(name, Integer.valueOf(tdefPageNumber), type, linkedDbName,
+        addTable(name, tdefPageNumber, type, linkedDbName,
             linkedTableName);
 
         // Add this table to system tables
@@ -1658,7 +1655,7 @@ public class DatabaseImpl implements Database, DateTimeContext {
         for (Iterator<ColumnImpl> iter = _systemCatalog.getColumns().iterator(); iter.hasNext(); idx++) {
             ColumnImpl col = iter.next();
             if (CAT_COL_ID.equals(col.getName())) {
-                catalogRow[idx] = Integer.valueOf(objectId);
+                catalogRow[idx] = objectId;
             } else if (CAT_COL_NAME.equals(col.getName())) {
                 catalogRow[idx] = name;
             } else if (CAT_COL_TYPE.equals(col.getName())) {
@@ -1669,7 +1666,7 @@ public class DatabaseImpl implements Database, DateTimeContext {
             } else if (CAT_COL_PARENT_ID.equals(col.getName())) {
                 catalogRow[idx] = parentId;
             } else if (CAT_COL_FLAGS.equals(col.getName())) {
-                catalogRow[idx] = Integer.valueOf(0);
+                catalogRow[idx] = 0;
             } else if (CAT_COL_OWNER.equals(col.getName())) {
                 catalogRow[idx] = owner;
             } else if (CAT_COL_DATABASE.equals(col.getName())) {

@@ -46,7 +46,7 @@ public interface Table extends Iterable<Row>, TableDefinition {
      *
      * @usage _intermediate_class_
      */
-    public enum ColumnOrder {
+    enum ColumnOrder {
         /**
          * columns are ordered based on the order of the data in the table (this order does not change as columns are
          * added to the table).

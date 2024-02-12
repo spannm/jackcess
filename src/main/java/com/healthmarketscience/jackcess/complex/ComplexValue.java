@@ -71,7 +71,7 @@ public interface ComplexValue {
     /**
      * Identifier for a ComplexValue. Only valid for comparing complex values for the same column.
      */
-    public abstract class Id extends Number {
+    abstract class Id extends Number {
         private static final long serialVersionUID = 20130318L;
 
         @Override
@@ -125,7 +125,7 @@ public interface ComplexValue {
             // if we are going to serialize this ComplexValue.Id, convert it back to
             // a normal Integer (in case it is restored outside of the context of
             // jackcess)
-            return Integer.valueOf(get());
+            return get();
         }
 
         /**

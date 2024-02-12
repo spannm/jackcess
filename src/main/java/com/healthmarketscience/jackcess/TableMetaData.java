@@ -26,7 +26,7 @@ import java.io.IOException;
  * @usage _intermediate_class_
  */
 public interface TableMetaData {
-    public enum Type {
+    enum Type {
         LOCAL,
         LINKED,
         LINKED_ODBC;

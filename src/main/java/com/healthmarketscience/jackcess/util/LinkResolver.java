@@ -36,16 +36,11 @@ public interface LinkResolver {
      *
      * @usage _general_field_
      */
-    LinkResolver DEFAULT = new LinkResolver() {
-        @Override
-        public Database resolveLinkedDatabase(Database linkerDb,
-            String linkeeFileName)
-            throws IOException {
-            // if linker is read-only, open linkee read-only
-            boolean readOnly = linkerDb instanceof DatabaseImpl ? ((DatabaseImpl) linkerDb).isReadOnly() : false;
-            return new DatabaseBuilder(new File(linkeeFileName))
-                .setReadOnly(readOnly).open();
-        }
+    LinkResolver DEFAULT = (linkerDb, linkeeFileName) -> {
+        // if linker is read-only, open linkee read-only
+        boolean readOnly = linkerDb instanceof DatabaseImpl ? ((DatabaseImpl) linkerDb).isReadOnly() : false;
+        return new DatabaseBuilder(new File(linkeeFileName))
+            .setReadOnly(readOnly).open();
     };
 
     /**

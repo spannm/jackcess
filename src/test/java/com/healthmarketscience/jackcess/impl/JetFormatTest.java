@@ -208,17 +208,14 @@ public class JetFormatTest extends TestCase {
 
         for (final TestDB testDB : SUPPORTED_DBS_TEST_FOR_READ) {
 
-            final FileChannel channel = DatabaseImpl.openChannel(
-                testDB.dbFile.toPath(), false, false);
-            try {
+            try (FileChannel channel = DatabaseImpl.openChannel(
+                    testDB.dbFile.toPath(), false, false)) {
 
                 JetFormat fmtActual = JetFormat.getFormat(channel);
                 assertEquals("Unexpected JetFormat for dbFile: " +
-                    testDB.dbFile.getAbsolutePath(),
-                    testDB.getExpectedFormat(), fmtActual);
+                                testDB.dbFile.getAbsolutePath(),
+                        testDB.getExpectedFormat(), fmtActual);
 
-            } finally {
-                channel.close();
             }
 
         }
@@ -260,26 +257,14 @@ public class JetFormatTest extends TestCase {
 
         for (final TestDB testDB : SUPPORTED_DBS_TEST_FOR_READ) {
 
-            Database db = null;
-            try {
-                db = open(testDB);
+            try (Database db = open(testDB)) {
                 assertEquals(testDB.getExpectedFileFormat(), db.getFileFormat());
-            } finally {
-                if (db != null) {
-                    db.close();
-                }
             }
         }
 
-        Database db = null;
-        try {
-            db = open(Database.FileFormat.GENERIC_JET4,
-                new File(DIR_TEST_DATA, "adox_jet4.mdb"));
-            assertEquals(Database.FileFormat.GENERIC_JET4, db.getFileFormat());
-        } finally {
-            if (db != null) {
-                db.close();
-            }
+        try (Database db = open(FileFormat.GENERIC_JET4,
+                new File(DIR_TEST_DATA, "adox_jet4.mdb"))) {
+            assertEquals(FileFormat.GENERIC_JET4, db.getFileFormat());
         }
     }
 

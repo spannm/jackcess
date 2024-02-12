@@ -122,13 +122,13 @@ public class ExtendedDateTest extends TestCase {
                 LocalDateTime l2 = (LocalDateTime) r2.get("extDate");
                 return l1.compareTo(l2);
             };
-            Collections.sort(expectedTable, comp);
+            expectedTable.sort(comp);
 
             Cursor c = t.newCursor().setIndexByName("idxAsc").toIndexCursor();
 
             assertCursor(expectedTable, c);
 
-            Collections.sort(expectedTable, comp.reversed());
+            expectedTable.sort(comp.reversed());
 
             c = t.newCursor().setIndexByName("idxDesc").toIndexCursor();
 

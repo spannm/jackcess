@@ -24,8 +24,6 @@ import static com.healthmarketscience.jackcess.impl.JetFormatTest.*;
 
 import com.healthmarketscience.jackcess.Database.FileFormat;
 import com.healthmarketscience.jackcess.impl.*;
-import com.healthmarketscience.jackcess.impl.JetFormatTest.Basename;
-import com.healthmarketscience.jackcess.impl.JetFormatTest.TestDB;
 import junit.framework.TestCase;
 
 import java.io.IOException;
@@ -315,9 +313,7 @@ public class IndexTest extends TestCase {
         for (int i = 0; i < testData.length; i += numValues + 1) {
             Object[] row = new Object[numValues + 1];
             row[0] = "testRow" + i;
-            for (int j = 1; j < numValues + 1; ++j) {
-                row[j] = testData[i + j - 1];
-            }
+            if (numValues + 1 - 1 >= 0) System.arraycopy(testData, i + 1 - 1, row, 1, numValues + 1 - 1);
             boolean expectedSuccess = (Boolean) testData[i + numValues];
 
             IOException failure = null;

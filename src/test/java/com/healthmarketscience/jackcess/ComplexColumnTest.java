@@ -27,6 +27,7 @@ import com.healthmarketscience.jackcess.impl.PageChannel;
 import junit.framework.TestCase;
 
 import java.nio.ByteBuffer;
+import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
@@ -195,7 +196,7 @@ public class ComplexColumnTest extends TestCase {
 
             a.setFileType("zip");
             a.setFileName("some_data.zip");
-            byte[] newBytes = "this is not a zip file".getBytes("US-ASCII");
+            byte[] newBytes = "this is not a zip file".getBytes(StandardCharsets.US_ASCII);
             a.setFileData(newBytes);
             a.update();
 
@@ -441,7 +442,7 @@ public class ComplexColumnTest extends TestCase {
 
     private static byte[] getAsciiBytes(String str) {
         try {
-            return str.getBytes("US-ASCII");
+            return str.getBytes(StandardCharsets.US_ASCII);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }

@@ -21,6 +21,7 @@ import com.healthmarketscience.jackcess.impl.ByteUtil.ByteStream;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
@@ -392,7 +393,7 @@ public class GeneralLegacyIndexCodes {
 
             reader = new BufferedReader(
                 new InputStreamReader(
-                    DatabaseImpl.getResourceAsStream(codesFilePath), "US-ASCII"));
+                    DatabaseImpl.getResourceAsStream(codesFilePath), StandardCharsets.US_ASCII));
 
             int start = asUnsignedChar(firstChar);
             int end = asUnsignedChar(lastChar);

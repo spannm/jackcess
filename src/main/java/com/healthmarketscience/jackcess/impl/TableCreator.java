@@ -273,7 +273,7 @@ public class TableCreator extends TableMutator {
 
             // now, validate the indexes
             Set<String> idxNames = new HashSet<>();
-            boolean foundPk[] = new boolean[1];
+            boolean[] foundPk = new boolean[1];
             for (IndexBuilder index : _indexes) {
                 validateIndex(colNames, idxNames, foundPk, index);
             }

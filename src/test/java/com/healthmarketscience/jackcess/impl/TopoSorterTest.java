@@ -100,8 +100,7 @@ public class TopoSorterTest extends TestCase {
         List<String> expected,
         String... descs) {
 
-        List<String> values = new ArrayList<>();
-        values.addAll(original);
+        List<String> values = new ArrayList<>(original);
 
         TestTopoSorter tsorter = new TestTopoSorter(values, false);
         for (int i = 0; i < descs.length; i += 2) {
@@ -112,8 +111,7 @@ public class TopoSorterTest extends TestCase {
 
         assertEquals(expected, values);
 
-        values = new ArrayList<>();
-        values.addAll(original);
+        values = new ArrayList<>(original);
 
         tsorter = new TestTopoSorter(values, true);
         for (int i = 0; i < descs.length; i += 2) {
@@ -137,11 +135,7 @@ public class TopoSorterTest extends TestCase {
         }
 
         public void addDescendents(String from, String... tos) {
-            List<String> descs = _descMap.get(from);
-            if (descs == null) {
-                descs = new ArrayList<>();
-                _descMap.put(from, descs);
-            }
+            List<String> descs = _descMap.computeIfAbsent(from, k -> new ArrayList<>());
 
             descs.addAll(Arrays.asList(tos));
         }

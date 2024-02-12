@@ -76,22 +76,12 @@ public class TableImpl implements Table, PropertyMaps.Owner {
      * comparator which sorts variable length columns based on their index into the variable length offset table
      */
     private static final Comparator<ColumnImpl> VAR_LEN_COLUMN_COMPARATOR =
-        new Comparator<>() {
-                                                                                  @Override
-                                                                                  public int compare(ColumnImpl c1, ColumnImpl c2) {
-                                                                                      return c1.getVarLenTableIndex() < c2.getVarLenTableIndex() ? -1
-                                                                                          : c1.getVarLenTableIndex() > c2.getVarLenTableIndex() ? 1 : 0;
-                                                                                  }
-                                                                              };
+            (c1, c2) -> c1.getVarLenTableIndex() < c2.getVarLenTableIndex() ? -1
+                : c1.getVarLenTableIndex() > c2.getVarLenTableIndex() ? 1 : 0;
 
     /** comparator which sorts columns based on their display index */
     private static final Comparator<ColumnImpl> DISPLAY_ORDER_COMPARATOR  =
-        new Comparator<>() {
-                                                                                  @Override
-                                                                                  public int compare(ColumnImpl c1, ColumnImpl c2) {
-                                                                                      return c1.getDisplayIndex() < c2.getDisplayIndex() ? -1 : c1.getDisplayIndex() > c2.getDisplayIndex() ? 1 : 0;
-                                                                                  }
-                                                                              };
+            (c1, c2) -> c1.getDisplayIndex() < c2.getDisplayIndex() ? -1 : c1.getDisplayIndex() > c2.getDisplayIndex() ? 1 : 0;
 
     /** owning database */
     private final DatabaseImpl                  _database;
@@ -257,7 +247,7 @@ public class TableImpl implements Table, PropertyMaps.Owner {
 
         // re-sort columns if necessary
         if (getDatabase().getColumnOrder() != ColumnOrder.DATA) {
-            Collections.sort(_columns, DISPLAY_ORDER_COMPARATOR);
+            _columns.sort(DISPLAY_ORDER_COMPARATOR);
         }
 
         for (ColumnImpl col : _columns) {
@@ -1967,7 +1957,7 @@ public class TableImpl implements Table, PropertyMaps.Owner {
 
         // sort variable length columns based on their index into the variable
         // length offset table, because we will write the columns in this order
-        Collections.sort(_varColumns, VAR_LEN_COLUMN_COMPARATOR);
+        _varColumns.sort(VAR_LEN_COLUMN_COMPARATOR);
     }
 
     private void readIndexDefinitions(ByteBuffer tableBuffer) throws IOException {

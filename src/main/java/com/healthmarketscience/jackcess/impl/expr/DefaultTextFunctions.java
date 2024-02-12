@@ -336,7 +336,7 @@ public class DefaultTextFunctions {
                                                 @Override
                                                 protected Value eval1(EvalContext ctx, Value param1) {
                                                     int lv = param1.getAsLongInt(ctx);
-                                                    return ValueSupport.toValue(nchars(lv, ' '));
+                                                    return ValueSupport.toValue(" ".repeat(lv));
                                                 }
                                             });
 
@@ -412,7 +412,7 @@ public class DefaultTextFunctions {
                                                     }
                                                     int lv = param1.getAsLongInt(ctx);
                                                     char c = (char) (param2.getAsString(ctx).charAt(0) % 256);
-                                                    return ValueSupport.toValue(nchars(lv, c));
+                                                    return ValueSupport.toValue(String.valueOf(c).repeat(lv));
                                                 }
                                             });
 
@@ -445,18 +445,6 @@ public class DefaultTextFunctions {
                                                     return FormatUtil.format(ctx, expr, fmtStr, firstDay, firstWeekType);
                                                 }
                                             });
-
-    private static String nchars(int num, char c) {
-        StringBuilder sb = new StringBuilder(num);
-        nchars(sb, num, c);
-        return sb.toString();
-    }
-
-    static void nchars(StringBuilder sb, int num, char c) {
-        for (int i = 0; i < num; ++i) {
-            sb.append(c);
-        }
-    }
 
     private static String trim(String str, boolean doLeft, boolean doRight) {
         int start = 0;

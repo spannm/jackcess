@@ -133,7 +133,7 @@ public interface PropertyMap extends Iterable<PropertyMap.Property> {
     /**
      * Info about a property defined in a PropertyMap.
      */
-    public interface Property {
+    interface Property {
         String getName();
 
         DataType getType();
@@ -158,7 +158,7 @@ public interface PropertyMap extends Iterable<PropertyMap.Property> {
     /**
      * Interface for enums which can be used as property values.
      */
-    public interface EnumValue {
+    interface EnumValue {
         /**
          * @return the property value which should be stored in the db
          */
@@ -168,7 +168,7 @@ public interface PropertyMap extends Iterable<PropertyMap.Property> {
     /**
      * Enum value constants for the DisplayControl property
      */
-    public enum DisplayControl implements EnumValue {
+    enum DisplayControl implements EnumValue {
         BOUND_OBJECT_FRAME(108),
         CHECK_BOX(106),
         COMBO_BOX(111),
@@ -213,7 +213,7 @@ public interface PropertyMap extends Iterable<PropertyMap.Property> {
     /**
      * Enum value constants for the TextFormat property
      */
-    public enum TextFormat implements EnumValue {
+    enum TextFormat implements EnumValue {
         HTMLRICHTEXT(1),
         PLAIN(0);
 
@@ -237,7 +237,7 @@ public interface PropertyMap extends Iterable<PropertyMap.Property> {
     /**
      * Enum value constants for the IMEMode property
      */
-    public enum IMEMode implements EnumValue {
+    enum IMEMode implements EnumValue {
         NOCONTROL(0),
         ON(1),
         OFF(2),
@@ -270,7 +270,7 @@ public interface PropertyMap extends Iterable<PropertyMap.Property> {
     /**
      * Enum value constants for the IMESentenceMode property
      */
-    public enum IMESentenceMode implements EnumValue {
+    enum IMESentenceMode implements EnumValue {
         NORMAL(0),
         PLURAL(1),
         SPEAKING(2),

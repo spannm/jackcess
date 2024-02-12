@@ -363,13 +363,7 @@ public class IndexImpl implements Index, Comparable<IndexImpl> {
 
     @Override
     public int compareTo(IndexImpl other) {
-        if (_indexNumber > other.getIndexNumber()) {
-            return 1;
-        } else if (_indexNumber < other.getIndexNumber()) {
-            return -1;
-        } else {
-            return 0;
-        }
+        return Integer.compare(_indexNumber, other.getIndexNumber());
     }
 
     /**

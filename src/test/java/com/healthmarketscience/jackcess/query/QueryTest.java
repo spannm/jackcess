@@ -594,11 +594,7 @@ public class QueryTest extends TestCase {
     }
 
     private static void removeRows(Query query, Byte attr) {
-        for (Iterator<Row> iter = ((QueryImpl) query).getRows().iterator(); iter.hasNext();) {
-            if (attr.equals(iter.next().attribute)) {
-                iter.remove();
-            }
-        }
+        ((QueryImpl) query).getRows().removeIf(row -> attr.equals(row.attribute));
     }
 
     private static void removeLastRows(Query query, int num) {

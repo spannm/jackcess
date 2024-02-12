@@ -74,7 +74,7 @@ public abstract class ComplexValueForeignKey extends Number {
         // if we are going to serialize this ComplexValueForeignKey, convert it
         // back to a normal Integer (in case it is restored outside of the context
         // of jackcess)
-        return Integer.valueOf(get());
+        return get();
     }
 
     @Override

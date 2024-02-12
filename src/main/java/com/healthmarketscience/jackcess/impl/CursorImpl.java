@@ -891,7 +891,7 @@ public abstract class CursorImpl implements Cursor {
     /**
      * Handles moving the cursor in a given direction. Separates cursor logic from value storage.
      */
-    protected abstract class DirHandler {
+    protected abstract static class DirHandler {
         public abstract PositionImpl getBeginningPosition();
 
         public abstract PositionImpl getEndPosition();

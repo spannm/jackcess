@@ -227,7 +227,7 @@ public class TableUpdater extends TableMutator {
                     getFormat().MAX_INDEXES_PER_TABLE + " indexes"));
         }
 
-        boolean foundPk[] = new boolean[1];
+        boolean[] foundPk = new boolean[1];
         Set<String> idxNames = getIndexNames(_table, foundPk);
         // next, validate the index definition
         validateIndex(getColumnNames(), idxNames, foundPk, _index);
