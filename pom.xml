@@ -100,7 +100,6 @@
 
         <dep.junit.version>4.13.2</dep.junit.version>
 
-        <dep.plugin.maven-bundle-plugin.version>5.1.9</dep.plugin.maven-bundle-plugin.version>
         <dep.plugin.sortpom.version>3.3.0</dep.plugin.sortpom.version>
 
         <basepom.check.skip-checkstyle>true</basepom.check.skip-checkstyle>
@@ -206,45 +205,15 @@
         <plugins>
 
             <plugin>
-                <groupId>org.apache.felix</groupId>
-                <artifactId>maven-bundle-plugin</artifactId>
-                <version>${dep.plugin.maven-bundle-plugin.version}</version>
-                <extensions>true</extensions>
-                <configuration>
-                    <instructions>
-                        <Automatic-Module-Name>com.healthmarketscience.jackcess</Automatic-Module-Name>
-                    </instructions>
-                </configuration>
-                <executions>
-                    <execution>
-                        <id>bundle-manifest</id>
-                        <goals>
-                            <goal>manifest</goal>
-                        </goals>
-                        <phase>process-classes</phase>
-                    </execution>
-                </executions>
-            </plugin>
-
-            <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-jar-plugin</artifactId>
                 <configuration>
                     <archive>
-                        <manifestFile>${project.build.outputDirectory}/META-INF/MANIFEST.MF</manifestFile>
+                        <manifestEntries>
+                            <Automatic-Module-Name>com.healthmarketscience.jackcess</Automatic-Module-Name>
+                        </manifestEntries>
                     </archive>
                 </configuration>
-                <executions>
-                    <execution>
-                        <id>build-test-jar</id>
-                        <goals>
-                            <goal>test-jar</goal>
-                        </goals>
-                        <configuration>
-                            <archive combine.self="override"/>
-                        </configuration>
-                    </execution>
-                </executions>
             </plugin>
 
         </plugins>
