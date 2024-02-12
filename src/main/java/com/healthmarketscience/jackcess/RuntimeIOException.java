@@ -23,17 +23,14 @@ import java.io.IOException;
  *
  * @author James Ahlborn
  */
-public class RuntimeIOException extends IllegalStateException 
-{
-  private static final long serialVersionUID = 20130315L;  
+public class RuntimeIOException extends IllegalStateException {
+    private static final long serialVersionUID = 20130315L;
 
-  public RuntimeIOException(IOException e) 
-  {
-    this(((e != null) ? e.getMessage() : null), e);
-  }
+    public RuntimeIOException(IOException e) {
+        this(e != null ? e.getMessage() : null, e);
+    }
 
-  public RuntimeIOException(String msg, IOException e) 
-  {
-    super(msg, e);
-  }
+    public RuntimeIOException(String msg, IOException e) {
+        super(msg, e);
+    }
 }

@@ -26,19 +26,17 @@ import com.healthmarketscience.jackcess.Table;
  * @usage _intermediate_class_
  */
 @FunctionalInterface
-public interface ColumnMatcher
-{
+public interface ColumnMatcher {
 
-  /**
-   * Returns {@code true} if the given value1 should be considered a match for
-   * the given value2 for the given column in the given table, {@code false}
-   * otherwise.
-   *
-   * @param table the relevant table
-   * @param columnName the name of the relevant column within the table
-   * @param value1 the first value to match (may be {@code null})
-   * @param value2 the second value to match (may be {@code null})
-   */
-  public boolean matches(Table table, String columnName, Object value1,
-                         Object value2);
+    /**
+     * Returns {@code true} if the given value1 should be considered a match for the given value2 for the given column
+     * in the given table, {@code false} otherwise.
+     *
+     * @param table the relevant table
+     * @param columnName the name of the relevant column within the table
+     * @param value1 the first value to match (may be {@code null})
+     * @param value2 the second value to match (may be {@code null})
+     */
+    boolean matches(Table table, String columnName, Object value1,
+        Object value2);
 }

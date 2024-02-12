@@ -16,29 +16,28 @@ limitations under the License.
 
 package com.healthmarketscience.jackcess.impl.query;
 
-import java.util.List;
 import com.healthmarketscience.jackcess.query.DeleteQuery;
 
+import java.util.List;
 
 /**
- * Concrete Query subclass which represents a delete query, e.g.:
- * {@code DELETE * FROM <table> WHERE <expression>}
+ * Concrete Query subclass which represents a delete query, e.g.: {@code DELETE * FROM 
+ * <table>
+ *  WHERE <expression>}
  *
  * @author James Ahlborn
  */
-public class DeleteQueryImpl extends BaseSelectQueryImpl implements DeleteQuery
-{
+public class DeleteQueryImpl extends BaseSelectQueryImpl implements DeleteQuery {
 
-  public DeleteQueryImpl(String name, List<Row> rows, int objectId, 
-                         int objectFlag) {
-    super(name, rows, objectId, objectFlag, Type.DELETE);
-  }
+    public DeleteQueryImpl(String name, List<Row> rows, int objectId,
+        int objectFlag) {
+        super(name, rows, objectId, objectFlag, Type.DELETE);
+    }
 
-  @Override
-  protected void toSQLString(StringBuilder builder)
-  {
-    builder.append("DELETE ");
-    toSQLSelectString(builder, false);
-  }
+    @Override
+    protected void toSQLString(StringBuilder builder) {
+        builder.append("DELETE ");
+        toSQLSelectString(builder, false);
+    }
 
 }

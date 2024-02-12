@@ -21,39 +21,33 @@ import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 
 /**
- * LocaleContext encapsulates all shared localization state for expression
- * parsing and evaluation.
+ * LocaleContext encapsulates all shared localization state for expression parsing and evaluation.
  *
  * @author James Ahlborn
  */
-public interface LocaleContext
-{
-  /**
-   * @return the currently configured TemporalConfig (from the
-   *         {@link EvalConfig})
-   */
-  public TemporalConfig getTemporalConfig();
+public interface LocaleContext {
+    /**
+     * @return the currently configured TemporalConfig (from the {@link EvalConfig})
+     */
+    TemporalConfig getTemporalConfig();
 
-  /**
-   * @return an appropriately configured (i.e. locale) DateTimeFormatter for
-   *         the given format.
-   */
-  public DateTimeFormatter createDateFormatter(String formatStr);
+    /**
+     * @return an appropriately configured (i.e. locale) DateTimeFormatter for the given format.
+     */
+    DateTimeFormatter createDateFormatter(String formatStr);
 
-  /**
-   * @return the currently configured ZoneId
-   */
-  public ZoneId getZoneId();
+    /**
+     * @return the currently configured ZoneId
+     */
+    ZoneId getZoneId();
 
-  /**
-   * @return the currently configured NumericConfig (from the
-   *         {@link EvalConfig})
-   */
-  public NumericConfig getNumericConfig();
+    /**
+     * @return the currently configured NumericConfig (from the {@link EvalConfig})
+     */
+    NumericConfig getNumericConfig();
 
-  /**
-   * @return an appropriately configured (i.e. DecimalFormatSymbols)
-   *         DecimalFormat for the given format.
-   */
-  public DecimalFormat createDecimalFormat(String formatStr);
+    /**
+     * @return an appropriately configured (i.e. DecimalFormatSymbols) DecimalFormat for the given format.
+     */
+    DecimalFormat createDecimalFormat(String formatStr);
 }

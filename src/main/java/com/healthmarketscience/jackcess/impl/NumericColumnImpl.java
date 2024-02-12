@@ -24,29 +24,27 @@ import java.io.IOException;
  * @author James Ahlborn
  * @usage _advanced_class_
  */
-class NumericColumnImpl extends ColumnImpl 
-{
-  /** Numeric precision */
-  private final byte _precision;
-  /** Numeric scale */
-  private final byte _scale;
+class NumericColumnImpl extends ColumnImpl {
+    /** Numeric precision */
+    private final byte _precision;
+    /** Numeric scale */
+    private final byte _scale;
 
-  NumericColumnImpl(InitArgs args) throws IOException
-  {
-    super(args);
+    NumericColumnImpl(InitArgs args) throws IOException {
+        super(args);
 
-    _precision = args.buffer.get(
-        args.offset + getFormat().OFFSET_COLUMN_PRECISION);
-    _scale = args.buffer.get(args.offset + getFormat().OFFSET_COLUMN_SCALE);
-  }
+        _precision = args.buffer.get(
+            args.offset + getFormat().OFFSET_COLUMN_PRECISION);
+        _scale = args.buffer.get(args.offset + getFormat().OFFSET_COLUMN_SCALE);
+    }
 
-  @Override
-  public byte getPrecision() {
-    return _precision;
-  }
-  
-  @Override
-  public byte getScale() {
-    return _scale;
-  }  
+    @Override
+    public byte getPrecision() {
+        return _precision;
+    }
+
+    @Override
+    public byte getScale() {
+        return _scale;
+    }
 }

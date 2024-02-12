@@ -18,20 +18,17 @@ package com.healthmarketscience.jackcess.query;
 
 import java.util.List;
 
-
 /**
- * Query interface which represents a UNION query, e.g.:
- * {@code SELECT <query1> UNION SELECT <query2>}
- * 
+ * Query interface which represents a UNION query, e.g.: {@code SELECT <query1> UNION SELECT <query2>}
+ *
  * @author James Ahlborn
  */
-public interface UnionQuery extends Query 
-{
-  public String getUnionType();
+public interface UnionQuery extends Query {
+    String getUnionType();
 
-  public String getUnionString1();
+    String getUnionString1();
 
-  public String getUnionString2();
+    String getUnionString2();
 
-  public List<String> getOrderings();
+    List<String> getOrderings();
 }

@@ -16,7 +16,6 @@ limitations under the License.
 
 package com.healthmarketscience.jackcess.impl.expr;
 
-
 import com.healthmarketscience.jackcess.expr.LocaleContext;
 import com.healthmarketscience.jackcess.expr.Value;
 
@@ -24,32 +23,30 @@ import com.healthmarketscience.jackcess.expr.Value;
  *
  * @author James Ahlborn
  */
-public abstract class BaseNumericValue extends BaseValue
-{
+public abstract class BaseNumericValue extends BaseValue {
 
-  protected BaseNumericValue()
-  {
-  }
-
-  @Override
-  public Integer getAsLongInt(LocaleContext ctx) {
-    return roundToLongInt(ctx);
-  }
-
-  @Override
-  public Double getAsDouble(LocaleContext ctx) {
-    return getNumber().doubleValue();
-  }
-
-  @Override
-  public Value getAsDateTimeValue(LocaleContext ctx) {
-    Value dateValue = DefaultDateFunctions.numberToDateValue(
-        getNumber().doubleValue());
-    if(dateValue == null) {
-      throw invalidConversion(Value.Type.DATE_TIME);
+    protected BaseNumericValue() {
     }
-    return dateValue;
-  }
 
-  protected abstract Number getNumber();
+    @Override
+    public Integer getAsLongInt(LocaleContext ctx) {
+        return roundToLongInt(ctx);
+    }
+
+    @Override
+    public Double getAsDouble(LocaleContext ctx) {
+        return getNumber().doubleValue();
+    }
+
+    @Override
+    public Value getAsDateTimeValue(LocaleContext ctx) {
+        Value dateValue = DefaultDateFunctions.numberToDateValue(
+            getNumber().doubleValue());
+        if (dateValue == null) {
+            throw invalidConversion(Value.Type.DATE_TIME);
+        }
+        return dateValue;
+    }
+
+    protected abstract Number getNumber();
 }

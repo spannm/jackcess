@@ -16,151 +16,142 @@ limitations under the License.
 
 package com.healthmarketscience.jackcess.impl;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 import junit.framework.TestCase;
+
+import java.util.*;
 
 /**
  *
  * @author James Ahlborn
  */
-public class TopoSorterTest extends TestCase
-{
+public class TopoSorterTest extends TestCase {
 
-  public TopoSorterTest(String name) {
-    super(name);
-  }
-
-  public void testTopoSort() throws Exception
-  {
-    doTopoTest(Arrays.asList("A", "B", "C"),
-               Arrays.asList("A", "B", "C"));
-
-    doTopoTest(Arrays.asList("B", "A", "C"),
-               Arrays.asList("A", "B", "C"),
-               "B", "C",
-               "A", "B");
-
-    try {
-      doTopoTest(Arrays.asList("B", "A", "C"),
-                 Arrays.asList("C", "B", "A"),
-                 "B", "C",
-                 "A", "B",
-                 "C", "A");
-      fail("IllegalStateException should have been thrown");
-    } catch(IllegalStateException expected) {
-      // success
-      assertTrue(expected.getMessage().startsWith("Cycle"));
+    public TopoSorterTest(String name) {
+        super(name);
     }
 
-    try {
-      doTopoTest(Arrays.asList("B", "A", "C"),
-                 Arrays.asList("C", "B", "A"),
-                 "B", "D");
-      fail("IllegalStateException should have been thrown");
-    } catch(IllegalStateException expected) {
-      // success
-      assertTrue(expected.getMessage().startsWith("Unknown descendent"));
+    public void testTopoSort() throws Exception {
+        doTopoTest(Arrays.asList("A", "B", "C"),
+            Arrays.asList("A", "B", "C"));
+
+        doTopoTest(Arrays.asList("B", "A", "C"),
+            Arrays.asList("A", "B", "C"),
+            "B", "C",
+            "A", "B");
+
+        try {
+            doTopoTest(Arrays.asList("B", "A", "C"),
+                Arrays.asList("C", "B", "A"),
+                "B", "C",
+                "A", "B",
+                "C", "A");
+            fail("IllegalStateException should have been thrown");
+        } catch (IllegalStateException expected) {
+            // success
+            assertTrue(expected.getMessage().startsWith("Cycle"));
+        }
+
+        try {
+            doTopoTest(Arrays.asList("B", "A", "C"),
+                Arrays.asList("C", "B", "A"),
+                "B", "D");
+            fail("IllegalStateException should have been thrown");
+        } catch (IllegalStateException expected) {
+            // success
+            assertTrue(expected.getMessage().startsWith("Unknown descendent"));
+        }
+
+        doTopoTest(Arrays.asList("B", "D", "A", "C"),
+            Arrays.asList("D", "A", "B", "C"),
+            "B", "C",
+            "A", "B");
+
+        doTopoTest(Arrays.asList("B", "D", "A", "C"),
+            Arrays.asList("A", "D", "B", "C"),
+            "B", "C",
+            "A", "B",
+            "A", "D");
+
+        doTopoTest(Arrays.asList("B", "D", "A", "C"),
+            Arrays.asList("D", "A", "C", "B"),
+            "D", "A",
+            "C", "B");
+
+        doTopoTest(Arrays.asList("B", "D", "A", "C"),
+            Arrays.asList("D", "C", "A", "B"),
+            "D", "A",
+            "C", "B",
+            "C", "A");
+
+        doTopoTest(Arrays.asList("B", "D", "A", "C"),
+            Arrays.asList("C", "D", "A", "B"),
+            "D", "A",
+            "C", "B",
+            "C", "D");
+
+        doTopoTest(Arrays.asList("B", "D", "A", "C"),
+            Arrays.asList("D", "A", "C", "B"),
+            "D", "A",
+            "C", "B",
+            "D", "B");
     }
 
-    doTopoTest(Arrays.asList("B", "D", "A", "C"),
-               Arrays.asList("D", "A", "B", "C"),
-               "B", "C",
-               "A", "B");
+    private static void doTopoTest(List<String> original,
+        List<String> expected,
+        String... descs) {
 
-    doTopoTest(Arrays.asList("B", "D", "A", "C"),
-               Arrays.asList("A", "D", "B", "C"),
-               "B", "C",
-               "A", "B",
-               "A", "D");
+        List<String> values = new ArrayList<>();
+        values.addAll(original);
 
-    doTopoTest(Arrays.asList("B", "D", "A", "C"),
-               Arrays.asList("D", "A", "C", "B"),
-               "D", "A",
-               "C", "B");
+        TestTopoSorter tsorter = new TestTopoSorter(values, false);
+        for (int i = 0; i < descs.length; i += 2) {
+            tsorter.addDescendents(descs[i], descs[i + 1]);
+        }
 
-    doTopoTest(Arrays.asList("B", "D", "A", "C"),
-               Arrays.asList("D", "C", "A", "B"),
-               "D", "A",
-               "C", "B",
-               "C", "A");
+        tsorter.sort();
 
-    doTopoTest(Arrays.asList("B", "D", "A", "C"),
-               Arrays.asList("C", "D", "A", "B"),
-               "D", "A",
-               "C", "B",
-               "C", "D");
+        assertEquals(expected, values);
 
-    doTopoTest(Arrays.asList("B", "D", "A", "C"),
-               Arrays.asList("D", "A", "C", "B"),
-               "D", "A",
-               "C", "B",
-               "D", "B");
-  }
+        values = new ArrayList<>();
+        values.addAll(original);
 
-  private static void doTopoTest(List<String> original,
-                                 List<String> expected,
-                                 String... descs) {
+        tsorter = new TestTopoSorter(values, true);
+        for (int i = 0; i < descs.length; i += 2) {
+            tsorter.addDescendents(descs[i], descs[i + 1]);
+        }
 
-    List<String> values = new ArrayList<String>();
-    values.addAll(original);
+        tsorter.sort();
 
-    TestTopoSorter tsorter = new TestTopoSorter(values, false);
-    for(int i = 0; i < descs.length; i+=2) {
-      tsorter.addDescendents(descs[i], descs[i+1]);
+        List<String> expectedReverse = new ArrayList<>(expected);
+        Collections.reverse(expectedReverse);
+
+        assertEquals(expectedReverse, values);
     }
 
-    tsorter.sort();
+    private static class TestTopoSorter extends TopoSorter<String> {
+        private final Map<String, List<String>> _descMap =
+            new HashMap<>();
 
-    assertEquals(expected, values);
+        protected TestTopoSorter(List<String> values, boolean reverse) {
+            super(values, reverse);
+        }
 
+        public void addDescendents(String from, String... tos) {
+            List<String> descs = _descMap.get(from);
+            if (descs == null) {
+                descs = new ArrayList<>();
+                _descMap.put(from, descs);
+            }
 
-    values = new ArrayList<String>();
-    values.addAll(original);
+            descs.addAll(Arrays.asList(tos));
+        }
 
-    tsorter = new TestTopoSorter(values, true);
-    for(int i = 0; i < descs.length; i+=2) {
-      tsorter.addDescendents(descs[i], descs[i+1]);
+        @Override
+        protected void getDescendents(String from, List<String> descendents) {
+            List<String> descs = _descMap.get(from);
+            if (descs != null) {
+                descendents.addAll(descs);
+            }
+        }
     }
-
-    tsorter.sort();
-
-    List<String> expectedReverse = new ArrayList<String>(expected);
-    Collections.reverse(expectedReverse);
-
-    assertEquals(expectedReverse, values);
-  }
-
-  private static class TestTopoSorter extends TopoSorter<String>
-  {
-    private final Map<String,List<String>> _descMap = 
-      new HashMap<String,List<String>>();
-
-    protected TestTopoSorter(List<String> values, boolean reverse) {
-      super(values, reverse);
-    }
-
-    public void addDescendents(String from, String... tos) {
-      List<String> descs = _descMap.get(from);
-      if(descs == null) {
-        descs = new ArrayList<String>();
-        _descMap.put(from, descs);
-      }
-
-      descs.addAll(Arrays.asList(tos));
-    }
-
-    @Override
-    protected void getDescendents(String from, List<String> descendents) {
-      List<String> descs = _descMap.get(from);
-      if(descs != null) {
-        descendents.addAll(descs);
-      }
-    }
-  }
 }

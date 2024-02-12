@@ -18,30 +18,28 @@ package com.healthmarketscience.jackcess.query;
 
 import java.util.List;
 
-
 /**
  * Base interface for queries which represent some form of SELECT statement.
- * 
+ *
  * @author James Ahlborn
  */
-public interface BaseSelectQuery extends Query 
-{
+public interface BaseSelectQuery extends Query {
 
-  public String getSelectType();
+    String getSelectType();
 
-  public List<String> getSelectColumns();
+    List<String> getSelectColumns();
 
-  public List<String> getFromTables();
+    List<String> getFromTables();
 
-  public String getFromRemoteDbPath();
+    String getFromRemoteDbPath();
 
-  public String getFromRemoteDbType();
+    String getFromRemoteDbType();
 
-  public String getWhereExpression();
+    String getWhereExpression();
 
-  public List<String> getGroupings();
+    List<String> getGroupings();
 
-  public String getHavingExpression();
+    String getHavingExpression();
 
-  public List<String> getOrderings();
+    List<String> getOrderings();
 }

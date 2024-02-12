@@ -16,43 +16,39 @@ limitations under the License.
 
 package com.healthmarketscience.jackcess.util;
 
-import java.io.IOException;
 import com.healthmarketscience.jackcess.Column;
 
+import java.io.IOException;
+
 /**
- * Simple implementation of an ErrorHandler which always returns the
- * configured object.
- * 
+ * Simple implementation of an ErrorHandler which always returns the configured object.
+ *
  * @author James Ahlborn
  * @usage _intermediate_class_
  */
-public class ReplacementErrorHandler implements ErrorHandler
-{
+public class ReplacementErrorHandler implements ErrorHandler {
 
-  private final Object _replacement;
+    private final Object _replacement;
 
-  /**
-   * Constructs a ReplacementErrorHandler which replaces all errored values
-   * with {@code null}.
-   */
-  public ReplacementErrorHandler() {
-    this(null);
-  }
+    /**
+     * Constructs a ReplacementErrorHandler which replaces all errored values with {@code null}.
+     */
+    public ReplacementErrorHandler() {
+        this(null);
+    }
 
-  /**
-   * Constructs a ReplacementErrorHandler which replaces all errored values
-   * with the given Object.
-   */
-  public ReplacementErrorHandler(Object replacement) {
-    _replacement = replacement;
-  }
+    /**
+     * Constructs a ReplacementErrorHandler which replaces all errored values with the given Object.
+     */
+    public ReplacementErrorHandler(Object replacement) {
+        _replacement = replacement;
+    }
 
-  @Override
-  public Object handleRowError(Column column, byte[] columnData,
-                               Location location, Exception error)
-    throws IOException
-  {
-    return _replacement;
-  }
+    @Override
+    public Object handleRowError(Column column, byte[] columnData,
+        Location location, Exception error)
+        throws IOException {
+        return _replacement;
+    }
 
 }

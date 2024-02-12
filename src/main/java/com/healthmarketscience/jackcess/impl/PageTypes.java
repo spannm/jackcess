@@ -18,21 +18,22 @@ package com.healthmarketscience.jackcess.impl;
 
 /**
  * Codes for page types
+ *
  * @author Tim McCune
  */
 public interface PageTypes {
-  
-  /** invalid page type */
-  public static final byte INVALID = (byte)0x00;
-  /** Data page */
-  public static final byte DATA = (byte)0x01;
-  /** Table definition page */
-  public static final byte TABLE_DEF = (byte)0x02;
-  /** intermediate index page pointing to other index pages */
-  public static final byte INDEX_NODE = (byte)0x03;
-  /** leaf index page containing actual entries */
-  public static final byte INDEX_LEAF = (byte)0x04;
-  /** Table usage map page */
-  public static final byte USAGE_MAP = (byte)0x05;
-  
+
+    /** invalid page type */
+    byte INVALID    = (byte) 0x00;
+    /** Data page */
+    byte DATA       = (byte) 0x01;
+    /** Table definition page */
+    byte TABLE_DEF  = (byte) 0x02;
+    /** intermediate index page pointing to other index pages */
+    byte INDEX_NODE = (byte) 0x03;
+    /** leaf index page containing actual entries */
+    byte INDEX_LEAF = (byte) 0x04;
+    /** Table usage map page */
+    byte USAGE_MAP  = (byte) 0x05;
+
 }

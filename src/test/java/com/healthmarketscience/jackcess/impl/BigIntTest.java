@@ -16,79 +16,76 @@ limitations under the License.
 
 package com.healthmarketscience.jackcess.impl;
 
+import static com.healthmarketscience.jackcess.DatabaseBuilder.*;
+import static com.healthmarketscience.jackcess.TestUtil.assertCursor;
+import static com.healthmarketscience.jackcess.TestUtil.create;
+import static com.healthmarketscience.jackcess.TestUtil.createExpectedRow;
+import static com.healthmarketscience.jackcess.impl.JetFormatTest.SUPPORTED_FILEFORMATS;
+
+import com.healthmarketscience.jackcess.*;
+import junit.framework.TestCase;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
-import com.healthmarketscience.jackcess.Column;
-import com.healthmarketscience.jackcess.Cursor;
-import com.healthmarketscience.jackcess.DataType;
-import com.healthmarketscience.jackcess.Database;
-import com.healthmarketscience.jackcess.Table;
-import junit.framework.TestCase;
-import static com.healthmarketscience.jackcess.TestUtil.*;
-import static com.healthmarketscience.jackcess.impl.JetFormatTest.*;
-import static com.healthmarketscience.jackcess.DatabaseBuilder.*;
-
 /**
  *
  * @author James Ahlborn
  */
-public class BigIntTest extends TestCase
-{
+public class BigIntTest extends TestCase {
 
-  public BigIntTest(String name) throws Exception {
-    super(name);
-  }
-
-  public void testBigInt() throws Exception {
-
-    for (final Database.FileFormat fileFormat : SUPPORTED_FILEFORMATS) {
-      JetFormat format = DatabaseImpl.getFileFormatDetails(fileFormat)
-        .getFormat();
-
-      if(!format.isSupportedDataType(DataType.BIG_INT)) {
-        continue;
-      }
-
-      Database db = create(fileFormat);
-
-      Table t = newTable("Test")
-        .addColumn(newColumn("id", DataType.LONG)
-                   .setAutoNumber(true))
-        .addColumn(newColumn("data1", DataType.TEXT))
-        .addColumn(newColumn("num1", DataType.BIG_INT))
-        .addIndex(newIndex("idx").addColumns("num1"))
-        .toTable(db);
-
-      long[] vals = new long[] {
-        0L, -10L, 3844L, -45309590834L, 50392084913L, 65000L, -6489273L};
-
-      List<Map<String, Object>> expectedTable =
-        new ArrayList<Map<String, Object>>();
-
-      int idx = 1;
-      for(long lng : vals) {
-        t.addRow(Column.AUTO_NUMBER, "" + lng, lng);
-
-        expectedTable.add(createExpectedRow(
-                              "id", idx++,
-                              "data1", "" + lng,
-                              "num1", lng));
-      }
-
-      Collections.sort(expectedTable, (r1, r2) -> {
-          Long l1 = (Long)r1.get("num1");
-          Long l2 = (Long)r2.get("num1");
-          return l1.compareTo(l2);
-        });
-
-      Cursor c = t.newCursor().setIndexByName("idx").toIndexCursor();
-
-      assertCursor(expectedTable, c);
-
-      db.close();
+    public BigIntTest(String name) throws Exception {
+        super(name);
     }
-  }
+
+    public void testBigInt() throws Exception {
+
+        for (final Database.FileFormat fileFormat : SUPPORTED_FILEFORMATS) {
+            JetFormat format = DatabaseImpl.getFileFormatDetails(fileFormat)
+                .getFormat();
+
+            if (!format.isSupportedDataType(DataType.BIG_INT)) {
+                continue;
+            }
+
+            Database db = create(fileFormat);
+
+            Table t = newTable("Test")
+                .addColumn(newColumn("id", DataType.LONG)
+                    .setAutoNumber(true))
+                .addColumn(newColumn("data1", DataType.TEXT))
+                .addColumn(newColumn("num1", DataType.BIG_INT))
+                .addIndex(newIndex("idx").addColumns("num1"))
+                .toTable(db);
+
+            long[] vals = new long[] {0L, -10L, 3844L, -45309590834L, 50392084913L, 65000L, -6489273L};
+
+            List<Map<String, Object>> expectedTable =
+                new ArrayList<>();
+
+            int idx = 1;
+            for (long lng : vals) {
+                t.addRow(Column.AUTO_NUMBER, "" + lng, lng);
+
+                expectedTable.add(createExpectedRow(
+                    "id", idx++,
+                    "data1", "" + lng,
+                    "num1", lng));
+            }
+
+            Collections.sort(expectedTable, (r1, r2) -> {
+                Long l1 = (Long) r1.get("num1");
+                Long l2 = (Long) r2.get("num1");
+                return l1.compareTo(l2);
+            });
+
+            Cursor c = t.newCursor().setIndexByName("idx").toIndexCursor();
+
+            assertCursor(expectedTable, c);
+
+            db.close();
+        }
+    }
 }

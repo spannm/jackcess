@@ -16,25 +16,23 @@ limitations under the License.
 
 package com.healthmarketscience.jackcess.expr;
 
-
 /**
  * Base class for exceptions thrown during expression evaluation.
  *
  * @author James Ahlborn
  */
-public class EvalException extends IllegalStateException
-{
-  private static final long serialVersionUID = 20180330L;
+public class EvalException extends IllegalStateException {
+    private static final long serialVersionUID = 20180330L;
 
-  public EvalException(String message) {
-    super(message);
-  }
+    public EvalException(String message) {
+        super(message);
+    }
 
-  public EvalException(Throwable cause) {
-    super(cause);
-  }
+    public EvalException(Throwable cause) {
+        super(cause);
+    }
 
-  public EvalException(String message, Throwable cause) {
-    super(message, cause);
-  }
+    public EvalException(String message, Throwable cause) {
+        super(message, cause);
+    }
 }

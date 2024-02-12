@@ -16,56 +16,55 @@ limitations under the License.
 
 package com.healthmarketscience.jackcess.complex;
 
+import com.healthmarketscience.jackcess.Row;
+
 import java.io.IOException;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
-
-import com.healthmarketscience.jackcess.Row;
 
 /**
  * Base class for the additional information tracked for complex columns.
  *
  * @author James Ahlborn
  */
-public interface ComplexColumnInfo<V extends ComplexValue>
-{
-  public ComplexDataType getType();
+public interface ComplexColumnInfo<V extends ComplexValue> {
+    ComplexDataType getType();
 
-  public int countValues(int complexValueFk) throws IOException;
+    int countValues(int complexValueFk) throws IOException;
 
-  public List<Row> getRawValues(int complexValueFk)
-    throws IOException;
+    List<Row> getRawValues(int complexValueFk)
+        throws IOException;
 
-  public List<Row> getRawValues(int complexValueFk,
-                                Collection<String> columnNames)
-    throws IOException;
+    List<Row> getRawValues(int complexValueFk,
+        Collection<String> columnNames)
+        throws IOException;
 
-  public List<V> getValues(ComplexValueForeignKey complexValueFk)
-    throws IOException;
+    List<V> getValues(ComplexValueForeignKey complexValueFk)
+        throws IOException;
 
-  public ComplexValue.Id addRawValue(Map<String,?> rawValue)
-    throws IOException;
+    ComplexValue.Id addRawValue(Map<String, ?> rawValue)
+        throws IOException;
 
-  public ComplexValue.Id addValue(V value) throws IOException;
+    ComplexValue.Id addValue(V value) throws IOException;
 
-  public void addValues(Collection<? extends V> values) throws IOException;
+    void addValues(Collection<? extends V> values) throws IOException;
 
-  public ComplexValue.Id updateRawValue(Row rawValue) throws IOException;
+    ComplexValue.Id updateRawValue(Row rawValue) throws IOException;
 
-  public ComplexValue.Id updateValue(V value) throws IOException;
+    ComplexValue.Id updateValue(V value) throws IOException;
 
-  public void updateValues(Collection<? extends V> values) throws IOException;
+    void updateValues(Collection<? extends V> values) throws IOException;
 
-  public void deleteRawValue(Row rawValue) throws IOException;
+    void deleteRawValue(Row rawValue) throws IOException;
 
-  public void deleteValue(V value) throws IOException;
+    void deleteValue(V value) throws IOException;
 
-  public void deleteValues(Collection<? extends V> values) throws IOException;
+    void deleteValues(Collection<? extends V> values) throws IOException;
 
-  public void deleteAllValues(int complexValueFk) throws IOException;
+    void deleteAllValues(int complexValueFk) throws IOException;
 
-  public void deleteAllValues(ComplexValueForeignKey complexValueFk)
-    throws IOException;
+    void deleteAllValues(ComplexValueForeignKey complexValueFk)
+        throws IOException;
 
 }

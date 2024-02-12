@@ -16,88 +16,85 @@ limitations under the License.
 
 package com.healthmarketscience.jackcess.util;
 
-import java.util.Iterator;
-import java.util.stream.Stream;
-import java.util.stream.StreamSupport;
-
 import com.healthmarketscience.jackcess.Database;
 import com.healthmarketscience.jackcess.Table;
 import com.healthmarketscience.jackcess.impl.DatabaseImpl;
 
+import java.util.Iterator;
+import java.util.stream.Stream;
+import java.util.stream.StreamSupport;
+
 /**
- * Builder style class for constructing a {@link Database} Iterable/Iterator
- * for {@link Table}s.  By default, normal (non-system, non-linked tables) and
- * linked tables are included and system tables are not.
+ * Builder style class for constructing a {@link Database} Iterable/Iterator for {@link Table}s. By default, normal
+ * (non-system, non-linked tables) and linked tables are included and system tables are not.
  *
  * @author James Ahlborn
  * @usage _general_class_
  */
-public class TableIterableBuilder implements Iterable<Table>
-{
-  private final Database _db;
-  private boolean _includeNormalTables = true;
-  private boolean _includeSystemTables;
-  private boolean _includeLinkedTables = true;
+public class TableIterableBuilder implements Iterable<Table> {
+    private final Database _db;
+    private boolean        _includeNormalTables = true;
+    private boolean        _includeSystemTables;
+    private boolean        _includeLinkedTables = true;
 
-  public TableIterableBuilder(Database db) {
-    _db = db;
-  }
+    public TableIterableBuilder(Database db) {
+        _db = db;
+    }
 
-  public boolean isIncludeNormalTables() {
-    return _includeNormalTables;
-  }
+    public boolean isIncludeNormalTables() {
+        return _includeNormalTables;
+    }
 
-  public boolean isIncludeSystemTables() {
-    return _includeSystemTables;
-  }
+    public boolean isIncludeSystemTables() {
+        return _includeSystemTables;
+    }
 
-  public boolean isIncludeLinkedTables() {
-    return _includeLinkedTables;
-  }
+    public boolean isIncludeLinkedTables() {
+        return _includeLinkedTables;
+    }
 
-  public TableIterableBuilder setIncludeNormalTables(boolean includeNormalTables) {
-    _includeNormalTables = includeNormalTables;
-    return this;
-  }
+    public TableIterableBuilder setIncludeNormalTables(boolean includeNormalTables) {
+        _includeNormalTables = includeNormalTables;
+        return this;
+    }
 
-  public TableIterableBuilder setIncludeSystemTables(boolean includeSystemTables) {
-    _includeSystemTables = includeSystemTables;
-    return this;
-  }
+    public TableIterableBuilder setIncludeSystemTables(boolean includeSystemTables) {
+        _includeSystemTables = includeSystemTables;
+        return this;
+    }
 
-  public TableIterableBuilder setIncludeLinkedTables(boolean includeLinkedTables) {
-    _includeLinkedTables = includeLinkedTables;
-    return this;
-  }
+    public TableIterableBuilder setIncludeLinkedTables(boolean includeLinkedTables) {
+        _includeLinkedTables = includeLinkedTables;
+        return this;
+    }
 
-  /**
-   * Convenience method to set the flags to include only non-linked (local)
-   * user tables.
-   */
-  public TableIterableBuilder withLocalUserTablesOnly() {
-    setIncludeNormalTables(true);
-    setIncludeSystemTables(false);
-    return setIncludeLinkedTables(false);
-  }
+    /**
+     * Convenience method to set the flags to include only non-linked (local) user tables.
+     */
+    public TableIterableBuilder withLocalUserTablesOnly() {
+        setIncludeNormalTables(true);
+        setIncludeSystemTables(false);
+        return setIncludeLinkedTables(false);
+    }
 
-  /**
-   * Convenience method to set the flags to include only system tables.
-   */
-  public TableIterableBuilder withSystemTablesOnly() {
-    setIncludeNormalTables(false);
-    setIncludeSystemTables(true);
-    return setIncludeLinkedTables(false);
-  }
+    /**
+     * Convenience method to set the flags to include only system tables.
+     */
+    public TableIterableBuilder withSystemTablesOnly() {
+        setIncludeNormalTables(false);
+        setIncludeSystemTables(true);
+        return setIncludeLinkedTables(false);
+    }
 
-  @Override
-  public Iterator<Table> iterator() {
-    return ((DatabaseImpl)_db).iterator(this);
-  }
+    @Override
+    public Iterator<Table> iterator() {
+        return ((DatabaseImpl) _db).iterator(this);
+    }
 
-  /**
-   * @return a Stream using the default Iterator.
-   */
-  public Stream<Table> stream() {
-    return StreamSupport.stream(spliterator(), false);
-  }
+    /**
+     * @return a Stream using the default Iterator.
+     */
+    public Stream<Table> stream() {
+        return StreamSupport.stream(spliterator(), false);
+    }
 }

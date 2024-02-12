@@ -17,17 +17,14 @@ limitations under the License.
 package com.healthmarketscience.jackcess;
 
 /**
- * JackcessException which indicates that the failure was caused by a database
- * constraint violation.
+ * JackcessException which indicates that the failure was caused by a database constraint violation.
  *
  * @author James Ahlborn
  */
-public class ConstraintViolationException extends JackcessException 
-{
-  private static final long serialVersionUID = 20131123L;  
-  
-  public ConstraintViolationException(String msg) {
-    super(msg);
-  }
-}
+public class ConstraintViolationException extends JackcessException {
+    private static final long serialVersionUID = 20131123L;
 
+    public ConstraintViolationException(String msg) {
+        super(msg);
+    }
+}

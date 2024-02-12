@@ -16,20 +16,16 @@ limitations under the License.
 
 package com.healthmarketscience.jackcess.query;
 
-
-
 /**
- * Query interface which represents an table creation query, e.g.:
- * {@code SELECT <query> INTO <newTable>}
- * 
+ * Query interface which represents an table creation query, e.g.: {@code SELECT <query> INTO <newTable>}
+ *
  * @author James Ahlborn
  */
-public interface MakeTableQuery extends BaseSelectQuery 
-{
+public interface MakeTableQuery extends BaseSelectQuery {
 
-  public String getTargetTable();
+    String getTargetTable();
 
-  public String getRemoteDbPath();
+    String getRemoteDbPath();
 
-  public String getRemoteDbType();
+    String getRemoteDbType();
 }

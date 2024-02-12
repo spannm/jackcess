@@ -21,7 +21,9 @@ package com.healthmarketscience.jackcess.complex;
  *
  * @author James Ahlborn
  */
-public enum ComplexDataType 
-{
-  ATTACHMENT, MULTI_VALUE, VERSION_HISTORY, UNSUPPORTED;
+public enum ComplexDataType {
+    ATTACHMENT,
+    MULTI_VALUE,
+    VERSION_HISTORY,
+    UNSUPPORTED;
 }

@@ -24,11 +24,10 @@ import java.util.TimeZone;
  *
  * @author James Ahlborn
  */
-interface DateTimeContext
-{
-  public ZoneId getZoneId();
+interface DateTimeContext {
+    ZoneId getZoneId();
 
-  public TimeZone getTimeZone();
+    TimeZone getTimeZone();
 
-  public ColumnImpl.DateTimeFactory getDateTimeFactory();
+    ColumnImpl.DateTimeFactory getDateTimeFactory();
 }

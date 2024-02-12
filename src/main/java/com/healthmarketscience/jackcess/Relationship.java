@@ -19,41 +19,41 @@ package com.healthmarketscience.jackcess;
 import java.util.List;
 
 /**
- * Information about a relationship between two tables in the {@link
- * Database}.
+ * Information about a relationship between two tables in the {@link Database}.
  *
  * @author James Ahlborn
  * @usage _general_class_
  */
-public interface Relationship 
-{
-  public enum JoinType {
-    INNER, LEFT_OUTER, RIGHT_OUTER;
-  }
-  
-  public String getName();
-  
-  public Table getFromTable();
+public interface Relationship {
+    public enum JoinType {
+        INNER,
+        LEFT_OUTER,
+        RIGHT_OUTER;
+    }
 
-  public List<Column> getFromColumns();
+    String getName();
 
-  public Table getToTable();
+    Table getFromTable();
 
-  public List<Column> getToColumns();
+    List<Column> getFromColumns();
 
-  public boolean isOneToOne();
+    Table getToTable();
 
-  public boolean hasReferentialIntegrity();
+    List<Column> getToColumns();
 
-  public boolean cascadeUpdates();
-  
-  public boolean cascadeDeletes();
+    boolean isOneToOne();
 
-  public boolean cascadeNullOnDelete();
+    boolean hasReferentialIntegrity();
 
-  public boolean isLeftOuterJoin();
+    boolean cascadeUpdates();
 
-  public boolean isRightOuterJoin();
+    boolean cascadeDeletes();
 
-  public JoinType getJoinType();
+    boolean cascadeNullOnDelete();
+
+    boolean isLeftOuterJoin();
+
+    boolean isRightOuterJoin();
+
+    JoinType getJoinType();
 }

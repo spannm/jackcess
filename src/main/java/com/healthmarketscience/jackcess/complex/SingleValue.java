@@ -21,9 +21,8 @@ package com.healthmarketscience.jackcess.complex;
  *
  * @author James Ahlborn
  */
-public interface SingleValue extends ComplexValue 
-{
-  public Object get();
+public interface SingleValue extends ComplexValue {
+    Object get();
 
-  public void set(Object value);
+    void set(Object value);
 }

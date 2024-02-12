@@ -23,19 +23,18 @@ import com.healthmarketscience.jackcess.impl.expr.Expressionator;
  *
  * @author James Ahlborn
  */
-public class ColDefaultValueEvalContext extends ColEvalContext
-{
-  public ColDefaultValueEvalContext(ColumnImpl col) {
-    super(col);
-  }
+public class ColDefaultValueEvalContext extends ColEvalContext {
+    public ColDefaultValueEvalContext(ColumnImpl col) {
+        super(col);
+    }
 
-  ColDefaultValueEvalContext setExpr(String exprStr) {
-    setExpr(Expressionator.Type.DEFAULT_VALUE, exprStr);
-    return this;
-  }
+    ColDefaultValueEvalContext setExpr(String exprStr) {
+        setExpr(Expressionator.Type.DEFAULT_VALUE, exprStr);
+        return this;
+    }
 
-  @Override
-  public Value.Type getResultType() {
-    return toValueType(getCol().getType());
-  }
+    @Override
+    public Value.Type getResultType() {
+        return toValueType(getCol().getType());
+    }
 }

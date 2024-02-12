@@ -18,23 +18,22 @@ package com.healthmarketscience.jackcess.query;
 
 import java.util.List;
 
-
 /**
- * Query interface which represents an append query, e.g.:
- * {@code INSERT INTO <table> VALUES (<values>)}
- * 
+ * Query interface which represents an append query, e.g.: {@code INSERT INTO 
+ * <table>
+ *  VALUES (<values>)}
+ *
  * @author James Ahlborn
  */
-public interface AppendQuery extends BaseSelectQuery 
-{
+public interface AppendQuery extends BaseSelectQuery {
 
-  public String getTargetTable();
+    String getTargetTable();
 
-  public List<String> getTargetColumns();
+    List<String> getTargetColumns();
 
-  public String getRemoteDbPath();
+    String getRemoteDbPath();
 
-  public String getRemoteDbType();
+    String getRemoteDbType();
 
-  public List<String> getValues();
+    List<String> getValues();
 }

@@ -17,22 +17,20 @@ limitations under the License.
 
 package com.healthmarketscience.jackcess.util;
 
-import java.io.IOException;
-
 import com.healthmarketscience.jackcess.Column;
 
+import java.io.IOException;
+
 /**
- * Simple concrete implementation of ColumnValidator which simply returns the
- * given value.
+ * Simple concrete implementation of ColumnValidator which simply returns the given value.
  *
  * @author James Ahlborn
  */
-public class SimpleColumnValidator implements ColumnValidator
-{
-  public static final SimpleColumnValidator INSTANCE = new SimpleColumnValidator();
-  
-  @Override
-  public Object validate(Column col, Object val) throws IOException {
-    return val;
-  }
+public class SimpleColumnValidator implements ColumnValidator {
+    public static final SimpleColumnValidator INSTANCE = new SimpleColumnValidator();
+
+    @Override
+    public Object validate(Column col, Object val) throws IOException {
+        return val;
+    }
 }

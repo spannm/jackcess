@@ -20,81 +20,75 @@ import java.io.IOException;
 import java.util.List;
 
 /**
- * Access database index definition.  A {@link Table} has a list of Index
- * instances.  Indexes can enable fast searches and ordered traversal on a
- * Table (for the indexed columns).  These features can be utilized via an
- * {@link IndexCursor}.
+ * Access database index definition. A {@link Table} has a list of Index instances. Indexes can enable fast searches and
+ * ordered traversal on a Table (for the indexed columns). These features can be utilized via an {@link IndexCursor}.
  *
  * @author James Ahlborn
  * @usage _general_class_
  */
-public interface Index 
-{
+public interface Index {
 
-  public Table getTable();
+    Table getTable();
 
-  public String getName();
+    String getName();
 
-  public boolean isPrimaryKey();
+    boolean isPrimaryKey();
 
-  public boolean isForeignKey();
+    boolean isForeignKey();
 
-  /**
-   * @usage _general_method_
-   */
-  public int getColumnCount();
+    /**
+     * @usage _general_method_
+     */
+    int getColumnCount();
 
-  /**
-   * @return the Columns for this index (unmodifiable)
-   */
-  public List<? extends Index.Column> getColumns();
+    /**
+     * @return the Columns for this index (unmodifiable)
+     */
+    List<? extends Index.Column> getColumns();
 
-  /**
-   * @return the Index referenced by this Index's ForeignKeyReference (if it
-   *         has one), otherwise {@code null}.
-   */
-  public Index getReferencedIndex() throws IOException;
+    /**
+     * @return the Index referenced by this Index's ForeignKeyReference (if it has one), otherwise {@code null}.
+     */
+    Index getReferencedIndex() throws IOException;
 
-  /**
-   * Whether or not {@code null} values are actually recorded in the index.
-   */
-  public boolean shouldIgnoreNulls();
+    /**
+     * Whether or not {@code null} values are actually recorded in the index.
+     */
+    boolean shouldIgnoreNulls();
 
-  /**
-   * Whether or not index entries must be unique.
-   * <p>
-   * Some notes about uniqueness:
-   * <ul>
-   * <li>Access does not seem to consider multiple {@code null} entries
-   *     invalid for a unique index</li>
-   * <li>text indexes collapse case, and Access seems to compare <b>only</b>
-   *     the index entry bytes, therefore two strings which differ only in
-   *     case <i>will violate</i> the unique constraint</li>
-   * </ul>
-   */
-  public boolean isUnique();
+    /**
+     * Whether or not index entries must be unique.
+     * <p>
+     * Some notes about uniqueness:
+     * <ul>
+     * <li>Access does not seem to consider multiple {@code null} entries invalid for a unique index</li>
+     * <li>text indexes collapse case, and Access seems to compare <b>only</b> the index entry bytes, therefore two
+     * strings which differ only in case <i>will violate</i> the unique constraint</li>
+     * </ul>
+     */
+    boolean isUnique();
 
-  /**
-   * Whether or not values are required for index columns.
-   */
-  public boolean isRequired();
+    /**
+     * Whether or not values are required for index columns.
+     */
+    boolean isRequired();
 
-  /**
-   * Convenience method for constructing a new CursorBuilder for this Index.
-   */
-  public CursorBuilder newCursor();
+    /**
+     * Convenience method for constructing a new CursorBuilder for this Index.
+     */
+    CursorBuilder newCursor();
 
-  /**
-   * Information about a Column in an Index
-   */
-  public interface Column {
+    /**
+     * Information about a Column in an Index
+     */
+    public interface Column {
 
-    public com.healthmarketscience.jackcess.Column getColumn();
+        com.healthmarketscience.jackcess.Column getColumn();
 
-    public boolean isAscending();
+        boolean isAscending();
 
-    public int getColumnIndex();
-    
-    public String getName();
-  }
+        int getColumnIndex();
+
+        String getName();
+    }
 }

@@ -16,7 +16,6 @@ limitations under the License.
 
 package com.healthmarketscience.jackcess.impl;
 
-
 /**
  * Various constants used for creating index entries.
  *
@@ -24,29 +23,28 @@ package com.healthmarketscience.jackcess.impl;
  */
 public class IndexCodes {
 
-  static final byte ASC_START_FLAG = (byte)0x7F;
-  static final byte ASC_NULL_FLAG = (byte)0x00;
-  static final byte DESC_START_FLAG = (byte)0x80;
-  static final byte DESC_NULL_FLAG = (byte)0xFF;
+    static final byte ASC_START_FLAG     = (byte) 0x7F;
+    static final byte ASC_NULL_FLAG      = (byte) 0x00;
+    static final byte DESC_START_FLAG    = (byte) 0x80;
+    static final byte DESC_NULL_FLAG     = (byte) 0xFF;
 
-  static final byte ASC_BOOLEAN_TRUE = (byte)0x00;
-  static final byte ASC_BOOLEAN_FALSE = (byte)0xFF;
-  
-  static final byte DESC_BOOLEAN_TRUE = ASC_BOOLEAN_FALSE;
-  static final byte DESC_BOOLEAN_FALSE = ASC_BOOLEAN_TRUE;
+    static final byte ASC_BOOLEAN_TRUE   = (byte) 0x00;
+    static final byte ASC_BOOLEAN_FALSE  = (byte) 0xFF;
 
+    static final byte DESC_BOOLEAN_TRUE  = ASC_BOOLEAN_FALSE;
+    static final byte DESC_BOOLEAN_FALSE = ASC_BOOLEAN_TRUE;
 
-  static boolean isNullEntry(byte startEntryFlag) {
-    return((startEntryFlag == ASC_NULL_FLAG) ||
-           (startEntryFlag == DESC_NULL_FLAG));
-  }
-  
-  static byte getNullEntryFlag(boolean isAscending) {
-    return(isAscending ? ASC_NULL_FLAG : DESC_NULL_FLAG);
-  }
-  
-  static byte getStartEntryFlag(boolean isAscending) {
-    return(isAscending ? ASC_START_FLAG : DESC_START_FLAG);
-  }
-  
+    static boolean isNullEntry(byte startEntryFlag) {
+        return startEntryFlag == ASC_NULL_FLAG ||
+            startEntryFlag == DESC_NULL_FLAG;
+    }
+
+    static byte getNullEntryFlag(boolean isAscending) {
+        return isAscending ? ASC_NULL_FLAG : DESC_NULL_FLAG;
+    }
+
+    static byte getStartEntryFlag(boolean isAscending) {
+        return isAscending ? ASC_START_FLAG : DESC_START_FLAG;
+    }
+
 }

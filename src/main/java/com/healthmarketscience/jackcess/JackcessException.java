@@ -23,19 +23,18 @@ import java.io.IOException;
  *
  * @author James Ahlborn
  */
-public class JackcessException extends IOException
-{
-  private static final long serialVersionUID = 20131123L;
+public class JackcessException extends IOException {
+    private static final long serialVersionUID = 20131123L;
 
-  public JackcessException(String message) {
-    super(message);
-  }
+    public JackcessException(String message) {
+        super(message);
+    }
 
-  public JackcessException(Throwable cause) {
-    super(cause);
-  }
+    public JackcessException(Throwable cause) {
+        super(cause);
+    }
 
-  public JackcessException(String message, Throwable cause) {
-    super(message, cause);
-  }
+    public JackcessException(String message, Throwable cause) {
+        super(message, cause);
+    }
 }

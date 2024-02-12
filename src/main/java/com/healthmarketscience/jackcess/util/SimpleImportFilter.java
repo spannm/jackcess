@@ -16,39 +16,37 @@ limitations under the License.
 
 package com.healthmarketscience.jackcess.util;
 
+import com.healthmarketscience.jackcess.ColumnBuilder;
+
 import java.io.IOException;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.util.List;
-import com.healthmarketscience.jackcess.ColumnBuilder;
 
 /**
- * Simple concrete implementation of ImportFilter which just returns the given
- * values.
+ * Simple concrete implementation of ImportFilter which just returns the given values.
  *
  * @author James Ahlborn
  * @usage _general_class_
  */
 public class SimpleImportFilter implements ImportFilter {
 
-  public static final SimpleImportFilter INSTANCE = new SimpleImportFilter();
-  
-  public SimpleImportFilter() {
-  }
+    public static final SimpleImportFilter INSTANCE = new SimpleImportFilter();
 
-  @Override
-  public List<ColumnBuilder> filterColumns(List<ColumnBuilder> destColumns,
-                                           ResultSetMetaData srcColumns)
-     throws SQLException, IOException
-  {
-    return destColumns;
-  }
+    public SimpleImportFilter() {
+    }
 
-  @Override
-  public Object[] filterRow(Object[] row)
-    throws SQLException, IOException
-  {
-    return row;
-  }
+    @Override
+    public List<ColumnBuilder> filterColumns(List<ColumnBuilder> destColumns,
+        ResultSetMetaData srcColumns)
+        throws SQLException, IOException {
+        return destColumns;
+    }
+
+    @Override
+    public Object[] filterRow(Object[] row)
+        throws SQLException, IOException {
+        return row;
+    }
 
 }

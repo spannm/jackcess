@@ -16,57 +16,57 @@ limitations under the License.
 
 package com.healthmarketscience.jackcess.complex;
 
+import com.healthmarketscience.jackcess.DateTimeType;
+
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.Date;
-import com.healthmarketscience.jackcess.DateTimeType;
 
 /**
  * Complex value corresponding to an attachment.
  *
  * @author James Ahlborn
  */
-public interface Attachment extends ComplexValue
-{
-  public byte[] getFileData() throws IOException;
+public interface Attachment extends ComplexValue {
+    byte[] getFileData() throws IOException;
 
-  public void setFileData(byte[] data);
+    void setFileData(byte[] data);
 
-  public byte[] getEncodedFileData() throws IOException;
+    byte[] getEncodedFileData() throws IOException;
 
-  public void setEncodedFileData(byte[] data);
+    void setEncodedFileData(byte[] data);
 
-  public String getFileName();
+    String getFileName();
 
-  public void setFileName(String fileName);
+    void setFileName(String fileName);
 
-  public String getFileUrl();
+    String getFileUrl();
 
-  public void setFileUrl(String fileUrl);
+    void setFileUrl(String fileUrl);
 
-  public String getFileType();
+    String getFileType();
 
-  public void setFileType(String fileType);
+    void setFileType(String fileType);
 
-  /**
-   * @deprecated see {@link DateTimeType} for details
-   */
-  @Deprecated
-  public Date getFileTimeStamp();
+    /**
+     * @deprecated see {@link DateTimeType} for details
+     */
+    @Deprecated
+    Date getFileTimeStamp();
 
-  /**
-   * @deprecated see {@link DateTimeType} for details
-   */
-  @Deprecated
-  public void setFileTimeStamp(Date fileTimeStamp);
+    /**
+     * @deprecated see {@link DateTimeType} for details
+     */
+    @Deprecated
+    void setFileTimeStamp(Date fileTimeStamp);
 
-  public LocalDateTime getFileLocalTimeStamp();
+    LocalDateTime getFileLocalTimeStamp();
 
-  public void setFileLocalTimeStamp(LocalDateTime fileTimeStamp);
+    void setFileLocalTimeStamp(LocalDateTime fileTimeStamp);
 
-  public Object getFileTimeStampObject();
+    Object getFileTimeStampObject();
 
-  public Integer getFileFlags();
+    Integer getFileFlags();
 
-  public void setFileFlags(Integer fileFlags);
+    void setFileFlags(Integer fileFlags);
 }

@@ -16,55 +16,49 @@ limitations under the License.
 
 package com.healthmarketscience.jackcess.util;
 
-import java.io.IOException;
-
 import com.healthmarketscience.jackcess.Column;
 import com.healthmarketscience.jackcess.impl.ByteUtil;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import java.io.IOException;
+
 /**
- * Implementation of ErrorHandler which is useful for generating debug
- * information about bad row data (great for bug reports!).  After logging a
- * debug entry for the failed column, it will return some sort of replacement
- * value, see {@link ReplacementErrorHandler}.
- * 
+ * Implementation of ErrorHandler which is useful for generating debug information about bad row data (great for bug
+ * reports!). After logging a debug entry for the failed column, it will return some sort of replacement value, see
+ * {@link ReplacementErrorHandler}.
+ *
  * @author James Ahlborn
  * @usage _general_class_
  */
-public class DebugErrorHandler extends ReplacementErrorHandler
-{
-  private static final Log LOG = LogFactory.getLog(DebugErrorHandler.class); 
+public class DebugErrorHandler extends ReplacementErrorHandler {
+    private static final Log LOG = LogFactory.getLog(DebugErrorHandler.class);
 
-  /**
-   * Constructs a DebugErrorHandler which replaces all errored values with
-   * {@code null}.
-   */
-  public DebugErrorHandler() {
-  }
-
-  /**
-   * Constructs a DebugErrorHandler which replaces all errored values with the
-   * given Object.
-   */
-  public DebugErrorHandler(Object replacement) {
-    super(replacement);
-  }
-
-  @Override
-  public Object handleRowError(Column column, byte[] columnData, 
-                               Location location, Exception error)
-    throws IOException
-  {
-    if(LOG.isDebugEnabled()) {
-      LOG.debug("Failed reading column " + column + ", row " +
-                location + ", bytes " +
-                ((columnData != null) ?
-                 ByteUtil.toHexString(columnData) : "null"),
-                error);
+    /**
+     * Constructs a DebugErrorHandler which replaces all errored values with {@code null}.
+     */
+    public DebugErrorHandler() {
     }
 
-    return super.handleRowError(column, columnData, location, error);
-  }
+    /**
+     * Constructs a DebugErrorHandler which replaces all errored values with the given Object.
+     */
+    public DebugErrorHandler(Object replacement) {
+        super(replacement);
+    }
+
+    @Override
+    public Object handleRowError(Column column, byte[] columnData,
+        Location location, Exception error)
+        throws IOException {
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Failed reading column " + column + ", row " +
+                location + ", bytes " +
+                (columnData != null ? ByteUtil.toHexString(columnData) : "null"),
+                error);
+        }
+
+        return super.handleRowError(column, columnData, location, error);
+    }
 
 }

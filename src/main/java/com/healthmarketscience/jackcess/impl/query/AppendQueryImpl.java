@@ -16,93 +16,96 @@ limitations under the License.
 
 package com.healthmarketscience.jackcess.impl.query;
 
-import java.util.List;
+import static com.healthmarketscience.jackcess.impl.query.QueryFormat.APPEND_VALUE_FLAG;
+import static com.healthmarketscience.jackcess.impl.query.QueryFormat.NEWLINE;
 
-import static com.healthmarketscience.jackcess.impl.query.QueryFormat.*;
 import com.healthmarketscience.jackcess.query.AppendQuery;
 
+import java.util.List;
 
 /**
- * Concrete Query subclass which represents an append query, e.g.:
- * {@code INSERT INTO <table> VALUES (<values>)}
- * 
+ * Concrete Query subclass which represents an append query, e.g.: {@code INSERT INTO 
+ * <table>
+ *  VALUES (<values>)}
+ *
  * @author James Ahlborn
  */
-public class AppendQueryImpl extends BaseSelectQueryImpl implements AppendQuery
-{
+public class AppendQueryImpl extends BaseSelectQueryImpl implements AppendQuery {
 
-  public AppendQueryImpl(String name, List<Row> rows, int objectId, 
-                         int objectFlag) {
-    super(name, rows, objectId, objectFlag, Type.APPEND);
-  }
-
-  @Override
-  public String getTargetTable() {
-    return getTypeRow().name1;
-  }
-
-  @Override
-  public List<String> getTargetColumns() {
-    return new RowFormatter(getTargetRows()) {
-        @Override protected void format(StringBuilder builder, Row row) {
-          toOptionalQuotedExpr(builder, row.name2, true);
-        }
-      }.format();
-  }
-
-  @Override
-  public String getRemoteDbPath() {
-    return getTypeRow().name2;
-  }
-
-  @Override
-  public String getRemoteDbType() {
-    return getTypeRow().expression;
-  }
-
-  @Override
-  public List<String> getValues() {
-    return new RowFormatter(getValueRows()) {
-        @Override protected void format(StringBuilder builder, Row row) {
-          builder.append(row.expression);
-        }
-      }.format();
-  }
-
-  protected List<Row> getValueRows() {
-    return filterRowsByFlag(super.getColumnRows(), APPEND_VALUE_FLAG);
-  }
-
-  @Override
-  protected List<Row> getColumnRows() {
-    return filterRowsByNotFlag(super.getColumnRows(), APPEND_VALUE_FLAG);
-  }
-
-  protected List<Row> getTargetRows() {
-    return new RowFilter() {
-        @Override protected boolean keep(Row row) {
-          return (row.name2 != null);
-        }      
-    }.filter(super.getColumnRows());
-  }
-
-  @Override
-  protected void toSQLString(StringBuilder builder)
-  {
-    builder.append("INSERT INTO ");
-    toOptionalQuotedExpr(builder, getTargetTable(), true);
-    List<String> columns = getTargetColumns();
-    if(!columns.isEmpty()) {
-      builder.append(" (").append(columns).append(')');
+    public AppendQueryImpl(String name, List<Row> rows, int objectId,
+        int objectFlag) {
+        super(name, rows, objectId, objectFlag, Type.APPEND);
     }
-    toRemoteDb(builder, getRemoteDbPath(), getRemoteDbType());
-    builder.append(NEWLINE);
-    List<String> values = getValues();
-    if(!values.isEmpty()) {
-      builder.append("VALUES (").append(values).append(')');
-    } else {
-      toSQLSelectString(builder, true);
+
+    @Override
+    public String getTargetTable() {
+        return getTypeRow().name1;
     }
-  }
-  
+
+    @Override
+    public List<String> getTargetColumns() {
+        return new RowFormatter(getTargetRows()) {
+            @Override
+            protected void format(StringBuilder builder, Row row) {
+                toOptionalQuotedExpr(builder, row.name2, true);
+            }
+        }.format();
+    }
+
+    @Override
+    public String getRemoteDbPath() {
+        return getTypeRow().name2;
+    }
+
+    @Override
+    public String getRemoteDbType() {
+        return getTypeRow().expression;
+    }
+
+    @Override
+    public List<String> getValues() {
+        return new RowFormatter(getValueRows()) {
+            @Override
+            protected void format(StringBuilder builder, Row row) {
+                builder.append(row.expression);
+            }
+        }.format();
+    }
+
+    protected List<Row> getValueRows() {
+        return filterRowsByFlag(super.getColumnRows(), APPEND_VALUE_FLAG);
+    }
+
+    @Override
+    protected List<Row> getColumnRows() {
+        return filterRowsByNotFlag(super.getColumnRows(), APPEND_VALUE_FLAG);
+    }
+
+    protected List<Row> getTargetRows() {
+        return new RowFilter() {
+            @Override
+            protected boolean keep(Row row) {
+                return row.name2 != null;
+            }
+        }.filter(super.getColumnRows());
+    }
+
+    @Override
+    protected void toSQLString(StringBuilder builder) {
+        builder.append("INSERT INTO ");
+        toOptionalQuotedExpr(builder, getTargetTable(), true);
+        List<String> columns = getTargetColumns();
+        if (!columns.isEmpty()) {
+            builder.append(" (").append(columns).append(')');
+        }
+        toRemoteDb(builder, getRemoteDbPath(), getRemoteDbType());
+        builder.append(NEWLINE);
+        List<String> values = getValues();
+        if (!values.isEmpty()) {
+            builder.append("VALUES (").append(values).append(')');
+        } else {
+            toSQLSelectString(builder, true);
+        }
+    }
+
 }

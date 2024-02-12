@@ -16,8 +16,6 @@ limitations under the License.
 
 package com.healthmarketscience.jackcess.impl;
 
-import java.io.IOException;
-
 import com.healthmarketscience.jackcess.Column;
 import com.healthmarketscience.jackcess.InvalidValueException;
 import com.healthmarketscience.jackcess.expr.EvalException;
@@ -26,70 +24,71 @@ import com.healthmarketscience.jackcess.expr.Value;
 import com.healthmarketscience.jackcess.impl.expr.Expressionator;
 import com.healthmarketscience.jackcess.util.ColumnValidator;
 
+import java.io.IOException;
+
 /**
  *
  * @author James Ahlborn
  */
-public class ColValidatorEvalContext extends ColEvalContext
-{
-  private String _helpStr;
-  private Object _val;
+public class ColValidatorEvalContext extends ColEvalContext {
+    private String _helpStr;
+    private Object _val;
 
-  public ColValidatorEvalContext(ColumnImpl col) {
-    super(col);
-  }
-
-  ColValidatorEvalContext setExpr(String exprStr, String helpStr) {
-    setExpr(Expressionator.Type.FIELD_VALIDATOR, exprStr);
-    _helpStr = helpStr;
-    return this;
-  }
-
-  ColumnValidator toColumnValidator(ColumnValidator delegate) {
-    return new InternalColumnValidator(delegate) {
-      @Override
-      protected Object internalValidate(Column col, Object val)
-        throws IOException {
-        return ColValidatorEvalContext.this.validate(val);
-      }
-      @Override
-      protected void appendToString(StringBuilder sb) {
-        sb.append("expression=").append(ColValidatorEvalContext.this);
-      }
-    };
-  }
-
-  private void reset() {
-    _val = null;
-  }
-
-  @Override
-  public Value getThisColumnValue() {
-    return toValue(_val);
-  }
-
-  @Override
-  public Value getIdentifierValue(Identifier identifier) {
-    // col validators can only get "this" column, but they can refer to it by
-    // name
-    if(!getCol().isThisColumn(identifier)) {
-      throw new EvalException("Cannot access other fields for " + identifier);
+    public ColValidatorEvalContext(ColumnImpl col) {
+        super(col);
     }
-    return getThisColumnValue();
-  }
 
-  private Object validate(Object val) throws IOException {
-    try {
-      _val = val;
-      Boolean result = (Boolean)eval();
-      if(!result) {
-        String msg = ((_helpStr != null) ? _helpStr :
-                      "Invalid column value '" + val + "'");
-        throw new InvalidValueException(withErrorContext(msg));
-      }
-      return val;
-    } finally {
-      reset();
+    ColValidatorEvalContext setExpr(String exprStr, String helpStr) {
+        setExpr(Expressionator.Type.FIELD_VALIDATOR, exprStr);
+        _helpStr = helpStr;
+        return this;
     }
-  }
+
+    ColumnValidator toColumnValidator(ColumnValidator delegate) {
+        return new InternalColumnValidator(delegate) {
+            @Override
+            protected Object internalValidate(Column col, Object val)
+                throws IOException {
+                return ColValidatorEvalContext.this.validate(val);
+            }
+
+            @Override
+            protected void appendToString(StringBuilder sb) {
+                sb.append("expression=").append(ColValidatorEvalContext.this);
+            }
+        };
+    }
+
+    private void reset() {
+        _val = null;
+    }
+
+    @Override
+    public Value getThisColumnValue() {
+        return toValue(_val);
+    }
+
+    @Override
+    public Value getIdentifierValue(Identifier identifier) {
+        // col validators can only get "this" column, but they can refer to it by
+        // name
+        if (!getCol().isThisColumn(identifier)) {
+            throw new EvalException("Cannot access other fields for " + identifier);
+        }
+        return getThisColumnValue();
+    }
+
+    private Object validate(Object val) throws IOException {
+        try {
+            _val = val;
+            Boolean result = (Boolean) eval();
+            if (!result) {
+                String msg = _helpStr != null ? _helpStr : "Invalid column value '" + val + "'";
+                throw new InvalidValueException(withErrorContext(msg));
+            }
+            return val;
+        } finally {
+            reset();
+        }
+    }
 }

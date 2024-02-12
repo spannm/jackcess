@@ -16,12 +16,12 @@ limitations under the License.
 
 package com.healthmarketscience.jackcess.util;
 
-import java.io.File;
-import java.io.IOException;
-
 import com.healthmarketscience.jackcess.Database;
 import com.healthmarketscience.jackcess.DatabaseBuilder;
 import com.healthmarketscience.jackcess.impl.DatabaseImpl;
+
+import java.io.File;
+import java.io.IOException;
 
 /**
  * Resolver for linked databases.
@@ -30,30 +30,27 @@ import com.healthmarketscience.jackcess.impl.DatabaseImpl;
  * @usage _intermediate_class_
  */
 @FunctionalInterface
-public interface LinkResolver
-{
-  /**
-   * default link resolver used if none provided
-   * @usage _general_field_
-   */
-  public static final LinkResolver DEFAULT = new LinkResolver() {
-      @Override
-      public Database resolveLinkedDatabase(Database linkerDb,
-                                            String linkeeFileName)
-        throws IOException
-      {
-        // if linker is read-only, open linkee read-only
-        boolean readOnly = ((linkerDb instanceof DatabaseImpl) ?
-                            ((DatabaseImpl)linkerDb).isReadOnly() : false);
-        return new DatabaseBuilder(new File(linkeeFileName))
-          .setReadOnly(readOnly).open();
-      }
+public interface LinkResolver {
+    /**
+     * default link resolver used if none provided
+     *
+     * @usage _general_field_
+     */
+    LinkResolver DEFAULT = new LinkResolver() {
+        @Override
+        public Database resolveLinkedDatabase(Database linkerDb,
+            String linkeeFileName)
+            throws IOException {
+            // if linker is read-only, open linkee read-only
+            boolean readOnly = linkerDb instanceof DatabaseImpl ? ((DatabaseImpl) linkerDb).isReadOnly() : false;
+            return new DatabaseBuilder(new File(linkeeFileName))
+                .setReadOnly(readOnly).open();
+        }
     };
 
-  /**
-   * Returns the appropriate Database instance for the linkeeFileName from the
-   * given linkerDb.
-   */
-  public Database resolveLinkedDatabase(Database linkerDb, String linkeeFileName)
-    throws IOException;
+    /**
+     * Returns the appropriate Database instance for the linkeeFileName from the given linkerDb.
+     */
+    Database resolveLinkedDatabase(Database linkerDb, String linkeeFileName)
+        throws IOException;
 }

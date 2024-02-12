@@ -16,41 +16,39 @@ limitations under the License.
 
 package com.healthmarketscience.jackcess.impl.query;
 
-import java.util.List;
 import com.healthmarketscience.jackcess.query.DataDefinitionQuery;
 
+import java.util.List;
 
 /**
  * Concrete Query subclass which represents a DDL query.
- * 
+ *
  * @author James Ahlborn
  */
-public class DataDefinitionQueryImpl extends QueryImpl 
-  implements DataDefinitionQuery
-{
+public class DataDefinitionQueryImpl extends QueryImpl
+    implements DataDefinitionQuery {
 
-  public DataDefinitionQueryImpl(String name, List<Row> rows, int objectId, 
-                                 int objectFlag) {
-    super(name, rows, objectId, objectFlag, Type.DATA_DEFINITION);
-  }
-
-  @Override
-  public String getDDLString() {
-    return getTypeRow().expression;
-  }
-
-  @Override
-  protected boolean supportsStandardClauses() {
-    return false;
-  }
-
-  @Override
-  protected void toSQLString(StringBuilder builder)
-  {
-    String ddl = getDDLString();
-    if(ddl != null) {
-      builder.append(ddl);
+    public DataDefinitionQueryImpl(String name, List<Row> rows, int objectId,
+        int objectFlag) {
+        super(name, rows, objectId, objectFlag, Type.DATA_DEFINITION);
     }
-  }
+
+    @Override
+    public String getDDLString() {
+        return getTypeRow().expression;
+    }
+
+    @Override
+    protected boolean supportsStandardClauses() {
+        return false;
+    }
+
+    @Override
+    protected void toSQLString(StringBuilder builder) {
+        String ddl = getDDLString();
+        if (ddl != null) {
+            builder.append(ddl);
+        }
+    }
 
 }

@@ -20,17 +20,14 @@ package com.healthmarketscience.jackcess.util;
 import com.healthmarketscience.jackcess.Column;
 
 /**
- * Factory which generates appropriate ColumnValidators when Column instances
- * are created.
+ * Factory which generates appropriate ColumnValidators when Column instances are created.
  *
  * @author James Ahlborn
  */
 @FunctionalInterface
-public interface ColumnValidatorFactory
-{
-  /**
-   * Returns a ColumnValidator instance for the given column, or {@code null}
-   * if the default should be used.
-   */
-  public ColumnValidator createValidator(Column col);
+public interface ColumnValidatorFactory {
+    /**
+     * Returns a ColumnValidator instance for the given column, or {@code null} if the default should be used.
+     */
+    ColumnValidator createValidator(Column col);
 }

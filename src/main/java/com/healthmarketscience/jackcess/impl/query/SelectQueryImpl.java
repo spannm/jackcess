@@ -16,28 +16,26 @@ limitations under the License.
 
 package com.healthmarketscience.jackcess.impl.query;
 
-import java.util.List;
 import com.healthmarketscience.jackcess.query.SelectQuery;
 
+import java.util.List;
 
 /**
  * Concrete Query subclass which represents a select query, e.g.:
  * {@code SELECT <columns> FROM <tables> WHERE <expression>}
- * 
+ *
  * @author James Ahlborn
  */
-public class SelectQueryImpl extends BaseSelectQueryImpl implements SelectQuery
-{
+public class SelectQueryImpl extends BaseSelectQueryImpl implements SelectQuery {
 
-  public SelectQueryImpl(String name, List<Row> rows, int objectId, 
-                         int objectFlag) {
-    super(name, rows, objectId, objectFlag, Type.SELECT);
-  }
+    public SelectQueryImpl(String name, List<Row> rows, int objectId,
+        int objectFlag) {
+        super(name, rows, objectId, objectFlag, Type.SELECT);
+    }
 
-  @Override
-  protected void toSQLString(StringBuilder builder)
-  {
-    toSQLSelectString(builder, true);
-  }  
+    @Override
+    protected void toSQLString(StringBuilder builder) {
+        toSQLSelectString(builder, true);
+    }
 
 }

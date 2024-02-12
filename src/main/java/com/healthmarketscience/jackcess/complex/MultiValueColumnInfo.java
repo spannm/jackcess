@@ -21,7 +21,6 @@ package com.healthmarketscience.jackcess.complex;
  *
  * @author James Ahlborn
  */
-public interface MultiValueColumnInfo extends ComplexColumnInfo<SingleValue>
-{
+public interface MultiValueColumnInfo extends ComplexColumnInfo<SingleValue> {
 
 }

@@ -16,50 +16,49 @@ limitations under the License.
 
 package com.healthmarketscience.jackcess.impl;
 
-import java.io.IOException;
-
 import com.healthmarketscience.jackcess.expr.Value;
 import com.healthmarketscience.jackcess.impl.expr.Expressionator;
+
+import java.io.IOException;
 
 /**
  *
  * @author James Ahlborn
  */
-public class CalcColEvalContext extends RowEvalContext
-{
-  private final ColumnImpl _col;
+public class CalcColEvalContext extends RowEvalContext {
+    private final ColumnImpl _col;
 
-  public CalcColEvalContext(ColumnImpl col) {
-    super(col.getDatabase());
-    _col = col;
-  }
-
-  CalcColEvalContext setExpr(String exprStr) {
-    setExpr(Expressionator.Type.EXPRESSION, exprStr);
-    return this;
-  }
-
-  @Override
-  protected TableImpl getTable() {
-    return _col.getTable();
-  }
-
-  @Override
-  public Value.Type getResultType() {
-    return toValueType(_col.getType());
-  }
-
-  public Object eval(Object[] row) throws IOException {
-    try {
-      setRow(row);
-      return eval();
-    } finally {
-      reset();
+    public CalcColEvalContext(ColumnImpl col) {
+        super(col.getDatabase());
+        _col = col;
     }
-  }
 
-  @Override
-  protected String withErrorContext(String msg) {
-    return _col.withErrorContext(msg);
-  }
+    CalcColEvalContext setExpr(String exprStr) {
+        setExpr(Expressionator.Type.EXPRESSION, exprStr);
+        return this;
+    }
+
+    @Override
+    protected TableImpl getTable() {
+        return _col.getTable();
+    }
+
+    @Override
+    public Value.Type getResultType() {
+        return toValueType(_col.getType());
+    }
+
+    public Object eval(Object[] row) throws IOException {
+        try {
+            setRow(row);
+            return eval();
+        } finally {
+            reset();
+        }
+    }
+
+    @Override
+    protected String withErrorContext(String msg) {
+        return _col.withErrorContext(msg);
+    }
 }

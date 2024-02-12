@@ -16,51 +16,50 @@ limitations under the License.
 
 package com.healthmarketscience.jackcess.impl;
 
-import java.io.IOException;
-
 import com.healthmarketscience.jackcess.InvalidValueException;
 import com.healthmarketscience.jackcess.impl.expr.Expressionator;
+
+import java.io.IOException;
 
 /**
  *
  * @author James Ahlborn
  */
-public class RowValidatorEvalContext extends RowEvalContext
-{
-  private final TableImpl _table;
-  private String _helpStr;
+public class RowValidatorEvalContext extends RowEvalContext {
+    private final TableImpl _table;
+    private String          _helpStr;
 
-  public RowValidatorEvalContext(TableImpl table) {
-    super(table.getDatabase());
-    _table = table;
-  }
-
-  RowValidatorEvalContext setExpr(String exprStr, String helpStr) {
-    setExpr(Expressionator.Type.RECORD_VALIDATOR, exprStr);
-    _helpStr = helpStr;
-    return this;
-  }
-
-  @Override
-  protected TableImpl getTable() {
-    return _table;
-  }
-
-  public void validate(Object[] row) throws IOException {
-    try {
-      setRow(row);
-      Boolean result = (Boolean)eval();
-      if(!result) {
-        String msg = ((_helpStr != null) ? _helpStr : "Invalid row");
-        throw new InvalidValueException(withErrorContext(msg));
-      }
-    } finally {
-      reset();
+    public RowValidatorEvalContext(TableImpl table) {
+        super(table.getDatabase());
+        _table = table;
     }
-  }
 
-  @Override
-  protected String withErrorContext(String msg) {
-    return _table.withErrorContext(msg);
-  }
+    RowValidatorEvalContext setExpr(String exprStr, String helpStr) {
+        setExpr(Expressionator.Type.RECORD_VALIDATOR, exprStr);
+        _helpStr = helpStr;
+        return this;
+    }
+
+    @Override
+    protected TableImpl getTable() {
+        return _table;
+    }
+
+    public void validate(Object[] row) throws IOException {
+        try {
+            setRow(row);
+            Boolean result = (Boolean) eval();
+            if (!result) {
+                String msg = _helpStr != null ? _helpStr : "Invalid row";
+                throw new InvalidValueException(withErrorContext(msg));
+            }
+        } finally {
+            reset();
+        }
+    }
+
+    @Override
+    protected String withErrorContext(String msg) {
+        return _table.withErrorContext(msg);
+    }
 }

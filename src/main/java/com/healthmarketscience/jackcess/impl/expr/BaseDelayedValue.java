@@ -16,79 +16,78 @@ limitations under the License.
 
 package com.healthmarketscience.jackcess.impl.expr;
 
-import java.math.BigDecimal;
-import java.time.LocalDateTime;
-
 import com.healthmarketscience.jackcess.expr.LocaleContext;
 import com.healthmarketscience.jackcess.expr.Value;
+
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
 
 /**
  *
  * @author James Ahlborn
  */
-public abstract class BaseDelayedValue implements Value
-{
-  private Value _val;
+public abstract class BaseDelayedValue implements Value {
+    private Value _val;
 
-  protected BaseDelayedValue() {
-  }
-
-  private Value getDelegate() {
-    if(_val == null) {
-      _val = eval();
+    protected BaseDelayedValue() {
     }
-    return _val;
-  }
 
-  @Override
-  public boolean isNull() {
-    return(getType() == Type.NULL);
-  }
+    private Value getDelegate() {
+        if (_val == null) {
+            _val = eval();
+        }
+        return _val;
+    }
 
-  @Override
-  public Value.Type getType() {
-    return getDelegate().getType();
-  }
+    @Override
+    public boolean isNull() {
+        return getType() == Type.NULL;
+    }
 
-  @Override
-  public Object get() {
-    return getDelegate().get();
-  }
+    @Override
+    public Value.Type getType() {
+        return getDelegate().getType();
+    }
 
-  @Override
-  public boolean getAsBoolean(LocaleContext ctx) {
-    return getDelegate().getAsBoolean(ctx);
-  }
+    @Override
+    public Object get() {
+        return getDelegate().get();
+    }
 
-  @Override
-  public String getAsString(LocaleContext ctx) {
-    return getDelegate().getAsString(ctx);
-  }
+    @Override
+    public boolean getAsBoolean(LocaleContext ctx) {
+        return getDelegate().getAsBoolean(ctx);
+    }
 
-  @Override
-  public LocalDateTime getAsLocalDateTime(LocaleContext ctx) {
-    return getDelegate().getAsLocalDateTime(ctx);
-  }
+    @Override
+    public String getAsString(LocaleContext ctx) {
+        return getDelegate().getAsString(ctx);
+    }
 
-  @Override
-  public Value getAsDateTimeValue(LocaleContext ctx) {
-    return getDelegate().getAsDateTimeValue(ctx);
-  }
+    @Override
+    public LocalDateTime getAsLocalDateTime(LocaleContext ctx) {
+        return getDelegate().getAsLocalDateTime(ctx);
+    }
 
-  @Override
-  public Integer getAsLongInt(LocaleContext ctx) {
-    return getDelegate().getAsLongInt(ctx);
-  }
+    @Override
+    public Value getAsDateTimeValue(LocaleContext ctx) {
+        return getDelegate().getAsDateTimeValue(ctx);
+    }
 
-  @Override
-  public Double getAsDouble(LocaleContext ctx) {
-    return getDelegate().getAsDouble(ctx);
-  }
+    @Override
+    public Integer getAsLongInt(LocaleContext ctx) {
+        return getDelegate().getAsLongInt(ctx);
+    }
 
-  @Override
-  public BigDecimal getAsBigDecimal(LocaleContext ctx) {
-    return getDelegate().getAsBigDecimal(ctx);
-  }
+    @Override
+    public Double getAsDouble(LocaleContext ctx) {
+        return getDelegate().getAsDouble(ctx);
+    }
 
-  protected abstract Value eval();
+    @Override
+    public BigDecimal getAsBigDecimal(LocaleContext ctx) {
+        return getDelegate().getAsBigDecimal(ctx);
+    }
+
+    protected abstract Value eval();
 }

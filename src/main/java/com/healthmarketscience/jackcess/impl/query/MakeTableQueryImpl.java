@@ -16,52 +16,48 @@ limitations under the License.
 
 package com.healthmarketscience.jackcess.impl.query;
 
-import java.util.List;
 import com.healthmarketscience.jackcess.query.MakeTableQuery;
 
+import java.util.List;
 
 /**
- * Concrete Query subclass which represents an table creation query, e.g.:
- * {@code SELECT <query> INTO <newTable>}
- * 
+ * Concrete Query subclass which represents an table creation query, e.g.: {@code SELECT <query> INTO <newTable>}
+ *
  * @author James Ahlborn
  */
-public class MakeTableQueryImpl extends BaseSelectQueryImpl 
-  implements MakeTableQuery
-{
+public class MakeTableQueryImpl extends BaseSelectQueryImpl
+    implements MakeTableQuery {
 
-  public MakeTableQueryImpl(String name, List<Row> rows, int objectId, 
-                            int objectFlag) {
-    super(name, rows, objectId, objectFlag, Type.MAKE_TABLE);
-  }
+    public MakeTableQueryImpl(String name, List<Row> rows, int objectId,
+        int objectFlag) {
+        super(name, rows, objectId, objectFlag, Type.MAKE_TABLE);
+    }
 
-  @Override
-  public String getTargetTable() {
-    return getTypeRow().name1;
-  }
+    @Override
+    public String getTargetTable() {
+        return getTypeRow().name1;
+    }
 
-  @Override
-  public String getRemoteDbPath() {
-    return getTypeRow().name2;
-  }
+    @Override
+    public String getRemoteDbPath() {
+        return getTypeRow().name2;
+    }
 
-  @Override
-  public String getRemoteDbType() {
-    return getTypeRow().expression;
-  }
+    @Override
+    public String getRemoteDbType() {
+        return getTypeRow().expression;
+    }
 
-  @Override
-  protected void toSelectInto(StringBuilder builder) 
-  {
-    builder.append(" INTO ");
-    toOptionalQuotedExpr(builder, getTargetTable(), true);
-    toRemoteDb(builder, getRemoteDbPath(), getRemoteDbType());
-  }
+    @Override
+    protected void toSelectInto(StringBuilder builder) {
+        builder.append(" INTO ");
+        toOptionalQuotedExpr(builder, getTargetTable(), true);
+        toRemoteDb(builder, getRemoteDbPath(), getRemoteDbType());
+    }
 
-  @Override
-  protected void toSQLString(StringBuilder builder)
-  {
-    toSQLSelectString(builder, true);
-  }  
+    @Override
+    protected void toSQLString(StringBuilder builder) {
+        toSQLSelectString(builder, true);
+    }
 
 }

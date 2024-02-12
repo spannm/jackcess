@@ -18,23 +18,22 @@ package com.healthmarketscience.jackcess.query;
 
 import java.util.List;
 
-
 /**
- * Query interface which represents a row update query, e.g.:
- * {@code UPDATE <table> SET <newValues>}
- * 
+ * Query interface which represents a row update query, e.g.: {@code UPDATE 
+ * <table>
+ *  SET <newValues>}
+ *
  * @author James Ahlborn
  */
-public interface UpdateQuery extends Query 
-{
+public interface UpdateQuery extends Query {
 
-  public List<String> getTargetTables();
+    List<String> getTargetTables();
 
-  public String getRemoteDbPath();
+    String getRemoteDbPath();
 
-  public String getRemoteDbType();
+    String getRemoteDbType();
 
-  public List<String> getNewValues();
+    List<String> getNewValues();
 
-  public String getWhereExpression();
+    String getWhereExpression();
 }

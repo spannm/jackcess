@@ -16,32 +16,32 @@ limitations under the License.
 
 package com.healthmarketscience.jackcess.util;
 
-import java.io.IOException;
-import java.util.List;
 import com.healthmarketscience.jackcess.Column;
 
+import java.io.IOException;
+import java.util.List;
+
 /**
- * Simple concrete implementation of ImportFilter which just returns the given
- * values.
- * 
+ * Simple concrete implementation of ImportFilter which just returns the given values.
+ *
  * @author James Ahlborn
  * @usage _general_class_
  */
 public class SimpleExportFilter implements ExportFilter {
 
-  public static final SimpleExportFilter INSTANCE = new SimpleExportFilter();
+    public static final SimpleExportFilter INSTANCE = new SimpleExportFilter();
 
-  public SimpleExportFilter() {
-  }
+    public SimpleExportFilter() {
+    }
 
-  @Override
-  public List<Column> filterColumns(List<Column> columns) throws IOException {
-    return columns;
-  }
+    @Override
+    public List<Column> filterColumns(List<Column> columns) throws IOException {
+        return columns;
+    }
 
-  @Override
-  public Object[] filterRow(Object[] row) throws IOException {
-    return row;
-  }
+    @Override
+    public Object[] filterRow(Object[] row) throws IOException {
+        return row;
+    }
 
 }

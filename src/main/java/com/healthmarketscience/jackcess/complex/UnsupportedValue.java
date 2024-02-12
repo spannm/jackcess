@@ -23,11 +23,10 @@ import java.util.Map;
  *
  * @author James Ahlborn
  */
-public interface UnsupportedValue extends ComplexValue 
-{
-  public Map<String,Object> getValues();
+public interface UnsupportedValue extends ComplexValue {
+    Map<String, Object> getValues();
 
-  public Object get(String columnName);
+    Object get(String columnName);
 
-  public void set(String columnName, Object value);
+    void set(String columnName, Object value);
 }

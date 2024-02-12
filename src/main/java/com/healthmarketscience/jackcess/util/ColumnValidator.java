@@ -17,23 +17,20 @@ limitations under the License.
 
 package com.healthmarketscience.jackcess.util;
 
-import java.io.IOException;
-
 import com.healthmarketscience.jackcess.Column;
 
+import java.io.IOException;
+
 /**
- * Interface which allows for data manipulation/validation as values are being
- * inserted into a database.
+ * Interface which allows for data manipulation/validation as values are being inserted into a database.
  *
  * @author James Ahlborn
  */
 @FunctionalInterface
-public interface ColumnValidator
-{
-  /**
-   * Validates and/or manipulates the given potential new value for the given
-   * column.  This method may return an entirely different value or throw an
-   * exception if the input value is not valid.
-   */
-  public Object validate(Column col, Object val) throws IOException;
+public interface ColumnValidator {
+    /**
+     * Validates and/or manipulates the given potential new value for the given column. This method may return an
+     * entirely different value or throw an exception if the input value is not valid.
+     */
+    Object validate(Column col, Object val) throws IOException;
 }

@@ -20,18 +20,17 @@ package com.healthmarketscience.jackcess.util;
 import com.healthmarketscience.jackcess.Column;
 
 /**
- * Simple concrete implementation of ColumnValidatorFactory which returns
- * {@link SimpleColumnValidator#INSTANCE} for all columns.
+ * Simple concrete implementation of ColumnValidatorFactory which returns {@link SimpleColumnValidator#INSTANCE} for all
+ * columns.
  *
  * @author James Ahlborn
  */
-public class SimpleColumnValidatorFactory implements ColumnValidatorFactory
-{
-  public static final SimpleColumnValidatorFactory INSTANCE =
-    new SimpleColumnValidatorFactory();
-  
-  @Override
-  public ColumnValidator createValidator(Column col) {
-    return SimpleColumnValidator.INSTANCE;
-  }
+public class SimpleColumnValidatorFactory implements ColumnValidatorFactory {
+    public static final SimpleColumnValidatorFactory INSTANCE =
+        new SimpleColumnValidatorFactory();
+
+    @Override
+    public ColumnValidator createValidator(Column col) {
+        return SimpleColumnValidator.INSTANCE;
+    }
 }

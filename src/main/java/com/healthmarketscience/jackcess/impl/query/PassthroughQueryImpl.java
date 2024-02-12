@@ -16,46 +16,43 @@ limitations under the License.
 
 package com.healthmarketscience.jackcess.impl.query;
 
-import java.util.List;
 import com.healthmarketscience.jackcess.query.PassthroughQuery;
 
+import java.util.List;
 
 /**
- * Concrete Query subclass which represents a query which will be executed via
- * ODBC.
- * 
+ * Concrete Query subclass which represents a query which will be executed via ODBC.
+ *
  * @author James Ahlborn
  */
-public class PassthroughQueryImpl extends QueryImpl implements PassthroughQuery
-{
+public class PassthroughQueryImpl extends QueryImpl implements PassthroughQuery {
 
-  public PassthroughQueryImpl(String name, List<Row> rows, int objectId, 
-                              int objectFlag) {
-    super(name, rows, objectId, objectFlag, Type.PASSTHROUGH);
-  }
-
-  @Override
-  public String getConnectionString() {
-    return getTypeRow().name1;
-  }
-
-  @Override
-  public String getPassthroughString() {
-    return getTypeRow().expression;
-  }
-
-  @Override
-  protected boolean supportsStandardClauses() {
-    return false;
-  }
-
-  @Override
-  protected void toSQLString(StringBuilder builder)
-  {
-    String pt = getPassthroughString();
-    if(pt != null) {
-      builder.append(pt);
+    public PassthroughQueryImpl(String name, List<Row> rows, int objectId,
+        int objectFlag) {
+        super(name, rows, objectId, objectFlag, Type.PASSTHROUGH);
     }
-  }
+
+    @Override
+    public String getConnectionString() {
+        return getTypeRow().name1;
+    }
+
+    @Override
+    public String getPassthroughString() {
+        return getTypeRow().expression;
+    }
+
+    @Override
+    protected boolean supportsStandardClauses() {
+        return false;
+    }
+
+    @Override
+    protected void toSQLString(StringBuilder builder) {
+        String pt = getPassthroughString();
+        if (pt != null) {
+            builder.append(pt);
+        }
+    }
 
 }

@@ -16,18 +16,14 @@ limitations under the License.
 
 package com.healthmarketscience.jackcess.query;
 
-
-
 /**
- * Query interface which represents a crosstab/pivot query, e.g.:
- * {@code TRANSFORM <expr> SELECT <query> PIVOT <expr>}
- * 
+ * Query interface which represents a crosstab/pivot query, e.g.: {@code TRANSFORM <expr> SELECT <query> PIVOT <expr>}
+ *
  * @author James Ahlborn
  */
-public interface CrossTabQuery extends BaseSelectQuery 
-{
+public interface CrossTabQuery extends BaseSelectQuery {
 
-  public String getTransformExpression();
+    String getTransformExpression();
 
-  public String getPivotExpression();
+    String getPivotExpression();
 }
