@@ -189,14 +189,6 @@
                 </plugin>
 
                 <plugin>
-                    <groupId>com.github.spotbugs</groupId>
-                    <artifactId>spotbugs-maven-plugin</artifactId>
-                    <configuration>
-                        <excludeFilterFile>${basedir}/src/site/findbugs/exclude.xml</excludeFilterFile>
-                    </configuration>
-                </plugin>
-
-                <plugin>
                     <groupId>com.github.ekryd.sortpom</groupId>
                     <artifactId>sortpom-maven-plugin</artifactId>
                     <version>${dep.plugin.sortpom.version}</version>
@@ -253,23 +245,6 @@
                         </configuration>
                     </execution>
                 </executions>
-            </plugin>
-
-            <plugin>
-                <artifactId>maven-javadoc-plugin</artifactId>
-                <configuration>
-                    <source>1.8</source>
-                    <show>public</show>
-                    <stylesheetfile>${basedir}/src/site/javadoc/stylesheet.css</stylesheetfile>
-                    <tags>
-                        <tag>
-                            <name>usage</name>
-                            <placement>a</placement>
-                            <head>Usage:</head>
-                        </tag>
-                    </tags>
-                    <quiet>true</quiet>
-                </configuration>
             </plugin>
 
         </plugins>
