@@ -31,6 +31,7 @@ import java.util.Map;
  *
  * @author James Ahlborn
  */
+@SuppressWarnings("PMD.FieldDeclarationsShouldBeAtStartOfClass")
 public class GeneralLegacyIndexCodes {
 
     static final int            MAX_TEXT_INDEX_CHAR_LENGTH      =
@@ -314,27 +315,27 @@ public class GeneralLegacyIndexCodes {
 
     /** shared CharHandler instance for Type.IGNORED */
     static final CharHandler IGNORED_CHAR_HANDLER   = new CharHandler() {
-                                                        @Override
-                                                        public Type getType() {
-                                                            return Type.IGNORED;
-                                                        }
-                                                    };
+        @Override
+        public Type getType() {
+            return Type.IGNORED;
+        }
+    };
 
     /**
      * alternate shared CharHandler instance for "surrogate" chars (which we do not handle)
      */
     static final CharHandler SURROGATE_CHAR_HANDLER = new CharHandler() {
-                                                        @Override
-                                                        public Type getType() {
-                                                            return Type.IGNORED;
-                                                        }
+        @Override
+        public Type getType() {
+            return Type.IGNORED;
+        }
 
-                                                        @Override
-                                                        public byte[] getInlineBytes() {
-                                                            throw new IllegalStateException(
-                                                                "Surrogate pair chars are not handled");
-                                                        }
-                                                    };
+        @Override
+        public byte[] getInlineBytes() {
+            throw new IllegalStateException(
+                "Surrogate pair chars are not handled");
+        }
+    };
 
     static final char        FIRST_CHAR             = (char) 0x0000;
     static final char        LAST_CHAR              = (char) 0x00FF;
@@ -376,8 +377,7 @@ public class GeneralLegacyIndexCodes {
     /**
      * Loads the CharHandlers for the given range of characters from the resource file with the given name.
      */
-    static CharHandler[] loadCodes(String codesFilePath,
-        char firstChar, char lastChar) {
+    static CharHandler[] loadCodes(String codesFilePath, char firstChar, char lastChar) {
         int numCodes = asUnsignedChar(lastChar) - asUnsignedChar(firstChar) + 1;
         CharHandler[] values = new CharHandler[numCodes];
 
@@ -386,12 +386,8 @@ public class GeneralLegacyIndexCodes {
             prefixMap.put(type.getPrefixCode(), type);
         }
 
-        BufferedReader reader = null;
-        try {
-
-            reader = new BufferedReader(
-                new InputStreamReader(
-                    DatabaseImpl.getResourceAsStream(codesFilePath), StandardCharsets.US_ASCII));
+        try (BufferedReader reader = new BufferedReader(new InputStreamReader(
+                DatabaseImpl.getResourceAsStream(codesFilePath), StandardCharsets.US_ASCII))) {
 
             int start = asUnsignedChar(firstChar);
             int end = asUnsignedChar(lastChar);
@@ -410,8 +406,6 @@ public class GeneralLegacyIndexCodes {
 
         } catch (IOException e) {
             throw new RuntimeException("failed loading index codes file " + codesFilePath, e);
-        } finally {
-            ByteUtil.closeQuietly(reader);
         }
 
         return values;

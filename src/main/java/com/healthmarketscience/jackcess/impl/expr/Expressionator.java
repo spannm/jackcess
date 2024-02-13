@@ -28,10 +28,40 @@ import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
 /**
- *
  * @author James Ahlborn
  */
+@SuppressWarnings("PMD.FieldDeclarationsShouldBeAtStartOfClass")
 public class Expressionator {
+
+    // Useful links:
+    // - syntax:
+    // https://support.office.com/en-us/article/Guide-to-expression-syntax-ebc770bc-8486-4adc-a9ec-7427cce39a90
+    // - examples: https://support.office.com/en-us/article/Examples-of-expressions-d3901e11-c04e-4649-b40b-8b6ec5aed41f
+    // - validation rule usage:
+    // https://support.office.com/en-us/article/Restrict-data-input-by-using-a-validation-rule-6c0b2ce1-76fa-4be0-8ae9-038b52652320
+
+    private static final String                FUNC_START_DELIM = "(";
+    private static final String                OPEN_PAREN       = "(";
+    private static final String                CLOSE_PAREN      = ")";
+    private static final String                FUNC_PARAM_SEP   = ",";
+
+    private static final Map<String, WordType> WORD_TYPES       = new HashMap<>();
+
+    static {
+        setWordType(WordType.OP, "+", "-", "*", "/", "\\", "^", "&", "mod");
+        setWordType(WordType.COMP, "<", "<=", ">", ">=", "=", "<>");
+        setWordType(WordType.LOG_OP, "and", "or", "eqv", "xor", "imp");
+        setWordType(WordType.CONST, "true", "false", "null", "on", "off",
+            "yes", "no");
+        setWordType(WordType.SPEC_OP_PREFIX, "is", "like", "between", "in", "not");
+        // "X is null", "X is not null", "X like P", "X between A and B",
+        // "X not between A and B", "X in (A, B, C...)", "X not in (A, B, C...)",
+        // "not X"
+        setWordType(WordType.DELIM, ".", "!", ",", "(", ")");
+    }
+
+    private static final Collection<String> TRUE_STRS  = Arrays.asList("true", "yes", "on");
+    private static final Collection<String> FALSE_STRS = Arrays.asList("false", "no", "off");
 
     // Useful links:
     // - syntax:
@@ -59,32 +89,6 @@ public class Expressionator {
         SPEC_OP_PREFIX,
         DELIM;
     }
-
-    private static final String                FUNC_START_DELIM = "(";
-    private static final String                OPEN_PAREN       = "(";
-    private static final String                CLOSE_PAREN      = ")";
-    private static final String                FUNC_PARAM_SEP   = ",";
-
-    private static final Map<String, WordType> WORD_TYPES       =
-        new HashMap<>();
-
-    static {
-        setWordType(WordType.OP, "+", "-", "*", "/", "\\", "^", "&", "mod");
-        setWordType(WordType.COMP, "<", "<=", ">", ">=", "=", "<>");
-        setWordType(WordType.LOG_OP, "and", "or", "eqv", "xor", "imp");
-        setWordType(WordType.CONST, "true", "false", "null", "on", "off",
-            "yes", "no");
-        setWordType(WordType.SPEC_OP_PREFIX, "is", "like", "between", "in", "not");
-        // "X is null", "X is not null", "X like P", "X between A and B",
-        // "X not between A and B", "X in (A, B, C...)", "X not in (A, B, C...)",
-        // "not X"
-        setWordType(WordType.DELIM, ".", "!", ",", "(", ")");
-    }
-
-    private static final Collection<String> TRUE_STRS  =
-        Arrays.asList("true", "yes", "on");
-    private static final Collection<String> FALSE_STRS =
-        Arrays.asList("false", "no", "off");
 
     private interface OpType {
     }
@@ -413,8 +417,7 @@ public class Expressionator {
             new OpType[] {SpecOp.IN, SpecOp.NOT_IN, SpecOp.BETWEEN, SpecOp.NOT_BETWEEN});
 
     private static final Set<Character>       REGEX_SPEC_CHARS  = new HashSet<>(
-        Arrays.asList('\\', '.', '%', '=', '+', '$', '^', '|', '(', ')', '{', '}', '&',
-            '[', ']', '*', '?'));
+        Arrays.asList('\\', '.', '%', '=', '+', '$', '^', '|', '(', ')', '{', '}', '&', '[', ']', '*', '?'));
     // this is a regular expression which will never match any string
     private static final Pattern              UNMATCHABLE_REGEX = Pattern.compile("(?!)");
 
@@ -1480,8 +1483,8 @@ public class Expressionator {
 
         public abstract void collectIdentifiers(Collection<Identifier> identifiers);
 
-        protected abstract void toExprString(
-            LocaleContext ctx, StringBuilder sb, boolean isDebug);
+        @SuppressWarnings("PMD.LinguisticNaming")
+        protected abstract void toExprString(LocaleContext ctx, StringBuilder sb, boolean isDebug);
     }
 
     private static final class EConstValue extends Expr {
@@ -1843,7 +1846,7 @@ public class Expressionator {
         }
 
         @Override
-        public Value eval(final EvalContext ctx) {
+        public Value eval(EvalContext ctx) {
 
             // logical operations do short circuit evaluation, so we need to delay
             // computing results until necessary

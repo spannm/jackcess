@@ -149,7 +149,7 @@ public class TableTest extends TestCase {
         return _testTable;
     }
 
-    private void newTestColumn(DataType type, final boolean compressedUnicode) {
+    private void newTestColumn(DataType type, boolean compressedUnicode) {
 
         int nextColIdx = _columns.size();
         int nextVarLenIdx = 0;

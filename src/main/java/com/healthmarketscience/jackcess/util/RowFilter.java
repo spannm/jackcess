@@ -100,8 +100,7 @@ public abstract class RowFilter implements Predicate<Row> {
      *            {@code Objects.equals(valuePattern, row.get(columnPattern.getName()))}.
      * @return a filter which matches table rows which match the value in the row pattern
      */
-    public static RowFilter matchPattern(final Column columnPattern,
-        final Object valuePattern) {
+    public static RowFilter matchPattern(Column columnPattern, Object valuePattern) {
         return new RowFilter() {
             @Override
             public boolean matches(Row row) {

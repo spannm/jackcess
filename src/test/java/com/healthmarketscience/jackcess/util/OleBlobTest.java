@@ -60,40 +60,26 @@ public class OleBlobTest extends TestCase {
                 .addColumn(new ColumnBuilder("ole", DataType.OLE))
                 .toTable(db);
 
-            OleBlob blob = null;
-            try {
-                blob = t.newBlob()
-                    .setSimplePackage(sampleFile)
-                    .toBlob();
+            try (OleBlob blob = t.newBlob().withSimplePackage(sampleFile).toBlob()) {
                 t.addRow(1, blob);
-            } finally {
-                ByteUtil.closeQuietly(blob);
             }
 
-            try {
-                blob = t.newBlob()
-                    .setLink(sampleFile)
-                    .toBlob();
+            try (OleBlob blob = t.newBlob().withLink(sampleFile).toBlob()) {
                 t.addRow(2, blob);
-            } finally {
-                ByteUtil.closeQuietly(blob);
             }
 
-            try {
-                blob = t.newBlob()
-                    .setPackagePrettyName("Text File")
-                    .setPackageClassName("Text.File")
-                    .setPackageTypeName("TextFile")
-                    .setOtherBytes(sampleFileBytes)
-                    .toBlob();
+            try (OleBlob blob = t.newBlob()
+                    .withPackagePrettyName("Text File")
+                    .withPackageClassName("Text.File")
+                    .withPackageTypeName("TextFile")
+                    .withOtherBytes(sampleFileBytes)
+                    .toBlob()) {
                 t.addRow(3, blob);
-            } finally {
-                ByteUtil.closeQuietly(blob);
             }
 
             for (Row row : t) {
-                try {
-                    blob = row.getBlob("ole");
+
+                try (OleBlob blob = row.getBlob("ole")) {
                     OleBlob.Content content = blob.getContent();
                     assertSame(blob, content.getBlob());
                     assertSame(content, blob.getContent());
@@ -140,8 +126,6 @@ public class OleBlobTest extends TestCase {
                         default:
                             throw new RuntimeException("unexpected id " + row);
                     }
-                } finally {
-                    ByteUtil.closeQuietly(blob);
                 }
             }
 
@@ -157,11 +141,8 @@ public class OleBlobTest extends TestCase {
 
             for (Row row : t) {
 
-                OleBlob oleBlob = null;
-                try {
-
+                try (OleBlob oleBlob = row.getBlob("ole_data")) {
                     String name = row.getString("name");
-                    oleBlob = row.getBlob("ole_data");
                     OleBlob.Content content = oleBlob.getContent();
                     Attachment attach = null;
                     if (content.getType() != OleBlob.ContentType.LINK) {
@@ -232,8 +213,6 @@ public class OleBlobTest extends TestCase {
                             throw new RuntimeException("unexpected type " + content.getType());
                     }
 
-                } finally {
-                    ByteUtil.closeQuietly(oleBlob);
                 }
             }
 
@@ -241,9 +220,7 @@ public class OleBlobTest extends TestCase {
         }
     }
 
-    private static void checkCompoundEntries(OleBlob.CompoundContent cc,
-        Object... entryInfo)
-        throws Exception {
+    private static void checkCompoundEntries(OleBlob.CompoundContent cc, Object... entryInfo) throws Exception {
         int idx = 0;
         for (OleBlob.CompoundContent.Entry e : cc) {
             String entryName = (String) entryInfo[idx];

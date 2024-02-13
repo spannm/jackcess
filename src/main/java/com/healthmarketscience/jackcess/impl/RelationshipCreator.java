@@ -239,20 +239,20 @@ public class RelationshipCreator extends DBMutator {
     private IndexBuilder createPrimaryIndex() {
         String name = createPrimaryIndexName();
         return createIndex(name, _primaryCols)
-            .setUnique()
-            .setType(IndexImpl.FOREIGN_KEY_INDEX_TYPE);
+            .withUnique()
+            .withType(IndexImpl.FOREIGN_KEY_INDEX_TYPE);
     }
 
     private IndexBuilder createSecondaryIndex() {
         // secondary index uses relationship name
         return createIndex(_name, _secondaryCols)
-            .setType(IndexImpl.FOREIGN_KEY_INDEX_TYPE);
+            .withType(IndexImpl.FOREIGN_KEY_INDEX_TYPE);
     }
 
     private static IndexBuilder createIndex(String name, List<ColumnImpl> cols) {
         IndexBuilder idx = new IndexBuilder(name);
         for (ColumnImpl col : cols) {
-            idx.addColumns(col.getName());
+            idx.withColumns(col.getName());
         }
         return idx;
     }

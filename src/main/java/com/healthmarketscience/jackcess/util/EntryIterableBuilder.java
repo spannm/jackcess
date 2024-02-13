@@ -57,7 +57,7 @@ public class EntryIterableBuilder implements Iterable<Row> {
         return _entryValues;
     }
 
-    public EntryIterableBuilder setColumnNames(Collection<String> columnNames) {
+    public EntryIterableBuilder withColumnNames(Collection<String> columnNames) {
         _columnNames = columnNames;
         return this;
     }
@@ -96,12 +96,12 @@ public class EntryIterableBuilder implements Iterable<Row> {
         _columnNames.add(columnName);
     }
 
-    public EntryIterableBuilder setEntryValues(Object... entryValues) {
+    public EntryIterableBuilder withEntryValues(Object... entryValues) {
         _entryValues = entryValues;
         return this;
     }
 
-    public EntryIterableBuilder setColumnMatcher(ColumnMatcher columnMatcher) {
+    public EntryIterableBuilder withColumnMatcher(ColumnMatcher columnMatcher) {
         _columnMatcher = columnMatcher;
         return this;
     }

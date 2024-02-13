@@ -367,6 +367,7 @@ public class AttachmentColumnInfoImpl extends ComplexColumnInfoImpl<Attachment>
         /**
          * Decodes the raw attachment file data to get the _actual_ content.
          */
+        @SuppressWarnings("PMD.UseTryWithResources")
         private byte[] decodeData() throws IOException {
 
             if (_encodedData.length < WRAPPER_HEADER_SIZE) {
@@ -417,6 +418,7 @@ public class AttachmentColumnInfoImpl extends ComplexColumnInfoImpl<Attachment>
         /**
          * Encodes the actual attachment file data to get the raw, stored format.
          */
+        @SuppressWarnings("PMD.UseTryWithResources")
         private byte[] encodeData() throws IOException {
 
             // possibly compress data based on file type

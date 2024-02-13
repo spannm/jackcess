@@ -53,10 +53,10 @@ public class BigIntTest extends TestCase {
 
             Table t = newTable("Test")
                 .addColumn(newColumn("id", DataType.LONG)
-                    .setAutoNumber(true))
+                    .withAutoNumber(true))
                 .addColumn(newColumn("data1", DataType.TEXT))
                 .addColumn(newColumn("num1", DataType.BIG_INT))
-                .addIndex(newIndex("idx").addColumns("num1"))
+                .addIndex(newIndex("idx").withColumns("num1"))
                 .toTable(db);
 
             long[] vals = new long[] {0L, -10L, 3844L, -45309590834L, 50392084913L, 65000L, -6489273L};
@@ -80,7 +80,7 @@ public class BigIntTest extends TestCase {
                 return l1.compareTo(l2);
             });
 
-            Cursor c = t.newCursor().setIndexByName("idx").toIndexCursor();
+            Cursor c = t.newCursor().withIndexByName("idx").toIndexCursor();
 
             assertCursor(expectedTable, c);
 

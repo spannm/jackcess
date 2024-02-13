@@ -119,9 +119,9 @@ public class DatabaseReadWriteTest extends TestCase {
             Table t = new TableBuilder("test")
                 .addColumn(new ColumnBuilder("name", DataType.TEXT))
                 .addColumn(new ColumnBuilder("id", DataType.LONG)
-                    .setAutoNumber(true))
+                    .withAutoNumber(true))
                 .addColumn(new ColumnBuilder("data", DataType.TEXT)
-                    .setLength(JetFormat.TEXT_FIELD_MAX_LENGTH))
+                    .withLength(JetFormat.TEXT_FIELD_MAX_LENGTH))
                 .toTable(db);
 
             for (int i = 0; i < 10; ++i) {

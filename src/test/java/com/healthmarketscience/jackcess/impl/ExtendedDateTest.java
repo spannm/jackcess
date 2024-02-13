@@ -90,11 +90,11 @@ public class ExtendedDateTest extends TestCase {
 
             Table t = newTable("Test")
                 .addColumn(newColumn("id", DataType.LONG)
-                    .setAutoNumber(true))
+                    .withAutoNumber(true))
                 .addColumn(newColumn("data1", DataType.TEXT))
                 .addColumn(newColumn("extDate", DataType.EXT_DATE_TIME))
-                .addIndex(newIndex("idxAsc").addColumns("extDate"))
-                .addIndex(newIndex("idxDesc").addColumns(false, "extDate"))
+                .addIndex(newIndex("idxAsc").withColumns("extDate"))
+                .addIndex(newIndex("idxDesc").withColumns(false, "extDate"))
                 .toTable(db);
 
             Object[] ldts = {LocalDate.of(2020, 6, 17), LocalDate.of(2021, 6, 14), LocalDateTime.of(2021, 6, 14, 12, 45), LocalDateTime.of(2021, 6, 14, 1, 45), LocalDateTime.of(2021, 6, 14, 22, 45,
@@ -124,13 +124,13 @@ public class ExtendedDateTest extends TestCase {
             };
             expectedTable.sort(comp);
 
-            Cursor c = t.newCursor().setIndexByName("idxAsc").toIndexCursor();
+            Cursor c = t.newCursor().withIndexByName("idxAsc").toIndexCursor();
 
             assertCursor(expectedTable, c);
 
             expectedTable.sort(comp.reversed());
 
-            c = t.newCursor().setIndexByName("idxDesc").toIndexCursor();
+            c = t.newCursor().withIndexByName("idxDesc").toIndexCursor();
 
             assertCursor(expectedTable, c);
 

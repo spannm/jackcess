@@ -249,7 +249,7 @@ final class FKEnforcer {
         Object[] toRow = new Object[joiner.getToTable().getColumnCount()];
 
         for (Iterator<Row> iter = joiner.findRows(oldFromRow)
-            .setColumnNames(Collections.emptySet())
+            .withColumnNames(Collections.emptySet())
             .iterator(); iter.hasNext();) {
             iter.next();
 
@@ -272,7 +272,7 @@ final class FKEnforcer {
         Object[] toRow = new Object[joiner.getToTable().getColumnCount()];
 
         for (Iterator<Row> iter = joiner.findRows(oldFromRow)
-            .setColumnNames(Collections.emptySet())
+            .withColumnNames(Collections.emptySet())
             .iterator(); iter.hasNext();) {
             iter.next();
 

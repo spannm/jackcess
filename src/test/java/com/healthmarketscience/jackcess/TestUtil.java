@@ -113,28 +113,22 @@ public class TestUtil {
         if (fileFormat == FileFormat.GENERIC_JET4) {
             // while we don't support creating GENERIC_JET4 as a jackcess feature,
             // we do want to be able to test these types of dbs
-            InputStream inStream = null;
-            OutputStream outStream = null;
-            try {
-                inStream = TestUtil.class.getClassLoader()
-                    .getResourceAsStream("emptyJet4.mdb");
+            try (InputStream inStream = TestUtil.class.getClassLoader().getResourceAsStream("emptyJet4.mdb")) {
                 File f = createTempFile(keep);
                 if (channel != null) {
                     JetFormatTest.transferDbFrom(channel, inStream);
                 } else {
-                    ByteUtil.copy(inStream, outStream = new FileOutputStream(f));
-                    outStream.close();
+                    try (OutputStream outStream = new FileOutputStream(f)) {
+                        ByteUtil.copy(inStream, outStream);
+                    }
                 }
                 return new DatabaseBuilder(f)
-                    .setAutoSync(getTestAutoSync()).setChannel(channel).open();
-            } finally {
-                ByteUtil.closeQuietly(inStream);
-                ByteUtil.closeQuietly(outStream);
+                    .withAutoSync(getTestAutoSync()).withChannel(channel).open();
             }
         }
 
-        return new DatabaseBuilder(createTempFile(keep)).setFileFormat(fileFormat)
-            .setAutoSync(getTestAutoSync()).setChannel(channel).create();
+        return new DatabaseBuilder(createTempFile(keep)).withFileFormat(fileFormat)
+            .withAutoSync(getTestAutoSync()).withChannel(channel).create();
     }
 
     public static Database openCopy(TestDB testDB) throws Exception {
@@ -166,9 +160,9 @@ public class TestUtil {
         FileChannel channel = inMem ? MemFileChannel.newChannel(
             file, MemFileChannel.RW_CHANNEL_MODE)
             : null;
-        final Database db = new DatabaseBuilder(file).setReadOnly(readOnly)
-            .setAutoSync(getTestAutoSync()).setChannel(channel)
-            .setCharset(charset).open();
+        final Database db = new DatabaseBuilder(file).withReadOnly(readOnly)
+            .withAutoSync(getTestAutoSync()).withChannel(channel)
+            .withCharset(charset).open();
         if (fileFormat != null) {
             Assert.assertEquals(
                 "Wrong JetFormat.",

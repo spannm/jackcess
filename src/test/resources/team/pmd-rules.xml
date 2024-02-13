@@ -25,7 +25,7 @@
     <rule ref="category/java/codestyle.xml/ClassNamingConventions">
         <properties>
             <property name="abstractClassPattern" value="[A-Z][a-zA-Z0-9]*" />
-            <property name="interfacePattern" value="(?:IF?[A-Z][a-zA-Z0-9]*)|(?:[A-Z][a-zA-Z0-9]+Constants[0-9]*)" />
+            <property name="interfacePattern" value="(?:(?:I|IF)?[A-Z][a-zA-Z0-9]*)|(?:[A-Z][a-zA-Z0-9]+Constants[0-9]*)" />
             <property name="testClassPattern" value="^[A-Z][a-zA-Z0-9]*Test[0-9]*$" />
         </properties>
     </rule>
@@ -37,7 +37,7 @@
     <rule ref="category/java/codestyle.xml/FormalParameterNamingConventions">
         <properties>
             <property name="methodParameterPattern" value="_?[a-z][a-zA-Z0-9]*" />
-            <property name="finalMethodParameterPattern" value="_[a-z][a-zA-Z0-9]*" />
+            <property name="finalMethodParameterPattern" value="_?[a-z][a-zA-Z0-9]*" />
             <property name="lambdaParameterPattern" value="[a-z][a-zA-Z0-9]*" />
             <property name="explicitLambdaParameterPattern" value="[a-z][a-zA-Z0-9]*" />
         </properties>
@@ -66,18 +66,18 @@
     <rule ref="category/java/codestyle.xml/UnnecessarySemicolon" />
     <rule ref="category/java/codestyle.xml/UnnecessaryReturn" />
     <rule ref="category/java/codestyle.xml/UseDiamondOperator" />
-    <rule ref="category/java/codestyle.xml/UselessParentheses" />
+    <!-- rule ref="category/java/codestyle.xml/UselessParentheses" /-->
     <rule ref="category/java/codestyle.xml/UselessQualifiedThis" />
 
     <rule ref="category/java/design.xml/AvoidThrowingNewInstanceOfSameException" />
     <!-- rule ref="category/java/design.xml/CollapsibleIfStatements" /-->
     <!-- rule ref="category/java/design.xml/ImmutableField" /-->
-    <rule ref="category/java/design.xml/SimplifiedTernary" />
+    <!-- rule ref="category/java/design.xml/SimplifiedTernary" /-->
     <rule ref="category/java/design.xml/SimplifyBooleanReturns" />
     <rule ref="category/java/design.xml/SimplifyConditional" />
     <rule ref="category/java/design.xml/UselessOverridingMethod" />
 
-    <rule ref="category/java/errorprone.xml/AvoidBranchingStatementAsLastInLoop" />
+    <!-- rule ref="category/java/errorprone.xml/AvoidBranchingStatementAsLastInLoop" /-->
     <rule ref="category/java/errorprone.xml/AvoidDecimalLiteralsInBigDecimalConstructor" />
     <rule ref="category/java/errorprone.xml/AvoidMultipleUnaryOperators" />
     <rule ref="category/java/errorprone.xml/AvoidUsingOctalValues" />

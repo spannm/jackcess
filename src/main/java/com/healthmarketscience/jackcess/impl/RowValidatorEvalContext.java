@@ -34,7 +34,7 @@ public class RowValidatorEvalContext extends RowEvalContext {
         _table = table;
     }
 
-    RowValidatorEvalContext setExpr(String exprStr, String helpStr) {
+    RowValidatorEvalContext withExpr(String exprStr, String helpStr) {
         setExpr(Expressionator.Type.RECORD_VALIDATOR, exprStr);
         _helpStr = helpStr;
         return this;

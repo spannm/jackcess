@@ -44,6 +44,7 @@ import java.util.*;
  * @see RelationshipBuilder
  * @usage _general_class_
  */
+@SuppressWarnings("PMD.FieldDeclarationsShouldBeAtStartOfClass")
 public class TableBuilder {
 
     /** Prefix for column or table names that are reserved words */
@@ -147,9 +148,9 @@ public class TableBuilder {
      */
     public TableBuilder addIndex(IndexBuilder index) {
         if (_escapeIdentifiers) {
-            index.setName(escapeIdentifier(index.getName()));
+            index.withName(escapeIdentifier(index.getName()));
             for (IndexBuilder.Column col : index.getColumns()) {
-                col.setName(escapeIdentifier(col.getName()));
+                col.withName(escapeIdentifier(col.getName()));
             }
         }
         _indexes.add(index);
@@ -175,7 +176,7 @@ public class TableBuilder {
     /**
      * Sets whether or not subsequently added columns will have their names automatically escaped
      */
-    public TableBuilder setEscapeIdentifiers(boolean escapeIdentifiers) {
+    public TableBuilder withEscapeIdentifiers(boolean escapeIdentifiers) {
         _escapeIdentifiers = escapeIdentifiers;
         return this;
     }
@@ -184,9 +185,9 @@ public class TableBuilder {
      * Sets the names of the primary key columns for this table. Convenience method for creating a primary key index on
      * a table.
      */
-    public TableBuilder setPrimaryKey(String... colNames) {
+    public TableBuilder withPrimaryKey(String... colNames) {
         addIndex(new IndexBuilder(IndexBuilder.PRIMARY_KEY_NAME)
-            .addColumns(colNames).setPrimaryKey());
+            .withColumns(colNames).withPrimaryKey());
         return this;
     }
 

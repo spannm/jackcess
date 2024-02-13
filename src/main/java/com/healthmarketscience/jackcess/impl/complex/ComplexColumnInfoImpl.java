@@ -126,12 +126,12 @@ public abstract class ComplexColumnInfoImpl<V extends ComplexValue>
         throws IOException {
         if (_complexValIdCursor == null) {
             _complexValIdCursor = _flatTable.newCursor()
-                .setIndexByColumns(_complexValFkCol)
+                .withIndexByColumns(_complexValFkCol)
                 .toIndexCursor();
         }
 
         return _complexValIdCursor.newEntryIterable(complexValueFk)
-            .setColumnNames(columnNames).iterator();
+            .withColumnNames(columnNames).iterator();
     }
 
     @Override

@@ -520,8 +520,7 @@ public class ExpressionatorTest extends TestCase {
     }
 
     static int roundToLongInt(double d) {
-        return new BigDecimal(d).setScale(0, NumberFormatter.ROUND_MODE)
-            .intValueExact();
+        return BigDecimal.valueOf(d).setScale(0, NumberFormatter.ROUND_MODE).intValueExact();
     }
 
     static BigDecimal toBD(double d) {

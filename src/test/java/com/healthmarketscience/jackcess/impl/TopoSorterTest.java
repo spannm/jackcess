@@ -130,18 +130,18 @@ public class TopoSorterTest extends TestCase {
         private final Map<String, List<String>> _descMap =
             new HashMap<>();
 
-        protected TestTopoSorter(List<String> values, boolean reverse) {
+        TestTopoSorter(List<String> values, boolean reverse) {
             super(values, reverse);
         }
 
-        public void addDescendents(String from, String... tos) {
+        void addDescendents(String from, String... tos) {
             List<String> descs = _descMap.computeIfAbsent(from, k -> new ArrayList<>());
 
             descs.addAll(Arrays.asList(tos));
         }
 
         @Override
-        protected void getDescendents(String from, List<String> descendents) {
+        protected void fillDescendents(String from, List<String> descendents) {
             List<String> descs = _descMap.get(from);
             if (descs != null) {
                 descendents.addAll(descs);

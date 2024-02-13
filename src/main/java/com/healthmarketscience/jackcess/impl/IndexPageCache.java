@@ -30,6 +30,7 @@ import java.util.*;
  *
  * @author James Ahlborn
  */
+@SuppressWarnings("PMD.FieldDeclarationsShouldBeAtStartOfClass")
 public class IndexPageCache {
     private enum UpdateType {
         ADD,
@@ -48,22 +49,22 @@ public class IndexPageCache {
     private DataPageMain                     _rootPage;
     /** the currently loaded pages for this index, pageNumber -> page */
     private final Map<Integer, DataPageMain> _dataPages     = new LinkedHashMap<>(16, 0.75f, true) {
-                                                                private static final long serialVersionUID = 0L;
+        private static final long serialVersionUID = 0L;
 
-                                                                @Override
-                                                                protected boolean removeEldestEntry(Map.Entry<Integer, DataPageMain> e) {
-                                                                    // only purge when the size is too big and a
-                                                                    // logical write operation is
-                                                                    // not in progress (while an update is
-                                                                    // happening, the pages can be in
-                                                                    // flux and removing pages from the cache can
-                                                                    // cause problems)
-                                                                    if (size() > MAX_CACHE_SIZE && !getPageChannel().isWriting()) {
-                                                                        purgeOldPages();
-                                                                    }
-                                                                    return false;
-                                                                }
-                                                            };
+        @Override
+        protected boolean removeEldestEntry(Map.Entry<Integer, DataPageMain> e) {
+            // only purge when the size is too big and a
+            // logical write operation is
+            // not in progress (while an update is
+            // happening, the pages can be in
+            // flux and removing pages from the cache can
+            // cause problems)
+            if (size() > MAX_CACHE_SIZE && !getPageChannel().isWriting()) {
+                purgeOldPages();
+            }
+            return false;
+        }
+    };
     /** the currently modified index pages */
     private final List<CacheDataPage>        _modifiedPages = new ArrayList<>();
 
@@ -1203,7 +1204,7 @@ public class IndexPageCache {
 
         @Override
         public Entry set(int idx, Entry newEntry) {
-            return isCurrentChildTailIndex(idx) ? setChildTailEntry(newEntry) : getEntries().set(idx, newEntry);
+            return isCurrentChildTailIndex(idx) ? withChildTailEntry(newEntry) : getEntries().set(idx, newEntry);
         }
 
         @Override
@@ -1215,10 +1216,10 @@ public class IndexPageCache {
 
         @Override
         public Entry remove(int idx) {
-            return isCurrentChildTailIndex(idx) ? setChildTailEntry(null) : getEntries().remove(idx);
+            return isCurrentChildTailIndex(idx) ? withChildTailEntry(null) : getEntries().remove(idx);
         }
 
-        public Entry setChildTailEntry(Entry newEntry) {
+        public Entry withChildTailEntry(Entry newEntry) {
             Entry old = _childTailEntry;
             _childTailEntry = newEntry;
             return old;

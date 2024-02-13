@@ -98,7 +98,7 @@ public class CursorBuilder {
     /**
      * Sets an index to use for the cursor.
      */
-    public CursorBuilder setIndex(Index index) {
+    public CursorBuilder withIndex(Index index) {
         _index = (IndexImpl) index;
         return this;
     }
@@ -108,8 +108,8 @@ public class CursorBuilder {
      *
      * @throws IllegalArgumentException if no index can be found on the table with the given name
      */
-    public CursorBuilder setIndexByName(String indexName) {
-        return setIndex(_table.getIndex(indexName));
+    public CursorBuilder withIndexByName(String indexName) {
+        return withIndex(_table.getIndex(indexName));
     }
 
     /**
@@ -117,8 +117,8 @@ public class CursorBuilder {
      *
      * @throws IllegalArgumentException if no index can be found on the table with the given columns
      */
-    public CursorBuilder setIndexByColumnNames(String... columnNames) {
-        return setIndexByColumns(Arrays.asList(columnNames));
+    public CursorBuilder withIndexByColumnNames(String... columnNames) {
+        return withIndexByColumns(Arrays.asList(columnNames));
     }
 
     /**
@@ -126,18 +126,18 @@ public class CursorBuilder {
      *
      * @throws IllegalArgumentException if no index can be found on the table with the given columns
      */
-    public CursorBuilder setIndexByColumns(Column... columns) {
+    public CursorBuilder withIndexByColumns(Column... columns) {
         List<String> colNames = new ArrayList<>();
         for (Column col : columns) {
             colNames.add(col.getName());
         }
-        return setIndexByColumns(colNames);
+        return withIndexByColumns(colNames);
     }
 
     /**
      * Searches for an index with the given column names.
      */
-    private CursorBuilder setIndexByColumns(List<String> searchColumns) {
+    private CursorBuilder withIndexByColumns(List<String> searchColumns) {
         IndexImpl index = _table.findIndexForColumns(
             searchColumns, TableImpl.IndexFeature.ANY_MATCH);
         if (index == null) {
@@ -152,10 +152,9 @@ public class CursorBuilder {
      * <p>
      * A valid index must be specified before calling this method.
      */
-    public CursorBuilder setSpecificRow(Object... specificRow) {
-        setStartRow(specificRow);
-        setEndRow(specificRow);
-        return this;
+    public CursorBuilder withSpecificRow(Object... specificRow) {
+        return withStartRow(specificRow)
+              .withEndRow(specificRow);
     }
 
     /**
@@ -164,9 +163,9 @@ public class CursorBuilder {
      * <p>
      * A valid index must be specified before calling this method.
      */
-    public CursorBuilder setSpecificEntry(Object... specificEntry) {
+    public CursorBuilder withSpecificEntry(Object... specificEntry) {
         if (specificEntry != null) {
-            setSpecificRow(_index.constructIndexRowFromEntry(specificEntry));
+            withSpecificRow(_index.constructIndexRowFromEntry(specificEntry));
         }
         return this;
     }
@@ -176,7 +175,7 @@ public class CursorBuilder {
      * <p>
      * A valid index must be specified before calling this method.
      */
-    public CursorBuilder setStartRow(Object... startRow) {
+    public CursorBuilder withStartRow(Object... startRow) {
         _startRow = startRow;
         return this;
     }
@@ -187,9 +186,9 @@ public class CursorBuilder {
      * <p>
      * A valid index must be specified before calling this method.
      */
-    public CursorBuilder setStartEntry(Object... startEntry) {
+    public CursorBuilder withStartEntry(Object... startEntry) {
         if (startEntry != null) {
-            setStartRow(_index.constructPartialIndexRowFromEntry(
+            withStartRow(_index.constructPartialIndexRowFromEntry(
                 IndexData.MIN_VALUE, startEntry));
         }
         return this;
@@ -198,7 +197,7 @@ public class CursorBuilder {
     /**
      * Sets whether the starting row for a range based index cursor is inclusive or exclusive.
      */
-    public CursorBuilder setStartRowInclusive(boolean inclusive) {
+    public CursorBuilder withStartRowInclusive(boolean inclusive) {
         _startRowInclusive = inclusive;
         return this;
     }
@@ -208,7 +207,7 @@ public class CursorBuilder {
      * <p>
      * A valid index must be specified before calling this method.
      */
-    public CursorBuilder setEndRow(Object... endRow) {
+    public CursorBuilder withEndRow(Object... endRow) {
         _endRow = endRow;
         return this;
     }
@@ -219,10 +218,9 @@ public class CursorBuilder {
      * <p>
      * A valid index must be specified before calling this method.
      */
-    public CursorBuilder setEndEntry(Object... endEntry) {
+    public CursorBuilder withEndEntry(Object... endEntry) {
         if (endEntry != null) {
-            setEndRow(_index.constructPartialIndexRowFromEntry(
-                IndexData.MAX_VALUE, endEntry));
+            withEndRow(_index.constructPartialIndexRowFromEntry(IndexData.MAX_VALUE, endEntry));
         }
         return this;
     }
@@ -230,7 +228,7 @@ public class CursorBuilder {
     /**
      * Sets whether the ending row for a range based index cursor is inclusive or exclusive.
      */
-    public CursorBuilder setEndRowInclusive(boolean inclusive) {
+    public CursorBuilder withEndRowInclusive(boolean inclusive) {
         _endRowInclusive = inclusive;
         return this;
     }
@@ -238,7 +236,7 @@ public class CursorBuilder {
     /**
      * Sets the ColumnMatcher to use for matching row patterns.
      */
-    public CursorBuilder setColumnMatcher(ColumnMatcher columnMatcher) {
+    public CursorBuilder withColumnMatcher(ColumnMatcher columnMatcher) {
         _columnMatcher = columnMatcher;
         return this;
     }
@@ -246,8 +244,8 @@ public class CursorBuilder {
     /**
      * Sets the ColumnMatcher to an instance of CaseInsensitiveColumnMatcher
      */
-    public CursorBuilder setCaseInsensitive() {
-        return setColumnMatcher(CaseInsensitiveColumnMatcher.INSTANCE);
+    public CursorBuilder withCaseInsensitive() {
+        return withColumnMatcher(CaseInsensitiveColumnMatcher.INSTANCE);
     }
 
     /**
@@ -299,7 +297,7 @@ public class CursorBuilder {
      */
     public static IndexCursor createCursor(Index index)
         throws IOException {
-        return index.getTable().newCursor().setIndex(index).toIndexCursor();
+        return index.getTable().newCursor().withIndex(index).toIndexCursor();
     }
 
     /**
@@ -325,9 +323,9 @@ public class CursorBuilder {
     public static IndexCursor createCursor(Index index,
         Object[] startRow, Object[] endRow)
         throws IOException {
-        return index.getTable().newCursor().setIndex(index)
-            .setStartRow(startRow)
-            .setEndRow(endRow)
+        return index.getTable().newCursor().withIndex(index)
+            .withStartRow(startRow)
+            .withEndRow(endRow)
             .toIndexCursor();
     }
 
@@ -349,11 +347,11 @@ public class CursorBuilder {
         Object[] endRow,
         boolean endInclusive)
         throws IOException {
-        return index.getTable().newCursor().setIndex(index)
-            .setStartRow(startRow)
-            .setStartRowInclusive(startInclusive)
-            .setEndRow(endRow)
-            .setEndRowInclusive(endInclusive)
+        return index.getTable().newCursor().withIndex(index)
+            .withStartRow(startRow)
+            .withStartRowInclusive(startInclusive)
+            .withEndRow(endRow)
+            .withEndRowInclusive(endInclusive)
             .toIndexCursor();
     }
 

@@ -82,9 +82,9 @@ public class ExportTest extends TestCase {
             out = new StringWriter();
 
             new ExportUtil.Builder(db, "test")
-                .setHeader(true)
-                .setDelimiter("||")
-                .setQuote('\'')
+                .withHeader(true)
+                .withDelimiter("||")
+                .withQuote('\'')
                 .exportWriter(new BufferedWriter(out));
 
             expected =
@@ -109,7 +109,7 @@ public class ExportTest extends TestCase {
             out = new StringWriter();
 
             new ExportUtil.Builder(db, "test")
-                .setFilter(oddFilter)
+                .withFilter(oddFilter)
                 .exportWriter(new BufferedWriter(out));
 
             expected =

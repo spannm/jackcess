@@ -85,7 +85,7 @@ public class RelationshipBuilder {
      *
      * Note, this requires the "from" table to have an existing unique index on the relevant columns.
      */
-    public RelationshipBuilder setReferentialIntegrity() {
+    public RelationshipBuilder withReferentialIntegrity() {
         return clearFlag(RelationshipImpl.NO_REFERENTIAL_INTEGRITY_FLAG);
     }
 
@@ -94,8 +94,8 @@ public class RelationshipBuilder {
      *
      * Note, this requires referential integrity to be enforced.
      */
-    public RelationshipBuilder setCascadeDeletes() {
-        return setFlag(RelationshipImpl.CASCADE_DELETES_FLAG);
+    public RelationshipBuilder withCascadeDeletes() {
+        return withFlag(RelationshipImpl.CASCADE_DELETES_FLAG);
     }
 
     /**
@@ -103,8 +103,8 @@ public class RelationshipBuilder {
      *
      * Note, this requires referential integrity to be enforced.
      */
-    public RelationshipBuilder setCascadeUpdates() {
-        return setFlag(RelationshipImpl.CASCADE_UPDATES_FLAG);
+    public RelationshipBuilder withCascadeUpdates() {
+        return withFlag(RelationshipImpl.CASCADE_UPDATES_FLAG);
     }
 
     /**
@@ -112,14 +112,14 @@ public class RelationshipBuilder {
      *
      * Note, this requires referential integrity to be enforced.
      */
-    public RelationshipBuilder setCascadeNullOnDelete() {
-        return setFlag(RelationshipImpl.CASCADE_NULL_FLAG);
+    public RelationshipBuilder withCascadeNullOnDelete() {
+        return withFlag(RelationshipImpl.CASCADE_NULL_FLAG);
     }
 
     /**
      * Sets the preferred join type for this relationship.
      */
-    public RelationshipBuilder setJoinType(Relationship.JoinType joinType) {
+    public RelationshipBuilder withJoinType(Relationship.JoinType joinType) {
         clearFlag(JOIN_FLAGS);
         switch (joinType) {
             case INNER:
@@ -142,7 +142,7 @@ public class RelationshipBuilder {
      *
      * Default = null, meaning that the standard Access naming convention will be used.
      */
-    public RelationshipBuilder setName(String relationshipName) {
+    public RelationshipBuilder withName(String relationshipName) {
         _name = relationshipName;
         return this;
     }
@@ -183,7 +183,7 @@ public class RelationshipBuilder {
         return new RelationshipCreator((DatabaseImpl) db).createRelationship(this);
     }
 
-    private RelationshipBuilder setFlag(int flagMask) {
+    private RelationshipBuilder withFlag(int flagMask) {
         _flags |= flagMask;
         return this;
     }

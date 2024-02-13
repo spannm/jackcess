@@ -694,7 +694,7 @@ public class UsageMap {
                     calculateMapPagePointerOffset(i));
                 if (mapPageNum > 0) {
                     ByteBuffer mapPageBuffer =
-                        _mapPageHolder.setPage(getPageChannel(), mapPageNum);
+                        _mapPageHolder.withPage(getPageChannel(), mapPageNum);
                     byte pageType = mapPageBuffer.get();
                     if (pageType != PageTypes.USAGE_MAP) {
                         throw new IOException("Looking for usage map at page " + mapPageNum + ", but page type is " + pageType);
@@ -724,7 +724,7 @@ public class UsageMap {
                 calculateMapPagePointerOffset(pageIndex));
             ByteBuffer mapPageBuffer = null;
             if (mapPageNum > 0) {
-                mapPageBuffer = _mapPageHolder.setPage(getPageChannel(), mapPageNum);
+                mapPageBuffer = _mapPageHolder.withPage(getPageChannel(), mapPageNum);
             } else {
                 // Need to create a new usage map page
                 mapPageBuffer = createNewUsageMapPage(pageIndex);
@@ -754,7 +754,7 @@ public class UsageMap {
 
         protected ByteBuffer allocateNewUsageMapPage(int pageIndex)
             throws IOException {
-            ByteBuffer mapPageBuffer = _mapPageHolder.setNewPage(getPageChannel());
+            ByteBuffer mapPageBuffer = _mapPageHolder.withNewPage(getPageChannel());
             mapPageBuffer.put(PageTypes.USAGE_MAP);
             mapPageBuffer.put((byte) 0x01); // Unknown
             mapPageBuffer.putShort((short) 0); // Unknown

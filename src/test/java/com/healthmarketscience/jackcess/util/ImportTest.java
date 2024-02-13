@@ -48,7 +48,7 @@ public class ImportTest extends TestCase {
         for (final FileFormat fileFormat : JetFormatTest.SUPPORTED_FILEFORMATS) {
             Database db = create(fileFormat);
             String tableName = new ImportUtil.Builder(db, "test")
-                .setDelimiter("\\t")
+                .withDelimiter("\\t")
                 .importFile(new File("src/test/data/sample-input.tab"));
             Table t = db.getTable(tableName);
 
@@ -90,9 +90,9 @@ public class ImportTest extends TestCase {
                 .toTable(db);
 
             new ImportUtil.Builder(db, "test2")
-                .setDelimiter("\\t")
-                .setUseExistingTable(true)
-                .setHeader(false)
+                .withDelimiter("\\t")
+                .withUseExistingTable(true)
+                .withHeader(false)
                 .importFile(new File("src/test/data/sample-input.tab"));
 
             expectedRows =
@@ -137,8 +137,8 @@ public class ImportTest extends TestCase {
             };
 
             tableName = new ImportUtil.Builder(db, "test3")
-                .setDelimiter("\\t")
-                .setFilter(oddFilter)
+                .withDelimiter("\\t")
+                .withFilter(oddFilter)
                 .importFile(new File("src/test/data/sample-input.tab"));
             t = db.getTable(tableName);
 
@@ -172,7 +172,7 @@ public class ImportTest extends TestCase {
         for (final FileFormat fileFormat : JetFormatTest.SUPPORTED_FILEFORMATS) {
             Database db = create(fileFormat);
             String tableName = new ImportUtil.Builder(db, "test")
-                .setDelimiter("\\t")
+                .withDelimiter("\\t")
                 .importFile(new File("src/test/data/sample-input-only-headers.tab"));
 
             Table t = db.getTable(tableName);

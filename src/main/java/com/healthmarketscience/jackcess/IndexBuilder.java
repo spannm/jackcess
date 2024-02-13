@@ -84,7 +84,7 @@ public class IndexBuilder {
     /**
      * Sets the name of the index.
      */
-    public IndexBuilder setName(String name) {
+    public IndexBuilder withName(String name) {
         _name = name;
         return this;
     }
@@ -92,14 +92,14 @@ public class IndexBuilder {
     /**
      * Adds the columns with ASCENDING ordering to the index.
      */
-    public IndexBuilder addColumns(String... names) {
-        return addColumns(true, names);
+    public IndexBuilder withColumns(String... names) {
+        return withColumns(true, names);
     }
 
     /**
      * Adds the columns with the given ordering to the index.
      */
-    public IndexBuilder addColumns(boolean ascending, String... names) {
+    public IndexBuilder withColumns(boolean ascending, String... names) {
         if (names != null) {
             for (String name : names) {
                 _columns.add(new Column(name, ascending));
@@ -111,16 +111,16 @@ public class IndexBuilder {
     /**
      * Sets this index to be a primary key index (additionally sets the index as unique and required).
      */
-    public IndexBuilder setPrimaryKey() {
+    public IndexBuilder withPrimaryKey() {
         _type = IndexImpl.PRIMARY_KEY_INDEX_TYPE;
-        setRequired();
-        return setUnique();
+        withRequired();
+        return withUnique();
     }
 
     /**
      * @usage _advanced_method_
      */
-    public IndexBuilder setType(byte type) {
+    public IndexBuilder withType(byte type) {
         _type = type;
         return this;
     }
@@ -128,7 +128,7 @@ public class IndexBuilder {
     /**
      * Sets this index to enforce uniqueness.
      */
-    public IndexBuilder setUnique() {
+    public IndexBuilder withUnique() {
         _flags |= IndexData.UNIQUE_INDEX_FLAG;
         return this;
     }
@@ -136,7 +136,7 @@ public class IndexBuilder {
     /**
      * Sets this index to encforce required.
      */
-    public IndexBuilder setRequired() {
+    public IndexBuilder withRequired() {
         _flags |= IndexData.REQUIRED_INDEX_FLAG;
         return this;
     }
@@ -144,7 +144,7 @@ public class IndexBuilder {
     /**
      * Sets this index to ignore null values.
      */
-    public IndexBuilder setIgnoreNulls() {
+    public IndexBuilder withIgnoreNulls() {
         _flags |= IndexData.IGNORE_NULLS_INDEX_FLAG;
         return this;
     }
@@ -233,7 +233,7 @@ public class IndexBuilder {
             return _name;
         }
 
-        public Column setName(String name) {
+        public Column withName(String name) {
             _name = name;
             return this;
         }

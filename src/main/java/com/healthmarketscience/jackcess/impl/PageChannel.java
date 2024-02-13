@@ -277,7 +277,7 @@ public class PageChannel implements Channel, Flushable {
                     // current codec handler cannot encode part of a page, so need to
                     // copy the modified part into the current page contents in a temp
                     // buffer so that we can encode the entire page
-                    ByteBuffer fullPage = _fullPageEncodeBufferH.setPage(this, pageNumber);
+                    ByteBuffer fullPage = _fullPageEncodeBufferH.withPage(this, pageNumber);
 
                     // copy the modified part to the full page
                     fullPage.position(pageOffset);

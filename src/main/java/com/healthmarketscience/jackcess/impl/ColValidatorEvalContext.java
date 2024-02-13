@@ -38,7 +38,7 @@ public class ColValidatorEvalContext extends ColEvalContext {
         super(col);
     }
 
-    ColValidatorEvalContext setExpr(String exprStr, String helpStr) {
+    ColValidatorEvalContext withExpr(String exprStr, String helpStr) {
         setExpr(Expressionator.Type.FIELD_VALIDATOR, exprStr);
         _helpStr = helpStr;
         return this;

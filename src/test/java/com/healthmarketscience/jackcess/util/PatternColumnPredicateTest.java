@@ -96,7 +96,7 @@ public class PatternColumnPredicateTest extends TestCase {
     private static List<String> findRowsByPattern(
         Table t, Predicate<Object> pred) {
         return t.getDefaultCursor().newIterable()
-            .setMatchPattern("data", pred)
+            .withMatchPattern("data", pred)
             .stream()
             .map(r -> r.getString("data"))
             .collect(Collectors.toList());
@@ -106,9 +106,9 @@ public class PatternColumnPredicateTest extends TestCase {
         Database db = create(fileFormat);
 
         Table table = new TableBuilder("Test")
-            .addColumn(new ColumnBuilder("id", DataType.LONG).setAutoNumber(true))
+            .addColumn(new ColumnBuilder("id", DataType.LONG).withAutoNumber(true))
             .addColumn(new ColumnBuilder("data", DataType.TEXT))
-            .setPrimaryKey("id")
+            .withPrimaryKey("id")
             .toTable(db);
 
         table.addRow(Column.AUTO_NUMBER, "Foo");

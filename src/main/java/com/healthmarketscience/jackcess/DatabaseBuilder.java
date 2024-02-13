@@ -95,8 +95,8 @@ public class DatabaseBuilder {
      *
      * @usage _general_method_
      */
-    public DatabaseBuilder setFile(File mdbFile) {
-        return setPath(toPath(mdbFile));
+    public DatabaseBuilder withFile(File mdbFile) {
+        return withPath(toPath(mdbFile));
     }
 
     /**
@@ -105,7 +105,7 @@ public class DatabaseBuilder {
      *
      * @usage _general_method_
      */
-    public DatabaseBuilder setPath(Path mdbFile) {
+    public DatabaseBuilder withPath(Path mdbFile) {
         _mdbFile = mdbFile;
         return this;
     }
@@ -115,7 +115,7 @@ public class DatabaseBuilder {
      *
      * @usage _general_method_
      */
-    public DatabaseBuilder setReadOnly(boolean readOnly) {
+    public DatabaseBuilder withReadOnly(boolean readOnly) {
         _readOnly = readOnly;
         return this;
     }
@@ -129,7 +129,7 @@ public class DatabaseBuilder {
      *
      * @usage _intermediate_method_
      */
-    public DatabaseBuilder setAutoSync(boolean autoSync) {
+    public DatabaseBuilder withAutoSync(boolean autoSync) {
         _autoSync = autoSync;
         return this;
     }
@@ -139,7 +139,7 @@ public class DatabaseBuilder {
      *
      * @usage _intermediate_method_
      */
-    public DatabaseBuilder setCharset(Charset charset) {
+    public DatabaseBuilder withCharset(Charset charset) {
         _charset = charset;
         return this;
     }
@@ -149,7 +149,7 @@ public class DatabaseBuilder {
      *
      * @usage _intermediate_method_
      */
-    public DatabaseBuilder setTimeZone(TimeZone timeZone) {
+    public DatabaseBuilder withTimeZone(TimeZone timeZone) {
         _timeZone = timeZone;
         return this;
     }
@@ -160,7 +160,7 @@ public class DatabaseBuilder {
      *
      * @usage _intermediate_method_
      */
-    public DatabaseBuilder setCodecProvider(CodecProvider codecProvider) {
+    public DatabaseBuilder withCodecProvider(CodecProvider codecProvider) {
         _codecProvider = codecProvider;
         return this;
     }
@@ -170,7 +170,7 @@ public class DatabaseBuilder {
      *
      * @usage _general_method_
      */
-    public DatabaseBuilder setFileFormat(Database.FileFormat fileFormat) {
+    public DatabaseBuilder withFileFormat(Database.FileFormat fileFormat) {
         _fileFormat = fileFormat;
         return this;
     }
@@ -183,7 +183,7 @@ public class DatabaseBuilder {
      *
      * @usage _advanced_method_
      */
-    public DatabaseBuilder setChannel(FileChannel channel) {
+    public DatabaseBuilder withChannel(FileChannel channel) {
         _channel = channel;
         return this;
     }
@@ -253,7 +253,7 @@ public class DatabaseBuilder {
      * Sets flag which, if {@code true}, will make the database ignore the index on the system catalog when looking up
      * tables. This will make table retrieval slower, but can be used to workaround broken indexes.
      */
-    public DatabaseBuilder setIgnoreBrokenSystemCatalogIndex(boolean ignore) {
+    public DatabaseBuilder withIgnoreBrokenSystemCatalogIndex(boolean ignore) {
         _ignoreBrokenSystemCatalogIndex = ignore;
         return this;
     }
@@ -328,7 +328,7 @@ public class DatabaseBuilder {
      */
     public static Database create(Database.FileFormat fileFormat, File mdbFile)
         throws IOException {
-        return new DatabaseBuilder(mdbFile).setFileFormat(fileFormat).create();
+        return new DatabaseBuilder(mdbFile).withFileFormat(fileFormat).create();
     }
 
     /**
@@ -415,8 +415,8 @@ public class DatabaseBuilder {
      */
     public static IndexBuilder newPrimaryKey(String... colNames) {
         return new IndexBuilder(IndexBuilder.PRIMARY_KEY_NAME)
-            .addColumns(colNames)
-            .setPrimaryKey();
+            .withColumns(colNames)
+            .withPrimaryKey();
     }
 
     /**

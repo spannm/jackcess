@@ -160,8 +160,10 @@ public abstract class QueryImpl implements Query {
         return getRowsByAttribute(ORDERBY_ATTRIBUTE);
     }
 
+    @SuppressWarnings("PMD.LinguisticNaming")
     protected abstract void toSQLString(StringBuilder builder);
 
+    @SuppressWarnings("PMD.LinguisticNaming")
     protected void toSQLParameterString(StringBuilder builder) {
         // handle any parameters
         List<String> params = getParameters();
@@ -680,6 +682,7 @@ public abstract class QueryImpl implements Query {
             return sb.toString();
         }
 
+        @SuppressWarnings("PMD.LinguisticNaming")
         protected abstract void toString(StringBuilder sb, boolean isTopLevel);
 
         public abstract boolean containsTable(String table);

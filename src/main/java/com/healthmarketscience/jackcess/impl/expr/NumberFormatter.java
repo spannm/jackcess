@@ -86,6 +86,7 @@ public class NumberFormatter {
         _decFmt = new TypeFormatter(DEC_SIG_DIGITS, syms);
     }
 
+    @SuppressWarnings("PMD.AvoidDecimalLiteralsInBigDecimalConstructor")
     public String format(float f) {
 
         if (Float.isNaN(f)) {
@@ -98,6 +99,7 @@ public class NumberFormatter {
         return _fltFmt.format(new BigDecimal(f, FLT_MATH_CONTEXT));
     }
 
+    @SuppressWarnings("PMD.AvoidDecimalLiteralsInBigDecimalConstructor")
     public String format(double d) {
 
         if (Double.isNaN(d)) {

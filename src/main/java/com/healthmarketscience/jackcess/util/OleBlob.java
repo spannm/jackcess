@@ -296,7 +296,7 @@ public interface OleBlob extends Blob, Closeable {
             return _typeName;
         }
 
-        public Builder setSimplePackageBytes(byte[] bytes) {
+        public Builder withSimplePackageBytes(byte[] bytes) {
             _bytes = bytes;
             _contentLen = bytes.length;
             setDefaultPackageType();
@@ -304,7 +304,7 @@ public interface OleBlob extends Blob, Closeable {
             return this;
         }
 
-        public Builder setSimplePackageStream(InputStream in, long length) {
+        public Builder withSimplePackageStream(InputStream in, long length) {
             _stream = in;
             _contentLen = length;
             setDefaultPackageType();
@@ -312,41 +312,41 @@ public interface OleBlob extends Blob, Closeable {
             return this;
         }
 
-        public Builder setSimplePackageFileName(String fileName) {
+        public Builder withSimplePackageFileName(String fileName) {
             _fileName = fileName;
             setDefaultPackageType();
             _type = ContentType.SIMPLE_PACKAGE;
             return this;
         }
 
-        public Builder setSimplePackageFilePath(String filePath) {
+        public Builder withSimplePackageFilePath(String filePath) {
             _filePath = filePath;
             setDefaultPackageType();
             _type = ContentType.SIMPLE_PACKAGE;
             return this;
         }
 
-        public Builder setSimplePackage(File f) throws FileNotFoundException {
+        public Builder withSimplePackage(File f) throws FileNotFoundException {
             _fileName = f.getName();
             _filePath = f.getAbsolutePath();
-            return setSimplePackageStream(new FileInputStream(f), f.length());
+            return withSimplePackageStream(new FileInputStream(f), f.length());
         }
 
-        public Builder setLinkFileName(String fileName) {
+        public Builder withLinkFileName(String fileName) {
             _fileName = fileName;
             setDefaultPackageType();
             _type = ContentType.LINK;
             return this;
         }
 
-        public Builder setLinkPath(String link) {
+        public Builder withLinkPath(String link) {
             _filePath = link;
             setDefaultPackageType();
             _type = ContentType.LINK;
             return this;
         }
 
-        public Builder setLink(File f) {
+        public Builder withLink(File f) {
             _fileName = f.getName();
             _filePath = f.getAbsolutePath();
             setDefaultPackageType();
@@ -363,35 +363,35 @@ public interface OleBlob extends Blob, Closeable {
             }
         }
 
-        public Builder setOtherBytes(byte[] bytes) {
+        public Builder withOtherBytes(byte[] bytes) {
             _bytes = bytes;
             _contentLen = bytes.length;
             _type = ContentType.OTHER;
             return this;
         }
 
-        public Builder setOtherStream(InputStream in, long length) {
+        public Builder withOtherStream(InputStream in, long length) {
             _stream = in;
             _contentLen = length;
             _type = ContentType.OTHER;
             return this;
         }
 
-        public Builder setOther(File f) throws FileNotFoundException {
-            return setOtherStream(new FileInputStream(f), f.length());
+        public Builder withOther(File f) throws FileNotFoundException {
+            return withOtherStream(new FileInputStream(f), f.length());
         }
 
-        public Builder setPackagePrettyName(String prettyName) {
+        public Builder withPackagePrettyName(String prettyName) {
             _prettyName = prettyName;
             return this;
         }
 
-        public Builder setPackageClassName(String className) {
+        public Builder withPackageClassName(String className) {
             _className = className;
             return this;
         }
 
-        public Builder setPackageTypeName(String typeName) {
+        public Builder withPackageTypeName(String typeName) {
             _typeName = typeName;
             return this;
         }

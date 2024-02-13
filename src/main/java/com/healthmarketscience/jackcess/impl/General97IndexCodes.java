@@ -28,12 +28,11 @@ import java.nio.charset.StandardCharsets;
  *
  * @author James Ahlborn
  */
+@SuppressWarnings("PMD.FieldDeclarationsShouldBeAtStartOfClass")
 public class General97IndexCodes extends GeneralLegacyIndexCodes {
     // stash the codes in some resource files
-    private static final String CODES_FILE              =
-        DatabaseImpl.RESOURCE_PATH + "index_codes_gen_97.txt";
-    private static final String EXT_MAPPINGS_FILE       =
-        DatabaseImpl.RESOURCE_PATH + "index_mappings_ext_gen_97.txt";
+    private static final String CODES_FILE              = DatabaseImpl.RESOURCE_PATH + "index_codes_gen_97.txt";
+    private static final String EXT_MAPPINGS_FILE       = DatabaseImpl.RESOURCE_PATH + "index_mappings_ext_gen_97.txt";
 
     // we only have a small range of extended chars which can mapped back into
     // the valid chars
@@ -169,19 +168,14 @@ public class General97IndexCodes extends GeneralLegacyIndexCodes {
         extraCodes.writeNibble(bytes[0]);
     }
 
-    static short[] loadMappings(String mappingsFilePath,
-        char firstChar, char lastChar) {
+    static short[] loadMappings(String mappingsFilePath, char firstChar, char lastChar) {
+
         int firstCharCode = asUnsignedChar(firstChar);
         int numMappings = asUnsignedChar(lastChar) - firstCharCode + 1;
         short[] values = new short[numMappings];
 
-        BufferedReader reader = null;
-        try {
-
-            reader = new BufferedReader(
-                new InputStreamReader(
-                    DatabaseImpl.getResourceAsStream(mappingsFilePath), StandardCharsets.US_ASCII));
-
+        try (BufferedReader reader = new BufferedReader(
+                new InputStreamReader(DatabaseImpl.getResourceAsStream(mappingsFilePath), StandardCharsets.US_ASCII))) {
             // this is a sparse file with entries like <fromCode>,<toCode>
             String mappingLine = null;
             while ((mappingLine = reader.readLine()) != null) {
@@ -199,8 +193,6 @@ public class General97IndexCodes extends GeneralLegacyIndexCodes {
 
         } catch (IOException e) {
             throw new RuntimeException("failed loading index mappings file " + mappingsFilePath, e);
-        } finally {
-            ByteUtil.closeQuietly(reader);
         }
 
         return values;

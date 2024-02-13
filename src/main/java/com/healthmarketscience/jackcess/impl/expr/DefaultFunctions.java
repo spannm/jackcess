@@ -32,7 +32,6 @@ import java.util.Map;
 import java.util.regex.Matcher;
 
 /**
- *
  * @author James Ahlborn
  */
 public class DefaultFunctions {
@@ -253,8 +252,7 @@ public class DefaultFunctions {
     public static final Function ISNUMERIC      = registerFunc(new Func1("IsNumeric") {
         @Override
         protected Value eval1(EvalContext ctx, Value param1) {
-            // note, only a string can be considered numberic for this
-            // function,
+            // note, only a string can be considered numeric for this function,
             // even though a date/time can be cast to a number in general
             if (param1.getType().isNumeric() || (param1.getType().isString() && stringIsNumeric(ctx, param1))) {
                 return ValueSupport.TRUE_VAL;
@@ -511,8 +509,7 @@ public class DefaultFunctions {
         return bv;
     }
 
-    private static Value formatNumber(
-        EvalContext ctx, Value[] params, FormatUtil.NumPatternType numPatType) {
+    private static Value formatNumber(EvalContext ctx, Value[] params, FormatUtil.NumPatternType numPatType) {
 
         Value param1 = params[0];
         if (param1.isNull()) {
@@ -520,20 +517,15 @@ public class DefaultFunctions {
         }
 
         NumericConfig cfg = ctx.getNumericConfig();
-        int numDecDigits = getOptionalIntParam(
-            ctx, params, 1, cfg.getNumDecimalDigits(), -1);
-        boolean incLeadDigit = getOptionalTriStateBoolean(
-            ctx, params, 2, cfg.includeLeadingDigit());
+        int numDecDigits = getOptionalIntParam(ctx, params, 1, cfg.getNumDecimalDigits(), -1);
+        boolean incLeadDigit = getOptionalTriStateBoolean(ctx, params, 2, cfg.includeLeadingDigit());
         boolean defNegParens = numPatType.useParensForNegatives(cfg);
-        boolean negParens = getOptionalTriStateBoolean(
-            ctx, params, 3, defNegParens);
+        boolean negParens = getOptionalTriStateBoolean(ctx, params, 3, defNegParens);
         int defNumGroupDigits = cfg.getNumGroupingDigits();
-        boolean groupDigits = getOptionalTriStateBoolean(
-            ctx, params, 4, defNumGroupDigits > 0);
+        boolean groupDigits = getOptionalTriStateBoolean(ctx, params, 4, defNumGroupDigits > 0);
         int numGroupDigits = groupDigits ? defNumGroupDigits : 0;
 
-        String fmtStr = FormatUtil.createNumberFormatPattern(
-            numPatType, numDecDigits, incLeadDigit, negParens, numGroupDigits);
+        String fmtStr = FormatUtil.createNumberFormatPattern(numPatType, numDecDigits, incLeadDigit, negParens, numGroupDigits);
 
         DecimalFormat df = ctx.createDecimalFormat(fmtStr);
 

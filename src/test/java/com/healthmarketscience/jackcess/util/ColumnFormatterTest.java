@@ -40,15 +40,15 @@ public class ColumnFormatterTest extends TestCase {
             db.setEvaluateExpressions(true);
 
             Table t = new TableBuilder("test")
-                .addColumn(new ColumnBuilder("id", DataType.LONG).setAutoNumber(true))
+                .addColumn(new ColumnBuilder("id", DataType.LONG).withAutoNumber(true))
                 .addColumn(new ColumnBuilder("data1", DataType.TEXT)
-                    .putProperty(PropertyMap.FORMAT_PROP,
+                    .withProperty(PropertyMap.FORMAT_PROP,
                         ">@@\\x\\x"))
                 .addColumn(new ColumnBuilder("data2", DataType.LONG)
-                    .putProperty(PropertyMap.FORMAT_PROP,
+                    .withProperty(PropertyMap.FORMAT_PROP,
                         "#.#E+0"))
                 .addColumn(new ColumnBuilder("data3", DataType.MONEY)
-                    .putProperty(PropertyMap.FORMAT_PROP,
+                    .withProperty(PropertyMap.FORMAT_PROP,
                         "Currency"))
                 .toTable(db);
 

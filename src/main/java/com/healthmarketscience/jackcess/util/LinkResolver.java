@@ -40,7 +40,7 @@ public interface LinkResolver {
         // if linker is read-only, open linkee read-only
         boolean readOnly = linkerDb instanceof DatabaseImpl ? ((DatabaseImpl) linkerDb).isReadOnly() : false;
         return new DatabaseBuilder(new File(linkeeFileName))
-            .setReadOnly(readOnly).open();
+            .withReadOnly(readOnly).open();
     };
 
     /**

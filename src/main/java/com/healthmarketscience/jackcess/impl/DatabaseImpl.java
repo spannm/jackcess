@@ -523,6 +523,7 @@ public class DatabaseImpl implements Database, DateTimeContext {
      * @param provider CodecProvider for handling page encoding/decoding, may be {@code null} if no special encoding is necessary
      * @usage _advanced_method_
      */
+    @SuppressWarnings("PMD.UseTryWithResources")
     public static DatabaseImpl open(Path mdbFile, boolean readOnly, FileChannel channel, boolean autoSync, Charset charset, TimeZone timeZone, CodecProvider provider, boolean ignoreSystemCatalogIndex)
         throws IOException {
         boolean closeChannel = false;
@@ -589,6 +590,7 @@ public class DatabaseImpl implements Database, DateTimeContext {
      * @param charset Charset to use, if {@code null}, uses default
      * @param timeZone TimeZone to use, if {@code null}, uses default
      */
+    @SuppressWarnings("PMD.UseTryWithResources")
     public static DatabaseImpl create(FileFormat fileFormat, Path mdbFile, FileChannel channel, boolean autoSync, Charset charset, TimeZone timeZone) throws IOException {
         FileFormatDetails details = getFileFormatDetails(fileFormat);
         if (details.getFormat().READ_ONLY) {
@@ -1064,21 +1066,21 @@ public class DatabaseImpl implements Database, DateTimeContext {
 
         if (!ignoreSystemCatalogIndex) {
             try {
-                _tableFinder
-                    = new DefaultTableFinder(_systemCatalog.newCursor().setIndexByColumnNames(CAT_COL_PARENT_ID, CAT_COL_NAME).setColumnMatcher(CaseInsensitiveColumnMatcher.INSTANCE).toIndexCursor());
+                _tableFinder = new DefaultTableFinder(
+                    _systemCatalog.newCursor().withIndexByColumnNames(CAT_COL_PARENT_ID, CAT_COL_NAME).withColumnMatcher(CaseInsensitiveColumnMatcher.INSTANCE).toIndexCursor());
             } catch (IllegalArgumentException e) {
                 if (LOG.isDebugEnabled()) {
                     LOG.debug(withErrorContext("Could not find expected index on table " + _systemCatalog.getName()));
                 }
                 // use table scan instead
-                _tableFinder = new FallbackTableFinder(_systemCatalog.newCursor().setColumnMatcher(CaseInsensitiveColumnMatcher.INSTANCE).toCursor());
+                _tableFinder = new FallbackTableFinder(_systemCatalog.newCursor().withColumnMatcher(CaseInsensitiveColumnMatcher.INSTANCE).toCursor());
             }
         } else {
             if (LOG.isDebugEnabled()) {
                 LOG.debug(withErrorContext("Ignoring index on table " + _systemCatalog.getName()));
             }
             // use table scan instead
-            _tableFinder = new FallbackTableFinder(_systemCatalog.newCursor().setColumnMatcher(CaseInsensitiveColumnMatcher.INSTANCE).toCursor());
+            _tableFinder = new FallbackTableFinder(_systemCatalog.newCursor().withColumnMatcher(CaseInsensitiveColumnMatcher.INSTANCE).toCursor());
         }
 
         _tableParentId = _tableFinder.findObjectId(DB_PARENT_ID, SYSTEM_OBJECT_NAME_TABLES);
@@ -1107,7 +1109,7 @@ public class DatabaseImpl implements Database, DateTimeContext {
 
     private Set<String> getTableNames(boolean normalTables, boolean systemTables, boolean linkedTables) throws IOException {
         Set<String> tableNames = new TreeSet<>(String.CASE_INSENSITIVE_ORDER);
-        _tableFinder.getTableNames(tableNames, normalTables, systemTables, linkedTables);
+        _tableFinder.fillTableNames(tableNames, normalTables, systemTables, linkedTables);
         return tableNames;
     }
 
@@ -1399,7 +1401,7 @@ public class DatabaseImpl implements Database, DateTimeContext {
         Set<String> names = new HashSet<>();
 
         // collect the names of all relationships for uniqueness check
-        for (Row row : CursorImpl.createCursor(_systemCatalog).newIterable().setColumnNames(SYSTEM_CATALOG_COLUMNS)) {
+        for (Row row : CursorImpl.createCursor(_systemCatalog).newIterable().withColumnNames(SYSTEM_CATALOG_COLUMNS)) {
             String name = row.getString(CAT_COL_NAME);
             if (name != null && TYPE_RELATIONSHIP.equals(row.get(CAT_COL_TYPE))) {
                 names.add(toLookupName(name));
@@ -1434,7 +1436,7 @@ public class DatabaseImpl implements Database, DateTimeContext {
         // find all the queries from the system catalog
         List<Row> queryInfo = new ArrayList<>();
         Map<Integer, List<QueryImpl.Row>> queryRowMap = new HashMap<>();
-        for (Row row : CursorImpl.createCursor(_systemCatalog).newIterable().setColumnNames(SYSTEM_CATALOG_COLUMNS)) {
+        for (Row row : CursorImpl.createCursor(_systemCatalog).newIterable().withColumnNames(SYSTEM_CATALOG_COLUMNS)) {
             String name = row.getString(CAT_COL_NAME);
             if (name != null && TYPE_QUERY.equals(row.get(CAT_COL_TYPE))) {
                 queryInfo.add(row);
@@ -1814,7 +1816,7 @@ public class DatabaseImpl implements Database, DateTimeContext {
      */
     private Cursor createCursorWithOptionalIndex(TableImpl table, String colName, Object colValue) throws IOException {
         try {
-            return table.newCursor().setIndexByColumnNames(colName).setSpecificEntry(colValue).toCursor();
+            return table.newCursor().withIndexByColumnNames(colName).withSpecificEntry(colValue).toCursor();
         } catch (IllegalArgumentException e) {
             if (LOG.isDebugEnabled()) {
                 LOG.debug(withErrorContext("Could not find expected index on table " + table.getName()));
@@ -2380,8 +2382,8 @@ public class DatabaseImpl implements Database, DateTimeContext {
             return cur != null ? cur.getCurrentRow(columns) : null;
         }
 
-        public void getTableNames(Set<String> tableNames, boolean normalTables, boolean systemTables, boolean linkedTables) throws IOException {
-            for (Row row : getTableNamesCursor().newIterable().setColumnNames(SYSTEM_CATALOG_COLUMNS)) {
+        public void fillTableNames(Set<String> tableNames, boolean normalTables, boolean systemTables, boolean linkedTables) throws IOException {
+            for (Row row : getTableNamesCursor().newIterable().withColumnNames(SYSTEM_CATALOG_COLUMNS)) {
 
                 String tableName = row.getString(CAT_COL_NAME);
                 int flags = row.getInt(CAT_COL_FLAGS);
@@ -2407,7 +2409,7 @@ public class DatabaseImpl implements Database, DateTimeContext {
         }
 
         public boolean isLinkedTable(Table table) throws IOException {
-            for (Row row : getTableNamesCursor().newIterable().setColumnNames(SYSTEM_CATALOG_TABLE_DETAIL_COLUMNS)) {
+            for (Row row : getTableNamesCursor().newIterable().withColumnNames(SYSTEM_CATALOG_TABLE_DETAIL_COLUMNS)) {
                 Short type = row.getShort(CAT_COL_TYPE);
                 String linkedDbName = row.getString(CAT_COL_DATABASE);
                 String linkedTableName = row.getString(CAT_COL_FOREIGN_NAME);
@@ -2430,7 +2432,7 @@ public class DatabaseImpl implements Database, DateTimeContext {
 
         public Iterator<TableMetaData> iterateTableMetaData() throws IOException {
             return new Iterator<>() {
-                private final Iterator<Row> _iter = getTableNamesCursor().newIterable().setColumnNames(SYSTEM_CATALOG_TABLE_DETAIL_COLUMNS).iterator();
+                private final Iterator<Row> _iter = getTableNamesCursor().newIterable().withColumnNames(SYSTEM_CATALOG_TABLE_DETAIL_COLUMNS).iterator();
                 private TableMetaData       _next;
 
                 @Override
@@ -2501,7 +2503,7 @@ public class DatabaseImpl implements Database, DateTimeContext {
 
         private void initIdCursor() throws IOException {
             if (_systemCatalogIdCursor == null) {
-                _systemCatalogIdCursor = _systemCatalog.newCursor().setIndexByColumnNames(CAT_COL_ID).toIndexCursor();
+                _systemCatalogIdCursor = _systemCatalog.newCursor().withIndexByColumnNames(CAT_COL_ID).toIndexCursor();
             }
         }
 
@@ -2537,7 +2539,7 @@ public class DatabaseImpl implements Database, DateTimeContext {
 
         @Override
         protected Cursor getTableNamesCursor() throws IOException {
-            return _systemCatalogCursor.getIndex().newCursor().setStartEntry(_tableParentId, IndexData.MIN_VALUE).setEndEntry(_tableParentId, IndexData.MAX_VALUE).toIndexCursor();
+            return _systemCatalogCursor.getIndex().newCursor().withStartEntry(_tableParentId, IndexData.MIN_VALUE).withEndEntry(_tableParentId, IndexData.MAX_VALUE).toIndexCursor();
         }
 
         @Override
@@ -2583,7 +2585,7 @@ public class DatabaseImpl implements Database, DateTimeContext {
         @Override
         public TableInfo lookupTable(String tableName) throws IOException {
 
-            for (Row row : _systemCatalogCursor.newIterable().setColumnNames(SYSTEM_CATALOG_TABLE_DETAIL_COLUMNS)) {
+            for (Row row : _systemCatalogCursor.newIterable().withColumnNames(SYSTEM_CATALOG_TABLE_DETAIL_COLUMNS)) {
 
                 Short type = row.getShort(CAT_COL_TYPE);
                 if (!isTableType(type)) {

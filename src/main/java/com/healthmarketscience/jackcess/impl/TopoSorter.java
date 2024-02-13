@@ -44,7 +44,7 @@ public abstract class TopoSorter<E> {
 
         for (E val : _values) {
             Node<E> node = new Node<>(val);
-            getDescendents(val, node._descs);
+            fillDescendents(val, node._descs);
 
             // build the internal list in reverse so that we maintain the "original"
             // order of items which we don't need to re-arrange
@@ -97,7 +97,7 @@ public abstract class TopoSorter<E> {
         throw new IllegalStateException("Unknown descendent " + val);
     }
 
-    protected abstract void getDescendents(E from, List<E> descendents);
+    protected abstract void fillDescendents(E from, List<E> descendents);
 
     private static class Node<E> {
         private final E       _val;

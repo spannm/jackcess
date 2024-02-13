@@ -35,6 +35,7 @@ public abstract class BaseSelectQueryImpl extends QueryImpl
         super(name, rows, objectId, objectFlag, type);
     }
 
+    @SuppressWarnings("PMD.LinguisticNaming")
     protected void toSQLSelectString(StringBuilder builder,
         boolean useSelectPrefix) {
         if (useSelectPrefix) {
@@ -113,6 +114,7 @@ public abstract class BaseSelectQueryImpl extends QueryImpl
         return result;
     }
 
+    @SuppressWarnings("PMD.LinguisticNaming")
     protected void toSelectInto(StringBuilder builder) {
         // base does nothing
     }

@@ -125,7 +125,7 @@ public class LinkedTableTest extends TestCase {
             assertTrue(tables.contains(t3));
             assertFalse(tables.contains(((DatabaseImpl) db).getSystemCatalog()));
 
-            tables = DatabaseTest.getTables(db.newIterable().setIncludeNormalTables(false));
+            tables = DatabaseTest.getTables(db.newIterable().withIncludeNormalTables(false));
             assertEquals(2, tables.size());
             assertFalse(tables.contains(t1));
             assertTrue(tables.contains(t2));

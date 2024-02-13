@@ -227,7 +227,7 @@ public class IndexImpl implements Index, Comparable<IndexImpl> {
 
     @Override
     public CursorBuilder newCursor() {
-        return getTable().newCursor().setIndex(this);
+        return getTable().newCursor().withIndex(this);
     }
 
     /**

@@ -19,7 +19,6 @@ package com.healthmarketscience.jackcess.impl;
 import static com.healthmarketscience.jackcess.DatabaseBuilder.newColumn;
 import static com.healthmarketscience.jackcess.DatabaseBuilder.newTable;
 import static com.healthmarketscience.jackcess.TestUtil.*;
-import static com.healthmarketscience.jackcess.impl.JetFormatTest.SUPPORTED_DBS_TEST;
 import static com.healthmarketscience.jackcess.impl.JetFormatTest.SUPPORTED_FILEFORMATS;
 
 import com.healthmarketscience.jackcess.*;
@@ -51,7 +50,7 @@ public class AutoNumberTest extends TestCase {
 
             Table table = newTable("test")
                 .addColumn(newColumn("a", DataType.LONG)
-                    .setAutoNumber(true))
+                    .withAutoNumber(true))
                 .addColumn(newColumn("b", DataType.TEXT))
                 .toTable(db);
 
@@ -62,7 +61,7 @@ public class AutoNumberTest extends TestCase {
     }
 
     public void testAutoNumberPK() throws Exception {
-        for (final TestDB testDB : SUPPORTED_DBS_TEST) {
+        for (final TestDB testDB : JetFormatTest.SUPPORTED_DBS_TEST) {
             Database db = openMem(testDB);
 
             Table table = db.getTable("Table3");
@@ -126,7 +125,7 @@ public class AutoNumberTest extends TestCase {
 
             Table table = newTable("test")
                 .addColumn(newColumn("a", DataType.GUID)
-                    .setAutoNumber(true))
+                    .withAutoNumber(true))
                 .addColumn(newColumn("b", DataType.TEXT))
                 .toTable(db);
 
@@ -153,7 +152,7 @@ public class AutoNumberTest extends TestCase {
 
             Table table = newTable("test")
                 .addColumn(newColumn("a", DataType.LONG)
-                    .setAutoNumber(true))
+                    .withAutoNumber(true))
                 .addColumn(newColumn("b", DataType.TEXT))
                 .toTable(db);
 
@@ -169,9 +168,9 @@ public class AutoNumberTest extends TestCase {
 
             Table table = newTable("test")
                 .addColumn(newColumn("a", DataType.LONG)
-                    .setAutoNumber(true))
+                    .withAutoNumber(true))
                 .addColumn(newColumn("b", DataType.TEXT))
-                .setPrimaryKey("a")
+                .withPrimaryKey("a")
                 .toTable(db);
 
             doTestInsertLongAutoNumber(table);
@@ -396,7 +395,7 @@ public class AutoNumberTest extends TestCase {
 
             Table table = newTable("test")
                 .addColumn(newColumn("a", DataType.GUID)
-                    .setAutoNumber(true))
+                    .withAutoNumber(true))
                 .addColumn(newColumn("b", DataType.TEXT))
                 .toTable(db);
 

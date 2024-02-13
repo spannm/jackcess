@@ -112,12 +112,12 @@ public class TableUpdaterTest extends TestCase {
         if (enforce) {
             ++t1idxs;
             ++t2idxs;
-            rb.setReferentialIntegrity()
-                .setCascadeDeletes();
+            rb.withReferentialIntegrity()
+                .withCascadeDeletes();
         }
 
         if (relationshipName != null) {
-            rb.setName(relationshipName);
+            rb.withName(relationshipName);
         }
 
         Relationship rel = rb.toRelationship(db);

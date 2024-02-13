@@ -516,11 +516,8 @@ public final class ByteUtil {
     /**
      * Writes a chunk of data to a file in pretty printed hexidecimal.
      */
-    public static void toHexFile(
-        String fileName,
-        ByteBuffer buffer,
-        int offset, int size)
-        throws IOException {
+    @SuppressWarnings("PMD.LinguisticNaming")
+    public static void toHexFile(String fileName, ByteBuffer buffer, int offset, int size) throws IOException {
         try (PrintWriter writer = new PrintWriter(new FileWriter(fileName))) {
             writer.println(toHexString(buffer, offset, size));
         }
@@ -632,13 +629,15 @@ public final class ByteUtil {
     }
 
     /**
-     * Closes the given Closeable if non-null, swallows any IOExceptions.
+     * Closes the given {@link Closeable} if non-null swallowing any {@link IOException}.
      */
     public static void closeQuietly(Closeable c) {
         if (c != null) {
             try {
                 c.close();
-            } catch (IOException ignored) {}
+            } catch (IOException ignored) {
+                return;
+            }
         }
     }
 

@@ -103,7 +103,7 @@
         <dep.plugin.sortpom.version>3.3.0</dep.plugin.sortpom.version>
 
         <basepom.check.skip-checkstyle>false</basepom.check.skip-checkstyle>
-        <basepom.check.skip-pmd>true</basepom.check.skip-pmd>
+        <basepom.check.skip-pmd>false</basepom.check.skip-pmd>
         <basepom.check.skip-spotbugs>true</basepom.check.skip-spotbugs>
         <basepom.check.skip-license>true</basepom.check.skip-license>
 

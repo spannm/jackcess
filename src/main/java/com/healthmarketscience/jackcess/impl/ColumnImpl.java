@@ -579,7 +579,7 @@ public class ColumnImpl implements Column, Comparable<ColumnImpl>, DateTimeConte
                 // init calc col expression evaluator
                 PropertyMap props = getProperties();
                 String calcExpr = (String) props.getValue(PropertyMap.EXPRESSION_PROP);
-                calcCol = new CalcColEvalContext(this).setExpr(calcExpr);
+                calcCol = new CalcColEvalContext(this).withExpr(calcExpr);
             }
 
             setCalcColEvalContext(calcCol);
@@ -622,7 +622,7 @@ public class ColumnImpl implements Column, Comparable<ColumnImpl>, DateTimeConte
                 props, PropertyMap.VALIDATION_TEXT_PROP);
 
             _validator = new ColValidatorEvalContext(this)
-                .setExpr(exprStr, helpStr)
+                .withExpr(exprStr, helpStr)
                 .toColumnValidator(_validator);
         }
 
@@ -630,7 +630,7 @@ public class ColumnImpl implements Column, Comparable<ColumnImpl>, DateTimeConte
             props, PropertyMap.DEFAULT_VALUE_PROP);
         if (defValueStr != null) {
             _defValue = new ColDefaultValueEvalContext(this)
-                .setExpr(defValueStr);
+                .withExpr(defValueStr);
         }
     }
 
@@ -1243,8 +1243,7 @@ public class ColumnImpl implements Column, Comparable<ColumnImpl>, DateTimeConte
      * Rounds the given decimal to milliseconds (3 decimal places) using the standard access rounding mode.
      */
     private static double roundToMillis(double dbl) {
-        return dbl == 0d ? dbl
-            : new BigDecimal(dbl).setScale(3, NumberFormatter.ROUND_MODE)
+        return dbl == 0d ? dbl : BigDecimal.valueOf(dbl).setScale(3, NumberFormatter.ROUND_MODE)
                 .doubleValue();
     }
 
@@ -1802,14 +1801,14 @@ public class ColumnImpl implements Column, Comparable<ColumnImpl>, DateTimeConte
         } else if (value instanceof BigInteger) {
             return new BigDecimal((BigInteger) value);
         } else if (value instanceof Number) {
-            return new BigDecimal(((Number) value).doubleValue());
+            return BigDecimal.valueOf(((Number) value).doubleValue());
         } else if (value instanceof Boolean) {
             // access seems to like -1 for true and 0 for false
             return (Boolean) value ? BigDecimal.valueOf(-1) : BigDecimal.ZERO;
         } else if (value instanceof Date) {
-            return new BigDecimal(toDateDouble(value, db));
+            return BigDecimal.valueOf(toDateDouble(value, db));
         } else if (value instanceof LocalDateTime) {
-            return new BigDecimal(toDateDouble((LocalDateTime) value));
+            return BigDecimal.valueOf(toDateDouble((LocalDateTime) value));
         }
         return new BigDecimal(value.toString());
     }

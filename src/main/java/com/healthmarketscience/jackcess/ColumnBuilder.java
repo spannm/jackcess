@@ -73,7 +73,7 @@ public class ColumnBuilder {
     /**
      * Sets the type for the new column.
      */
-    public ColumnBuilder setType(DataType type) {
+    public ColumnBuilder withType(DataType type) {
         _type = type;
         return this;
     }
@@ -85,32 +85,32 @@ public class ColumnBuilder {
     /**
      * Sets the type for the new column based on the given SQL type.
      */
-    public ColumnBuilder setSQLType(int type) throws IOException {
-        return setSQLType(type, 0, null);
+    public ColumnBuilder withSqlType(int type) throws IOException {
+        return withSqlType(type, 0, null);
     }
 
     /**
      * Sets the type for the new column based on the given SQL type and target data length (in type specific units).
      */
-    public ColumnBuilder setSQLType(int type, int lengthInUnits)
+    public ColumnBuilder withSqlType(int type, int lengthInUnits)
         throws IOException {
-        return setSQLType(type, lengthInUnits, null);
+        return withSqlType(type, lengthInUnits, null);
     }
 
     /**
      * Sets the type for the new column based on the given SQL type, target data length (in type specific units), and
      * target FileFormat.
      */
-    public ColumnBuilder setSQLType(int type, int lengthInUnits,
+    public ColumnBuilder withSqlType(int type, int lengthInUnits,
         Database.FileFormat fileFormat)
         throws IOException {
-        return setType(DataType.fromSQLType(type, lengthInUnits, fileFormat));
+        return withType(DataType.fromSQLType(type, lengthInUnits, fileFormat));
     }
 
     /**
      * Sets the precision for the new column.
      */
-    public ColumnBuilder setPrecision(int newPrecision) {
+    public ColumnBuilder withPrecision(int newPrecision) {
         _precision = (byte) newPrecision;
         return this;
     }
@@ -123,9 +123,9 @@ public class ColumnBuilder {
      * Sets the precision for the new column to the max length for the type. Does nothing for types which do not have a
      * precision.
      */
-    public ColumnBuilder setMaxPrecision() {
+    public ColumnBuilder withMaxPrecision() {
         if (_type.getHasScalePrecision()) {
-            setPrecision(_type.getMaxPrecision());
+            withPrecision(_type.getMaxPrecision());
         }
         return this;
     }
@@ -133,7 +133,7 @@ public class ColumnBuilder {
     /**
      * Sets the scale for the new column.
      */
-    public ColumnBuilder setScale(int newScale) {
+    public ColumnBuilder withScale(int newScale) {
         _scale = (byte) newScale;
         return this;
     }
@@ -146,9 +146,9 @@ public class ColumnBuilder {
      * Sets the scale for the new column to the max length for the type. Does nothing for types which do not have a
      * scale.
      */
-    public ColumnBuilder setMaxScale() {
+    public ColumnBuilder withMaxScale() {
         if (_type.getHasScalePrecision()) {
-            setScale(_type.getMaxScale());
+            withScale(_type.getMaxScale());
         }
         return this;
     }
@@ -156,7 +156,7 @@ public class ColumnBuilder {
     /**
      * Sets the length (in bytes) for the new column.
      */
-    public ColumnBuilder setLength(int length) {
+    public ColumnBuilder withLength(int length) {
         _length = (short) length;
         return this;
     }
@@ -168,18 +168,18 @@ public class ColumnBuilder {
     /**
      * Sets the length (in type specific units) for the new column.
      */
-    public ColumnBuilder setLengthInUnits(int unitLength) {
-        return setLength(_type.fromUnitSize(unitLength));
+    public ColumnBuilder withLengthInUnits(int unitLength) {
+        return withLength(_type.fromUnitSize(unitLength));
     }
 
     /**
      * Sets the length for the new column to the max length for the type. Does nothing for types which are not variable
      * length.
      */
-    public ColumnBuilder setMaxLength() {
+    public ColumnBuilder withMaxLength() {
         // length setting only makes sense for variable length columns
         if (_type.isVariableLength()) {
-            setLength(_type.getMaxSize());
+            withLength(_type.getMaxSize());
         }
         return this;
     }
@@ -187,7 +187,7 @@ public class ColumnBuilder {
     /**
      * Sets whether of not the new column is an auto-number column.
      */
-    public ColumnBuilder setAutoNumber(boolean autoNumber) {
+    public ColumnBuilder withAutoNumber(boolean autoNumber) {
         _autoNumber = autoNumber;
         return this;
     }
@@ -199,7 +199,7 @@ public class ColumnBuilder {
     /**
      * Sets whether of not the new column allows unicode compression.
      */
-    public ColumnBuilder setCompressedUnicode(boolean compressedUnicode) {
+    public ColumnBuilder withCompressedUnicode(boolean compressedUnicode) {
         _compressedUnicode = compressedUnicode;
         return this;
     }
@@ -211,7 +211,7 @@ public class ColumnBuilder {
     /**
      * Sets whether of not the new column is a calculated column.
      */
-    public ColumnBuilder setCalculated(boolean calculated) {
+    public ColumnBuilder withCalculated(boolean calculated) {
         _calculated = calculated;
         return this;
     }
@@ -223,10 +223,10 @@ public class ColumnBuilder {
     /**
      * Convenience method to set the various info for a calculated type (flag, result type property and expression)
      */
-    public ColumnBuilder setCalculatedInfo(String expression) {
-        setCalculated(true);
-        putProperty(PropertyMap.EXPRESSION_PROP, expression);
-        return putProperty(PropertyMap.RESULT_TYPE_PROP, getType().getValue());
+    public ColumnBuilder withCalculatedInfo(String expression) {
+        withCalculated(true);
+        withProperty(PropertyMap.EXPRESSION_PROP, expression);
+        return withProperty(PropertyMap.RESULT_TYPE_PROP, getType().getValue());
     }
 
     public boolean isVariableLength() {
@@ -237,7 +237,7 @@ public class ColumnBuilder {
     /**
      * Sets whether of not the new column allows unicode compression.
      */
-    public ColumnBuilder setHyperlink(boolean hyperlink) {
+    public ColumnBuilder withHyperlink(boolean hyperlink) {
         _hyperlink = hyperlink;
         return this;
     }
@@ -250,14 +250,14 @@ public class ColumnBuilder {
      * Sets the column property with the given name to the given value. Attempts to determine the type of the property
      * (see {@link PropertyMap#put(String,Object)} for details on determining the property type).
      */
-    public ColumnBuilder putProperty(String name, Object value) {
-        return putProperty(name, null, value);
+    public ColumnBuilder withProperty(String name, Object value) {
+        return withProperty(name, null, value);
     }
 
     /**
      * Sets the column property with the given name and type to the given value.
      */
-    public ColumnBuilder putProperty(String name, DataType type, Object value) {
+    public ColumnBuilder withProperty(String name, DataType type, Object value) {
         setProperty(name, PropertyMapImpl.createProperty(name, type, value));
         return this;
     }
@@ -283,19 +283,19 @@ public class ColumnBuilder {
     /**
      * Sets all attributes except name from the given Column template (including all column properties except GUID).
      */
-    public ColumnBuilder setFromColumn(Column template)
+    public ColumnBuilder withFromColumn(Column template)
         throws IOException {
         DataType type = template.getType();
-        setType(type);
-        setLength(template.getLength());
-        setAutoNumber(template.isAutoNumber());
+        withType(type);
+        withLength(template.getLength());
+        withAutoNumber(template.isAutoNumber());
         if (type.getHasScalePrecision()) {
-            setScale(template.getScale());
-            setPrecision(template.getPrecision());
+            withScale(template.getScale());
+            withPrecision(template.getPrecision());
         }
-        setCalculated(template.isCalculated());
-        setCompressedUnicode(template.isCompressedUnicode());
-        setHyperlink(template.isHyperlink());
+        withCalculated(template.isCalculated());
+        withCompressedUnicode(template.isCompressedUnicode());
+        withHyperlink(template.isHyperlink());
         if (template instanceof ColumnImpl) {
             setTextSortOrder(((ColumnImpl) template).getTextSortOrder());
         }
@@ -314,7 +314,7 @@ public class ColumnBuilder {
     /**
      * Sets all attributes except name from the given Column template.
      */
-    public ColumnBuilder setFromColumn(ColumnBuilder template) {
+    public ColumnBuilder withFromColumn(ColumnBuilder template) {
         DataType type = template.getType();
         _type = type;
         _length = template._length;
@@ -454,7 +454,7 @@ public class ColumnBuilder {
 
             // must have result type (just fill in if missing)
             if (getProperty(PropertyMap.RESULT_TYPE_PROP) == null) {
-                putProperty(PropertyMap.RESULT_TYPE_PROP, getType().getValue());
+                withProperty(PropertyMap.RESULT_TYPE_PROP, getType().getValue());
             }
         }
     }

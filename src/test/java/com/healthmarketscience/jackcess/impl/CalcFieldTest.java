@@ -43,7 +43,7 @@ public class CalcFieldTest extends TestCase {
     public void testCreateCalcField() throws Exception {
 
         ColumnBuilder cb = new ColumnBuilder("calc_data", DataType.TEXT)
-            .setCalculatedInfo("[id] & \"_\" & [data]");
+            .withCalculatedInfo("[id] & \"_\" & [data]");
 
         try {
             cb.validate(JetFormat.VERSION_12);
@@ -67,18 +67,18 @@ public class CalcFieldTest extends TestCase {
             Table t = new TableBuilder("Test")
                 .putProperty("awesome_table", true)
                 .addColumn(new ColumnBuilder("id", DataType.LONG)
-                    .setAutoNumber(true))
+                    .withAutoNumber(true))
                 .addColumn(new ColumnBuilder("data", DataType.TEXT))
                 .addColumn(new ColumnBuilder("calc_text", DataType.TEXT)
-                    .setCalculatedInfo("[id] & \"_\" & [data]"))
+                    .withCalculatedInfo("[id] & \"_\" & [data]"))
                 .addColumn(new ColumnBuilder("calc_memo", DataType.MEMO)
-                    .setCalculatedInfo("[id] & \"_\" & [data]"))
+                    .withCalculatedInfo("[id] & \"_\" & [data]"))
                 .addColumn(new ColumnBuilder("calc_bool", DataType.BOOLEAN)
-                    .setCalculatedInfo("[id] > 0"))
+                    .withCalculatedInfo("[id] > 0"))
                 .addColumn(new ColumnBuilder("calc_long", DataType.LONG)
-                    .setCalculatedInfo("[id] + 1"))
+                    .withCalculatedInfo("[id] + 1"))
                 .addColumn(new ColumnBuilder("calc_numeric", DataType.NUMERIC)
-                    .setCalculatedInfo("[id] / 0.03"))
+                    .withCalculatedInfo("[id] / 0.03"))
                 .toTable(db);
 
             Column col = t.getColumn("calc_text");

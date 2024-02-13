@@ -18,7 +18,6 @@ package com.healthmarketscience.jackcess.util;
 
 import com.healthmarketscience.jackcess.Database;
 import com.healthmarketscience.jackcess.DatabaseBuilder;
-import com.healthmarketscience.jackcess.impl.ByteUtil;
 import com.healthmarketscience.jackcess.impl.DatabaseImpl;
 
 import java.io.*;
@@ -97,16 +96,9 @@ public class MemFileChannel extends FileChannel {
      * {@link RandomAccessFile#RandomAccessFile(File,String)}). Note, modifications to the returned channel will
      * <i>not</i> affect the original File source.
      */
-    public static MemFileChannel newChannel(File file, String mode)
-        throws IOException {
-        RandomAccessFile raf = null;
-        FileChannel in = null;
-        try {
-            raf = new RandomAccessFile(file, RO_CHANNEL_MODE);
-            return newChannel(in = raf.getChannel(), mode);
-        } finally {
-            ByteUtil.closeQuietly(in);
-            ByteUtil.closeQuietly(raf);
+    public static MemFileChannel newChannel(File file, String mode) throws IOException {
+        try (RandomAccessFile raf = new RandomAccessFile(file, RO_CHANNEL_MODE); FileChannel in = raf.getChannel()) {
+            return newChannel(in, mode);
         }
     }
 
@@ -115,23 +107,17 @@ public class MemFileChannel extends FileChannel {
      * {@link RandomAccessFile#RandomAccessFile(File,String)}). Note, modifications to the returned channel will
      * <i>not</i> affect the original File source.
      */
-    public static MemFileChannel newChannel(Path file, OpenOption... opts)
-        throws IOException {
-        FileChannel in = null;
-        try {
+    public static MemFileChannel newChannel(Path file, OpenOption... opts) throws IOException {
+
+        try (FileChannel in = FileChannel.open(file, StandardOpenOption.READ)) {
             String mode = RO_CHANNEL_MODE;
-            if (opts != null) {
-                for (OpenOption opt : opts) {
-                    if (opt == StandardOpenOption.WRITE) {
-                        mode = RW_CHANNEL_MODE;
-                        break;
-                    }
+            for (OpenOption opt : opts) {
+                if (opt == StandardOpenOption.WRITE) {
+                    mode = RW_CHANNEL_MODE;
+                    break;
                 }
             }
-            return newChannel(in = FileChannel.open(file, StandardOpenOption.READ),
-                mode);
-        } finally {
-            ByteUtil.closeQuietly(in);
+            return newChannel(in, mode);
         }
     }
 
@@ -154,16 +140,14 @@ public class MemFileChannel extends FileChannel {
      * Creates a new MemFileChannel containing the contents of the given InputStream with the given mode (for mode
      * details see {@link RandomAccessFile#RandomAccessFile(File,String)}).
      */
-    public static MemFileChannel newChannel(InputStream in, String mode)
-        throws IOException {
+    public static MemFileChannel newChannel(InputStream in, String mode) throws IOException {
         return newChannel(Channels.newChannel(in), mode);
     }
 
     /**
      * Creates a new read/write MemFileChannel containing the contents of the given ReadableByteChannel.
      */
-    public static MemFileChannel newChannel(ReadableByteChannel in)
-        throws IOException {
+    public static MemFileChannel newChannel(ReadableByteChannel in) throws IOException {
         return newChannel(in, RW_CHANNEL_MODE);
     }
 
@@ -171,8 +155,7 @@ public class MemFileChannel extends FileChannel {
      * Creates a new MemFileChannel containing the contents of the given ReadableByteChannel with the given mode (for
      * mode details see {@link RandomAccessFile#RandomAccessFile(File,String)}).
      */
-    public static MemFileChannel newChannel(ReadableByteChannel in, String mode)
-        throws IOException {
+    public static MemFileChannel newChannel(ReadableByteChannel in, String mode) throws IOException {
         MemFileChannel channel = new MemFileChannel();
         channel.transferFrom(in, 0L, Long.MAX_VALUE);
         if (!mode.contains("w")) {
@@ -287,14 +270,12 @@ public class MemFileChannel extends FileChannel {
      *
      * @see #transferTo(long,long,WritableByteChannel)
      */
-    public long transferTo(WritableByteChannel dst)
-        throws IOException {
+    public long transferTo(WritableByteChannel dst) throws IOException {
         return transferTo(0L, _size, dst);
     }
 
     @Override
-    public long transferTo(long position, long count, WritableByteChannel dst)
-        throws IOException {
+    public long transferTo(long position, long count, WritableByteChannel dst) throws IOException {
         if (position >= _size) {
             return 0L;
         }
@@ -333,8 +314,7 @@ public class MemFileChannel extends FileChannel {
      *
      * @see #transferTo(long,long,WritableByteChannel)
      */
-    public long transferTo(OutputStream dst)
-        throws IOException {
+    public long transferTo(OutputStream dst) throws IOException {
         return transferTo(0L, _size, dst);
     }
 
@@ -343,15 +323,12 @@ public class MemFileChannel extends FileChannel {
      *
      * @see #transferTo(long,long,WritableByteChannel)
      */
-    public long transferTo(long position, long count, OutputStream dst)
-        throws IOException {
+    public long transferTo(long position, long count, OutputStream dst) throws IOException {
         return transferTo(position, count, Channels.newChannel(dst));
     }
 
     @Override
-    public long transferFrom(ReadableByteChannel src,
-        long position, long count)
-        throws IOException {
+    public long transferFrom(ReadableByteChannel src, long position, long count) throws IOException {
         int chunkIndex = getChunkIndex(position);
         int chunkOffset = getChunkOffset(position);
 
@@ -432,8 +409,7 @@ public class MemFileChannel extends FileChannel {
     }
 
     @Override
-    public long write(ByteBuffer[] srcs, int offset, int length)
-        throws IOException {
+    public long write(ByteBuffer[] srcs, int offset, int length) throws IOException {
         long numBytes = 0L;
         for (int i = offset; i < offset + length; ++i) {
             numBytes += write(srcs[i]);
@@ -442,8 +418,7 @@ public class MemFileChannel extends FileChannel {
     }
 
     @Override
-    public long read(ByteBuffer[] dsts, int offset, int length)
-        throws IOException {
+    public long read(ByteBuffer[] dsts, int offset, int length) throws IOException {
         long numBytes = 0L;
         for (int i = offset; i < offset + length; ++i) {
             if (_position >= _size) {
@@ -455,20 +430,17 @@ public class MemFileChannel extends FileChannel {
     }
 
     @Override
-    public MappedByteBuffer map(MapMode mode, long position, long size)
-        throws IOException {
+    public MappedByteBuffer map(MapMode mode, long position, long size) throws IOException {
         throw new UnsupportedOperationException();
     }
 
     @Override
-    public FileLock lock(long position, long size, boolean shared)
-        throws IOException {
+    public FileLock lock(long position, long size, boolean shared) throws IOException {
         throw new UnsupportedOperationException();
     }
 
     @Override
-    public FileLock tryLock(long position, long size, boolean shared)
-        throws IOException {
+    public FileLock tryLock(long position, long size, boolean shared) throws IOException {
         throw new UnsupportedOperationException();
     }
 
@@ -491,10 +463,9 @@ public class MemFileChannel extends FileChannel {
         }
 
         @Override
-        public long transferFrom(ReadableByteChannel src,
-            long position, long count)
-            throws IOException {
+        public long transferFrom(ReadableByteChannel src, long position, long count) throws IOException {
             throw new NonWritableChannelException();
         }
     }
+
 }

@@ -259,11 +259,8 @@ public class CompoundOleUtil implements CompoundPackageFactory {
 
             @Override
             public void writeTo(OutputStream out) throws IOException {
-                InputStream in = null;
-                try {
-                    ByteUtil.copy(in = getStream(), out);
-                } finally {
-                    ByteUtil.closeQuietly(in);
+                try (InputStream in = getStream()) {
+                    ByteUtil.copy(in, out);
                 }
             }
 

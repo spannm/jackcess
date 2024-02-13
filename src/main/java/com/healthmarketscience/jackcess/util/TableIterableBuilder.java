@@ -53,17 +53,17 @@ public class TableIterableBuilder implements Iterable<Table> {
         return _includeLinkedTables;
     }
 
-    public TableIterableBuilder setIncludeNormalTables(boolean includeNormalTables) {
+    public TableIterableBuilder withIncludeNormalTables(boolean includeNormalTables) {
         _includeNormalTables = includeNormalTables;
         return this;
     }
 
-    public TableIterableBuilder setIncludeSystemTables(boolean includeSystemTables) {
+    public TableIterableBuilder withIncludeSystemTables(boolean includeSystemTables) {
         _includeSystemTables = includeSystemTables;
         return this;
     }
 
-    public TableIterableBuilder setIncludeLinkedTables(boolean includeLinkedTables) {
+    public TableIterableBuilder withIncludeLinkedTables(boolean includeLinkedTables) {
         _includeLinkedTables = includeLinkedTables;
         return this;
     }
@@ -72,18 +72,18 @@ public class TableIterableBuilder implements Iterable<Table> {
      * Convenience method to set the flags to include only non-linked (local) user tables.
      */
     public TableIterableBuilder withLocalUserTablesOnly() {
-        setIncludeNormalTables(true);
-        setIncludeSystemTables(false);
-        return setIncludeLinkedTables(false);
+        withIncludeNormalTables(true);
+        withIncludeSystemTables(false);
+        return withIncludeLinkedTables(false);
     }
 
     /**
      * Convenience method to set the flags to include only system tables.
      */
     public TableIterableBuilder withSystemTablesOnly() {
-        setIncludeNormalTables(false);
-        setIncludeSystemTables(true);
-        return setIncludeLinkedTables(false);
+        withIncludeNormalTables(false);
+        withIncludeSystemTables(true);
+        return withIncludeLinkedTables(false);
     }
 
     @Override

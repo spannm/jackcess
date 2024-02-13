@@ -33,7 +33,7 @@ public class CalcColEvalContext extends RowEvalContext {
         _col = col;
     }
 
-    CalcColEvalContext setExpr(String exprStr) {
+    CalcColEvalContext withExpr(String exprStr) {
         setExpr(Expressionator.Type.EXPRESSION, exprStr);
         return this;
     }

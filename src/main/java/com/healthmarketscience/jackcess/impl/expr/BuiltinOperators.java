@@ -452,10 +452,12 @@ public class BuiltinOperators {
         return toValue(param2.getAsBoolean(ctx));
     }
 
+    @SuppressWarnings("PMD.LinguisticNaming")
     public static Value isNull(Value param1) {
         return toValue(param1.isNull());
     }
 
+    @SuppressWarnings("PMD.LinguisticNaming")
     public static Value isNotNull(Value param1) {
         return toValue(!param1.isNull());
     }

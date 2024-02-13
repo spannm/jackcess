@@ -16,14 +16,10 @@ limitations under the License.
 
 package com.healthmarketscience.jackcess;
 
-import static com.healthmarketscience.jackcess.DatabaseBuilder.*;
-import static com.healthmarketscience.jackcess.TestUtil.*;
-import static com.healthmarketscience.jackcess.TestUtil.create;
-import static com.healthmarketscience.jackcess.TestUtil.open;
-import static com.healthmarketscience.jackcess.impl.JetFormatTest.*;
-
 import com.healthmarketscience.jackcess.Database.FileFormat;
 import com.healthmarketscience.jackcess.impl.*;
+import com.healthmarketscience.jackcess.impl.JetFormatTest.Basename;
+import com.healthmarketscience.jackcess.impl.JetFormatTest.TestDB;
 import junit.framework.TestCase;
 
 import java.io.IOException;
@@ -81,8 +77,8 @@ public class IndexTest extends TestCase {
     }
 
     public void testPrimaryKey() throws Exception {
-        for (final TestDB testDB : SUPPORTED_DBS_TEST_FOR_READ) {
-            Table table = open(testDB).getTable("Table1");
+        for (final TestDB testDB : JetFormatTest.SUPPORTED_DBS_TEST_FOR_READ) {
+            Table table = TestUtil.open(testDB).getTable("Table1");
             Map<String, Boolean> foundPKs = new HashMap<>();
             Index pkIndex = null;
             for (Index index : table.getIndexes()) {
@@ -103,7 +99,7 @@ public class IndexTest extends TestCase {
 
     public void testLogicalIndexes() throws Exception {
         for (final TestDB testDB : TestDB.getSupportedForBasename(Basename.INDEX, true)) {
-            Database mdb = open(testDB);
+            Database mdb = TestUtil.open(testDB);
 
             TableImpl table = (TableImpl) mdb.getTable("Table1");
             for (IndexImpl idx : table.getIndexes()) {
@@ -164,16 +160,16 @@ public class IndexTest extends TestCase {
     public void testComplexIndex() throws Exception {
         for (final TestDB testDB : TestDB.getSupportedForBasename(Basename.COMP_INDEX)) {
             // this file has an index with "compressed" entries and node pages
-            Database db = open(testDB);
+            Database db = TestUtil.open(testDB);
             TableImpl t = (TableImpl) db.getTable("Table1");
             IndexImpl index = t.getIndexes().get(0);
             assertFalse(index.isInitialized());
-            assertEquals(512, countRows(t));
+            assertEquals(512, TestUtil.countRows(t));
             assertEquals(512, index.getIndexData().getEntryCount());
             db.close();
 
             // copy to temp file and attempt to edit
-            db = openCopy(testDB);
+            db = TestUtil.openCopy(testDB);
             t = (TableImpl) db.getTable("Table1");
             index = t.getIndexes().get(0);
 
@@ -182,15 +178,15 @@ public class IndexTest extends TestCase {
     }
 
     public void testEntryDeletion() throws Exception {
-        for (final TestDB testDB : SUPPORTED_DBS_TEST) {
-            Table table = openCopy(testDB).getTable("Table1");
+        for (final TestDB testDB : JetFormatTest.SUPPORTED_DBS_TEST) {
+            Table table = TestUtil.openCopy(testDB).getTable("Table1");
 
             for (int i = 0; i < 10; ++i) {
                 table.addRow("foo" + i, "bar" + i, (byte) 42 + i, (short) 53 + i, 13 * i,
                     6.7d / i, null, null, true);
             }
             table.reset();
-            assertRowCount(12, table);
+            TestUtil.assertRowCount(12, table);
 
             for (Index index : table.getIndexes()) {
                 assertEquals(12, ((IndexImpl) index).getIndexData().getEntryCount());
@@ -211,7 +207,7 @@ public class IndexTest extends TestCase {
             table.getDefaultCursor().deleteCurrentRow();
 
             table.reset();
-            assertRowCount(8, table);
+            TestUtil.assertRowCount(8, table);
 
             for (Index index : table.getIndexes()) {
                 assertEquals(8, ((IndexImpl) index).getIndexData().getEntryCount());
@@ -221,7 +217,7 @@ public class IndexTest extends TestCase {
 
     public void testIgnoreNulls() throws Exception {
         for (final TestDB testDB : TestDB.getSupportedForBasename(Basename.INDEX_PROPERTIES)) {
-            Database db = openCopy(testDB);
+            Database db = TestUtil.openCopy(testDB);
 
             db.setEvaluateExpressions(false);
 
@@ -271,7 +267,7 @@ public class IndexTest extends TestCase {
 
     public void testUnique() throws Exception {
         for (final TestDB testDB : TestDB.getSupportedForBasename(Basename.INDEX_PROPERTIES)) {
-            Database db = openCopy(testDB);
+            Database db = TestUtil.openCopy(testDB);
 
             Table t = db.getTable("TableUnique1_temp");
             Index index = t.getIndex("DataIndex");
@@ -334,8 +330,8 @@ public class IndexTest extends TestCase {
     }
 
     public void testUniqueEntryCount() throws Exception {
-        for (final TestDB testDB : SUPPORTED_DBS_TEST) {
-            Database db = openCopy(testDB);
+        for (final TestDB testDB : JetFormatTest.SUPPORTED_DBS_TEST) {
+            Database db = TestUtil.openCopy(testDB);
             db.setDateTimeType(DateTimeType.DATE);
             Table table = db.getTable("Table1");
             IndexImpl indA = (IndexImpl) table.getIndex("PrimaryKey");
@@ -395,8 +391,8 @@ public class IndexTest extends TestCase {
     }
 
     public void testReplId() throws Exception {
-        for (final TestDB testDB : SUPPORTED_DBS_TEST) {
-            Database db = openCopy(testDB);
+        for (final TestDB testDB : JetFormatTest.SUPPORTED_DBS_TEST) {
+            Database db = TestUtil.openCopy(testDB);
             Table table = db.getTable("Table4");
 
             for (int i = 0; i < 20; ++i) {
@@ -410,13 +406,13 @@ public class IndexTest extends TestCase {
     }
 
     public void testIndexCreation() throws Exception {
-        for (final FileFormat fileFormat : SUPPORTED_FILEFORMATS) {
-            Database db = create(fileFormat);
+        for (final FileFormat fileFormat : JetFormatTest.SUPPORTED_FILEFORMATS) {
+            Database db = TestUtil.create(fileFormat);
 
-            Table t = newTable("TestTable")
-                .addColumn(newColumn("id", DataType.LONG))
-                .addColumn(newColumn("data", DataType.TEXT))
-                .setPrimaryKey("id")
+            Table t = DatabaseBuilder.newTable("TestTable")
+                .addColumn(DatabaseBuilder.newColumn("id", DataType.LONG))
+                .addColumn(DatabaseBuilder.newColumn("data", DataType.TEXT))
+                .withPrimaryKey("id")
                 .toTable(db);
 
             assertEquals(1, t.getIndexes().size());
@@ -436,7 +432,7 @@ public class IndexTest extends TestCase {
             t.addRow(3, "row3");
 
             Cursor c = t.newCursor()
-                .setIndexByName(IndexBuilder.PRIMARY_KEY_NAME).toCursor();
+                .withIndexByName(IndexBuilder.PRIMARY_KEY_NAME).toCursor();
 
             for (int i = 1; i <= 3; ++i) {
                 Map<String, Object> row = c.getNextRow();
@@ -448,16 +444,16 @@ public class IndexTest extends TestCase {
     }
 
     public void testIndexCreationSharedData() throws Exception {
-        for (final FileFormat fileFormat : SUPPORTED_FILEFORMATS) {
-            Database db = create(fileFormat);
+        for (final FileFormat fileFormat : JetFormatTest.SUPPORTED_FILEFORMATS) {
+            Database db = TestUtil.create(fileFormat);
 
-            Table t = newTable("TestTable")
-                .addColumn(newColumn("id", DataType.LONG))
-                .addColumn(newColumn("data", DataType.TEXT))
-                .setPrimaryKey("id")
-                .addIndex(newIndex("Index1").addColumns("id"))
-                .addIndex(newIndex("Index2").addColumns("id"))
-                .addIndex(newIndex("Index3").addColumns(false, "id"))
+            Table t = DatabaseBuilder.newTable("TestTable")
+                .addColumn(DatabaseBuilder.newColumn("id", DataType.LONG))
+                .addColumn(DatabaseBuilder.newColumn("data", DataType.TEXT))
+                .withPrimaryKey("id")
+                .addIndex(DatabaseBuilder.newIndex("Index1").withColumns("id"))
+                .addIndex(DatabaseBuilder.newIndex("Index2").withColumns("id"))
+                .addIndex(DatabaseBuilder.newIndex("Index3").withColumns(false, "id"))
                 .toTable(db);
 
             assertEquals(4, t.getIndexes().size());
@@ -485,7 +481,7 @@ public class IndexTest extends TestCase {
             t.addRow(3, "row3");
 
             Cursor c = t.newCursor()
-                .setIndexByName(IndexBuilder.PRIMARY_KEY_NAME).toCursor();
+                .withIndexByName(IndexBuilder.PRIMARY_KEY_NAME).toCursor();
 
             for (int i = 1; i <= 3; ++i) {
                 Map<String, Object> row = c.getNextRow();
@@ -498,7 +494,7 @@ public class IndexTest extends TestCase {
 
     public void testGetForeignKeyIndex() throws Exception {
         for (final TestDB testDB : TestDB.getSupportedForBasename(Basename.INDEX, true)) {
-            Database db = open(testDB);
+            Database db = TestUtil.open(testDB);
             Table t1 = db.getTable("Table1");
             Table t2 = db.getTable("Table2");
             Table t3 = db.getTable("Table3");
@@ -511,14 +507,14 @@ public class IndexTest extends TestCase {
             assertFalse(t2t1.getReference().isPrimaryTable());
             assertFalse(t2t1.getReference().isCascadeUpdates());
             assertTrue(t2t1.getReference().isCascadeDeletes());
-            doCheckForeignKeyIndex(t1, t2t1, t2);
+            doCheckForeignKeyIndex(t2t1, t2);
 
             assertTrue(t3t1.isForeignKey());
             assertNotNull(t3t1.getReference());
             assertFalse(t3t1.getReference().isPrimaryTable());
             assertTrue(t3t1.getReference().isCascadeUpdates());
             assertFalse(t3t1.getReference().isCascadeDeletes());
-            doCheckForeignKeyIndex(t1, t3t1, t3);
+            doCheckForeignKeyIndex(t3t1, t3);
 
             Index t1pk = t1.getIndex(IndexBuilder.PRIMARY_KEY_NAME);
             assertNotNull(t1pk);
@@ -528,15 +524,15 @@ public class IndexTest extends TestCase {
     }
 
     public void testConstraintViolation() throws Exception {
-        for (final FileFormat fileFormat : SUPPORTED_FILEFORMATS) {
-            Database db = create(fileFormat);
+        for (final FileFormat fileFormat : JetFormatTest.SUPPORTED_FILEFORMATS) {
+            Database db = TestUtil.create(fileFormat);
 
-            Table t = newTable("TestTable")
-                .addColumn(newColumn("id", DataType.LONG))
-                .addColumn(newColumn("data", DataType.TEXT))
-                .setPrimaryKey("id")
-                .addIndex(newIndex("data_ind")
-                    .addColumns("data").setUnique())
+            Table t = DatabaseBuilder.newTable("TestTable")
+                .addColumn(DatabaseBuilder.newColumn("id", DataType.LONG))
+                .addColumn(DatabaseBuilder.newColumn("data", DataType.TEXT))
+                .withPrimaryKey("id")
+                .addIndex(DatabaseBuilder.newIndex("data_ind")
+                    .withColumns("data").withUnique())
                 .toTable(db);
 
             for (int i = 0; i < 5; ++i) {
@@ -552,25 +548,18 @@ public class IndexTest extends TestCase {
 
             assertEquals(5, t.getRowCount());
 
-            List<Row> expectedRows =
-                createExpectedTable(
-                    createExpectedRow(
-                        "id", 0, "data", "row0"),
-                    createExpectedRow(
-                        "id", 1, "data", "row1"),
-                    createExpectedRow(
-                        "id", 2, "data", "row2"),
-                    createExpectedRow(
-                        "id", 3, "data", "row3"),
-                    createExpectedRow(
-                        "id", 4, "data", "row4"));
+            List<Row> expectedRows = TestUtil.createExpectedTable(TestUtil.createExpectedRow("id", 0, "data", "row0"),
+                    TestUtil.createExpectedRow("id", 1, "data", "row1"),
+                    TestUtil.createExpectedRow("id", 2, "data", "row2"),
+                    TestUtil.createExpectedRow("id", 3, "data", "row3"),
+                    TestUtil.createExpectedRow("id", 4, "data", "row4"));
 
-            assertTable(expectedRows, t);
+            TestUtil.assertTable(expectedRows, t);
 
             IndexCursor pkCursor = CursorBuilder.createPrimaryKeyCursor(t);
-            assertCursor(expectedRows, pkCursor);
+            TestUtil.assertCursor(expectedRows, pkCursor);
 
-            assertCursor(expectedRows,
+            TestUtil.assertCursor(expectedRows,
                 CursorBuilder.createCursor(t.getIndex("data_ind")));
 
             List<Object[]> batch = new ArrayList<>();
@@ -589,15 +578,14 @@ public class IndexTest extends TestCase {
             }
 
             expectedRows = new ArrayList<>(expectedRows);
-            expectedRows.add(createExpectedRow("id", 5, "data", "row5"));
-            expectedRows.add(createExpectedRow("id", 6, "data", "row6"));
+            expectedRows.add(TestUtil.createExpectedRow("id", 5, "data", "row5"));
+            expectedRows.add(TestUtil.createExpectedRow("id", 6, "data", "row6"));
 
-            assertTable(expectedRows, t);
+            TestUtil.assertTable(expectedRows, t);
 
-            assertCursor(expectedRows, pkCursor);
+            TestUtil.assertCursor(expectedRows, pkCursor);
 
-            assertCursor(expectedRows,
-                CursorBuilder.createCursor(t.getIndex("data_ind")));
+            TestUtil.assertCursor(expectedRows, CursorBuilder.createCursor(t.getIndex("data_ind")));
 
             pkCursor.findFirstRowByEntry(4);
             Row row4 = pkCursor.getCurrentRow();
@@ -611,27 +599,26 @@ public class IndexTest extends TestCase {
                 // success
             }
 
-            assertTable(expectedRows, t);
+            TestUtil.assertTable(expectedRows, t);
 
-            assertCursor(expectedRows, pkCursor);
+            TestUtil.assertCursor(expectedRows, pkCursor);
 
-            assertCursor(expectedRows,
-                CursorBuilder.createCursor(t.getIndex("data_ind")));
+            TestUtil.assertCursor(expectedRows, CursorBuilder.createCursor(t.getIndex("data_ind")));
 
             db.close();
         }
     }
 
     public void testAutoNumberRecover() throws Exception {
-        for (final FileFormat fileFormat : SUPPORTED_FILEFORMATS) {
-            Database db = create(fileFormat);
+        for (final FileFormat fileFormat : JetFormatTest.SUPPORTED_FILEFORMATS) {
+            Database db = TestUtil.create(fileFormat);
 
-            Table t = newTable("TestTable")
-                .addColumn(newColumn("id", DataType.LONG).setAutoNumber(true))
-                .addColumn(newColumn("data", DataType.TEXT))
-                .setPrimaryKey("id")
-                .addIndex(newIndex("data_ind")
-                    .addColumns("data").setUnique())
+            Table t = DatabaseBuilder.newTable("TestTable")
+                .addColumn(DatabaseBuilder.newColumn("id", DataType.LONG).withAutoNumber(true))
+                .addColumn(DatabaseBuilder.newColumn("data", DataType.TEXT))
+                .withPrimaryKey("id")
+                .addIndex(DatabaseBuilder.newIndex("data_ind")
+                    .withColumns("data").withUnique())
                 .toTable(db);
 
             for (int i = 1; i < 3; ++i) {
@@ -649,22 +636,17 @@ public class IndexTest extends TestCase {
 
             assertEquals(3, t.getRowCount());
 
-            List<Row> expectedRows =
-                createExpectedTable(
-                    createExpectedRow(
-                        "id", 1, "data", "row1"),
-                    createExpectedRow(
-                        "id", 2, "data", "row2"),
-                    createExpectedRow(
-                        "id", 3, "data", "row3"));
+            List<Row> expectedRows = TestUtil.createExpectedTable(
+                    TestUtil.createExpectedRow("id", 1, "data", "row1"),
+                    TestUtil.createExpectedRow("id", 2, "data", "row2"),
+                    TestUtil.createExpectedRow("id", 3, "data", "row3"));
 
-            assertTable(expectedRows, t);
+            TestUtil.assertTable(expectedRows, t);
 
             IndexCursor pkCursor = CursorBuilder.createPrimaryKeyCursor(t);
-            assertCursor(expectedRows, pkCursor);
+            TestUtil.assertCursor(expectedRows, pkCursor);
 
-            assertCursor(expectedRows,
-                CursorBuilder.createCursor(t.getIndex("data_ind")));
+            TestUtil.assertCursor(expectedRows, CursorBuilder.createCursor(t.getIndex("data_ind")));
 
             List<Object[]> batch = new ArrayList<>();
             batch.add(new Object[] {null, "row4"});
@@ -681,15 +663,14 @@ public class IndexTest extends TestCase {
             }
 
             expectedRows = new ArrayList<>(expectedRows);
-            expectedRows.add(createExpectedRow("id", 4, "data", "row4"));
-            expectedRows.add(createExpectedRow("id", 5, "data", "row5"));
+            expectedRows.add(TestUtil.createExpectedRow("id", 4, "data", "row4"));
+            expectedRows.add(TestUtil.createExpectedRow("id", 5, "data", "row5"));
 
-            assertTable(expectedRows, t);
+            TestUtil.assertTable(expectedRows, t);
 
-            assertCursor(expectedRows, pkCursor);
+            TestUtil.assertCursor(expectedRows, pkCursor);
 
-            assertCursor(expectedRows,
-                CursorBuilder.createCursor(t.getIndex("data_ind")));
+            TestUtil.assertCursor(expectedRows, CursorBuilder.createCursor(t.getIndex("data_ind")));
 
             db.close();
         }
@@ -697,7 +678,7 @@ public class IndexTest extends TestCase {
 
     public void testBinaryIndex() throws Exception {
         for (final TestDB testDB : TestDB.getSupportedForBasename(Basename.BINARY_INDEX)) {
-            Database db = open(testDB);
+            Database db = TestUtil.open(testDB);
 
             Table table = db.getTable("Test");
 
@@ -715,7 +696,7 @@ public class IndexTest extends TestCase {
         throws Exception {
         IndexCursor ic = CursorBuilder.createCursor(idx);
 
-        for (Row row : idx.getTable().getDefaultCursor().newIterable().setForward(forward)) {
+        for (Row row : idx.getTable().getDefaultCursor().newIterable().withForward(forward)) {
             int id = row.getInt("ID");
             byte[] data = row.getBytes(colName);
 
@@ -732,8 +713,7 @@ public class IndexTest extends TestCase {
         }
     }
 
-    private void doCheckForeignKeyIndex(Table ta, Index ia, Table tb)
-        throws Exception {
+    private void doCheckForeignKeyIndex(Index ia, Table tb) throws Exception {
         IndexImpl ib = (IndexImpl) ia.getReferencedIndex();
         assertNotNull(ib);
         assertSame(tb, ib.getTable());

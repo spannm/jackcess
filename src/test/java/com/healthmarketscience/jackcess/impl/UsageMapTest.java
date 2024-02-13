@@ -2,7 +2,6 @@ package com.healthmarketscience.jackcess.impl;
 
 import static com.healthmarketscience.jackcess.TestUtil.createString;
 import static com.healthmarketscience.jackcess.TestUtil.openCopy;
-import static com.healthmarketscience.jackcess.impl.JetFormatTest.SUPPORTED_DBS_TEST;
 
 import com.healthmarketscience.jackcess.*;
 import com.healthmarketscience.jackcess.impl.JetFormatTest.TestDB;
@@ -19,7 +18,7 @@ import java.util.List;
 public final class UsageMapTest extends TestCase {
 
     public void testRead() throws Exception {
-        for (final TestDB testDB : SUPPORTED_DBS_TEST) {
+        for (final TestDB testDB : JetFormatTest.SUPPORTED_DBS_TEST) {
             final int expectedFirstPage;
             final int expectedLastPage;
             final Database.FileFormat expectedFileFormat = testDB.getExpectedFileFormat();
@@ -42,9 +41,7 @@ public final class UsageMapTest extends TestCase {
         }
     }
 
-    private static void checkUsageMapRead(
-        final File dbFile, final int expectedFirstPage, final int expectedLastPage)
-        throws IOException {
+    private static void checkUsageMapRead(File dbFile, int expectedFirstPage, int expectedLastPage) throws IOException {
 
         final Database db = DatabaseBuilder.open(dbFile);
         final UsageMap usageMap = UsageMap.read((DatabaseImpl) db,

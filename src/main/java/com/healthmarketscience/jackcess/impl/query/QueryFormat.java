@@ -28,6 +28,7 @@ import java.util.regex.Pattern;
  *
  * @author James Ahlborn
  */
+@SuppressWarnings("PMD.FieldDeclarationsShouldBeAtStartOfClass")
 public class QueryFormat {
 
     private QueryFormat() {

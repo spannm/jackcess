@@ -39,6 +39,7 @@ import java.util.regex.Pattern;
  * @author James Ahlborn
  * @usage _advanced_class_
  */
+@SuppressWarnings("PMD.FieldDeclarationsShouldBeAtStartOfClass")
 public class OleUtil {
 
     /**

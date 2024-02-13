@@ -51,12 +51,12 @@ public class PropertyExpressionTest extends TestCase {
             db.setEvaluateExpressions(true);
 
             Table t = newTable("test")
-                .addColumn(newColumn("id", DataType.LONG).setAutoNumber(true))
+                .addColumn(newColumn("id", DataType.LONG).withAutoNumber(true))
                 .addColumn(newColumn("data1", DataType.TEXT)
-                    .putProperty(PropertyMap.DEFAULT_VALUE_PROP,
+                    .withProperty(PropertyMap.DEFAULT_VALUE_PROP,
                         "=\"FOO \" & \"BAR\""))
                 .addColumn(newColumn("data2", DataType.LONG)
-                    .putProperty(PropertyMap.DEFAULT_VALUE_PROP,
+                    .withProperty(PropertyMap.DEFAULT_VALUE_PROP,
                         "37"))
                 .toTable(db);
 
@@ -113,13 +113,13 @@ public class PropertyExpressionTest extends TestCase {
         db.setEvaluateExpressions(true);
 
         Table t = newTable("test")
-            .addColumn(newColumn("id", DataType.LONG).setAutoNumber(true))
+            .addColumn(newColumn("id", DataType.LONG).withAutoNumber(true))
             .addColumn(newColumn("c1", DataType.LONG)
-                .setCalculatedInfo("[c2]+[c3]"))
+                .withCalculatedInfo("[c2]+[c3]"))
             .addColumn(newColumn("c2", DataType.LONG)
-                .setCalculatedInfo("[c3]*5"))
+                .withCalculatedInfo("[c3]*5"))
             .addColumn(newColumn("c3", DataType.LONG)
-                .setCalculatedInfo("[c4]-6"))
+                .withCalculatedInfo("[c4]-6"))
             .addColumn(newColumn("c4", DataType.LONG))
             .toTable(db);
 
@@ -157,14 +157,14 @@ public class PropertyExpressionTest extends TestCase {
             db.setEvaluateExpressions(true);
 
             Table t = newTable("test")
-                .addColumn(newColumn("id", DataType.LONG).setAutoNumber(true))
+                .addColumn(newColumn("id", DataType.LONG).withAutoNumber(true))
                 .addColumn(newColumn("data1", DataType.LONG)
-                    .putProperty(PropertyMap.VALIDATION_RULE_PROP,
+                    .withProperty(PropertyMap.VALIDATION_RULE_PROP,
                         ">37"))
                 .addColumn(newColumn("data2", DataType.LONG)
-                    .putProperty(PropertyMap.VALIDATION_RULE_PROP,
+                    .withProperty(PropertyMap.VALIDATION_RULE_PROP,
                         "between 7 and 10")
-                    .putProperty(PropertyMap.VALIDATION_TEXT_PROP,
+                    .withProperty(PropertyMap.VALIDATION_TEXT_PROP,
                         "You failed"))
                 .toTable(db);
 
@@ -229,7 +229,7 @@ public class PropertyExpressionTest extends TestCase {
             db.setEvaluateExpressions(true);
 
             Table t = newTable("test")
-                .addColumn(newColumn("id", DataType.LONG).setAutoNumber(true))
+                .addColumn(newColumn("id", DataType.LONG).withAutoNumber(true))
                 .addColumn(newColumn("data1", DataType.LONG))
                 .addColumn(newColumn("data2", DataType.LONG))
                 .putProperty(PropertyMap.VALIDATION_RULE_PROP,
@@ -312,15 +312,15 @@ public class PropertyExpressionTest extends TestCase {
             db.setEvaluateExpressions(true);
 
             Table t = newTable("test")
-                .addColumn(newColumn("id", DataType.LONG).setAutoNumber(true))
+                .addColumn(newColumn("id", DataType.LONG).withAutoNumber(true))
                 .addColumn(newColumn("data1", DataType.TEXT)
-                    .putProperty(PropertyMap.DEFAULT_VALUE_PROP,
+                    .withProperty(PropertyMap.DEFAULT_VALUE_PROP,
                         "=FooFunc()"))
                 .addColumn(newColumn("data2", DataType.TEXT)
-                    .putProperty(PropertyMap.DEFAULT_VALUE_PROP,
+                    .withProperty(PropertyMap.DEFAULT_VALUE_PROP,
                         "=Date()"))
                 .addColumn(newColumn("data3", DataType.TEXT)
-                    .putProperty(PropertyMap.DEFAULT_VALUE_PROP,
+                    .withProperty(PropertyMap.DEFAULT_VALUE_PROP,
                         "=Time()"))
                 .toTable(db);
 

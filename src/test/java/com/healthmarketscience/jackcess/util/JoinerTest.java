@@ -110,7 +110,7 @@ public class JoinerTest extends TestCase {
                 expectedRows2.add(tmpRow2);
             }
 
-            joinedRows = join.findRows(row).setColumnNames(colNames)
+            joinedRows = join.findRows(row).withColumnNames(colNames)
                 .stream().collect(Collectors.toList());
 
             assertEquals(expectedRows2, joinedRows);

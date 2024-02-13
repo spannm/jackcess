@@ -160,16 +160,11 @@ public class ExportUtil {
      * @see #exportWriter(Database,String,BufferedWriter,boolean,String,char,ExportFilter)
      * @see Builder
      */
-    public static void exportFile(Database db, String tableName,
-        File f, boolean header, String delim, char quote,
-        ExportFilter filter) throws IOException {
-        BufferedWriter out = null;
-        try {
-            out = new BufferedWriter(new FileWriter(f));
+    public static void exportFile(Database db, String tableName, File f, boolean header,
+            String delim, char quote, ExportFilter filter) throws IOException {
+
+        try (BufferedWriter out = new BufferedWriter(new FileWriter(f))) {
             exportWriter(db, tableName, out, header, delim, quote, filter);
-            out.close();
-        } finally {
-            ByteUtil.closeQuietly(out);
         }
     }
 
@@ -358,42 +353,42 @@ public class ExportUtil {
             _cursor = cursor;
         }
 
-        public Builder setDatabase(Database db) {
+        public Builder withDatabase(Database db) {
             _db = db;
             return this;
         }
 
-        public Builder setTableName(String tableName) {
+        public Builder withTableName(String tableName) {
             _tableName = tableName;
             return this;
         }
 
-        public Builder setCursor(Cursor cursor) {
+        public Builder withCursor(Cursor cursor) {
             _cursor = cursor;
             return this;
         }
 
-        public Builder setDelimiter(String delim) {
+        public Builder withDelimiter(String delim) {
             _delim = delim;
             return this;
         }
 
-        public Builder setQuote(char quote) {
+        public Builder withQuote(char quote) {
             _quote = quote;
             return this;
         }
 
-        public Builder setFilter(ExportFilter filter) {
+        public Builder withFilter(ExportFilter filter) {
             _filter = filter;
             return this;
         }
 
-        public Builder setHeader(boolean header) {
+        public Builder withHeader(boolean header) {
             _header = header;
             return this;
         }
 
-        public Builder setFileNameExtension(String ext) {
+        public Builder withFileNameExtension(String ext) {
             _ext = ext;
             return this;
         }

@@ -31,6 +31,7 @@ import java.util.*;
  *
  * @author Tim McCune
  */
+@SuppressWarnings("PMD.FieldDeclarationsShouldBeAtStartOfClass")
 public abstract class JetFormat {
 
     /** Maximum size of a record minus OLE objects and Memo fields */

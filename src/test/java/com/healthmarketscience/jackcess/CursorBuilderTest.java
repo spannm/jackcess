@@ -59,13 +59,13 @@ public class CursorBuilderTest extends TestCase {
 
             expected = CursorBuilder.createCursor(idx);
             found = table.newCursor()
-                .setIndexByName("id")
+                .withIndexByName("id")
                 .toCursor();
             assertCursor(expected, found);
 
             try {
                 table.newCursor()
-                    .setIndexByName("foo");
+                    .withIndexByName("foo");
                 fail("IllegalArgumentException should have been thrown");
             } catch (IllegalArgumentException ignored) {
                 // success
@@ -73,13 +73,13 @@ public class CursorBuilderTest extends TestCase {
 
             expected = CursorBuilder.createCursor(idx);
             found = table.newCursor()
-                .setIndexByColumns(table.getColumn("id"))
+                .withIndexByColumns(table.getColumn("id"))
                 .toCursor();
             assertCursor(expected, found);
 
             try {
                 table.newCursor()
-                    .setIndexByColumns(table.getColumn("value"));
+                    .withIndexByColumns(table.getColumn("value"));
                 fail("IllegalArgumentException should have been thrown");
             } catch (IllegalArgumentException ignored) {
                 // success
@@ -87,7 +87,7 @@ public class CursorBuilderTest extends TestCase {
 
             try {
                 table.newCursor()
-                    .setIndexByColumns(table.getColumn("id"), table.getColumn("value"));
+                    .withIndexByColumns(table.getColumn("id"), table.getColumn("value"));
                 fail("IllegalArgumentException should have been thrown");
             } catch (IllegalArgumentException ignored) {
                 // success
@@ -129,7 +129,7 @@ public class CursorBuilderTest extends TestCase {
                 idx.constructIndexRowFromEntry(3),
                 null);
             found = idx.newCursor()
-                .setStartEntry(3)
+                .withStartEntry(3)
                 .toCursor();
             assertCursor(expected, found);
 
@@ -139,10 +139,10 @@ public class CursorBuilderTest extends TestCase {
                 idx.constructIndexRowFromEntry(7),
                 false);
             found = idx.newCursor()
-                .setStartEntry(3)
-                .setStartRowInclusive(false)
-                .setEndEntry(7)
-                .setEndRowInclusive(false)
+                .withStartEntry(3)
+                .withStartRowInclusive(false)
+                .withEndEntry(7)
+                .withEndRowInclusive(false)
                 .toCursor();
             assertCursor(expected, found);
 

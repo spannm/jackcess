@@ -173,8 +173,10 @@ public interface Column {
      */
     void setColumnValidator(ColumnValidator newValidator);
 
+    @SuppressWarnings("PMD.LinguisticNaming")
     Object setRowValue(Object[] rowArray, Object value);
 
+    @SuppressWarnings("PMD.LinguisticNaming")
     Object setRowValue(Map<String, Object> rowMap, Object value);
 
     Object getRowValue(Object[] rowArray);

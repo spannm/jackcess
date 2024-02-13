@@ -147,29 +147,26 @@ public abstract class CustomLinkResolver implements LinkResolver {
      *
      * @return the temp db for holding the linked table info
      */
-    protected Database createTempDb(Object customFile, FileFormat format,
-        boolean inMemory, Path tempDir,
-        boolean readOnly)
-        throws IOException {
+    @SuppressWarnings("PMD.UseTryWithResources")
+    protected Database createTempDb(Object customFile, FileFormat format, boolean inMemory, Path tempDir,
+            boolean readOnly) throws IOException {
+
         Path dbFile = null;
         FileChannel channel = null;
         boolean success = false;
-        try {
 
+        try {
             if (inMemory) {
                 dbFile = Paths.get(MEM_DB_PREFIX + DB_ID.nextLong() + format.getFileExtension());
                 channel = MemFileChannel.newChannel();
             } else {
-                dbFile = tempDir != null ? Files.createTempFile(tempDir, FILE_DB_PREFIX,
-                    format.getFileExtension())
-                    : Files.createTempFile(FILE_DB_PREFIX,
-                        format.getFileExtension());
+                dbFile = tempDir != null ? Files.createTempFile(tempDir, FILE_DB_PREFIX, format.getFileExtension())
+                        : Files.createTempFile(FILE_DB_PREFIX, format.getFileExtension());
                 channel = FileChannel.open(dbFile, DatabaseImpl.RW_CHANNEL_OPTS);
             }
 
             TempDatabaseImpl.initDbChannel(channel, format);
-            TempDatabaseImpl db = new TempDatabaseImpl(this, customFile, dbFile,
-                channel, format, readOnly);
+            TempDatabaseImpl db = new TempDatabaseImpl(this, customFile, dbFile, channel, format, readOnly);
             success = true;
             return db;
 

@@ -56,21 +56,21 @@ public class CodecHandlerTest extends TestCase {
             encodeFile(dbFile, pageSize, simple);
 
             db = new DatabaseBuilder(dbFile)
-                .setCodecProvider(simple ? SIMPLE_PROVIDER : FULL_PROVIDER)
+                .withCodecProvider(simple ? SIMPLE_PROVIDER : FULL_PROVIDER)
                 .open();
 
             Table t1 = new TableBuilder("test1")
-                .addColumn(new ColumnBuilder("id", DataType.LONG).setAutoNumber(true))
-                .addColumn(new ColumnBuilder("data", DataType.TEXT).setLength(250))
-                .setPrimaryKey("id")
-                .addIndex(new IndexBuilder("data_idx").addColumns("data"))
+                .addColumn(new ColumnBuilder("id", DataType.LONG).withAutoNumber(true))
+                .addColumn(new ColumnBuilder("data", DataType.TEXT).withLength(250))
+                .withPrimaryKey("id")
+                .addIndex(new IndexBuilder("data_idx").withColumns("data"))
                 .toTable(db);
 
             Table t2 = new TableBuilder("test2")
-                .addColumn(new ColumnBuilder("id", DataType.LONG).setAutoNumber(true))
-                .addColumn(new ColumnBuilder("data", DataType.TEXT).setLength(250))
-                .setPrimaryKey("id")
-                .addIndex(new IndexBuilder("data_idx").addColumns("data"))
+                .addColumn(new ColumnBuilder("id", DataType.LONG).withAutoNumber(true))
+                .addColumn(new ColumnBuilder("data", DataType.TEXT).withLength(250))
+                .withPrimaryKey("id")
+                .addIndex(new IndexBuilder("data_idx").withColumns("data"))
                 .toTable(db);
 
             int autonum = 1;
@@ -96,9 +96,9 @@ public class CodecHandlerTest extends TestCase {
             ((DatabaseImpl) db).getPageChannel().finishWrite();
         }
 
-        Cursor c1 = t1.newCursor().setIndex(t1.getPrimaryKeyIndex())
+        Cursor c1 = t1.newCursor().withIndex(t1.getPrimaryKeyIndex())
             .toCursor();
-        Cursor c2 = t2.newCursor().setIndex(t2.getPrimaryKeyIndex())
+        Cursor c2 = t2.newCursor().withIndex(t2.getPrimaryKeyIndex())
             .toCursor();
 
         Iterator<? extends Row> i1 = c1.iterator();

@@ -70,7 +70,7 @@ public class RandomContext {
         return rnd.get();
     }
 
-    private float setLast(float lastVal) {
+    private float withLast(float lastVal) {
         _lastVal = lastVal;
         return lastVal;
     }
@@ -88,7 +88,7 @@ public class RandomContext {
 
     private abstract class Source {
         public float get() {
-            return setLast(getImpl());
+            return withLast(getImpl());
         }
 
         protected abstract float getImpl();

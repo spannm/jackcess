@@ -322,9 +322,10 @@ public class DefaultFinancialFunctions {
         return (v1 - v2) / Math.log(1 + rate);
     }
 
-    public static double calculateRate(double nper, double pmt, double pv,
-        double fv, int pmtType, double guess) {
-        double y, f = 0;
+    public static double calculateRate(double nper, double pmt, double pv, double fv, int pmtType, double guess) {
+
+        double y = 0;
+        double f = 0;
         double rate = guess;
         if (Math.abs(rate) < RATE_PRECISION) {
             y = pv * (1 + nper * rate) + pmt * (1 + rate * pmtType) * nper + fv;

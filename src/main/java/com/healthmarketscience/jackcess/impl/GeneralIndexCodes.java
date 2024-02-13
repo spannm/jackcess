@@ -21,6 +21,7 @@ package com.healthmarketscience.jackcess.impl;
  *
  * @author James Ahlborn
  */
+@SuppressWarnings("PMD.FieldDeclarationsShouldBeAtStartOfClass")
 public class GeneralIndexCodes extends GeneralLegacyIndexCodes {
 
     // stash the codes in some resource files

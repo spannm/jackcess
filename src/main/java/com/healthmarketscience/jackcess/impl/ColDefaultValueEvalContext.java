@@ -28,7 +28,7 @@ public class ColDefaultValueEvalContext extends ColEvalContext {
         super(col);
     }
 
-    ColDefaultValueEvalContext setExpr(String exprStr) {
+    ColDefaultValueEvalContext withExpr(String exprStr) {
         setExpr(Expressionator.Type.DEFAULT_VALUE, exprStr);
         return this;
     }

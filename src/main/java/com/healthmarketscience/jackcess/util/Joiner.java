@@ -174,7 +174,7 @@ public class Joiner {
      * @return {@code true} if any "to" rows were deleted, {@code false} otherwise
      */
     public boolean deleteRows(Map<String, ?> fromRow) throws IOException {
-        return deleteRowsImpl(findRows(fromRow).setColumnNames(Collections.emptySet()).iterator());
+        return deleteRowsImpl(findRows(fromRow).withColumnNames(Collections.emptySet()).iterator());
     }
 
     /**
@@ -185,7 +185,7 @@ public class Joiner {
      * @usage _intermediate_method_
      */
     public boolean deleteRows(Object[] fromRow) throws IOException {
-        return deleteRowsImpl(findRows(fromRow).setColumnNames(Collections.emptySet()).iterator());
+        return deleteRowsImpl(findRows(fromRow).withColumnNames(Collections.emptySet()).iterator());
     }
 
     /**
@@ -205,6 +205,7 @@ public class Joiner {
     /**
      * Fills in the _entryValues with the relevant info from the given "from" table row.
      */
+    @SuppressWarnings("PMD.LinguisticNaming")
     private void toEntryValues(Map<String, ?> fromRow) {
         for (int i = 0; i < _entryValues.length; ++i) {
             _entryValues[i] = _fromCols.get(i).getColumn().getRowValue(fromRow);
@@ -214,6 +215,7 @@ public class Joiner {
     /**
      * Fills in the _entryValues with the relevant info from the given "from" table row.
      */
+    @SuppressWarnings("PMD.LinguisticNaming")
     private void toEntryValues(Object[] fromRow) {
         for (int i = 0; i < _entryValues.length; ++i) {
             _entryValues[i] = _fromCols.get(i).getColumn().getRowValue(fromRow);

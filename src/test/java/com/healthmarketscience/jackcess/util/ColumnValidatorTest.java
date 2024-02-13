@@ -44,10 +44,10 @@ public class ColumnValidatorTest extends TestCase {
             assertNotNull(initFact);
 
             Table table = new TableBuilder("Test")
-                .addColumn(new ColumnBuilder("id", DataType.LONG).setAutoNumber(true))
+                .addColumn(new ColumnBuilder("id", DataType.LONG).withAutoNumber(true))
                 .addColumn(new ColumnBuilder("data", DataType.TEXT))
                 .addColumn(new ColumnBuilder("num", DataType.LONG))
-                .setPrimaryKey("id")
+                .withPrimaryKey("id")
                 .toTable(db);
 
             for (Column col : table.getColumns()) {

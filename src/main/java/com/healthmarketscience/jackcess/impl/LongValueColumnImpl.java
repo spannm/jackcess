@@ -399,7 +399,7 @@ class LongValueColumnImpl extends ColumnImpl {
         }
 
         protected ByteBuffer findNewPage(int dataLength) throws IOException {
-            ByteBuffer lvalPage = getBufferHolder().setNewPage(getPageChannel());
+            ByteBuffer lvalPage = getBufferHolder().withNewPage(getPageChannel());
             writeLongValueHeader(lvalPage);
             return lvalPage;
         }

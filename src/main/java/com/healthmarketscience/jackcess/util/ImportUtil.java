@@ -17,7 +17,6 @@ limitations under the License.
 package com.healthmarketscience.jackcess.util;
 
 import com.healthmarketscience.jackcess.*;
-import com.healthmarketscience.jackcess.impl.ByteUtil;
 import com.healthmarketscience.jackcess.impl.DatabaseImpl;
 
 import java.io.*;
@@ -61,22 +60,22 @@ public class ImportUtil {
             ColumnBuilder column = new ColumnBuilder(md.getColumnLabel(i))
                 .escapeName();
             int lengthInUnits = md.getColumnDisplaySize(i);
-            column.setSQLType(md.getColumnType(i), lengthInUnits);
+            column.withSqlType(md.getColumnType(i), lengthInUnits);
             DataType type = column.getType();
             // we check for isTrueVariableLength here to avoid setting the length
             // for a NUMERIC column, which pretends to be var-len, even though it
             // isn't
             if (type.isTrueVariableLength() && !type.isLongValue()) {
-                column.setLengthInUnits((short) lengthInUnits);
+                column.withLengthInUnits((short) lengthInUnits);
             }
             if (type.getHasScalePrecision()) {
                 int scale = md.getScale(i);
                 int precision = md.getPrecision(i);
                 if (type.isValidScale(scale)) {
-                    column.setScale((byte) scale);
+                    column.withScale((byte) scale);
                 }
                 if (type.isValidPrecision(precision)) {
-                    column.setPrecision((byte) precision);
+                    column.withPrecision((byte) precision);
                 }
             }
             columns.add(column);
@@ -167,7 +166,7 @@ public class ImportUtil {
                 rows.clear();
             }
         }
-        if (rows.size() > 0) {
+        if (!rows.isEmpty()) {
             table.addRows(rows);
         }
 
@@ -262,19 +261,11 @@ public class ImportUtil {
      * @see #importReader(BufferedReader,Database,String,String,char,ImportFilter,boolean,boolean)
      * @see Builder
      */
-    public static String importFile(File f, Database db, String name,
-        String delim, char quote,
-        ImportFilter filter,
-        boolean useExistingTable,
-        boolean header)
-        throws IOException {
-        BufferedReader in = null;
-        try {
-            in = new BufferedReader(new FileReader(f));
-            return importReader(in, db, name, delim, quote, filter,
-                useExistingTable, header);
-        } finally {
-            ByteUtil.closeQuietly(in);
+    public static String importFile(File f, Database db, String name, String delim, char quote,
+        ImportFilter filter, boolean useExistingTable, boolean header) throws IOException {
+
+        try (BufferedReader in = new BufferedReader(new FileReader(f))) {
+            return importReader(in, db, name, delim, quote, filter, useExistingTable, header);
         }
     }
 
@@ -410,7 +401,7 @@ public class ImportUtil {
                 for (Object columnName : columnNames) {
                     columns.add(new ColumnBuilder((String) columnName, DataType.TEXT)
                         .escapeName()
-                        .setLength((short) DataType.TEXT.getMaxSize())
+                        .withLength((short) DataType.TEXT.getMaxSize())
                         .toColumn());
                 }
 
@@ -444,7 +435,7 @@ public class ImportUtil {
                     rows.clear();
                 }
             }
-            if (rows.size() > 0) {
+            if (!rows.isEmpty()) {
                 table.addRows(rows);
             }
 
@@ -573,37 +564,37 @@ public class ImportUtil {
             _tableName = tableName;
         }
 
-        public Builder setDatabase(Database db) {
+        public Builder withDatabase(Database db) {
             _db = db;
             return this;
         }
 
-        public Builder setTableName(String tableName) {
+        public Builder withTableName(String tableName) {
             _tableName = tableName;
             return this;
         }
 
-        public Builder setDelimiter(String delim) {
+        public Builder withDelimiter(String delim) {
             _delim = delim;
             return this;
         }
 
-        public Builder setQuote(char quote) {
+        public Builder withQuote(char quote) {
             _quote = quote;
             return this;
         }
 
-        public Builder setFilter(ImportFilter filter) {
+        public Builder withFilter(ImportFilter filter) {
             _filter = filter;
             return this;
         }
 
-        public Builder setUseExistingTable(boolean useExistingTable) {
+        public Builder withUseExistingTable(boolean useExistingTable) {
             _useExistingTable = useExistingTable;
             return this;
         }
 
-        public Builder setHeader(boolean header) {
+        public Builder withHeader(boolean header) {
             _header = header;
             return this;
         }

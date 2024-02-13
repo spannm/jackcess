@@ -16,18 +16,9 @@ limitations under the License.
 
 package com.healthmarketscience.jackcess;
 
-import static com.healthmarketscience.jackcess.DatabaseBuilder.*;
-import static com.healthmarketscience.jackcess.DatabaseBuilder.open;
-import static com.healthmarketscience.jackcess.TestUtil.*;
-import static com.healthmarketscience.jackcess.TestUtil.create;
-import static com.healthmarketscience.jackcess.TestUtil.open;
-import static com.healthmarketscience.jackcess.impl.JetFormatTest.*;
-
 import com.healthmarketscience.jackcess.Database.FileFormat;
-import com.healthmarketscience.jackcess.impl.DatabaseImpl;
-import com.healthmarketscience.jackcess.impl.PropertyMapImpl;
-import com.healthmarketscience.jackcess.impl.PropertyMaps;
-import com.healthmarketscience.jackcess.impl.TableImpl;
+import com.healthmarketscience.jackcess.impl.*;
+import com.healthmarketscience.jackcess.impl.JetFormatTest.TestDB;
 import junit.framework.TestCase;
 
 import java.io.File;
@@ -120,8 +111,8 @@ public class PropertiesTest extends TestCase {
     public void testReadProperties() throws Exception {
         byte[] nameMapBytes = null;
 
-        for (TestDB testDb : SUPPORTED_DBS_TEST_FOR_READ) {
-            Database db = open(testDb);
+        for (TestDB testDb : JetFormatTest.SUPPORTED_DBS_TEST_FOR_READ) {
+            Database db = TestUtil.open(testDb);
 
             TableImpl t = (TableImpl) db.getTable("Table1");
             assertEquals(t.getTableDefPageNumber(),
@@ -185,8 +176,8 @@ public class PropertiesTest extends TestCase {
     }
 
     public void testParseProperties() throws Exception {
-        for (FileFormat ff : SUPPORTED_FILEFORMATS_FOR_READ) {
-            File[] dbFiles = new File(DIR_TEST_DATA, ff.name()).listFiles();
+        for (FileFormat ff : JetFormatTest.SUPPORTED_FILEFORMATS_FOR_READ) {
+            File[] dbFiles = new File(JetFormatTest.DIR_TEST_DATA, ff.name()).listFiles();
             if (dbFiles == null) {
                 continue;
             }
@@ -196,7 +187,7 @@ public class PropertiesTest extends TestCase {
                     continue;
                 }
 
-                Database db = open(ff, f);
+                Database db = TestUtil.open(ff, f);
 
                 PropertyMap dbProps = db.getDatabaseProperties();
                 assertFalse(dbProps.isEmpty());
@@ -224,8 +215,8 @@ public class PropertiesTest extends TestCase {
     }
 
     public void testWriteProperties() throws Exception {
-        for (TestDB testDb : SUPPORTED_DBS_TEST) {
-            Database db = open(testDb);
+        for (TestDB testDb : JetFormatTest.SUPPORTED_DBS_TEST) {
+            Database db = TestUtil.open(testDb);
 
             TableImpl t = (TableImpl) db.getTable("Table1");
 
@@ -256,8 +247,8 @@ public class PropertiesTest extends TestCase {
     }
 
     public void testModifyProperties() throws Exception {
-        for (TestDB testDb : SUPPORTED_DBS_TEST) {
-            Database db = openCopy(testDb);
+        for (TestDB testDb : JetFormatTest.SUPPORTED_DBS_TEST) {
+            Database db = TestUtil.openCopy(testDb);
             File dbFile = db.getFile();
 
             Table t = db.getTable("Table1");
@@ -270,7 +261,7 @@ public class PropertiesTest extends TestCase {
             db.close();
 
             // modify but do not save
-            db = open(dbFile);
+            db = DatabaseBuilder.open(dbFile);
 
             t = db.getTable("Table1");
 
@@ -289,7 +280,7 @@ public class PropertiesTest extends TestCase {
             db.close();
 
             // modify and save
-            db = open(dbFile);
+            db = DatabaseBuilder.open(dbFile);
 
             t = db.getTable("Table1");
 
@@ -315,7 +306,7 @@ public class PropertiesTest extends TestCase {
             db.close();
 
             // reload saved props
-            db = open(dbFile);
+            db = DatabaseBuilder.open(dbFile);
 
             t = db.getTable("Table1");
 
@@ -340,7 +331,7 @@ public class PropertiesTest extends TestCase {
     }
 
     public void testCreateDbProperties() throws Exception {
-        for (FileFormat ff : SUPPORTED_FILEFORMATS) {
+        for (FileFormat ff : JetFormatTest.SUPPORTED_FILEFORMATS) {
 
             if (ff == FileFormat.GENERIC_JET4) {
                 // weirdo format, no properties
@@ -348,29 +339,29 @@ public class PropertiesTest extends TestCase {
             }
 
             File file = TestUtil.createTempFile(false);
-            Database db = newDatabase(file)
-                .setFileFormat(ff)
+            Database db = DatabaseBuilder.newDatabase(file)
+                .withFileFormat(ff)
                 .putUserDefinedProperty("testing", "123")
                 .create();
 
             UUID u1 = UUID.randomUUID();
             UUID u2 = UUID.randomUUID();
-            Table t = newTable("Test")
+            Table t = DatabaseBuilder.newTable("Test")
                 .putProperty("awesome_table", true)
-                .addColumn(newColumn("id", DataType.LONG)
-                    .setAutoNumber(true)
-                    .putProperty(PropertyMap.REQUIRED_PROP, true)
-                    .putProperty(PropertyMap.GUID_PROP, u1))
-                .addColumn(newColumn("data", DataType.TEXT)
-                    .putProperty(PropertyMap.ALLOW_ZERO_LEN_PROP, false)
-                    .putProperty(PropertyMap.GUID_PROP, u2))
+                .addColumn(DatabaseBuilder.newColumn("id", DataType.LONG)
+                    .withAutoNumber(true)
+                    .withProperty(PropertyMap.REQUIRED_PROP, true)
+                    .withProperty(PropertyMap.GUID_PROP, u1))
+                .addColumn(DatabaseBuilder.newColumn("data", DataType.TEXT)
+                    .withProperty(PropertyMap.ALLOW_ZERO_LEN_PROP, false)
+                    .withProperty(PropertyMap.GUID_PROP, u2))
                 .toTable(db);
 
             t.addRow(Column.AUTO_NUMBER, "value");
 
             db.close();
 
-            db = open(file);
+            db = DatabaseBuilder.open(file);
 
             assertEquals("123", db.getUserDefinedProperties().getValue("testing"));
 
@@ -380,30 +371,26 @@ public class PropertiesTest extends TestCase {
                 t.getProperties().getValue("awesome_table"));
 
             Column c = t.getColumn("id");
-            assertEquals(Boolean.TRUE,
-                c.getProperties().getValue(PropertyMap.REQUIRED_PROP));
-            assertEquals("{" + u1.toString().toUpperCase() + "}",
-                c.getProperties().getValue(PropertyMap.GUID_PROP));
+            assertEquals(Boolean.TRUE, c.getProperties().getValue(PropertyMap.REQUIRED_PROP));
+            assertEquals("{" + u1.toString().toUpperCase() + "}", c.getProperties().getValue(PropertyMap.GUID_PROP));
 
             c = t.getColumn("data");
-            assertEquals(Boolean.FALSE,
-                c.getProperties().getValue(PropertyMap.ALLOW_ZERO_LEN_PROP));
-            assertEquals("{" + u2.toString().toUpperCase() + "}",
-                c.getProperties().getValue(PropertyMap.GUID_PROP));
+            assertEquals(Boolean.FALSE, c.getProperties().getValue(PropertyMap.ALLOW_ZERO_LEN_PROP));
+            assertEquals("{" + u2.toString().toUpperCase() + "}", c.getProperties().getValue(PropertyMap.GUID_PROP));
 
         }
     }
 
     public void testEnforceProperties() throws Exception {
-        for (final FileFormat fileFormat : SUPPORTED_FILEFORMATS) {
-            Database db = create(fileFormat);
+        for (final FileFormat fileFormat : JetFormatTest.SUPPORTED_FILEFORMATS) {
+            Database db = TestUtil.create(fileFormat);
 
-            Table t = newTable("testReq")
-                .addColumn(newColumn("id", DataType.LONG)
-                    .setAutoNumber(true)
-                    .putProperty(PropertyMap.REQUIRED_PROP, true))
-                .addColumn(newColumn("value", DataType.TEXT)
-                    .putProperty(PropertyMap.REQUIRED_PROP, true))
+            Table t = DatabaseBuilder.newTable("testReq")
+                .addColumn(DatabaseBuilder.newColumn("id", DataType.LONG)
+                    .withAutoNumber(true)
+                    .withProperty(PropertyMap.REQUIRED_PROP, true))
+                .addColumn(DatabaseBuilder.newColumn("value", DataType.TEXT)
+                    .withProperty(PropertyMap.REQUIRED_PROP, true))
                 .toTable(db);
 
             t.addRow(Column.AUTO_NUMBER, "v1");
@@ -418,22 +405,16 @@ public class PropertiesTest extends TestCase {
             t.addRow(Column.AUTO_NUMBER, "");
 
             List<? extends Map<String, Object>> expectedRows =
-                createExpectedTable(
-                    createExpectedRow(
-                        "id", 1,
-                        "value", "v1"),
-                    createExpectedRow(
-                        "id", 2,
-                        "value", ""));
-            assertTable(expectedRows, t);
+                    TestUtil.createExpectedTable(TestUtil.createExpectedRow("id", 1, "value", "v1"),
+                            TestUtil.createExpectedRow("id", 2, "value", ""));
+            TestUtil.assertTable(expectedRows, t);
 
-            t = newTable("testNz")
-                .addColumn(newColumn("id", DataType.LONG)
-                    .setAutoNumber(true)
-                    .putProperty(PropertyMap.REQUIRED_PROP, true))
-                .addColumn(newColumn("value", DataType.TEXT)
-                    .putProperty(PropertyMap.ALLOW_ZERO_LEN_PROP, false))
-                .toTable(db);
+            t = DatabaseBuilder.newTable("testNz")
+                    .addColumn(DatabaseBuilder.newColumn("id", DataType.LONG).withAutoNumber(true)
+                            .withProperty(PropertyMap.REQUIRED_PROP, true))
+                    .addColumn(DatabaseBuilder.newColumn("value", DataType.TEXT)
+                            .withProperty(PropertyMap.ALLOW_ZERO_LEN_PROP, false))
+                    .toTable(db);
 
             t.addRow(Column.AUTO_NUMBER, "v1");
 
@@ -446,21 +427,15 @@ public class PropertiesTest extends TestCase {
 
             t.addRow(Column.AUTO_NUMBER, null);
 
-            expectedRows =
-                createExpectedTable(
-                    createExpectedRow(
-                        "id", 1,
-                        "value", "v1"),
-                    createExpectedRow(
-                        "id", 2,
-                        "value", null));
-            assertTable(expectedRows, t);
+            expectedRows = TestUtil.createExpectedTable(TestUtil.createExpectedRow("id", 1, "value", "v1"),
+                    TestUtil.createExpectedRow("id", 2, "value", null));
+            TestUtil.assertTable(expectedRows, t);
 
-            t = newTable("testReqNz")
-                .addColumn(newColumn("id", DataType.LONG)
-                    .setAutoNumber(true)
-                    .putProperty(PropertyMap.REQUIRED_PROP, true))
-                .addColumn(newColumn("value", DataType.TEXT))
+            t = DatabaseBuilder.newTable("testReqNz")
+                .addColumn(DatabaseBuilder.newColumn("id", DataType.LONG)
+                    .withAutoNumber(true)
+                    .withProperty(PropertyMap.REQUIRED_PROP, true))
+                .addColumn(DatabaseBuilder.newColumn("value", DataType.TEXT))
                 .toTable(db);
 
             Column col = t.getColumn("value");
@@ -487,15 +462,10 @@ public class PropertiesTest extends TestCase {
 
             t.addRow(Column.AUTO_NUMBER, "v2");
 
-            expectedRows =
-                createExpectedTable(
-                    createExpectedRow(
-                        "id", 1,
-                        "value", "v1"),
-                    createExpectedRow(
-                        "id", 2,
-                        "value", "v2"));
-            assertTable(expectedRows, t);
+            expectedRows = TestUtil.createExpectedTable(
+                    TestUtil.createExpectedRow("id", 1, "value", "v1"),
+                    TestUtil.createExpectedRow("id", 2, "value", "v2"));
+            TestUtil.assertTable(expectedRows, t);
 
             db.close();
         }

@@ -21,6 +21,7 @@ import java.util.Set;
 /**
  * @author Dan Rollo Date: Mar 5, 2010 Time: 12:44:21 PM
  */
+@SuppressWarnings("PMD.FieldDeclarationsShouldBeAtStartOfClass")
 public class JetFormatTest extends TestCase {
 
     public static final File DIR_TEST_DATA = new File("src/test/data");
@@ -149,8 +150,7 @@ public class JetFormatTest extends TestCase {
             return getSupportedForBasename(basename, false);
         }
 
-        public static List<TestDB> getSupportedForBasename(Basename basename,
-            boolean readOnly) {
+        public static List<TestDB> getSupportedForBasename(Basename basename, boolean readOnly) {
 
             List<TestDB> supportedTestDBs = new ArrayList<>();
             for (FileFormat fileFormat : readOnly ? SUPPORTED_FILEFORMATS_FOR_READ : SUPPORTED_FILEFORMATS) {
@@ -161,7 +161,7 @@ public class JetFormatTest extends TestCase {
 
                 // verify that the db is the file format expected
                 try {
-                    Database db = new DatabaseBuilder(testFile).setReadOnly(true).open();
+                    Database db = new DatabaseBuilder(testFile).withReadOnly(true).open();
                     FileFormat dbFileFormat = db.getFileFormat();
                     db.close();
                     if (dbFileFormat != fileFormat) {
@@ -189,10 +189,9 @@ public class JetFormatTest extends TestCase {
         }
     }
 
-    public static final List<TestDB> SUPPORTED_DBS_TEST          =
-        TestDB.getSupportedForBasename(Basename.TEST);
-    public static final List<TestDB> SUPPORTED_DBS_TEST_FOR_READ =
-        TestDB.getSupportedForBasename(Basename.TEST, true);
+    public static final List<TestDB> SUPPORTED_DBS_TEST          = TestDB.getSupportedForBasename(Basename.TEST);
+
+    public static final List<TestDB> SUPPORTED_DBS_TEST_FOR_READ = TestDB.getSupportedForBasename(Basename.TEST, true);
 
     public void testGetFormat() throws Exception {
         try {
@@ -218,11 +217,8 @@ public class JetFormatTest extends TestCase {
 
         for (final TestDB testDB : SUPPORTED_DBS_TEST_FOR_READ) {
 
-            Database db = null;
             Exception failure = null;
-            try {
-                db = openCopy(testDB);
-
+            try (Database db = openCopy(testDB)) {
                 if (testDB.getExpectedFormat().READ_ONLY) {
                     PropertyMap props = db.getUserDefinedProperties();
                     props.put("foo", "bar");
@@ -231,10 +227,6 @@ public class JetFormatTest extends TestCase {
 
             } catch (Exception e) {
                 failure = e;
-            } finally {
-                if (db != null) {
-                    db.close();
-                }
             }
 
             if (!testDB.getExpectedFormat().READ_ONLY) {

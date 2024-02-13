@@ -179,9 +179,9 @@ public class LongValueTest extends TestCase {
         for (final FileFormat fileFormat : SUPPORTED_FILEFORMATS) {
             Database db = createMem(fileFormat);
             Table newTable = new TableBuilder("NewTable")
-                .addColumn(new ColumnBuilder("a").setSQLType(Types.INTEGER))
-                .addColumn(new ColumnBuilder("b").setSQLType(Types.LONGVARCHAR))
-                .addColumn(new ColumnBuilder("c").setSQLType(Types.VARCHAR))
+                .addColumn(new ColumnBuilder("a").withSqlType(Types.INTEGER))
+                .addColumn(new ColumnBuilder("b").withSqlType(Types.LONGVARCHAR))
+                .addColumn(new ColumnBuilder("c").withSqlType(Types.VARCHAR))
                 .toTable(db);
 
             String lval = createString(2000); // "--2000 chars long text--";

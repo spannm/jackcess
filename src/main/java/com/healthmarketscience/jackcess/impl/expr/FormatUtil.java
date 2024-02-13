@@ -33,9 +33,9 @@ import java.util.*;
 import java.util.function.BiConsumer;
 
 /**
- *
  * @author James Ahlborn
  */
+@SuppressWarnings("PMD.FieldDeclarationsShouldBeAtStartOfClass")
 public class FormatUtil {
     public enum NumPatternType {
         GENERAL,
@@ -190,21 +190,18 @@ public class FormatUtil {
 
     @FunctionalInterface
     interface DateFormatBuilder {
-        void build(DateTimeFormatterBuilder dtfb, Args args,
-            boolean hasAmPm, Value.Type dtType);
+        void build(DateTimeFormatterBuilder dtfb, Args args, boolean hasAmPm, Value.Type dtType);
     }
 
-    private static final DateFormatBuilder              PARTIAL_PREFIX    =
-        (dtfb, args, hasAmPm, dtType) -> {
-                                                                                  throw new UnsupportedOperationException();
-                                                                              };
+    private static final DateFormatBuilder PARTIAL_PREFIX = (dtfb, args, hasAmPm, dtType) -> {
+        throw new UnsupportedOperationException();
+    };
 
-    private static final Map<String, DateFormatBuilder> DATE_FMT_BUILDERS =
-        new HashMap<>();
+    private static final Map<String, DateFormatBuilder> DATE_FMT_BUILDERS = new HashMap<>();
+
     static {
         DATE_FMT_BUILDERS.put("c",
-            (dtfb, args, hasAmPm, dtType) -> dtfb.append(ValueSupport.getDateFormatForType(
-                args._ctx, dtType)));
+                (dtfb, args, hasAmPm, dtType) -> dtfb.append(ValueSupport.getDateFormatForType(args._ctx, dtType)));
         DATE_FMT_BUILDERS.put("d", new SimpleDFB("d"));
         DATE_FMT_BUILDERS.put("dd", new SimpleDFB("dd"));
         DATE_FMT_BUILDERS.put("ddd", new SimpleDFB("eee"));
@@ -273,7 +270,7 @@ public class FormatUtil {
             _firstWeekType = firstWeekType;
         }
 
-        public Args setExpr(Value expr) {
+        public Args withExpr(Value expr) {
             _expr = expr;
             return this;
         }
@@ -411,7 +408,7 @@ public class FormatUtil {
         }
 
         public Value format(Value expr) {
-            return _args.setExpr(expr).format(_fmt);
+            return _args.withExpr(expr).format(_fmt);
         }
     }
 

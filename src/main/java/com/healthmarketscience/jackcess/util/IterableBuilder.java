@@ -81,14 +81,14 @@ public class IterableBuilder implements Iterable<Row> {
     }
 
     public IterableBuilder forward() {
-        return setForward(true);
+        return withForward(true);
     }
 
     public IterableBuilder reverse() {
-        return setForward(false);
+        return withForward(false);
     }
 
-    public IterableBuilder setForward(boolean forward) {
+    public IterableBuilder withForward(boolean forward) {
         _forward = forward;
         return this;
     }
@@ -98,7 +98,7 @@ public class IterableBuilder implements Iterable<Row> {
         return this;
     }
 
-    public IterableBuilder setColumnNames(Collection<String> columnNames) {
+    public IterableBuilder withColumnNames(Collection<String> columnNames) {
         _columnNames = columnNames;
         return this;
     }
@@ -137,7 +137,7 @@ public class IterableBuilder implements Iterable<Row> {
         _columnNames.add(columnName);
     }
 
-    public IterableBuilder setMatchPattern(Column columnPattern,
+    public IterableBuilder withMatchPattern(Column columnPattern,
         Object valuePattern) {
         _type = Type.COLUMN_MATCH;
         _matchPattern = new AbstractMap.SimpleImmutableEntry<>(
@@ -145,13 +145,11 @@ public class IterableBuilder implements Iterable<Row> {
         return this;
     }
 
-    public IterableBuilder setMatchPattern(String columnNamePattern,
-        Object valuePattern) {
-        return setMatchPattern(_cursor.getTable().getColumn(columnNamePattern),
-            valuePattern);
+    public IterableBuilder withMatchPattern(String columnNamePattern, Object valuePattern) {
+        return withMatchPattern(_cursor.getTable().getColumn(columnNamePattern), valuePattern);
     }
 
-    public IterableBuilder setMatchPattern(Map<String, ?> rowPattern) {
+    public IterableBuilder withMatchPattern(Map<String, ?> rowPattern) {
         _type = Type.ROW_MATCH;
         _matchPattern = rowPattern;
         return this;
@@ -170,7 +168,7 @@ public class IterableBuilder implements Iterable<Row> {
         return this;
     }
 
-    public IterableBuilder setColumnMatcher(ColumnMatcher columnMatcher) {
+    public IterableBuilder withColumnMatcher(ColumnMatcher columnMatcher) {
         _columnMatcher = columnMatcher;
         return this;
     }
