@@ -22,7 +22,7 @@
           Even though Jackcess is now Java 9+ module compatible, <i>it still
           only requires Java 8+</i>.  However, Jackcess can now be safely used
           in the module path of a Java 9+ project (with the module name of
-          <code>com.healthmarketscience.jackcess</code>).  There are a few
+          <code>io.github.spannm.jackcess</code>).  There are a few
           features which require additional core Java modules to be enabled
           (but these modules are not required if the corresponding features
           are not utilized).

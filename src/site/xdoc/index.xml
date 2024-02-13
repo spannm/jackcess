@@ -23,7 +23,7 @@
         <p>
           While Jackcess <i>still only requires Java 8+</i>, as of the 4.0.0
           release it now includes an Automatic-Module-Name of
-          <code>com.healthmarketscience.jackcess</code> in its manifest.  This
+          <code>io.github.spannm.jackcess</code> in its manifest.  This
           allows it to be used safely in the module path for Java 9+ projects.
         </p>
         <p>
@@ -38,7 +38,7 @@
           Jackcess now supports Java 8+ data types like
           <code>LocalDateTime</code> and <code>Path</code>.  Databases can now
           optionally return <code>Date</code> values (legacy, backwards
-          compatible) or <code>LocalDateTime</code> values.  See <a href="apidocs/com/healthmarketscience/jackcess/DateTimeType.html">DateTimeType</a>
+          compatible) or <code>LocalDateTime</code> values.  See <a href="apidocs/io/github/spannm/jackcess/DateTimeType.html">DateTimeType</a>
           and the <a href="jackcess-3.html">Upgrade Guide</a> for more details
         </p>
       </subsection>
@@ -48,7 +48,7 @@
           Have you ever wished that Jackcess could handle field "default
           values" (or other expressions)?  Wish no longer!  Expression
           evaluation is now enabled by default as of the 3.5.0 release.  See
-          the <a href="apidocs/com/healthmarketscience/jackcess/expr/package-summary.html#package_description">expression package</a> javadocs for more details.
+          the <a href="apidocs/io/github/spannm/jackcess/expr/package-summary.html#package_description">expression package</a> javadocs for more details.
         </p>
       </subsection>
 

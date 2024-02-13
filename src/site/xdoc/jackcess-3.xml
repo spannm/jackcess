@@ -35,7 +35,7 @@
             methods is mutally exclusive.  By default, the backwards
             compatible Date based methods are enabled.  The LocalDateTime
             based methods can be enabled by setting the appropriate
-            <a href="apidocs/com/healthmarketscience/jackcess/DateTimeType.html">DateTimeType</a> on the Database.</li>
+            <a href="apidocs/io/github/spannm/jackcess/DateTimeType.html">DateTimeType</a> on the Database.</li>
           </ul>
           <li><b>Path is now supported.</b></li>
           <ul>

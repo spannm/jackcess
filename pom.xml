@@ -210,7 +210,7 @@
                 <configuration>
                     <archive>
                         <manifestEntries>
-                            <Automatic-Module-Name>com.healthmarketscience.jackcess</Automatic-Module-Name>
+                            <Automatic-Module-Name>io.github.spannm.jackcess</Automatic-Module-Name>
                         </manifestEntries>
                     </archive>
                 </configuration>
