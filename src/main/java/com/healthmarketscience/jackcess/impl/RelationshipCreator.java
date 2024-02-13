@@ -72,8 +72,6 @@ public class RelationshipCreator extends DBMutator {
 
     /**
      * Creates the relationship in the database.
-     *
-     * @usage _advanced_method_
      */
     public RelationshipImpl createRelationship(RelationshipBuilder relationship)
         throws IOException {

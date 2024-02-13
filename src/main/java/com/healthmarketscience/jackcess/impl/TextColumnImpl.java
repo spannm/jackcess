@@ -22,7 +22,6 @@ import java.io.IOException;
  * ColumnImpl subclass which is used for Text data types.
  *
  * @author James Ahlborn
- * @usage _advanced_class_
  */
 class TextColumnImpl extends ColumnImpl {
     /** whether or not they are compressed */

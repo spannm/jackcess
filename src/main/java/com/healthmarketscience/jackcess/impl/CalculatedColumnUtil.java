@@ -56,7 +56,6 @@ class CalculatedColumnUtil {
      * Creates the appropriate ColumnImpl class for a calculated column and reads a column definition in from a buffer
      *
      * @param args column construction info
-     * @usage _advanced_method_
      */
     static ColumnImpl create(ColumnImpl.InitArgs args) throws IOException {
         switch (args.type) {

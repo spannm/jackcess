@@ -32,7 +32,6 @@ import java.util.regex.Pattern;
  * implementing a custom {@link ExportFilter}.
  *
  * @author Frank Gerbig
- * @usage _general_class_
  */
 public class ExportUtil {
 

@@ -28,7 +28,6 @@ import java.util.Set;
  * Common helper class used to maintain state during table mutation.
  *
  * @author James Ahlborn
- * @usage _advanced_class_
  */
 public abstract class TableMutator extends DBMutator {
     private ColumnOffsets _colOffsets;
@@ -122,8 +121,6 @@ public abstract class TableMutator extends DBMutator {
 
     /**
      * Maintains additional state used during column writing.
-     *
-     * @usage _advanced_class_
      */
     static final class ColumnOffsets {
         private short _fixedOffset;
@@ -152,8 +149,6 @@ public abstract class TableMutator extends DBMutator {
 
     /**
      * Maintains additional state used during column creation.
-     *
-     * @usage _advanced_class_
      */
     static final class ColumnState {
         private byte _umapOwnedRowNumber;
@@ -188,8 +183,6 @@ public abstract class TableMutator extends DBMutator {
 
     /**
      * Maintains additional state used during index data creation.
-     *
-     * @usage _advanced_class_
      */
     static final class IndexDataState {
         private final List<IndexBuilder> _indexes = new ArrayList<>();

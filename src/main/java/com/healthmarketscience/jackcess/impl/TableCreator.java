@@ -25,7 +25,6 @@ import java.util.*;
  * Helper class used to maintain state during table creation.
  *
  * @author James Ahlborn
- * @usage _advanced_class_
  */
 public class TableCreator extends TableMutator {
     private String                                _name;
@@ -121,7 +120,6 @@ public class TableCreator extends TableMutator {
 
     /**
      * @return The number of variable length columns which are not long values found in the list
-     * @usage _advanced_method_
      */
     public short countNonLongVariableLength() {
         short rtn = 0;
@@ -135,8 +133,6 @@ public class TableCreator extends TableMutator {
 
     /**
      * Creates the table in the database.
-     *
-     * @usage _advanced_method_
      */
     public TableImpl createTable(TableBuilder table) throws IOException {
 

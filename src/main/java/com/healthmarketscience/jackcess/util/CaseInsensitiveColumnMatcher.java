@@ -29,7 +29,6 @@ import java.io.UncheckedIOException;
  * {@link DataType#MEMO}), and all other columns using simple equality.
  *
  * @author James Ahlborn
- * @usage _general_class_
  */
 public class CaseInsensitiveColumnMatcher implements ColumnMatcher {
 

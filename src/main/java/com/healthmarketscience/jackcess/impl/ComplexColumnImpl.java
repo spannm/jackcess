@@ -30,7 +30,6 @@ import java.io.IOException;
  * ColumnImpl subclass which is used for complex data types.
  *
  * @author James Ahlborn
- * @usage _advanced_class_
  */
 class ComplexColumnImpl extends ColumnImpl {
     /** additional information specific to complex columns */

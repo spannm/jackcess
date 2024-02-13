@@ -29,7 +29,6 @@ import java.io.IOException;
  * {@link ReplacementErrorHandler}.
  *
  * @author James Ahlborn
- * @usage _general_class_
  */
 public class DebugErrorHandler extends ReplacementErrorHandler {
     private static final Log LOG = LogFactory.getLog(DebugErrorHandler.class);

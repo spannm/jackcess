@@ -29,7 +29,6 @@ import java.util.stream.StreamSupport;
  * Builder style class for constructing a {@link Cursor} Iterable/Iterator.
  *
  * @author James Ahlborn
- * @usage _general_class_
  */
 public class IterableBuilder implements Iterable<Row> {
     public enum Type {
@@ -66,16 +65,10 @@ public class IterableBuilder implements Iterable<Row> {
         return _reset;
     }
 
-    /**
-     * @usage _advanced_method_
-     */
     public Object getMatchPattern() {
         return _matchPattern;
     }
 
-    /**
-     * @usage _advanced_method_
-     */
     public Type getType() {
         return _type;
     }

@@ -23,7 +23,6 @@ import java.io.IOException;
  * can be retrieved without attempting to load the Table itself.
  *
  * @author James Ahlborn
- * @usage _intermediate_class_
  */
 public interface TableMetaData {
     enum Type {

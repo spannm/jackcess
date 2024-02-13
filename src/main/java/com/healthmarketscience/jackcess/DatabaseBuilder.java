@@ -47,7 +47,6 @@ import java.util.*;
  * </pre>
  *
  * @author James Ahlborn
- * @usage _general_class_
  */
 public class DatabaseBuilder {
     /** the file name of the mdb to open/create */
@@ -92,8 +91,6 @@ public class DatabaseBuilder {
     /**
      * File containing an existing database for {@link #open} or target file for new database for {@link #create} (in
      * which case, <b>tf this file already exists, it will be overwritten.</b>)
-     *
-     * @usage _general_method_
      */
     public DatabaseBuilder withFile(File mdbFile) {
         return withPath(toPath(mdbFile));
@@ -102,8 +99,6 @@ public class DatabaseBuilder {
     /**
      * File containing an existing database for {@link #open} or target file for new database for {@link #create} (in
      * which case, <b>tf this file already exists, it will be overwritten.</b>)
-     *
-     * @usage _general_method_
      */
     public DatabaseBuilder withPath(Path mdbFile) {
         _mdbFile = mdbFile;
@@ -112,8 +107,6 @@ public class DatabaseBuilder {
 
     /**
      * Sets flag which, iff {@code true}, will force opening file in read-only mode ({@link #open} only).
-     *
-     * @usage _general_method_
      */
     public DatabaseBuilder withReadOnly(boolean readOnly) {
         _readOnly = readOnly;
@@ -126,8 +119,6 @@ public class DatabaseBuilder {
      * be very inefficient for many updates. if {@code false}, flushing to disk happens at the jvm's leisure, which can
      * be much faster, but may leave the database in an inconsistent state if failures are encountered during writing.
      * Writes may be flushed at any time using {@link Database#flush}.
-     *
-     * @usage _intermediate_method_
      */
     public DatabaseBuilder withAutoSync(boolean autoSync) {
         _autoSync = autoSync;
@@ -136,8 +127,6 @@ public class DatabaseBuilder {
 
     /**
      * Sets the Charset to use, if {@code null}, uses default.
-     *
-     * @usage _intermediate_method_
      */
     public DatabaseBuilder withCharset(Charset charset) {
         _charset = charset;
@@ -146,8 +135,6 @@ public class DatabaseBuilder {
 
     /**
      * Sets the TimeZone to use for interpreting dates, if {@code null}, uses default
-     *
-     * @usage _intermediate_method_
      */
     public DatabaseBuilder withTimeZone(TimeZone timeZone) {
         _timeZone = timeZone;
@@ -157,8 +144,6 @@ public class DatabaseBuilder {
     /**
      * Sets the CodecProvider for handling page encoding/decoding, may be {@code null} if no special encoding is
      * necessary
-     *
-     * @usage _intermediate_method_
      */
     public DatabaseBuilder withCodecProvider(CodecProvider codecProvider) {
         _codecProvider = codecProvider;
@@ -167,8 +152,6 @@ public class DatabaseBuilder {
 
     /**
      * Sets the version of new database ({@link #create} only).
-     *
-     * @usage _general_method_
      */
     public DatabaseBuilder withFileFormat(Database.FileFormat fileFormat) {
         _fileFormat = fileFormat;
@@ -180,8 +163,6 @@ public class DatabaseBuilder {
      * This allows ultimate control of where the mdb file exists (which may not be on disk, e.g.
      * {@link MemFileChannel}). If provided, the File parameter will be available from {@link Database#getFile}, but
      * otherwise ignored.
-     *
-     * @usage _advanced_method_
      */
     public DatabaseBuilder withChannel(FileChannel channel) {
         _channel = channel;
@@ -298,7 +279,6 @@ public class DatabaseBuilder {
      * @param mdbFile File containing the database
      *
      * @see DatabaseBuilder for more flexible Database opening
-     * @usage _general_method_
      */
     public static Database open(File mdbFile) throws IOException {
         return new DatabaseBuilder(mdbFile).open();
@@ -311,7 +291,6 @@ public class DatabaseBuilder {
      * @param mdbFile File containing the database
      *
      * @see DatabaseBuilder for more flexible Database opening
-     * @usage _general_method_
      */
     public static Database open(Path mdbFile) throws IOException {
         return new DatabaseBuilder(mdbFile).open();
@@ -324,7 +303,6 @@ public class DatabaseBuilder {
      * @param mdbFile Location to write the new database to. <b>If this file already exists, it will be overwritten.</b>
      *
      * @see DatabaseBuilder for more flexible Database creation
-     * @usage _general_method_
      */
     public static Database create(Database.FileFormat fileFormat, File mdbFile)
         throws IOException {

@@ -28,7 +28,6 @@ import java.util.*;
  * Utility class used by Table to enforce foreign-key relationships (if enabled).
  *
  * @author James Ahlborn
- * @usage _advanced_class_
  */
 final class FKEnforcer {
     // fk constraints always work with indexes, which are always case-insensitive

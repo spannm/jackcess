@@ -24,7 +24,6 @@ import java.io.IOException;
  * Simple implementation of an ErrorHandler which always returns the configured object.
  *
  * @author James Ahlborn
- * @usage _intermediate_class_
  */
 public class ReplacementErrorHandler implements ErrorHandler {
 

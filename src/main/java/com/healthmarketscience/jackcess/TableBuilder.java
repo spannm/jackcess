@@ -42,7 +42,6 @@ import java.util.*;
  * @see ColumnBuilder
  * @see IndexBuilder
  * @see RelationshipBuilder
- * @usage _general_class_
  */
 @SuppressWarnings("PMD.FieldDeclarationsShouldBeAtStartOfClass")
 public class TableBuilder {
@@ -231,7 +230,6 @@ public class TableBuilder {
 
     /**
      * @return A table or column name escaped for Access
-     * @usage _general_method_
      */
     public static String escapeIdentifier(String s) {
         if (isReservedWord(s)) {
@@ -242,7 +240,6 @@ public class TableBuilder {
 
     /**
      * @return {@code true} if the given string is a reserved word, {@code false} otherwise
-     * @usage _general_method_
      */
     public static boolean isReservedWord(String s) {
         return ReservedWords.VALUES.contains(s.toLowerCase());

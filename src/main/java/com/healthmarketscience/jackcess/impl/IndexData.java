@@ -354,8 +354,6 @@ public class IndexData {
 
     /**
      * Returns the number of database pages owned by this index data.
-     *
-     * @usage _intermediate_method_
      */
     public int getOwnedPageCount() {
         return _ownedPages.getPageCount();
@@ -373,7 +371,6 @@ public class IndexData {
      * Used by unit tests to validate the internal status of the index.
      *
      * @param forceLoad if {@code false} only validate currently loaded index data pages, otherwise, load and validate all index pages
-     * @usage _advanced_method_
      */
     public void validate(boolean forceLoad) throws IOException {
         _pageCache.validate(forceLoad);
@@ -381,8 +378,6 @@ public class IndexData {
 
     /**
      * Returns the number of index entries in the index. Only called by unit tests. <p> Forces index initialization.
-     *
-     * @usage _advanced_method_
      */
     public int getEntryCount() throws IOException {
         initialize();

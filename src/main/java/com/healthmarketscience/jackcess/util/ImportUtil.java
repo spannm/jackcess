@@ -34,7 +34,6 @@ import java.util.regex.Pattern;
  * implementing a custom {@link ImportFilter}.
  *
  * @author James Ahlborn
- * @usage _general_class_
  */
 public class ImportUtil {
     /** Batch commit size for copying other result sets into this database */

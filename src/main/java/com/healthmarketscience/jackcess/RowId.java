@@ -22,7 +22,6 @@ package com.healthmarketscience.jackcess;
  * {@code toString()} methods.
  *
  * @author James Ahlborn
- * @usage _intermediate_class_
  */
 public interface RowId extends Comparable<RowId> {
 

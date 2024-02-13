@@ -28,7 +28,6 @@ import java.util.Map;
  *
  * @author James Ahlborn
  * @see TableBuilder
- * @usage _general_class_
  */
 public class ColumnBuilder {
 
@@ -343,30 +342,18 @@ public class ColumnBuilder {
         return this;
     }
 
-    /**
-     * @usage _advanced_method_
-     */
     public short getColumnNumber() {
         return _columnNumber;
     }
 
-    /**
-     * @usage _advanced_method_
-     */
     public void setColumnNumber(short newColumnNumber) {
         _columnNumber = newColumnNumber;
     }
 
-    /**
-     * @usage _advanced_method_
-     */
     public ColumnImpl.SortOrder getTextSortOrder() {
         return _sortOrder;
     }
 
-    /**
-     * @usage _advanced_method_
-     */
     public void setTextSortOrder(ColumnImpl.SortOrder newTextSortOrder) {
         _sortOrder = newTextSortOrder;
     }
@@ -375,7 +362,6 @@ public class ColumnBuilder {
      * Checks that this column definition is valid.
      *
      * @throws IllegalArgumentException if this column definition is invalid.
-     * @usage _advanced_method_
      */
     public void validate(JetFormat format) {
         DatabaseImpl.validateIdentifierName(

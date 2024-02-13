@@ -40,7 +40,6 @@ import java.nio.file.StandardOpenOption;
  * implemented and individual read/write operations are only supported within page boundaries.
  *
  * @author James Ahlborn
- * @usage _advanced_class_
  */
 public class MemFileChannel extends FileChannel {
     /** read-only channel access mode */

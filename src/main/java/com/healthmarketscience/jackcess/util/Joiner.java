@@ -27,7 +27,6 @@ import java.util.*;
  * Utility for finding rows based on pre-defined, foreign-key table relationships.
  *
  * @author James Ahlborn
- * @usage _general_class_
  */
 public class Joiner {
     private final Index                        _fromIndex;
@@ -115,8 +114,6 @@ public class Joiner {
     /**
      * Returns {@code true} if the "to" table has any rows based on the given columns in the "from" table, {@code false}
      * otherwise.
-     *
-     * @usage _intermediate_method_
      */
     public boolean hasRows(Object[] fromRow) throws IOException {
         toEntryValues(fromRow);
@@ -182,7 +179,6 @@ public class Joiner {
      *
      * @param fromRow row from the "from" table (which must include the relevant columns for this join relationship)
      * @return {@code true} if any "to" rows were deleted, {@code false} otherwise
-     * @usage _intermediate_method_
      */
     public boolean deleteRows(Object[] fromRow) throws IOException {
         return deleteRowsImpl(findRows(fromRow).withColumnNames(Collections.emptySet()).iterator());

@@ -47,7 +47,6 @@ import java.util.Random;
  * </ul>
  *
  * @author James Ahlborn
- * @usage _intermediate_class_
  */
 public abstract class CustomLinkResolver implements LinkResolver {
     private static final Random    DB_ID             = new Random();

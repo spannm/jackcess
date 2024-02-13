@@ -48,7 +48,6 @@ import java.util.regex.Pattern;
  * Access database column definition
  *
  * @author Tim McCune
- * @usage _intermediate_class_
  */
 public class ColumnImpl implements Column, Comparable<ColumnImpl>, DateTimeContext {
 
@@ -59,7 +58,6 @@ public class ColumnImpl implements Column, Comparable<ColumnImpl>, DateTimeConte
      * as an extra value at the end of the row values array.
      *
      * @see TableImpl#asRowWithRowId
-     * @usage _intermediate_field_
      */
     public static final Object           RETURN_ROW_ID                    = "<RETURN_ROW_ID>";
 
@@ -98,36 +96,26 @@ public class ColumnImpl implements Column, Comparable<ColumnImpl>, DateTimeConte
 
     /**
      * mask for the fixed len bit
-     *
-     * @usage _advanced_field_
      */
     public static final byte             FIXED_LEN_FLAG_MASK              = (byte) 0x01;
 
     /**
      * mask for the auto number bit
-     *
-     * @usage _advanced_field_
      */
     public static final byte             AUTO_NUMBER_FLAG_MASK            = (byte) 0x04;
 
     /**
      * mask for the auto number guid bit
-     *
-     * @usage _advanced_field_
      */
     public static final byte             AUTO_NUMBER_GUID_FLAG_MASK       = (byte) 0x40;
 
     /**
      * mask for the hyperlink bit (on memo types)
-     *
-     * @usage _advanced_field_
      */
     public static final byte             HYPERLINK_FLAG_MASK              = (byte) 0x80;
 
     /**
      * mask for the "is updatable" field bit
-     *
-     * @usage _advanced_field_
      */
     public static final byte             UPDATABLE_FLAG_MASK              = (byte) 0x02;
 
@@ -144,24 +132,18 @@ public class ColumnImpl implements Column, Comparable<ColumnImpl>, DateTimeConte
 
     /**
      * the "general" text sort order, version (access 1997)
-     *
-     * @usage _intermediate_field_
      */
     public static final SortOrder        GENERAL_97_SORT_ORDER            =
         new SortOrder(GENERAL_SORT_ORDER_VALUE, (short) -1);
 
     /**
      * the "general" text sort order, legacy version (access 2000-2007)
-     *
-     * @usage _intermediate_field_
      */
     public static final SortOrder        GENERAL_LEGACY_SORT_ORDER        =
         new SortOrder(GENERAL_SORT_ORDER_VALUE, (short) 0);
 
     /**
      * the "general" text sort order, latest version (access 2010+)
-     *
-     * @usage _intermediate_field_
      */
     public static final SortOrder        GENERAL_SORT_ORDER               =
         new SortOrder(GENERAL_SORT_ORDER_VALUE, (short) 1);
@@ -218,9 +200,6 @@ public class ColumnImpl implements Column, Comparable<ColumnImpl>, DateTimeConte
     /** length of the column in units, lazily computed */
     private int                          _lengthInUnits                   = INVALID_LENGTH;
 
-    /**
-     * @usage _advanced_method_
-     */
     protected ColumnImpl(TableImpl table, String name, DataType type,
         int colNumber, int fixedOffset, int varLenIndex) {
         _table = table;
@@ -245,8 +224,6 @@ public class ColumnImpl implements Column, Comparable<ColumnImpl>, DateTimeConte
 
     /**
      * Read a column definition in from a buffer
-     *
-     * @usage _advanced_method_
      */
     ColumnImpl(InitArgs args)
         throws IOException {
@@ -283,7 +260,6 @@ public class ColumnImpl implements Column, Comparable<ColumnImpl>, DateTimeConte
      * @param table owning table
      * @param buffer Buffer containing column definition
      * @param offset Offset in the buffer at which the column definition starts
-     * @usage _advanced_method_
      */
     public static ColumnImpl create(TableImpl table, ByteBuffer buffer,
         int offset, String name, int displayIndex)
@@ -364,16 +340,10 @@ public class ColumnImpl implements Column, Comparable<ColumnImpl>, DateTimeConte
         return getTable().getDatabase();
     }
 
-    /**
-     * @usage _advanced_method_
-     */
     public JetFormat getFormat() {
         return getDatabase().getFormat();
     }
 
-    /**
-     * @usage _advanced_method_
-     */
     public PageChannel getPageChannel() {
         return getDatabase().getPageChannel();
     }
@@ -393,9 +363,6 @@ public class ColumnImpl implements Column, Comparable<ColumnImpl>, DateTimeConte
         return _autoNumber;
     }
 
-    /**
-     * @usage _advanced_method_
-     */
     public short getColumnNumber() {
         return _columnNumber;
     }
@@ -405,16 +372,10 @@ public class ColumnImpl implements Column, Comparable<ColumnImpl>, DateTimeConte
         return _columnIndex;
     }
 
-    /**
-     * @usage _advanced_method_
-     */
     public void setColumnIndex(int newColumnIndex) {
         _columnIndex = newColumnIndex;
     }
 
-    /**
-     * @usage _advanced_method_
-     */
     public int getDisplayIndex() {
         return _displayIndex;
     }
@@ -444,16 +405,10 @@ public class ColumnImpl implements Column, Comparable<ColumnImpl>, DateTimeConte
         return (byte) getType().getDefaultScale();
     }
 
-    /**
-     * @usage _intermediate_method_
-     */
     public SortOrder getTextSortOrder() {
         return null;
     }
 
-    /**
-     * @usage _intermediate_method_
-     */
     public short getTextCodePage() {
         return 0;
     }
@@ -480,16 +435,10 @@ public class ColumnImpl implements Column, Comparable<ColumnImpl>, DateTimeConte
         return _calculated;
     }
 
-    /**
-     * @usage _advanced_method_
-     */
     public int getVarLenTableIndex() {
         return _varLenTableIndex;
     }
 
-    /**
-     * @usage _advanced_method_
-     */
     public int getFixedDataOffset() {
         return _fixedDataOffset;
     }
@@ -525,16 +474,11 @@ public class ColumnImpl implements Column, Comparable<ColumnImpl>, DateTimeConte
 
     /**
      * Returns the number of database pages owned by this column.
-     *
-     * @usage _intermediate_method_
      */
     public int getOwnedPageCount() {
         return 0;
     }
 
-    /**
-     * @usage _advanced_method_
-     */
     public void setVersionHistoryColumn(ColumnImpl versionHistoryCol) {
         throw new UnsupportedOperationException();
     }
@@ -698,8 +642,6 @@ public class ColumnImpl implements Column, Comparable<ColumnImpl>, DateTimeConte
 
     /**
      * Returns the AutoNumberGenerator for this column if this is an autonumber column, {@code null} otherwise.
-     *
-     * @usage _advanced_method_
      */
     public AutoNumberGenerator getAutoNumberGenerator() {
         return _autoNumberGenerator;
@@ -752,7 +694,6 @@ public class ColumnImpl implements Column, Comparable<ColumnImpl>, DateTimeConte
      *
      * @param data The raw byte value
      * @return The deserialized Object
-     * @usage _advanced_method_
      */
     public Object read(byte[] data) throws IOException {
         return read(data, PageChannel.DEFAULT_BYTE_ORDER);
@@ -764,7 +705,6 @@ public class ColumnImpl implements Column, Comparable<ColumnImpl>, DateTimeConte
      * @param data The raw byte value
      * @param order Byte order in which the raw value is stored
      * @return The deserialized Object
-     * @usage _advanced_method_
      */
     public Object read(byte[] data, ByteOrder order) throws IOException {
         ByteBuffer buffer = ByteBuffer.wrap(data).order(order);
@@ -981,8 +921,6 @@ public class ColumnImpl implements Column, Comparable<ColumnImpl>, DateTimeConte
 
     /**
      * Returns a java long time value converted from an access date double.
-     *
-     * @usage _advanced_method_
      */
     public long fromDateDouble(double value) {
         return fromDateDouble(value, getTimeZone());
@@ -1090,8 +1028,6 @@ public class ColumnImpl implements Column, Comparable<ColumnImpl>, DateTimeConte
 
     /**
      * Returns an access date double converted from a java Date/Calendar/Number time value.
-     *
-     * @usage _advanced_method_
      */
     public double toDateDouble(Object value)
         throws InvalidValueException {
@@ -1104,8 +1040,6 @@ public class ColumnImpl implements Column, Comparable<ColumnImpl>, DateTimeConte
 
     /**
      * Returns an access date double converted from a java Date/Calendar/Number/Temporal time value.
-     *
-     * @usage _advanced_method_
      */
     private static double toDateDouble(Object value, DateTimeContext dtc) {
         return dtc.getDateTimeFactory().toDateDouble(value, dtc);
@@ -1379,7 +1313,6 @@ public class ColumnImpl implements Column, Comparable<ColumnImpl>, DateTimeConte
      *
      * @param obj Object to serialize
      * @return A buffer containing the bytes
-     * @usage _advanced_method_
      */
     public ByteBuffer write(Object obj, int remainingRowLength)
         throws IOException {
@@ -1392,7 +1325,6 @@ public class ColumnImpl implements Column, Comparable<ColumnImpl>, DateTimeConte
      * @param obj Object to serialize
      * @param order Order in which to serialize
      * @return A buffer containing the bytes
-     * @usage _advanced_method_
      */
     public ByteBuffer write(Object obj, int remainingRowLength, ByteOrder order)
         throws IOException {
@@ -1445,7 +1377,6 @@ public class ColumnImpl implements Column, Comparable<ColumnImpl>, DateTimeConte
      * @param obj Object to serialize
      * @param order Order in which to serialize
      * @return A buffer containing the bytes
-     * @usage _advanced_method_
      */
     protected ByteBuffer writeFixedLengthField(Object obj, ByteOrder order)
         throws IOException {
@@ -1736,7 +1667,6 @@ public class ColumnImpl implements Column, Comparable<ColumnImpl>, DateTimeConte
      * @param textBytes bytes of text to decode
      * @param charset relevant charset
      * @return the decoded string
-     * @usage _advanced_method_
      */
     public static String decodeUncompressedText(byte[] textBytes,
         Charset charset) {
@@ -1748,7 +1678,6 @@ public class ColumnImpl implements Column, Comparable<ColumnImpl>, DateTimeConte
      * @param text Text to encode
      * @param charset database charset
      * @return A buffer with the text encoded
-     * @usage _advanced_method_
      */
     public static ByteBuffer encodeUncompressedText(CharSequence text,
         Charset charset) {
@@ -1758,8 +1687,6 @@ public class ColumnImpl implements Column, Comparable<ColumnImpl>, DateTimeConte
 
     /**
      * Orders Columns by column number.
-     *
-     * @usage _general_method_
      */
     @Override
     public int compareTo(ColumnImpl other) {
@@ -1769,7 +1696,6 @@ public class ColumnImpl implements Column, Comparable<ColumnImpl>, DateTimeConte
     /**
      * @param columns A list of columns in a table definition
      * @return The number of variable length columns found in the list
-     * @usage _advanced_method_
      */
     public static short countVariableLength(List<ColumnBuilder> columns) {
         short rtn = 0;
@@ -1843,7 +1769,6 @@ public class ColumnImpl implements Column, Comparable<ColumnImpl>, DateTimeConte
 
     /**
      * @return an appropriate CharSequence representation of the given object.
-     * @usage _advanced_method_
      */
     public static CharSequence toCharSequence(Object value)
         throws IOException {
@@ -1869,7 +1794,6 @@ public class ColumnImpl implements Column, Comparable<ColumnImpl>, DateTimeConte
 
     /**
      * @return an appropriate byte[] representation of the given object.
-     * @usage _advanced_method_
      */
     public static byte[] toByteArray(Object value)
         throws IOException {
@@ -1899,8 +1823,6 @@ public class ColumnImpl implements Column, Comparable<ColumnImpl>, DateTimeConte
 
     /**
      * Interpret a boolean value (null == false)
-     *
-     * @usage _advanced_method_
      */
     public static boolean toBooleanValue(Object obj) {
         if (obj == null) {
@@ -1950,8 +1872,6 @@ public class ColumnImpl implements Column, Comparable<ColumnImpl>, DateTimeConte
 
     /**
      * Returns {@code true} if the given value is "raw" column data, {@code false} otherwise.
-     *
-     * @usage _advanced_method_
      */
     public static boolean isRawData(Object value) {
         return value instanceof RawData;
@@ -2311,8 +2231,6 @@ public class ColumnImpl implements Column, Comparable<ColumnImpl>, DateTimeConte
 
     /**
      * Base class for the supported autonumber types.
-     *
-     * @usage _advanced_class_
      */
     public abstract static class AutoNumberGenerator {
         protected AutoNumberGenerator() {
@@ -2539,8 +2457,6 @@ public class ColumnImpl implements Column, Comparable<ColumnImpl>, DateTimeConte
 
     /**
      * Information about the sort order (collation) for a textual column.
-     *
-     * @usage _intermediate_class_
      */
     public static final class SortOrder {
         private final short _value;

@@ -22,7 +22,6 @@ import java.io.IOException;
  * ColumnImpl subclass which is used for Memo data types.
  *
  * @author James Ahlborn
- * @usage _advanced_class_
  */
 class MemoColumnImpl extends LongValueColumnImpl {
     /** whether or not they are compressed */

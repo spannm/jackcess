@@ -46,7 +46,6 @@ import java.util.regex.Pattern;
 
 /**
  * @author Tim McCune
- * @usage _intermediate_class_
  */
 public class DatabaseImpl implements Database, DateTimeContext {
     private static final Log                                         LOG                   = LogFactory.getLog(DatabaseImpl.class);
@@ -521,7 +520,6 @@ public class DatabaseImpl implements Database, DateTimeContext {
      * @param charset Charset to use, if {@code null}, uses default
      * @param timeZone TimeZone to use, if {@code null}, uses default
      * @param provider CodecProvider for handling page encoding/decoding, may be {@code null} if no special encoding is necessary
-     * @usage _advanced_method_
      */
     @SuppressWarnings("PMD.UseTryWithResources")
     public static DatabaseImpl open(Path mdbFile, boolean readOnly, FileChannel channel, boolean autoSync, Charset charset, TimeZone timeZone, CodecProvider provider, boolean ignoreSystemCatalogIndex)
@@ -692,23 +690,16 @@ public class DatabaseImpl implements Database, DateTimeContext {
         return _readOnly;
     }
 
-    /**
-     * @usage _advanced_method_
-     */
     public PageChannel getPageChannel() {
         return _pageChannel;
     }
 
-    /**
-     * @usage _advanced_method_
-     */
     public JetFormat getFormat() {
         return _format;
     }
 
     /**
      * @return The system catalog table
-     * @usage _advanced_method_
      */
     public TableImpl getSystemCatalog() {
         return _systemCatalog;
@@ -716,7 +707,6 @@ public class DatabaseImpl implements Database, DateTimeContext {
 
     /**
      * @return The system Access Control Entries table (loaded on demand)
-     * @usage _advanced_method_
      */
     public TableImpl getAccessControlEntries() throws IOException {
         if (_accessControlEntries == null) {
@@ -727,7 +717,6 @@ public class DatabaseImpl implements Database, DateTimeContext {
 
     /**
      * @return the complex column system table (loaded on demand)
-     * @usage _advanced_method_
      */
     public TableImpl getSystemComplexColumns() throws IOException {
         if (_complexCols == null) {
@@ -911,9 +900,6 @@ public class DatabaseImpl implements Database, DateTimeContext {
         _validatorFactory = newFactory;
     }
 
-    /**
-     * @usage _advanced_method_
-     */
     FKEnforcer.SharedState getFKEnforcerSharedState() {
         return _fkEnforcerSharedState;
     }
@@ -923,9 +909,6 @@ public class DatabaseImpl implements Database, DateTimeContext {
         return getEvalContext();
     }
 
-    /**
-     * @usage _advanced_method_
-     */
     DBEvalContext getEvalContext() {
         if (_evalCtx == null) {
             _evalCtx = new DBEvalContext(this);
@@ -1014,7 +997,6 @@ public class DatabaseImpl implements Database, DateTimeContext {
 
     /**
      * @return the currently configured database default language sort order for textual columns
-     * @usage _intermediate_method_
      */
     public ColumnImpl.SortOrder getDefaultSortOrder() throws IOException {
 
@@ -1026,7 +1008,6 @@ public class DatabaseImpl implements Database, DateTimeContext {
 
     /**
      * @return the currently configured database default code page for textual data (may not be relevant to all database versions)
-     * @usage _intermediate_method_
      */
     public short getDefaultCodePage() throws IOException {
 
@@ -1052,7 +1033,6 @@ public class DatabaseImpl implements Database, DateTimeContext {
 
     /**
      * @return a PropertyMaps instance decoded from the given bytes (always returns non-{@code null} result).
-     * @usage _intermediate_method_
      */
     public PropertyMaps readProperties(byte[] propsBytes, int objectId, RowIdImpl rowId) throws IOException {
         return getPropsHandler().read(propsBytes, objectId, rowId, null);
@@ -1159,7 +1139,6 @@ public class DatabaseImpl implements Database, DateTimeContext {
     /**
      * @param tableDefPageNumber the page number of a table definition
      * @return The table, or null if it doesn't exist
-     * @usage _advanced_method_
      */
     public TableImpl getTable(int tableDefPageNumber) throws IOException {
         return loadTable(null, tableDefPageNumber, 0, null);
@@ -1508,7 +1487,6 @@ public class DatabaseImpl implements Database, DateTimeContext {
 
     /**
      * @return the PropertyMaps for the object with the given id
-     * @usage _advanced_method_
      */
     public PropertyMaps getPropertiesForObject(int objectId, PropertyMaps.Owner owner) throws IOException {
         return readProperties(objectId, _tableFinder.getObjectRow(objectId, SYSTEM_CATALOG_PROPS_COLUMNS), owner);
@@ -1858,8 +1836,6 @@ public class DatabaseImpl implements Database, DateTimeContext {
      * Validates an identifier name. <p> Names of fields, controls, and objects in Microsoft Access: <ul> <li>Can include any combination of letters, numbers, spaces, and special characters except a
      * period (.), an exclamation point (!), an accent grave (`), and brackets ([ ]).</li> <li>Can't begin with leading spaces.</li> <li>Can't include control characters (ASCII values 0 through
      * 31).</li> </ul>
-     *
-     * @usage _advanced_method_
      */
     public static void validateIdentifierName(String name, int maxLength, String identifierType) {
         // basic name validation
@@ -1978,8 +1954,6 @@ public class DatabaseImpl implements Database, DateTimeContext {
     /**
      * Returns the default TimeZone. This is normally the platform default TimeZone as returned by {@link TimeZone#getDefault}, but can be overridden using the system property
      * {@value com.healthmarketscience.jackcess.Database#TIMEZONE_PROPERTY}.
-     *
-     * @usage _advanced_method_
      */
     public static TimeZone getDefaultTimeZone() {
         String tzProp = System.getProperty(TIMEZONE_PROPERTY);
@@ -1998,8 +1972,6 @@ public class DatabaseImpl implements Database, DateTimeContext {
      * Returns the default Charset for the given JetFormat. This may or may not be platform specific, depending on the format, but can be overridden using a system property composed of the prefix
      * {@value com.healthmarketscience.jackcess.Database#CHARSET_PROPERTY_PREFIX} followed by the JetFormat version to which the charset should apply, e.g.
      * {@code "com.healthmarketscience.jackcess.charset.VERSION_3"}.
-     *
-     * @usage _advanced_method_
      */
     public static Charset getDefaultCharset(JetFormat format) {
         String csProp = System.getProperty(CHARSET_PROPERTY_PREFIX + format);
@@ -2017,8 +1989,6 @@ public class DatabaseImpl implements Database, DateTimeContext {
     /**
      * Returns the default Table.ColumnOrder. This defaults to {@link Database#DEFAULT_COLUMN_ORDER}, but can be overridden using the system property
      * {@value com.healthmarketscience.jackcess.Database#COLUMN_ORDER_PROPERTY}.
-     *
-     * @usage _advanced_method_
      */
     public static Table.ColumnOrder getDefaultColumnOrder() {
         return getEnumSystemProperty(Table.ColumnOrder.class, COLUMN_ORDER_PROPERTY, DEFAULT_COLUMN_ORDER);
@@ -2027,8 +1997,6 @@ public class DatabaseImpl implements Database, DateTimeContext {
     /**
      * Returns the default enforce foreign-keys policy. This defaults to {@code true}, but can be overridden using the system property
      * {@value com.healthmarketscience.jackcess.Database#FK_ENFORCE_PROPERTY}.
-     *
-     * @usage _advanced_method_
      */
     public static boolean getDefaultEnforceForeignKeys() {
         String prop = System.getProperty(FK_ENFORCE_PROPERTY);
@@ -2041,8 +2009,6 @@ public class DatabaseImpl implements Database, DateTimeContext {
     /**
      * Returns the default allow auto number insert policy. This defaults to {@code false}, but can be overridden using the system property
      * {@value com.healthmarketscience.jackcess.Database#ALLOW_AUTONUM_INSERT_PROPERTY}.
-     *
-     * @usage _advanced_method_
      */
     public static boolean getDefaultAllowAutoNumberInsert() {
         String prop = System.getProperty(ALLOW_AUTONUM_INSERT_PROPERTY);
@@ -2055,8 +2021,6 @@ public class DatabaseImpl implements Database, DateTimeContext {
     /**
      * Returns the default enable expression evaluation policy. This defaults to {@code true}, but can be overridden using the system property
      * {@value com.healthmarketscience.jackcess.Database#ENABLE_EXPRESSION_EVALUATION_PROPERTY}.
-     *
-     * @usage _advanced_method_
      */
     public static boolean getDefaultEvaluateExpressions() {
         String prop = System.getProperty(ENABLE_EXPRESSION_EVALUATION_PROPERTY);
@@ -2069,8 +2033,6 @@ public class DatabaseImpl implements Database, DateTimeContext {
     /**
      * Returns the default DateTimeType. This defaults to {@link DateTimeType#LOCAL_DATE_TIME}, but can be overridden using the system property
      * {@value com.healthmarketscience.jackcess.Database#DATE_TIME_TYPE_PROPERTY}.
-     *
-     * @usage _advanced_method_
      */
     public static DateTimeType getDefaultDateTimeType() {
         return getEnumSystemProperty(DateTimeType.class, DATE_TIME_TYPE_PROPERTY, DateTimeType.LOCAL_DATE_TIME);
@@ -2097,8 +2059,6 @@ public class DatabaseImpl implements Database, DateTimeContext {
 
     /**
      * Returns the password mask retrieved from the given header page and format, or {@code null} if this format does not use a password mask.
-     *
-     * @usage _advanced_method_
      */
     public static byte[] getPasswordMask(ByteBuffer buffer, JetFormat format) {
         // get extra password mask if necessary (the extra password mask is
@@ -2677,8 +2637,6 @@ public class DatabaseImpl implements Database, DateTimeContext {
 
     /**
      * Internal details for each FileForrmat
-     *
-     * @usage _advanced_class_
      */
     public static final class FileFormatDetails {
         private final String    _emptyFile;

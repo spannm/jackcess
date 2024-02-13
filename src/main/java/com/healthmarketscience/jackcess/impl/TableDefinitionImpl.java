@@ -29,7 +29,6 @@ import java.util.List;
  * Is not thread-safe.
  *
  * @author James Ahlborn
- * @usage _advanced_class_
  */
 public class TableDefinitionImpl extends TableImpl {
     protected TableDefinitionImpl(DatabaseImpl database, ByteBuffer tableBuffer,

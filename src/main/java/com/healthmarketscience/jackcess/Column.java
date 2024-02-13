@@ -29,136 +29,79 @@ import java.util.Map;
  * A Column instance is not thread-safe (see {@link Database} for more thread-safety details).
  *
  * @author James Ahlborn
- * @usage _general_class_
  */
 public interface Column {
     /**
      * Meaningless placeholder object for inserting values in an autonumber column. it is not required that this value
      * be used (any passed in value is ignored), but using this placeholder may make code more obvious.
-     *
-     * @usage _general_field_
      */
     Object AUTO_NUMBER = "<AUTO_NUMBER>";
 
     /**
      * Meaningless placeholder object for updating rows which indicates that a given column should keep its existing
      * value.
-     *
-     * @usage _general_field_
      */
     Object KEEP_VALUE  = "<KEEP_VALUE>";
 
-    /**
-     * @usage _general_method_
-     */
     Table getTable();
 
-    /**
-     * @usage _general_method_
-     */
     Database getDatabase();
 
-    /**
-     * @usage _general_method_
-     */
     String getName();
 
-    /**
-     * @usage _advanced_method_
-     */
     boolean isVariableLength();
 
-    /**
-     * @usage _general_method_
-     */
     boolean isAutoNumber();
 
-    /**
-     * @usage _advanced_method_
-     */
     int getColumnIndex();
 
-    /**
-     * @usage _general_method_
-     */
     DataType getType();
 
-    /**
-     * @usage _general_method_
-     */
     int getSQLType() throws IOException;
 
-    /**
-     * @usage _general_method_
-     */
     boolean isCompressedUnicode();
 
-    /**
-     * @usage _general_method_
-     */
     byte getPrecision();
 
-    /**
-     * @usage _general_method_
-     */
     byte getScale();
 
-    /**
-     * @usage _general_method_
-     */
     short getLength();
 
-    /**
-     * @usage _general_method_
-     */
     short getLengthInUnits();
 
     /**
      * Whether or not this column is "append only" (its history is tracked by a separate version history column).
-     *
-     * @usage _general_method_
      */
     boolean isAppendOnly();
 
     /**
      * Returns whether or not this is a hyperlink column (only possible for columns of type MEMO).
-     *
-     * @usage _general_method_
      */
     boolean isHyperlink();
 
     /**
      * Returns whether or not this is a calculated column. Note that jackess <b>won't interpret the calculation
      * expression</b> (but the field can be written directly).
-     *
-     * @usage _general_method_
      */
     boolean isCalculated();
 
     /**
      * Returns extended functionality for "complex" columns.
-     *
-     * @usage _general_method_
      */
     ComplexColumnInfo<? extends ComplexValue> getComplexInfo();
 
     /**
      * @return the properties for this column
-     * @usage _general_method_
      */
     PropertyMap getProperties() throws IOException;
 
     /**
      * Returns the column which tracks the version history for an "append only" column.
-     *
-     * @usage _intermediate_method_
      */
     Column getVersionHistoryColumn();
 
     /**
      * Gets currently configured ColumnValidator (always non-{@code null}).
-     *
-     * @usage _intermediate_method_
      */
     ColumnValidator getColumnValidator();
 
@@ -169,7 +112,6 @@ public interface Column {
      *
      * @throws IllegalArgumentException if an attempt is made to set a non-{@code null} ColumnValidator instance on an
      *             autonumber column
-     * @usage _intermediate_method_
      */
     void setColumnValidator(ColumnValidator newValidator);
 

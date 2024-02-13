@@ -27,14 +27,11 @@ import java.io.IOException;
  * Resolver for linked databases.
  *
  * @author James Ahlborn
- * @usage _intermediate_class_
  */
 @FunctionalInterface
 public interface LinkResolver {
     /**
      * default link resolver used if none provided
-     *
-     * @usage _general_field_
      */
     LinkResolver DEFAULT = (linkerDb, linkeeFileName) -> {
         // if linker is read-only, open linkee read-only

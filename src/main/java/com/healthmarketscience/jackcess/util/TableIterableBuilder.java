@@ -29,7 +29,6 @@ import java.util.stream.StreamSupport;
  * (non-system, non-linked tables) and linked tables are included and system tables are not.
  *
  * @author James Ahlborn
- * @usage _general_class_
  */
 public class TableIterableBuilder implements Iterable<Table> {
     private final Database _db;

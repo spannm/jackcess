@@ -30,7 +30,6 @@ import java.nio.channels.*;
  * implemented.
  *
  * @author James Ahlborn
- * @usage _advanced_class_
  */
 public class ReadOnlyFileChannel extends FileChannel {
     private final FileChannel _delegate;

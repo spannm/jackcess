@@ -45,7 +45,6 @@ import java.util.List;
  * requiring POI.
  *
  * @author James Ahlborn
- * @usage _advanced_class_
  */
 public class CompoundOleUtil implements CompoundPackageFactory {
     private static final String ENTRY_NAME_CHARSET = "UTF-8";

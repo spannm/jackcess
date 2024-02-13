@@ -38,13 +38,10 @@ import java.util.stream.StreamSupport;
  * A Table instance is not thread-safe (see {@link Database} for more thread-safety details).
  *
  * @author James Ahlborn
- * @usage _general_class_
  */
 public interface Table extends Iterable<Row>, TableDefinition {
     /**
      * enum which controls the ordering of the columns in a table.
-     *
-     * @usage _intermediate_class_
      */
     enum ColumnOrder {
         /**
@@ -60,51 +57,36 @@ public interface Table extends Iterable<Row>, TableDefinition {
 
     /**
      * @return The name of the table
-     * @usage _general_method_
      */
     @Override
     String getName();
 
     /**
      * Whether or not this table has been marked as hidden.
-     *
-     * @usage _general_method_
      */
     @Override
     boolean isHidden();
 
     /**
      * Whether or not this table is a system (internal) table.
-     *
-     * @usage _general_method_
      */
     @Override
     boolean isSystem();
 
-    /**
-     * @usage _general_method_
-     */
     @Override
     int getColumnCount();
 
-    /**
-     * @usage _general_method_
-     */
     @Override
     Database getDatabase();
 
     /**
      * Gets the currently configured ErrorHandler (always non-{@code null}). This will be used to handle all errors
      * unless overridden at the Cursor level.
-     *
-     * @usage _intermediate_method_
      */
     ErrorHandler getErrorHandler();
 
     /**
      * Sets a new ErrorHandler. If {@code null}, resets to using the ErrorHandler configured at the Database level.
-     *
-     * @usage _intermediate_method_
      */
     void setErrorHandler(ErrorHandler newErrorHandler);
 
@@ -112,42 +94,35 @@ public interface Table extends Iterable<Row>, TableDefinition {
      * Gets the currently configured auto number insert policy.
      *
      * @see Database#isAllowAutoNumberInsert
-     * @usage _intermediate_method_
      */
     boolean isAllowAutoNumberInsert();
 
     /**
      * Sets the new auto number insert policy for the Table. If {@code null}, resets to using the policy configured at
      * the Database level.
-     *
-     * @usage _intermediate_method_
      */
     void setAllowAutoNumberInsert(Boolean allowAutoNumInsert);
 
     /**
      * @return All of the columns in this table (unmodifiable List)
-     * @usage _general_method_
      */
     @Override
     List<? extends Column> getColumns();
 
     /**
      * @return the column with the given name
-     * @usage _general_method_
      */
     @Override
     Column getColumn(String name);
 
     /**
      * @return the properties for this table
-     * @usage _general_method_
      */
     @Override
     PropertyMap getProperties() throws IOException;
 
     /**
      * @return the created date for this table if available
-     * @usage _general_method_
      */
     @Override
     LocalDateTime getCreatedDate() throws IOException;
@@ -156,14 +131,12 @@ public interface Table extends Iterable<Row>, TableDefinition {
      * Note: jackcess <i>does not automatically update the modified date of a Table</i>.
      *
      * @return the last updated date for this table if available
-     * @usage _general_method_
      */
     @Override
     LocalDateTime getUpdatedDate() throws IOException;
 
     /**
      * @return All of the Indexes on this table (unmodifiable List)
-     * @usage _intermediate_method_
      */
     @Override
     List<? extends Index> getIndexes();
@@ -171,7 +144,6 @@ public interface Table extends Iterable<Row>, TableDefinition {
     /**
      * @return the index with the given name
      * @throws IllegalArgumentException if there is no index with the given name
-     * @usage _intermediate_method_
      */
     @Override
     Index getIndex(String name);
@@ -179,7 +151,6 @@ public interface Table extends Iterable<Row>, TableDefinition {
     /**
      * @return the primary key index for this table
      * @throws IllegalArgumentException if there is no primary key index on this table
-     * @usage _intermediate_method_
      */
     @Override
     Index getPrimaryKeyIndex();
@@ -187,7 +158,6 @@ public interface Table extends Iterable<Row>, TableDefinition {
     /**
      * @return the foreign key index joining this table to the given other table
      * @throws IllegalArgumentException if there is no relationship between this table and the given table
-     * @usage _intermediate_method_
      */
     @Override
     Index getForeignKeyIndex(Table otherTable);
@@ -195,22 +165,15 @@ public interface Table extends Iterable<Row>, TableDefinition {
     /**
      * Converts a map of columnName -&gt; columnValue to an array of row values appropriate for a call to
      * {@link #addRow(Object...)}.
-     *
-     * @usage _general_method_
      */
     Object[] asRow(Map<String, ?> rowMap);
 
     /**
      * Converts a map of columnName -&gt; columnValue to an array of row values appropriate for a call to
      * {@link Cursor#updateCurrentRow(Object...)}.
-     *
-     * @usage _general_method_
      */
     Object[] asUpdateRow(Map<String, ?> rowMap);
 
-    /**
-     * @usage _general_method_
-     */
     int getRowCount();
 
     /**
@@ -227,7 +190,6 @@ public interface Table extends Iterable<Row>, TableDefinition {
      *            auto-number column, otherwise it will not be modified.
      * @return the given row values if long enough, otherwise a new array. the returned array will contain any
      *         autonumbers generated
-     * @usage _general_method_
      */
     Object[] addRow(Object... row) throws IOException;
 
@@ -237,7 +199,6 @@ public interface Table extends Iterable<Row>, TableDefinition {
      * Note, if this table has an auto-number column, the value generated will be put back into the given row map.
      *
      * @return the given row map, which will contain any autonumbers generated
-     * @usage _general_method_
      */
     <M extends Map<String, Object>> M addRowFromMap(M row)
         throws IOException;
@@ -258,7 +219,6 @@ public interface Table extends Iterable<Row>, TableDefinition {
      *            otherwise they will not be modified.
      * @return the given row values list (unless row values were to small), with appropriately sized row values (the
      *         ones passed in if long enough). the returned arrays will contain any autonumbers generated
-     * @usage _general_method_
      */
     List<? extends Object[]> addRows(List<? extends Object[]> rows)
         throws IOException;
@@ -273,7 +233,6 @@ public interface Table extends Iterable<Row>, TableDefinition {
      * information in the case of a partially successful write.
      *
      * @return the given row map list, where the row maps will contain any autonumbers generated
-     * @usage _general_method_
      */
     <M extends Map<String, Object>> List<M> addRowsFromMaps(List<M> rows)
         throws IOException;
@@ -302,7 +261,6 @@ public interface Table extends Iterable<Row>, TableDefinition {
      *
      * @throws UncheckedIOException if an IOException is thrown by one of the operations, the actual exception will be
      *             contained within
-     * @usage _general_method_
      */
     @Override
     Iterator<Row> iterator();
@@ -317,15 +275,12 @@ public interface Table extends Iterable<Row>, TableDefinition {
     /**
      * After calling this method, {@link #getNextRow} will return the first row in the table, see {@link Cursor#reset}
      * (uses the {@link #getDefaultCursor default cursor}).
-     *
-     * @usage _general_method_
      */
     void reset();
 
     /**
      * @return The next row in this table (Column name -&gt; Column value) (uses the {@link #getDefaultCursor default
      *         cursor})
-     * @usage _general_method_
      */
     Row getNextRow() throws IOException;
 

@@ -37,7 +37,6 @@ import java.util.Map;
  * add/update method).
  *
  * @author James Ahlborn
- * @usage _general_class_
  */
 public class ColumnFormatter {
     private final ColumnImpl               _col;

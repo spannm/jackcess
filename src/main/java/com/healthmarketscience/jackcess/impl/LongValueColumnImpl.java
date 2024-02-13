@@ -27,7 +27,6 @@ import java.util.Collection;
  * ColumnImpl subclass which is used for long value data types.
  *
  * @author James Ahlborn
- * @usage _advanced_class_
  */
 class LongValueColumnImpl extends ColumnImpl {
     /**
@@ -237,7 +236,6 @@ class LongValueColumnImpl extends ColumnImpl {
      *
      * @param value Value of the LVAL column
      * @return A buffer containing the LVAL definition and (possibly) the column value (unless written to other pages)
-     * @usage _advanced_method_
      */
     protected ByteBuffer writeLongValue(byte[] value, int remainingRowLength)
         throws IOException {

@@ -42,7 +42,6 @@ import java.util.List;
  *
  * @author James Ahlborn
  * @see TableBuilder
- * @usage _general_class_
  */
 public class RelationshipBuilder {
     private static final int JOIN_FLAGS = RelationshipImpl.LEFT_OUTER_JOIN_FLAG | RelationshipImpl.RIGHT_OUTER_JOIN_FLAG;

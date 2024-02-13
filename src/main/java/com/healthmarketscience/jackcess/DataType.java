@@ -35,7 +35,6 @@ import java.util.stream.Collectors;
  * Supported access data types.
  *
  * @author Tim McCune
- * @usage _general_class_
  */
 public enum DataType {
 

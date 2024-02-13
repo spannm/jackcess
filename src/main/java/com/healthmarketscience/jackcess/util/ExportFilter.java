@@ -25,7 +25,6 @@ import java.util.List;
  * Interface which allows customization of the behavior of the {@link ExportUtil} export methods.
  *
  * @author James Ahlborn
- * @usage _general_class_
  */
 public interface ExportFilter {
 

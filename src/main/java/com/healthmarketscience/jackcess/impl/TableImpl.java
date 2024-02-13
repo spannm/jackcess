@@ -38,7 +38,6 @@ import java.util.*;
  * Is not thread-safe.
  *
  * @author Tim McCune
- * @usage _intermediate_class_
  */
 public class TableImpl implements Table, PropertyMaps.Owner {
     private static final Log   LOG                = LogFactory.getLog(TableImpl.class);
@@ -55,14 +54,10 @@ public class TableImpl implements Table, PropertyMaps.Owner {
 
     /**
      * Table type code for system tables
-     *
-     * @usage _intermediate_class_
      */
     public static final byte   TYPE_SYSTEM        = 0x53;
     /**
      * Table type code for user tables
-     *
-     * @usage _intermediate_class_
      */
     public static final byte   TYPE_USER          = 0x4e;
 
@@ -165,8 +160,6 @@ public class TableImpl implements Table, PropertyMaps.Owner {
 
     /**
      * Only used by unit tests
-     *
-     * @usage _advanced_method_
      */
     protected TableImpl(boolean testing, List<ColumnImpl> columns)
         throws IOException {
@@ -306,9 +299,6 @@ public class TableImpl implements Table, PropertyMaps.Owner {
         return _tableType != TYPE_USER;
     }
 
-    /**
-     * @usage _advanced_method_
-     */
     public int getMaxColumnCount() {
         return _maxColumnCount;
     }
@@ -323,16 +313,10 @@ public class TableImpl implements Table, PropertyMaps.Owner {
         return _database;
     }
 
-    /**
-     * @usage _advanced_method_
-     */
     public JetFormat getFormat() {
         return getDatabase().getFormat();
     }
 
-    /**
-     * @usage _advanced_method_
-     */
     public PageChannel getPageChannel() {
         return getDatabase().getPageChannel();
     }
@@ -361,16 +345,10 @@ public class TableImpl implements Table, PropertyMaps.Owner {
         _allowAutoNumInsert = allowAutoNumInsert;
     }
 
-    /**
-     * @usage _advanced_method_
-     */
     public RowState createRowState() {
         return new RowState(TempBufferHolder.Type.HARD);
     }
 
-    /**
-     * @usage _advanced_method_
-     */
     public UsageMap.PageCursor getOwnedPagesCursor() {
         return _ownedPages.cursor();
     }
@@ -383,8 +361,6 @@ public class TableImpl implements Table, PropertyMaps.Owner {
      * int approxTableBytes = (table.getApproximateOwnedPageCount() *
      *                         table.getFormat().PAGE_SIZE);
      * </code>
-     *
-     * @usage _intermediate_method_
      */
     public int getApproximateOwnedPageCount() {
 
@@ -454,7 +430,6 @@ public class TableImpl implements Table, PropertyMaps.Owner {
 
     /**
      * @return all PropertyMaps for this table (and columns)
-     * @usage _advanced_method_
      */
     public PropertyMaps getPropertyMaps() throws IOException {
         if (_propertyMaps == null) {
@@ -518,7 +493,6 @@ public class TableImpl implements Table, PropertyMaps.Owner {
 
     /**
      * @return All of the IndexData on this table (unmodifiable List)
-     * @usage _advanced_method_
      */
     public List<IndexData> getIndexDatas() {
         return Collections.unmodifiableList(_indexDatas);
@@ -526,8 +500,6 @@ public class TableImpl implements Table, PropertyMaps.Owner {
 
     /**
      * Only called by unit tests
-     *
-     * @usage _advanced_method_
      */
     public int getLogicalIndexCount() {
         return _logicalIndexCount;
@@ -608,7 +580,6 @@ public class TableImpl implements Table, PropertyMaps.Owner {
      *
      * @return the given rowId
      * @throws IllegalStateException if the given row is not valid
-     * @usage _intermediate_method_
      */
     public RowId deleteRow(RowId rowId) throws IOException {
         deleteRow(getDefaultCursor().getRowState(), (RowIdImpl) rowId);
@@ -617,8 +588,6 @@ public class TableImpl implements Table, PropertyMaps.Owner {
 
     /**
      * Delete the row for the given rowId.
-     *
-     * @usage _advanced_method_
      */
     public void deleteRow(RowState rowState, RowIdImpl rowId)
         throws IOException {
@@ -688,8 +657,6 @@ public class TableImpl implements Table, PropertyMaps.Owner {
 
     /**
      * Reads a single column from the given row.
-     *
-     * @usage _advanced_method_
      */
     public Object getRowValue(RowState rowState, RowIdImpl rowId,
         ColumnImpl column)
@@ -711,7 +678,6 @@ public class TableImpl implements Table, PropertyMaps.Owner {
      * Reads some columns from the given row.
      *
      * @param columnNames Only column names in this collection will be returned
-     * @usage _advanced_method_
      */
     public RowImpl getRow(
         RowState rowState, RowIdImpl rowId, Collection<String> columnNames)
@@ -910,7 +876,6 @@ public class TableImpl implements Table, PropertyMaps.Owner {
      * state is determined, but overflow row pointers are not followed.
      *
      * @return a ByteBuffer of the relevant page, or null if row was invalid
-     * @usage _advanced_method_
      */
     public static ByteBuffer positionAtRowHeader(RowState rowState,
         RowIdImpl rowId)
@@ -952,7 +917,6 @@ public class TableImpl implements Table, PropertyMaps.Owner {
      * end, following overflow row pointers as necessary.
      *
      * @return a ByteBuffer narrowed to the actual row data, or null if row was invalid or deleted
-     * @usage _advanced_method_
      */
     public static ByteBuffer positionAtRowData(RowState rowState,
         RowIdImpl rowId)
@@ -1020,8 +984,6 @@ public class TableImpl implements Table, PropertyMaps.Owner {
 
     /**
      * Writes a new table defined by the given TableCreator to the database.
-     *
-     * @usage _advanced_method_
      */
     protected static void writeTableDefinition(TableCreator creator)
         throws IOException {
@@ -1156,8 +1118,6 @@ public class TableImpl implements Table, PropertyMaps.Owner {
 
     /**
      * Writes a column defined by the given TableUpdater to this table.
-     *
-     * @usage _advanced_method_
      */
     protected ColumnImpl mutateAddColumn(TableUpdater mutator) throws IOException {
         ColumnBuilder column = mutator.getColumn();
@@ -1331,8 +1291,6 @@ public class TableImpl implements Table, PropertyMaps.Owner {
 
     /**
      * Writes a index defined by the given TableUpdater to this table.
-     *
-     * @usage _advanced_method_
      */
     protected IndexData mutateAddIndexData(TableUpdater mutator) throws IOException {
         IndexBuilder index = mutator.getIndex();
@@ -1449,8 +1407,6 @@ public class TableImpl implements Table, PropertyMaps.Owner {
 
     /**
      * Writes a index defined by the given TableUpdater to this table.
-     *
-     * @usage _advanced_method_
      */
     protected IndexImpl mutateAddIndex(TableUpdater mutator) throws IOException {
         IndexBuilder index = mutator.getIndex();
@@ -2031,7 +1987,6 @@ public class TableImpl implements Table, PropertyMaps.Owner {
      * {@link #addRow(Object...)}, where the generated RowId will be an extra value at the end of the array.
      *
      * @see ColumnImpl#RETURN_ROW_ID
-     * @usage _intermediate_method_
      */
     public Object[] asRowWithRowId(Map<String, ?> rowMap) {
         return asRow(rowMap, null, true);
@@ -2044,7 +1999,6 @@ public class TableImpl implements Table, PropertyMaps.Owner {
 
     /**
      * @return the generated RowId added to a row of values created via {@link #asRowWithRowId}
-     * @usage _intermediate_method_
      */
     public RowId getRowId(Object[] row) {
         return (RowId) row[_columns.size()];
@@ -2337,7 +2291,6 @@ public class TableImpl implements Table, PropertyMaps.Owner {
      *
      * @return the given row, updated with the current row values
      * @throws IllegalStateException if the given row is not valid, or deleted.
-     * @usage _intermediate_method_
      */
     public Object[] updateRow(RowId rowId, Object... row) throws IOException {
         return updateRow(
@@ -2349,7 +2302,6 @@ public class TableImpl implements Table, PropertyMaps.Owner {
      * Table.
      *
      * @throws IllegalStateException if the given row is not valid, or deleted.
-     * @usage _intermediate_method_
      */
     public void updateValue(Column column, RowId rowId, Object value)
         throws IOException {
@@ -2370,8 +2322,6 @@ public class TableImpl implements Table, PropertyMaps.Owner {
 
     /**
      * Update the row for the given rowId.
-     *
-     * @usage _advanced_method_
      */
     public Object[] updateRow(RowState rowState, RowIdImpl rowId, Object... row)
         throws IOException {
@@ -2984,7 +2934,6 @@ public class TableImpl implements Table, PropertyMaps.Owner {
 
     /**
      * @return A simple String representation of the entire table in tab-delimited format
-     * @usage _general_method_
      */
     public String display() throws IOException {
         return display(Long.MAX_VALUE);
@@ -2993,7 +2942,6 @@ public class TableImpl implements Table, PropertyMaps.Owner {
     /**
      * @param limit Maximum number of rows to display
      * @return A simple String representation of the entire table in tab-delimited format
-     * @usage _general_method_
      */
     public String display(long limit) throws IOException {
         reset();
@@ -3008,7 +2956,6 @@ public class TableImpl implements Table, PropertyMaps.Owner {
      * writing the row data.
      *
      * @return the row number of the new row
-     * @usage _advanced_method_
      */
     public static int addDataPageRow(ByteBuffer dataPage,
         int rowSize,
@@ -3076,46 +3023,28 @@ public class TableImpl implements Table, PropertyMaps.Owner {
         }
     }
 
-    /**
-     * @usage _advanced_method_
-     */
     public static boolean isDeletedRow(short rowStart) {
         return (rowStart & DELETED_ROW_MASK) != 0;
     }
 
-    /**
-     * @usage _advanced_method_
-     */
     public static boolean isOverflowRow(short rowStart) {
         return (rowStart & OVERFLOW_ROW_MASK) != 0;
     }
 
-    /**
-     * @usage _advanced_method_
-     */
     public static short cleanRowStart(short rowStart) {
         return (short) (rowStart & OFFSET_MASK);
     }
 
-    /**
-     * @usage _advanced_method_
-     */
     public static short findRowStart(ByteBuffer buffer, int rowNum,
         JetFormat format) {
         return cleanRowStart(
             buffer.getShort(getRowStartOffset(rowNum, format)));
     }
 
-    /**
-     * @usage _advanced_method_
-     */
     public static int getRowStartOffset(int rowNum, JetFormat format) {
         return format.OFFSET_ROW_START + format.SIZE_ROW_LOCATION * rowNum;
     }
 
-    /**
-     * @usage _advanced_method_
-     */
     public static short findRowEnd(ByteBuffer buffer, int rowNum,
         JetFormat format) {
         return (short) (rowNum == 0 ? format.PAGE_SIZE
@@ -3123,16 +3052,10 @@ public class TableImpl implements Table, PropertyMaps.Owner {
                 buffer.getShort(getRowEndOffset(rowNum, format))));
     }
 
-    /**
-     * @usage _advanced_method_
-     */
     public static int getRowEndOffset(int rowNum, JetFormat format) {
         return format.OFFSET_ROW_START + format.SIZE_ROW_LOCATION * (rowNum - 1);
     }
 
-    /**
-     * @usage _advanced_method_
-     */
     public static int getRowSpaceUsage(int rowSize, JetFormat format) {
         return rowSize + format.SIZE_ROW_LOCATION;
     }
@@ -3160,8 +3083,6 @@ public class TableImpl implements Table, PropertyMaps.Owner {
 
     /**
      * Returns {@code true} if a row of the given size will fit on the given data page, {@code false} otherwise.
-     *
-     * @usage _advanced_method_
      */
     public static boolean rowFitsOnDataPage(
         int rowLength, ByteBuffer dataPage, JetFormat format)
@@ -3229,8 +3150,6 @@ public class TableImpl implements Table, PropertyMaps.Owner {
 
     /**
      * Maintains the state of reading/updating a row of data.
-     *
-     * @usage _advanced_class_
      */
     public final class RowState extends WriteRowState
         implements ErrorHandler.Location {

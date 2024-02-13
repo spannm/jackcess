@@ -28,7 +28,6 @@ import java.util.*;
  * Helper class used to maintain state during table mutation.
  *
  * @author James Ahlborn
- * @usage _advanced_class_
  */
 public class TableUpdater extends TableMutator {
     private final TableImpl               _table;

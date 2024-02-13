@@ -42,7 +42,6 @@ import java.util.stream.StreamSupport;
  * A Cursor instance is not thread-safe (see {@link Database} for more thread-safety details).
  *
  * @author James Ahlborn
- * @usage _general_class_
  */
 public interface Cursor extends Iterable<Row> {
 

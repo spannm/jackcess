@@ -27,7 +27,6 @@ import java.util.List;
  * Simple concrete implementation of ImportFilter which just returns the given values.
  *
  * @author James Ahlborn
- * @usage _general_class_
  */
 public class SimpleImportFilter implements ImportFilter {
 

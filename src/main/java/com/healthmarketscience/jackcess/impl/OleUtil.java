@@ -37,7 +37,6 @@ import java.util.regex.Pattern;
  * Utility code for working with OLE data.
  *
  * @author James Ahlborn
- * @usage _advanced_class_
  */
 @SuppressWarnings("PMD.FieldDeclarationsShouldBeAtStartOfClass")
 public class OleUtil {

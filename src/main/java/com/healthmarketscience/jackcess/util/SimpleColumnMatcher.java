@@ -31,7 +31,6 @@ import java.util.Objects;
  * coerce the values to a common type for comparison.
  *
  * @author James Ahlborn
- * @usage _general_class_
  */
 public class SimpleColumnMatcher implements ColumnMatcher {
 

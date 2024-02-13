@@ -24,7 +24,6 @@ import java.util.List;
  * ordered traversal on a Table (for the indexed columns). These features can be utilized via an {@link IndexCursor}.
  *
  * @author James Ahlborn
- * @usage _general_class_
  */
 public interface Index {
 
@@ -36,9 +35,6 @@ public interface Index {
 
     boolean isForeignKey();
 
-    /**
-     * @usage _general_method_
-     */
     int getColumnCount();
 
     /**

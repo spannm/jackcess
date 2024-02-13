@@ -22,7 +22,6 @@ import java.io.IOException;
  * ColumnImpl subclass which is used for numeric data types.
  *
  * @author James Ahlborn
- * @usage _advanced_class_
  */
 class NumericColumnImpl extends ColumnImpl {
     /** Numeric precision */

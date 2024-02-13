@@ -51,29 +51,22 @@ import java.util.stream.StreamSupport;
  * database file corruption</i>.
  *
  * @author James Ahlborn
- * @usage _general_class_
  */
 public interface Database extends Iterable<Table>, Closeable, Flushable {
     /**
      * default value for the auto-sync value ({@code true}). this is slower, but leaves more chance of a useable
      * database in the face of failures.
-     *
-     * @usage _general_field_
      */
     boolean           DEFAULT_AUTO_SYNC                     = true;
 
     /**
      * the default sort order for table columns.
-     *
-     * @usage _intermediate_field_
      */
     Table.ColumnOrder DEFAULT_COLUMN_ORDER                  =
         Table.ColumnOrder.DATA;
 
     /**
      * system property which can be used to set the default TimeZone used for date calculations.
-     *
-     * @usage _general_field_
      */
     String            TIMEZONE_PROPERTY                     =
         "com.healthmarketscience.jackcess.timeZone";
@@ -81,8 +74,6 @@ public interface Database extends Iterable<Table>, Closeable, Flushable {
     /**
      * system property prefix which can be used to set the default Charset used for text data (full property includes
      * the JetFormat version).
-     *
-     * @usage _general_field_
      */
     String            CHARSET_PROPERTY_PREFIX               =
         "com.healthmarketscience.jackcess.charset.";
@@ -91,8 +82,6 @@ public interface Database extends Iterable<Table>, Closeable, Flushable {
      * system property which can be used to set the path from which classpath resources are loaded (must end with a "/"
      * if non-empty). Default value is {@value com.healthmarketscience.jackcess.impl.DatabaseImpl#DEFAULT_RESOURCE_PATH}
      * if unspecified.
-     *
-     * @usage _general_field_
      */
     String            RESOURCE_PATH_PROPERTY                =
         "com.healthmarketscience.jackcess.resourcePath";
@@ -100,8 +89,6 @@ public interface Database extends Iterable<Table>, Closeable, Flushable {
     /**
      * (boolean) system property which can be used to indicate that the current vm has a poor nio implementation
      * (specifically for {@code FileChannel.transferFrom})
-     *
-     * @usage _intermediate_field_
      */
     String            BROKEN_NIO_PROPERTY                   =
         "com.healthmarketscience.jackcess.brokenNio";
@@ -109,8 +96,6 @@ public interface Database extends Iterable<Table>, Closeable, Flushable {
     /**
      * system property which can be used to set the default sort order for table columns. Value should be one of
      * {@link Table.ColumnOrder} enum values.
-     *
-     * @usage _intermediate_field_
      */
     String            COLUMN_ORDER_PROPERTY                 =
         "com.healthmarketscience.jackcess.columnOrder";
@@ -118,24 +103,18 @@ public interface Database extends Iterable<Table>, Closeable, Flushable {
     /**
      * system property which can be used to set the default enforcement of foreign-key relationships. Defaults to
      * {@code true}.
-     *
-     * @usage _general_field_
      */
     String            FK_ENFORCE_PROPERTY                   =
         "com.healthmarketscience.jackcess.enforceForeignKeys";
 
     /**
      * system property which can be used to set the default allow auto number insert policy. Defaults to {@code false}.
-     *
-     * @usage _general_field_
      */
     String            ALLOW_AUTONUM_INSERT_PROPERTY         =
         "com.healthmarketscience.jackcess.allowAutoNumberInsert";
 
     /**
      * system property which can be used to disable expression evaluation if necessary. Defaults to {@code true}.
-     *
-     * @usage _general_field_
      */
     String            ENABLE_EXPRESSION_EVALUATION_PROPERTY =
         "com.healthmarketscience.jackcess.enableExpressionEvaluation";
@@ -143,8 +122,6 @@ public interface Database extends Iterable<Table>, Closeable, Flushable {
     /**
      * system property which can be used to set the default date/Time type. Value should be one of {@link DateTimeType}
      * enum values.
-     *
-     * @usage _general_field_
      */
     String            DATE_TIME_TYPE_PROPERTY               =
         "com.healthmarketscience.jackcess.dateTimeType";
@@ -152,7 +129,6 @@ public interface Database extends Iterable<Table>, Closeable, Flushable {
     /**
      * Enum which indicates which version of Access created the database.
      *
-     * @usage _general_class_
      */
     enum FileFormat {
 
@@ -208,14 +184,12 @@ public interface Database extends Iterable<Table>, Closeable, Flushable {
 
     /**
      * @return The names of all of the user tables
-     * @usage _general_method_
      */
     Set<String> getTableNames() throws IOException;
 
     /**
      * @return The names of all of the system tables (String). Note, in order to read these tables, you must use
      *         {@link #getSystemTable}. <i>Extreme care should be taken if modifying these tables directly!</i>.
-     * @usage _intermediate_method_
      */
     Set<String> getSystemTableNames() throws IOException;
 
@@ -224,7 +198,6 @@ public interface Database extends Iterable<Table>, Closeable, Flushable {
      * @throws UncheckedIOException if an IOException is thrown by one of the operations, the actual exception will be
      *             contained within
      * @throws ConcurrentModificationException if a table is added to the database while an Iterator is in use.
-     * @usage _general_method_
      */
     @Override
     Iterator<Table> iterator();
@@ -248,7 +221,6 @@ public interface Database extends Iterable<Table>, Closeable, Flushable {
      * @throws UncheckedIOException if an IOException is thrown by one of the operations, the actual exception will be
      *             contained within
      * @throws ConcurrentModificationException if a table is added to the database while an Iterator is in use.
-     * @usage _intermediate_method_
      */
     Iterable<TableMetaData> newTableMetaDataIterable();
 
@@ -263,29 +235,23 @@ public interface Database extends Iterable<Table>, Closeable, Flushable {
     /**
      * @param name User table name (case-insensitive)
      * @return The Table, or null if it doesn't exist (or is a system table)
-     * @usage _general_method_
      */
     Table getTable(String name) throws IOException;
 
     /**
      * @param name Table name (case-insensitive), may be any table type (i.e. includes system or linked tables).
      * @return The meta data for the table, or null if it doesn't exist
-     * @usage _intermediate_method_
      */
     TableMetaData getTableMetaData(String name) throws IOException;
 
     /**
      * Finds all the relationships in the database between the given tables.
-     *
-     * @usage _intermediate_method_
      */
     List<Relationship> getRelationships(Table table1, Table table2)
         throws IOException;
 
     /**
      * Finds all the relationships in the database for the given table.
-     *
-     * @usage _intermediate_method_
      */
     List<Relationship> getRelationships(Table table) throws IOException;
 
@@ -294,8 +260,6 @@ public interface Database extends Iterable<Table>, Closeable, Flushable {
      * <p>
      * Warning, this may load <i>all</i> the Tables (metadata, not data) in the database which could cause memory
      * issues.
-     *
-     * @usage _intermediate_method_
      */
     List<Relationship> getRelationships() throws IOException;
 
@@ -304,16 +268,12 @@ public interface Database extends Iterable<Table>, Closeable, Flushable {
      * <p>
      * Warning, this may load <i>all</i> the Tables (metadata, not data) in the database which could cause memory
      * issues.
-     *
-     * @usage _intermediate_method_
      */
     List<Relationship> getSystemRelationships()
         throws IOException;
 
     /**
      * Finds all the queries in the database.
-     *
-     * @usage _intermediate_method_
      */
     List<Query> getQueries() throws IOException;
 
@@ -326,31 +286,26 @@ public interface Database extends Iterable<Table>, Closeable, Flushable {
      *
      * @param tableName Table name, may be a system table
      * @return The table, or {@code null} if it doesn't exist
-     * @usage _intermediate_method_
      */
     Table getSystemTable(String tableName) throws IOException;
 
     /**
      * @return the core properties for the database
-     * @usage _general_method_
      */
     PropertyMap getDatabaseProperties() throws IOException;
 
     /**
      * @return the summary properties for the database
-     * @usage _general_method_
      */
     PropertyMap getSummaryProperties() throws IOException;
 
     /**
      * @return the user-defined properties for the database
-     * @usage _general_method_
      */
     PropertyMap getUserDefinedProperties() throws IOException;
 
     /**
      * @return the current database password, or {@code null} if none set.
-     * @usage _general_method_
      */
     String getDatabasePassword() throws IOException;
 
@@ -360,7 +315,6 @@ public interface Database extends Iterable<Table>, Closeable, Flushable {
      * @param name Name of the table to create in this database
      * @param linkedDbName path to the linked database
      * @param linkedTableName name of the table in the linked database
-     * @usage _general_method_
      */
     void createLinkedTable(String name, String linkedDbName,
         String linkedTableName)
@@ -368,8 +322,6 @@ public interface Database extends Iterable<Table>, Closeable, Flushable {
 
     /**
      * Flushes any current changes to the database file (and any linked databases) to disk.
-     *
-     * @usage _general_method_
      */
     @Override
     void flush() throws IOException;
@@ -378,8 +330,6 @@ public interface Database extends Iterable<Table>, Closeable, Flushable {
      * Close the database file (and any linked databases). A Database <b>must</b> be closed after use or changes could
      * be lost and the Database file corrupted. A Database instance should be treated like any other external resource
      * which would be closed in a finally block (e.g. an OutputStream or jdbc Connection).
-     *
-     * @usage _general_method_
      */
     @Override
     void close() throws IOException;
@@ -387,119 +337,87 @@ public interface Database extends Iterable<Table>, Closeable, Flushable {
     /**
      * Gets the currently configured ErrorHandler (always non-{@code null}). This will be used to handle all errors
      * unless overridden at the Table or Cursor level.
-     *
-     * @usage _intermediate_method_
      */
     ErrorHandler getErrorHandler();
 
     /**
      * Sets a new ErrorHandler. If {@code null}, resets to the {@link ErrorHandler#DEFAULT}.
-     *
-     * @usage _intermediate_method_
      */
     void setErrorHandler(ErrorHandler newErrorHandler);
 
     /**
      * Gets the currently configured LinkResolver (always non-{@code null}). This will be used to handle all linked
      * database loading.
-     *
-     * @usage _intermediate_method_
      */
     LinkResolver getLinkResolver();
 
     /**
      * Sets a new LinkResolver. If {@code null}, resets to the {@link LinkResolver#DEFAULT}.
-     *
-     * @usage _intermediate_method_
      */
     void setLinkResolver(LinkResolver newLinkResolver);
 
     /**
      * Returns an unmodifiable view of the currently loaded linked databases, mapped from the linked database file name
      * to the linked database. This information may be useful for implementing a LinkResolver.
-     *
-     * @usage _intermediate_method_
      */
     Map<String, Database> getLinkedDatabases();
 
     /**
      * Returns {@code true} if this Database links to the given Table, {@code
      * false} otherwise.
-     *
-     * @usage _general_method_
      */
     boolean isLinkedTable(Table table) throws IOException;
 
     /**
      * Gets currently configured TimeZone (always non-{@code null} and aligned with the ZoneId).
-     *
-     * @usage _intermediate_method_
      */
     TimeZone getTimeZone();
 
     /**
      * Sets a new TimeZone. If {@code null}, resets to the default value. Note that setting the TimeZone will alter the
      * ZoneId as well.
-     *
-     * @usage _intermediate_method_
      */
     void setTimeZone(TimeZone newTimeZone);
 
     /**
      * Gets currently configured ZoneId (always non-{@code null} and aligned with the TimeZone).
-     *
-     * @usage _intermediate_method_
      */
     ZoneId getZoneId();
 
     /**
      * Sets a new ZoneId. If {@code null}, resets to the default value. Note that setting the ZoneId will alter the
      * TimeZone as well.
-     *
-     * @usage _intermediate_method_
      */
     void setZoneId(ZoneId newZoneId);
 
     /**
      * Gets currently configured Charset (always non-{@code null}).
-     *
-     * @usage _intermediate_method_
      */
     Charset getCharset();
 
     /**
      * Sets a new Charset. If {@code null}, resets to the default value.
-     *
-     * @usage _intermediate_method_
      */
     void setCharset(Charset newCharset);
 
     /**
      * Gets currently configured {@link Table.ColumnOrder} (always non-{@code
      * null}).
-     *
-     * @usage _intermediate_method_
      */
     Table.ColumnOrder getColumnOrder();
 
     /**
      * Sets a new Table.ColumnOrder. If {@code null}, resets to the default value.
-     *
-     * @usage _intermediate_method_
      */
     void setColumnOrder(Table.ColumnOrder newColumnOrder);
 
     /**
      * Gets current foreign-key enforcement policy.
-     *
-     * @usage _intermediate_method_
      */
     boolean isEnforceForeignKeys();
 
     /**
      * Sets a new foreign-key enforcement policy. If {@code null}, resets to the default value.
-     *
-     * @usage _intermediate_method_
      */
     void setEnforceForeignKeys(Boolean newEnforceForeignKeys);
 
@@ -511,16 +429,12 @@ public interface Database extends Iterable<Table>, Closeable, Flushable {
      * {@link #setAllowAutoNumberInsert} and/or on a per-table basis using {@link Table#setAllowAutoNumberInsert}
      * (and/or on a jvm-wide using the {@link #ALLOW_AUTONUM_INSERT_PROPERTY} system property). Note that <i>enabling
      * this feature should be done with care</i> to reduce the chances of screwing up the database.
-     *
-     * @usage _intermediate_method_
      */
     boolean isAllowAutoNumberInsert();
 
     /**
      * Sets the new auto number insert policy for the database (unless overridden at the Table level). If {@code null},
      * resets to the default value.
-     *
-     * @usage _intermediate_method_
      */
     void setAllowAutoNumberInsert(Boolean allowAutoNumInsert);
 
@@ -533,15 +447,11 @@ public interface Database extends Iterable<Table>, Closeable, Flushable {
     /**
      * Sets the current expression evaluation policy. Expression evaluation is enabled by default but can be disabled if
      * necessary. If {@code null}, resets to the default value.
-     *
-     * @usage _intermediate_method_
      */
     void setEvaluateExpressions(Boolean evaluateExpressions);
 
     /**
      * Gets currently configured ColumnValidatorFactory (always non-{@code null}).
-     *
-     * @usage _intermediate_method_
      */
     ColumnValidatorFactory getColumnValidatorFactory();
 
@@ -549,8 +459,6 @@ public interface Database extends Iterable<Table>, Closeable, Flushable {
      * Sets a new ColumnValidatorFactory. If {@code null}, resets to the default value. The configured
      * ColumnValidatorFactory will be used to create ColumnValidator instances on any <i>user</i> tables loaded from
      * this point onward (this will not be used for system tables).
-     *
-     * @usage _intermediate_method_
      */
     void setColumnValidatorFactory(ColumnValidatorFactory newFactory);
 
@@ -558,7 +466,6 @@ public interface Database extends Iterable<Table>, Closeable, Flushable {
      * Returns the FileFormat of this database (which may involve inspecting the database itself).
      *
      * @throws IllegalStateException if the file format cannot be determined
-     * @usage _general_method_
      */
     FileFormat getFileFormat() throws IOException;
 
@@ -569,15 +476,11 @@ public interface Database extends Iterable<Table>, Closeable, Flushable {
 
     /**
      * Gets the currently configured DateTimeType.
-     *
-     * @usage _general_method_
      */
     DateTimeType getDateTimeType();
 
     /**
      * Sets the DateTimeType. If {@code null}, resets to the default value.
-     *
-     * @usage _general_method_
      */
     void setDateTimeType(DateTimeType dateTimeType);
 }

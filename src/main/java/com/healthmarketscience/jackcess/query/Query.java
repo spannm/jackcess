@@ -69,8 +69,6 @@ public interface Query {
 
     /**
      * Whether or not this query has been marked as hidden.
-     *
-     * @usage _general_method_
      */
     boolean isHidden();
 

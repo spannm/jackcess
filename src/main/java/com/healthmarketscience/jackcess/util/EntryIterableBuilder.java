@@ -31,7 +31,6 @@ import java.util.stream.StreamSupport;
  * Builder style class for constructing an {@link IndexCursor} entry Iterable/Iterator.
  *
  * @author James Ahlborn
- * @usage _general_class_
  */
 public class EntryIterableBuilder implements Iterable<Row> {
     private final IndexCursor  _cursor;

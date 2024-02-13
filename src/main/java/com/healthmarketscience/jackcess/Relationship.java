@@ -22,7 +22,6 @@ import java.util.List;
  * Information about a relationship between two tables in the {@link Database}.
  *
  * @author James Ahlborn
- * @usage _general_class_
  */
 public interface Relationship {
     enum JoinType {

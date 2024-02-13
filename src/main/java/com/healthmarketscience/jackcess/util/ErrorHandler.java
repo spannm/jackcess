@@ -27,14 +27,11 @@ import java.io.IOException;
  * is {@link #DEFAULT}, which just rethrows any exceptions encountered.
  *
  * @author James Ahlborn
- * @usage _intermediate_class_
  */
 @FunctionalInterface
 public interface ErrorHandler {
     /**
      * default error handler used if none provided (just rethrows exception)
-     *
-     * @usage _general_field_
      */
     ErrorHandler DEFAULT = (column, columnData, location, error) -> {
         // really can only be RuntimeException or IOException

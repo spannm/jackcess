@@ -30,7 +30,6 @@ import java.util.Set;
  *
  * @author James Ahlborn
  * @see TableBuilder
- * @usage _general_class_
  */
 public class IndexBuilder {
     /** name typically used by MS Access for the primary key index */
@@ -117,9 +116,6 @@ public class IndexBuilder {
         return withUnique();
     }
 
-    /**
-     * @usage _advanced_method_
-     */
     public IndexBuilder withType(byte type) {
         _type = type;
         return this;
@@ -149,16 +145,10 @@ public class IndexBuilder {
         return this;
     }
 
-    /**
-     * @usage _advanced_method_
-     */
     public int getIndexNumber() {
         return _indexNumber;
     }
 
-    /**
-     * @usage _advanced_method_
-     */
     public void setIndexNumber(int newIndexNumber) {
         _indexNumber = newIndexNumber;
     }
@@ -167,7 +157,6 @@ public class IndexBuilder {
      * Checks that this index definition is valid.
      *
      * @throws IllegalArgumentException if this index definition is invalid.
-     * @usage _advanced_method_
      */
     public void validate(Set<String> tableColNames, JetFormat format) {
 

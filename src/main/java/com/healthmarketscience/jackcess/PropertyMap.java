@@ -24,7 +24,6 @@ import java.util.stream.StreamSupport;
  * Map of properties for a database object.
  *
  * @author James Ahlborn
- * @usage _general_class_
  */
 public interface PropertyMap extends Iterable<PropertyMap.Property> {
     String ACCESS_VERSION_PROP    = "AccessVersion";
