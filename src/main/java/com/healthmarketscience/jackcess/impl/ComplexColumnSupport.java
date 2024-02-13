@@ -49,6 +49,9 @@ public class ComplexColumnSupport {
         DataType.DOUBLE, DataType.GUID, DataType.NUMERIC, DataType.TEXT,
         DataType.BIG_INT);
 
+    private ComplexColumnSupport() {
+    }
+
     /**
      * Creates a ComplexColumnInfo for a complex column.
      */
@@ -64,15 +67,13 @@ public class ComplexColumnSupport {
             complexColumns.getPrimaryKeyIndex());
         if (!cursor.findFirstRowByEntry(complexTypeId)) {
             throw new IOException(column.withErrorContext(
-                "Could not find complex column info for complex column with id " +
-                    complexTypeId));
+                "Could not find complex column info for complex column with id " + complexTypeId));
         }
         Row cColRow = cursor.getCurrentRow();
         int tableId = cColRow.getInt(COL_TABLE_ID);
         if (tableId != column.getTable().getTableDefPageNumber()) {
             throw new IOException(column.withErrorContext(
-                "Found complex column for table " + tableId + " but expected table " +
-                    column.getTable().getTableDefPageNumber()));
+                "Found complex column for table " + tableId + " but expected table " + column.getTable().getTableDefPageNumber()));
         }
         int flatTableId = cColRow.getInt(COL_FLAT_TABLE_ID);
         int typeObjId = cColRow.getInt(COL_COMPLEX_TYPE_OBJECT_ID);
@@ -109,8 +110,7 @@ public class ComplexColumnSupport {
         // if we found a single value of a "simple" type, then we are dealing with
         // a multi-value column
         List<? extends Column> typeCols = typeObjTable.getColumns();
-        return typeCols.size() == 1 &&
-            MULTI_VALUE_TYPES.contains(typeCols.get(0).getType());
+        return typeCols.size() == 1 && MULTI_VALUE_TYPES.contains(typeCols.get(0).getType());
     }
 
     public static boolean isAttachmentColumn(Table typeObjTable) {
@@ -151,8 +151,7 @@ public class ComplexColumnSupport {
         }
 
         // be flexible, allow for extra columns...
-        return numMemo >= 1 && numText >= 2 && numOle >= 1 &&
-            numDate >= 1 && numLong >= 1;
+        return numMemo >= 1 && numText >= 2 && numOle >= 1 && numDate >= 1 && numLong >= 1;
     }
 
     public static boolean isVersionHistoryColumn(Table typeObjTable) {

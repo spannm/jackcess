@@ -84,9 +84,7 @@ public abstract class ComplexValueForeignKey extends Number {
 
     @Override
     public boolean equals(Object o) {
-        return this == o ||
-            o != null && getClass() == o.getClass() &&
-                get() == ((ComplexValueForeignKey) o).get();
+        return this == o || o != null && getClass() == o.getClass() && get() == ((ComplexValueForeignKey) o).get();
     }
 
     @Override

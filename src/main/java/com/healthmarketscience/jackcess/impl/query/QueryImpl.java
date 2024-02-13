@@ -176,15 +176,15 @@ public abstract class QueryImpl implements Query {
         return new RowFormatter(getParameterRows()) {
             @Override
             protected void format(StringBuilder builder, Row row) {
-                String typeName = PARAM_TYPE_MAP.get(row.flag);
+                String typeName = PARAM_TYPE_MAP.get(row._flag);
                 if (typeName == null) {
                     throw new IllegalStateException(withErrorContext(
-                        "Unknown param type " + row.flag));
+                        "Unknown param type " + row._flag));
                 }
 
-                builder.append(row.name1).append(' ').append(typeName);
-                if (TEXT_FLAG.equals(row.flag) && getIntValue(row.extra, 0) > 0) {
-                    builder.append('(').append(row.extra).append(')');
+                builder.append(row._name1).append(' ').append(typeName);
+                if (TEXT_FLAG.equals(row._flag) && getIntValue(row._extra, 0) > 0) {
+                    builder.append('(').append(row._extra).append(')');
                 }
             }
         }.format();
@@ -196,15 +196,15 @@ public abstract class QueryImpl implements Query {
         for (Row table : getTableRows()) {
             StringBuilder builder = new StringBuilder();
 
-            if (table.expression != null) {
-                toQuotedExpr(builder, table.expression).append(IDENTIFIER_SEP_CHAR);
+            if (table._expression != null) {
+                toQuotedExpr(builder, table._expression).append(IDENTIFIER_SEP_CHAR);
             }
-            if (table.name1 != null) {
-                toOptionalQuotedExpr(builder, table.name1, true);
+            if (table._name1 != null) {
+                toOptionalQuotedExpr(builder, table._name1, true);
             }
-            toAlias(builder, table.name2);
+            toAlias(builder, table._name2);
 
-            String key = table.name2 != null ? table.name2 : table.name1;
+            String key = table._name2 != null ? table._name2 : table._name1;
             tableExprs.add(new SimpleTable(key, builder.toString()));
         }
 
@@ -212,8 +212,8 @@ public abstract class QueryImpl implements Query {
         List<Row> joins = getJoinRows();
         for (Row joinRow : joins) {
 
-            String fromTable = joinRow.name1;
-            String toTable = joinRow.name2;
+            String fromTable = joinRow._name1;
+            String toTable = joinRow._name2;
 
             TableSource fromTs = null;
             TableSource toTs = null;
@@ -249,7 +249,7 @@ public abstract class QueryImpl implements Query {
 
             if (fromTs == toTs) {
 
-                if (fromTs.sameJoin(joinRow.flag, joinRow.expression)) {
+                if (fromTs.sameJoin(joinRow._flag, joinRow._expression)) {
                     // easy-peasy, we just added the join expression to existing join,
                     // nothing more to do
                     continue;
@@ -260,7 +260,7 @@ public abstract class QueryImpl implements Query {
             }
 
             // new join expression
-            tableExprs.add(new Join(fromTs, toTs, joinRow.flag, joinRow.expression));
+            tableExprs.add(new Join(fromTs, toTs, joinRow._flag, joinRow._expression));
         }
 
         // convert join objects to SQL strings
@@ -273,23 +273,23 @@ public abstract class QueryImpl implements Query {
     }
 
     protected String getFromRemoteDbPath() {
-        return getRemoteDatabaseRow().name1;
+        return getRemoteDatabaseRow()._name1;
     }
 
     protected String getFromRemoteDbType() {
-        return getRemoteDatabaseRow().expression;
+        return getRemoteDatabaseRow()._expression;
     }
 
     protected String getWhereExpression() {
-        return getWhereRow().expression;
+        return getWhereRow()._expression;
     }
 
     protected List<String> getOrderings() {
         return new RowFormatter(getOrderByRows()) {
             @Override
             protected void format(StringBuilder builder, Row row) {
-                builder.append(row.expression);
-                if (DESCENDING_FLAG.equalsIgnoreCase(row.name1)) {
+                builder.append(row._expression);
+                if (DESCENDING_FLAG.equalsIgnoreCase(row._name1)) {
                     builder.append(" DESC");
                 }
             }
@@ -397,13 +397,13 @@ public abstract class QueryImpl implements Query {
     }
 
     private static Short getQueryType(List<Row> rows) {
-        return getFirstRowByAttribute(rows, TYPE_ATTRIBUTE).flag;
+        return getFirstRowByAttribute(rows, TYPE_ATTRIBUTE)._flag;
     }
 
     private static List<Row> getRowsByAttribute(List<Row> rows, Byte attribute) {
         List<Row> result = new ArrayList<>();
         for (Row row : rows) {
-            if (attribute.equals(row.attribute)) {
+            if (attribute.equals(row._attribute)) {
                 result.add(row);
             }
         }
@@ -412,7 +412,7 @@ public abstract class QueryImpl implements Query {
 
     private static Row getFirstRowByAttribute(List<Row> rows, Byte attribute) {
         for (Row row : rows) {
-            if (attribute.equals(row.attribute)) {
+            if (attribute.equals(row._attribute)) {
                 return row;
             }
         }
@@ -451,7 +451,7 @@ public abstract class QueryImpl implements Query {
     }
 
     protected static boolean hasFlag(Row row, int flagMask) {
-        return (getShortValue(row.flag, 0) & flagMask) != 0;
+        return (getShortValue(row._flag, 0) & flagMask) != 0;
     }
 
     protected static short getShortValue(Short s, int def) {
@@ -486,8 +486,7 @@ public abstract class QueryImpl implements Query {
     }
 
     protected static boolean isQuoted(String expr) {
-        return expr.length() >= 2 &&
-            expr.charAt(0) == '[' && expr.charAt(expr.length() - 1) == ']';
+        return expr.length() >= 2 && expr.charAt(0) == '[' && expr.charAt(expr.length() - 1) == ']';
     }
 
     protected static StringBuilder toRemoteDb(StringBuilder builder,
@@ -540,25 +539,25 @@ public abstract class QueryImpl implements Query {
      */
     public static final class Row {
         private final RowId  _id;
-        public final Byte    attribute;
-        public final String  expression;
-        public final Short   flag;
-        public final Integer extra;
-        public final String  name1;
-        public final String  name2;
-        public final Integer objectId;
-        public final byte[]  order;
+        public final Byte    _attribute;
+        public final String  _expression;
+        public final Short   _flag;
+        public final Integer _extra;
+        public final String  _name1;
+        public final String  _name2;
+        public final Integer _objectId;
+        public final byte[]  _order;
 
         private Row() {
             _id = null;
-            attribute = null;
-            expression = null;
-            flag = null;
-            extra = null;
-            name1 = null;
-            name2 = null;
-            objectId = null;
-            order = null;
+            _attribute = null;
+            _expression = null;
+            _flag = null;
+            _extra = null;
+            _name1 = null;
+            _name2 = null;
+            _objectId = null;
+            _order = null;
         }
 
         public Row(com.healthmarketscience.jackcess.Row tableRow) {
@@ -577,27 +576,27 @@ public abstract class QueryImpl implements Query {
             Integer extra, String name1, String name2,
             Integer objectId, byte[] order) {
             _id = id;
-            this.attribute = attribute;
-            this.expression = expression;
-            this.flag = flag;
-            this.extra = extra;
-            this.name1 = name1;
-            this.name2 = name2;
-            this.objectId = objectId;
-            this.order = order;
+            this._attribute = attribute;
+            this._expression = expression;
+            this._flag = flag;
+            this._extra = extra;
+            this._name1 = name1;
+            this._name2 = name2;
+            this._objectId = objectId;
+            this._order = order;
         }
 
         public com.healthmarketscience.jackcess.Row toTableRow() {
             com.healthmarketscience.jackcess.Row tableRow = new RowImpl((RowIdImpl) _id);
 
-            tableRow.put(COL_ATTRIBUTE, attribute);
-            tableRow.put(COL_EXPRESSION, expression);
-            tableRow.put(COL_FLAG, flag);
-            tableRow.put(COL_EXTRA, extra);
-            tableRow.put(COL_NAME1, name1);
-            tableRow.put(COL_NAME2, name2);
-            tableRow.put(COL_OBJECTID, objectId);
-            tableRow.put(COL_ORDER, order);
+            tableRow.put(COL_ATTRIBUTE, _attribute);
+            tableRow.put(COL_EXPRESSION, _expression);
+            tableRow.put(COL_FLAG, _flag);
+            tableRow.put(COL_EXTRA, _extra);
+            tableRow.put(COL_NAME1, _name1);
+            tableRow.put(COL_NAME2, _name2);
+            tableRow.put(COL_OBJECTID, _objectId);
+            tableRow.put(COL_ORDER, _order);
 
             return tableRow;
         }
@@ -608,7 +607,7 @@ public abstract class QueryImpl implements Query {
         }
     }
 
-    protected static abstract class RowFormatter {
+    protected abstract static class RowFormatter {
         private final List<Row> _list;
 
         protected RowFormatter(List<Row> list) {
@@ -631,7 +630,7 @@ public abstract class QueryImpl implements Query {
         protected abstract void format(StringBuilder builder, Row row);
     }
 
-    protected static abstract class RowFilter {
+    protected abstract static class RowFilter {
         protected RowFilter() {
         }
 
@@ -673,7 +672,7 @@ public abstract class QueryImpl implements Query {
     /**
      * Base type of something which provides table data in a query
      */
-    private static abstract class TableSource {
+    private abstract static class TableSource {
         @Override
         public String toString() {
             StringBuilder sb = new StringBuilder();

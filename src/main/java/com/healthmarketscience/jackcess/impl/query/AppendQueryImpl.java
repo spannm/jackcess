@@ -24,9 +24,8 @@ import com.healthmarketscience.jackcess.query.AppendQuery;
 import java.util.List;
 
 /**
- * Concrete Query subclass which represents an append query, e.g.: {@code INSERT INTO 
- * <table>
- *  VALUES (<values>)}
+ * Concrete Query subclass which represents an append query,
+ * e.g.: {@code INSERT INTO table VALUES (values)}
  *
  * @author James Ahlborn
  */
@@ -39,7 +38,7 @@ public class AppendQueryImpl extends BaseSelectQueryImpl implements AppendQuery 
 
     @Override
     public String getTargetTable() {
-        return getTypeRow().name1;
+        return getTypeRow()._name1;
     }
 
     @Override
@@ -47,19 +46,19 @@ public class AppendQueryImpl extends BaseSelectQueryImpl implements AppendQuery 
         return new RowFormatter(getTargetRows()) {
             @Override
             protected void format(StringBuilder builder, Row row) {
-                toOptionalQuotedExpr(builder, row.name2, true);
+                toOptionalQuotedExpr(builder, row._name2, true);
             }
         }.format();
     }
 
     @Override
     public String getRemoteDbPath() {
-        return getTypeRow().name2;
+        return getTypeRow()._name2;
     }
 
     @Override
     public String getRemoteDbType() {
-        return getTypeRow().expression;
+        return getTypeRow()._expression;
     }
 
     @Override
@@ -67,7 +66,7 @@ public class AppendQueryImpl extends BaseSelectQueryImpl implements AppendQuery 
         return new RowFormatter(getValueRows()) {
             @Override
             protected void format(StringBuilder builder, Row row) {
-                builder.append(row.expression);
+                builder.append(row._expression);
             }
         }.format();
     }
@@ -85,7 +84,7 @@ public class AppendQueryImpl extends BaseSelectQueryImpl implements AppendQuery 
         return new RowFilter() {
             @Override
             protected boolean keep(Row row) {
-                return row.name2 != null;
+                return row._name2 != null;
             }
         }.filter(super.getColumnRows());
     }

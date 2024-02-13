@@ -37,10 +37,7 @@ public class CrossTabQueryImpl extends BaseSelectQueryImpl
     }
 
     protected Row getTransformRow() {
-        return getUniqueRow(
-            filterRowsByNotFlag(super.getColumnRows(),
-                (short) (CROSSTAB_PIVOT_FLAG |
-                    CROSSTAB_NORMAL_FLAG)));
+        return getUniqueRow(filterRowsByNotFlag(super.getColumnRows(), (short) (CROSSTAB_PIVOT_FLAG | CROSSTAB_NORMAL_FLAG)));
     }
 
     @Override
@@ -61,17 +58,17 @@ public class CrossTabQueryImpl extends BaseSelectQueryImpl
     @Override
     public String getTransformExpression() {
         Row row = getTransformRow();
-        if (row.expression == null) {
+        if (row._expression == null) {
             return null;
         }
         // note column expression are always quoted appropriately
-        StringBuilder builder = new StringBuilder(row.expression);
-        return toAlias(builder, row.name1).toString();
+        StringBuilder builder = new StringBuilder(row._expression);
+        return toAlias(builder, row._name1).toString();
     }
 
     @Override
     public String getPivotExpression() {
-        return getPivotRow().expression;
+        return getPivotRow()._expression;
     }
 
     @Override

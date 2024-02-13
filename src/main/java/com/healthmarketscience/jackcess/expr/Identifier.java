@@ -64,9 +64,9 @@ public class Identifier {
 
         Identifier oi = (Identifier) o;
 
-        return Objects.equals(_objectName, oi._objectName) &&
-            Objects.equals(_collectionName, oi._collectionName) &&
-            Objects.equals(_propertyName, oi._propertyName);
+        return Objects.equals(_objectName, oi._objectName)
+            && Objects.equals(_collectionName, oi._collectionName)
+            && Objects.equals(_propertyName, oi._propertyName);
     }
 
     @Override

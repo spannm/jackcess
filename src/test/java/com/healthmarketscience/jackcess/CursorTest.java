@@ -493,14 +493,11 @@ public class CursorTest extends TestCase {
         assertEquals(3, cursor3.moveNextRows(3));
         assertEquals(4, cursor4.moveNextRows(4));
 
-        Map<String, Object> expectedPrevRow =
-            createExpectedRow("id", firstValue, "value", "data" + firstValue);
-        ++firstValue;
-        Map<String, Object> expectedDeletedRow =
-            createExpectedRow("id", firstValue, "value", "data" + firstValue);
-        ++firstValue;
-        Map<String, Object> expectedNextRow =
-            createExpectedRow("id", firstValue, "value", "data" + firstValue);
+        Map<String, Object> expectedPrevRow = createExpectedRow("id", firstValue, "value", "data" + firstValue);
+        firstValue++;
+        Map<String, Object> expectedDeletedRow = createExpectedRow("id", firstValue, "value", "data" + firstValue);
+        firstValue++;
+        Map<String, Object> expectedNextRow = createExpectedRow("id", firstValue, "value", "data" + firstValue);
 
         assertEquals(expectedDeletedRow, cursor2.getCurrentRow());
         assertEquals(expectedDeletedRow, cursor3.getCurrentRow());

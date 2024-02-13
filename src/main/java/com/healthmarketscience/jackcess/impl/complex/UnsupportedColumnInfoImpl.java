@@ -124,8 +124,7 @@ public class UnsupportedColumnInfoImpl
 
         @Override
         public String toString() {
-            return "UnsupportedValue(" + getComplexValueForeignKey() + "," + getId() +
-                ") " + getValues();
+            return "UnsupportedValue(" + getComplexValueForeignKey() + "," + getId() + ") " + getValues();
         }
     }
 }

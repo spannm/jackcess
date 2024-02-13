@@ -36,10 +36,10 @@ import java.util.regex.Pattern;
 /**
  * @author James Ahlborn
  */
+@SuppressWarnings("checkstyle:MethodNameCheck")
 public class IndexCodesTest extends TestCase {
 
-    private static final Map<Character, String> SPECIAL_CHARS =
-        new HashMap<>();
+    private static final Map<Character, String> SPECIAL_CHARS = new HashMap<>();
     static {
         SPECIAL_CHARS.put('\b', "\\b");
         SPECIAL_CHARS.put('\t', "\\t");
@@ -81,8 +81,7 @@ public class IndexCodesTest extends TestCase {
             Row row = cursor.getCurrentRow();
 
             Object data = row.get("data");
-            if (testDB.getExpectedFileFormat() == Database.FileFormat.V1997 &&
-                data instanceof String && ((String) data).contains("\uFFFD")) {
+            if (testDB.getExpectedFileFormat() == Database.FileFormat.V1997 && data instanceof String && ((String) data).contains("\uFFFD")) {
                 // this row has a character not supported in the v1997 charset
                 continue;
             }
@@ -95,18 +94,14 @@ public class IndexCodesTest extends TestCase {
             } finally {
                 if (!success) {
                     System.out.println("CurPos: " + curPos);
-                    System.out.println("Value: " + row + ": " +
-                        toUnicodeStr(row.get("data")));
+                    System.out.println("Value: " + row + ": " + toUnicodeStr(row.get("data")));
                 }
             }
         }
 
     }
 
-    private static void findRow(final TestDB testDB, Table t, Index index,
-        Row expectedRow,
-        Cursor.Position expectedPos)
-        throws Exception {
+    private static void findRow(final TestDB testDB, Table t, Index index, Row expectedRow, Cursor.Position expectedPos) throws Exception {
         Object[] idxRow = ((IndexImpl) index).constructIndexRow(expectedRow);
         Cursor cursor = CursorBuilder.createCursor(index, idxRow, idxRow);
 
@@ -125,22 +120,16 @@ public class IndexCodesTest extends TestCase {
 
         // TODO long rows not handled completely yet in V2010
         // seems to truncate entry at 508 bytes with some trailing 2 byte seq
-        if (testDB != null &&
-            testDB.getExpectedFileFormat() == Database.FileFormat.V2010) {
+        if (testDB != null && testDB.getExpectedFileFormat() == Database.FileFormat.V2010) {
             String rowId = expectedRow.getString("name");
             String tName = t.getName();
-            if (("Table11".equals(tName) || "Table11_desc".equals(tName)) &&
-                ("row10".equals(rowId) || "row11".equals(rowId) ||
-                    "row12".equals(rowId))) {
-                System.out.println(
-                    "TODO long rows not handled completely yet in V2010: " + tName +
-                        ", " + rowId);
+            if (("Table11".equals(tName) || "Table11_desc".equals(tName)) && ("row10".equals(rowId) || "row11".equals(rowId) || "row12".equals(rowId))) {
+                System.out.println("TODO long rows not handled completely yet in V2010: " + tName + ", " + rowId);
                 return;
             }
         }
 
-        fail("testDB: " + testDB + ";\nCould not find expected row " + expectedRow + " starting at " +
-            entryToString(startPos));
+        fail("testDB: " + testDB + ";\nCould not find expected row " + expectedRow + " starting at " + entryToString(startPos));
     }
 
     //////
@@ -156,10 +145,7 @@ public class IndexCodesTest extends TestCase {
     public void x_testCreateIsoFile() throws Exception {
         Database db = create(Database.FileFormat.V2000, true);
 
-        Table t = new TableBuilder("test")
-            .addColumn(new ColumnBuilder("row", DataType.TEXT))
-            .addColumn(new ColumnBuilder("data", DataType.TEXT))
-            .toTable(db);
+        Table t = new TableBuilder("test").addColumn(new ColumnBuilder("row", DataType.TEXT)).addColumn(new ColumnBuilder("data", DataType.TEXT)).toTable(db);
 
         for (int i = 0; i < 256; ++i) {
             String str = "AA" + (char) i + "AA";
@@ -176,9 +162,7 @@ public class IndexCodesTest extends TestCase {
 
         for (int i = 0; i < 256; ++i) {
             String str = "AA" + (char) i + "AA";
-            t.addRow("row" + i, str,
-                (byte) 42 + i, (short) 53 + i, 13 * i,
-                6.7d / i, null, null, true);
+            t.addRow("row" + i, str, (byte) 42 + i, (short) 53 + i, 13 * i, 6.7d / i, null, null, true);
         }
 
         db.close();
@@ -204,10 +188,7 @@ public class IndexCodesTest extends TestCase {
         // t.addRow(key, str);
         // }
 
-        Table t = new TableBuilder("Table5")
-            .addColumn(new ColumnBuilder("name", DataType.TEXT))
-            .addColumn(new ColumnBuilder("data", DataType.TEXT))
-            .toTable(db);
+        Table t = new TableBuilder("Table5").addColumn(new ColumnBuilder("name", DataType.TEXT)).addColumn(new ColumnBuilder("data", DataType.TEXT)).toTable(db);
 
         char c = (char) 0x3041; // crazy 7F 02 ... A0
         char c2 = (char) 0x30A2; // crazy 7F 02 ...
@@ -224,7 +205,16 @@ public class IndexCodesTest extends TestCase {
         char c13 = (char) 0x005F; // _ (long inline)
         char c14 = (char) 0xFFFE; // removed
 
-        char[] cs = new char[] {c7, c8, c3, c12, c13, c14, c, c2, c9};
+        char[] cs = new char[] {
+            c7,
+            c8,
+            c3,
+            c12,
+            c13,
+            c14,
+            c,
+            c2,
+            c9};
         addCombos(t, 0, "", cs, 5);
 
         // t = new TableBuilder("Table2")
@@ -257,18 +247,15 @@ public class IndexCodesTest extends TestCase {
         Cursor cursor = CursorBuilder.createCursor(ind);
         while (cursor.moveToNextRow()) {
             System.out.println("=======");
-            String entryStr =
-                entryToString(cursor.getSavepoint().getCurrentPosition());
+            String entryStr = entryToString(cursor.getSavepoint().getCurrentPosition());
             System.out.println("Entry Bytes: " + entryStr);
-            System.out.println("Value: " + cursor.getCurrentRow() + "; " +
-                toUnicodeStr(cursor.getCurrentRow().get("data")));
+            System.out.println("Value: " + cursor.getCurrentRow() + "; " + toUnicodeStr(cursor.getCurrentRow().get("data")));
         }
 
         db.close();
     }
 
-    private int addCombos(Table t, int rowNum, String s, char[] cs, int len)
-        throws Exception {
+    private int addCombos(Table t, int rowNum, String s, char[] cs, int len) throws Exception {
         if (s.length() >= len) {
             return rowNum;
         }
@@ -350,13 +337,11 @@ public class IndexCodesTest extends TestCase {
             char c = value.charAt(2);
 
             System.out.println("=======");
-            System.out.println("RowId: " +
-                savepoint.getCurrentPosition().getRowId());
+            System.out.println("RowId: " + savepoint.getCurrentPosition().getRowId());
             System.out.println("Entry: " + entryStr);
             // System.out.println("Row: " + row);
             System.out.println("Value: (" + key + ")" + value);
-            System.out.println("Char: " + c + ", " + (int) c + ", " +
-                toUnicodeStr(c));
+            System.out.println("Char: " + c + ", " + (int) c + ", " + toUnicodeStr(c));
 
             String type = null;
             if (entryStr.endsWith("01 00")) {
@@ -375,15 +360,13 @@ public class IndexCodesTest extends TestCase {
                 m.find();
                 handleUnprintableEntry(m.group(2), c, unprintCodes);
 
-            } else if (entryStr.contains("01 02 02") &&
-                !entryStr.contains("FF 02 80 FF 80")) {
+            } else if (entryStr.contains("01 02 02") && !entryStr.contains("FF 02 80 FF 80")) {
 
                 // handle chars w/ symbols
                 type = "CHAR_WITH_SYMBOL";
                 Matcher m = inatPat.matcher(entryStr);
                 m.find();
-                handleInternationalEntry(m.group(1), m.group(2), c,
-                    inatInlineCodes, inatExtraCodes);
+                handleInternationalEntry(m.group(1), m.group(2), c, inatInlineCodes, inatExtraCodes);
 
             } else if (entryStr.contains("0E 02 0E 02 0E 02 0E 02 01 02")) {
 
@@ -398,9 +381,7 @@ public class IndexCodesTest extends TestCase {
                 type = "CRAZY_INAT";
                 Matcher m = inat2Pat.matcher(entryStr);
                 m.find();
-                handleInternational2Entry(m.group(1), m.group(3), m.group(4), c,
-                    inat2Codes, inat2ExtraCodes,
-                    inat2CrazyCodes);
+                handleInternational2Entry(m.group(1), m.group(3), m.group(4), c, inat2Codes, inat2ExtraCodes, inat2CrazyCodes);
 
             } else {
 
@@ -443,8 +424,7 @@ public class IndexCodesTest extends TestCase {
             chars = inatInlineCodes.get(cc);
             if (chars != null) {
                 String[] extra = inatExtraCodes.get(cc);
-                System.out.println("I" + toByteString(chars) + "," +
-                    toByteString(extra));
+                System.out.println("I" + toByteString(chars) + "," + toByteString(extra));
                 continue;
             }
 
@@ -460,7 +440,8 @@ public class IndexCodesTest extends TestCase {
                     throw new RuntimeException("long unprint codes");
                 }
                 int val = Integer.parseInt(chars[0], 16) - 2;
-                String valStr = ByteUtil.toHexString(new byte[] {(byte) val}).trim();
+                String valStr = ByteUtil.toHexString(new byte[] {
+                    (byte) val}).trim();
                 System.out.println("P" + valStr);
                 continue;
             }
@@ -477,9 +458,7 @@ public class IndexCodesTest extends TestCase {
                 }
 
                 String[] extra = inat2ExtraCodes.get(cc);
-                System.out.println("Z" + toByteString(chars) + "," +
-                    toByteString(extra) + "," +
-                    crazyCode);
+                System.out.println("Z" + toByteString(chars) + "," + toByteString(extra) + "," + crazyCode);
                 continue;
             }
 
@@ -526,13 +505,11 @@ public class IndexCodesTest extends TestCase {
             String key = row.getString("key");
             char c = value.charAt(2);
             System.out.println("=======");
-            System.out.println("RowId: " +
-                savepoint.getCurrentPosition().getRowId());
+            System.out.println("RowId: " + savepoint.getCurrentPosition().getRowId());
             System.out.println("Entry: " + entryStr);
             // System.out.println("Row: " + row);
             System.out.println("Value: (" + key + ")" + value);
-            System.out.println("Char: " + c + ", " + (int) c + ", " +
-                toUnicodeStr(c));
+            System.out.println("Char: " + c + ", " + (int) c + ", " + toUnicodeStr(c));
 
             String type = null;
             if (entryStr.endsWith("01 00")) {
@@ -551,15 +528,13 @@ public class IndexCodesTest extends TestCase {
                 m.find();
                 handleUnprintableEntry(m.group(2), c, unprintCodes);
 
-            } else if (entryStr.contains("01 02 02") &&
-                !entryStr.contains("FF 02 80 FF 80")) {
+            } else if (entryStr.contains("01 02 02") && !entryStr.contains("FF 02 80 FF 80")) {
 
                 // handle chars w/ symbols
                 type = "CHAR_WITH_SYMBOL";
                 Matcher m = inatPat.matcher(entryStr);
                 m.find();
-                handleInternationalEntry(m.group(1), m.group(2), c,
-                    inatInlineCodes, inatExtraCodes);
+                handleInternationalEntry(m.group(1), m.group(2), c, inatInlineCodes, inatExtraCodes);
 
             } else if (entryStr.contains("4A 4A 4A 4A 01 02")) {
 
@@ -574,9 +549,7 @@ public class IndexCodesTest extends TestCase {
                 type = "CRAZY_INAT";
                 Matcher m = inat2Pat.matcher(entryStr);
                 m.find();
-                handleInternational2Entry(m.group(1), m.group(3), m.group(4), c,
-                    inat2Codes, inat2ExtraCodes,
-                    inat2CrazyCodes);
+                handleInternational2Entry(m.group(1), m.group(3), m.group(4), c, inat2Codes, inat2ExtraCodes, inat2CrazyCodes);
 
             } else {
 
@@ -618,8 +591,7 @@ public class IndexCodesTest extends TestCase {
             chars = inatInlineCodes.get(cc);
             if (chars != null) {
                 String[] extra = inatExtraCodes.get(cc);
-                System.out.println("I" + toByteString(chars) + "," +
-                    toByteString(extra));
+                System.out.println("I" + toByteString(chars) + "," + toByteString(extra));
                 continue;
             }
 
@@ -635,7 +607,8 @@ public class IndexCodesTest extends TestCase {
                     throw new RuntimeException("long unprint codes");
                 }
                 int val = Integer.parseInt(chars[0], 16) - 2;
-                String valStr = ByteUtil.toHexString(new byte[] {(byte) val}).trim();
+                String valStr = ByteUtil.toHexString(new byte[] {
+                    (byte) val}).trim();
                 System.out.println("P" + valStr);
                 continue;
             }
@@ -652,9 +625,7 @@ public class IndexCodesTest extends TestCase {
                 }
 
                 String[] extra = inat2ExtraCodes.get(cc);
-                System.out.println("Z" + toByteString(chars) + "," +
-                    toByteString(extra) + "," +
-                    crazyCode);
+                System.out.println("Z" + toByteString(chars) + "," + toByteString(extra) + "," + crazyCode);
                 continue;
             }
 
@@ -673,39 +644,25 @@ public class IndexCodesTest extends TestCase {
         return str;
     }
 
-    private static void handleInlineEntry(
-        String entryCodes, char c, Map<Character, String[]> inlineCodes)
-        throws Exception {
+    private static void handleInlineEntry(String entryCodes, char c, Map<Character, String[]> inlineCodes) throws Exception {
         inlineCodes.put(c, entryCodes.trim().split(" "));
     }
 
-    private static void handleUnprintableEntry(
-        String entryCodes, char c, Map<Character, String[]> unprintCodes)
-        throws Exception {
+    private static void handleUnprintableEntry(String entryCodes, char c, Map<Character, String[]> unprintCodes) throws Exception {
         unprintCodes.put(c, entryCodes.trim().split(" "));
     }
 
-    private static void handleUnprintable2Entry(
-        String entryCodes, char c, Map<Character, String[]> unprintCodes)
-        throws Exception {
+    private static void handleUnprintable2Entry(String entryCodes, char c, Map<Character, String[]> unprintCodes) throws Exception {
         unprintCodes.put(c, entryCodes.trim().split(" "));
     }
 
-    private static void handleInternationalEntry(
-        String inlineCodes, String entryCodes, char c,
-        Map<Character, String[]> inatInlineCodes,
-        Map<Character, String[]> inatExtraCodes)
-        throws Exception {
+    private static void handleInternationalEntry(String inlineCodes, String entryCodes, char c, Map<Character, String[]> inatInlineCodes, Map<Character, String[]> inatExtraCodes) throws Exception {
         inatInlineCodes.put(c, inlineCodes.trim().split(" "));
         inatExtraCodes.put(c, entryCodes.trim().split(" "));
     }
 
-    private static void handleInternational2Entry(
-        String inlineCodes, String entryCodes, String crazyCodes, char c,
-        Map<Character, String[]> inatInlineCodes,
-        Map<Character, String[]> inatExtraCodes,
-        Map<Character, String[]> inatCrazyCodes)
-        throws Exception {
+    private static void handleInternational2Entry(String inlineCodes, String entryCodes, String crazyCodes, char c, Map<Character, String[]> inatInlineCodes, Map<Character, String[]> inatExtraCodes,
+        Map<Character, String[]> inatCrazyCodes) throws Exception {
         inatInlineCodes.put(c, inlineCodes.trim().split(" "));
         if (entryCodes != null) {
             inatExtraCodes.put(c, entryCodes.trim().split(" "));
@@ -753,8 +710,7 @@ public class IndexCodesTest extends TestCase {
         return builder.toString();
     }
 
-    public static String entryToString(Cursor.Position curPos)
-        throws Exception {
+    public static String entryToString(Cursor.Position curPos) throws Exception {
         Field eField = curPos.getClass().getDeclaredField("_entry");
         eField.setAccessible(true);
         IndexData.Entry entry = (IndexData.Entry) eField.get(curPos);
@@ -762,8 +718,7 @@ public class IndexCodesTest extends TestCase {
         ebField.setAccessible(true);
         byte[] entryBytes = (byte[]) ebField.get(entry);
 
-        return ByteUtil.toHexString(ByteBuffer.wrap(entryBytes),
-            0, entryBytes.length, false);
+        return ByteUtil.toHexString(ByteBuffer.wrap(entryBytes), 0, entryBytes.length, false);
     }
 
 }

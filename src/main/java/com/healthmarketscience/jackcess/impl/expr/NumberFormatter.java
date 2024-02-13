@@ -67,17 +67,14 @@ public class NumberFormatter {
     private static final int        DBL_SIG_DIGITS   = 15;
     private static final int        DEC_SIG_DIGITS   = 28;
 
-    public static final MathContext FLT_MATH_CONTEXT =
-        new MathContext(FLT_SIG_DIGITS, ROUND_MODE);
-    public static final MathContext DBL_MATH_CONTEXT =
-        new MathContext(DBL_SIG_DIGITS, ROUND_MODE);
-    public static final MathContext DEC_MATH_CONTEXT =
-        new MathContext(DEC_SIG_DIGITS, ROUND_MODE);
+    public static final MathContext FLT_MATH_CONTEXT = new MathContext(FLT_SIG_DIGITS, ROUND_MODE);
+    public static final MathContext DBL_MATH_CONTEXT = new MathContext(DBL_SIG_DIGITS, ROUND_MODE);
+    public static final MathContext DEC_MATH_CONTEXT = new MathContext(DEC_SIG_DIGITS, ROUND_MODE);
 
     // note, java doesn't distinguish between pos/neg NaN
     private static final String     NAN_STR          = "1.#QNAN";
     private static final String     POS_INF_STR      = "1.#INF";
-    private static final String     NEG_INf_STR      = "-1.#INF";
+    private static final String     NEG_INF_STR      = "-1.#INF";
 
     private final TypeFormatter     _fltFmt;
     private final TypeFormatter     _dblFmt;
@@ -95,7 +92,7 @@ public class NumberFormatter {
             return NAN_STR;
         }
         if (Float.isInfinite(f)) {
-            return f < 0f ? NEG_INf_STR : POS_INF_STR;
+            return f < 0f ? NEG_INF_STR : POS_INF_STR;
         }
 
         return _fltFmt.format(new BigDecimal(f, FLT_MATH_CONTEXT));
@@ -107,7 +104,7 @@ public class NumberFormatter {
             return NAN_STR;
         }
         if (Double.isInfinite(d)) {
-            return d < 0d ? NEG_INf_STR : POS_INF_STR;
+            return d < 0d ? NEG_INF_STR : POS_INF_STR;
         }
 
         return _dblFmt.format(new BigDecimal(d, DBL_MATH_CONTEXT));

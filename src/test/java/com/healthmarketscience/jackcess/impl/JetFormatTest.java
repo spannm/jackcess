@@ -74,8 +74,8 @@ public class JetFormatTest extends TestCase {
      * Defines currently supported db file formats. (can be modified at runtime via the system property
      * "com.healthmarketscience.jackcess.testFormats")
      */
-    public final static FileFormat[] SUPPORTED_FILEFORMATS;
-    public final static FileFormat[] SUPPORTED_FILEFORMATS_FOR_READ;
+    public static final FileFormat[] SUPPORTED_FILEFORMATS;
+    public static final FileFormat[] SUPPORTED_FILEFORMATS_FOR_READ;
 
     static {
         String testFormatStr = System.getProperty("com.healthmarketscience.jackcess.testFormats");
@@ -94,8 +94,7 @@ public class JetFormatTest extends TestCase {
                 continue;
             }
             supportedForRead.add(ff);
-            if (DatabaseImpl.getFileFormatDetails(ff).getFormat().READ_ONLY ||
-                ff == FileFormat.MSISAM) {
+            if (DatabaseImpl.getFileFormatDetails(ff).getFormat().READ_ONLY || ff == FileFormat.MSISAM) {
                 continue;
             }
             supported.add(ff);
@@ -166,8 +165,7 @@ public class JetFormatTest extends TestCase {
                     FileFormat dbFileFormat = db.getFileFormat();
                     db.close();
                     if (dbFileFormat != fileFormat) {
-                        throw new IllegalStateException("Expected " + fileFormat +
-                            " was " + dbFileFormat);
+                        throw new IllegalStateException("Expected " + fileFormat + " was " + dbFileFormat);
                     }
                 } catch (Exception e) {
                     throw new RuntimeException(e);
@@ -187,9 +185,7 @@ public class JetFormatTest extends TestCase {
             Basename basename, FileFormat fileFormat) {
 
             return new File(DIR_TEST_DATA,
-                fileFormat.name() + File.separator +
-                    basename + fileFormat.name() +
-                    fileFormat.getFileExtension());
+                fileFormat.name() + File.separator + basename + fileFormat.name() + fileFormat.getFileExtension());
         }
     }
 
@@ -212,10 +208,7 @@ public class JetFormatTest extends TestCase {
                     testDB.dbFile.toPath(), false, false)) {
 
                 JetFormat fmtActual = JetFormat.getFormat(channel);
-                assertEquals("Unexpected JetFormat for dbFile: " +
-                                testDB.dbFile.getAbsolutePath(),
-                        testDB.getExpectedFormat(), fmtActual);
-
+                assertEquals("Unexpected JetFormat for dbFile: " + testDB.dbFile.getAbsolutePath(), testDB.getExpectedFormat(), fmtActual);
             }
 
         }

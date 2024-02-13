@@ -23,9 +23,8 @@ import com.healthmarketscience.jackcess.query.UpdateQuery;
 import java.util.List;
 
 /**
- * Concrete Query subclass which represents a row update query, e.g.: {@code UPDATE 
- * <table>
- *  SET <newValues>}
+ * Concrete Query subclass which represents a row update query,
+ * e.g.: {@code UPDATE table SET newValues}.
  *
  * @author James Ahlborn
  */
@@ -56,8 +55,8 @@ public class UpdateQueryImpl extends QueryImpl implements UpdateQuery {
         return new RowFormatter(getColumnRows()) {
             @Override
             protected void format(StringBuilder builder, Row row) {
-                toOptionalQuotedExpr(builder, row.name2, true)
-                    .append(" = ").append(row.expression);
+                toOptionalQuotedExpr(builder, row._name2, true)
+                    .append(" = ").append(row._expression);
             }
         }.format();
     }

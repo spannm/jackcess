@@ -46,8 +46,7 @@ public class General97IndexCodes extends GeneralLegacyIndexCodes {
         /**
          * handlers for the first 256 chars. use nested class to lazy load the handlers
          */
-        private static final CharHandler[] _values = loadCodes(
-            CODES_FILE, FIRST_CHAR, LAST_CHAR);
+        private static final CharHandler[] VALUES = loadCodes(CODES_FILE, FIRST_CHAR, LAST_CHAR);
     }
 
     private static final class ExtMappings {
@@ -57,8 +56,7 @@ public class General97IndexCodes extends GeneralLegacyIndexCodes {
          * some chars in the extended range have corollaries in the single byte range. this array holds the mappings
          * from the ext range to the single byte range. chars without mappings go to 0 (ignored).
          */
-        private static final short[] _values = loadMappings(
-            EXT_MAPPINGS_FILE, FIRST_MAP_CHAR, LAST_MAP_CHAR);
+        private static final short[] VALUES = loadMappings(EXT_MAPPINGS_FILE, FIRST_MAP_CHAR, LAST_MAP_CHAR);
     }
 
     static final General97IndexCodes GEN_97_INSTANCE = new General97IndexCodes();
@@ -72,7 +70,7 @@ public class General97IndexCodes extends GeneralLegacyIndexCodes {
     @Override
     CharHandler getCharHandler(char c) {
         if (c <= LAST_CHAR) {
-            return Codes._values[c];
+            return Codes.VALUES[c];
         }
 
         if (c < FIRST_MAP_CHAR || c > LAST_MAP_CHAR) {
@@ -84,7 +82,7 @@ public class General97IndexCodes extends GeneralLegacyIndexCodes {
         // equivalent, and they map to 0 (which is an "ignored" char, so it all
         // works out)
         int extOffset = asUnsignedChar(c) - asUnsignedChar(FIRST_MAP_CHAR);
-        return Codes._values[ExtMappings._values[extOffset]];
+        return Codes.VALUES[ExtMappings.VALUES[extOffset]];
     }
 
     /**
@@ -200,8 +198,7 @@ public class General97IndexCodes extends GeneralLegacyIndexCodes {
             }
 
         } catch (IOException e) {
-            throw new RuntimeException("failed loading index mappings file " +
-                mappingsFilePath, e);
+            throw new RuntimeException("failed loading index mappings file " + mappingsFilePath, e);
         } finally {
             ByteUtil.closeQuietly(reader);
         }

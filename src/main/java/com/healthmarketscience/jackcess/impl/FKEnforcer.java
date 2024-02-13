@@ -31,10 +31,8 @@ import java.util.*;
  * @usage _advanced_class_
  */
 final class FKEnforcer {
-    // fk constraints always work with indexes, which are always
-    // case-insensitive
-    private static final ColumnMatcher MATCHER =
-        CaseInsensitiveColumnMatcher.INSTANCE;
+    // fk constraints always work with indexes, which are always case-insensitive
+    private static final ColumnMatcher MATCHER = CaseInsensitiveColumnMatcher.INSTANCE;
 
     private final TableImpl            _table;
     private List<ColumnImpl>           _cols;
@@ -64,7 +62,7 @@ final class FKEnforcer {
                 }
             }
         }
-        _cols = !cols.isEmpty() ? List.copyOf(cols) : Collections.<ColumnImpl> emptyList();
+        _cols = !cols.isEmpty() ? List.copyOf(cols) : Collections.emptyList();
     }
 
     /**
@@ -228,8 +226,7 @@ final class FKEnforcer {
         // this table is a secondary table. however, null values are allowed
         if (!areNull(joiner, row) && !joiner.hasRows(row)) {
             throw new ConstraintViolationException(
-                "Adding new row " + Arrays.asList(row) + " violates constraint " +
-                    joiner.toFKString());
+                "Adding new row " + Arrays.asList(row) + " violates constraint " + joiner.toFKString());
         }
     }
 
@@ -239,8 +236,7 @@ final class FKEnforcer {
         // the primary table.
         if (joiner.hasRows(row)) {
             throw new ConstraintViolationException(
-                "Removing old row " + Arrays.asList(row) + " violates constraint " +
-                    joiner.toFKString());
+                "Removing old row " + Arrays.asList(row) + " violates constraint " + joiner.toFKString());
         }
     }
 
@@ -253,7 +249,7 @@ final class FKEnforcer {
         Object[] toRow = new Object[joiner.getToTable().getColumnCount()];
 
         for (Iterator<Row> iter = joiner.findRows(oldFromRow)
-            .setColumnNames(Collections.<String> emptySet())
+            .setColumnNames(Collections.emptySet())
             .iterator(); iter.hasNext();) {
             iter.next();
 
@@ -276,7 +272,7 @@ final class FKEnforcer {
         Object[] toRow = new Object[joiner.getToTable().getColumnCount()];
 
         for (Iterator<Row> iter = joiner.findRows(oldFromRow)
-            .setColumnNames(Collections.<String> emptySet())
+            .setColumnNames(Collections.emptySet())
             .iterator(); iter.hasNext();) {
             iter.next();
 

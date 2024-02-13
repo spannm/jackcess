@@ -21,9 +21,8 @@ import com.healthmarketscience.jackcess.query.DeleteQuery;
 import java.util.List;
 
 /**
- * Concrete Query subclass which represents a delete query, e.g.: {@code DELETE * FROM 
- * <table>
- *  WHERE <expression>}
+ * Concrete Query subclass which represents a delete query,
+ * e.g.: {@code DELETE * FROM table WHERE expression}.
  *
  * @author James Ahlborn
  */

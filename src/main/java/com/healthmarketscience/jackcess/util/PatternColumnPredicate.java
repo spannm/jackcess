@@ -35,9 +35,7 @@ import java.util.regex.Pattern;
  */
 public class PatternColumnPredicate implements Predicate<Object> {
     private static final int LIKE_REGEX_FLAGS    = Pattern.DOTALL;
-    private static final int CI_LIKE_REGEX_FLAGS =
-        LIKE_REGEX_FLAGS | Pattern.CASE_INSENSITIVE |
-            Pattern.UNICODE_CASE;
+    private static final int CI_LIKE_REGEX_FLAGS = LIKE_REGEX_FLAGS | Pattern.CASE_INSENSITIVE | Pattern.UNICODE_CASE;
 
     private final Pattern    _pattern;
 

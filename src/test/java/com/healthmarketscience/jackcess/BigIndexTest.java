@@ -65,8 +65,9 @@ public class BigIndexTest extends TestCase {
             TestUtil.setTestAutoSync(false);
             try {
 
-                String extraText =
-                    " some random text to fill out the index and make it fill up pages with lots of extra bytes so i will keep typing until i think that i probably have enough text in the index entry so that i do not need to add as many entries in order";
+                String extraText
+                    = " some random text to fill out the index and make it fill up pages with lots of extra bytes "
+                    + "so i will keep typing until i think that i probably have enough text in the index entry so that i do not need to add as many entries in order";
 
                 // copy to temp file and attempt to edit
                 db = openMem(testDB);

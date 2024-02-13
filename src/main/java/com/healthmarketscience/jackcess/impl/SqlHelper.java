@@ -55,7 +55,7 @@ public class SqlHelper {
         throw new UnsupportedOperationException();
     }
 
-    private static final SqlHelper loadInstance() {
+    private static SqlHelper loadInstance() {
         // attempt to load the implementation of this class which works with
         // java.sql classes. if that fails, use this fallback instance instead.
         try {

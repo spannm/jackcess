@@ -112,8 +112,7 @@ class ExpressionTokenizer {
                     case IS_COMP_FLAG:
 
                         // special case for default values
-                        if (exprType == Type.DEFAULT_VALUE && c == EQUALS_CHAR &&
-                            buf.prevPos() == 0) {
+                        if (exprType == Type.DEFAULT_VALUE && c == EQUALS_CHAR && buf.prevPos() == 0) {
                             // a leading equals sign indicates how a default value should be
                             // evaluated
                             tokens.add(new Token(TokenType.OP, String.valueOf(c)));
@@ -208,8 +207,7 @@ class ExpressionTokenizer {
 
     private static void consumeWhitespace(ExprBuf buf) {
         int c = EOF;
-        while ((c = buf.peekNext()) != EOF &&
-            hasFlag(getCharFlag((char) c), IS_SPACE_FLAG)) {
+        while ((c = buf.peekNext()) != EOF && hasFlag(getCharFlag((char) c), IS_SPACE_FLAG)) {
             buf.next();
         }
     }
@@ -268,18 +266,15 @@ class ExpressionTokenizer {
                     complete = true;
                     break;
                 }
-            } else if (startChar != null &&
-                startChar == c) {
-                throw new ParseException("Missing closing '" + endChar +
-                    "' for quoted string " + buf);
+            } else if (startChar != null && startChar == c) {
+                throw new ParseException("Missing closing '" + endChar + "' for quoted string " + buf);
             }
 
             sb.append(c);
         }
 
         if (!complete) {
-            throw new ParseException("Missing closing '" + endChar +
-                "' for quoted string " + buf);
+            throw new ParseException("Missing closing '" + endChar + "' for quoted string " + buf);
         }
 
         return sb;
@@ -291,8 +286,7 @@ class ExpressionTokenizer {
         TemporalConfig.Type type = determineDateType(
             dateStr, buf.getContext());
         if (type == null) {
-            throw new ParseException("Invalid date/time literal " + dateStr +
-                " " + buf);
+            throw new ParseException("Invalid date/time literal " + dateStr + " " + buf);
         }
 
         // note that although we may parse in the time "24" format, we will
@@ -348,9 +342,7 @@ class ExpressionTokenizer {
     private static boolean hasSuffix(String str, String suffStr) {
         int strLen = str.length();
         int suffStrLen = suffStr.length();
-        return strLen >= suffStrLen &&
-            str.regionMatches(true, strLen - suffStrLen,
-                suffStr, 0, suffStrLen);
+        return strLen >= suffStrLen && str.regionMatches(true, strLen - suffStrLen, suffStr, 0, suffStrLen);
     }
 
     private static Token maybeParseNumberLiteral(

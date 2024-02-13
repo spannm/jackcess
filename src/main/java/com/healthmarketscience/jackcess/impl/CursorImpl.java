@@ -238,23 +238,16 @@ public abstract class CursorImpl implements Cursor {
 
         switch (iterBuilder.getType()) {
             case SIMPLE:
-                return new RowIterator(iterBuilder.getColumnNames(),
-                    iterBuilder.isReset(), iterBuilder.isForward());
-            case COLUMN_MATCH: {
+                return new RowIterator(iterBuilder.getColumnNames(), iterBuilder.isReset(), iterBuilder.isForward());
+            case COLUMN_MATCH:
                 @SuppressWarnings("unchecked")
-                Map.Entry<Column, Object> matchPattern = (Map.Entry<Column, Object>) iterBuilder.getMatchPattern();
-                return new ColumnMatchIterator(
-                    iterBuilder.getColumnNames(), (ColumnImpl) matchPattern.getKey(),
-                    matchPattern.getValue(), iterBuilder.isReset(),
-                    iterBuilder.isForward(), iterBuilder.getColumnMatcher());
-            }
-            case ROW_MATCH: {
+                Map.Entry<Column, Object> entry = (Map.Entry<Column, Object>) iterBuilder.getMatchPattern();
+                return new ColumnMatchIterator(iterBuilder.getColumnNames(), (ColumnImpl) entry.getKey(), entry.getValue(), iterBuilder.isReset(), iterBuilder.isForward(),
+                    iterBuilder.getColumnMatcher());
+            case ROW_MATCH:
                 @SuppressWarnings("unchecked")
-                Map<String, ?> matchPattern = (Map<String, ?>) iterBuilder.getMatchPattern();
-                return new RowMatchIterator(
-                    iterBuilder.getColumnNames(), matchPattern, iterBuilder.isReset(),
-                    iterBuilder.isForward(), iterBuilder.getColumnMatcher());
-            }
+                Map<String, ?> map = (Map<String, ?>) iterBuilder.getMatchPattern();
+                return new RowMatchIterator(iterBuilder.getColumnNames(), map, iterBuilder.isReset(), iterBuilder.isForward(), iterBuilder.getColumnMatcher());
             default:
                 throw new RuntimeException("unknown match type " + iterBuilder.getType());
         }
@@ -723,14 +716,12 @@ public abstract class CursorImpl implements Cursor {
      * Returns {@code true} of the current row is valid, {@code false} otherwise.
      */
     protected boolean isCurrentRowValid() throws IOException {
-        return _curPos.getRowId().isValid() && !isCurrentRowDeleted() &&
-            !isBeforeFirst() && !isAfterLast();
+        return _curPos.getRowId().isValid() && !isCurrentRowDeleted() && !isBeforeFirst() && !isAfterLast();
     }
 
     @Override
     public String toString() {
-        return getClass().getSimpleName() + " CurPosition " + _curPos +
-            ", PrevPosition " + _prevPos;
+        return getClass().getSimpleName() + " CurPosition " + _curPos + ", PrevPosition " + _prevPos;
     }
 
     /**
@@ -918,10 +909,10 @@ public abstract class CursorImpl implements Cursor {
 
         @Override
         public boolean equals(Object o) {
-            return this == o ||
-                o != null && getClass() == o.getClass() &&
-                    _tablePageNumber == ((IdImpl) o)._tablePageNumber &&
-                    _indexNumber == ((IdImpl) o)._indexNumber;
+            return this == o
+                || o != null && getClass() == o.getClass()
+                    && _tablePageNumber == ((IdImpl) o)._tablePageNumber
+                    && _indexNumber == ((IdImpl) o)._indexNumber;
         }
 
         @Override
@@ -933,7 +924,7 @@ public abstract class CursorImpl implements Cursor {
     /**
      * Value object which maintains the current position of the cursor.
      */
-    protected static abstract class PositionImpl implements Position {
+    protected abstract static class PositionImpl implements Position {
         protected PositionImpl() {
         }
 
@@ -944,8 +935,7 @@ public abstract class CursorImpl implements Cursor {
 
         @Override
         public final boolean equals(Object o) {
-            return this == o ||
-                o != null && getClass() == o.getClass() && equalsImpl(o);
+            return this == o || o != null && getClass() == o.getClass() && equalsImpl(o);
         }
 
         /**
@@ -993,8 +983,7 @@ public abstract class CursorImpl implements Cursor {
 
         @Override
         public String toString() {
-            return getClass().getSimpleName() + " " + _cursorId + " CurPosition " +
-                _curPos + ", PrevPosition " + _prevPos;
+            return getClass().getSimpleName() + " " + _cursorId + " CurPosition " + _curPos + ", PrevPosition " + _prevPos;
         }
     }
 

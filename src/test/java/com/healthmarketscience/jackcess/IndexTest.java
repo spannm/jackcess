@@ -72,8 +72,7 @@ public class IndexTest extends TestCase {
         byte[] b7 = new byte[] {(byte) 0xFF, (byte) 0x00};
         byte[] b8 = new byte[] {(byte) 0xFF, (byte) 0x01};
 
-        List<byte[]> expectedList = Arrays.<byte[]> asList(b0, b1, b2, b3, b4,
-            b5, b6, b7, b8);
+        List<byte[]> expectedList = Arrays.asList(b0, b1, b2, b3, b4, b5, b6, b7, b8);
         SortedSet<byte[]> sortedSet = new TreeSet<>(
             IndexData.BYTE_CODE_COMPARATOR);
         sortedSet.addAll(expectedList);
@@ -313,7 +312,9 @@ public class IndexTest extends TestCase {
         for (int i = 0; i < testData.length; i += numValues + 1) {
             Object[] row = new Object[numValues + 1];
             row[0] = "testRow" + i;
-            if (numValues + 1 - 1 >= 0) System.arraycopy(testData, i + 1 - 1, row, 1, numValues + 1 - 1);
+            if (numValues + 1 - 1 >= 0) {
+                System.arraycopy(testData, i + 1 - 1, row, 1, numValues + 1 - 1);
+            }
             boolean expectedSuccess = (Boolean) testData[i + numValues];
 
             IOException failure = null;

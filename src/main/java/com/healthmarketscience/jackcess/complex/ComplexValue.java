@@ -33,7 +33,7 @@ public interface ComplexValue {
     /**
      * Returns the unique identifier of this complex value (this value is unique among all values in all rows of the
      * main table).
-     * 
+     *
      * @return the current id or {@link ComplexColumnInfoImpl#INVALID_ID} for a new, unsaved value.
      */
     Id getId();
@@ -46,7 +46,7 @@ public interface ComplexValue {
     /**
      * Returns the foreign key identifier for this complex value (this value is the same for all values in the same row
      * of the main table).
-     * 
+     *
      * @return the current id or {@link ComplexColumnInfoImpl#INVALID_FK} for a new, unsaved value.
      */
     ComplexValueForeignKey getComplexValueForeignKey();
@@ -111,9 +111,7 @@ public interface ComplexValue {
 
         @Override
         public boolean equals(Object o) {
-            return this == o ||
-                o != null && getClass() == o.getClass() &&
-                    get() == ((Id) o).get();
+            return this == o || o != null && getClass() == o.getClass() && get() == ((Id) o).get();
         }
 
         @Override
@@ -123,8 +121,7 @@ public interface ComplexValue {
 
         protected final Object writeReplace() throws ObjectStreamException {
             // if we are going to serialize this ComplexValue.Id, convert it back to
-            // a normal Integer (in case it is restored outside of the context of
-            // jackcess)
+            // a normal Integer (in case it is restored outside of the context of jackcess)
             return get();
         }
 

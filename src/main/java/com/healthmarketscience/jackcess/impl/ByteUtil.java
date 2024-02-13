@@ -449,8 +449,7 @@ public final class ByteUtil {
 
         int bufLen = size * 2;
         if (formatted) {
-            bufLen += size +
-                7 * ((size + NUM_BYTES_PER_LINE - 1) / NUM_BYTES_PER_LINE);
+            bufLen += size + 7 * ((size + NUM_BYTES_PER_LINE - 1) / NUM_BYTES_PER_LINE);
         }
         StringBuilder rtn = new StringBuilder(bufLen);
         int position = buffer.position();

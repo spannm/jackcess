@@ -46,10 +46,8 @@ public abstract class RowEvalContext extends BaseEvalContext {
 
         // we only support getting column values in this table from the current
         // row
-        if (!table.isThisTable(identifier) ||
-            identifier.getPropertyName() != null) {
-            throw new EvalException("Cannot access fields outside this table for " +
-                identifier);
+        if (!table.isThisTable(identifier) || identifier.getPropertyName() != null) {
+            throw new EvalException("Cannot access fields outside this table for " + identifier);
         }
 
         ColumnImpl col = table.getColumn(identifier.getObjectName());

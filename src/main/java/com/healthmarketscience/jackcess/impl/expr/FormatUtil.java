@@ -160,8 +160,8 @@ public class FormatUtil {
     private static final char   DT_LIT_COLON_CHAR    = ':';
     private static final char   DT_LIT_SLASH_CHAR    = '/';
     private static final char   SINGLE_QUOTE_CHAR    = '\'';
-    private static final char   EXP_E_CHAR           = 'E';
-    private static final char   EXP_e_CHAR           = 'e';
+    private static final char   EXP_E_UC_CHAR        = 'E';
+    private static final char   EXP_E_LC_CHAR        = 'e';
     private static final char   PLUS_CHAR            = '+';
     private static final char   MINUS_CHAR           = '-';
     private static final char   REQ_DIGIT_CHAR       = '0';
@@ -283,9 +283,7 @@ public class FormatUtil {
         }
 
         public boolean isNullOrEmptyString() {
-            return _expr.isNull() ||
-            // only a string value could ever be an empty string
-                _expr.getType().isString() && getAsString().isEmpty();
+            return _expr.isNull() || _expr.getType().isString() && getAsString().isEmpty();
         }
 
         public boolean maybeCoerceToEmptyString() {
@@ -303,8 +301,7 @@ public class FormatUtil {
 
                 // format coerces boolean strings to numbers
                 Value boolExpr = null;
-                if (_expr.getType().isString() &&
-                    (boolExpr = maybeGetStringAsBooleanValue()) != null) {
+                if (_expr.getType().isString() && (boolExpr = maybeGetStringAsBooleanValue()) != null) {
                     _expr = boolExpr;
                 }
 
@@ -809,24 +806,24 @@ public class FormatUtil {
                 case FCT_NUMBER:
                     hasFmts[fmtIdx] = true;
                     switch (c) {
-                        case EXP_E_CHAR:
+                        case EXP_E_UC_CHAR:
                             int signChar = buf.peekNext();
                             if (signChar == PLUS_CHAR || signChar == MINUS_CHAR) {
                                 buf.next();
                                 expTypes[fmtIdx] = signChar == PLUS_CHAR ? NumberFormatter.NotationType.EXP_E_PLUS : NumberFormatter.NotationType.EXP_E_MINUS;
                                 flushPendingNumberLiteral(pendingLiteral, sb);
-                                sb.append(EXP_E_CHAR);
+                                sb.append(EXP_E_UC_CHAR);
                             } else {
                                 pendingLiteral.append(c);
                             }
                             break;
-                        case EXP_e_CHAR:
+                        case EXP_E_LC_CHAR:
                             signChar = buf.peekNext();
                             if (signChar == PLUS_CHAR || signChar == MINUS_CHAR) {
                                 buf.next();
                                 expTypes[fmtIdx] = signChar == PLUS_CHAR ? NumberFormatter.NotationType.EXP_e_PLUS : NumberFormatter.NotationType.EXP_e_MINUS;
                                 flushPendingNumberLiteral(pendingLiteral, sb);
-                                sb.append(EXP_E_CHAR);
+                                sb.append(EXP_E_UC_CHAR);
                             } else {
                                 pendingLiteral.append(c);
                             }
@@ -900,8 +897,7 @@ public class FormatUtil {
             return;
         }
 
-        if (pendingLiteral.length() == 1 &&
-            pendingLiteral.charAt(0) == SINGLE_QUOTE_CHAR) {
+        if (pendingLiteral.length() == 1 && pendingLiteral.charAt(0) == SINGLE_QUOTE_CHAR) {
             // handle standalone single quote
             sb.append(SINGLE_QUOTE_CHAR).append(SINGLE_QUOTE_CHAR);
             pendingLiteral.setLength(0);
@@ -1227,7 +1223,7 @@ public class FormatUtil {
         }
     }
 
-    private static abstract class BaseNumberFmt implements Fmt {
+    private abstract static class BaseNumberFmt implements Fmt {
         @Override
         public Value format(Args args) {
             NumberFormat df = getNumberFormat(args);
@@ -1309,7 +1305,7 @@ public class FormatUtil {
         }
     }
 
-    private static abstract class WeekBasedDFB implements DateFormatBuilder {
+    private abstract static class WeekBasedDFB implements DateFormatBuilder {
         @Override
         public void build(DateTimeFormatterBuilder dtfb, Args args,
             boolean hasAmPm, Value.Type dtType) {
@@ -1357,10 +1353,10 @@ public class FormatUtil {
 
                 @Override
                 public Iterator<Map.Entry<Long, String>> iterator() {
-                    return Arrays.<Map.Entry<Long, String>> asList(
+                    List<Entry<Long, String>> list = List.of(
                         new AbstractMap.SimpleImmutableEntry<>(0L, _am),
-                        new AbstractMap.SimpleImmutableEntry<>(1L, _pm))
-                        .iterator();
+                        new AbstractMap.SimpleImmutableEntry<>(1L, _pm));
+                    return list.iterator();
                 }
             };
         }
@@ -1458,7 +1454,7 @@ public class FormatUtil {
         }
     }
 
-    private static abstract class BaseCustomNumberFmt implements Fmt {
+    private abstract static class BaseCustomNumberFmt implements Fmt {
         @Override
         public Value format(Args args) {
             if (args._expr.isNull()) {
@@ -1567,7 +1563,7 @@ public class FormatUtil {
         }
     }
 
-    private static abstract class BDFormat {
+    private abstract static class BDFormat {
         public int getMaxDecimalDigits() {
             return Integer.MAX_VALUE;
         }

@@ -345,16 +345,14 @@ public class GeneralLegacyIndexCodes {
         /**
          * handlers for the first 256 chars. use nested class to lazy load the handlers
          */
-        private static final CharHandler[] _values = loadCodes(
-            CODES_FILE, FIRST_CHAR, LAST_CHAR);
+        private static final CharHandler[] VALUES = loadCodes(CODES_FILE, FIRST_CHAR, LAST_CHAR);
     }
 
     private static final class ExtCodes {
         /**
          * handlers for the rest of the chars in BMP 0. use nested class to lazy load the handlers
          */
-        private static final CharHandler[] _values = loadCodes(
-            EXT_CODES_FILE, FIRST_EXT_CHAR, LAST_EXT_CHAR);
+        private static final CharHandler[] VALUES = loadCodes(EXT_CODES_FILE, FIRST_EXT_CHAR, LAST_EXT_CHAR);
     }
 
     static final GeneralLegacyIndexCodes GEN_LEG_INSTANCE =
@@ -368,11 +366,11 @@ public class GeneralLegacyIndexCodes {
      */
     CharHandler getCharHandler(char c) {
         if (c <= LAST_CHAR) {
-            return Codes._values[c];
+            return Codes.VALUES[c];
         }
 
         int extOffset = asUnsignedChar(c) - asUnsignedChar(FIRST_EXT_CHAR);
-        return ExtCodes._values[extOffset];
+        return ExtCodes.VALUES[extOffset];
     }
 
     /**
@@ -411,8 +409,7 @@ public class GeneralLegacyIndexCodes {
             }
 
         } catch (IOException e) {
-            throw new RuntimeException("failed loading index codes file " +
-                codesFilePath, e);
+            throw new RuntimeException("failed loading index codes file " + codesFilePath, e);
         } finally {
             ByteUtil.closeQuietly(reader);
         }
@@ -435,8 +432,7 @@ public class GeneralLegacyIndexCodes {
      */
     private static CharHandler parseSimpleCodes(String[] codeStrings) {
         if (codeStrings.length != 1) {
-            throw new IllegalStateException("Unexpected code strings " +
-                Arrays.asList(codeStrings));
+            throw new IllegalStateException("Unexpected code strings " + Arrays.asList(codeStrings));
         }
         return new SimpleCharHandler(codesToBytes(codeStrings[0], true));
     }
@@ -446,8 +442,7 @@ public class GeneralLegacyIndexCodes {
      */
     private static CharHandler parseInternationalCodes(String[] codeStrings) {
         if (codeStrings.length != 2) {
-            throw new IllegalStateException("Unexpected code strings " +
-                Arrays.asList(codeStrings));
+            throw new IllegalStateException("Unexpected code strings " + Arrays.asList(codeStrings));
         }
         return new InternationalCharHandler(codesToBytes(codeStrings[0], true),
             codesToBytes(codeStrings[1], true));
@@ -458,8 +453,7 @@ public class GeneralLegacyIndexCodes {
      */
     private static CharHandler parseUnprintableCodes(String[] codeStrings) {
         if (codeStrings.length != 1) {
-            throw new IllegalStateException("Unexpected code strings " +
-                Arrays.asList(codeStrings));
+            throw new IllegalStateException("Unexpected code strings " + Arrays.asList(codeStrings));
         }
         return new UnprintableCharHandler(codesToBytes(codeStrings[0], true));
     }
@@ -469,13 +463,11 @@ public class GeneralLegacyIndexCodes {
      */
     private static CharHandler parseUnprintableExtCodes(String[] codeStrings) {
         if (codeStrings.length != 1) {
-            throw new IllegalStateException("Unexpected code strings " +
-                Arrays.asList(codeStrings));
+            throw new IllegalStateException("Unexpected code strings " + Arrays.asList(codeStrings));
         }
         byte[] bytes = codesToBytes(codeStrings[0], true);
         if (bytes.length != 1) {
-            throw new IllegalStateException("Unexpected code strings " +
-                Arrays.asList(codeStrings));
+            throw new IllegalStateException("Unexpected code strings " + Arrays.asList(codeStrings));
         }
         return new UnprintableExtCharHandler(bytes[0]);
     }
@@ -485,14 +477,11 @@ public class GeneralLegacyIndexCodes {
      */
     private static CharHandler parseInternationalExtCodes(String[] codeStrings) {
         if (codeStrings.length != 3) {
-            throw new IllegalStateException("Unexpected code strings " +
-                Arrays.asList(codeStrings));
+            throw new IllegalStateException("Unexpected code strings " + Arrays.asList(codeStrings));
         }
 
         byte crazyFlag = "1".equals(codeStrings[2]) ? CRAZY_CODE_1 : CRAZY_CODE_2;
-        return new InternationalExtCharHandler(codesToBytes(codeStrings[0], true),
-            codesToBytes(codeStrings[1], false),
-            crazyFlag);
+        return new InternationalExtCharHandler(codesToBytes(codeStrings[0], true), codesToBytes(codeStrings[1], false), crazyFlag);
     }
 
     /**
@@ -500,8 +489,7 @@ public class GeneralLegacyIndexCodes {
      */
     private static CharHandler parseSignificantCodes(String[] codeStrings) {
         if (codeStrings.length != 1) {
-            throw new IllegalStateException("Unexpected code strings " +
-                Arrays.asList(codeStrings));
+            throw new IllegalStateException("Unexpected code strings " + Arrays.asList(codeStrings));
         }
         return new SignificantCharHandler(codesToBytes(codeStrings[0], true));
     }
@@ -768,16 +756,16 @@ public class GeneralLegacyIndexCodes {
             // we need to account for some extra codes which have not been written
             // yet. additionally, any unprintable bytes added to the beginning of
             // the extra codes are ignored.
-            unprintCharOffset = extraCodes.getLength() +
-                charOffset - extraCodes.getNumChars() -
-                extraCodes.getUnprintablePrefixLen();
+            unprintCharOffset = extraCodes.getLength()
+                + charOffset - extraCodes.getNumChars()
+                - extraCodes.getUnprintablePrefixLen();
         }
 
         // we write a whacky combo of bytes for each unprintable char which
         // includes a funky offset and extra char itself
         int offset =
-            UNPRINTABLE_COUNT_START +
-                UNPRINTABLE_COUNT_MULTIPLIER * unprintCharOffset
+            UNPRINTABLE_COUNT_START
+                + UNPRINTABLE_COUNT_MULTIPLIER * unprintCharOffset
                 | UNPRINTABLE_OFFSET_FLAGS;
 
         // write offset as big-endian short

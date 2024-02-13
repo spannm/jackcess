@@ -29,7 +29,7 @@ public abstract class TopoSorter<E> {
     // https://en.wikipedia.org/wiki/Topological_sorting
     private static final int    UNMARKED  = 0;
     private static final int    TEMP_MARK = 1;
-    private final static int    PERM_MARK = 2;
+    private static final int    PERM_MARK = 2;
 
     private final List<E>       _values;
     private final List<Node<E>> _nodes    = new ArrayList<>();

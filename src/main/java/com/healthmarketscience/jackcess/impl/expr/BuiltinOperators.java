@@ -595,11 +595,10 @@ public class BuiltinOperators {
         }
 
         // for "simple" math, keep as date/times
-        if (cType._preferTemporal &&
-            (t1.isTemporal() || t2.isTemporal())) {
-            return t1.isTemporal() ? t2.isTemporal() ?
+        if (cType._preferTemporal && (t1.isTemporal() || t2.isTemporal())) {
+            return t1.isTemporal() ? t2.isTemporal()
             // for mixed temporal types, always go to date/time
-                Value.Type.DATE_TIME : t1 : t2;
+                ? Value.Type.DATE_TIME : t1 : t2;
         }
 
         return getPreferredNumericType(t1.getPreferredNumericType(),
@@ -666,7 +665,6 @@ public class BuiltinOperators {
 
     static boolean isIntegral(double d) {
         double id = Math.rint(d);
-        return d == id && d >= MIN_INT && d <= MAX_INT &&
-            !Double.isInfinite(d) && !Double.isNaN(d);
+        return d == id && d >= MIN_INT && d <= MAX_INT && !Double.isInfinite(d) && !Double.isNaN(d);
     }
 }

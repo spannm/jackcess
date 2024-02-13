@@ -25,9 +25,11 @@ import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.sql.Types;
 import java.time.LocalDateTime;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * Supported access data types.
@@ -258,15 +260,8 @@ public enum DataType {
         addNewSqlType("TIMESTAMP_WITH_TIMEZONE", SHORT_DATE_TIME, null);
     }
 
-    private static Map<Byte, DataType> DATA_TYPES = new HashMap<>();
-    static {
-        for (DataType type : DataType.values()) {
-            if (type.isUnsupported()) {
-                continue;
-            }
-            DATA_TYPES.put(type._value, type);
-        }
-    }
+    private static final Map<Byte, DataType> DATA_TYPES =
+        Arrays.stream(DataType.values()).filter(dt -> !dt.isUnsupported()).collect(Collectors.toMap(k -> k._value, v -> v));
 
     /** is this a variable length field */
     private final boolean _variableLength;
@@ -389,8 +384,7 @@ public enum DataType {
         if (colLength != null) {
             return colLength;
         }
-        throw new IllegalArgumentException("Unexpected fixed length column " +
-            this);
+        throw new IllegalArgumentException("Unexpected fixed length column " + this);
     }
 
     public int getMinSize() {
@@ -558,8 +552,7 @@ public enum DataType {
             // try alternate type. we always accept alternate "long value" types
             // regardless of the given lengthInUnits
             DataType altRtn = ALT_SQL_TYPES.get(sqlType);
-            if (altRtn != null &&
-                (altRtn.isLongValue() || altRtn.isValidSize(size))) {
+            if (altRtn != null && (altRtn.isLongValue() || altRtn.isValidSize(size))) {
                 // use alternate type
                 rtn = altRtn;
             }

@@ -107,8 +107,8 @@ public class MultiValueColumnInfoImpl extends ComplexColumnInfoImpl<SingleValue>
 
         @Override
         public String toString() {
-            return "SingleValue(" + getComplexValueForeignKey() + "," + getId() +
-                ") " + get();
+            return "SingleValue(" + getComplexValueForeignKey() + "," + getId() + ") " + get();
         }
+
     }
 }

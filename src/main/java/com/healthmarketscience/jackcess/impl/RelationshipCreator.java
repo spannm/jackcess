@@ -27,17 +27,12 @@ import java.util.*;
  * @author James Ahlborn
  */
 public class RelationshipCreator extends DBMutator {
-    private final static int    CASCADE_FLAGS                 =
-        RelationshipImpl.CASCADE_DELETES_FLAG |
-            RelationshipImpl.CASCADE_UPDATES_FLAG |
-            RelationshipImpl.CASCADE_NULL_FLAG;
+    private static final int    CASCADE_FLAGS                 = RelationshipImpl.CASCADE_DELETES_FLAG | RelationshipImpl.CASCADE_UPDATES_FLAG | RelationshipImpl.CASCADE_NULL_FLAG;
 
     // for the purposes of choosing a backing index for a foreign key, there are
     // certain index flags that can be ignored (we don't care how they are set)
-    private final static byte   IGNORED_PRIMARY_INDEX_FLAGS   =
-        IndexData.IGNORE_NULLS_INDEX_FLAG | IndexData.REQUIRED_INDEX_FLAG;
-    private final static byte   IGNORED_SECONDARY_INDEX_FLAGS =
-        IGNORED_PRIMARY_INDEX_FLAGS | IndexData.UNIQUE_INDEX_FLAG;
+    private static final byte   IGNORED_PRIMARY_INDEX_FLAGS   = IndexData.IGNORE_NULLS_INDEX_FLAG | IndexData.REQUIRED_INDEX_FLAG;
+    private static final byte   IGNORED_SECONDARY_INDEX_FLAGS = IGNORED_PRIMARY_INDEX_FLAGS | IndexData.UNIQUE_INDEX_FLAG;
 
     private TableImpl           _primaryTable;
     private TableImpl           _secondaryTable;
@@ -168,8 +163,7 @@ public class RelationshipCreator extends DBMutator {
         _primaryCols = getColumns(_primaryTable, _relationship.getFromColumns());
         _secondaryCols = getColumns(_secondaryTable, _relationship.getToColumns());
 
-        if (_primaryCols == null || _primaryCols.isEmpty() ||
-            _secondaryCols == null || _secondaryCols.isEmpty()) {
+        if (_primaryCols == null || _primaryCols.isEmpty() || _secondaryCols == null || _secondaryCols.isEmpty()) {
             throw new IllegalArgumentException(withErrorContext(
                 "Missing columns in relationship"));
         }
@@ -208,8 +202,8 @@ public class RelationshipCreator extends DBMutator {
 
         // while relationships can have "dupe" columns, indexes (and therefore
         // integrity enforced relationships) cannot
-        if (new HashSet<>(getColumnNames(_primaryCols)).size() != _primaryCols.size() ||
-            new HashSet<>(getColumnNames(_secondaryCols)).size() != _secondaryCols.size()) {
+        if (new HashSet<>(getColumnNames(_primaryCols)).size() != _primaryCols.size()
+            || new HashSet<>(getColumnNames(_secondaryCols)).size() != _secondaryCols.size()) {
             throw new IllegalArgumentException(withErrorContext(
                 "Cannot have duplicate columns in an integrity enforced relationship"));
         }
@@ -333,12 +327,12 @@ public class RelationshipCreator extends DBMutator {
     }
 
     private String withErrorContext(String msg) {
-        return msg + "(Rel=" +
-            getTableErrorContext(_primaryTable, _primaryCols,
+        return msg + "(Rel="
+            + getTableErrorContext(_primaryTable, _primaryCols,
                 _relationship.getFromTable(),
                 _relationship.getFromColumns())
-            + " -> " +
-            getTableErrorContext(_secondaryTable, _secondaryCols,
+            + " -> "
+            + getTableErrorContext(_secondaryTable, _secondaryCols,
                 _relationship.getToTable(),
                 _relationship.getToColumns())
             + ")";

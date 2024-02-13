@@ -163,8 +163,7 @@ public class PropertyMaps implements Iterable<PropertyMapImpl> {
             }
 
             if (!knownType) {
-                throw new IOException("Unknown property map type " +
-                    ByteUtil.toHexString(bb, 4));
+                throw new IOException("Unknown property map type " + ByteUtil.toHexString(bb, 4));
             }
 
             // parse each data "chunk"
@@ -429,11 +428,9 @@ public class PropertyMaps implements Iterable<PropertyMapImpl> {
             DataType dataType, String propName, int dataSize, Object value)
             throws IOException {
             // guids seem to be marked as "binary" fields
-            return dataType == DataType.BINARY &&
-                (dataSize == DataType.GUID.getFixedSize() ||
-                    dataSize == -1 && ColumnImpl.isGUIDValue(value))
-                &&
-                PropertyMap.GUID_PROP.equalsIgnoreCase(propName);
+            return dataType == DataType.BINARY
+                && (dataSize == DataType.GUID.getFixedSize() || dataSize == -1 && ColumnImpl.isGUIDValue(value))
+                && PropertyMap.GUID_PROP.equalsIgnoreCase(propName);
         }
 
         /**

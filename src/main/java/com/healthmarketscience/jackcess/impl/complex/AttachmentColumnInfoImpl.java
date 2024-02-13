@@ -359,10 +359,9 @@ public class AttachmentColumnInfoImpl extends ComplexColumnInfoImpl<Attachment>
                 dataStr = e.toString();
             }
 
-            return "Attachment(" + getComplexValueForeignKey() + "," + getId() +
-                ") " + getFileUrl() + ", " + getFileName() + ", " + getFileType()
-                + ", " + getFileTimeStampObject() + ", " + getFileFlags() + ", " +
-                dataStr;
+            return "Attachment(" + getComplexValueForeignKey() + "," + getId()
+                + ") " + getFileUrl() + ", " + getFileName() + ", " + getFileType()
+                + ", " + getFileTimeStampObject() + ", " + getFileFlags() + ", " + dataStr;
         }
 
         /**
@@ -386,14 +385,11 @@ public class AttachmentColumnInfoImpl extends ComplexColumnInfoImpl<Attachment>
                     _encodedData, WRAPPER_HEADER_SIZE,
                     _encodedData.length - WRAPPER_HEADER_SIZE);
 
-                if (typeFlag == DATA_TYPE_RAW) {
-                    // nothing else to do
-                } else if (typeFlag == DATA_TYPE_COMPRESSED) {
+                if (typeFlag == DATA_TYPE_COMPRESSED) {
                     // actual content is deflate compressed
                     bin = new InflaterInputStream(bin);
-                } else {
-                    throw new IOException(
-                        "Unknown encoded attachment data type " + typeFlag);
+                } else if (typeFlag != DATA_TYPE_RAW) {
+                    throw new IOException("Unknown encoded attachment data type " + typeFlag);
                 }
 
                 contentStream = new DataInputStream(bin);

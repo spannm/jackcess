@@ -3,7 +3,7 @@
     "-//Checkstyle//DTD Checkstyle Configuration 1.3//EN"
     "https://checkstyle.org/dtds/configuration_1_3.dtd">
 
-<!-- Checkstyle-Configuration: UCanAccess Checkstyle -->
+<!-- Checkstyle-Configuration: Jackcess Checkstyle -->
 
 <module name="Checker">
     <property name="fileExtensions" value="java, properties, xml"/>
@@ -46,15 +46,15 @@
             <property name="format" value="(^_ex[a-zA-Z0-9]*$)|(^_[a-z][a-zA-Z0-9]*Exception$)"/>
         </module-->
         <module name="ConstantName"/>
-        <!--module name="DeclarationOrder" /-->
+        <!--module name="DeclarationOrder"/-->
         <module name="EmptyBlock"/>
         <module name="EmptyForInitializerPad"/>
         <module name="EmptyForIteratorPad"/>
         <module name="EmptyStatement"/>
-        <module name="EqualsAvoidNull"/>
+        <!--module name="EqualsAvoidNull"/-->
         <module name="EqualsHashCode"/>
         <module name="GenericWhitespace"/>
-        <module name="FinalClass"/>
+        <!--module name="FinalClass"/-->
         <module name="HiddenField"/>
         <module name="HideUtilityClassConstructor"/>
         <module name="IllegalImport"/>
@@ -68,9 +68,9 @@
             <property name="staticGroups" value="/^(?!javaf?x?\.).+/,java,javax"/>
             <property name="sortStaticImportsAlphabetically" value="true"/>
         </module>
-        <!--module name="InnerAssignment" /-->
-        <!--module name="InnerTypeLast" /-->
-        <!--module name="InterfaceIsType" /-->
+        <!--module name="InnerAssignment"/-->
+        <!--module name="InnerTypeLast"/-->
+        <!--module name="InterfaceIsType"/-->
         <module name="JavadocStyle">
             <property name="checkFirstSentence" value="false"/>
         </module>
@@ -81,7 +81,7 @@
         <module name="LocalVariableName">
             <property name="format" value="(^[a-z][a-zA-Z0-9]*$)|(^[ijk]$)"/>
         </module>
-        <module name="MemberName"/>
+        <!--module name="MemberName"/-->
         <module name="MethodLength">
             <property name="max" value="400"/>
             <property name="countEmpty" value="false"/>
@@ -103,13 +103,13 @@
         <module name="OperatorWrap"/>
         <module name="OuterTypeFilename"/>
         <module name="PackageName"/>
-        <!--module name="ParameterAssignment" /-->
+        <!--module name="ParameterAssignment"/-->
         <!--module name="ParameterName">
             <property name="format" value="(?:^_[a-zA-Z0-9]*$)"/>
         </module-->
-        <module name="ParameterNumber">
+        <!--module name="ParameterNumber">
             <property name="max" value="10"/>
-        </module>
+        </module-->
         <module name="ParenPad"/>
         <module name="RedundantImport"/>
         <module name="RedundantModifier"/>
@@ -122,7 +122,7 @@
         <module name="SuperFinalize"/>
         <module name="SuppressWarningsHolder"/>
         <module name="SuppressionCommentFilter"/>
-        <!--module name="TodoComment" /-->
+        <!--module name="TodoComment"/-->
         <module name="TypeName"/>
         <!--module name="TypeName">
             <property name="format" value="^([A-Z][a-zA-Z0-9]+IF|I[A-Z][a-zA-Z0-9]+)$"/>
@@ -137,10 +137,10 @@
         <module name="TypecastParenPad"/>
         <module name="UnusedImports"/>
         <module name="UpperEll"/>
-        <module name="VariableDeclarationUsageDistance">
+        <!--module name="VariableDeclarationUsageDistance">
             <property name="allowedDistance" value="10"/>
-        </module>
-        <module name="VisibilityModifier"/>
+        </module-->
+        <!--module name="VisibilityModifier"/-->
         <module name="WhitespaceAfter"/>
         <module name="WhitespaceAround">
             <property name="allowEmptyCatches" value="true"/>

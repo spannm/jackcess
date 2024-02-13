@@ -90,8 +90,7 @@ public class IndexImpl implements Index, Comparable<IndexImpl> {
 
         _indexType = tableBuffer.get();
 
-        if (_indexType == FOREIGN_KEY_INDEX_TYPE &&
-            relIndexNumber != INVALID_INDEX_NUMBER) {
+        if (_indexType == FOREIGN_KEY_INDEX_TYPE && relIndexNumber != INVALID_INDEX_NUMBER) {
             _reference = new ForeignKeyReference(
                 relIndexType, relIndexNumber, relTablePageNumber,
                 (cascadeUpdatesFlag & CASCADE_UPDATES_FLAG) != 0,
@@ -189,20 +188,13 @@ public class IndexImpl implements Index, Comparable<IndexImpl> {
         }
 
         if (refIndex == null) {
-            throw new IOException(withErrorContext(
-                "Reference to missing index " + idxNumber +
-                    " on table " + refTable.getName()));
+            throw new IOException(withErrorContext("Reference to missing index " + idxNumber + " on table " + refTable.getName()));
         }
 
-        // finally verify that we found the expected index (should reference this
-        // index)
+        // finally verify that we found the expected index (should reference this index)
         ForeignKeyReference otherRef = refIndex.getReference();
-        if (otherRef == null ||
-            otherRef.getOtherTablePageNumber() != getTable().getTableDefPageNumber() ||
-            otherRef.getOtherIndexNumber() != _indexNumber) {
-            throw new IOException(withErrorContext(
-                "Found unexpected index " + refIndex.getName() +
-                    " on table " + refTable.getName() + " with reference " + otherRef));
+        if (otherRef == null || otherRef.getOtherTablePageNumber() != getTable().getTableDefPageNumber() || otherRef.getOtherIndexNumber() != _indexNumber) {
+            throw new IOException(withErrorContext("Found unexpected index " + refIndex.getName() + " on table " + refTable.getName() + " with reference " + otherRef));
         }
 
         return refIndex;
@@ -267,7 +259,7 @@ public class IndexImpl implements Index, Comparable<IndexImpl> {
      * Gets a new cursor for this index, narrowed to the range defined by the given startRow and endRow.
      * <p>
      * Forces index initialization.
-     * 
+     *
      * @param startRow the first row of data for the cursor, or {@code null} for the first entry
      * @param startInclusive whether or not startRow is inclusive or exclusive
      * @param endRow the last row of data for the cursor, or {@code null} for the last entry

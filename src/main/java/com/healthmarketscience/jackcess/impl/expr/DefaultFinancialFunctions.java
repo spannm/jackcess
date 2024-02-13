@@ -49,7 +49,7 @@ public class DefaultFinancialFunctions {
     private static final int    PMT_BEG_MNTH        = 1;
 
     private static final int    MAX_RATE_ITERATIONS = 20;
-    private static final double RATE_PRECISION      = 0.0000001;// 1.0e-8
+    private static final double RATE_PRECISION      = 0.0000001; // 1.0e-8
 
     private DefaultFinancialFunctions() {
     }
@@ -59,158 +59,158 @@ public class DefaultFinancialFunctions {
     }
 
     public static final Function NPER = registerFunc(new FuncVar("NPer", 3, 5) {
-                                          @Override
-                                          protected Value evalVar(EvalContext ctx, Value[] params) {
-                                              double rate = params[0].getAsDouble(ctx);
-                                              double pmt = params[1].getAsDouble(ctx);
-                                              double pv = params[2].getAsDouble(ctx);
-                                              double fv = getFV(ctx, params, 3);
-                                              int pmtType = getPaymentType(ctx, params, 4);
+        @Override
+        protected Value evalVar(EvalContext ctx, Value[] params) {
+            double rate = params[0].getAsDouble(ctx);
+            double pmt = params[1].getAsDouble(ctx);
+            double pv = params[2].getAsDouble(ctx);
+            double fv = getFV(ctx, params, 3);
+            int pmtType = getPaymentType(ctx, params, 4);
 
-                                              double result = calculateLoanPaymentPeriods(rate, pmt, pv, fv, pmtType);
+            double result = calculateLoanPaymentPeriods(rate, pmt, pv, fv, pmtType);
 
-                                              return ValueSupport.toValue(result);
-                                          }
-                                      });
+            return ValueSupport.toValue(result);
+        }
+    });
 
     public static final Function FV   = registerFunc(new FuncVar("FV", 3, 5) {
-                                          @Override
-                                          protected Value evalVar(EvalContext ctx, Value[] params) {
-                                              double rate = params[0].getAsDouble(ctx);
-                                              double nper = params[1].getAsDouble(ctx);
-                                              double pmt = params[2].getAsDouble(ctx);
-                                              double pv = getOptionalDoubleParam(ctx, params, 3, 0d);
-                                              int pmtType = getPaymentType(ctx, params, 4);
+        @Override
+        protected Value evalVar(EvalContext ctx, Value[] params) {
+            double rate = params[0].getAsDouble(ctx);
+            double nper = params[1].getAsDouble(ctx);
+            double pmt = params[2].getAsDouble(ctx);
+            double pv = getOptionalDoubleParam(ctx, params, 3, 0d);
+            int pmtType = getPaymentType(ctx, params, 4);
 
-                                              double result = calculateFutureValue(rate, nper, pmt, pv, pmtType);
+            double result = calculateFutureValue(rate, nper, pmt, pv, pmtType);
 
-                                              return ValueSupport.toValue(result);
-                                          }
-                                      });
+            return ValueSupport.toValue(result);
+        }
+    });
 
     public static final Function PV   = registerFunc(new FuncVar("PV", 3, 5) {
-                                          @Override
-                                          protected Value evalVar(EvalContext ctx, Value[] params) {
-                                              double rate = params[0].getAsDouble(ctx);
-                                              double nper = params[1].getAsDouble(ctx);
-                                              double pmt = params[2].getAsDouble(ctx);
-                                              double fv = getFV(ctx, params, 3);
-                                              int pmtType = getPaymentType(ctx, params, 4);
+        @Override
+        protected Value evalVar(EvalContext ctx, Value[] params) {
+            double rate = params[0].getAsDouble(ctx);
+            double nper = params[1].getAsDouble(ctx);
+            double pmt = params[2].getAsDouble(ctx);
+            double fv = getFV(ctx, params, 3);
+            int pmtType = getPaymentType(ctx, params, 4);
 
-                                              double result = calculatePresentValue(rate, nper, pmt, fv, pmtType);
+            double result = calculatePresentValue(rate, nper, pmt, fv, pmtType);
 
-                                              return ValueSupport.toValue(result);
-                                          }
-                                      });
+            return ValueSupport.toValue(result);
+        }
+    });
 
     public static final Function PMT  = registerFunc(new FuncVar("Pmt", 3, 5) {
-                                          @Override
-                                          protected Value evalVar(EvalContext ctx, Value[] params) {
-                                              double rate = params[0].getAsDouble(ctx);
-                                              double nper = params[1].getAsDouble(ctx);
-                                              double pv = params[2].getAsDouble(ctx);
-                                              double fv = getFV(ctx, params, 3);
-                                              int pmtType = getPaymentType(ctx, params, 4);
+        @Override
+        protected Value evalVar(EvalContext ctx, Value[] params) {
+            double rate = params[0].getAsDouble(ctx);
+            double nper = params[1].getAsDouble(ctx);
+            double pv = params[2].getAsDouble(ctx);
+            double fv = getFV(ctx, params, 3);
+            int pmtType = getPaymentType(ctx, params, 4);
 
-                                              double result = calculateLoanPayment(rate, nper, pv, fv, pmtType);
+            double result = calculateLoanPayment(rate, nper, pv, fv, pmtType);
 
-                                              return ValueSupport.toValue(result);
-                                          }
-                                      });
+            return ValueSupport.toValue(result);
+        }
+    });
 
     public static final Function IPMT = registerFunc(new FuncVar("IPmt", 4, 6) {
-                                          @Override
-                                          protected Value evalVar(EvalContext ctx, Value[] params) {
-                                              double rate = params[0].getAsDouble(ctx);
-                                              double per = params[1].getAsDouble(ctx);
-                                              double nper = params[2].getAsDouble(ctx);
-                                              double pv = params[3].getAsDouble(ctx);
-                                              double fv = getFV(ctx, params, 4);
-                                              int pmtType = getPaymentType(ctx, params, 5);
+        @Override
+        protected Value evalVar(EvalContext ctx, Value[] params) {
+            double rate = params[0].getAsDouble(ctx);
+            double per = params[1].getAsDouble(ctx);
+            double nper = params[2].getAsDouble(ctx);
+            double pv = params[3].getAsDouble(ctx);
+            double fv = getFV(ctx, params, 4);
+            int pmtType = getPaymentType(ctx, params, 5);
 
-                                              double result = calculateInterestPayment(rate, per, nper, pv, fv,
-                                                  pmtType);
+            double result = calculateInterestPayment(rate, per, nper, pv, fv,
+                pmtType);
 
-                                              return ValueSupport.toValue(result);
-                                          }
-                                      });
+            return ValueSupport.toValue(result);
+        }
+    });
 
     public static final Function PPMT = registerFunc(new FuncVar("PPmt", 4, 6) {
-                                          @Override
-                                          protected Value evalVar(EvalContext ctx, Value[] params) {
-                                              double rate = params[0].getAsDouble(ctx);
-                                              double per = params[1].getAsDouble(ctx);
-                                              double nper = params[2].getAsDouble(ctx);
-                                              double pv = params[3].getAsDouble(ctx);
-                                              double fv = getFV(ctx, params, 4);
-                                              int pmtType = getPaymentType(ctx, params, 5);
+        @Override
+        protected Value evalVar(EvalContext ctx, Value[] params) {
+            double rate = params[0].getAsDouble(ctx);
+            double per = params[1].getAsDouble(ctx);
+            double nper = params[2].getAsDouble(ctx);
+            double pv = params[3].getAsDouble(ctx);
+            double fv = getFV(ctx, params, 4);
+            int pmtType = getPaymentType(ctx, params, 5);
 
-                                              double result = calculatePrincipalPayment(rate, per, nper, pv, fv,
-                                                  pmtType);
+            double result = calculatePrincipalPayment(rate, per, nper, pv, fv,
+                pmtType);
 
-                                              return ValueSupport.toValue(result);
-                                          }
-                                      });
+            return ValueSupport.toValue(result);
+        }
+    });
 
     public static final Function DDB  = registerFunc(new FuncVar("DDB", 4, 5) {
-                                          @Override
-                                          protected Value evalVar(EvalContext ctx, Value[] params) {
-                                              double cost = params[0].getAsDouble(ctx);
-                                              double salvage = params[1].getAsDouble(ctx);
-                                              double life = params[2].getAsDouble(ctx);
-                                              double period = params[3].getAsDouble(ctx);
-                                              double factor = getOptionalDoubleParam(ctx, params, 4, 2d);
+        @Override
+        protected Value evalVar(EvalContext ctx, Value[] params) {
+            double cost = params[0].getAsDouble(ctx);
+            double salvage = params[1].getAsDouble(ctx);
+            double life = params[2].getAsDouble(ctx);
+            double period = params[3].getAsDouble(ctx);
+            double factor = getOptionalDoubleParam(ctx, params, 4, 2d);
 
-                                              double result = calculateDoubleDecliningBalance(
-                                                  cost, salvage, life, period, factor);
+            double result = calculateDoubleDecliningBalance(
+                cost, salvage, life, period, factor);
 
-                                              return ValueSupport.toValue(result);
-                                          }
-                                      });
+            return ValueSupport.toValue(result);
+        }
+    });
 
     public static final Function SLN  = registerFunc(new FuncVar("SLN", 3, 3) {
-                                          @Override
-                                          protected Value evalVar(EvalContext ctx, Value[] params) {
-                                              double cost = params[0].getAsDouble(ctx);
-                                              double salvage = params[1].getAsDouble(ctx);
-                                              double life = params[2].getAsDouble(ctx);
+        @Override
+        protected Value evalVar(EvalContext ctx, Value[] params) {
+            double cost = params[0].getAsDouble(ctx);
+            double salvage = params[1].getAsDouble(ctx);
+            double life = params[2].getAsDouble(ctx);
 
-                                              double result = calculateStraightLineDepreciation(cost, salvage, life);
+            double result = calculateStraightLineDepreciation(cost, salvage, life);
 
-                                              return ValueSupport.toValue(result);
-                                          }
-                                      });
+            return ValueSupport.toValue(result);
+        }
+    });
 
     public static final Function SYD  = registerFunc(new FuncVar("SYD", 4, 4) {
-                                          @Override
-                                          protected Value evalVar(EvalContext ctx, Value[] params) {
-                                              double cost = params[0].getAsDouble(ctx);
-                                              double salvage = params[1].getAsDouble(ctx);
-                                              double life = params[2].getAsDouble(ctx);
-                                              double period = params[3].getAsDouble(ctx);
+        @Override
+        protected Value evalVar(EvalContext ctx, Value[] params) {
+            double cost = params[0].getAsDouble(ctx);
+            double salvage = params[1].getAsDouble(ctx);
+            double life = params[2].getAsDouble(ctx);
+            double period = params[3].getAsDouble(ctx);
 
-                                              double result = calculateSumOfYearsDepreciation(
-                                                  cost, salvage, life, period);
+            double result = calculateSumOfYearsDepreciation(
+                cost, salvage, life, period);
 
-                                              return ValueSupport.toValue(result);
-                                          }
-                                      });
+            return ValueSupport.toValue(result);
+        }
+    });
 
-    public static final Function Rate = registerFunc(new FuncVar("Rate", 3, 6) {
-                                          @Override
-                                          protected Value evalVar(EvalContext ctx, Value[] params) {
-                                              double nper = params[0].getAsDouble(ctx);
-                                              double pmt = params[1].getAsDouble(ctx);
-                                              double pv = params[2].getAsDouble(ctx);
-                                              double fv = getFV(ctx, params, 3);
-                                              int pmtType = getPaymentType(ctx, params, 4);
-                                              double guess = getOptionalDoubleParam(ctx, params, 5, 0.1);
+    public static final Function RATE = registerFunc(new FuncVar("Rate", 3, 6) {
+        @Override
+        protected Value evalVar(EvalContext ctx, Value[] params) {
+            double nper = params[0].getAsDouble(ctx);
+            double pmt = params[1].getAsDouble(ctx);
+            double pv = params[2].getAsDouble(ctx);
+            double fv = getFV(ctx, params, 3);
+            int pmtType = getPaymentType(ctx, params, 4);
+            double guess = getOptionalDoubleParam(ctx, params, 5, 0.1);
 
-                                              double result = calculateRate(nper, pmt, pv, fv, pmtType, guess);
+            double result = calculateRate(nper, pmt, pv, fv, pmtType, guess);
 
-                                              return ValueSupport.toValue(result);
-                                          }
-                                      });
+            return ValueSupport.toValue(result);
+        }
+    });
 
     private static double calculateFutureValue(
         double rate, double nper, double pmt, double pv, int pmtType) {
@@ -297,8 +297,7 @@ public class DefaultFinancialFunctions {
 
     private static double calculateSumOfYearsDepreciation(
         double cost, double salvage, double life, double period) {
-        double result = (cost - salvage) * (life - period + 1) * 2d /
-            (life * (life + 1));
+        double result = (cost - salvage) * (life - period + 1) * 2d / (life * (life + 1));
         return result;
     }
 

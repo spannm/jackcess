@@ -27,6 +27,7 @@ import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 /**
  * Value which is returned for a complex column. This value corresponds to a foreign key in a secondary table which
@@ -43,7 +44,7 @@ import java.util.Map;
 public class ComplexValueForeignKeyImpl extends ComplexValueForeignKey {
     private static final long                      serialVersionUID = 20110805L;
 
-    private transient final Column                 _column;
+    private final transient Column                 _column;
     private final int                              _value;
     private transient List<? extends ComplexValue> _values;
 
@@ -304,8 +305,13 @@ public class ComplexValueForeignKeyImpl extends ComplexValueForeignKey {
 
     @Override
     public boolean equals(Object o) {
-        return super.equals(o) &&
-            _column == ((ComplexValueForeignKeyImpl) o)._column;
+        return super.equals(o)
+            && _column == ((ComplexValueForeignKeyImpl) o)._column;
+    }
+
+    @Override
+    public int hashCode() {
+        return super.hashCode() + Objects.hash(_column);
     }
 
     private Object now() {

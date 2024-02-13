@@ -144,7 +144,7 @@ public class TableCreator extends TableMutator {
         _columns = table.getColumns();
         _indexes = table.getIndexes();
         if (_indexes == null) {
-            _indexes = Collections.<IndexBuilder> emptyList();
+            _indexes = Collections.emptyList();
         }
 
         validate();
@@ -244,8 +244,7 @@ public class TableCreator extends TableMutator {
         }
         if (_columns.size() > getFormat().MAX_COLUMNS_PER_TABLE) {
             throw new IllegalArgumentException(withErrorContext(
-                "Cannot create table with more than " +
-                    getFormat().MAX_COLUMNS_PER_TABLE + " columns"));
+                "Cannot create table with more than " + getFormat().MAX_COLUMNS_PER_TABLE + " columns"));
         }
 
         Set<String> colNames = new HashSet<>();
@@ -267,8 +266,7 @@ public class TableCreator extends TableMutator {
 
             if (_indexes.size() > getFormat().MAX_INDEXES_PER_TABLE) {
                 throw new IllegalArgumentException(withErrorContext(
-                    "Cannot create table with more than " +
-                        getFormat().MAX_INDEXES_PER_TABLE + " indexes"));
+                    "Cannot create table with more than " + getFormat().MAX_INDEXES_PER_TABLE + " indexes"));
             }
 
             // now, validate the indexes
@@ -311,8 +309,7 @@ public class TableCreator extends TableMutator {
 
     private static boolean sameIndexData(
         IndexBuilder.Column col1, IndexBuilder.Column col2) {
-        return col1.getName().equals(col2.getName()) &&
-            col1.getFlags() == col2.getFlags();
+        return col1.getName().equals(col2.getName()) && col1.getFlags() == col2.getFlags();
     }
 
     @Override

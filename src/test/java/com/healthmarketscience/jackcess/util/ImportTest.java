@@ -271,8 +271,7 @@ public class ImportTest extends TestCase {
                 return Boolean.FALSE;
             } else if (methodName.equals("getColumnCount")) {
                 return _types.size();
-            } else if (methodName.equals("getColumnName") ||
-                methodName.equals("getColumnLabel")) {
+            } else if (methodName.equals("getColumnName") || methodName.equals("getColumnLabel")) {
                 return getValue(_names, args[0]);
             } else if (methodName.equals("getColumnDisplaySize")) {
                 return getValue(_displaySizes, args[0]);

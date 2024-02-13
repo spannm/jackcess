@@ -401,22 +401,22 @@ public class ColumnBuilder {
         } else if (!getType().isLongValue()) {
             if (!getType().isValidSize(getLength())) {
                 throw new IllegalArgumentException(withErrorContext(
-                    "Var length must be from " + getType().getMinSize() + " to " +
-                        getType().getMaxSize() + " inclusive, found " + getLength()));
+                    "Var length must be from " + getType().getMinSize() + " to "
+                        + getType().getMaxSize() + " inclusive, found " + getLength()));
             }
         }
 
         if (getType().getHasScalePrecision()) {
             if (!getType().isValidScale(getScale())) {
                 throw new IllegalArgumentException(withErrorContext(
-                    "Scale must be from " + getType().getMinScale() + " to " +
-                        getType().getMaxScale() + " inclusive, found " + getScale()));
+                    "Scale must be from " + getType().getMinScale() + " to "
+                        + getType().getMaxScale() + " inclusive, found " + getScale()));
             }
             if (!getType().isValidPrecision(getPrecision())) {
                 throw new IllegalArgumentException(withErrorContext(
-                    "Precision must be from " + getType().getMinPrecision() + " to " +
-                        getType().getMaxPrecision() + " inclusive, found " +
-                        getPrecision()));
+                    "Precision must be from " + getType().getMinPrecision() + " to "
+                        + getType().getMaxPrecision() + " inclusive, found "
+                        + getPrecision()));
             }
         }
 
@@ -444,14 +444,12 @@ public class ColumnBuilder {
         if (isCalculated()) {
             if (!format.isSupportedCalculatedDataType(getType())) {
                 throw new IllegalArgumentException(withErrorContext(
-                    "Database format " + format + " does not support calculated type " +
-                        getType()));
+                    "Database format " + format + " does not support calculated type " + getType()));
             }
 
             // must have an expression
             if (getProperty(PropertyMap.EXPRESSION_PROP) == null) {
-                throw new IllegalArgumentException(withErrorContext(
-                    "No expression provided for calculated type " + getType()));
+                throw new IllegalArgumentException(withErrorContext("No expression provided for calculated type " + getType()));
             }
 
             // must have result type (just fill in if missing)

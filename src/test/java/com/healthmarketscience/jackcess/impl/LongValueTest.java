@@ -31,7 +31,6 @@ import java.sql.Types;
 import java.util.*;
 
 /**
- *
  * @author James Ahlborn
  */
 public class LongValueTest extends TestCase {
@@ -46,8 +45,10 @@ public class LongValueTest extends TestCase {
             Database db = openMem(testDB);
             Table table = db.getTable("MSP_PROJECTS");
             Row row = table.getNextRow();
-            assertEquals(
-                "Jon Iles this is a a vawesrasoih aksdkl fas dlkjflkasjd flkjaslkdjflkajlksj dfl lkasjdf lkjaskldfj lkas dlk lkjsjdfkl; aslkdf lkasjkldjf lka skldf lka sdkjfl;kasjd falksjdfljaslkdjf laskjdfk jalskjd flkj aslkdjflkjkjasljdflkjas jf;lkasjd fjkas dasdf asd fasdf asdf asdmhf lksaiyudfoi jasodfj902384jsdf9 aw90se fisajldkfj lkasj dlkfslkd jflksjadf as",
+            assertEquals("Jon Iles this is a a vawesrasoih aksdkl fas dlkjflkasjd flkjaslkdjflkajlksj dfl lkasjdf lkjaskldfj "
+                + "lkas dlk lkjsjdfkl; aslkdf lkasjkldjf lka skldf lka sdkjfl;kasjd falksjdfljaslkdjf laskjdfk jalskjd "
+                + "flkj aslkdjflkjkjasljdflkjas jf;lkasjd fjkas dasdf asd fasdf asdf asdmhf lksaiyudfoi jasodfj902384jsdf9 "
+                + "aw90se fisajldkfj lkasj dlkfslkd jflksjadf as",
                 row.get("PROJ_PROP_AUTHOR"));
             assertEquals("T", row.get("PROJ_PROP_COMPANY"));
             assertEquals("Standard", row.get("PROJ_INFO_CAL_NAME"));
@@ -207,9 +208,15 @@ public class LongValueTest extends TestCase {
         }
         String longStr = sb.toString();
 
-        String[] expectedStrs =
-            {"only ascii chars", "\u00E4\u00E4kk\u00F6si\u00E4", "\u041C\u0438\u0440", "\u03F0\u03B1\u1F76 \u03C4\u1F79\u03C4' \u1F10\u03B3\u1F7C \u039A\u1F7B\u03F0\u03BB\u03C9\u03C0\u03B1", "\u6F22\u5B57\u4EEE\u540D\u4EA4\u3058\u308A\u6587", "3L9\u001D52\u0002_AB(\u00A5\u0005!!V", "\u00FCmlaut", longStr
-            };
+        String[] expectedStrs = {
+            "only ascii chars",
+            "\u00E4\u00E4kk\u00F6si\u00E4",
+            "\u041C\u0438\u0440",
+            "\u03F0\u03B1\u1F76 \u03C4\u1F79\u03C4' \u1F10\u03B3\u1F7C \u039A\u1F7B\u03F0\u03BB\u03C9\u03C0\u03B1",
+            "\u6F22\u5B57\u4EEE\u540D\u4EA4\u3058\u308A\u6587",
+            "3L9\u001D52\u0002_AB(\u00A5\u0005!!V",
+            "\u00FCmlaut",
+            longStr};
 
         Table t = db.getTable("Table");
         for (Row row : t) {

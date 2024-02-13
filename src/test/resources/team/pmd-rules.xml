@@ -5,7 +5,7 @@
     xsi:schemaLocation="http://pmd.sourceforge.net/ruleset/2.0.0 http://pmd.sourceforge.net/ruleset_2_0_0.xsd">
 
     <description>
-        PMD rules of the UCanAccess project.
+        PMD rules of the Jackcess project.
     </description>
 
     <!--rule ref="category/java/bestpractices.xml/CheckResultSet" /-->

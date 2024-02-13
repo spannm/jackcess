@@ -30,7 +30,7 @@ public class FunctionSupport {
     private FunctionSupport() {
     }
 
-    public static abstract class BaseFunction implements Function {
+    public abstract static class BaseFunction implements Function {
         private final String _name;
         private final int    _minParams;
         private final int    _maxParams;
@@ -56,17 +56,14 @@ public class FunctionSupport {
             int num = params.length;
             if (num < _minParams || num > _maxParams) {
                 String range = _minParams == _maxParams ? "" + _minParams : _minParams + " to " + _maxParams;
-                throw new EvalException(
-                    "Invalid number of parameters " +
-                        num + " passed, expected " + range);
+                throw new EvalException("Invalid number of parameters " + num + " passed, expected " + range);
             }
         }
 
         protected EvalException invalidFunctionCall(
             Throwable t, Value[] params) {
             String paramStr = Arrays.toString(params);
-            String msg = "Invalid function call {" + _name + "(" +
-                paramStr.substring(1, paramStr.length() - 1) + ")}";
+            String msg = "Invalid function call {" + _name + "(" + paramStr.substring(1, paramStr.length() - 1) + ")}";
             return new EvalException(msg, t);
         }
 
@@ -76,7 +73,7 @@ public class FunctionSupport {
         }
     }
 
-    public static abstract class Func0 extends BaseFunction {
+    public abstract static class Func0 extends BaseFunction {
         protected Func0(String name) {
             super(name, 0, 0);
         }
@@ -100,7 +97,7 @@ public class FunctionSupport {
         protected abstract Value eval0(EvalContext ctx);
     }
 
-    public static abstract class Func1 extends BaseFunction {
+    public abstract static class Func1 extends BaseFunction {
         protected Func1(String name) {
             super(name, 1, 1);
         }
@@ -118,7 +115,7 @@ public class FunctionSupport {
         protected abstract Value eval1(EvalContext ctx, Value param);
     }
 
-    public static abstract class Func1NullIsNull extends BaseFunction {
+    public abstract static class Func1NullIsNull extends BaseFunction {
         protected Func1NullIsNull(String name) {
             super(name, 1, 1);
         }
@@ -140,7 +137,7 @@ public class FunctionSupport {
         protected abstract Value eval1(EvalContext ctx, Value param);
     }
 
-    public static abstract class Func2 extends BaseFunction {
+    public abstract static class Func2 extends BaseFunction {
         protected Func2(String name) {
             super(name, 2, 2);
         }
@@ -158,7 +155,7 @@ public class FunctionSupport {
         protected abstract Value eval2(EvalContext ctx, Value param1, Value param2);
     }
 
-    public static abstract class Func3 extends BaseFunction {
+    public abstract static class Func3 extends BaseFunction {
         protected Func3(String name) {
             super(name, 3, 3);
         }
@@ -177,7 +174,7 @@ public class FunctionSupport {
             Value param1, Value param2, Value param3);
     }
 
-    public static abstract class FuncVar extends BaseFunction {
+    public abstract static class FuncVar extends BaseFunction {
         protected FuncVar(String name) {
             super(name, 0, Integer.MAX_VALUE);
         }

@@ -65,10 +65,8 @@ public class TableScanCursor extends CursorImpl {
     }
 
     @Override
-    protected void restorePositionImpl(PositionImpl curPos, PositionImpl prevPos)
-        throws IOException {
-        if (!(curPos instanceof ScanPosition) ||
-            !(prevPos instanceof ScanPosition)) {
+    protected void restorePositionImpl(PositionImpl curPos, PositionImpl prevPos) throws IOException {
+        if (!(curPos instanceof ScanPosition) || !(prevPos instanceof ScanPosition)) {
             throw new IllegalArgumentException(
                 "Restored positions must be scan positions");
         }
@@ -83,9 +81,7 @@ public class TableScanCursor extends CursorImpl {
     }
 
     @Override
-    protected PositionImpl findAnotherPosition(
-        RowState rowState, PositionImpl curPos, boolean moveForward)
-        throws IOException {
+    protected PositionImpl findAnotherPosition(RowState rowState, PositionImpl curPos, boolean moveForward) throws IOException {
         ScanDirHandler handler = getDirHandler(moveForward);
 
         // figure out how many rows are left on this page so we can find the

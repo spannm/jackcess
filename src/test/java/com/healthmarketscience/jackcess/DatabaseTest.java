@@ -511,7 +511,7 @@ public class DatabaseTest extends TestCase {
             table.getNextRow();
 
             Map<String, Object> row = table.getNextRow();
-            assertEquals(Arrays.<Object> asList(
+            assertEquals(Arrays.asList(
                 null, "row3col3", null, null, null, null, null,
                 "row3col9", null),
                 new ArrayList<>(row.values()));
@@ -519,7 +519,7 @@ public class DatabaseTest extends TestCase {
             table.getNextRow();
 
             row = table.getNextRow();
-            assertEquals(Arrays.<Object> asList(
+            assertEquals(Arrays.asList(
                 null, "row5col2", null, null, null, null, null, null,
                 null),
                 new ArrayList<>(row.values()));

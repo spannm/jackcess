@@ -31,10 +31,10 @@ import java.nio.charset.Charset;
 public interface CodecProvider {
     /**
      * Returns a new CodecHandler for the database associated with the given PageChannel.
-     * 
+     *
      * @param channel the PageChannel for a Database
      * @param charset the Charset for the Database
-     * 
+     *
      * @return a new CodecHandler, may not be {@code null}
      */
     CodecHandler createHandler(PageChannel channel, Charset charset)

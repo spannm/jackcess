@@ -169,27 +169,23 @@ public class Joiner {
 
     /**
      * Deletes any rows in the "to" table based on the given columns in the "from" table.
-     * 
+     *
      * @param fromRow row from the "from" table (which must include the relevant columns for this join relationship)
      * @return {@code true} if any "to" rows were deleted, {@code false} otherwise
      */
     public boolean deleteRows(Map<String, ?> fromRow) throws IOException {
-        return deleteRowsImpl(findRows(fromRow)
-            .setColumnNames(Collections.<String> emptySet())
-            .iterator());
+        return deleteRowsImpl(findRows(fromRow).setColumnNames(Collections.emptySet()).iterator());
     }
 
     /**
      * Deletes any rows in the "to" table based on the given columns in the "from" table.
-     * 
+     *
      * @param fromRow row from the "from" table (which must include the relevant columns for this join relationship)
      * @return {@code true} if any "to" rows were deleted, {@code false} otherwise
      * @usage _intermediate_method_
      */
     public boolean deleteRows(Object[] fromRow) throws IOException {
-        return deleteRowsImpl(findRows(fromRow)
-            .setColumnNames(Collections.<String> emptySet())
-            .iterator());
+        return deleteRowsImpl(findRows(fromRow).setColumnNames(Collections.emptySet()).iterator());
     }
 
     /**

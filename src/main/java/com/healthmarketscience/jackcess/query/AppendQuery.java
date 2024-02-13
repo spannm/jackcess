@@ -19,9 +19,8 @@ package com.healthmarketscience.jackcess.query;
 import java.util.List;
 
 /**
- * Query interface which represents an append query, e.g.: {@code INSERT INTO 
- * <table>
- *  VALUES (<values>)}
+ * Query interface which represents an append query,
+ * e.g.: {@code INSERT INTO table VALUES (values)}
  *
  * @author James Ahlborn
  */

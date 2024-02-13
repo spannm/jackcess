@@ -41,25 +41,23 @@ import java.util.stream.StreamSupport;
  */
 @SuppressWarnings("deprecation")
 public class TestUtil {
-    public static final TimeZone              TEST_TZ   =
-        TimeZone.getTimeZone("America/New_York");
+    public static final TimeZone              TEST_TZ   = TimeZone.getTimeZone("America/New_York");
 
-    private static final ThreadLocal<Boolean> _autoSync =
-        new ThreadLocal<>();
+    private static final ThreadLocal<Boolean> AUTO_SYNC = new ThreadLocal<>();
 
     private TestUtil() {
     }
 
     static void setTestAutoSync(boolean autoSync) {
-        _autoSync.set(autoSync);
+        AUTO_SYNC.set(autoSync);
     }
 
     static void clearTestAutoSync() {
-        _autoSync.remove();
+        AUTO_SYNC.remove();
     }
 
     static boolean getTestAutoSync() {
-        Boolean autoSync = _autoSync.get();
+        Boolean autoSync = AUTO_SYNC.get();
         return autoSync != null ? autoSync : Database.DEFAULT_AUTO_SYNC;
     }
 
@@ -268,7 +266,7 @@ public class TestUtil {
     }
 
     public static List<Row> createExpectedTable(Row... rows) {
-        return Arrays.<Row> asList(rows);
+        return Arrays.asList(rows);
     }
 
     public static void dumpDatabase(Database mdb) throws Exception {
@@ -285,11 +283,9 @@ public class TestUtil {
     }
 
     public static void dumpProperties(Table table) throws Exception {
-        System.out.println("TABLE_PROPS: " + table.getName() + ": " +
-            table.getProperties());
+        System.out.println("TABLE_PROPS: " + table.getName() + ": " + table.getProperties());
         for (Column c : table.getColumns()) {
-            System.out.println("COL_PROPS: " + c.getName() + ": " +
-                c.getProperties());
+            System.out.println("COL_PROPS: " + c.getName() + ": " + c.getProperties());
         }
     }
 
@@ -333,8 +329,7 @@ public class TestUtil {
                 entry.setValue(ByteUtil.toHexString(ByteBuffer.wrap(bv), bv.length));
             } else if (v instanceof ComplexValueForeignKey) {
                 // deref complex values
-                String str = "ComplexValue(" + v + ")" +
-                    ((ComplexValueForeignKey) v).getValues();
+                String str = "ComplexValue(" + v + ")" + ((ComplexValueForeignKey) v).getValues();
                 entry.setValue(str);
             }
         }
@@ -369,8 +364,7 @@ public class TestUtil {
         // but it results in a 1 millisecond difference, so i'm not going to worry
         // about it
         if (expTime != foundTime && Math.abs(expTime - foundTime) > 1) {
-            throw new AssertionError("Expected " + expTime + " (" + expected +
-                "), found " + foundTime + " (" + found + ")");
+            throw new AssertionError("Expected " + expTime + " (" + expected + "), found " + foundTime + " (" + found + ")");
         }
     }
 

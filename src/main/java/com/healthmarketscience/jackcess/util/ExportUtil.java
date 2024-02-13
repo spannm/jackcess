@@ -46,10 +46,10 @@ public class ExportUtil {
     /**
      * Copy all tables into new delimited text files <br>
      * Equivalent to: {@code exportAll(db, dir, "csv");}
-     * 
+     *
      * @param db Database the table to export belongs to
      * @param dir The directory where the new files will be created
-     * 
+     *
      * @see #exportAll(Database,File,String)
      * @see Builder
      */
@@ -62,11 +62,11 @@ public class ExportUtil {
      * Copy all tables into new delimited text files <br>
      * Equivalent to: {@code exportFile(db, name, f, false, null, '"',
      * SimpleExportFilter.INSTANCE);}
-     * 
+     *
      * @param db Database the table to export belongs to
      * @param dir The directory where the new files will be created
      * @param ext The file extension of the new files
-     * 
+     *
      * @see #exportFile(Database,String,File,boolean,String,char,ExportFilter)
      * @see Builder
      */
@@ -82,12 +82,12 @@ public class ExportUtil {
      * Copy all tables into new delimited text files <br>
      * Equivalent to: {@code exportFile(db, name, f, false, null, '"',
      * SimpleExportFilter.INSTANCE);}
-     * 
+     *
      * @param db Database the table to export belongs to
      * @param dir The directory where the new files will be created
      * @param ext The file extension of the new files
      * @param header If <code>true</code> the first line contains the column names
-     * 
+     *
      * @see #exportFile(Database,String,File,boolean,String,char,ExportFilter)
      * @see Builder
      */
@@ -104,7 +104,7 @@ public class ExportUtil {
      * Copy all tables into new delimited text files <br>
      * Equivalent to: {@code exportFile(db, name, f, false, null, '"',
      * SimpleExportFilter.INSTANCE);}
-     * 
+     *
      * @param db Database the table to export belongs to
      * @param dir The directory where the new files will be created
      * @param ext The file extension of the new files
@@ -112,7 +112,7 @@ public class ExportUtil {
      * @param delim The column delimiter, <code>null</code> for default (comma)
      * @param quote The quote character
      * @param filter valid export filter
-     * 
+     *
      * @see #exportFile(Database,String,File,boolean,String,char,ExportFilter)
      * @see Builder
      */
@@ -130,11 +130,11 @@ public class ExportUtil {
      * Copy a table into a new delimited text file <br>
      * Equivalent to: {@code exportFile(db, name, f, false, null, '"',
      * SimpleExportFilter.INSTANCE);}
-     * 
+     *
      * @param db Database the table to export belongs to
      * @param tableName Name of the table to export
      * @param f New file to create
-     * 
+     *
      * @see #exportFile(Database,String,File,boolean,String,char,ExportFilter)
      * @see Builder
      */
@@ -148,7 +148,7 @@ public class ExportUtil {
      * Copy a table into a new delimited text file <br>
      * Nearly equivalent to: {@code exportWriter(db, name, new BufferedWriter(f),
      * header, delim, quote, filter);}
-     * 
+     *
      * @param db Database the table to export belongs to
      * @param tableName Name of the table to export
      * @param f New file to create
@@ -156,7 +156,7 @@ public class ExportUtil {
      * @param delim The column delimiter, <code>null</code> for default (comma)
      * @param quote The quote character
      * @param filter valid export filter
-     * 
+     *
      * @see #exportWriter(Database,String,BufferedWriter,boolean,String,char,ExportFilter)
      * @see Builder
      */
@@ -177,11 +177,11 @@ public class ExportUtil {
      * Copy a table in this database into a new delimited text file <br>
      * Equivalent to: {@code exportWriter(db, name, out, false, null, '"',
      * SimpleExportFilter.INSTANCE);}
-     * 
+     *
      * @param db Database the table to export belongs to
      * @param tableName Name of the table to export
      * @param out Writer to export to
-     * 
+     *
      * @see #exportWriter(Database,String,BufferedWriter,boolean,String,char,ExportFilter)
      * @see Builder
      */
@@ -195,7 +195,7 @@ public class ExportUtil {
      * Copy a table in this database into a new delimited text file. <br>
      * Equivalent to:
      * {@code exportWriter(Cursor.createCursor(db.getTable(tableName)), out, header, delim, quote, filter);}
-     * 
+     *
      * @param db Database the table to export belongs to
      * @param tableName Name of the table to export
      * @param out Writer to export to
@@ -203,21 +203,19 @@ public class ExportUtil {
      * @param delim The column delimiter, <code>null</code> for default (comma)
      * @param quote The quote character
      * @param filter valid export filter
-     * 
+     *
      * @see #exportWriter(Cursor,BufferedWriter,boolean,String,char,ExportFilter)
      * @see Builder
      */
-    public static void exportWriter(Database db, String tableName,
-        BufferedWriter out, boolean header, String delim,
-        char quote, ExportFilter filter)
-        throws IOException {
+    public static void exportWriter(Database db, String tableName, BufferedWriter out, boolean header, String delim,
+        char quote, ExportFilter filter) throws IOException {
         exportWriter(CursorBuilder.createCursor(db.getTable(tableName)), out, header,
             delim, quote, filter);
     }
 
     /**
      * Copy a table in this database into a new delimited text file.
-     * 
+     *
      * @param cursor Cursor to export
      * @param out Writer to export to
      * @param header If <code>true</code> the first line contains the column names
@@ -236,8 +234,7 @@ public class ExportUtil {
         // create pattern which will indicate whether or not a value needs to be
         // quoted or not (contains delimiter, separator, or newline)
         Pattern needsQuotePattern = Pattern.compile(
-            "(?:" + Pattern.quote(delimiter) + ")|(?:" +
-                Pattern.quote("" + quote) + ")|(?:[\n\r])");
+            "(?:" + Pattern.quote(delimiter) + ")|(?:" + Pattern.quote("" + quote) + ")|(?:[\n\r])");
 
         List<? extends Column> origCols = cursor.getTable().getColumns();
         List<Column> columns = new ArrayList<>(origCols);

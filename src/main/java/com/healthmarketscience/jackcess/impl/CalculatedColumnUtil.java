@@ -32,6 +32,7 @@ import java.nio.ByteOrder;
  * @author James Ahlborn
  */
 class CalculatedColumnUtil {
+
     // offset to the int which specifies the length of the actual data
     private static final int    CALC_DATA_LEN_OFFSET = 16;
     // offset to the actual data
@@ -47,6 +48,9 @@ class CalculatedColumnUtil {
     // fully encode calculated BOOLEAN "false" value
     private static final byte[] CALC_BOOL_FALSE      = wrapCalculatedValue(
         new byte[] {0});
+
+    private CalculatedColumnUtil() {
+    }
 
     /**
      * Creates the appropriate ColumnImpl class for a calculated column and reads a column definition in from a buffer

@@ -157,8 +157,7 @@ public abstract class CustomLinkResolver implements LinkResolver {
         try {
 
             if (inMemory) {
-                dbFile = Paths.get(MEM_DB_PREFIX + DB_ID.nextLong() +
-                    format.getFileExtension());
+                dbFile = Paths.get(MEM_DB_PREFIX + DB_ID.nextLong() + format.getFileExtension());
                 channel = MemFileChannel.newChannel();
             } else {
                 dbFile = tempDir != null ? Files.createTempFile(tempDir, FILE_DB_PREFIX,
@@ -184,8 +183,7 @@ public abstract class CustomLinkResolver implements LinkResolver {
     }
 
     private static void deleteDbFile(Path dbFile) {
-        if (dbFile != null &&
-            dbFile.getFileName().toString().startsWith(FILE_DB_PREFIX)) {
+        if (dbFile != null && dbFile.getFileName().toString().startsWith(FILE_DB_PREFIX)) {
             try {
                 Files.deleteIfExists(dbFile);
             } catch (IOException ignores) {}
@@ -250,8 +248,7 @@ public abstract class CustomLinkResolver implements LinkResolver {
         protected TableImpl getTable(String name, boolean includeSystemTables)
             throws IOException {
             TableImpl table = super.getTable(name, includeSystemTables);
-            if (table == null &&
-                _resolver.loadCustomTable(this, _customFile, name)) {
+            if (table == null && _resolver.loadCustomTable(this, _customFile, name)) {
                 table = super.getTable(name, includeSystemTables);
             }
             return table;

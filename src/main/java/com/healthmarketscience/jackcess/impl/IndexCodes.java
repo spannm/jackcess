@@ -34,9 +34,12 @@ public class IndexCodes {
     static final byte DESC_BOOLEAN_TRUE  = ASC_BOOLEAN_FALSE;
     static final byte DESC_BOOLEAN_FALSE = ASC_BOOLEAN_TRUE;
 
+    private IndexCodes() {
+    }
+
     static boolean isNullEntry(byte startEntryFlag) {
-        return startEntryFlag == ASC_NULL_FLAG ||
-            startEntryFlag == DESC_NULL_FLAG;
+        return startEntryFlag == ASC_NULL_FLAG
+            || startEntryFlag == DESC_NULL_FLAG;
     }
 
     static byte getNullEntryFlag(boolean isAscending) {

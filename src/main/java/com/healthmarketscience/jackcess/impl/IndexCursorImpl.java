@@ -88,9 +88,7 @@ public class IndexCursorImpl extends CursorImpl implements IndexCursor {
         }
         if (index.getIndexData().getUnsupportedReason() != null) {
             throw new IllegalArgumentException(
-                "Given index " + index +
-                    " is not usable for indexed lookups due to " +
-                    index.getIndexData().getUnsupportedReason());
+                "Given index " + index + " is not usable for indexed lookups due to " + index.getIndexData().getUnsupportedReason());
         }
         IndexCursorImpl cursor = new IndexCursorImpl(
             table, index, index.cursor(startRow, startInclusive,
@@ -203,8 +201,7 @@ public class IndexCursorImpl extends CursorImpl implements IndexCursor {
     @Override
     protected void restorePositionImpl(PositionImpl curPos, PositionImpl prevPos)
         throws IOException {
-        if (!(curPos instanceof IndexPosition) ||
-            !(prevPos instanceof IndexPosition)) {
+        if (!(curPos instanceof IndexPosition) || !(prevPos instanceof IndexPosition)) {
             throw new IllegalArgumentException(
                 "Restored positions must be index positions");
         }
@@ -324,8 +321,7 @@ public class IndexCursorImpl extends CursorImpl implements IndexCursor {
 
             Object patValue = rowValues[col.getColumnIndex()];
 
-            if (patValue == IndexData.MIN_VALUE ||
-                patValue == IndexData.MAX_VALUE) {
+            if (patValue == IndexData.MIN_VALUE || patValue == IndexData.MAX_VALUE) {
                 // all remaining entry values are "special" (used for partial lookups)
                 return true;
             }
@@ -505,8 +501,7 @@ public class IndexCursorImpl extends CursorImpl implements IndexCursor {
 
         @Override
         protected boolean findNext() throws IOException {
-            return moveToNextRow() &&
-                currentRowMatchesEntryImpl(_rowValues, _colMatcher);
+            return moveToNextRow() && currentRowMatchesEntryImpl(_rowValues, _colMatcher);
         }
     }
 

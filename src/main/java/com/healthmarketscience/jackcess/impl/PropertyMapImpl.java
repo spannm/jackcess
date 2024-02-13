@@ -223,9 +223,7 @@ public class PropertyMapImpl implements PropertyMap {
             } else if (value instanceof Long) {
                 type = DataType.BIG_INT;
             } else {
-                throw new IllegalArgumentException(
-                    "Could not determine type for property " + name +
-                        " with value " + value);
+                throw new IllegalArgumentException("Could not determine type for property " + name + " with value " + value);
             }
         }
 

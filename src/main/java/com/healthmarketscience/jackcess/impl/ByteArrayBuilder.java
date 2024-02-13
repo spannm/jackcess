@@ -104,7 +104,7 @@ public class ByteArrayBuilder {
         return toBuffer().array();
     }
 
-    private static abstract class Data {
+    private abstract static class Data {
         private int _pos;
 
         protected Data(int pos) {

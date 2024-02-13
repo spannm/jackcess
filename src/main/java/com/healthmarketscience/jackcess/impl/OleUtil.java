@@ -40,6 +40,7 @@ import java.util.regex.Pattern;
  * @usage _advanced_class_
  */
 public class OleUtil {
+
     /**
      * Interface used to allow optional inclusion of the poi library for working with compound ole data.
      */
@@ -86,6 +87,9 @@ public class OleUtil {
         COMPOUND_FACTORY = compoundFactory;
     }
 
+    private OleUtil() {
+    }
+
     /**
      * Parses an access database blob structure and returns an appropriate OleBlob instance.
      */
@@ -101,9 +105,7 @@ public class OleUtil {
         try {
 
             if (!WRITEABLE_TYPES.contains(oleBuilder.getType())) {
-                throw new IllegalArgumentException(
-                    "Cannot currently create ole values of type " +
-                        oleBuilder.getType());
+                throw new IllegalArgumentException("Cannot currently create ole values of type " + oleBuilder.getType());
             }
 
             long contentLen = oleBuilder.getContentLength();
@@ -133,15 +135,12 @@ public class OleUtil {
                     throw new RuntimeException("unexpected type " + oleBuilder.getType());
             }
 
-            long payloadLen = packageStreamHeader.length + packageStreamFooter.length +
-                contentLen;
+            long payloadLen = packageStreamHeader.length + packageStreamFooter.length + contentLen;
             byte[] packageHeader = writePackageHeader(oleBuilder, payloadLen);
 
-            long totalOleLen = packageHeader.length + PACKAGE_FOOTER.length +
-                payloadLen;
+            long totalOleLen = packageHeader.length + PACKAGE_FOOTER.length + payloadLen;
             if (totalOleLen > DataType.OLE.getMaxSize()) {
-                throw new IllegalArgumentException("Content size of " + totalOleLen +
-                    " is too large for ole column");
+                throw new IllegalArgumentException("Content size of " + totalOleLen + " is too large for ole column");
             }
 
             byte[] oleBytes = new byte[(int) totalOleLen];
@@ -317,9 +316,9 @@ public class OleUtil {
 
         // if COMPOUND_FACTORY is null, the poi library isn't available, so just
         // load compound data as "other"
-        if (COMPOUND_FACTORY != null &&
-            bb.remaining() >= COMPOUND_STORAGE_SIGNATURE.length &&
-            ByteUtil.matchesRange(bb, bb.position(), COMPOUND_STORAGE_SIGNATURE)) {
+        if (COMPOUND_FACTORY != null
+            && bb.remaining() >= COMPOUND_STORAGE_SIGNATURE.length
+            && ByteUtil.matchesRange(bb, bb.position(), COMPOUND_STORAGE_SIGNATURE)) {
             return COMPOUND_FACTORY.createCompoundPackageContent(
                 blob, prettyName, className, typeName, bb, dataBlockLen);
         }
@@ -563,7 +562,7 @@ public class OleUtil {
         }
     }
 
-    static abstract class ContentImpl implements Content, Closeable {
+    abstract static class ContentImpl implements Content, Closeable {
         protected final OleBlobImpl _blob;
 
         protected ContentImpl(OleBlobImpl blob) {
@@ -590,7 +589,7 @@ public class OleUtil {
         }
     }
 
-    static abstract class EmbeddedContentImpl extends ContentImpl
+    abstract static class EmbeddedContentImpl extends ContentImpl
         implements EmbeddedContent {
         private final int _position;
         private final int _length;
@@ -626,7 +625,7 @@ public class OleUtil {
         }
     }
 
-    static abstract class EmbeddedPackageContentImpl
+    abstract static class EmbeddedPackageContentImpl
         extends EmbeddedContentImpl
         implements PackageContent {
         private final String _prettyName;

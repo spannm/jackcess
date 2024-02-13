@@ -550,11 +550,9 @@ public class DefaultFunctionsTest {
             String val = testStrs[i + 1];
 
             try {
-                assertEval(expected,
-                    "=Format(" + val + ", " + fmtStr + ")");
+                assertEval(expected, "=Format(" + val + ", " + fmtStr + ")");
             } catch (AssertionFailedError afe) {
-                throw new AssertionFailedError("Input " + val + ": " +
-                    afe.getMessage());
+                throw new AssertionFailedError("Input " + val + ": " + afe.getMessage());
             }
         }
     }

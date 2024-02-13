@@ -118,10 +118,9 @@ public class RowIdImpl implements RowId, Serializable {
 
     @Override
     public boolean equals(Object o) {
-        return this == o ||
-            o != null && getClass() == o.getClass() &&
-                getPageNumber() == ((RowIdImpl) o).getPageNumber() &&
-                getRowNumber() == ((RowIdImpl) o).getRowNumber();
+        return this == o || o != null && getClass() == o.getClass()
+                && getPageNumber() == ((RowIdImpl) o).getPageNumber()
+                && getRowNumber() == ((RowIdImpl) o).getRowNumber();
     }
 
     @Override

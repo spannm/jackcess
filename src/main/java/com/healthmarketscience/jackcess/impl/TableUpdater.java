@@ -196,8 +196,7 @@ public class TableUpdater extends TableMutator {
         }
         if (_table.getColumnCount() + 1 > getFormat().MAX_COLUMNS_PER_TABLE) {
             throw new IllegalArgumentException(withErrorContext(
-                "Cannot add column to table with " +
-                    getFormat().MAX_COLUMNS_PER_TABLE + " columns"));
+                "Cannot add column to table with " + getFormat().MAX_COLUMNS_PER_TABLE + " columns"));
         }
 
         Set<String> colNames = getColumnNames();
@@ -223,8 +222,7 @@ public class TableUpdater extends TableMutator {
         }
         if (_table.getLogicalIndexCount() + 1 > getFormat().MAX_INDEXES_PER_TABLE) {
             throw new IllegalArgumentException(withErrorContext(
-                "Cannot add index to table with " +
-                    getFormat().MAX_INDEXES_PER_TABLE + " indexes"));
+                "Cannot add index to table with " + getFormat().MAX_INDEXES_PER_TABLE + " indexes"));
         }
 
         boolean[] foundPk = new boolean[1];
@@ -300,8 +298,7 @@ public class TableUpdater extends TableMutator {
     private static boolean sameIndexData(
         IndexBuilder.Column col1, IndexData.ColumnDescriptor col2,
         int ignoreColFlags) {
-        return col1.getName().equals(col2.getName()) &&
-            (col1.getFlags() | ignoreColFlags) == (col2.getFlags() | ignoreColFlags);
+        return col1.getName().equals(col2.getName()) && (col1.getFlags() | ignoreColFlags) == (col2.getFlags() | ignoreColFlags);
     }
 
     @Override

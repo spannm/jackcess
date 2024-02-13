@@ -52,10 +52,8 @@ public class DebugErrorHandler extends ReplacementErrorHandler {
         Location location, Exception error)
         throws IOException {
         if (LOG.isDebugEnabled()) {
-            LOG.debug("Failed reading column " + column + ", row " +
-                location + ", bytes " +
-                (columnData != null ? ByteUtil.toHexString(columnData) : "null"),
-                error);
+            LOG.debug("Failed reading column " + column + ", row " + location + ", bytes "
+                + (columnData != null ? ByteUtil.toHexString(columnData) : "null"), error);
         }
 
         return super.handleRowError(column, columnData, location, error);

@@ -76,8 +76,8 @@ public abstract class ComplexColumnInfoImpl<V extends ComplexValue>
         }
 
         if (pkCol == null || complexValFkCol == null) {
-            throw new IOException("Could not find expected columns in flat table " +
-                flatTable.getName() + " for complex column with id "
+            throw new IOException("Could not find expected columns in flat table "
+                + flatTable.getName() + " for complex column with id "
                 + complexTypeId);
         }
         _pkCol = pkCol;
@@ -237,8 +237,7 @@ public abstract class ComplexColumnInfoImpl<V extends ComplexValue>
 
     @Override
     public void deleteAllValues(int complexValueFk) throws IOException {
-        Iterator<Row> entryIter =
-            getComplexValFkIter(complexValueFk, Collections.<String> emptySet());
+        Iterator<Row> entryIter = getComplexValFkIter(complexValueFk, Collections.emptySet());
         while (entryIter.hasNext()) {
             entryIter.next();
             entryIter.remove();
@@ -317,7 +316,7 @@ public abstract class ComplexColumnInfoImpl<V extends ComplexValue>
         Row rawValues)
         throws IOException;
 
-    protected static abstract class ComplexValueImpl implements ComplexValue {
+    protected abstract static class ComplexValueImpl implements ComplexValue {
         private Id                     _id;
         private ComplexValueForeignKey _complexValueFk;
 
@@ -372,10 +371,10 @@ public abstract class ComplexColumnInfoImpl<V extends ComplexValue>
 
         @Override
         public boolean equals(Object o) {
-            return this == o ||
-                o != null && getClass() == o.getClass() &&
-                    _id == ((ComplexValueImpl) o)._id &&
-                    _complexValueFk.equals(((ComplexValueImpl) o)._complexValueFk);
+            return this == o
+                || o != null && getClass() == o.getClass()
+                  && _id == ((ComplexValueImpl) o)._id
+                  && _complexValueFk.equals(((ComplexValueImpl) o)._complexValueFk);
         }
     }
 

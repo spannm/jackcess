@@ -225,8 +225,8 @@ public class VersionHistoryColumnInfoImpl extends ComplexColumnInfoImpl<Version>
 
         @Override
         public String toString() {
-            return "Version(" + getComplexValueForeignKey() + "," + getId() + ") " +
-                getModifiedDateObject() + ", " + getValue();
+            return "Version(" + getComplexValueForeignKey() + "," + getId() + ") "
+                + getModifiedDateObject() + ", " + getValue();
         }
     }
 

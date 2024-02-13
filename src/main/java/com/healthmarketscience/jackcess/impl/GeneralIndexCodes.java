@@ -33,16 +33,14 @@ public class GeneralIndexCodes extends GeneralLegacyIndexCodes {
         /**
          * handlers for the first 256 chars. use nested class to lazy load the handlers
          */
-        private static final CharHandler[] _values = loadCodes(
-            CODES_FILE, FIRST_CHAR, LAST_CHAR);
+        private static final CharHandler[] VALUES = loadCodes(CODES_FILE, FIRST_CHAR, LAST_CHAR);
     }
 
     private static final class ExtCodes {
         /**
          * handlers for the rest of the chars in BMP 0. use nested class to lazy load the handlers
          */
-        private static final CharHandler[] _values = loadCodes(
-            EXT_CODES_FILE, FIRST_EXT_CHAR, LAST_EXT_CHAR);
+        private static final CharHandler[] VALUES = loadCodes(EXT_CODES_FILE, FIRST_EXT_CHAR, LAST_EXT_CHAR);
     }
 
     static final GeneralIndexCodes GEN_INSTANCE = new GeneralIndexCodes();
@@ -56,11 +54,11 @@ public class GeneralIndexCodes extends GeneralLegacyIndexCodes {
     @Override
     CharHandler getCharHandler(char c) {
         if (c <= LAST_CHAR) {
-            return Codes._values[c];
+            return Codes.VALUES[c];
         }
 
         int extOffset = asUnsignedChar(c) - asUnsignedChar(FIRST_EXT_CHAR);
-        return ExtCodes._values[extOffset];
+        return ExtCodes.VALUES[extOffset];
     }
 
 }

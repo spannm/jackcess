@@ -151,8 +151,7 @@ class LongValueColumnImpl extends ColumnImpl {
             if (rowLen < length) {
                 // warn the caller, but return whatever we can
                 LOG.warn(withErrorContext(
-                    "Value may be truncated: expected length " +
-                        length + " found " + rowLen));
+                    "Value may be truncated: expected length " + length + " found " + rowLen));
                 rtn = new byte[rowLen];
             }
 
@@ -163,69 +162,54 @@ class LongValueColumnImpl extends ColumnImpl {
             // long value on other page(s)
             if (lvalDefinition.length != getFormat().SIZE_LONG_VALUE_DEF) {
                 throw new IOException(withErrorContext(
-                    "Expected " + getFormat().SIZE_LONG_VALUE_DEF +
-                        " bytes in long value definition, but found " +
-                        lvalDefinition.length));
+                    "Expected " + getFormat().SIZE_LONG_VALUE_DEF + " bytes in long value definition, but found " + lvalDefinition.length));
             }
 
             int rowNum = ByteUtil.getUnsignedByte(def);
             int pageNum = ByteUtil.get3ByteInt(def, def.position());
             ByteBuffer lvalPage = getPageChannel().createPageBuffer();
 
-            switch (type) {
-                case LONG_VALUE_TYPE_OTHER_PAGE: {
+            if (LONG_VALUE_TYPE_OTHER_PAGE == type) {
+                getPageChannel().readPage(lvalPage, pageNum);
+                short rowStart = TableImpl.findRowStart(lvalPage, rowNum, getFormat());
+                short rowEnd = TableImpl.findRowEnd(lvalPage, rowNum, getFormat());
+                int rowLen = rowEnd - rowStart;
+                if (rowLen < length) {
+                    // warn the caller, but return whatever we can
+                    LOG.warn(withErrorContext("Value may be truncated: expected length " + length + " found " + rowLen));
+                    rtn = new byte[rowLen];
+                }
+                lvalPage.position(rowStart);
+                lvalPage.get(rtn);
+
+            } else if (LONG_VALUE_TYPE_OTHER_PAGES == type) {
+                ByteBuffer rtnBuf = ByteBuffer.wrap(rtn);
+                int remainingLen = length;
+                while (remainingLen > 0) {
+                    lvalPage.clear();
                     getPageChannel().readPage(lvalPage, pageNum);
 
                     short rowStart = TableImpl.findRowStart(lvalPage, rowNum, getFormat());
                     short rowEnd = TableImpl.findRowEnd(lvalPage, rowNum, getFormat());
 
-                    int rowLen = rowEnd - rowStart;
-                    if (rowLen < length) {
-                        // warn the caller, but return whatever we can
-                        LOG.warn(withErrorContext(
-                            "Value may be truncated: expected length " +
-                                length + " found " + rowLen));
-                        rtn = new byte[rowLen];
-                    }
-
+                    // read next page information
                     lvalPage.position(rowStart);
-                    lvalPage.get(rtn);
-                }
-                    break;
+                    rowNum = ByteUtil.getUnsignedByte(lvalPage);
+                    pageNum = ByteUtil.get3ByteInt(lvalPage);
 
-                case LONG_VALUE_TYPE_OTHER_PAGES:
-
-                    ByteBuffer rtnBuf = ByteBuffer.wrap(rtn);
-                    int remainingLen = length;
-                    while (remainingLen > 0) {
-                        lvalPage.clear();
-                        getPageChannel().readPage(lvalPage, pageNum);
-
-                        short rowStart = TableImpl.findRowStart(lvalPage, rowNum, getFormat());
-                        short rowEnd = TableImpl.findRowEnd(lvalPage, rowNum, getFormat());
-
-                        // read next page information
-                        lvalPage.position(rowStart);
-                        rowNum = ByteUtil.getUnsignedByte(lvalPage);
-                        pageNum = ByteUtil.get3ByteInt(lvalPage);
-
-                        // update rowEnd and remainingLen based on chunkLength
-                        int chunkLength = rowEnd - rowStart - 4;
-                        if (chunkLength > remainingLen) {
-                            rowEnd = (short) (rowEnd - (chunkLength - remainingLen));
-                            chunkLength = remainingLen;
-                        }
-                        remainingLen -= chunkLength;
-
-                        lvalPage.limit(rowEnd);
-                        rtnBuf.put(lvalPage);
+                    // update rowEnd and remainingLen based on chunkLength
+                    int chunkLength = rowEnd - rowStart - 4;
+                    if (chunkLength > remainingLen) {
+                        rowEnd = (short) (rowEnd - (chunkLength - remainingLen));
+                        chunkLength = remainingLen;
                     }
+                    remainingLen -= chunkLength;
 
-                    break;
-
-                default:
-                    throw new IOException(withErrorContext(
-                        "Unrecognized long value type: " + type));
+                    lvalPage.limit(rowEnd);
+                    rtnBuf.put(lvalPage);
+                }
+            } else {
+                throw new IOException(withErrorContext("Unrecognized long value type: " + type));
             }
         }
 
@@ -259,8 +243,7 @@ class LongValueColumnImpl extends ColumnImpl {
         throws IOException {
         if (value.length > getType().getMaxSize()) {
             throw new InvalidValueException(withErrorContext(
-                "value too big for column, max " +
-                    getType().getMaxSize() + ", got " + value.length));
+                "value too big for column, max " + getType().getMaxSize() + ", got " + value.length));
         }
 
         // determine which type to write

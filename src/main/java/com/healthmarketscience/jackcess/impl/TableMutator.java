@@ -94,11 +94,10 @@ public abstract class TableMutator extends DBMutator {
 
     protected void validateAutoNumberColumn(Set<DataType> autoTypes,
         ColumnBuilder column) {
-        if (!column.getType().isMultipleAutoNumberAllowed() &&
-            !autoTypes.add(column.getType())) {
+        if (!column.getType().isMultipleAutoNumberAllowed()
+            && !autoTypes.add(column.getType())) {
             throw new IllegalArgumentException(withErrorContext(
-                "Can have at most one AutoNumber column of type " + column.getType() +
-                    " per table"));
+                "Can have at most one AutoNumber column of type " + column.getType() + " per table"));
         }
     }
 

@@ -31,7 +31,7 @@ public interface ExportFilter {
 
     /**
      * The columns that should be used to create the exported file.
-     * 
+     *
      * @param columns the columns as determined by the export code, may be directly modified and returned
      * @return the columns to use when creating the export file
      */
@@ -40,7 +40,7 @@ public interface ExportFilter {
 
     /**
      * The desired values for the row.
-     * 
+     *
      * @param row the row data as determined by the import code, may be directly modified
      * @return the row data as it should be written to the import table. if {@code null}, the row will be skipped
      */

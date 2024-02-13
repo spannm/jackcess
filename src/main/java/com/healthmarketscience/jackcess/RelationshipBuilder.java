@@ -45,9 +45,7 @@ import java.util.List;
  * @usage _general_class_
  */
 public class RelationshipBuilder {
-    private static final int JOIN_FLAGS =
-        RelationshipImpl.LEFT_OUTER_JOIN_FLAG |
-            RelationshipImpl.RIGHT_OUTER_JOIN_FLAG;
+    private static final int JOIN_FLAGS = RelationshipImpl.LEFT_OUTER_JOIN_FLAG | RelationshipImpl.RIGHT_OUTER_JOIN_FLAG;
 
     /** relationship flags (default to "don't enforce") */
     private int              _flags     = RelationshipImpl.NO_REFERENTIAL_INTEGRITY_FLAG;
@@ -141,7 +139,7 @@ public class RelationshipBuilder {
 
     /**
      * Sets a specific name for this relationship.
-     * 
+     *
      * Default = null, meaning that the standard Access naming convention will be used.
      */
     public RelationshipBuilder setName(String relationshipName) {

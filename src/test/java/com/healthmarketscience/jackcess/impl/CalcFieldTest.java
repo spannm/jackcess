@@ -139,6 +139,7 @@ public class CalcFieldTest extends TestCase {
         }
     }
 
+    @SuppressWarnings("checkstyle:LineLengthCheck")
     public void testReadCalcFields() throws Exception {
 
         for (TestDB testDB : TestDB.getSupportedForBasename(Basename.CALC_FIELD)) {

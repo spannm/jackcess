@@ -141,9 +141,7 @@ public class CursorBuilder {
         IndexImpl index = _table.findIndexForColumns(
             searchColumns, TableImpl.IndexFeature.ANY_MATCH);
         if (index == null) {
-            throw new IllegalArgumentException("Index with columns " +
-                searchColumns +
-                " does not exist in table " + _table);
+            throw new IllegalArgumentException("Index with columns " + searchColumns + " does not exist in table " + _table);
         }
         _index = index;
         return this;

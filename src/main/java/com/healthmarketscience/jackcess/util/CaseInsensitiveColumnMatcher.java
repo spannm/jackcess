@@ -50,9 +50,7 @@ public class CaseInsensitiveColumnMatcher implements ColumnMatcher {
             CharSequence cs1 = ColumnImpl.toCharSequence(value1);
             CharSequence cs2 = ColumnImpl.toCharSequence(value2);
 
-            return cs1 == cs2 ||
-                cs1 != null && cs2 != null &&
-                    cs1.toString().equalsIgnoreCase(cs2.toString());
+            return cs1 == cs2 || cs1 != null && cs2 != null && cs1.toString().equalsIgnoreCase(cs2.toString());
         } catch (IOException e) {
             throw new UncheckedIOException("Could not read column " + columnName
                 + " value", e);

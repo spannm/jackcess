@@ -33,6 +33,7 @@ import java.util.*;
 /**
  * @author James Ahlborn
  */
+@SuppressWarnings("checkstyle:LineLengthCheck")
 public class QueryTest extends TestCase {
 
     public QueryTest(String name) throws Exception {
@@ -589,12 +590,12 @@ public class QueryTest extends TestCase {
     }
 
     private static void replaceRows(Query query, Row... rows) {
-        removeRows(query, rows[0].attribute);
+        removeRows(query, rows[0]._attribute);
         addRows(query, rows);
     }
 
     private static void removeRows(Query query, Byte attr) {
-        ((QueryImpl) query).getRows().removeIf(row -> attr.equals(row.attribute));
+        ((QueryImpl) query).getRows().removeIf(row -> attr.equals(row._attribute));
     }
 
     private static void removeLastRows(Query query, int num) {
