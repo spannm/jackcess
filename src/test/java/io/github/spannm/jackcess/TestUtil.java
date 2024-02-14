@@ -260,7 +260,7 @@ public class TestUtil {
     }
 
     public static List<Row> createExpectedTable(Row... rows) {
-        return Arrays.asList(rows);
+        return List.of(rows);
     }
 
     public static void dumpDatabase(Database mdb) throws Exception {

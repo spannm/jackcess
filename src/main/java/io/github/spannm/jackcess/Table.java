@@ -20,6 +20,7 @@ import io.github.spannm.jackcess.util.ErrorHandler;
 import io.github.spannm.jackcess.util.OleBlob;
 
 import java.io.IOException;
+import java.io.UncheckedIOException;
 import java.time.LocalDateTime;
 import java.util.Iterator;
 import java.util.List;

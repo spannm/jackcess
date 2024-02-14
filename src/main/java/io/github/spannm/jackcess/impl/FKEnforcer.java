@@ -61,7 +61,7 @@ final class FKEnforcer {
                 }
             }
         }
-        _cols = !cols.isEmpty() ? List.copyOf(cols) : Collections.emptyList();
+        _cols = !cols.isEmpty() ? List.copyOf(cols) : List.of();
     }
 
     /**
@@ -225,7 +225,7 @@ final class FKEnforcer {
         // this table is a secondary table. however, null values are allowed
         if (!areNull(joiner, row) && !joiner.hasRows(row)) {
             throw new ConstraintViolationException(
-                "Adding new row " + Arrays.asList(row) + " violates constraint " + joiner.toFKString());
+                "Adding new row " + Arrays.toString(row) + " violates constraint " + joiner.toFKString());
         }
     }
 
@@ -235,7 +235,7 @@ final class FKEnforcer {
         // the primary table.
         if (joiner.hasRows(row)) {
             throw new ConstraintViolationException(
-                "Removing old row " + Arrays.asList(row) + " violates constraint " + joiner.toFKString());
+                "Removing old row " + Arrays.toString(row) + " violates constraint " + joiner.toFKString());
         }
     }
 
@@ -248,7 +248,7 @@ final class FKEnforcer {
         Object[] toRow = new Object[joiner.getToTable().getColumnCount()];
 
         for (Iterator<Row> iter = joiner.findRows(oldFromRow)
-            .withColumnNames(Collections.emptySet())
+            .withColumnNames(Set.of())
             .iterator(); iter.hasNext();) {
             iter.next();
 
@@ -271,7 +271,7 @@ final class FKEnforcer {
         Object[] toRow = new Object[joiner.getToTable().getColumnCount()];
 
         for (Iterator<Row> iter = joiner.findRows(oldFromRow)
-            .withColumnNames(Collections.emptySet())
+            .withColumnNames(Set.of())
             .iterator(); iter.hasNext();) {
             iter.next();
 

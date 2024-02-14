@@ -24,7 +24,6 @@ import io.github.spannm.jackcess.impl.ColumnImpl;
 import junit.framework.TestCase;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -48,42 +47,42 @@ public class RowFilterTest extends TestCase {
         Row row4 = createExpectedRow(ID_COL, 4, COL1, "foo", COL2, 13, COL3, null);
         Row row5 = createExpectedRow(ID_COL, 5, COL1, "bla", COL2, 13, COL3, "bar");
 
-        List<Row> rows = Arrays.asList(row0, row1, row2, row3, row4, row5);
+        List<Row> rows = List.of(row0, row1, row2, row3, row4, row5);
 
         ColumnImpl testCol = new ColumnImpl(null, COL1, DataType.TEXT, 0, 0, 0) {
         };
-        assertEquals(Arrays.asList(row0, row2, row4),
+        assertEquals(List.of(row0, row2, row4),
             toList(RowFilter.matchPattern(testCol,
                 "foo").apply(rows)));
-        assertEquals(Arrays.asList(row1, row3, row5),
+        assertEquals(List.of(row1, row3, row5),
             toList(RowFilter.invert(
                 RowFilter.matchPattern(
                     testCol,
                     "foo"))
                 .apply(rows)));
 
-        assertEquals(Arrays.asList(row0, row2, row4),
+        assertEquals(List.of(row0, row2, row4),
             toList(RowFilter.matchPattern(
                 createExpectedRow(COL1, "foo"))
                 .apply(rows)));
-        assertEquals(Arrays.asList(row0, row2),
+        assertEquals(List.of(row0, row2),
             toList(RowFilter.matchPattern(
                 createExpectedRow(COL1, "foo", COL3, "bar"))
                 .apply(rows)));
-        assertEquals(Arrays.asList(row4),
+        assertEquals(List.of(row4),
             toList(RowFilter.matchPattern(
                 createExpectedRow(COL1, "foo", COL3, null))
                 .apply(rows)));
-        assertEquals(Arrays.asList(row0, row4, row5),
+        assertEquals(List.of(row0, row4, row5),
             toList(RowFilter.matchPattern(
                 createExpectedRow(COL2, 13))
                 .apply(rows)));
-        assertEquals(Arrays.asList(row1),
+        assertEquals(List.of(row1),
             toList(RowFilter.matchPattern(row1)
                 .apply(rows)));
 
         assertEquals(rows, toList(RowFilter.apply(null, rows)));
-        assertEquals(Arrays.asList(row1),
+        assertEquals(List.of(row1),
             toList(RowFilter.apply(RowFilter.matchPattern(row1),
                 rows)));
     }

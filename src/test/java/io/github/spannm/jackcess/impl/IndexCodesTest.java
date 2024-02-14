@@ -452,7 +452,7 @@ public class IndexCodesTest extends TestCase {
                 String crazyCode = "";
                 if (crazyCodes != null) {
                     if (crazyCodes.length != 1 || !"A0".equals(crazyCodes[0])) {
-                        throw new RuntimeException("CC " + Arrays.asList(crazyCodes));
+                        throw new RuntimeException("CC " + Arrays.toString(crazyCodes));
                     }
                     crazyCode = "1";
                 }
@@ -619,7 +619,7 @@ public class IndexCodesTest extends TestCase {
                 String crazyCode = "";
                 if (crazyCodes != null) {
                     if (crazyCodes.length != 1 || !"A0".equals(crazyCodes[0])) {
-                        throw new RuntimeException("CC " + Arrays.asList(crazyCodes));
+                        throw new RuntimeException("CC " + Arrays.toString(crazyCodes));
                     }
                     crazyCode = "1";
                 }

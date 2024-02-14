@@ -104,10 +104,10 @@ public class TableTest extends TestCase {
             assertTrue(Arrays.equals(toBytes(buf2[i]), toBytes(bufCmp2[i])));
         }
 
-        assertEquals(Arrays.asList(small, large),
-            Arrays.asList(decodeColumns(bufCmp1)));
-        assertEquals(Arrays.asList(smallNotAscii, largeNotAscii),
-            Arrays.asList(decodeColumns(bufCmp2)));
+        assertEquals(List.of(small, large),
+            List.of(decodeColumns(bufCmp1)));
+        assertEquals(List.of(smallNotAscii, largeNotAscii),
+            List.of(decodeColumns(bufCmp2)));
 
     }
 

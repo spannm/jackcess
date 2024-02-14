@@ -1037,7 +1037,7 @@ public class TableImpl implements Table, PropertyMaps.Owner {
         buffer.flip();
 
         // write table buffer to database
-        writeTableDefinitionBuffer(buffer, creator.getTdefPageNumber(), creator, Collections.emptyList());
+        writeTableDefinitionBuffer(buffer, creator.getTdefPageNumber(), creator, List.of());
     }
 
     private static void writeTableDefinitionBuffer(
@@ -2619,7 +2619,7 @@ public class TableImpl implements Table, PropertyMaps.Owner {
     // exposed for unit tests
     protected ByteBuffer createRow(Object[] rowArray, ByteBuffer buffer)
         throws IOException {
-        return createRow(rowArray, buffer, 0, Collections.emptyMap());
+        return createRow(rowArray, buffer, 0, Map.of());
     }
 
     /**

@@ -31,17 +31,17 @@ public class TopoSorterTest extends TestCase {
     }
 
     public void testTopoSort() throws Exception {
-        doTopoTest(Arrays.asList("A", "B", "C"),
-            Arrays.asList("A", "B", "C"));
+        doTopoTest(List.of("A", "B", "C"),
+            List.of("A", "B", "C"));
 
-        doTopoTest(Arrays.asList("B", "A", "C"),
-            Arrays.asList("A", "B", "C"),
+        doTopoTest(List.of("B", "A", "C"),
+            List.of("A", "B", "C"),
             "B", "C",
             "A", "B");
 
         try {
-            doTopoTest(Arrays.asList("B", "A", "C"),
-                Arrays.asList("C", "B", "A"),
+            doTopoTest(List.of("B", "A", "C"),
+                List.of("C", "B", "A"),
                 "B", "C",
                 "A", "B",
                 "C", "A");
@@ -52,8 +52,8 @@ public class TopoSorterTest extends TestCase {
         }
 
         try {
-            doTopoTest(Arrays.asList("B", "A", "C"),
-                Arrays.asList("C", "B", "A"),
+            doTopoTest(List.of("B", "A", "C"),
+                List.of("C", "B", "A"),
                 "B", "D");
             fail("IllegalStateException should have been thrown");
         } catch (IllegalStateException expected) {
@@ -61,36 +61,36 @@ public class TopoSorterTest extends TestCase {
             assertTrue(expected.getMessage().startsWith("Unknown descendent"));
         }
 
-        doTopoTest(Arrays.asList("B", "D", "A", "C"),
-            Arrays.asList("D", "A", "B", "C"),
+        doTopoTest(List.of("B", "D", "A", "C"),
+            List.of("D", "A", "B", "C"),
             "B", "C",
             "A", "B");
 
-        doTopoTest(Arrays.asList("B", "D", "A", "C"),
-            Arrays.asList("A", "D", "B", "C"),
+        doTopoTest(List.of("B", "D", "A", "C"),
+            List.of("A", "D", "B", "C"),
             "B", "C",
             "A", "B",
             "A", "D");
 
-        doTopoTest(Arrays.asList("B", "D", "A", "C"),
-            Arrays.asList("D", "A", "C", "B"),
+        doTopoTest(List.of("B", "D", "A", "C"),
+            List.of("D", "A", "C", "B"),
             "D", "A",
             "C", "B");
 
-        doTopoTest(Arrays.asList("B", "D", "A", "C"),
-            Arrays.asList("D", "C", "A", "B"),
+        doTopoTest(List.of("B", "D", "A", "C"),
+            List.of("D", "C", "A", "B"),
             "D", "A",
             "C", "B",
             "C", "A");
 
-        doTopoTest(Arrays.asList("B", "D", "A", "C"),
-            Arrays.asList("C", "D", "A", "B"),
+        doTopoTest(List.of("B", "D", "A", "C"),
+            List.of("C", "D", "A", "B"),
             "D", "A",
             "C", "B",
             "C", "D");
 
-        doTopoTest(Arrays.asList("B", "D", "A", "C"),
-            Arrays.asList("D", "A", "C", "B"),
+        doTopoTest(List.of("B", "D", "A", "C"),
+            List.of("D", "A", "C", "B"),
             "D", "A",
             "C", "B",
             "D", "B");
@@ -137,7 +137,7 @@ public class TopoSorterTest extends TestCase {
         void addDescendents(String from, String... tos) {
             List<String> descs = _descMap.computeIfAbsent(from, k -> new ArrayList<>());
 
-            descs.addAll(Arrays.asList(tos));
+            descs.addAll(List.of(tos));
         }
 
         @Override

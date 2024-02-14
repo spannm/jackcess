@@ -426,7 +426,7 @@ public class GeneralLegacyIndexCodes {
      */
     private static CharHandler parseSimpleCodes(String[] codeStrings) {
         if (codeStrings.length != 1) {
-            throw new IllegalStateException("Unexpected code strings " + Arrays.asList(codeStrings));
+            throw new IllegalStateException("Unexpected code strings " + Arrays.toString(codeStrings));
         }
         return new SimpleCharHandler(codesToBytes(codeStrings[0], true));
     }
@@ -436,7 +436,7 @@ public class GeneralLegacyIndexCodes {
      */
     private static CharHandler parseInternationalCodes(String[] codeStrings) {
         if (codeStrings.length != 2) {
-            throw new IllegalStateException("Unexpected code strings " + Arrays.asList(codeStrings));
+            throw new IllegalStateException("Unexpected code strings " + Arrays.toString(codeStrings));
         }
         return new InternationalCharHandler(codesToBytes(codeStrings[0], true),
             codesToBytes(codeStrings[1], true));
@@ -447,7 +447,7 @@ public class GeneralLegacyIndexCodes {
      */
     private static CharHandler parseUnprintableCodes(String[] codeStrings) {
         if (codeStrings.length != 1) {
-            throw new IllegalStateException("Unexpected code strings " + Arrays.asList(codeStrings));
+            throw new IllegalStateException("Unexpected code strings " + Arrays.toString(codeStrings));
         }
         return new UnprintableCharHandler(codesToBytes(codeStrings[0], true));
     }
@@ -457,11 +457,11 @@ public class GeneralLegacyIndexCodes {
      */
     private static CharHandler parseUnprintableExtCodes(String[] codeStrings) {
         if (codeStrings.length != 1) {
-            throw new IllegalStateException("Unexpected code strings " + Arrays.asList(codeStrings));
+            throw new IllegalStateException("Unexpected code strings " + Arrays.toString(codeStrings));
         }
         byte[] bytes = codesToBytes(codeStrings[0], true);
         if (bytes.length != 1) {
-            throw new IllegalStateException("Unexpected code strings " + Arrays.asList(codeStrings));
+            throw new IllegalStateException("Unexpected code strings " + Arrays.toString(codeStrings));
         }
         return new UnprintableExtCharHandler(bytes[0]);
     }
@@ -471,7 +471,7 @@ public class GeneralLegacyIndexCodes {
      */
     private static CharHandler parseInternationalExtCodes(String[] codeStrings) {
         if (codeStrings.length != 3) {
-            throw new IllegalStateException("Unexpected code strings " + Arrays.asList(codeStrings));
+            throw new IllegalStateException("Unexpected code strings " + Arrays.toString(codeStrings));
         }
 
         byte crazyFlag = "1".equals(codeStrings[2]) ? CRAZY_CODE_1 : CRAZY_CODE_2;
@@ -483,7 +483,7 @@ public class GeneralLegacyIndexCodes {
      */
     private static CharHandler parseSignificantCodes(String[] codeStrings) {
         if (codeStrings.length != 1) {
-            throw new IllegalStateException("Unexpected code strings " + Arrays.asList(codeStrings));
+            throw new IllegalStateException("Unexpected code strings " + Arrays.toString(codeStrings));
         }
         return new SignificantCharHandler(codesToBytes(codeStrings[0], true));
     }

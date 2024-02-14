@@ -18,6 +18,8 @@ package io.github.spannm.jackcess.impl;
 
 import static io.github.spannm.jackcess.impl.IndexData.*;
 
+import io.github.spannm.jackcess.impl.IndexData.DataPage;
+import io.github.spannm.jackcess.impl.IndexData.Entry;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 
 import java.io.IOException;

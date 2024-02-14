@@ -24,7 +24,6 @@ import io.github.spannm.jackcess.Database.FileFormat;
 import junit.framework.TestCase;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -68,7 +67,7 @@ public class ColumnFormatterTest extends TestCase {
                 found.add(d3Fmt.getRowValue(r));
             }
 
-            assertEquals(Arrays.asList(
+            assertEquals(List.of(
                 "FOxxOBAR", "3.7E+1", "$0.03",
                 "37xx", "4.5E+3", "$4,500.00",
                 "FOxxOBARBAZ", "-3.7E+1", "($37.13)",
@@ -91,7 +90,7 @@ public class ColumnFormatterTest extends TestCase {
                 found.add(d3Fmt.getRowValue(r));
             }
 
-            assertEquals(Arrays.asList(
+            assertEquals(List.of(
                 "foobar", "37", "12:43:12 AM",
                 "3.70E+1", "4500", "4/26/1912",
                 "foobarbaz", "-37", "11/23/1899 3:07:12 AM",

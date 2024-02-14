@@ -21,6 +21,7 @@ import io.github.spannm.jackcess.util.ErrorHandler;
 import io.github.spannm.jackcess.util.IterableBuilder;
 
 import java.io.IOException;
+import java.io.UncheckedIOException;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.Map;

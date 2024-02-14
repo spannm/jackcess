@@ -565,7 +565,7 @@ public class IndexData {
             return change;
         }
         if (nullCount > 0 && (isBackingPrimaryKey() || isRequired())) {
-            throw new ConstraintViolationException(withErrorContext("Null value found in row " + Arrays.asList(row) + " for primary key or required index"));
+            throw new ConstraintViolationException(withErrorContext("Null value found in row " + Arrays.toString(row) + " for primary key or required index"));
         }
 
         // make sure we've parsed the entries
@@ -594,7 +594,7 @@ public class IndexData {
             // defined by Access.
             boolean isDupeEntry = nextPos != null && newEntry.equalsEntryBytes(nextPos.getEntry()) || prevPos != null && newEntry.equalsEntryBytes(prevPos.getEntry());
             if (isUnique() && !isNullEntry && isDupeEntry) {
-                throw new ConstraintViolationException(withErrorContext("New row " + Arrays.asList(row) + " violates uniqueness constraint for index"));
+                throw new ConstraintViolationException(withErrorContext("New row " + Arrays.toString(row) + " violates uniqueness constraint for index"));
             }
 
             change.setAddRow(newEntry, dataPage, idx, isDupeEntry);
@@ -671,7 +671,7 @@ public class IndexData {
         if (removedEntry != null) {
             ++_modCount;
         } else {
-            LOG.warn(withErrorContext("Failed removing index entry " + oldEntry + " for row: " + Arrays.asList(row)));
+            LOG.warn(withErrorContext("Failed removing index entry " + oldEntry + " for row: " + Arrays.toString(row)));
         }
         return removedEntry;
     }
@@ -2511,7 +2511,7 @@ public class IndexData {
 
         @Override
         public List<Entry> getEntries() {
-            return Collections.emptyList();
+            return List.of();
         }
 
         @Override

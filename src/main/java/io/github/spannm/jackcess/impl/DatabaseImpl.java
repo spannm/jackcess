@@ -747,7 +747,7 @@ public class DatabaseImpl implements Database, DateTimeContext {
 
     @Override
     public Map<String, Database> getLinkedDatabases() {
-        return _linkedDbs == null ? Collections.emptyMap() : Collections.unmodifiableMap(_linkedDbs);
+        return _linkedDbs == null ? Map.of() : Collections.unmodifiableMap(_linkedDbs);
     }
 
     @Override

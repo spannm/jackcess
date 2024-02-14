@@ -181,10 +181,10 @@ public class CursorTest extends TestCase {
 
         List<RowIdImpl> sortedRowIds =
             new ArrayList<>(new TreeSet<>(
-                Arrays.asList(rowId1, rowId2, rowId3, RowIdImpl.FIRST_ROW_ID,
+                List.of(rowId1, rowId2, rowId3, RowIdImpl.FIRST_ROW_ID,
                     RowIdImpl.LAST_ROW_ID)));
 
-        assertEquals(Arrays.asList(RowIdImpl.FIRST_ROW_ID, rowId1, rowId2, rowId3,
+        assertEquals(List.of(RowIdImpl.FIRST_ROW_ID, rowId1, rowId2, rowId3,
             RowIdImpl.LAST_ROW_ID),
             sortedRowIds);
     }
@@ -1012,21 +1012,21 @@ public class CursorTest extends TestCase {
                 cursor.getCurrentRow());
         }
 
-        assertEquals(Arrays.asList(createExpectedRow("id", 4,
+        assertEquals(List.of(createExpectedRow("id", 4,
             "value", "data" + 4)),
             RowFilterTest.toList(
                 cursor.newIterable()
                     .withMatchPattern("value", "data4")
                     .withColumnMatcher(SimpleColumnMatcher.INSTANCE)));
 
-        assertEquals(Arrays.asList(createExpectedRow("id", 3,
+        assertEquals(List.of(createExpectedRow("id", 3,
             "value", "data" + 3)),
             RowFilterTest.toList(
                 cursor.newIterable()
                     .withMatchPattern("value", "DaTa3")
                     .withColumnMatcher(CaseInsensitiveColumnMatcher.INSTANCE)));
 
-        assertEquals(Arrays.asList(createExpectedRow("id", 2,
+        assertEquals(List.of(createExpectedRow("id", 2,
             "value", "data" + 2)),
             RowFilterTest.toList(
                 cursor.newIterable()
@@ -1074,7 +1074,7 @@ public class CursorTest extends TestCase {
                 .stream().map(r -> r.getString("data"))
                 .collect(Collectors.toList());
 
-            assertEquals(Arrays.asList("baz11", "baz11-2"), expectedData);
+            assertEquals(List.of("baz11", "baz11-2"), expectedData);
 
             expectedData = new ArrayList<>();
             for (Iterator<? extends Row> iter =
@@ -1098,7 +1098,7 @@ public class CursorTest extends TestCase {
                 }
             }
 
-            assertEquals(Arrays.asList("baz11", "baz11-2"), expectedData);
+            assertEquals(List.of("baz11", "baz11-2"), expectedData);
 
             expectedData = new ArrayList<>();
             for (Row row : cursor.newEntryIterable(1)
@@ -1120,12 +1120,12 @@ public class CursorTest extends TestCase {
             Cursor cursor = CursorBuilder.createCursor(t1);
 
             List<String> expectedData = cursor.newIterable().withColumnNames(
-                Arrays.asList("otherfk1", "data")).stream()
+                List.of("otherfk1", "data")).stream()
                 .filter(r -> r.get("otherfk1").equals(1))
                 .map(r -> r.getString("data"))
                 .collect(Collectors.toList());
 
-            assertEquals(Arrays.asList("baz11", "baz11-2"), expectedData);
+            assertEquals(List.of("baz11", "baz11-2"), expectedData);
 
             expectedData = new ArrayList<>();
             for (Iterator<? extends Row> iter = cursor.iterator(); iter.hasNext();) {
@@ -1151,11 +1151,11 @@ public class CursorTest extends TestCase {
                 }
             }
 
-            assertEquals(Arrays.asList("baz11", "baz11-2"), expectedData);
+            assertEquals(List.of("baz11", "baz11-2"), expectedData);
 
             expectedData = new ArrayList<>();
             for (Row row : cursor.newIterable().withColumnNames(
-                Arrays.asList("otherfk1", "data"))) {
+                List.of("otherfk1", "data"))) {
                 if (row.get("otherfk1").equals(1)) {
                     expectedData.add(row.getString("data"));
                 }
@@ -1306,67 +1306,67 @@ public class CursorTest extends TestCase {
                 .addIndex(DatabaseBuilder.newIndex("idx3").withColumns("data1", "num2", "key3"))
                 .toTable(db);
 
-            Index idx = t.findIndexForColumns(Arrays.asList("data1"),
+            Index idx = t.findIndexForColumns(List.of("data1"),
                 TableImpl.IndexFeature.ANY_MATCH);
             assertEquals("idx3", idx.getName());
 
-            idx = t.findIndexForColumns(Arrays.asList("data1", "num2"),
+            idx = t.findIndexForColumns(List.of("data1", "num2"),
                 TableImpl.IndexFeature.ANY_MATCH);
             assertEquals("idx3", idx.getName());
 
-            idx = t.findIndexForColumns(Arrays.asList("data1", "num2", "key3"),
+            idx = t.findIndexForColumns(List.of("data1", "num2", "key3"),
                 TableImpl.IndexFeature.ANY_MATCH);
             assertEquals("idx3", idx.getName());
 
-            assertNull(t.findIndexForColumns(Arrays.asList("num2"),
+            assertNull(t.findIndexForColumns(List.of("num2"),
                 TableImpl.IndexFeature.ANY_MATCH));
-            assertNull(t.findIndexForColumns(Arrays.asList("data1", "key3"),
+            assertNull(t.findIndexForColumns(List.of("data1", "key3"),
                 TableImpl.IndexFeature.ANY_MATCH));
-            assertNull(t.findIndexForColumns(Arrays.asList("data1"),
+            assertNull(t.findIndexForColumns(List.of("data1"),
                 TableImpl.IndexFeature.EXACT_MATCH));
 
             DatabaseBuilder.newIndex("idx2")
                 .withColumns("data1", "num2")
                 .addToTable(t);
 
-            idx = t.findIndexForColumns(Arrays.asList("data1"),
+            idx = t.findIndexForColumns(List.of("data1"),
                 TableImpl.IndexFeature.ANY_MATCH);
             assertEquals("idx2", idx.getName());
 
-            idx = t.findIndexForColumns(Arrays.asList("data1", "num2"),
+            idx = t.findIndexForColumns(List.of("data1", "num2"),
                 TableImpl.IndexFeature.ANY_MATCH);
             assertEquals("idx2", idx.getName());
 
-            idx = t.findIndexForColumns(Arrays.asList("data1", "num2", "key3"),
+            idx = t.findIndexForColumns(List.of("data1", "num2", "key3"),
                 TableImpl.IndexFeature.ANY_MATCH);
             assertEquals("idx3", idx.getName());
 
-            assertNull(t.findIndexForColumns(Arrays.asList("num2"),
+            assertNull(t.findIndexForColumns(List.of("num2"),
                 TableImpl.IndexFeature.ANY_MATCH));
-            assertNull(t.findIndexForColumns(Arrays.asList("data1", "key3"),
+            assertNull(t.findIndexForColumns(List.of("data1", "key3"),
                 TableImpl.IndexFeature.ANY_MATCH));
-            assertNull(t.findIndexForColumns(Arrays.asList("data1"),
+            assertNull(t.findIndexForColumns(List.of("data1"),
                 TableImpl.IndexFeature.EXACT_MATCH));
 
             DatabaseBuilder.newIndex("idx1")
                 .withColumns("data1")
                 .addToTable(t);
 
-            idx = t.findIndexForColumns(Arrays.asList("data1"),
+            idx = t.findIndexForColumns(List.of("data1"),
                 TableImpl.IndexFeature.ANY_MATCH);
             assertEquals("idx1", idx.getName());
 
-            idx = t.findIndexForColumns(Arrays.asList("data1", "num2"),
+            idx = t.findIndexForColumns(List.of("data1", "num2"),
                 TableImpl.IndexFeature.ANY_MATCH);
             assertEquals("idx2", idx.getName());
 
-            idx = t.findIndexForColumns(Arrays.asList("data1", "num2", "key3"),
+            idx = t.findIndexForColumns(List.of("data1", "num2", "key3"),
                 TableImpl.IndexFeature.ANY_MATCH);
             assertEquals("idx3", idx.getName());
 
-            assertNull(t.findIndexForColumns(Arrays.asList("num2"),
+            assertNull(t.findIndexForColumns(List.of("num2"),
                 TableImpl.IndexFeature.ANY_MATCH));
-            assertNull(t.findIndexForColumns(Arrays.asList("data1", "key3"),
+            assertNull(t.findIndexForColumns(List.of("data1", "key3"),
                 TableImpl.IndexFeature.ANY_MATCH));
 
             db.close();
@@ -1391,7 +1391,7 @@ public class CursorTest extends TestCase {
                 .toTable(db);
 
             int id = 1;
-            for (String str : Arrays.asList("A", "B", "C", "D")) {
+            for (String str : List.of("A", "B", "C", "D")) {
                 for (int i = 4; i >= 0; --i) {
                     // for(int i = 0; i < 5; ++i) {
                     for (int j = 1; j < 3; ++j) {

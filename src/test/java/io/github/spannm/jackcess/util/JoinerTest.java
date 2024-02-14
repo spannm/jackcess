@@ -80,8 +80,7 @@ public class JoinerTest extends TestCase {
     private static void doTestJoiner(
         Joiner join, Map<Integer, List<Row>> expectedData)
         throws Exception {
-        final Set<String> colNames = new HashSet<>(
-            Arrays.asList("id", "data"));
+        final Set<String> colNames = Set.of("id", "data");
 
         Joiner revJoin = join.createReverse();
         for (Row row : join.getFromTable()) {

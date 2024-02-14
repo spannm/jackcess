@@ -69,8 +69,7 @@ public class IndexTest extends TestCase {
         byte[] b8 = new byte[] {(byte) 0xFF, (byte) 0x01};
 
         List<byte[]> expectedList = Arrays.asList(b0, b1, b2, b3, b4, b5, b6, b7, b8);
-        SortedSet<byte[]> sortedSet = new TreeSet<>(
-            IndexData.BYTE_CODE_COMPARATOR);
+        SortedSet<byte[]> sortedSet = new TreeSet<>(IndexData.BYTE_CODE_COMPARATOR);
         sortedSet.addAll(expectedList);
         assertEquals(expectedList, new ArrayList<>(sortedSet));
 
@@ -131,7 +130,7 @@ public class IndexTest extends TestCase {
             assertTrue(fkIdx.isForeignKey());
             assertSame(pkIdx.getIndexData(), fkIdx.getIndexData());
             IndexData indexData = pkIdx.getIndexData();
-            assertEquals(Arrays.asList(pkIdx, fkIdx), indexData.getIndexes());
+            assertEquals(List.of(pkIdx, fkIdx), indexData.getIndexes());
             assertSame(pkIdx, indexData.getPrimaryIndex());
 
             table = (TableImpl) mdb.getTable("Table3");
@@ -152,7 +151,7 @@ public class IndexTest extends TestCase {
             assertTrue(fkIdx.isForeignKey());
             assertSame(pkIdx.getIndexData(), fkIdx.getIndexData());
             indexData = pkIdx.getIndexData();
-            assertEquals(Arrays.asList(pkIdx, fkIdx), indexData.getIndexes());
+            assertEquals(List.of(pkIdx, fkIdx), indexData.getIndexes());
             assertSame(pkIdx, indexData.getPrimaryIndex());
         }
     }
@@ -340,8 +339,8 @@ public class IndexTest extends TestCase {
             assertEquals(2, indA.getUniqueEntryCount());
             assertEquals(2, indB.getUniqueEntryCount());
 
-            List<String> bElems = Arrays.asList("bar", null, "baz", "argle", null,
-                "bazzle", "37", "bar", "bar", "BAZ");
+            List<String> bElems = Arrays.asList(
+                "bar", null, "baz", "argle", null, "bazzle", "37", "bar", "bar", "BAZ");
 
             for (int i = 0; i < 10; ++i) {
                 table.addRow("foo" + i, bElems.get(i), (byte) 42 + i, (short) 53 + i,

@@ -31,7 +31,6 @@ import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.Types;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
@@ -56,7 +55,7 @@ public class ImportTest extends TestCase {
             for (Column c : t.getColumns()) {
                 colNames.add(c.getName());
             }
-            assertEquals(Arrays.asList("Test1", "Test2", "Test3"), colNames);
+            assertEquals(List.of("Test1", "Test2", "Test3"), colNames);
 
             List<? extends Map<String, Object>> expectedRows =
                 createExpectedTable(
@@ -146,7 +145,7 @@ public class ImportTest extends TestCase {
             for (Column c : t.getColumns()) {
                 colNames.add(c.getName());
             }
-            assertEquals(Arrays.asList("Test1", "Test2", "Test3"), colNames);
+            assertEquals(List.of("Test1", "Test2", "Test3"), colNames);
 
             expectedRows =
                 createExpectedTable(
@@ -181,7 +180,7 @@ public class ImportTest extends TestCase {
             for (Column c : t.getColumns()) {
                 colNames.add(c.getName());
             }
-            assertEquals(Arrays.asList(
+            assertEquals(List.of(
                 "RESULT_PHYS_ID", "FIRST", "MIDDLE", "LAST", "OUTLIER",
                 "RANK", "CLAIM_COUNT", "PROCEDURE_COUNT",
                 "WEIGHTED_CLAIM_COUNT", "WEIGHTED_PROCEDURE_COUNT"),

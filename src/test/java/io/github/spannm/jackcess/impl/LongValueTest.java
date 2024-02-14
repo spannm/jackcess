@@ -167,8 +167,7 @@ public class LongValueTest extends TestCase {
             Iterator<Object[]> expIter = expectedRows.iterator();
             for (Map<?, ?> row : bigTable) {
                 Object[] expectedRow = expIter.next();
-                assertEquals(Arrays.asList(expectedRow),
-                    new ArrayList<>(row.values()));
+                assertEquals(Arrays.asList(expectedRow), new ArrayList<>(row.values()));
             }
 
             db.close();

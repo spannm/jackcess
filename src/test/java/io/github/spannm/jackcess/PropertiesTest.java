@@ -87,7 +87,7 @@ public class PropertiesTest extends TestCase {
             }
         }
 
-        assertEquals(Arrays.asList(defMap.get("foo"), defMap.get("baz"),
+        assertEquals(List.of(defMap.get("foo"), defMap.get("baz"),
             colMap.get("buzz")), props);
     }
 

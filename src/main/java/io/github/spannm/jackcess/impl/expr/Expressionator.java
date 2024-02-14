@@ -60,8 +60,8 @@ public class Expressionator {
         setWordType(WordType.DELIM, ".", "!", ",", "(", ")");
     }
 
-    private static final Collection<String> TRUE_STRS  = Arrays.asList("true", "yes", "on");
-    private static final Collection<String> FALSE_STRS = Arrays.asList("false", "no", "off");
+    private static final Collection<String> TRUE_STRS  = List.of("true", "yes", "on");
+    private static final Collection<String> FALSE_STRS = List.of("false", "no", "off");
 
     // Useful links:
     // - syntax:
@@ -416,8 +416,8 @@ public class Expressionator {
             new OpType[] {LogOp.IMP},
             new OpType[] {SpecOp.IN, SpecOp.NOT_IN, SpecOp.BETWEEN, SpecOp.NOT_BETWEEN});
 
-    private static final Set<Character>       REGEX_SPEC_CHARS  = new HashSet<>(
-        Arrays.asList('\\', '.', '%', '=', '+', '$', '^', '|', '(', ')', '{', '}', '&', '[', ']', '*', '?'));
+    private static final Set<Character>       REGEX_SPEC_CHARS  = Set.of(
+        '\\', '.', '%', '=', '+', '$', '^', '|', '(', ')', '{', '}', '&', '[', ']', '*', '?');
     // this is a regular expression which will never match any string
     private static final Pattern              UNMATCHABLE_REGEX = Pattern.compile("(?!)");
 
@@ -729,7 +729,7 @@ public class Expressionator {
             Token t = buf.peekNext();
             if (isDelim(t, CLOSE_PAREN)) {
                 buf.next();
-                return Collections.emptyList();
+                return List.of();
             }
         }
 

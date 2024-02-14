@@ -60,14 +60,12 @@ public class LocalDateTimeTest extends TestCase {
             curTimeNoMillis *= 1000L;
 
             DateFormat df = new SimpleDateFormat("yyyyMMdd HH:mm:ss");
-            List<Date> dates =
-                new ArrayList<>(
-                    Arrays.asList(
-                        df.parse("19801231 00:00:00"),
-                        df.parse("19930513 14:43:27"),
-                        null,
-                        df.parse("20210102 02:37:00"),
-                        new Date(curTimeNoMillis)));
+            List<Date> dates = new ArrayList<>(Arrays.asList(
+                df.parse("19801231 00:00:00"),
+                df.parse("19930513 14:43:27"),
+                null,
+                df.parse("20210102 02:37:00"),
+                new Date(curTimeNoMillis)));
 
             Calendar c = Calendar.getInstance();
             for (int year = 1801; year < 2050; year += 3) {
@@ -111,8 +109,7 @@ public class LocalDateTimeTest extends TestCase {
         ZoneId zoneId = ZoneId.of("America/New_York");
         DateTimeFormatter sdf = DateTimeFormatter.ofPattern("uuuu-MM-dd");
 
-        List<String> dates = Arrays.asList("1582-10-15", "1582-10-14",
-            "1492-01-10", "1392-01-10");
+        List<String> dates = List.of("1582-10-15", "1582-10-14", "1492-01-10", "1392-01-10");
 
         for (final FileFormat fileFormat : SUPPORTED_FILEFORMATS) {
             Database db = createMem(fileFormat);
@@ -227,13 +224,11 @@ public class LocalDateTimeTest extends TestCase {
             curTimeNoMillis *= 1000L;
 
             DateFormat df = new SimpleDateFormat("yyyyMMdd HH:mm:ss");
-            List<Date> tmpDates =
-                new ArrayList<>(
-                    Arrays.asList(
-                        df.parse("19801231 00:00:00"),
-                        df.parse("19930513 14:43:27"),
-                        df.parse("20210102 02:37:00"),
-                        new Date(curTimeNoMillis)));
+            List<Date> tmpDates = new ArrayList<>(List.of(
+                df.parse("19801231 00:00:00"),
+                df.parse("19930513 14:43:27"),
+                df.parse("20210102 02:37:00"),
+                new Date(curTimeNoMillis)));
 
             List<Object> objs = new ArrayList<>();
             List<LocalDateTime> expected = new ArrayList<>();

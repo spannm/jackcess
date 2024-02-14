@@ -25,7 +25,10 @@ import io.github.spannm.jackcess.impl.DatabaseImpl;
 import io.github.spannm.jackcess.impl.TableImpl;
 import junit.framework.TestCase;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  *
@@ -128,9 +131,9 @@ public class TableUpdaterTest extends TestCase {
             assertEquals(relationshipName, rel.getName());
         }
         assertSame(t1, rel.getFromTable());
-        assertEquals(Arrays.asList(t1.getColumn("id")), rel.getFromColumns());
+        assertEquals(List.of(t1.getColumn("id")), rel.getFromColumns());
         assertSame(t2, rel.getToTable());
-        assertEquals(Arrays.asList(t2.getColumn("id2")), rel.getToColumns());
+        assertEquals(List.of(t2.getColumn("id2")), rel.getToColumns());
         assertEquals(oneToOne, rel.isOneToOne());
         assertEquals(enforce, rel.hasReferentialIntegrity());
         assertEquals(enforce, rel.cascadeDeletes());

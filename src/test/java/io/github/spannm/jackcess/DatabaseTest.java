@@ -182,7 +182,7 @@ public class DatabaseTest extends TestCase {
             Map<String, Object> row2 = createTestRowMap("Tim2");
             Map<String, Object> row3 = createTestRowMap("Tim3");
             Table table = db.getTable("Test");
-            List<Map<String, Object>> rows = Arrays.asList(row1, row2, row3);
+            List<Map<String, Object>> rows = List.of(row1, row2, row3);
             table.addRowsFromMaps(rows);
             assertRowCount(3, table);
 
@@ -336,7 +336,7 @@ public class DatabaseTest extends TestCase {
                 foundValues.add(row.get("A"));
             }
 
-            assertEquals(Arrays.asList(
+            assertEquals(List.of(
                 new BigDecimal("-2341234.0345"),
                 new BigDecimal("37.0000"),
                 new BigDecimal("10000.4500")),
@@ -375,7 +375,7 @@ public class DatabaseTest extends TestCase {
                 foundValues.add(row.get("A"));
             }
 
-            assertEquals(Arrays.asList(
+            assertEquals(List.of(
                 "{32A59F01-AA34-3E29-453F-4523453CD2E6}",
                 "{32A59F01-AA34-3E29-453F-4523453CD2E6}",
                 "{11111111-1111-1111-1111-111111111111}",
@@ -423,12 +423,12 @@ public class DatabaseTest extends TestCase {
                 foundBigValues.add(row.get("B"));
             }
 
-            assertEquals(Arrays.asList(
+            assertEquals(List.of(
                 new BigDecimal("-1234.0345"),
                 new BigDecimal("37.0000"),
                 new BigDecimal("1000.4500")),
                 foundSmallValues);
-            assertEquals(Arrays.asList(
+            assertEquals(List.of(
                 new BigDecimal("23923434453436.36234219"),
                 new BigDecimal("37.00000000"),
                 new BigDecimal("-3452345321000.00000000")),
@@ -507,17 +507,13 @@ public class DatabaseTest extends TestCase {
             table.getNextRow();
 
             Map<String, Object> row = table.getNextRow();
-            assertEquals(Arrays.asList(
-                null, "row3col3", null, null, null, null, null,
-                "row3col9", null),
+            assertEquals(Arrays.asList(null, "row3col3", null, null, null, null, null, "row3col9", null),
                 new ArrayList<>(row.values()));
 
             table.getNextRow();
 
             row = table.getNextRow();
-            assertEquals(Arrays.asList(
-                null, "row5col2", null, null, null, null, null, null,
-                null),
+            assertEquals(Arrays.asList(null, "row5col2", null, null, null, null, null, null, null),
                 new ArrayList<>(row.values()));
 
             table.reset();
@@ -609,14 +605,12 @@ public class DatabaseTest extends TestCase {
             curTimeNoMillis *= 1000L;
 
             DateFormat df = new SimpleDateFormat("yyyyMMdd HH:mm:ss");
-            List<Date> dates =
-                new ArrayList<>(
-                    Arrays.asList(
-                        df.parse("19801231 00:00:00"),
-                        df.parse("19930513 14:43:27"),
-                        null,
-                        df.parse("20210102 02:37:00"),
-                        new Date(curTimeNoMillis)));
+            List<Date> dates = new ArrayList<>(Arrays.asList(
+                df.parse("19801231 00:00:00"),
+                df.parse("19930513 14:43:27"),
+                null,
+                df.parse("20210102 02:37:00"),
+                new Date(curTimeNoMillis)));
 
             Calendar c = Calendar.getInstance();
             for (int year = 1801; year < 2050; year += 3) {
@@ -658,7 +652,7 @@ public class DatabaseTest extends TestCase {
     public void testAncientDatesWrite() throws Exception {
         SimpleDateFormat sdf = DatabaseBuilder.createDateFormat("yyyy-MM-dd");
 
-        List<String> dates = Arrays.asList("1582-10-15", "1582-10-14",
+        List<String> dates = List.of("1582-10-15", "1582-10-14",
             "1492-01-10", "1392-01-10");
 
         for (final FileFormat fileFormat : SUPPORTED_FILEFORMATS) {
@@ -694,7 +688,7 @@ public class DatabaseTest extends TestCase {
         SimpleDateFormat sdf = DatabaseBuilder.createDateFormat("yyyy-MM-dd");
         sdf.getCalendar().setTimeZone(tz);
 
-        List<String> dates = Arrays.asList("1582-10-15", "1582-10-14",
+        List<String> dates = List.of("1582-10-15", "1582-10-14",
             "1492-01-10", "1392-01-10");
 
         for (final TestDB testDB : TestDB.getSupportedForBasename(Basename.OLD_DATES)) {
@@ -723,7 +717,7 @@ public class DatabaseTest extends TestCase {
             Set<String> sysTables = new TreeSet<>(
                 String.CASE_INSENSITIVE_ORDER);
             sysTables.addAll(
-                Arrays.asList("MSysObjects", "MSysQueries", "MSysACES",
+                List.of("MSysObjects", "MSysQueries", "MSysACES",
                     "MSysRelationships"));
 
             if (fileFormat == FileFormat.GENERIC_JET4) {
@@ -735,12 +729,12 @@ public class DatabaseTest extends TestCase {
                 // v2003+ template files have no "MSysAccessObjects" table
                 assertNull("file format: " + fileFormat, db.getSystemTable("MSysAccessObjects"));
                 sysTables.addAll(
-                    Arrays.asList("MSysNavPaneGroupCategories",
+                    List.of("MSysNavPaneGroupCategories",
                         "MSysNavPaneGroups", "MSysNavPaneGroupToObjects",
                         "MSysNavPaneObjectIDs", "MSysAccessStorage"));
                 if (fileFormat.ordinal() >= FileFormat.V2007.ordinal()) {
                     sysTables.addAll(
-                        Arrays.asList(
+                        List.of(
                             "MSysComplexColumns", "MSysComplexType_Attachment",
                             "MSysComplexType_Decimal", "MSysComplexType_GUID",
                             "MSysComplexType_IEEEDouble", "MSysComplexType_IEEESingle",
@@ -923,9 +917,7 @@ public class DatabaseTest extends TestCase {
             }
 
             assertTrue(sysCount > 4);
-            assertEquals(new HashSet<>(Arrays.asList("Table1", "Table2", "Table3",
-                "Table4")),
-                names);
+            assertEquals(Set.of("Table1", "Table2", "Table3", "Table4"), names);
         }
 
         for (final TestDB testDB : TestDB.getSupportedForBasename(Basename.LINKED)) {
@@ -948,8 +940,7 @@ public class DatabaseTest extends TestCase {
                 names.add(tmd.getName());
             }
 
-            assertEquals(new HashSet<>(Arrays.asList("Table1", "Table2")),
-                names);
+            assertEquals(Set.of("Table1", "Table2"), names);
         }
     }
 

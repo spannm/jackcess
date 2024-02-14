@@ -171,7 +171,7 @@ public class Joiner {
      * @return {@code true} if any "to" rows were deleted, {@code false} otherwise
      */
     public boolean deleteRows(Map<String, ?> fromRow) throws IOException {
-        return deleteRowsImpl(findRows(fromRow).withColumnNames(Collections.emptySet()).iterator());
+        return deleteRowsImpl(findRows(fromRow).withColumnNames(Set.of()).iterator());
     }
 
     /**
@@ -181,7 +181,7 @@ public class Joiner {
      * @return {@code true} if any "to" rows were deleted, {@code false} otherwise
      */
     public boolean deleteRows(Object[] fromRow) throws IOException {
-        return deleteRowsImpl(findRows(fromRow).withColumnNames(Collections.emptySet()).iterator());
+        return deleteRowsImpl(findRows(fromRow).withColumnNames(Set.of()).iterator());
     }
 
     /**

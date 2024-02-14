@@ -24,7 +24,6 @@ import io.github.spannm.jackcess.impl.RelationshipImpl;
 import junit.framework.TestCase;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
 
@@ -51,10 +50,10 @@ public class RelationshipTest extends TestCase {
             Relationship rel = rels.get(0);
             assertEquals("Table2Table1", rel.getName());
             assertEquals(t2, rel.getFromTable());
-            assertEquals(Arrays.asList(t2.getColumn("id")),
+            assertEquals(List.of(t2.getColumn("id")),
                 rel.getFromColumns());
             assertEquals(t1, rel.getToTable());
-            assertEquals(Arrays.asList(t1.getColumn("otherfk1")),
+            assertEquals(List.of(t1.getColumn("otherfk1")),
                 rel.getToColumns());
             assertTrue(rel.hasReferentialIntegrity());
             assertEquals(4096, ((RelationshipImpl) rel).getFlags());
@@ -70,10 +69,10 @@ public class RelationshipTest extends TestCase {
             rel = rels.get(0);
             assertEquals("Table3Table1", rel.getName());
             assertEquals(t3, rel.getFromTable());
-            assertEquals(Arrays.asList(t3.getColumn("id")),
+            assertEquals(List.of(t3.getColumn("id")),
                 rel.getFromColumns());
             assertEquals(t1, rel.getToTable());
-            assertEquals(Arrays.asList(t1.getColumn("otherfk2")),
+            assertEquals(List.of(t1.getColumn("otherfk2")),
                 rel.getToColumns());
             assertTrue(rel.hasReferentialIntegrity());
             assertEquals(256, ((RelationshipImpl) rel).getFlags());
