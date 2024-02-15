@@ -1456,7 +1456,10 @@ public class IndexData {
 
         @Override
         public String toString() {
-            return ToStringBuilder.builder(this).append("column", getColumn()).append("flags", getFlags() + " " + (isAscending() ? "(ASC)" : "(DSC)")).toString();
+            return ToStringBuilder.builder(this)
+                .append("column", getColumn())
+                .append("flags", getFlags() + " " + (isAscending() ? "(ASC)" : "(DSC)"))
+                .toString();
         }
     }
 

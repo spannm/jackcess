@@ -69,16 +69,4 @@ public class StringUtilTest {
         assertEquals("long", StringUtil.remove("long", "longer"));
     }
 
-    @Test
-    public void testReflectionToString() {
-        assertEquals("null", StringUtil.reflectionToString(null));
-        String str = StringUtil.reflectionToString(new TestObj());
-        assertTrue(str.matches("^io\\.github\\.spannm\\.jackcess\\.util\\.StringUtilTest\\$TestObj@[0-9a-f]+\\[strVal=testing\\]$"));
-        assertEquals("Integer[value=47]", StringUtil.reflectionToString(Integer.valueOf(47), false, false));
-    }
-
-    static class TestObj {
-        final String strVal = "testing";
-    }
-
 }

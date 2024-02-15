@@ -721,7 +721,8 @@ public abstract class CursorImpl implements Cursor {
 
     @Override
     public String toString() {
-        return getClass().getSimpleName() + " CurPosition " + _curPos + ", PrevPosition " + _prevPos;
+        return String.format("%s[id=%s, table=%s, prevPos=%s, curPos=%s]",
+            getClass().getSimpleName(), _id, _table, _prevPos, _curPos);
     }
 
     /**
@@ -983,7 +984,8 @@ public abstract class CursorImpl implements Cursor {
 
         @Override
         public String toString() {
-            return getClass().getSimpleName() + " " + _cursorId + " CurPosition " + _curPos + ", PrevPosition " + _prevPos;
+            return String.format("%s[cursorId=%s, curPos=%s, prevPos=%s]",
+                getClass().getSimpleName(), _cursorId, _curPos, _prevPos);
         }
     }
 

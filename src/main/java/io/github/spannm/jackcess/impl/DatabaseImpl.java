@@ -1864,7 +1864,18 @@ public class DatabaseImpl implements Database, DateTimeContext {
 
     @Override
     public String toString() {
-        return StringUtil.reflectionToString(this);
+        return String.format(
+            "%s[file=%s, name=%s, readOnly=%s, tableParentId=%s, format=%s, tableNames=%s, pageChannel=%s, "
+            + "systemCatalog=%s, tableFinder=%s, accessControlEntries=%s, relParentId=%s, relationships=%s, queries=%s, "
+            + "complexCols=%s, newTableSIDs=%s, dbErrorHandler=%s, fileFormat=%s, charset=%s, timeZone=%s, zoneId=%s, defaultSortOrder=%s, "
+            + "defaultCodePage=%s, columnOrder=%s, enforceForeignKeys=%s, allowAutoNumInsert=%s, evaluateExpressions=%s, validatorFactory=%s, "
+            + "tableCache=%s, propsHandler=%s, dbParentId=%s, newObjOwner=%s, dbPropMaps=%s, summaryPropMaps=%s, userDefPropMaps=%s, "
+            + "linkResolver=%s, linkedDbs=%s, fkEnforcerSharedState=%s, evalCtx=%s, dtf=%s]",
+            getClass().getSimpleName(),
+            _file, _name, _readOnly, _tableParentId, _format, _tableNames, _pageChannel, _systemCatalog, _tableFinder, _accessControlEntries, _relParentId,
+            _relationships, _queries, _complexCols, _newTableSIDs, _dbErrorHandler, _fileFormat, _charset, _timeZone, _zoneId, _defaultSortOrder, _defaultCodePage, _columnOrder, _enforceForeignKeys,
+            _allowAutoNumInsert, _evaluateExpressions, _validatorFactory, _tableCache, _propsHandler, _dbParentId, Arrays.toString(_newObjOwner), _dbPropMaps, _summaryPropMaps, _userDefPropMaps,
+            _linkResolver, _linkedDbs, _fkEnforcerSharedState, _evalCtx, _dtf);
     }
 
     /**

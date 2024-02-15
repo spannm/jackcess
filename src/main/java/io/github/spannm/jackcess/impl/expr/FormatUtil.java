@@ -752,8 +752,7 @@ public class FormatUtil {
         String[] fmtStrs = new String[NUM_NF_FMTS];
         int fmtIdx = 0;
         StringBuilder pendingLiteral = new StringBuilder();
-        NumberFormatter.NotationType[] expTypes =
-            new NumberFormatter.NotationType[NUM_NF_FMTS];
+        NumberFormatter.NotationType[] expTypes = new NumberFormatter.NotationType[NUM_NF_FMTS];
         boolean[] hasFmts = new boolean[NUM_NF_FMTS];
         boolean[] hasReqDigit = new boolean[NUM_NF_FMTS];
 
@@ -1130,7 +1129,7 @@ public class FormatUtil {
 
         fmt.append(incLeadDigit ? "0" : "#");
         if (numDecDigits > 0) {
-            fmt.append(".");
+            fmt.append('.');
             fmt.append("0".repeat(Math.max(0, numDecDigits)));
         }
 
@@ -1140,7 +1139,7 @@ public class FormatUtil {
             // the javadocs claim the second pattern does not need to be fully
             // defined, but it doesn't seem to work that way
             String mainPat = fmt.toString();
-            fmt.append(";(").append(mainPat).append(")");
+            fmt.append(";(").append(mainPat).append(')');
         }
 
         return fmt.toString();

@@ -17,6 +17,7 @@ limitations under the License.
 package io.github.spannm.jackcess.expr;
 
 import java.util.Objects;
+import java.util.Optional;
 
 /**
  * identifies a database entity (e.g. the name of a database field). An Identify must have an object name, but the
@@ -72,13 +73,9 @@ public class Identifier {
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
-        if (_collectionName != null) {
-            sb.append("[").append(_collectionName).append("].");
-        }
-        sb.append("[").append(_objectName).append("]");
-        if (_propertyName != null) {
-            sb.append(".[").append(_propertyName).append("]");
-        }
+        Optional.ofNullable(_collectionName).ifPresent(x -> sb.append('[').append(x).append("]."));
+        sb.append('[').append(_objectName).append(']');
+        Optional.ofNullable(_propertyName).ifPresent(x -> sb.append('[').append(x).append("]."));
         return sb.toString();
     }
 

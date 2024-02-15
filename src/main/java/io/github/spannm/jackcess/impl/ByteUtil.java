@@ -473,10 +473,10 @@ public final class ByteUtil {
 
                 } else {
 
-                    rtn.append(" ");
+                    rtn.append(' ');
 
                     if (next % NUM_BYTES_PER_BLOCK == 0) {
-                        rtn.append(" ");
+                        rtn.append(' ');
                     }
                 }
             }

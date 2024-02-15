@@ -1221,22 +1221,22 @@ public class ColumnImpl implements Column, Comparable<ColumnImpl>, DateTimeConte
         }
 
         StringBuilder sb = new StringBuilder(22);
-        sb.append("{");
+        sb.append('{');
         sb.append(ByteUtil.toHexString(buffer, 0, 4,
             false));
-        sb.append("-");
+        sb.append('-');
         sb.append(ByteUtil.toHexString(buffer, 4, 2,
             false));
-        sb.append("-");
+        sb.append('-');
         sb.append(ByteUtil.toHexString(buffer, 6, 2,
             false));
-        sb.append("-");
+        sb.append('-');
         sb.append(ByteUtil.toHexString(buffer, 8, 2,
             false));
-        sb.append("-");
+        sb.append('-');
         sb.append(ByteUtil.toHexString(buffer, 10, 6,
             false));
-        sb.append("}");
+        sb.append('}');
         return sb.toString();
     }
 

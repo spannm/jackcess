@@ -1,11 +1,6 @@
 package io.github.spannm.jackcess.util;
 
-import java.lang.reflect.Field;
-import java.lang.reflect.Modifier;
 import java.nio.CharBuffer;
-import java.util.Arrays;
-import java.util.Comparator;
-import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.IntStream;
 
 /**
@@ -92,50 +87,6 @@ public final class StringUtil {
             return cs.toString();
         }
         return cs.toString().replace(remove, "");
-    }
-
-    /**
-     * Generates a string representation of {@code obj} using reflection on its non-static declared fields.
-     *
-     * @param obj object to generate string from
-     * @param longClassName use full class name if {@code true} or simple name if {@code false}
-     * @param hashCode include the object's hash code if {@code true}
-     * @return string representation
-     */
-    public static String reflectionToString(Object obj, boolean longClassName, boolean hashCode) {
-        if (obj == null) {
-            return "null";
-        }
-        StringBuilder sb = new StringBuilder(longClassName ? obj.getClass().getName() : obj.getClass().getSimpleName());
-        if (hashCode) {
-            sb.append('@').append(Integer.toHexString(System.identityHashCode(obj)));
-        }
-        sb.append('[');
-        AtomicBoolean firstField = new AtomicBoolean(true);
-        Arrays.stream(obj.getClass().getDeclaredFields()).filter(f -> !Modifier.isStatic(f.getModifiers())).sorted(Comparator.comparing(Field::getName)).forEach(f -> {
-            if (!firstField.compareAndSet(true, false)) {
-                sb.append(',');
-            }
-            sb.append(f.getName()).append('=');
-            try {
-                f.setAccessible(true);
-                Object val = f.get(obj);
-                sb.append(val == null ? "<null>" : val);
-            } catch (Exception _ex) {
-                sb.append('<').append(_ex).append('>');
-            }
-        });
-        return sb.append(']').toString();
-    }
-
-    /**
-     * Generates a string representation of {@code obj} using reflection on its non-static declared fields using the object's full class name and including the object's hash code.<br>
-     *
-     * @param obj object to generate string from
-     * @return string representation
-     */
-    public static String reflectionToString(Object obj) {
-        return reflectionToString(obj, true, true);
     }
 
 }

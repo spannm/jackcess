@@ -348,7 +348,6 @@ public class AttachmentColumnInfoImpl extends ComplexColumnInfoImpl<Attachment> 
 
         @Override
         public String toString() {
-
             String dataStr = null;
             try {
                 dataStr = ByteUtil.toHexString(getFileData());
@@ -356,8 +355,8 @@ public class AttachmentColumnInfoImpl extends ComplexColumnInfoImpl<Attachment> 
                 dataStr = e.toString();
             }
 
-            return "Attachment(" + getComplexValueForeignKey() + "," + getId()
-                + ") " + getFileUrl() + ", " + getFileName() + ", " + getFileType()
+            return "Attachment(" + getComplexValueForeignKey() + "," + getId() + ") "
+                + getFileUrl() + ", " + getFileName() + ", " + getFileType()
                 + ", " + getFileTimeStampObject() + ", " + getFileFlags() + ", " + dataStr;
         }
 

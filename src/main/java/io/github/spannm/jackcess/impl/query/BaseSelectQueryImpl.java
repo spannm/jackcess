@@ -30,8 +30,7 @@ import java.util.List;
 public abstract class BaseSelectQueryImpl extends QueryImpl
     implements BaseSelectQuery {
 
-    protected BaseSelectQueryImpl(String name, List<Row> rows, int objectId,
-        int objectFlag, Type type) {
+    protected BaseSelectQueryImpl(String name, List<Row> rows, int objectId, int objectFlag, Type type) {
         super(name, rows, objectId, objectFlag, type);
     }
 
@@ -87,8 +86,8 @@ public abstract class BaseSelectQueryImpl extends QueryImpl
         }
 
         if (hasFlag(TOP_SELECT_TYPE)) {
-            StringBuilder builder = new StringBuilder();
-            builder.append("TOP ").append(getFlagRow()._name1);
+            StringBuilder builder = new StringBuilder("TOP ")
+                .append(getFlagRow()._name1);
             if (hasFlag(PERCENT_SELECT_TYPE)) {
                 builder.append(" PERCENT");
             }

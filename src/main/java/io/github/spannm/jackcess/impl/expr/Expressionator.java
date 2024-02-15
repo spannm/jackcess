@@ -1044,7 +1044,7 @@ public class Expressionator {
         expr.toString(ctx, sb, isDebug);
         if (sb.length() > len) {
             // only add space if the leading expr added some text
-            sb.append(" ");
+            sb.append(' ');
         }
         return sb;
     }
@@ -1159,22 +1159,23 @@ public class Expressionator {
             Map.Entry<Integer, List<Token>> e = getTopPos();
 
             // TODO actually format expression?
-            StringBuilder sb = new StringBuilder()
-                .append("[token ").append(e.getKey()).append("] (");
+            StringBuilder sb = new StringBuilder("[token ")
+                .append(e.getKey()).append("] (");
 
             for (Iterator<Token> iter = e.getValue().iterator(); iter.hasNext();) {
                 Token t = iter.next();
-                sb.append("'").append(t.getValueStr()).append("'");
+                sb.append('\'').append(t.getValueStr()).append('\'');
                 if (iter.hasNext()) {
-                    sb.append(",");
+                    sb.append(',');
                 }
             }
 
-            sb.append(")");
+            sb.append(')');
 
             if (_pendingExpr != null) {
-                sb.append(" [pending '").append(_pendingExpr.toDebugString(_ctx))
-                    .append("']");
+                sb.append(" [pending '")
+                  .append(_pendingExpr.toDebugString(_ctx))
+                  .append("']");
             }
 
             return sb.toString();
@@ -1413,11 +1414,11 @@ public class Expressionator {
         protected StringBuilder toString(
             LocaleContext ctx, StringBuilder sb, boolean isDebug) {
             if (isDebug) {
-                sb.append("<").append(getClass().getSimpleName()).append(">{");
+                sb.append('<').append(getClass().getSimpleName()).append(">{");
             }
             toExprString(ctx, sb, isDebug);
             if (isDebug) {
-                sb.append("}");
+                sb.append('}');
             }
             return sb;
         }
@@ -1571,7 +1572,7 @@ public class Expressionator {
             if (_val.getType() == Value.Type.STRING) {
                 literalStrToString((String) _val.get(), sb);
             } else if (_val.getType().isTemporal()) {
-                sb.append("#").append(_val.getAsString(ctx)).append("#");
+                sb.append('#').append(_val.getAsString(ctx)).append('#');
             } else {
                 sb.append(_val.get());
             }
@@ -1637,9 +1638,9 @@ public class Expressionator {
         @Override
         protected void toExprString(
             LocaleContext ctx, StringBuilder sb, boolean isDebug) {
-            sb.append("(");
+            sb.append('(');
             _expr.toString(ctx, sb, isDebug);
-            sb.append(")");
+            sb.append(')');
         }
     }
 
@@ -1672,13 +1673,13 @@ public class Expressionator {
         @Override
         protected void toExprString(
             LocaleContext ctx, StringBuilder sb, boolean isDebug) {
-            sb.append(_func.getName()).append("(");
+            sb.append(_func.getName()).append('(');
 
             if (!_params.isEmpty()) {
                 exprListToString(_params, ",", ctx, sb, isDebug);
             }
 
-            sb.append(")");
+            sb.append(')');
         }
     }
 
@@ -1734,7 +1735,7 @@ public class Expressionator {
         protected void toExprString(
             LocaleContext ctx, StringBuilder sb, boolean isDebug) {
             appendLeadingExpr(_left, ctx, sb, isDebug)
-                .append(_op).append(" ");
+                .append(_op).append(' ');
             _right.toString(ctx, sb, isDebug);
         }
     }
@@ -1795,7 +1796,7 @@ public class Expressionator {
             LocaleContext ctx, StringBuilder sb, boolean isDebug) {
             sb.append(_op);
             if (isDebug || ((UnaryOp) _op).needsSpace()) {
-                sb.append(" ");
+                sb.append(' ');
             }
             _expr.toString(ctx, sb, isDebug);
         }
@@ -1939,10 +1940,10 @@ public class Expressionator {
         protected void toExprString(
             LocaleContext ctx, StringBuilder sb, boolean isDebug) {
             appendLeadingExpr(_expr, ctx, sb, isDebug)
-                .append(_op).append(" ");
+                .append(_op).append(' ');
             literalStrToString(_patternStr, sb);
             if (isDebug) {
-                sb.append("(").append(getPattern()).append(")");
+                sb.append('(').append(getPattern()).append(')');
             }
         }
     }
@@ -1979,7 +1980,7 @@ public class Expressionator {
             appendLeadingExpr(_expr, ctx, sb, isDebug)
                 .append(_op).append(" (");
             exprListToString(_exprs, ",", ctx, sb, isDebug);
-            sb.append(")");
+            sb.append(')');
         }
     }
 
@@ -2028,7 +2029,7 @@ public class Expressionator {
         protected void toExprString(
             LocaleContext ctx, StringBuilder sb, boolean isDebug) {
             appendLeadingExpr(_expr, ctx, sb, isDebug)
-                .append(_op).append(" ");
+                .append(_op).append(' ');
             _startRangeExpr.toString(ctx, sb, isDebug);
             sb.append(" And ");
             _endRangeExpr.toString(ctx, sb, isDebug);

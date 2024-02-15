@@ -998,7 +998,8 @@ public class UsageMap {
 
         @Override
         public String toString() {
-            return getClass().getSimpleName() + " CurPosition " + _curPageNumber + ", PrevPosition " + _prevPageNumber;
+            return String.format("%s[curPageNumber=%s, prevPageNumber=%s]",
+                getClass().getSimpleName(), _curPageNumber, _prevPageNumber);
         }
 
         /**

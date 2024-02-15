@@ -169,17 +169,16 @@ public class PropertyMapImpl implements PropertyMap {
     }
 
     public static String toString(PropertyMap map) {
-        StringBuilder sb = new StringBuilder();
-        sb.append(PropertyMaps.DEFAULT_NAME.equals(map.getName()) ? "<DEFAULT>" : map.getName())
+        StringBuilder sb = new StringBuilder(PropertyMaps.DEFAULT_NAME.equals(map.getName()) ? "<DEFAULT>" : map.getName())
             .append(" {");
         for (Iterator<Property> iter = map.iterator(); iter.hasNext();) {
             sb.append(iter.next());
             if (iter.hasNext()) {
-                sb.append(",");
+                sb.append(',');
             }
         }
-        sb.append("}");
-        return sb.toString();
+        return sb.append('}')
+            .toString();
     }
 
     public static Property createProperty(String name, DataType type, Object value) {

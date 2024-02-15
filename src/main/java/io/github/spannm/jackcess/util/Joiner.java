@@ -222,8 +222,7 @@ public class Joiner {
      * Returns a pretty string describing the foreign key relationship backing this Joiner.
      */
     public String toFKString() {
-        StringBuilder sb = new StringBuilder();
-        sb.append("Foreign Key from ");
+        StringBuilder sb = new StringBuilder("Foreign Key from ");
 
         String fromType = "] (primary)";
         String toType = "] (secondary)";
@@ -232,25 +231,27 @@ public class Joiner {
             toType = "] (primary)";
         }
 
-        sb.append(getFromTable().getName()).append("[");
+        sb.append(getFromTable().getName())
+          .append('[')
 
-        sb.append(_fromCols.get(0).getName());
+          .append(_fromCols.get(0).getName());
         for (int i = 1; i < _fromCols.size(); ++i) {
-            sb.append(",").append(_fromCols.get(i).getName());
+            sb.append(',').append(_fromCols.get(i).getName());
         }
-        sb.append(fromType);
+        sb.append(fromType)
 
-        sb.append(" to ").append(getToTable().getName()).append("[");
+          .append(" to ")
+          .append(getToTable().getName())
+          .append('[');
         List<? extends Index.Column> toCols = _toCursor.getIndex().getColumns();
         sb.append(toCols.get(0).getName());
         for (int i = 1; i < toCols.size(); ++i) {
-            sb.append(",").append(toCols.get(i).getName());
+            sb.append(',').append(toCols.get(i).getName());
         }
-        sb.append(toType)
-            .append(" (Db=")
-            .append(((DatabaseImpl) getFromTable().getDatabase()).getName())
-            .append(")");
-
-        return sb.toString();
+        return sb.append(toType)
+          .append(" (Db=")
+          .append(((DatabaseImpl) getFromTable().getDatabase()).getName())
+          .append(')')
+          .toString();
     }
 }

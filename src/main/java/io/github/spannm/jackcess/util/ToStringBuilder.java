@@ -109,7 +109,7 @@ public class ToStringBuilder {
             if (_value instanceof byte[]) {
                 ByteBuffer bb = PageChannel.wrap((byte[]) _value);
                 int len = bb.remaining();
-                _buffer.append("(").append(len).append(") ").append(ByteUtil.toHexString(bb, bb.position(), Math.min(len, maxByteDetailLen)));
+                _buffer.append('(').append(len).append(") ").append(ByteUtil.toHexString(bb, bb.position(), Math.min(len, maxByteDetailLen)));
                 if (len > maxByteDetailLen) {
                     _buffer.append("...");
                 }

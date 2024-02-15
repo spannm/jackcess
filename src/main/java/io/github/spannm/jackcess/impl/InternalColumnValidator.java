@@ -59,18 +59,18 @@ abstract class InternalColumnValidator implements ColumnValidator {
 
     @Override
     public String toString() {
-        StringBuilder sb = new StringBuilder().append("{");
+        StringBuilder sb = new StringBuilder('{');
         if (_delegate instanceof InternalColumnValidator) {
             ((InternalColumnValidator) _delegate).appendToString(sb);
         } else if (_delegate != SimpleColumnValidator.INSTANCE) {
             sb.append("custom=").append(_delegate);
         }
         if (sb.length() > 1) {
-            sb.append(";");
+            sb.append(';');
         }
         appendToString(sb);
-        sb.append("}");
-        return sb.toString();
+        return sb.append('}')
+            .toString();
     }
 
     protected abstract void appendToString(StringBuilder sb);

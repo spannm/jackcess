@@ -23,14 +23,10 @@ import io.github.spannm.jackcess.impl.DatabaseImpl;
 import io.github.spannm.jackcess.impl.RowIdImpl;
 import io.github.spannm.jackcess.impl.RowImpl;
 import io.github.spannm.jackcess.query.Query;
-import io.github.spannm.jackcess.util.StringUtil;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.List;
+import java.util.*;
 
 /**
  * Base class for classes which encapsulate information about an Access query. The {@link #toSQLString()} method can be
@@ -46,11 +42,10 @@ public abstract class QueryImpl implements Query {
     private final String       _name;
     private final List<Row>    _rows;
     private final int          _objectId;
-    private final Type         _type;
     private final int          _objectFlag;
+    private final Type         _type;
 
-    protected QueryImpl(String name, List<Row> rows, int objectId, int objectFlag,
-        Type type) {
+    protected QueryImpl(String name, List<Row> rows, int objectId, int objectFlag, Type type) {
         _name = name;
         _rows = rows;
         _objectId = objectId;
@@ -58,11 +53,9 @@ public abstract class QueryImpl implements Query {
         _objectFlag = objectFlag;
 
         if (type != Type.UNKNOWN) {
-            short foundType = getShortValue(getQueryType(rows),
-                _type.getValue());
+            short foundType = getShortValue(getQueryType(rows), _type.getValue());
             if (foundType != _type.getValue()) {
-                throw new IllegalStateException(withErrorContext(
-                    "Unexpected query type " + foundType));
+                throw new IllegalStateException(withErrorContext("Unexpected query type " + foundType));
             }
         }
     }
@@ -337,7 +330,8 @@ public abstract class QueryImpl implements Query {
 
     @Override
     public String toString() {
-        return StringUtil.reflectionToString(this);
+        return String.format("%s[name=%s, rows=%d, objectId=%s, type=%s, objectFlag=%s]",
+            getClass().getSimpleName(), _name, _rows.size(), _objectId, _type, _objectFlag);
     }
 
     /**
@@ -603,7 +597,8 @@ public abstract class QueryImpl implements Query {
 
         @Override
         public String toString() {
-            return StringUtil.reflectionToString(this);
+            return String.format("%s[id=%s, attribute=%s, expression=%s, flag=%s, extra=%s, name1=%s, name2=%s, objectId=%s, order=%s]",
+                getClass().getSimpleName(), _id, _attribute, _expression, _flag, _extra, _name1, _name2, _objectId, Arrays.toString(_order));
         }
     }
 
@@ -696,8 +691,7 @@ public abstract class QueryImpl implements Query {
         private final String _tableExpr;
 
         private SimpleTable(String tableName) {
-            this(tableName, toOptionalQuotedExpr(
-                new StringBuilder(), tableName, true).toString());
+            this(tableName, toOptionalQuotedExpr(new StringBuilder(), tableName, true).toString());
         }
 
         private SimpleTable(String tableName, String tableExpr) {
@@ -754,7 +748,7 @@ public abstract class QueryImpl implements Query {
             }
 
             if (!isTopLevel) {
-                sb.append("(");
+                sb.append('(');
             }
 
             _from.toString(sb, false);
@@ -764,15 +758,15 @@ public abstract class QueryImpl implements Query {
 
             boolean multiOnExpr = _on.size() > 1;
             if (multiOnExpr) {
-                sb.append("(");
+                sb.append('(');
             }
             sb.append(_on);
             if (multiOnExpr) {
-                sb.append(")");
+                sb.append(')');
             }
 
             if (!isTopLevel) {
-                sb.append(")");
+                sb.append(')');
             }
         }
 
