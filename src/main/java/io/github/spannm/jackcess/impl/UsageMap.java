@@ -16,6 +16,8 @@ limitations under the License.
 
 package io.github.spannm.jackcess.impl;
 
+import io.github.spannm.jackcess.util.ToStringBuilder;
+
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
@@ -406,8 +408,7 @@ public class UsageMap {
             rangeToString(ranges, curRangeStart, prevPage);
         }
 
-        return CustomToStringStyle.valueBuilder(
-            _handler.getClass().getSimpleName())
+        return ToStringBuilder.valueBuilder(_handler.getClass().getSimpleName())
             .append("range", "(" + _startPage + "-" + _endPage + ")")
             .append("pageNumbers", ranges)
             .toString();

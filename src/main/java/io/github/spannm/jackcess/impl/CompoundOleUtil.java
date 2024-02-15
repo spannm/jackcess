@@ -23,7 +23,7 @@ import io.github.spannm.jackcess.impl.OleUtil.OleBlobImpl;
 import io.github.spannm.jackcess.util.MemFileChannel;
 import io.github.spannm.jackcess.util.OleBlob.CompoundContent;
 import io.github.spannm.jackcess.util.OleBlob.ContentType;
-import org.apache.commons.lang3.builder.ToStringBuilder;
+import io.github.spannm.jackcess.util.ToStringBuilder;
 import org.apache.poi.poifs.filesystem.DirectoryEntry;
 import org.apache.poi.poifs.filesystem.DocumentEntry;
 import org.apache.poi.poifs.filesystem.DocumentInputStream;
@@ -185,7 +185,7 @@ public class CompoundOleUtil implements CompoundPackageFactory {
                     // .. recurse into this directory
                     getEntries(entries, (DirectoryEntry) entry, prefix + ENTRY_SEPARATOR);
                 } else if (entry instanceof DocumentEntry) {
-                    // grab the entry name/detils
+                    // grab the entry name/details
                     DocumentEntry de = (DocumentEntry) entry;
                     String entryName = prefix + encodeEntryName(entry.getName());
                     entries.add(new EntryImpl(entryName, de));
@@ -203,13 +203,11 @@ public class CompoundOleUtil implements CompoundPackageFactory {
 
         @Override
         public String toString() {
-            ToStringBuilder sb = toString(CustomToStringStyle.builder(this));
+            ToStringBuilder sb = toString(ToStringBuilder.builder(this));
 
             try {
-                sb.append("hasContentsEntry", hasContentsEntry());
-                sb.append("entries", getEntries(new ArrayList<>(),
-                    getFileSystem().getRoot(),
-                    ENTRY_SEPARATOR));
+                sb.append("hasContentsEntry", hasContentsEntry())
+                  .append("entries", getEntries(new ArrayList<Entry>(), getFileSystem().getRoot(), ENTRY_SEPARATOR));
             } catch (IOException e) {
                 sb.append("entries", "<" + e + ">");
             }
@@ -265,7 +263,7 @@ public class CompoundOleUtil implements CompoundPackageFactory {
 
             @Override
             public String toString() {
-                return CustomToStringStyle.valueBuilder(this)
+                return ToStringBuilder.valueBuilder(this)
                     .append("name", _name)
                     .append("length", length())
                     .toString();

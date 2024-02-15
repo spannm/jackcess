@@ -22,8 +22,8 @@ import io.github.spannm.jackcess.complex.ComplexDataType;
 import io.github.spannm.jackcess.complex.ComplexValue;
 import io.github.spannm.jackcess.complex.ComplexValueForeignKey;
 import io.github.spannm.jackcess.impl.ColumnImpl;
-import io.github.spannm.jackcess.impl.CustomToStringStyle;
 import io.github.spannm.jackcess.impl.TableImpl;
+import io.github.spannm.jackcess.util.ToStringBuilder;
 
 import java.io.IOException;
 import java.util.*;
@@ -287,7 +287,7 @@ public abstract class ComplexColumnInfoImpl<V extends ComplexValue>
 
     @Override
     public String toString() {
-        return CustomToStringStyle.valueBuilder(this)
+        return ToStringBuilder.valueBuilder(this)
             .append("complexType", getType())
             .append("complexTypeId", _complexTypeId)
             .toString();

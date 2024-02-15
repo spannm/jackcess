@@ -19,7 +19,7 @@ package io.github.spannm.jackcess.impl;
 import io.github.spannm.jackcess.DataType;
 import io.github.spannm.jackcess.util.OleBlob;
 import io.github.spannm.jackcess.util.OleBlob.*;
-import org.apache.commons.lang3.builder.ToStringBuilder;
+import io.github.spannm.jackcess.util.ToStringBuilder;
 
 import java.io.*;
 import java.nio.ByteBuffer;
@@ -551,12 +551,12 @@ public class OleUtil {
 
         @Override
         public String toString() {
-            ToStringBuilder sb = CustomToStringStyle.builder(this);
+            ToStringBuilder sb = ToStringBuilder.builder(this);
             if (_content != null) {
                 sb.append("content", _content);
             } else {
-                sb.append("bytes", _bytes);
-                sb.append("content", "(uninitialized)");
+                sb.append("bytes", _bytes)
+                  .append("content", "(uninitialized)");
             }
             return sb.toString();
         }
@@ -659,16 +659,14 @@ public class OleUtil {
         @Override
         protected ToStringBuilder toString(ToStringBuilder sb) {
             sb.append("prettyName", _prettyName)
-                .append("className", _className)
-                .append("typeName", _typeName);
+              .append("className", _className)
+              .append("typeName", _typeName);
             super.toString(sb);
             return sb;
         }
     }
 
-    private static final class LinkContentImpl
-        extends EmbeddedPackageContentImpl
-        implements LinkContent {
+    private static final class LinkContentImpl extends EmbeddedPackageContentImpl implements LinkContent {
         private final String _fileName;
         private final String _linkPath;
         private final String _filePath;
@@ -710,7 +708,7 @@ public class OleUtil {
 
         @Override
         public String toString() {
-            return toString(CustomToStringStyle.builder(this))
+            return toString(ToStringBuilder.builder(this))
                 .append("fileName", _fileName)
                 .append("linkPath", _linkPath)
                 .append("filePath", _filePath)
@@ -758,7 +756,7 @@ public class OleUtil {
 
         @Override
         public String toString() {
-            return toString(CustomToStringStyle.builder(this))
+            return toString(ToStringBuilder.builder(this))
                 .append("fileName", _fileName)
                 .append("filePath", _filePath)
                 .append("localFilePath", _localFilePath)
@@ -766,9 +764,7 @@ public class OleUtil {
         }
     }
 
-    private static final class OtherContentImpl
-        extends EmbeddedPackageContentImpl
-        implements OtherContent {
+    private static final class OtherContentImpl extends EmbeddedPackageContentImpl implements OtherContent {
         private OtherContentImpl(
             OleBlobImpl blob, String prettyName, String className,
             String typeName, int position, int length) {
@@ -782,7 +778,7 @@ public class OleUtil {
 
         @Override
         public String toString() {
-            return toString(CustomToStringStyle.builder(this))
+            return toString(ToStringBuilder.builder(this))
                 .toString();
         }
     }
@@ -799,7 +795,7 @@ public class OleUtil {
 
         @Override
         public String toString() {
-            return toString(CustomToStringStyle.builder(this))
+            return toString(ToStringBuilder.builder(this))
                 .append("content", _blob._bytes)
                 .toString();
         }

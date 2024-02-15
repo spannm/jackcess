@@ -19,7 +19,7 @@ package io.github.spannm.jackcess.impl.expr;
 import io.github.spannm.jackcess.expr.*;
 import io.github.spannm.jackcess.impl.expr.ExpressionTokenizer.Token;
 import io.github.spannm.jackcess.impl.expr.ExpressionTokenizer.TokenType;
-import org.apache.commons.lang3.StringUtils;
+import io.github.spannm.jackcess.util.StringUtil;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -1253,8 +1253,8 @@ public class Expressionator {
 
     private static void literalStrToString(String str, StringBuilder sb) {
         sb.append("\"")
-            .append(StringUtils.replace(str, "\"", "\"\""))
-            .append("\"");
+          .append(StringUtil.replace(str, "\"", "\"\""))
+          .append("\"");
     }
 
     /**

@@ -17,6 +17,7 @@ limitations under the License.
 package io.github.spannm.jackcess.impl;
 
 import io.github.spannm.jackcess.*;
+import io.github.spannm.jackcess.util.ToStringBuilder;
 
 import java.io.IOException;
 import java.util.*;
@@ -319,7 +320,7 @@ public class RelationshipCreator extends DBMutator {
             colNames = getColumnNames(cols);
         }
 
-        return CustomToStringStyle.valueBuilder(tableName)
+        return ToStringBuilder.valueBuilder(tableName)
             .append(null, colNames)
             .toString();
     }

@@ -153,10 +153,7 @@ public class TestUtil {
         return openDB(fileFormat, tmp, false, null, false);
     }
 
-    private static Database openDB(
-        FileFormat fileFormat, File file, boolean inMem, Charset charset,
-        boolean readOnly)
-        throws Exception {
+    private static Database openDB(FileFormat fileFormat, File file, boolean inMem, Charset charset, boolean readOnly) throws Exception {
         FileChannel channel = inMem ? MemFileChannel.newChannel(
             file, MemFileChannel.RW_CHANNEL_MODE)
             : null;

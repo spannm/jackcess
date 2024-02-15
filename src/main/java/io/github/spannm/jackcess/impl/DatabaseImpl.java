@@ -21,8 +21,6 @@ import io.github.spannm.jackcess.expr.EvalConfig;
 import io.github.spannm.jackcess.impl.query.QueryImpl;
 import io.github.spannm.jackcess.query.Query;
 import io.github.spannm.jackcess.util.*;
-import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -953,7 +951,7 @@ public class DatabaseImpl implements Database, DateTimeContext {
                 // need to check the "AccessVersion" property
                 String accessVersion = (String) getDatabaseProperties().getValue(PropertyMap.ACCESS_VERSION_PROP);
 
-                if (isBlank(accessVersion)) {
+                if (StringUtil.isBlank(accessVersion)) {
                     // no access version, fall back to "generic"
                     accessVersion = null;
                 }
@@ -1856,7 +1854,7 @@ public class DatabaseImpl implements Database, DateTimeContext {
      * Validates a name.
      */
     private static void validateName(String name, int maxLength, String nameType) {
-        if (isBlank(name)) {
+        if (StringUtil.isBlank(name)) {
             throw new IllegalArgumentException(nameType + " must have non-blank name");
         }
         if (name.length() > maxLength) {
@@ -1864,24 +1862,9 @@ public class DatabaseImpl implements Database, DateTimeContext {
         }
     }
 
-    /**
-     * Returns {@code true} if the given string is {@code null} or all blank space, {@code false} otherwise.
-     */
-    public static boolean isBlank(String name) {
-        return StringUtils.isBlank(name);
-    }
-
-    /**
-     * Returns the given string trimmed, or {@code null} if the string is {@code
-     * null} or empty.
-     */
-    public static String trimToNull(String str) {
-        return StringUtils.trimToNull(str);
-    }
-
     @Override
     public String toString() {
-        return ToStringBuilder.reflectionToString(this);
+        return StringUtil.reflectionToString(this);
     }
 
     /**
@@ -2198,12 +2181,16 @@ public class DatabaseImpl implements Database, DateTimeContext {
 
         @Override
         public String toString() {
-            ToStringBuilder sb = CustomToStringStyle.valueBuilder("TableMetaData").append("name", getName());
+            ToStringBuilder sb = ToStringBuilder.valueBuilder("TableMetaData")
+                .append("name", getName());
             if (isSystem()) {
                 sb.append("isSystem", isSystem());
             }
             if (isLinked()) {
-                sb.append("isLinked", isLinked()).append("linkedTableName", getLinkedTableName()).append("linkedDbName", getLinkedDbName()).append("connectionName", maskPassword(getConnectionName()));
+                sb.append("isLinked", isLinked())
+                  .append("linkedTableName", getLinkedTableName())
+                  .append("linkedDbName", getLinkedDbName())
+                  .append("connectionName", maskPassword(getConnectionName()));
             }
             return sb.toString();
         }

@@ -131,10 +131,7 @@ public class DatabaseTest extends TestCase {
         }
     }
 
-    private static void checkColumn(
-        List<? extends Column> columns, int columnNumber, String name,
-        DataType dataType)
-        throws Exception {
+    private static void checkColumn(List<? extends Column> columns, int columnNumber, String name, DataType dataType) throws Exception {
         Column column = columns.get(columnNumber);
         assertEquals(name, column.getName());
         assertEquals(dataType, column.getType());
@@ -976,8 +973,7 @@ public class DatabaseTest extends TestCase {
         }
     }
 
-    private static void verifyFinderType(Database db, String clazzName)
-        throws Exception {
+    private static void verifyFinderType(Database db, String clazzName) throws Exception {
         java.lang.reflect.Field f = db.getClass().getDeclaredField("_tableFinder");
         f.setAccessible(true);
         Object finder = f.get(db);

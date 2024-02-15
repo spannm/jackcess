@@ -26,7 +26,6 @@ import io.github.spannm.jackcess.impl.JetFormatTest.TestDB;
 import io.github.spannm.jackcess.impl.query.QueryImpl;
 import io.github.spannm.jackcess.impl.query.QueryImpl.Row;
 import junit.framework.TestCase;
-import org.apache.commons.lang3.StringUtils;
 
 import java.util.*;
 
@@ -605,7 +604,7 @@ public class QueryTest extends TestCase {
     }
 
     private static String multiline(String... strs) {
-        return StringUtils.join(strs, System.lineSeparator());
+        return String.join(System.lineSeparator(), strs);
     }
 
 }

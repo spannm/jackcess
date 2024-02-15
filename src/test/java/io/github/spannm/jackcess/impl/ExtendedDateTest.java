@@ -29,11 +29,9 @@ import org.junit.Assert;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  *
@@ -47,12 +45,14 @@ public class ExtendedDateTest extends TestCase {
 
     public void testReadExtendedDate() throws Exception {
 
-        DateTimeFormatter dtfNoTime = DateTimeFormatter.ofPattern("M/d/yyy");
-        DateTimeFormatter dtfFull = DateTimeFormatter.ofPattern("M/d/yyy h:mm:ss.SSSSSSS a");
+        ZoneId zoneId = ZoneId.of("America/New_York");
+        DateTimeFormatter dtfNoTime = DateTimeFormatter.ofPattern("M/d/yyy", Locale.US);
+        DateTimeFormatter dtfFull = DateTimeFormatter.ofPattern("M/d/yyy h:mm:ss.SSSSSSS a", Locale.US);
 
-        for (final TestDB testDB : TestDB.getSupportedForBasename(Basename.EXT_DATE)) {
+        for (TestDB testDB : TestDB.getSupportedForBasename(Basename.EXT_DATE)) {
 
             Database db = openMem(testDB);
+            db.setZoneId(zoneId);
 
             Table t = db.getTable("Table1");
             for (Row r : t) {

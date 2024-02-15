@@ -23,7 +23,7 @@ import io.github.spannm.jackcess.impl.DatabaseImpl;
 import io.github.spannm.jackcess.impl.RowIdImpl;
 import io.github.spannm.jackcess.impl.RowImpl;
 import io.github.spannm.jackcess.query.Query;
-import org.apache.commons.lang3.builder.ToStringBuilder;
+import io.github.spannm.jackcess.util.StringUtil;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -337,7 +337,7 @@ public abstract class QueryImpl implements Query {
 
     @Override
     public String toString() {
-        return ToStringBuilder.reflectionToString(this);
+        return StringUtil.reflectionToString(this);
     }
 
     /**
@@ -350,8 +350,7 @@ public abstract class QueryImpl implements Query {
      *
      * @return a Query instance for the given query data
      */
-    public static QueryImpl create(int objectFlag, String name, List<Row> rows,
-        int objectId) {
+    public static QueryImpl create(int objectFlag, String name, List<Row> rows, int objectId) {
         // remove other object flags before testing for query type
         int objTypeFlag = objectFlag & OBJECT_FLAG_MASK;
 
@@ -387,8 +386,7 @@ public abstract class QueryImpl implements Query {
                     return new UnionQueryImpl(name, rows, objectId, objectFlag);
                 default:
                     // unknown querytype
-                    throw new IllegalStateException(withErrorContext(
-                        "unknown query object flag " + objTypeFlag, name));
+                    throw new IllegalStateException(withErrorContext("unknown query object flag " + objTypeFlag, name));
             }
         } catch (IllegalStateException e) {
             LOG.warn(withErrorContext("Failed parsing query", name), e);
@@ -605,7 +603,7 @@ public abstract class QueryImpl implements Query {
 
         @Override
         public String toString() {
-            return ToStringBuilder.reflectionToString(this);
+            return StringUtil.reflectionToString(this);
         }
     }
 

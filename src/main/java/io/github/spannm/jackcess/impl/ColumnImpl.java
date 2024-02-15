@@ -25,7 +25,7 @@ import io.github.spannm.jackcess.impl.complex.ComplexValueForeignKeyImpl;
 import io.github.spannm.jackcess.impl.expr.NumberFormatter;
 import io.github.spannm.jackcess.util.ColumnValidator;
 import io.github.spannm.jackcess.util.SimpleColumnValidator;
-import org.apache.commons.lang3.builder.ToStringBuilder;
+import io.github.spannm.jackcess.util.ToStringBuilder;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -1624,21 +1624,18 @@ public class ColumnImpl implements Column, Comparable<ColumnImpl>, DateTimeConte
 
     @Override
     public String toString() {
-        ToStringBuilder sb = CustomToStringStyle.builder(this)
-            .append("name", "(" + _table.getName() + ") " + _name);
-        byte typeValue = getOriginalDataType();
-        sb.append("type", "0x" + Integer.toHexString(typeValue) + " (" + _type + ")")
-          .append("number", _columnNumber)
-          .append("length", _columnLength)
-          .append("variableLength", _variableLength);
+        ToStringBuilder sb = ToStringBuilder.builder(this)
+            .append("name", "(" + _table.getName() + ") " + _name)
+            .append("type", "0x" + Integer.toHexString(getOriginalDataType()) + " (" + _type + ")")
+            .append("number", _columnNumber)
+            .append("length", _columnLength)
+            .append("variableLength", _variableLength);
         if (_calculated) {
             sb.append("calculated", _calculated)
-                .append("expression",
-                    CustomToStringStyle.ignoreNull(getCalculationContext()));
+              .appendIgnoreNull("expression", getCalculationContext());
         }
         if (_type.isTextual()) {
-            sb.append("compressedUnicode", isCompressedUnicode())
-                .append("textSortOrder", getTextSortOrder());
+            sb.append("compressedUnicode", isCompressedUnicode()).append("textSortOrder", getTextSortOrder());
             if (getTextCodePage() > 0) {
                 sb.append("textCodePage", getTextCodePage());
             }
@@ -1651,16 +1648,16 @@ public class ColumnImpl implements Column, Comparable<ColumnImpl>, DateTimeConte
         }
         if (_type.getHasScalePrecision()) {
             sb.append("precision", getPrecision())
-                .append("scale", getScale());
+              .append("scale", getScale());
         }
         if (_autoNumber) {
             sb.append("lastAutoNumber", _autoNumberGenerator.getLast());
         }
-        sb.append("complexInfo", CustomToStringStyle.ignoreNull(getComplexInfo()))
-            .append("validator", CustomToStringStyle.ignoreNull(
-                _validator != SimpleColumnValidator.INSTANCE ? _validator : null))
-            .append("defaultValue", CustomToStringStyle.ignoreNull(_defValue));
-        return sb.toString();
+        return sb
+          .appendIgnoreNull("complexInfo", getComplexInfo())
+          .appendIgnoreNull("validator", _validator != SimpleColumnValidator.INSTANCE ? _validator : null)
+          .appendIgnoreNull("defaultValue", _defValue)
+          .toString();
     }
 
     /**
@@ -2217,7 +2214,7 @@ public class ColumnImpl implements Column, Comparable<ColumnImpl>, DateTimeConte
 
         @Override
         public String toString() {
-            return CustomToStringStyle.valueBuilder(this)
+            return ToStringBuilder.valueBuilder(this)
                 .append(null, getBytes())
                 .toString();
         }
@@ -2490,7 +2487,7 @@ public class ColumnImpl implements Column, Comparable<ColumnImpl>, DateTimeConte
 
         @Override
         public String toString() {
-            return CustomToStringStyle.valueBuilder(this)
+            return ToStringBuilder.valueBuilder(this)
                 .append(null, _value + "(" + _version + ")")
                 .toString();
         }

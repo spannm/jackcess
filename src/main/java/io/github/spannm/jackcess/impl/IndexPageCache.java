@@ -20,7 +20,7 @@ import static io.github.spannm.jackcess.impl.IndexData.*;
 
 import io.github.spannm.jackcess.impl.IndexData.DataPage;
 import io.github.spannm.jackcess.impl.IndexData.Entry;
-import org.apache.commons.lang3.builder.ToStringBuilder;
+import io.github.spannm.jackcess.util.ToStringBuilder;
 
 import java.io.IOException;
 import java.lang.ref.Reference;
@@ -907,13 +907,9 @@ public class IndexPageCache {
 
     @Override
     public String toString() {
-        ToStringBuilder sb = CustomToStringStyle.builder(this);
-        if (_rootPage == null) {
-            sb.append("pages", "(uninitialized)");
-        } else {
-            sb.append("pages", collectPages(new ArrayList<>(), _rootPage));
-        }
-        return sb.toString();
+        return ToStringBuilder.builder(this)
+            .append("pages", _rootPage == null ? "(uninitialized)" : collectPages(new ArrayList<>(), _rootPage))
+            .toString();
     }
 
     private String withErrorContext(String msg) {
@@ -1065,7 +1061,7 @@ public class IndexPageCache {
 
         @Override
         public String toString() {
-            return CustomToStringStyle.builder("DPExtra").append(null, _entryView).toString();
+            return ToStringBuilder.builder("DPExtra").append(null, _entryView).toString();
         }
     }
 

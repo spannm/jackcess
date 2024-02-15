@@ -17,7 +17,6 @@ limitations under the License.
 package io.github.spannm.jackcess.impl;
 
 import io.github.spannm.jackcess.RowId;
-import org.apache.commons.lang3.builder.CompareToBuilder;
 
 import java.io.Serializable;
 
@@ -104,11 +103,14 @@ public class RowIdImpl implements RowId, Serializable {
     }
 
     public int compareTo(RowIdImpl other) {
-        return new CompareToBuilder()
-            .append(getType(), other.getType())
-            .append(getPageNumber(), other.getPageNumber())
-            .append(getRowNumber(), other.getRowNumber())
-            .toComparison();
+        int compare = getType().compareTo(other.getType());
+        if (compare == 0) {
+            compare = Integer.compare(getPageNumber(), other.getPageNumber());
+        }
+        if (compare == 0) {
+            compare = Integer.compare(getRowNumber(), other.getRowNumber());
+        }
+        return compare;
     }
 
     @Override

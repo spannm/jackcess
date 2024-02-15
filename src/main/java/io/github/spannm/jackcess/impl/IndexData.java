@@ -22,7 +22,7 @@ import io.github.spannm.jackcess.ConstraintViolationException;
 import io.github.spannm.jackcess.Index;
 import io.github.spannm.jackcess.IndexBuilder;
 import io.github.spannm.jackcess.impl.ByteUtil.ByteStream;
-import org.apache.commons.lang3.builder.ToStringBuilder;
+import io.github.spannm.jackcess.util.ToStringBuilder;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -66,14 +66,7 @@ public class IndexData {
 
     protected static final byte[]  EMPTY_PREFIX              = new byte[0];
 
-    private static final byte[]    ASC_EXT_DATE_TRAILER      = {
-        0x00,
-        0x00,
-        0x00,
-        0x00,
-        0x00,
-        0x00,
-        0x02};
+    private static final byte[]    ASC_EXT_DATE_TRAILER      = {0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02};
     private static final byte[]    DESC_EXT_DATE_TRAILER     = flipBytes(ByteUtil.copyOf(ASC_EXT_DATE_TRAILER, ASC_EXT_DATE_TRAILER.length));
 
     static final short             COLUMN_UNUSED             = -1;
@@ -83,9 +76,7 @@ public class IndexData {
     public static final byte       UNIQUE_INDEX_FLAG         = (byte) 0x01;
     public static final byte       IGNORE_NULLS_INDEX_FLAG   = (byte) 0x02;
     public static final byte       REQUIRED_INDEX_FLAG       = (byte) 0x08;
-    public static final byte       UNKNOWN_INDEX_FLAG        = (byte) 0x80;                                                                  // always seems to be set
-                                                                                                                                             // on indexes in access
-                                                                                                                                             // 2000+
+    public static final byte       UNKNOWN_INDEX_FLAG        = (byte) 0x80;                                                                  // always seems to be set on indexes in access 2000+
 
     private static final int       MAGIC_INDEX_NUMBER        = 1923;
 
@@ -116,26 +107,26 @@ public class IndexData {
     }
 
     public static final Comparator<byte[]> BYTE_CODE_COMPARATOR = (left, right) -> {
-                                                                    if (left == right) {
-                                                                        return 0;
-                                                                    }
-                                                                    if (left == null) {
-                                                                        return -1;
-                                                                    }
-                                                                    if (right == null) {
-                                                                        return 1;
-                                                                    }
+        if (left == right) {
+            return 0;
+        }
+        if (left == null) {
+            return -1;
+        }
+        if (right == null) {
+            return 1;
+        }
 
-                                                                    int len = Math.min(left.length, right.length);
-                                                                    int pos = 0;
-                                                                    while (pos < len && left[pos] == right[pos]) {
-                                                                        ++pos;
-                                                                    }
-                                                                    if (pos < len) {
-                                                                        return ByteUtil.asUnsignedByte(left[pos]) < ByteUtil.asUnsignedByte(right[pos]) ? -1 : 1;
-                                                                    }
-                                                                    return left.length < right.length ? -1 : left.length > right.length ? 1 : 0;
-                                                                };
+        int len = Math.min(left.length, right.length);
+        int pos = 0;
+        while (pos < len && left[pos] == right[pos]) {
+            ++pos;
+        }
+        if (pos < len) {
+            return ByteUtil.asUnsignedByte(left[pos]) < ByteUtil.asUnsignedByte(right[pos]) ? -1 : 1;
+        }
+        return left.length < right.length ? -1 : left.length > right.length ? 1 : 0;
+    };
 
     /** name, generated on demand */
     private String                         _name;
@@ -960,8 +951,14 @@ public class IndexData {
 
     @Override
     public String toString() {
-        ToStringBuilder sb = CustomToStringStyle.builder(this).append("dataNumber", _number).append("pageNumber", _rootPageNumber).append("isBackingPrimaryKey", isBackingPrimaryKey())
-            .append("isUnique", isUnique()).append("ignoreNulls", shouldIgnoreNulls()).append("isRequired", isRequired()).append("columns", _columns).append("initialized", _initialized);
+        ToStringBuilder sb = ToStringBuilder.builder(this)
+            .append("dataNumber", _number)
+            .append("pageNumber", _rootPageNumber)
+            .append("isBackingPrimaryKey", isBackingPrimaryKey())
+            .append("isUnique", isUnique())
+            .append("ignoreNulls", shouldIgnoreNulls())
+            .append("isRequired", isRequired())
+            .append("columns", _columns).append("initialized", _initialized);
         if (_initialized) {
             try {
                 sb.append("entryCount", getEntryCount());
@@ -969,8 +966,8 @@ public class IndexData {
                 throw new UncheckedIOException(e);
             }
         }
-        sb.append("pageCache", _pageCache);
-        return sb.toString();
+        return sb.append("pageCache", _pageCache)
+            .toString();
     }
 
     /**
@@ -1459,7 +1456,7 @@ public class IndexData {
 
         @Override
         public String toString() {
-            return CustomToStringStyle.builder(this).append("column", getColumn()).append("flags", getFlags() + " " + (isAscending() ? "(ASC)" : "(DSC)")).toString();
+            return ToStringBuilder.builder(this).append("column", getColumn()).append("flags", getFlags() + " " + (isAscending() ? "(ASC)" : "(DSC)")).toString();
         }
     }
 
@@ -1880,7 +1877,7 @@ public class IndexData {
 
         @Override
         public String toString() {
-            return entryBytesToStringBuilder(CustomToStringStyle.valueBuilder(this).append("rowId", _rowId)).toString();
+            return entryBytesToStringBuilder(ToStringBuilder.valueBuilder(this).append("rowId", _rowId)).toString();
         }
 
         @Override
@@ -2009,7 +2006,7 @@ public class IndexData {
 
         @Override
         public String toString() {
-            return entryBytesToStringBuilder(CustomToStringStyle.valueBuilder(this).append("rowId", getRowId()).append("subPage", _subPageNumber)).toString();
+            return entryBytesToStringBuilder(ToStringBuilder.valueBuilder(this).append("rowId", getRowId()).append("subPage", _subPageNumber)).toString();
         }
     }
 
@@ -2213,7 +2210,10 @@ public class IndexData {
 
         @Override
         public String toString() {
-            return CustomToStringStyle.valueBuilder(this).append("curPosition", _curPos).append("prevPosition", _prevPos).toString();
+            return ToStringBuilder.valueBuilder(this)
+                .append("curPosition", _curPos)
+                .append("prevPosition", _prevPos)
+                .toString();
         }
 
         /**
@@ -2361,7 +2361,12 @@ public class IndexData {
 
         @Override
         public String toString() {
-            return CustomToStringStyle.valueBuilder(this).append("page", _dataPage.getPageNumber()).append("idx", _idx).append("entry", _entry).append("between", _between).toString();
+            return ToStringBuilder.valueBuilder(this)
+                .append("page", _dataPage.getPageNumber())
+                .append("idx", _idx)
+                .append("entry", _entry)
+                .append("between", _between)
+                .toString();
         }
     }
 
@@ -2434,7 +2439,7 @@ public class IndexData {
             List<Entry> entries = getEntries();
 
             String objName = (isLeaf() ? "Leaf" : "Node") + "DataPage[" + getPageNumber() + "] " + getPrevPageNumber() + ", " + getNextPageNumber() + ", (" + getChildTailPageNumber() + ")";
-            ToStringBuilder sb = CustomToStringStyle.valueBuilder(objName);
+            ToStringBuilder sb = ToStringBuilder.valueBuilder(objName);
 
             if (isLeaf() && !entries.isEmpty()) {
                 sb.append("entryRange", "[" + entries.get(0) + ", " + entries.get(entries.size() - 1) + "]");

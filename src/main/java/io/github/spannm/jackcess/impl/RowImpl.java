@@ -19,6 +19,7 @@ package io.github.spannm.jackcess.impl;
 import io.github.spannm.jackcess.Row;
 import io.github.spannm.jackcess.complex.ComplexValueForeignKey;
 import io.github.spannm.jackcess.util.OleBlob;
+import io.github.spannm.jackcess.util.ToStringBuilder;
 
 import java.io.IOException;
 import java.math.BigDecimal;
@@ -127,7 +128,7 @@ public class RowImpl extends LinkedHashMap<String, Object> implements Row {
 
     @Override
     public String toString() {
-        return CustomToStringStyle.valueBuilder("Row[" + _id + "]")
+        return ToStringBuilder.valueBuilder("Row[" + _id + "]")
             .append(null, this)
             .toString();
     }

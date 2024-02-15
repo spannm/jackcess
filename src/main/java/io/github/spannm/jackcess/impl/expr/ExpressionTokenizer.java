@@ -23,7 +23,7 @@ import io.github.spannm.jackcess.expr.Value;
 import io.github.spannm.jackcess.impl.ColumnImpl;
 import io.github.spannm.jackcess.impl.expr.Expressionator.ParseContext;
 import io.github.spannm.jackcess.impl.expr.Expressionator.Type;
-import org.apache.commons.lang3.StringUtils;
+import io.github.spannm.jackcess.util.StringUtil;
 
 import java.math.BigDecimal;
 import java.time.DateTimeException;
@@ -79,14 +79,13 @@ class ExpressionTokenizer {
     /**
      * Tokenizes an expression string of the given type and (optionally) in the context of the relevant database.
      */
-    static List<Token> tokenize(Type exprType, String exprStr,
-        ParseContext context) {
+    static List<Token> tokenize(Type exprType, String exprStr, ParseContext context) {
 
         if (exprStr != null) {
             exprStr = exprStr.trim();
         }
 
-        if (StringUtils.isEmpty(exprStr)) {
+        if (StringUtil.isEmpty(exprStr)) {
             return null;
         }
 
@@ -139,8 +138,7 @@ class ExpressionTokenizer {
                         switch (c) {
                             case QUOTED_STR_CHAR:
                             case SINGLE_QUOTED_STR_CHAR:
-                                tokens.add(new Token(TokenType.LITERAL, null,
-                                    parseQuotedString(buf, c), Value.Type.STRING));
+                                tokens.add(new Token(TokenType.LITERAL, null, parseQuotedString(buf, c), Value.Type.STRING));
                                 break;
                             case DATE_LIT_QUOTE_CHAR:
                                 tokens.add(parseDateLiteral(buf));
@@ -149,8 +147,7 @@ class ExpressionTokenizer {
                                 tokens.add(new Token(TokenType.OBJ_NAME, parseObjNameString(buf)));
                                 break;
                             default:
-                                throw new ParseException(
-                                    "Invalid leading quote character " + c + " " + buf);
+                                throw new ParseException("Invalid leading quote character " + c + " " + buf);
                         }
 
                         break;
@@ -211,8 +208,7 @@ class ExpressionTokenizer {
         }
     }
 
-    private static String parseBareString(char firstChar, ExprBuf buf,
-        Type exprType) {
+    private static String parseBareString(char firstChar, ExprBuf buf, Type exprType) {
         StringBuilder sb = buf.getScratchBuffer().append(firstChar);
 
         byte stopFlags = IS_OP_FLAG | IS_DELIM_FLAG | IS_SPACE_FLAG;
@@ -248,8 +244,7 @@ class ExpressionTokenizer {
     static String parseStringUntil(ExprBuf buf, Character startChar,
         char endChar, boolean allowDoubledEscape) {
         return parseStringUntil(buf, startChar, endChar, allowDoubledEscape,
-            buf.getScratchBuffer())
-                .toString();
+            buf.getScratchBuffer()).toString();
     }
 
     static StringBuilder parseStringUntil(
@@ -449,8 +444,7 @@ class ExpressionTokenizer {
         private final ParseContext                                _ctx;
         private int                                               _pos;
         private final Map<TemporalConfig.Type, DateTimeFormatter> _dateTimeFmts =
-            new EnumMap<>(
-                TemporalConfig.Type.class);
+            new EnumMap<>(TemporalConfig.Type.class);
         private final StringBuilder                               _scratch      = new StringBuilder();
 
         ExprBuf(String str, ParseContext ctx) {

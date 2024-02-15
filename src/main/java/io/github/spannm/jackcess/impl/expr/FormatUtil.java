@@ -18,7 +18,7 @@ package io.github.spannm.jackcess.impl.expr;
 
 import io.github.spannm.jackcess.expr.*;
 import io.github.spannm.jackcess.impl.expr.ExpressionTokenizer.ExprBuf;
-import org.apache.commons.lang3.StringUtils;
+import io.github.spannm.jackcess.util.StringUtil;
 
 import java.math.BigDecimal;
 import java.text.DecimalFormat;
@@ -431,7 +431,7 @@ public class FormatUtil {
             return predefFmt;
         }
 
-        if (StringUtils.isEmpty(fmtStr)) {
+        if (StringUtil.isEmpty(fmtStr)) {
             return DUMMY_FMT;
         }
 

@@ -19,6 +19,7 @@ package io.github.spannm.jackcess.impl;
 import io.github.spannm.jackcess.Column;
 import io.github.spannm.jackcess.Relationship;
 import io.github.spannm.jackcess.Table;
+import io.github.spannm.jackcess.util.ToStringBuilder;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -163,7 +164,7 @@ public class RelationshipImpl implements Relationship {
 
     @Override
     public String toString() {
-        return CustomToStringStyle.builder(this)
+        return ToStringBuilder.builder(this)
             .append("name", _name)
             .append("fromTable", _fromTable.getName())
             .append("fromColumns", _fromColumns)

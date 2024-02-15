@@ -19,7 +19,7 @@ package io.github.spannm.jackcess.impl.expr;
 import io.github.spannm.jackcess.expr.EvalException;
 import io.github.spannm.jackcess.expr.LocaleContext;
 import io.github.spannm.jackcess.expr.Value;
-import org.apache.commons.lang3.StringUtils;
+import io.github.spannm.jackcess.util.StringUtil;
 
 import java.math.BigDecimal;
 import java.text.DecimalFormatSymbols;
@@ -145,7 +145,7 @@ public class StringValue extends BaseValue {
         // - convert decimal separator to '.'
         DecimalFormatSymbols syms = ctx.getNumericConfig().getDecimalFormatSymbols();
         char groupSepChar = syms.getGroupingSeparator();
-        tmpVal = StringUtils.remove(tmpVal, groupSepChar);
+        tmpVal = StringUtil.remove(tmpVal, String.valueOf(groupSepChar));
 
         char decSepChar = syms.getDecimalSeparator();
         if (decSepChar != ValueSupport.CANON_DEC_SEP && tmpVal.indexOf(decSepChar) >= 0) {

@@ -23,7 +23,6 @@ import io.github.spannm.jackcess.expr.EvalException;
 import io.github.spannm.jackcess.impl.ColEvalContext;
 import io.github.spannm.jackcess.impl.ColumnImpl;
 import io.github.spannm.jackcess.impl.expr.FormatUtil;
-import org.apache.commons.lang3.StringUtils;
 
 import java.io.IOException;
 import java.util.Map;
@@ -65,7 +64,7 @@ public class ColumnFormatter {
      */
     public void setFormatString(String fmtStr) throws IOException {
         PropertyMap props = _col.getProperties();
-        if (!StringUtils.isEmpty(fmtStr)) {
+        if (!StringUtil.isEmpty(fmtStr)) {
             props.put(PropertyMap.FORMAT_PROP, fmtStr);
         } else {
             props.remove(PropertyMap.FORMAT_PROP);

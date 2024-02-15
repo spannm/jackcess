@@ -17,7 +17,6 @@ limitations under the License.
 package io.github.spannm.jackcess.util;
 
 import io.github.spannm.jackcess.*;
-import io.github.spannm.jackcess.impl.DatabaseImpl;
 
 import java.io.*;
 import java.sql.ResultSet;
@@ -383,7 +382,7 @@ public class ImportUtil {
         boolean useExistingTable, boolean header)
         throws IOException {
         String line = in.readLine();
-        if (DatabaseImpl.isBlank(line)) {
+        if (StringUtil.isBlank(line)) {
             return null;
         }
 

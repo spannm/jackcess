@@ -24,8 +24,11 @@ import io.github.spannm.jackcess.impl.expr.FunctionSupport.Func1;
 import io.github.spannm.jackcess.impl.expr.FunctionSupport.Func1NullIsNull;
 import io.github.spannm.jackcess.impl.expr.FunctionSupport.Func2;
 import io.github.spannm.jackcess.impl.expr.FunctionSupport.FuncVar;
+import io.github.spannm.jackcess.util.StringUtil;
 
 import java.math.BigDecimal;
+import java.util.Arrays;
+import java.util.stream.Collectors;
 
 /**
  *
@@ -383,16 +386,14 @@ public class DefaultTextFunctions {
                     break;
                 case 3:
                     // vbProperCase
-                    str = org.apache.commons.lang3.text.WordUtils.capitalize(
-                        str.toLowerCase());
+                    str = Arrays.stream(str.toLowerCase().split(" ")).map(StringUtil::capitalize).collect(Collectors.joining(" "));
                     break;
                 default:
                     // do nothing
             }
 
             if (charConv != 0) {
-                // 64 = vbUnicode, all java strings are already unicode,so
-                // nothing to do
+                // 64 = vbUnicode, all java strings are already unicode, so nothing to do
                 if (charConv != 64) {
                     throw new EvalException("Unsupported character conversion " + charConv);
                 }

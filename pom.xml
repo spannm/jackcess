@@ -94,7 +94,6 @@
 
         <developerId>spannm</developerId>
 
-        <dep.commons-lang3.version>3.14.0</dep.commons-lang3.version>
         <dep.commons-logging.version>1.3.0</dep.commons-logging.version>
         <dep.poi.version>4.1.2</dep.poi.version>
 
@@ -116,11 +115,6 @@
 
     <dependencies>
 
-        <dependency>
-            <groupId>org.apache.commons</groupId>
-            <artifactId>commons-lang3</artifactId>
-            <version>${dep.commons-lang3.version}</version>
-        </dependency>
         <dependency>
             <groupId>commons-logging</groupId>
             <artifactId>commons-logging</artifactId>

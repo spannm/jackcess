@@ -18,6 +18,8 @@ package io.github.spannm.jackcess.impl;
 
 import io.github.spannm.jackcess.DataType;
 import io.github.spannm.jackcess.PropertyMap;
+import io.github.spannm.jackcess.util.StringUtil;
+import io.github.spannm.jackcess.util.ToStringBuilder;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
@@ -111,14 +113,13 @@ public class PropertyMaps implements Iterable<PropertyMapImpl> {
 
     @Override
     public String toString() {
-        return CustomToStringStyle.builder(this)
+        return ToStringBuilder.builder(this)
             .append(null, _maps.values())
             .toString();
     }
 
-    public static String getTrimmedStringProperty(
-        PropertyMap props, String propName) {
-        return DatabaseImpl.trimToNull((String) props.getValue(propName));
+    public static String getTrimmedStringProperty(PropertyMap props, String propName) {
+        return StringUtil.trimToNull((String) props.getValue(propName));
     }
 
     /**
@@ -174,8 +175,7 @@ public class PropertyMaps implements Iterable<PropertyMapImpl> {
                 short type = bb.getShort();
                 int endPos = bb.position() + len - 6;
 
-                ByteBuffer bbBlock = PageChannel.narrowBuffer(bb, bb.position(),
-                    endPos);
+                ByteBuffer bbBlock = PageChannel.narrowBuffer(bb, bb.position(), endPos);
 
                 if (type == PROPERTY_NAME_LIST) {
                     propNames = readPropertyNames(bbBlock);
@@ -192,8 +192,7 @@ public class PropertyMaps implements Iterable<PropertyMapImpl> {
         /**
          * @return a byte[] encoded from the given PropertyMaps instance
          */
-        public byte[] write(PropertyMaps maps)
-            throws IOException {
+        public byte[] write(PropertyMaps maps) throws IOException {
             if (maps == null) {
                 return null;
             }
@@ -233,8 +232,7 @@ public class PropertyMaps implements Iterable<PropertyMapImpl> {
         public void save(PropertyMaps maps) throws IOException {
             RowIdImpl rowId = maps._rowId;
             if (rowId == null) {
-                throw new IllegalStateException(
-                    "PropertyMaps cannot be saved without a row id");
+                throw new IllegalStateException("PropertyMaps cannot be saved without a row id");
             }
 
             byte[] mapsBytes = write(maps);
