@@ -39,9 +39,9 @@ public class DefaultFunctionsTest {
         assertEval("foo", "=IIf(10 > 1, \"foo\", \"bar\")");
         assertEval("bar", "=IIf(10 < 1, \"foo\", \"bar\")");
         assertEval(102, "=Asc(\"foo\")");
-        assertEval(9786, "=AscW(\"\u263A\")");
+        assertEval(9786, "=AscW(\"☺\")");
         assertEval("f", "=Chr(102)");
-        assertEval("\u263A", "=ChrW(9786)");
+        assertEval("☺", "=ChrW(9786)");
         assertEval("263A", "=Hex(9786)");
 
         assertEval("blah", "=Nz(\"blah\")");
@@ -282,10 +282,10 @@ public class DefaultFunctionsTest {
         assertEval("-12345.68", "=Format(-12345.6789, 'Fixed')");
         assertEval("-0.12", "=Format(-0.12345, 'Fixed')");
 
-        assertEval("\u20AC12,345.68", "=Format(12345.6789, 'Euro')");
-        assertEval("\u20AC0.12", "=Format(0.12345, 'Euro')");
-        assertEval("(\u20AC12,345.68)", "=Format(-12345.6789, 'Euro')");
-        assertEval("(\u20AC0.12)", "=Format(-0.12345, 'Euro')");
+        assertEval("€12,345.68", "=Format(12345.6789, 'Euro')");
+        assertEval("€0.12", "=Format(0.12345, 'Euro')");
+        assertEval("(€12,345.68)", "=Format(-12345.6789, 'Euro')");
+        assertEval("(€0.12)", "=Format(-0.12345, 'Euro')");
 
         assertEval("$12,345.68", "=Format(12345.6789, 'Currency')");
         assertEval("$0.12", "=Format(0.12345, 'Currency')");
