@@ -31,7 +31,6 @@ import java.time.*;
 import java.time.format.DateTimeFormatter;
 import java.time.format.TextStyle;
 import java.time.temporal.ChronoField;
-import java.time.temporal.ChronoUnit;
 import java.time.temporal.TemporalAccessor;
 import java.time.temporal.WeekFields;
 
@@ -160,23 +159,23 @@ public class DefaultDateFunctions {
             LocalDateTime ldt = param3.getAsLocalDateTime(ctx);
 
             if (intv.equalsIgnoreCase(INTV_YEAR)) {
-                ldt = ldt.plus(val, ChronoUnit.YEARS);
+                ldt = ldt.plusYears(val);
             } else if (intv.equalsIgnoreCase(INTV_QUARTER)) {
-                ldt = ldt.plus(val * 3, ChronoUnit.MONTHS);
+                ldt = ldt.plusMonths(val * 3);
             } else if (intv.equalsIgnoreCase(INTV_MONTH)) {
-                ldt = ldt.plus(val, ChronoUnit.MONTHS);
+                ldt = ldt.plusMonths(val);
             } else if (intv.equalsIgnoreCase(INTV_DAY_OF_YEAR)
                 || intv.equalsIgnoreCase(INTV_DAY)
                 || intv.equalsIgnoreCase(INTV_WEEKDAY)) {
-                ldt = ldt.plus(val, ChronoUnit.DAYS);
+                ldt = ldt.plusDays(val);
             } else if (intv.equalsIgnoreCase(INTV_WEEK)) {
-                ldt = ldt.plus(val, ChronoUnit.WEEKS);
+                ldt = ldt.plusWeeks(val);
             } else if (intv.equalsIgnoreCase(INTV_HOUR)) {
-                ldt = ldt.plus(val, ChronoUnit.HOURS);
+                ldt = ldt.plusHours(val);
             } else if (intv.equalsIgnoreCase(INTV_MINUTE)) {
-                ldt = ldt.plus(val, ChronoUnit.MINUTES);
+                ldt = ldt.plusMinutes(val);
             } else if (intv.equalsIgnoreCase(INTV_SECOND)) {
-                ldt = ldt.plus(val, ChronoUnit.SECONDS);
+                ldt = ldt.plusSeconds(val);
             } else {
                 throw new EvalException("Invalid interval " + intv);
             }

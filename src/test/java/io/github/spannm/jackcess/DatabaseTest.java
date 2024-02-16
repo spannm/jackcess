@@ -578,7 +578,7 @@ public class DatabaseTest extends TestCase {
             List<String> row = new ArrayList<>();
             Map<String, Object> expectedRowData = new LinkedHashMap<>();
             for (int i = 0; i < numColumns; ++i) {
-                String value = "" + i + " some row data";
+                String value = i + " some row data";
                 row.add(value);
                 expectedRowData.put(colNames.get(i), value);
             }

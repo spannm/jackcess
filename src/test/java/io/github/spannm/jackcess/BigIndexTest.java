@@ -82,7 +82,7 @@ public class BigIndexTest extends TestCase {
                         List<Object[]> rows = new ArrayList<>(50);
                         for (; i < end; ++i) {
                             int nextInt = rand.nextInt(Integer.MAX_VALUE);
-                            String nextVal = "" + nextInt + extraText;
+                            String nextVal = nextInt + extraText;
                             if ((i + 1) % 333 == 0) {
                                 nextVal = null;
                             }
@@ -92,7 +92,7 @@ public class BigIndexTest extends TestCase {
                         --i;
                     } else {
                         int nextInt = rand.nextInt(Integer.MAX_VALUE);
-                        String nextVal = "" + nextInt + extraText;
+                        String nextVal = nextInt + extraText;
                         if ((i + 1) % 333 == 0) {
                             nextVal = null;
                         }
@@ -120,7 +120,7 @@ public class BigIndexTest extends TestCase {
                     if (val == null) {
                         val = firstValue;
                     }
-                    assertTrue("" + prevValue + " <= " + val + " " + rowCount,
+                    assertTrue(prevValue + " <= " + val + " " + rowCount,
                         prevValue.compareTo(val) <= 0);
                     if (firstTwo.size() < 2) {
                         firstTwo.add(origVal);

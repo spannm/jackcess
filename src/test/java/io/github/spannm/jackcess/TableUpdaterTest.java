@@ -25,10 +25,7 @@ import io.github.spannm.jackcess.impl.DatabaseImpl;
 import io.github.spannm.jackcess.impl.TableImpl;
 import junit.framework.TestCase;
 
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  *
@@ -125,11 +122,7 @@ public class TableUpdaterTest extends TestCase {
 
         Relationship rel = rb.toRelationship(db);
 
-        if (relationshipName == null) {
-            assertEquals("TestTableTestTable2", rel.getName());
-        } else {
-            assertEquals(relationshipName, rel.getName());
-        }
+        assertEquals(Objects.requireNonNullElse(relationshipName, "TestTableTestTable2"), rel.getName());
         assertSame(t1, rel.getFromTable());
         assertEquals(List.of(t1.getColumn("id")), rel.getFromColumns());
         assertSame(t2, rel.getToTable());
@@ -259,7 +252,7 @@ public class TableUpdaterTest extends TestCase {
             List<String> row = new ArrayList<>();
             Map<String, Object> expectedRowData = new LinkedHashMap<>();
             for (int i = 0; i < colNames.size(); ++i) {
-                String value = "" + i + " some row data";
+                String value = i + " some row data";
                 row.add(value);
                 expectedRowData.put(colNames.get(i), value);
             }

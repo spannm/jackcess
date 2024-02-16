@@ -39,7 +39,7 @@ public class ImportUtil {
     private static final int COPY_TABLE_BATCH_SIZE = 200;
 
     /** the platform line separator */
-    static final String      LINE_SEPARATOR        = System.getProperty("line.separator");
+    static final String      LINE_SEPARATOR        = System.lineSeparator();
 
     private ImportUtil() {
     }
