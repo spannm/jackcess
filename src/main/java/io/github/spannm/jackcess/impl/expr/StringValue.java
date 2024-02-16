@@ -108,7 +108,7 @@ public class StringValue extends BaseValue {
                 // ignore extraneous whitespace whitespace and handle "&[hH]" or
                 // "&[oO]" prefix (only supports integers)
                 String tmpVal = _val.trim();
-                if (tmpVal.length() > 0) {
+                if (!tmpVal.isEmpty()) {
 
                     if (tmpVal.charAt(0) != ValueSupport.NUMBER_BASE_PREFIX) {
                         // convert to standard numeric support for parsing

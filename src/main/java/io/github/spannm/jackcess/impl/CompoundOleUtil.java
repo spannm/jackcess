@@ -87,7 +87,7 @@ public class CompoundOleUtil implements CompoundPackageFactory {
         // split entry name into individual components and decode them
         List<String> entryNames = new ArrayList<>();
         for (String str : entryName.split(ENTRY_SEPARATOR)) {
-            if (str.length() == 0) {
+            if (str.isEmpty()) {
                 continue;
             }
             entryNames.add(decodeEntryName(str));

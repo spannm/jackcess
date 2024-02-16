@@ -1953,7 +1953,7 @@ public class DatabaseImpl implements Database, DateTimeContext {
         String tzProp = System.getProperty(TIMEZONE_PROPERTY);
         if (tzProp != null) {
             tzProp = tzProp.trim();
-            if (tzProp.length() > 0) {
+            if (!tzProp.isEmpty()) {
                 return TimeZone.getTimeZone(tzProp);
             }
         }
@@ -1971,7 +1971,7 @@ public class DatabaseImpl implements Database, DateTimeContext {
         String csProp = System.getProperty(CHARSET_PROPERTY_PREFIX + format);
         if (csProp != null) {
             csProp = csProp.trim();
-            if (csProp.length() > 0) {
+            if (!csProp.isEmpty()) {
                 return Charset.forName(csProp);
             }
         }

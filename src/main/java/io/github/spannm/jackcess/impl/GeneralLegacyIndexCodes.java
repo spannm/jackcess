@@ -492,7 +492,7 @@ public class GeneralLegacyIndexCodes {
      * Converts a string of hex encoded bytes to a byte[], optionally throwing an exception if no codes are given.
      */
     private static byte[] codesToBytes(String codes, boolean required) {
-        if (codes.length() == 0) {
+        if (codes.isEmpty()) {
             if (required) {
                 throw new IllegalStateException("empty code bytes");
             }

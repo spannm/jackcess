@@ -413,7 +413,7 @@ public class IndexCodesTest extends TestCase {
             Character cc = c;
             String[] chars = inlineCodes.get(cc);
             if (chars != null) {
-                if (chars.length == 1 && chars[0].length() == 0) {
+                if (chars.length == 1 && chars[0].isEmpty()) {
                     System.out.println("X");
                 } else {
                     System.out.println("S" + toByteString(chars));
@@ -580,7 +580,7 @@ public class IndexCodesTest extends TestCase {
             Character cc = c;
             String[] chars = inlineCodes.get(cc);
             if (chars != null) {
-                if (chars.length == 1 && chars[0].length() == 0) {
+                if (chars.length == 1 && chars[0].isEmpty()) {
                     System.out.println("X");
                 } else {
                     System.out.println("S" + toByteString(chars));
@@ -638,7 +638,7 @@ public class IndexCodesTest extends TestCase {
 
     private static String toByteString(String[] chars) {
         String str = join(chars, "", "");
-        if (str.length() > 0 && str.charAt(0) == '0') {
+        if (!str.isEmpty() && str.charAt(0) == '0') {
             str = str.substring(1);
         }
         return str;
@@ -667,7 +667,7 @@ public class IndexCodesTest extends TestCase {
         if (entryCodes != null) {
             inatExtraCodes.put(c, entryCodes.trim().split(" "));
         }
-        if (crazyCodes != null && crazyCodes.length() > 0) {
+        if (crazyCodes != null && !crazyCodes.isEmpty()) {
             inatCrazyCodes.put(c, crazyCodes.trim().split(" "));
         }
     }
@@ -699,7 +699,7 @@ public class IndexCodesTest extends TestCase {
         }
         StringBuilder builder = new StringBuilder();
         for (int i = 0; i < strs.length; ++i) {
-            if (strs[i].length() == 0) {
+            if (strs[i].isEmpty()) {
                 continue;
             }
             builder.append(prefixStr).append(strs[i]);

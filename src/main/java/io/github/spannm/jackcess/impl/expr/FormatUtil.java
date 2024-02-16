@@ -924,7 +924,7 @@ public class FormatUtil {
         String fmtStr = fmtStrs[fmtIdx];
         if (!hasFmts[fmtIdx]) {
             // convert the literal string to a dummy number format
-            if (fmtStr.length() > 0) {
+            if (!fmtStr.isEmpty()) {
                 // strip quoting
                 StringBuilder sb = buf.getScratchBuffer().append(fmtStr)
                     .deleteCharAt(fmtStr.length() - 1)

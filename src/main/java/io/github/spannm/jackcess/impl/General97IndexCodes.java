@@ -180,7 +180,7 @@ public class General97IndexCodes extends GeneralLegacyIndexCodes {
             String mappingLine = null;
             while ((mappingLine = reader.readLine()) != null) {
                 mappingLine = mappingLine.trim();
-                if (mappingLine.length() == 0) {
+                if (mappingLine.isEmpty()) {
                     continue;
                 }
 

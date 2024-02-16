@@ -81,7 +81,7 @@ public class JetFormatTest extends TestCase {
     static {
         String testFormatStr = System.getProperty("io.github.spannm.jackcess.testFormats");
         Set<FileFormat> testFormats = EnumSet.allOf(FileFormat.class);
-        if (testFormatStr != null && testFormatStr.length() > 0) {
+        if (testFormatStr != null && !testFormatStr.isEmpty()) {
             testFormats.clear();
             for (String tmp : testFormatStr.split(",")) {
                 testFormats.add(FileFormat.valueOf(tmp.toUpperCase()));

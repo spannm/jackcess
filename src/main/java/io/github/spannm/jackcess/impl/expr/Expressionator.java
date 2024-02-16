@@ -1299,7 +1299,7 @@ public class Expressionator {
 
                 String charClass = pattern.substring(startPos, endPos);
 
-                if (charClass.length() > 0 && charClass.charAt(0) == '!') {
+                if (!charClass.isEmpty() && charClass.charAt(0) == '!') {
                     // this is a negated char class
                     charClass = '^' + charClass.substring(1);
                 }
@@ -1364,7 +1364,7 @@ public class Expressionator {
         }
 
         return resultType == Value.Type.STRING
-            && (exprStr.length() == 0 || exprStr.charAt(0) != ExpressionTokenizer.QUOTED_STR_CHAR);
+            && (exprStr.isEmpty() || exprStr.charAt(0) != ExpressionTokenizer.QUOTED_STR_CHAR);
     }
 
     private interface LeftAssocExpr {

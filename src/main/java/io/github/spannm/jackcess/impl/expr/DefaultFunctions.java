@@ -63,7 +63,7 @@ public class DefaultFunctions {
     public static final Function HEX    = registerStringFunc(new Func1NullIsNull("Hex") {
         @Override
         protected Value eval1(EvalContext ctx, Value param1) {
-            if (param1.getType().isString() && param1.getAsString(ctx).length() == 0) {
+            if (param1.getType().isString() && param1.getAsString(ctx).isEmpty()) {
                 return ValueSupport.ZERO_VAL;
             }
             int lv = param1.getAsLongInt(ctx);
@@ -116,7 +116,7 @@ public class DefaultFunctions {
     public static final Function OCT    = registerStringFunc(new Func1NullIsNull("Oct") {
         @Override
         protected Value eval1(EvalContext ctx, Value param1) {
-            if (param1.getType().isString() && param1.getAsString(ctx).length() == 0) {
+            if (param1.getType().isString() && param1.getAsString(ctx).isEmpty()) {
                 return ValueSupport.ZERO_VAL;
             }
             int lv = param1.getAsLongInt(ctx);
@@ -416,7 +416,7 @@ public class DefaultFunctions {
             String str = ValueSupport.WHITESPACE_PAT.matcher(param1.getAsString(ctx))
                 .replaceAll("");
 
-            if (str.length() == 0) {
+            if (str.isEmpty()) {
                 return ValueSupport.ZERO_D_VAL;
             }
 
