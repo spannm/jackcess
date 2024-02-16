@@ -362,10 +362,6 @@ public class PropertyExpressionTest extends TestCase {
     }
 
     private static final Function FOO = new FunctionSupport.Func0("FooFunc") {
-        @Override
-        public boolean isPure() {
-            return false;
-        }
 
         @Override
         protected Value eval0(EvalContext ctx) {

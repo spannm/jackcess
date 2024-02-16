@@ -1593,10 +1593,6 @@ public abstract class JetFormat {
             return !V12_UNSUPP_TYPES.contains(type);
         }
 
-        @Override
-        public boolean isSupportedCalculatedDataType(DataType type) {
-            return false;
-        }
     }
 
     private static class Jet14Format extends Jet12Format {
@@ -1611,11 +1607,6 @@ public abstract class JetFormat {
         @Override
         protected ColumnImpl.SortOrder defineDefaultSortOrder() {
             return ColumnImpl.GENERAL_SORT_ORDER;
-        }
-
-        @Override
-        protected byte[] definePropMapType() {
-            return PROPERTY_MAP_TYPES[0];
         }
 
         @Override
