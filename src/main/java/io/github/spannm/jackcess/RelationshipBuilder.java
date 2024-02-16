@@ -81,7 +81,7 @@ public class RelationshipBuilder {
 
     /**
      * Enables referential integrity enforcement for this relationship.
-     *
+     * <p>
      * Note, this requires the "from" table to have an existing unique index on the relevant columns.
      */
     public RelationshipBuilder withReferentialIntegrity() {
@@ -90,7 +90,7 @@ public class RelationshipBuilder {
 
     /**
      * Enables deletes to be cascaded from the "from" table to the "to" table.
-     *
+     * <p>
      * Note, this requires referential integrity to be enforced.
      */
     public RelationshipBuilder withCascadeDeletes() {
@@ -99,7 +99,7 @@ public class RelationshipBuilder {
 
     /**
      * Enables updates to be cascaded from the "from" table to the "to" table.
-     *
+     * <p>
      * Note, this requires referential integrity to be enforced.
      */
     public RelationshipBuilder withCascadeUpdates() {
@@ -108,7 +108,7 @@ public class RelationshipBuilder {
 
     /**
      * Enables deletes in the "from" table to be cascaded as "null" to the "to" table.
-     *
+     * <p>
      * Note, this requires referential integrity to be enforced.
      */
     public RelationshipBuilder withCascadeNullOnDelete() {
@@ -138,7 +138,7 @@ public class RelationshipBuilder {
 
     /**
      * Sets a specific name for this relationship.
-     *
+     * <p>
      * Default = null, meaning that the standard Access naming convention will be used.
      */
     public RelationshipBuilder withName(String relationshipName) {

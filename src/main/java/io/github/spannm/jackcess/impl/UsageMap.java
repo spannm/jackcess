@@ -582,7 +582,7 @@ public class UsageMap {
      * Modified version of an "inline" usage map used for the global usage map. When an inline usage map is used for the
      * global usage map, we assume out-of-range bits are on. We never promote the global usage map to a reference usage
      * map (although ms access may).
-     *
+     * <p>
      * Note, this UsageMap does not implement all the methods "correctly". Only addPageNumber and removePageNumber
      * should be called by PageChannel.
      */
@@ -769,7 +769,7 @@ public class UsageMap {
      * allocate a new page (and remove it from the global usage map) and this usage map also needs to allocate a new
      * page. When that happens, we stash the pending information from the PageChannel and handle it after we have
      * retrieved the new page.
-     *
+     * <p>
      * Note, this UsageMap does not implement all the methods "correctly". Only addPageNumber and removePageNumber
      * should be called by PageChannel.
      */

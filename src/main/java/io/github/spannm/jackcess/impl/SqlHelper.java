@@ -23,7 +23,7 @@ import java.io.IOException;
  * module is enabled (indicating that the application is already using sql constructs), then jackcess will seamlessly
  * interact with sql types. If the module is not enabled (indicating that the application is not using any sql
  * constructs), then jackcess will not require the module in order to function otherwise normally.
- *
+ * <p>
  * This base class is the "fallback" class if the java.sql module is not available.
  *
  * @author James Ahlborn

@@ -27,7 +27,7 @@ import java.util.regex.Pattern;
 /**
  * Predicate which tests a column value against a {@link Pattern}. The static factory methods can be used to construct
  * the Pattern from various forms of wildcard pattern syntaxes.
- *
+ * <p>
  * This class can be used as a value pattern in the various Cursor search methods, e.g.
  * {@link io.github.spannm.jackcess.Cursor#findFirstRow(io.github.spannm.jackcess.Column,Object)}.
  *
