@@ -364,8 +364,7 @@ public class IndexImpl implements Index, Comparable<IndexImpl> {
      * @param buffer Buffer to write to
      */
     protected static void writeDefinitions(
-        TableCreator creator, ByteBuffer buffer)
-        throws IOException {
+        TableCreator creator, ByteBuffer buffer) {
         // write logical index information
         for (IndexBuilder idx : creator.getIndexes()) {
             writeDefinition(creator, idx, buffer);

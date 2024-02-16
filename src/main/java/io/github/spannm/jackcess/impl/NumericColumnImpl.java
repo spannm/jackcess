@@ -16,8 +16,6 @@ limitations under the License.
 
 package io.github.spannm.jackcess.impl;
 
-import java.io.IOException;
-
 /**
  * ColumnImpl subclass which is used for numeric data types.
  *
@@ -29,7 +27,7 @@ class NumericColumnImpl extends ColumnImpl {
     /** Numeric scale */
     private final byte _scale;
 
-    NumericColumnImpl(InitArgs args) throws IOException {
+    NumericColumnImpl(InitArgs args) {
         super(args);
 
         _precision = args.buffer.get(

@@ -48,7 +48,7 @@ public class ExpressionatorTest extends TestCase {
         super(name);
     }
 
-    public void testParseSimpleExprs() throws Exception {
+    public void testParseSimpleExprs() {
         validateExpr("\"A\"", "<ELiteralValue>{\"A\"}");
 
         validateExpr("13", "<ELiteralValue>{13}");

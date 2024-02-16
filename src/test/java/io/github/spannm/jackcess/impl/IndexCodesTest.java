@@ -672,7 +672,7 @@ public class IndexCodesTest extends TestCase {
         }
     }
 
-    public static String toUnicodeStr(Object obj) throws Exception {
+    public static String toUnicodeStr(Object obj) {
         StringBuilder sb = new StringBuilder();
         for (char c : obj.toString().toCharArray()) {
             sb.append(toUnicodeStr(c)).append(' ');

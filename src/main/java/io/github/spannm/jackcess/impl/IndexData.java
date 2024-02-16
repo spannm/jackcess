@@ -1467,7 +1467,7 @@ public class IndexData {
      * ColumnDescriptor for integer based columns.
      */
     private static final class IntegerColumnDescriptor extends ColumnDescriptor {
-        private IntegerColumnDescriptor(ColumnImpl column, byte flags) throws IOException {
+        private IntegerColumnDescriptor(ColumnImpl column, byte flags) {
             super(column, flags);
         }
 
@@ -1492,7 +1492,7 @@ public class IndexData {
      * ColumnDescriptor for floating point based columns.
      */
     private static final class FloatingPointColumnDescriptor extends ColumnDescriptor {
-        private FloatingPointColumnDescriptor(ColumnImpl column, byte flags) throws IOException {
+        private FloatingPointColumnDescriptor(ColumnImpl column, byte flags) {
             super(column, flags);
         }
 
@@ -1525,7 +1525,7 @@ public class IndexData {
      * ColumnDescriptor for fixed point based columns (legacy sort order).
      */
     private static class LegacyFixedPointColumnDescriptor extends ColumnDescriptor {
-        private LegacyFixedPointColumnDescriptor(ColumnImpl column, byte flags) throws IOException {
+        private LegacyFixedPointColumnDescriptor(ColumnImpl column, byte flags) {
             super(column, flags);
         }
 
@@ -1588,7 +1588,7 @@ public class IndexData {
      * ColumnDescriptor for byte based columns.
      */
     private static final class ByteColumnDescriptor extends ColumnDescriptor {
-        private ByteColumnDescriptor(ColumnImpl column, byte flags) throws IOException {
+        private ByteColumnDescriptor(ColumnImpl column, byte flags) {
             super(column, flags);
         }
 
@@ -1611,7 +1611,7 @@ public class IndexData {
      * ColumnDescriptor for boolean columns.
      */
     private static final class BooleanColumnDescriptor extends ColumnDescriptor {
-        private BooleanColumnDescriptor(ColumnImpl column, byte flags) throws IOException {
+        private BooleanColumnDescriptor(ColumnImpl column, byte flags) {
             super(column, flags);
         }
 
@@ -1631,7 +1631,7 @@ public class IndexData {
      * ColumnDescriptor for "general legacy" sort order text based columns.
      */
     private static final class GenLegTextColumnDescriptor extends ColumnDescriptor {
-        private GenLegTextColumnDescriptor(ColumnImpl column, byte flags) throws IOException {
+        private GenLegTextColumnDescriptor(ColumnImpl column, byte flags) {
             super(column, flags);
         }
 
@@ -1645,7 +1645,7 @@ public class IndexData {
      * ColumnDescriptor for "general" sort order (2010+) text based columns.
      */
     private static final class GenTextColumnDescriptor extends ColumnDescriptor {
-        private GenTextColumnDescriptor(ColumnImpl column, byte flags) throws IOException {
+        private GenTextColumnDescriptor(ColumnImpl column, byte flags) {
             super(column, flags);
         }
 
@@ -1659,7 +1659,7 @@ public class IndexData {
      * ColumnDescriptor for "general 97" sort order text based columns.
      */
     private static final class Gen97TextColumnDescriptor extends ColumnDescriptor {
-        private Gen97TextColumnDescriptor(ColumnImpl column, byte flags) throws IOException {
+        private Gen97TextColumnDescriptor(ColumnImpl column, byte flags) {
             super(column, flags);
         }
 
@@ -1673,7 +1673,7 @@ public class IndexData {
      * ColumnDescriptor for guid columns.
      */
     private static final class GuidColumnDescriptor extends ColumnDescriptor {
-        private GuidColumnDescriptor(ColumnImpl column, byte flags) throws IOException {
+        private GuidColumnDescriptor(ColumnImpl column, byte flags) {
             super(column, flags);
         }
 
@@ -1687,7 +1687,7 @@ public class IndexData {
      * ColumnDescriptor for BINARY columns.
      */
     private static final class BinaryColumnDescriptor extends ColumnDescriptor {
-        private BinaryColumnDescriptor(ColumnImpl column, byte flags) throws IOException {
+        private BinaryColumnDescriptor(ColumnImpl column, byte flags) {
             super(column, flags);
         }
 
@@ -1701,7 +1701,7 @@ public class IndexData {
      * ColumnDescriptor for extended date/time based columns.
      */
     private static final class ExtDateColumnDescriptor extends ColumnDescriptor {
-        private ExtDateColumnDescriptor(ColumnImpl column, byte flags) throws IOException {
+        private ExtDateColumnDescriptor(ColumnImpl column, byte flags) {
             super(column, flags);
         }
 
@@ -1737,7 +1737,7 @@ public class IndexData {
      * ColumnDescriptor for columns which we cannot currently write.
      */
     private final class ReadOnlyColumnDescriptor extends ColumnDescriptor {
-        private ReadOnlyColumnDescriptor(ColumnImpl column, byte flags) throws IOException {
+        private ReadOnlyColumnDescriptor(ColumnImpl column, byte flags) {
             super(column, flags);
         }
 
@@ -1784,7 +1784,7 @@ public class IndexData {
         /**
          * Read an existing entry in from a buffer
          */
-        private Entry(ByteBuffer buffer, int entryLen) throws IOException {
+        private Entry(ByteBuffer buffer, int entryLen) {
             this(buffer, entryLen, 0);
         }
 
@@ -1961,7 +1961,7 @@ public class IndexData {
         /**
          * Read an existing node entry in from a buffer
          */
-        private NodeEntry(ByteBuffer buffer, int entryLen) throws IOException {
+        private NodeEntry(ByteBuffer buffer, int entryLen) {
             // we need 4 trailing bytes for the sub-page number
             super(buffer, entryLen, 4);
 

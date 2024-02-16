@@ -21,7 +21,6 @@ import io.github.spannm.jackcess.complex.ComplexValueForeignKey;
 import io.github.spannm.jackcess.util.OleBlob;
 import io.github.spannm.jackcess.util.ToStringBuilder;
 
-import java.io.IOException;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.Date;
@@ -121,7 +120,7 @@ public class RowImpl extends LinkedHashMap<String, Object> implements Row {
     }
 
     @Override
-    public OleBlob getBlob(String name) throws IOException {
+    public OleBlob getBlob(String name) {
         byte[] bytes = getBytes(name);
         return bytes != null ? OleBlob.Builder.fromInternalData(bytes) : null;
     }

@@ -1875,8 +1875,7 @@ public class ColumnImpl implements Column, Comparable<ColumnImpl>, DateTimeConte
      *
      * @param buffer Buffer to write to
      */
-    protected static void writeDefinitions(TableCreator creator, ByteBuffer buffer)
-        throws IOException {
+    protected static void writeDefinitions(TableCreator creator, ByteBuffer buffer) {
         // we specifically put the "long variable" values after the normal
         // variable length values so that we have a better chance of fitting it
         // all (because "long variable" values can go in separate pages)
@@ -1961,8 +1960,7 @@ public class ColumnImpl implements Column, Comparable<ColumnImpl>, DateTimeConte
     }
 
     protected static void writeColUsageMapDefinitions(
-        TableCreator creator, ByteBuffer buffer)
-        throws IOException {
+        TableCreator creator, ByteBuffer buffer) {
         // write long value column usage map references
         for (ColumnBuilder lvalCol : creator.getLongValueColumns()) {
             writeColUsageMapDefinition(creator, lvalCol, buffer);

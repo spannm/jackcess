@@ -3079,8 +3079,7 @@ public class TableImpl implements Table, PropertyMaps.Owner {
      * Returns {@code true} if a row of the given size will fit on the given data page, {@code false} otherwise.
      */
     public static boolean rowFitsOnDataPage(
-        int rowLength, ByteBuffer dataPage, JetFormat format)
-        throws IOException {
+        int rowLength, ByteBuffer dataPage, JetFormat format) {
         int rowSpaceUsage = getRowSpaceUsage(rowLength, format);
         short freeSpaceInPage = dataPage.getShort(format.OFFSET_FREE_SPACE);
         int rowsOnPage = getRowsOnDataPage(dataPage, format);
@@ -3305,7 +3304,7 @@ public class TableImpl implements Table, PropertyMaps.Owner {
             return dupeRow(_rowValues, _rowValues.length);
         }
 
-        public NullMask getNullMask(ByteBuffer rowBuffer) throws IOException {
+        public NullMask getNullMask(ByteBuffer rowBuffer) {
             if (_nullMask == null) {
                 _nullMask = getRowNullMask(rowBuffer);
             }

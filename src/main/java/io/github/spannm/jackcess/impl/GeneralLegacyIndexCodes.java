@@ -770,8 +770,7 @@ public class GeneralLegacyIndexCodes {
     /**
      * Encode the given crazy code bytes into the given byte stream.
      */
-    private static void writeCrazyCodes(ByteStream crazyCodes, ByteStream bout)
-        throws IOException {
+    private static void writeCrazyCodes(ByteStream crazyCodes, ByteStream bout) {
         // CRAZY_CODE_2 flags at the end are ignored, so ditch them
         trimExtraCodes(crazyCodes, CRAZY_CODE_2, CRAZY_CODE_2);
 

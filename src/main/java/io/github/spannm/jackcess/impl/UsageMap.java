@@ -584,7 +584,7 @@ public class UsageMap {
      * should be called by PageChannel.
      */
     private class GlobalInlineHandler extends InlineHandler {
-        private GlobalInlineHandler() throws IOException {
+        private GlobalInlineHandler() {
         }
 
         @Override

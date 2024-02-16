@@ -16,8 +16,6 @@ limitations under the License.
 
 package io.github.spannm.jackcess.impl;
 
-import java.io.IOException;
-
 /**
  * ColumnImpl subclass which is used for Text data types.
  *
@@ -31,7 +29,7 @@ class TextColumnImpl extends ColumnImpl {
     /** the code page for a text field (for certain db versions) */
     private final short     _codePage;
 
-    TextColumnImpl(InitArgs args) throws IOException {
+    TextColumnImpl(InitArgs args) {
         super(args);
 
         // co-located w/ precision/scale

@@ -120,7 +120,7 @@ public class QueryTest extends TestCase {
             query.toSQLString());
     }
 
-    public void testSelectQuery() throws Exception {
+    public void testSelectQuery() {
         SelectQuery query = (SelectQuery) newQuery(
             Query.Type.SELECT,
             newRow(TABLE_ATTRIBUTE, null, "Table1", null));

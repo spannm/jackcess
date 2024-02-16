@@ -170,7 +170,7 @@ public class Joiner {
      * @param fromRow row from the "from" table (which must include the relevant columns for this join relationship)
      * @return {@code true} if any "to" rows were deleted, {@code false} otherwise
      */
-    public boolean deleteRows(Map<String, ?> fromRow) throws IOException {
+    public boolean deleteRows(Map<String, ?> fromRow) {
         return deleteRowsImpl(findRows(fromRow).withColumnNames(Set.of()).iterator());
     }
 
@@ -180,7 +180,7 @@ public class Joiner {
      * @param fromRow row from the "from" table (which must include the relevant columns for this join relationship)
      * @return {@code true} if any "to" rows were deleted, {@code false} otherwise
      */
-    public boolean deleteRows(Object[] fromRow) throws IOException {
+    public boolean deleteRows(Object[] fromRow) {
         return deleteRowsImpl(findRows(fromRow).withColumnNames(Set.of()).iterator());
     }
 

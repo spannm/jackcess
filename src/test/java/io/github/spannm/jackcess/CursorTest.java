@@ -68,8 +68,7 @@ public class CursorTest extends TestCase {
 
     private static List<Map<String, Object>> createTestTableData(
         int startIdx,
-        int endIdx)
-        throws Exception {
+        int endIdx) {
         List<Map<String, Object>> expectedRows = createTestTableData();
         expectedRows.subList(endIdx, expectedRows.size()).clear();
         expectedRows.subList(0, startIdx).clear();
@@ -197,8 +196,7 @@ public class CursorTest extends TestCase {
     }
 
     private static void doTestSimple(Cursor cursor,
-        List<Map<String, Object>> expectedRows)
-        throws Exception {
+        List<Map<String, Object>> expectedRows) {
         if (expectedRows == null) {
             expectedRows = createTestTableData();
         }
@@ -281,8 +279,7 @@ public class CursorTest extends TestCase {
         }
     }
 
-    private static void doTestMoveNoReset(Cursor cursor)
-        throws Exception {
+    private static void doTestMoveNoReset(Cursor cursor) {
         List<Map<String, Object>> expectedRows = createTestTableData();
         List<Map<String, Object>> foundRows = new ArrayList<>();
 
@@ -407,8 +404,7 @@ public class CursorTest extends TestCase {
     }
 
     private static void doTestReverse(Cursor cursor,
-        List<Map<String, Object>> expectedRows)
-        throws Exception {
+        List<Map<String, Object>> expectedRows) {
         if (expectedRows == null) {
             expectedRows = createTestTableData();
         }

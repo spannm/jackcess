@@ -19,7 +19,6 @@ package io.github.spannm.jackcess;
 import io.github.spannm.jackcess.complex.ComplexValueForeignKey;
 import io.github.spannm.jackcess.util.OleBlob;
 
-import java.io.IOException;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.Date;
@@ -116,5 +115,5 @@ public interface Row extends Map<String, Object> {
      * <p>
      * Note, <i>the OleBlob should be closed after use</i>.
      */
-    OleBlob getBlob(String name) throws IOException;
+    OleBlob getBlob(String name);
 }

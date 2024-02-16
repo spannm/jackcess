@@ -371,16 +371,11 @@ public class ImportUtil {
      * @param useExistingTable if {@code true} use current table if it already exists, otherwise, create new table with
      *            unique name
      * @param header if {@code false} the first line is not a header row, only valid if useExistingTable is {@code true}
-     *
      * @return the name of the imported table
-     *
-     * @see Builder
      */
-    public static String importReader(BufferedReader in, Database db,
-        String name, String delim, char quote,
-        ImportFilter filter,
-        boolean useExistingTable, boolean header)
-        throws IOException {
+    public static String importReader(BufferedReader in, Database db, String name, String delim,
+        char quote, ImportFilter filter, boolean useExistingTable, boolean header) throws IOException {
+
         String line = in.readLine();
         if (StringUtil.isBlank(line)) {
             return null;
@@ -397,10 +392,7 @@ public class ImportUtil {
                 Object[] columnNames = splitLine(line, delimPat, quote, in, 0);
 
                 for (Object columnName : columnNames) {
-                    columns.add(new ColumnBuilder((String) columnName, DataType.TEXT)
-                        .escapeName()
-                        .withLength((short) DataType.TEXT.getMaxSize())
-                        .toColumn());
+                    columns.add(new ColumnBuilder((String) columnName, DataType.TEXT).escapeName().withLength((short) DataType.TEXT.getMaxSize()).toColumn());
                 }
 
                 table = createUniqueTable(db, name, columns, null, filter);

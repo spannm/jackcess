@@ -164,7 +164,7 @@ public class MemFileChannel extends FileChannel {
     }
 
     @Override
-    public int read(ByteBuffer dst) throws IOException {
+    public int read(ByteBuffer dst) {
         int bytesRead = read(dst, _position);
         if (bytesRead > 0) {
             _position += bytesRead;
@@ -194,7 +194,7 @@ public class MemFileChannel extends FileChannel {
     }
 
     @Override
-    public int write(ByteBuffer src) throws IOException {
+    public int write(ByteBuffer src) {
         int bytesWritten = write(src, _position);
         _position += bytesWritten;
         return bytesWritten;
