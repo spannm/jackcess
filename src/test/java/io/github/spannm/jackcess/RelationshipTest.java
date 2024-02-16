@@ -34,7 +34,7 @@ public class RelationshipTest extends TestCase {
 
     private static final Comparator<Relationship> REL_COMP = (r1, r2) -> String.CASE_INSENSITIVE_ORDER.compare(r1.getName(), r2.getName());
 
-    public RelationshipTest(String name) throws Exception {
+    public RelationshipTest(String name) {
         super(name);
     }
 

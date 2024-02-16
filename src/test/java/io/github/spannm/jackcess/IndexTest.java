@@ -44,7 +44,7 @@ public class IndexTest extends TestCase {
         TestUtil.clearTestAutoSync();
     }
 
-    public void testByteOrder() throws Exception {
+    public void testByteOrder() {
         byte b1 = (byte) 0x00;
         byte b2 = (byte) 0x01;
         byte b3 = (byte) 0x7F;
@@ -305,9 +305,7 @@ public class IndexTest extends TestCase {
         }
     }
 
-    private void doTestUnique(Index index, int numValues,
-        Object... testData)
-        throws Exception {
+    private void doTestUnique(Index index, int numValues, Object... testData) {
         for (int i = 0; i < testData.length; i += numValues + 1) {
             Object[] row = new Object[numValues + 1];
             row[0] = "testRow" + i;
@@ -696,8 +694,7 @@ public class IndexTest extends TestCase {
         }
     }
 
-    private static void doTestBinaryIndex(Index idx, String colName, boolean forward)
-        throws Exception {
+    private static void doTestBinaryIndex(Index idx, String colName, boolean forward) throws Exception {
         IndexCursor ic = CursorBuilder.createCursor(idx);
 
         for (Row row : idx.getTable().getDefaultCursor().newIterable().withForward(forward)) {
@@ -727,8 +724,7 @@ public class IndexTest extends TestCase {
         assertTrue(ib.getReference().isPrimaryTable());
     }
 
-    private void checkIndexColumns(Table table, String... idxInfo)
-        throws Exception {
+    private void checkIndexColumns(Table table, String... idxInfo) {
         Map<String, String> expectedIndexes = new HashMap<>();
         for (int i = 0; i < idxInfo.length; i += 2) {
             expectedIndexes.put(idxInfo[i], idxInfo[i + 1]);

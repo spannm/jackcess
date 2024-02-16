@@ -44,15 +44,15 @@ import java.util.List;
  * @see TableBuilder
  */
 public class RelationshipBuilder {
-    private static final int JOIN_FLAGS = RelationshipImpl.LEFT_OUTER_JOIN_FLAG | RelationshipImpl.RIGHT_OUTER_JOIN_FLAG;
+    private static final int   JOIN_FLAGS = RelationshipImpl.LEFT_OUTER_JOIN_FLAG | RelationshipImpl.RIGHT_OUTER_JOIN_FLAG;
 
     /** relationship flags (default to "don't enforce") */
-    private int              _flags     = RelationshipImpl.NO_REFERENTIAL_INTEGRITY_FLAG;
-    private String           _fromTable;
-    private String           _toTable;
-    private List<String>     _fromCols  = new ArrayList<>();
-    private List<String>     _toCols    = new ArrayList<>();
-    private String           _name      = null;
+    private int                _flags     = RelationshipImpl.NO_REFERENTIAL_INTEGRITY_FLAG;
+    private final String       _fromTable;
+    private final String       _toTable;
+    private final List<String> _fromCols  = new ArrayList<>();
+    private final List<String> _toCols    = new ArrayList<>();
+    private String             _name      = null;
 
     public RelationshipBuilder(Table fromTable, Table toTable) {
         this(fromTable.getName(), toTable.getName());

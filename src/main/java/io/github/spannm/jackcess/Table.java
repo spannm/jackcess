@@ -53,7 +53,7 @@ public interface Table extends Iterable<Row>, TableDefinition {
         /**
          * columns are ordered based on the "display" order (this order can be changed arbitrarily)
          */
-        DISPLAY;
+        DISPLAY
     }
 
     /**

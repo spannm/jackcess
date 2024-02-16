@@ -90,9 +90,9 @@ public class TableBuilder {
     /** name of the new table */
     private String                            _name;
     /** columns for the new table */
-    private List<ColumnBuilder>               _columns = new ArrayList<>();
+    private final List<ColumnBuilder>         _columns = new ArrayList<>();
     /** indexes for the new table */
-    private List<IndexBuilder>                _indexes = new ArrayList<>();
+    private final List<IndexBuilder>          _indexes = new ArrayList<>();
     /** whether or not table/column/index names are automatically escaped */
     private boolean                           _escapeIdentifiers;
     /** table properties (if any) */

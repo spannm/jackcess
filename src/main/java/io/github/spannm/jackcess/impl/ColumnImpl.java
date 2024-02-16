@@ -225,8 +225,7 @@ public class ColumnImpl implements Column, Comparable<ColumnImpl>, DateTimeConte
     /**
      * Read a column definition in from a buffer
      */
-    ColumnImpl(InitArgs args)
-        throws IOException {
+    ColumnImpl(InitArgs args) {
         _table = args.table;
         _name = args.name;
         _displayIndex = args.displayIndex;
@@ -986,8 +985,7 @@ public class ColumnImpl implements Column, Comparable<ColumnImpl>, DateTimeConte
     /**
      * Writes an "extended" date/time value.
      */
-    private void writeExtendedDateValue(ByteBuffer buffer, Object value)
-        throws InvalidValueException {
+    private void writeExtendedDateValue(ByteBuffer buffer, Object value) {
         LocalDateTime ldt = BASE_EXT_LDT;
         if (value != null) {
             ldt = toLocalDateTime(value, this);
@@ -1367,8 +1365,7 @@ public class ColumnImpl implements Column, Comparable<ColumnImpl>, DateTimeConte
                     "unexpected inline var length type: " + getType()));
         }
 
-        ByteBuffer buffer = ByteBuffer.wrap(toByteArray(obj)).order(order);
-        return buffer;
+        return ByteBuffer.wrap(toByteArray(obj)).order(order);
     }
 
     /**
@@ -1465,8 +1462,7 @@ public class ColumnImpl implements Column, Comparable<ColumnImpl>, DateTimeConte
     /**
      * Decodes a compressed or uncompressed text value.
      */
-    String decodeTextValue(byte[] data)
-        throws IOException {
+    String decodeTextValue(byte[] data) {
         // see if data is compressed. the 0xFF, 0xFE sequence indicates that
         // compression is used (sort of, see algorithm below)
         boolean isCompressed = data.length > 1 && data[0] == TEXT_COMPRESSION_HEADER[0] && data[1] == TEXT_COMPRESSION_HEADER[1];
@@ -1897,8 +1893,7 @@ public class ColumnImpl implements Column, Comparable<ColumnImpl>, DateTimeConte
     }
 
     protected static void writeDefinition(
-        TableMutator mutator, ColumnBuilder col, ByteBuffer buffer)
-        throws IOException {
+        TableMutator mutator, ColumnBuilder col, ByteBuffer buffer) {
         TableMutator.ColumnOffsets colOffsets = mutator.getColumnOffsets();
 
         buffer.put(col.getType().getValue());
@@ -1975,8 +1970,7 @@ public class ColumnImpl implements Column, Comparable<ColumnImpl>, DateTimeConte
     }
 
     protected static void writeColUsageMapDefinition(
-        TableMutator creator, ColumnBuilder lvalCol, ByteBuffer buffer)
-        throws IOException {
+        TableMutator creator, ColumnBuilder lvalCol, ByteBuffer buffer) {
         TableMutator.ColumnState colState = creator.getColumnState(lvalCol);
 
         buffer.putShort(lvalCol.getColumnNumber());

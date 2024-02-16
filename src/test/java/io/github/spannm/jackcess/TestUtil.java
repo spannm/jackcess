@@ -428,8 +428,7 @@ public class TestUtil {
         }
     }
 
-    static void checkTestDBTable1RowABCDEFG(final TestDB testDB, final Table table, final Row row)
-        throws IOException {
+    static void checkTestDBTable1RowABCDEFG(final TestDB testDB, final Table table, final Row row) {
         Assert.assertEquals("testDB: " + testDB + "; table: " + table, "abcdefg", row.get("A"));
         Assert.assertEquals("hijklmnop", row.get("B"));
         Assert.assertEquals((byte) 2, row.get("C"));
@@ -448,8 +447,7 @@ public class TestUtil {
         Assert.assertEquals(Boolean.TRUE, row.get("I"));
     }
 
-    static void checkTestDBTable1RowA(final TestDB testDB, final Table table, final Row row)
-        throws IOException {
+    static void checkTestDBTable1RowA(final TestDB testDB, final Table table, final Row row) {
         Assert.assertEquals("testDB: " + testDB + "; table: " + table, "a", row.get("A"));
         Assert.assertEquals("b", row.get("B"));
         Assert.assertEquals((byte) 0, row.get("C"));

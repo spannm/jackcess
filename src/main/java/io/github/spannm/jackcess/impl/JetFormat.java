@@ -46,7 +46,7 @@ public abstract class JetFormat {
         NONE,
         JET,
         MSISAM,
-        OFFICE;
+        OFFICE
     }
 
     /**
@@ -111,25 +111,25 @@ public abstract class JetFormat {
     // use nested inner class to avoid problematic static init loops
     private static final class PossibleFileFormats {
         private static final Map<String, Database.FileFormat> POSSIBLE_VERSION_3      =
-            Collections.singletonMap((String) null, Database.FileFormat.V1997);
+            Collections.singletonMap(null, Database.FileFormat.V1997);
 
         private static final Map<String, Database.FileFormat> POSSIBLE_VERSION_4      =
             new HashMap<>();
 
         private static final Map<String, Database.FileFormat> POSSIBLE_VERSION_12     =
-            Collections.singletonMap((String) null, Database.FileFormat.V2007);
+            Collections.singletonMap(null, Database.FileFormat.V2007);
 
         private static final Map<String, Database.FileFormat> POSSIBLE_VERSION_14     =
-            Collections.singletonMap((String) null, Database.FileFormat.V2010);
+            Collections.singletonMap(null, Database.FileFormat.V2010);
 
         private static final Map<String, Database.FileFormat> POSSIBLE_VERSION_16     =
-            Collections.singletonMap((String) null, Database.FileFormat.V2016);
+            Collections.singletonMap(null, Database.FileFormat.V2016);
 
         private static final Map<String, Database.FileFormat> POSSIBLE_VERSION_17     =
-            Collections.singletonMap((String) null, Database.FileFormat.V2019);
+            Collections.singletonMap(null, Database.FileFormat.V2019);
 
         private static final Map<String, Database.FileFormat> POSSIBLE_VERSION_MSISAM =
-            Collections.singletonMap((String) null, Database.FileFormat.MSISAM);
+            Collections.singletonMap(null, Database.FileFormat.MSISAM);
 
         static {
             POSSIBLE_VERSION_4.put(ACCESS_VERSION_2000, Database.FileFormat.V2000);

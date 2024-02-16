@@ -187,8 +187,7 @@ public class Joiner {
     /**
      * Deletes all the rows and returns whether or not any "to"" rows were deleted.
      */
-    private static boolean deleteRowsImpl(Iterator<Row> iter)
-        throws IOException {
+    private static boolean deleteRowsImpl(Iterator<Row> iter) {
         boolean removed = false;
         while (iter.hasNext()) {
             iter.next();

@@ -38,7 +38,7 @@ class UnsupportedColumnImpl extends ColumnImpl {
     }
 
     @Override
-    public Object read(byte[] data, ByteOrder order) throws IOException {
+    public Object read(byte[] data, ByteOrder order) {
         return rawDataWrapper(data);
     }
 }

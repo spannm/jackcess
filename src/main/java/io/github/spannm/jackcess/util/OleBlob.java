@@ -122,7 +122,7 @@ public interface OleBlob extends Blob, Closeable {
          * the top-level blob wrapper is not understood (this may not be a valid ole instance). Content will simply be
          * an instance of Content (the data can be accessed from the main blob instance)
          */
-        UNKNOWN;
+        UNKNOWN
     }
 
     /**
@@ -154,11 +154,11 @@ public interface OleBlob extends Blob, Closeable {
      * Intermediate sub-interface for Content which has a nested package.
      */
     interface PackageContent extends Content {
-        String getPrettyName() throws IOException;
+        String getPrettyName();
 
-        String getClassName() throws IOException;
+        String getClassName();
 
-        String getTypeName() throws IOException;
+        String getTypeName();
     }
 
     /**
@@ -400,7 +400,7 @@ public interface OleBlob extends Blob, Closeable {
             return OleUtil.createBlob(this);
         }
 
-        public static OleBlob fromInternalData(byte[] bytes) throws IOException {
+        public static OleBlob fromInternalData(byte[] bytes) {
             return OleUtil.parseBlob(bytes);
         }
     }

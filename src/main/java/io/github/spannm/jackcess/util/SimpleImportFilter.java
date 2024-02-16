@@ -18,9 +18,7 @@ package io.github.spannm.jackcess.util;
 
 import io.github.spannm.jackcess.ColumnBuilder;
 
-import java.io.IOException;
 import java.sql.ResultSetMetaData;
-import java.sql.SQLException;
 import java.util.List;
 
 /**
@@ -36,13 +34,12 @@ public class SimpleImportFilter implements ImportFilter {
     }
 
     @Override
-    public List<ColumnBuilder> filterColumns(List<ColumnBuilder> destColumns, ResultSetMetaData srcColumns) throws SQLException, IOException {
+    public List<ColumnBuilder> filterColumns(List<ColumnBuilder> destColumns, ResultSetMetaData srcColumns) {
         return destColumns;
     }
 
     @Override
-    public Object[] filterRow(Object[] row)
-        throws SQLException, IOException {
+    public Object[] filterRow(Object[] row) {
         return row;
     }
 

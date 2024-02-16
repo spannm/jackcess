@@ -65,10 +65,9 @@ public class RelationshipCreator extends DBMutator {
 
     public RelationshipImpl createRelationshipImpl(String name) {
         _name = name;
-        RelationshipImpl newRel = new RelationshipImpl(
+        return new RelationshipImpl(
             name, _primaryTable, _secondaryTable, _flags,
             _primaryCols, _secondaryCols);
-        return newRel;
     }
 
     /**
@@ -173,9 +172,8 @@ public class RelationshipCreator extends DBMutator {
         }
 
         for (ColumnImpl pcol : _primaryCols) {
-            ColumnImpl scol = pcol;
 
-            if (pcol.getType() != scol.getType()) {
+            if (pcol.getType() != pcol.getType()) {
                 throw new IllegalArgumentException(withErrorContext(
                     "Matched columns must have the same data type"));
             }

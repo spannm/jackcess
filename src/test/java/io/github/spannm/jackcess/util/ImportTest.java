@@ -252,20 +252,17 @@ public class ImportTest extends TestCase {
     }
 
     private static class TestResultSet implements InvocationHandler {
-        private List<Integer> _types        = new ArrayList<>();
-        private List<String>  _names        = new ArrayList<>();
-        private List<Integer> _displaySizes = new ArrayList<>();
-        private List<Integer> _scales       = new ArrayList<>();
-        private List<Integer> _precisions   = new ArrayList<>();
+        private final List<Integer> _types        = new ArrayList<>();
+        private final List<String>  _names        = new ArrayList<>();
+        private final List<Integer> _displaySizes = new ArrayList<>();
+        private final List<Integer> _scales       = new ArrayList<>();
+        private final List<Integer> _precisions   = new ArrayList<>();
 
         @Override
         public Object invoke(Object proxy, Method method, Object[] args) {
             String methodName = method.getName();
             if (methodName.equals("getMetaData")) {
-                return Proxy.newProxyInstance(
-                    Thread.currentThread().getContextClassLoader(),
-                    new Class<?>[] {ResultSetMetaData.class},
-                    this);
+                return Proxy.newProxyInstance(Thread.currentThread().getContextClassLoader(), new Class<?>[] {ResultSetMetaData.class}, this);
             } else if (methodName.equals("next")) {
                 return Boolean.FALSE;
             } else if (methodName.equals("getColumnCount")) {

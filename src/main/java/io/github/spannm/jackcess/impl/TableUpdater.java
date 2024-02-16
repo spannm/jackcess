@@ -36,7 +36,7 @@ public class TableUpdater extends TableMutator {
     private IndexBuilder                  _index;
     private int                           _origTdefLen;
     private int                           _addedTdefLen;
-    private List<Integer>                 _nextPages = new ArrayList<>(1);
+    private final List<Integer>           _nextPages = new ArrayList<>(1);
     private ColumnState                   _colState;
     private IndexDataState                _idxDataState;
     private IndexImpl.ForeignKeyReference _fkReference;

@@ -16,7 +16,6 @@ limitations under the License.
 
 package io.github.spannm.jackcess.impl;
 
-import java.io.IOException;
 import java.nio.ByteBuffer;
 
 /**
@@ -44,11 +43,8 @@ public interface CodecHandler {
      * @param outPage the decoded page. if {@link #canDecodeInline} is {@code
      *                true}, this will be the same buffer as inPage.
      * @param pageNumber the page number of the given page
-     *
-     * @throws IOException if an exception occurs during decoding
      */
-    void decodePage(ByteBuffer inPage, ByteBuffer outPage, int pageNumber)
-        throws IOException;
+    void decodePage(ByteBuffer inPage, ByteBuffer outPage, int pageNumber);
 
     /**
      * Encodes the given page buffer into a new page buffer and returns it. The returned page buffer will be used
@@ -58,11 +54,7 @@ public interface CodecHandler {
      * @param pageNumber the page number of the given page
      * @param pageOffset offset within the page at which to start writing the page data
      *
-     * @throws IOException if an exception occurs during decoding
-     *
      * @return the properly encoded page buffer for the given page buffer
      */
-    ByteBuffer encodePage(ByteBuffer page, int pageNumber,
-        int pageOffset)
-        throws IOException;
+    ByteBuffer encodePage(ByteBuffer page, int pageNumber, int pageOffset);
 }

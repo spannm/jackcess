@@ -18,9 +18,7 @@ package io.github.spannm.jackcess.util;
 
 import io.github.spannm.jackcess.ColumnBuilder;
 
-import java.io.IOException;
 import java.sql.ResultSetMetaData;
-import java.sql.SQLException;
 import java.util.List;
 
 /**
@@ -37,9 +35,7 @@ public interface ImportFilter {
      * @param srcColumns the sql metadata, only available if importing from a JDBC source
      * @return the columns to use when creating the import table
      */
-    List<ColumnBuilder> filterColumns(List<ColumnBuilder> destColumns,
-        ResultSetMetaData srcColumns)
-        throws SQLException, IOException;
+    List<ColumnBuilder> filterColumns(List<ColumnBuilder> destColumns, ResultSetMetaData srcColumns);
 
     /**
      * The desired values for the row.
@@ -47,7 +43,6 @@ public interface ImportFilter {
      * @param row the row data as determined by the import code, may be directly modified
      * @return the row data as it should be written to the import table. if {@code null}, the row will be skipped
      */
-    Object[] filterRow(Object[] row)
-        throws SQLException, IOException;
+    Object[] filterRow(Object[] row);
 
 }

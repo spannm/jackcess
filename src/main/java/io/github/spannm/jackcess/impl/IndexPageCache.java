@@ -37,7 +37,7 @@ public class IndexPageCache {
     private enum UpdateType {
         ADD,
         REMOVE,
-        REPLACE;
+        REPLACE
     }
 
     /**

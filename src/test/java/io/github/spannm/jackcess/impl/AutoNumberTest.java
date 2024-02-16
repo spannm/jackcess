@@ -40,7 +40,7 @@ import java.util.UUID;
  */
 public class AutoNumberTest extends TestCase {
 
-    public AutoNumberTest(String name) throws Exception {
+    public AutoNumberTest(String name) {
         super(name);
     }
 

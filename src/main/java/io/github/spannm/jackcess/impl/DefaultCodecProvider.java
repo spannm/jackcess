@@ -87,15 +87,13 @@ public class DefaultCodecProvider implements CodecProvider {
 
         @Override
         public void decodePage(ByteBuffer inPage, ByteBuffer outPage,
-            int pageNumber)
-            throws IOException {
+            int pageNumber) {
             // does nothing
         }
 
         @Override
         public ByteBuffer encodePage(ByteBuffer page, int pageNumber,
-            int pageOffset)
-            throws IOException {
+            int pageOffset) {
             // does nothing
             return page;
         }
@@ -118,15 +116,13 @@ public class DefaultCodecProvider implements CodecProvider {
 
         @Override
         public void decodePage(ByteBuffer inPage, ByteBuffer outPage,
-            int pageNumber)
-            throws IOException {
+            int pageNumber) {
             throw new UnsupportedCodecException("Decoding not supported.  Please choose a CodecProvider which supports reading the current database encoding.");
         }
 
         @Override
         public ByteBuffer encodePage(ByteBuffer page, int pageNumber,
-            int pageOffset)
-            throws IOException {
+            int pageOffset) {
             throw new UnsupportedCodecException("Encoding not supported.  Please choose a CodecProvider which supports writing the current database encoding.");
         }
     }

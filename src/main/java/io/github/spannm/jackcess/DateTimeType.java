@@ -30,5 +30,5 @@ public enum DateTimeType {
     /**
      * Use jdk8+ {@link java.time.LocalDateTime} objects. This is the default for Jackcess from version 3.5 onwards.
      */
-    LOCAL_DATE_TIME;
+    LOCAL_DATE_TIME
 }

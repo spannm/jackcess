@@ -37,7 +37,7 @@ import java.util.Map;
  */
 public class DatabaseReadWriteTest extends TestCase {
 
-    public DatabaseReadWriteTest(String name) throws Exception {
+    public DatabaseReadWriteTest(String name) {
         super(name);
     }
 

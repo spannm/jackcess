@@ -680,8 +680,7 @@ public class GeneralLegacyIndexCodes {
      */
     private static void writeExtraCodes(
         int charOffset, byte[] bytes, byte extraCodeModifier,
-        ExtraCodesStream extraCodes)
-        throws IOException {
+        ExtraCodesStream extraCodes) {
         // we fill in a placeholder value for any chars w/out extra codes
         int numChars = extraCodes.getNumChars();
         if (numChars < charOffset) {
@@ -723,8 +722,7 @@ public class GeneralLegacyIndexCodes {
      * bytes left in the given stream after trimming.
      */
     private static boolean trimExtraCodes(ByteStream extraCodes,
-        byte minTrimCode, byte maxTrimCode)
-        throws IOException {
+        byte minTrimCode, byte maxTrimCode) {
         if (extraCodes == null) {
             return false;
         }
@@ -740,8 +738,7 @@ public class GeneralLegacyIndexCodes {
      */
     private static void writeUnprintableCodes(
         int charOffset, byte[] bytes, ByteStream unprintableCodes,
-        ExtraCodesStream extraCodes)
-        throws IOException {
+        ExtraCodesStream extraCodes) {
         // the offset seems to be calculated based on the number of bytes in the
         // "extra codes" part of the entry (even if there are no extra codes bytes
         // actually written in the final entry).

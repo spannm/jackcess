@@ -75,8 +75,7 @@ public class IndexImpl implements Index, Comparable<IndexImpl> {
     private final ForeignKeyReference _reference;
 
     protected IndexImpl(ByteBuffer tableBuffer, List<IndexData> indexDatas,
-        JetFormat format)
-        throws IOException {
+        JetFormat format) {
         ByteUtil.forward(tableBuffer, format.SKIP_BEFORE_INDEX_SLOT); // Forward past Unknown
         _indexNumber = tableBuffer.getInt();
         int indexDataNumber = tableBuffer.getInt();
@@ -379,8 +378,7 @@ public class IndexImpl implements Index, Comparable<IndexImpl> {
     }
 
     protected static void writeDefinition(
-        TableMutator mutator, IndexBuilder idx, ByteBuffer buffer)
-        throws IOException {
+        TableMutator mutator, IndexBuilder idx, ByteBuffer buffer) {
         TableMutator.IndexDataState idxDataState = mutator.getIndexDataState(idx);
 
         // write logical index information

@@ -69,8 +69,8 @@ public class RelationshipImpl implements Relationship {
     public RelationshipImpl(String name, Table fromTable, Table toTable, int flags,
         int numCols) {
         this(name, fromTable, toTable, flags,
-            Collections.nCopies(numCols, (Column) null),
-            Collections.nCopies(numCols, (Column) null));
+            Collections.nCopies(numCols, null),
+            Collections.nCopies(numCols, null));
     }
 
     public RelationshipImpl(String name, Table fromTable, Table toTable, int flags,

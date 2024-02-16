@@ -76,7 +76,7 @@ public class TableScanCursor extends CursorImpl {
     }
 
     @Override
-    protected PositionImpl getRowPosition(RowIdImpl rowId) throws IOException {
+    protected PositionImpl getRowPosition(RowIdImpl rowId) {
         return new ScanPosition(rowId);
     }
 

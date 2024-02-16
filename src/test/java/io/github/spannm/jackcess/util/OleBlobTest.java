@@ -220,7 +220,7 @@ public class OleBlobTest extends TestCase {
         }
     }
 
-    private static void checkCompoundEntries(OleBlob.CompoundContent cc, Object... entryInfo) throws Exception {
+    private static void checkCompoundEntries(OleBlob.CompoundContent cc, Object... entryInfo) {
         int idx = 0;
         for (OleBlob.CompoundContent.Entry e : cc) {
             String entryName = (String) entryInfo[idx];

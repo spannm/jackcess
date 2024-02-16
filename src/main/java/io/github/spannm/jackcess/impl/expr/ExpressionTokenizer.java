@@ -59,7 +59,7 @@ class ExpressionTokenizer {
         OP,
         DELIM,
         STRING,
-        SPACE;
+        SPACE
     }
 
     private static final byte[]      CHAR_FLAGS        = new byte[128];

@@ -35,7 +35,7 @@ import java.util.Map;
  */
 public class BigIntTest extends TestCase {
 
-    public BigIntTest(String name) throws Exception {
+    public BigIntTest(String name) {
         super(name);
     }
 

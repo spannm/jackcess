@@ -53,7 +53,7 @@ public class RowIdImpl implements RowId, Serializable {
         /**
          * comparable type indicating this RowId should always compare greater than normal RowIds
          */
-        ALWAYS_LAST;
+        ALWAYS_LAST
     }
 
     /** special rowId which will sort before any other valid rowId */

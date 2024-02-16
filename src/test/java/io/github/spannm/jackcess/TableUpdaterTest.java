@@ -33,7 +33,7 @@ import java.util.*;
  */
 public class TableUpdaterTest extends TestCase {
 
-    public TableUpdaterTest(String name) throws Exception {
+    public TableUpdaterTest(String name) {
         super(name);
     }
 

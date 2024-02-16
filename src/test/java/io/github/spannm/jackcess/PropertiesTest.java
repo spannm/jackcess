@@ -29,11 +29,11 @@ import java.util.*;
  */
 public class PropertiesTest extends TestCase {
 
-    public PropertiesTest(String name) throws Exception {
+    public PropertiesTest(String name) {
         super(name);
     }
 
-    public void testPropertyMaps() throws Exception {
+    public void testPropertyMaps() {
         PropertyMaps maps = new PropertyMaps(10, null, null, null);
         assertTrue(maps.isEmpty());
         assertEquals(0, maps.getSize());
@@ -91,7 +91,7 @@ public class PropertiesTest extends TestCase {
             colMap.get("buzz")), props);
     }
 
-    public void testInferTypes() throws Exception {
+    public void testInferTypes() {
         PropertyMaps maps = new PropertyMaps(10, null, null, null);
         PropertyMap defMap = maps.getDefault();
 
@@ -464,7 +464,7 @@ public class PropertiesTest extends TestCase {
         }
     }
 
-    public void testEnumValues() throws Exception {
+    public void testEnumValues() {
         PropertyMaps maps = new PropertyMaps(10, null, null, null);
 
         PropertyMapImpl colMap = maps.get("testcol");

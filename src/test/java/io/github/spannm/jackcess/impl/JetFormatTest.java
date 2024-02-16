@@ -213,7 +213,7 @@ public class JetFormatTest extends TestCase {
         }
     }
 
-    public void testReadOnlyFormat() throws Exception {
+    public void testReadOnlyFormat() {
 
         for (final TestDB testDB : SUPPORTED_DBS_TEST_FOR_READ) {
 

@@ -70,12 +70,12 @@ public class ReadOnlyFileChannel extends FileChannel {
     }
 
     @Override
-    public FileChannel truncate(long size) throws IOException {
+    public FileChannel truncate(long size) {
         throw new NonWritableChannelException();
     }
 
     @Override
-    public void force(boolean metaData) throws IOException {
+    public void force(boolean metaData) {
         // do nothing
     }
 
@@ -86,42 +86,37 @@ public class ReadOnlyFileChannel extends FileChannel {
     }
 
     @Override
-    public long transferFrom(ReadableByteChannel src, long position, long count)
-        throws IOException {
+    public long transferFrom(ReadableByteChannel src, long position, long count) {
         throw new NonWritableChannelException();
     }
 
     @Override
-    public int write(ByteBuffer src, long position) throws IOException {
+    public int write(ByteBuffer src, long position) {
         throw new NonWritableChannelException();
     }
 
     @Override
-    public int write(ByteBuffer src) throws IOException {
+    public int write(ByteBuffer src) {
         throw new NonWritableChannelException();
     }
 
     @Override
-    public long write(ByteBuffer[] srcs, int offset, int length)
-        throws IOException {
+    public long write(ByteBuffer[] srcs, int offset, int length) {
         throw new NonWritableChannelException();
     }
 
     @Override
-    public MappedByteBuffer map(MapMode mode, long position, long size)
-        throws IOException {
+    public MappedByteBuffer map(MapMode mode, long position, long size) {
         throw new UnsupportedOperationException();
     }
 
     @Override
-    public FileLock lock(long position, long size, boolean shared)
-        throws IOException {
+    public FileLock lock(long position, long size, boolean shared) {
         throw new UnsupportedOperationException();
     }
 
     @Override
-    public FileLock tryLock(long position, long size, boolean shared)
-        throws IOException {
+    public FileLock tryLock(long position, long size, boolean shared) {
         throw new UnsupportedOperationException();
     }
 

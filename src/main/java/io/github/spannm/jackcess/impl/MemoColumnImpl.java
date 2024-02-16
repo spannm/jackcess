@@ -37,7 +37,7 @@ class MemoColumnImpl extends LongValueColumnImpl {
     /**
      * whether or not this is a hyperlink column (only possible for columns of type MEMO)
      */
-    private boolean         _hyperlink;
+    private final boolean   _hyperlink;
 
     MemoColumnImpl(InitArgs args) throws IOException {
         super(args);

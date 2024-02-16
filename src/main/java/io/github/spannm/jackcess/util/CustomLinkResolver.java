@@ -208,7 +208,7 @@ public abstract class CustomLinkResolver implements LinkResolver {
      *         if it should be treated as a normal access db.
      */
     protected abstract Object loadCustomFile(
-        Database linkerDb, String linkeeFileName) throws IOException;
+        Database linkerDb, String linkeeFileName);
 
     /**
      * Called by an instance of a temp db when a missing table is first requested.

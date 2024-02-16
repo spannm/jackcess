@@ -35,11 +35,11 @@ import java.util.*;
 @SuppressWarnings("checkstyle:LineLengthCheck")
 public class QueryTest extends TestCase {
 
-    public QueryTest(String name) throws Exception {
+    public QueryTest(String name) {
         super(name);
     }
 
-    public void testUnionQuery() throws Exception {
+    public void testUnionQuery() {
         String expr1 = "Select * from Table1";
         String expr2 = "Select * from Table2";
 
@@ -78,7 +78,7 @@ public class QueryTest extends TestCase {
 
     }
 
-    public void testPassthroughQuery() throws Exception {
+    public void testPassthroughQuery() {
         String expr = "Select * from Table1";
         String constr = "ODBC;";
 
@@ -89,7 +89,7 @@ public class QueryTest extends TestCase {
         assertEquals(constr, query.getConnectionString());
     }
 
-    public void testDataDefinitionQuery() throws Exception {
+    public void testDataDefinitionQuery() {
         String expr = "Drop table Table1";
 
         DataDefinitionQuery query = (DataDefinitionQuery) newQuery(
@@ -98,7 +98,7 @@ public class QueryTest extends TestCase {
         assertEquals(expr, query.toSQLString());
     }
 
-    public void testUpdateQuery() throws Exception {
+    public void testUpdateQuery() {
         UpdateQuery query = (UpdateQuery) newQuery(
             Query.Type.UPDATE,
             newRow(TABLE_ATTRIBUTE, null, "Table1", null),
@@ -142,7 +142,7 @@ public class QueryTest extends TestCase {
         doTestOrderings(query);
     }
 
-    public void testBadQueries() throws Exception {
+    public void testBadQueries() {
         List<Row> rowList = new ArrayList<>();
         rowList.add(newRow(TYPE_ATTRIBUTE, null, -1, null, null));
         QueryImpl query = QueryImpl.create(-1, "TestQuery", rowList, 13);
@@ -244,7 +244,7 @@ public class QueryTest extends TestCase {
         }
     }
 
-    public void testAppendQuery() throws Exception {
+    public void testAppendQuery() {
         AppendQuery query = (AppendQuery) newQuery(
             Query.Type.APPEND, null, "Table2",
             // newRow(TABLE_ATTRIBUTE, null, "Table1", null),
@@ -264,7 +264,7 @@ public class QueryTest extends TestCase {
             "VALUES (54, 'hello');"), query.toSQLString());
     }
 
-    private void doTestColumns(SelectQuery query) throws Exception {
+    private void doTestColumns(SelectQuery query) {
         addRows(query, newRow(COLUMN_ATTRIBUTE, "Table1.id", null, null));
         addRows(query, newRow(COLUMN_ATTRIBUTE, "Table1.col", "Some.Alias", null));
 
@@ -273,7 +273,7 @@ public class QueryTest extends TestCase {
             query.toSQLString());
     }
 
-    private void doTestSelectFlags(SelectQuery query) throws Exception {
+    private void doTestSelectFlags(SelectQuery query) {
         setFlag(query, 3);
 
         assertEquals(multiline("SELECT DISTINCT Table1.id, Table1.col AS [Some.Alias], *",
@@ -303,7 +303,7 @@ public class QueryTest extends TestCase {
         setFlag(query, 0);
     }
 
-    private void doTestParameters(SelectQuery query) throws Exception {
+    private void doTestParameters(SelectQuery query) {
         addRows(query, newRow(PARAMETER_ATTRIBUTE, null, DataType.INT.getValue(), "INT_VAL", null));
 
         assertEquals(multiline("PARAMETERS INT_VAL Short;",
@@ -330,7 +330,7 @@ public class QueryTest extends TestCase {
         removeRows(query, PARAMETER_ATTRIBUTE);
     }
 
-    private void doTestTables(SelectQuery query) throws Exception {
+    private void doTestTables(SelectQuery query) {
         addRows(query, newRow(TABLE_ATTRIBUTE, null, "Table2", "Another Table"));
         addRows(query, newRow(TABLE_ATTRIBUTE, "Select val from Table3", "val", "Table3Val"));
 
@@ -339,7 +339,7 @@ public class QueryTest extends TestCase {
             query.toSQLString());
     }
 
-    private void doTestRemoteDb(SelectQuery query) throws Exception {
+    private void doTestRemoteDb(SelectQuery query) {
         addRows(query, newRow(REMOTEDB_ATTRIBUTE, null, 2, "other_db.mdb", null));
 
         assertEquals(multiline("SELECT Table1.id, Table1.col AS [Some.Alias]",
@@ -361,7 +361,7 @@ public class QueryTest extends TestCase {
         removeRows(query, REMOTEDB_ATTRIBUTE);
     }
 
-    private void doTestJoins(SelectQuery query) throws Exception {
+    private void doTestJoins(SelectQuery query) {
         addRows(query, newRow(JOIN_ATTRIBUTE, "(Table1.id = [Another Table].id)", 1, "Table1", "Another Table"));
 
         assertEquals(multiline("SELECT Table1.id, Table1.col AS [Some.Alias]",
@@ -395,7 +395,7 @@ public class QueryTest extends TestCase {
         removeRows(query, JOIN_ATTRIBUTE);
     }
 
-    private void doTestWhereExpression(SelectQuery query) throws Exception {
+    private void doTestWhereExpression(SelectQuery query) {
         addRows(query, newRow(WHERE_ATTRIBUTE, "(Table1.col2 < 13)",
             null, null));
 
@@ -405,7 +405,7 @@ public class QueryTest extends TestCase {
             query.toSQLString());
     }
 
-    private void doTestGroupings(SelectQuery query) throws Exception {
+    private void doTestGroupings(SelectQuery query) {
         addRows(query, newRow(GROUPBY_ATTRIBUTE, "Table1.id", null, null),
             newRow(GROUPBY_ATTRIBUTE, "SUM(Table1.val)", null, null));
 
@@ -416,7 +416,7 @@ public class QueryTest extends TestCase {
             query.toSQLString());
     }
 
-    private void doTestHavingExpression(SelectQuery query) throws Exception {
+    private void doTestHavingExpression(SelectQuery query) {
         addRows(query, newRow(HAVING_ATTRIBUTE, "(SUM(Table1.val) = 500)", null, null));
 
         assertEquals(multiline("SELECT Table1.id, Table1.col AS [Some.Alias]",
@@ -427,7 +427,7 @@ public class QueryTest extends TestCase {
             query.toSQLString());
     }
 
-    private void doTestOrderings(SelectQuery query) throws Exception {
+    private void doTestOrderings(SelectQuery query) {
         addRows(query, newRow(ORDERBY_ATTRIBUTE, "Table1.id", null, null),
             newRow(ORDERBY_ATTRIBUTE, "Table2.val", "D", null));
 
@@ -440,7 +440,7 @@ public class QueryTest extends TestCase {
             query.toSQLString());
     }
 
-    public void testComplexJoins() throws Exception {
+    public void testComplexJoins() {
         SelectQuery query = (SelectQuery) newQuery(
             Query.Type.SELECT);
         setFlag(query, 1);

@@ -311,10 +311,7 @@ public abstract class ComplexColumnInfoImpl<V extends ComplexValue>
     @Override
     public abstract ComplexDataType getType();
 
-    protected abstract V toValue(
-        ComplexValueForeignKey complexValueFk,
-        Row rawValues)
-        throws IOException;
+    protected abstract V toValue(ComplexValueForeignKey complexValueFk, Row rawValues);
 
     protected abstract static class ComplexValueImpl implements ComplexValue {
         private Id                     _id;
@@ -332,7 +329,7 @@ public abstract class ComplexColumnInfoImpl<V extends ComplexValue>
 
         @Override
         public void setId(Id id) {
-            if (_id == id) {
+            if (Objects.equals(_id, id)) {
                 // harmless, ignore
                 return;
             }
@@ -349,7 +346,7 @@ public abstract class ComplexColumnInfoImpl<V extends ComplexValue>
 
         @Override
         public void setComplexValueForeignKey(ComplexValueForeignKey complexValueFk) {
-            if (_complexValueFk == complexValueFk) {
+            if (Objects.equals(_complexValueFk, complexValueFk)) {
                 // harmless, ignore
                 return;
             }
@@ -373,7 +370,7 @@ public abstract class ComplexColumnInfoImpl<V extends ComplexValue>
         public boolean equals(Object o) {
             return this == o
                 || o != null && getClass() == o.getClass()
-                  && _id == ((ComplexValueImpl) o)._id
+                  && Objects.equals(_id, ((ComplexValueImpl) o)._id)
                   && _complexValueFk.equals(((ComplexValueImpl) o)._complexValueFk);
         }
     }

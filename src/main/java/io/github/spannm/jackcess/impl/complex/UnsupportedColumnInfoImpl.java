@@ -87,9 +87,8 @@ public class UnsupportedColumnInfoImpl
             new LinkedHashMap<>(values));
     }
 
-    private static class UnsupportedValueImpl extends ComplexValueImpl
-        implements UnsupportedValue {
-        private Map<String, Object> _values;
+    private static class UnsupportedValueImpl extends ComplexValueImpl implements UnsupportedValue {
+        private final Map<String, Object> _values;
 
         private UnsupportedValueImpl(Id id, ComplexValueForeignKey complexValueFk,
             Map<String, Object> values) {

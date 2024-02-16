@@ -65,7 +65,7 @@ public class TableImpl implements Table, PropertyMaps.Owner {
     public enum IndexFeature {
         EXACT_MATCH,
         EXACT_UNIQUE_ONLY,
-        ANY_MATCH;
+        ANY_MATCH
     }
 
     /**
@@ -161,8 +161,7 @@ public class TableImpl implements Table, PropertyMaps.Owner {
     /**
      * Only used by unit tests
      */
-    protected TableImpl(boolean testing, List<ColumnImpl> columns)
-        throws IOException {
+    protected TableImpl(boolean testing, List<ColumnImpl> columns) {
         if (!testing) {
             throw new IllegalArgumentException();
         }
@@ -337,7 +336,7 @@ public class TableImpl implements Table, PropertyMaps.Owner {
 
     @Override
     public boolean isAllowAutoNumberInsert() {
-        return _allowAutoNumInsert != null ? (boolean) _allowAutoNumInsert : getDatabase().isAllowAutoNumberInsert();
+        return _allowAutoNumInsert != null ? _allowAutoNumInsert : getDatabase().isAllowAutoNumberInsert();
     }
 
     @Override
@@ -525,7 +524,7 @@ public class TableImpl implements Table, PropertyMaps.Owner {
             boolean searchMatches = true;
             for (String sColName : searchColumns) {
                 String iColName = iIter.next().getName();
-                if (sColName != iColName && (sColName == null || !sColName.equalsIgnoreCase(iColName))) {
+                if (!sColName.equals(iColName) && (sColName == null || !sColName.equalsIgnoreCase(iColName))) {
                     searchMatches = false;
                     break;
                 }
@@ -854,8 +853,7 @@ public class TableImpl implements Table, PropertyMaps.Owner {
     /**
      * Reads the null mask from the given row buffer. Leaves limit unchanged.
      */
-    private NullMask getRowNullMask(ByteBuffer rowBuffer)
-        throws IOException {
+    private NullMask getRowNullMask(ByteBuffer rowBuffer) {
         // reset position to row start
         rowBuffer.reset();
 
@@ -1487,15 +1485,14 @@ public class TableImpl implements Table, PropertyMaps.Owner {
         return newIdx;
     }
 
-    private void validateTableDefUpdate(TableUpdater mutator, ByteBuffer tableBuffer)
-        throws IOException {
+    private void validateTableDefUpdate(TableUpdater mutator, ByteBuffer tableBuffer) {
         if (!mutator.validateUpdatedTdef(tableBuffer)) {
             throw new IllegalStateException(
                 withErrorContext("Failed updating table definition (unexpected length)"));
         }
     }
 
-    private void completeTableMutation(ByteBuffer tableBuffer) throws IOException {
+    private void completeTableMutation(ByteBuffer tableBuffer) {
         // lastly, may need to clear table def buffer
         _tableDefBufferH.possiblyInvalidate(_tableDefPageNumber, tableBuffer);
 
@@ -1638,8 +1635,7 @@ public class TableImpl implements Table, PropertyMaps.Owner {
      * @param buffer Buffer to write to
      */
     private static void writeTableDefinitionHeader(
-        TableCreator creator, ByteBuffer buffer, int totalTableDefSize)
-        throws IOException {
+        TableCreator creator, ByteBuffer buffer, int totalTableDefSize) {
         List<ColumnBuilder> columns = creator.getColumns();
 
         // Start writing the tdef
@@ -2846,8 +2842,7 @@ public class TableImpl implements Table, PropertyMaps.Owner {
     /**
      * Restores all autonumber column values from a failed add row.
      */
-    private void restoreAutoNumbersFromAdd(Object[] row)
-        throws IOException {
+    private void restoreAutoNumbersFromAdd(Object[] row) {
         if (_autoNumColumns.isEmpty()) {
             return;
         }
@@ -2990,8 +2985,7 @@ public class TableImpl implements Table, PropertyMaps.Owner {
      * Returns the row count for the current page. If the page is invalid ({@code null}) or the page is not a DATA page,
      * 0 is returned.
      */
-    static int getRowsOnDataPage(ByteBuffer rowBuffer, JetFormat format)
-        throws IOException {
+    static int getRowsOnDataPage(ByteBuffer rowBuffer, JetFormat format) {
         int rowsOnPage = 0;
         if (rowBuffer != null && rowBuffer.get(0) == PageTypes.DATA) {
             rowsOnPage = rowBuffer.getShort(format.OFFSET_NUM_ROWS_ON_DATA_PAGE);
@@ -3119,14 +3113,14 @@ public class TableImpl implements Table, PropertyMaps.Owner {
         VALID,
         DELETED,
         NORMAL,
-        OVERFLOW;
+        OVERFLOW
     }
 
     /** the phases the RowState moves through as the data is parsed */
     private enum RowStateStatus {
         INIT,
         AT_HEADER,
-        AT_FINAL;
+        AT_FINAL
     }
 
     /**

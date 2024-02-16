@@ -27,7 +27,7 @@ public interface Relationship {
     enum JoinType {
         INNER,
         LEFT_OUTER,
-        RIGHT_OUTER;
+        RIGHT_OUTER
     }
 
     String getName();

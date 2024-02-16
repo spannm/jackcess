@@ -39,7 +39,7 @@ import java.util.*;
  * @author James Ahlborn
  */
 public class LocalDateTimeTest extends TestCase {
-    public LocalDateTimeTest(String name) throws Exception {
+    public LocalDateTimeTest(String name) {
         super(name);
     }
 

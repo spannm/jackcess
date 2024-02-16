@@ -51,7 +51,7 @@ public class UsageMap {
     /** Last page that this usage map applies to */
     private int                _endPage;
     /** bits representing page numbers used, offset from _startPage */
-    private BitSet             _pageNumbers                = new BitSet();
+    private final BitSet       _pageNumbers                = new BitSet();
     /** Buffer that contains the usage map table declaration page */
     private final ByteBuffer   _tableBuffer;
     /**
@@ -59,8 +59,7 @@ public class UsageMap {
      */
     private int                _modCount;
     /**
-     * the current handler implementation for reading/writing the specific usage map type. note, this may change over
-     * time.
+     * the current handler implementation for reading/writing the specific usage map type. note, this may change over time.
      */
     private Handler            _handler;
 
@@ -73,9 +72,7 @@ public class UsageMap {
      * @param pageNum Page number that this usage map is contained in
      * @param rowStart Offset at which the declaration starts in the buffer
      */
-    private UsageMap(DatabaseImpl database, ByteBuffer tableBuffer,
-        int pageNum, short rowStart)
-        throws IOException {
+    private UsageMap(DatabaseImpl database, ByteBuffer tableBuffer, int pageNum, short rowStart) {
         _database = database;
         _tableBuffer = tableBuffer;
         _tablePageNum = pageNum;
@@ -456,7 +453,7 @@ public class UsageMap {
     private class InlineHandler extends Handler {
         private final int _maxInlinePages;
 
-        protected InlineHandler() throws IOException {
+        protected InlineHandler() {
             _maxInlinePages = (getInlineDataEnd() - getInlineDataStart()) * 8;
             int startPage = getTableBuffer().getInt(getRowStart() + 1);
             setInlinePageRange(startPage);

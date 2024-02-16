@@ -93,14 +93,14 @@ public class ExpressionatorTest extends TestCase {
         validateExpr("<=1 And >=0", "<ELogicalOp>{<ECompOp>{<EThisValue>{<THIS_COL>} <= <ELiteralValue>{1}} And <ECompOp>{<EThisValue>{<THIS_COL>} >= <ELiteralValue>{0}}}", "<= 1 And >= 0");
     }
 
-    private static void doTestSimpleBinOp(String opName, String... ops) throws Exception {
+    private static void doTestSimpleBinOp(String opName, String... ops) {
         for (String op : ops) {
             validateExpr("\"A\" " + op + " \"B\"", "<" + opName + ">{<ELiteralValue>{\"A\"} " + op + " <ELiteralValue>{\"B\"}}");
         }
     }
 
     @SuppressWarnings("checkstyle:LineLengthCheck")
-    public void testOrderOfOperations() throws Exception {
+    public void testOrderOfOperations() {
         validateExpr("\"A\" Eqv \"B\"", "<ELogicalOp>{<ELiteralValue>{\"A\"} Eqv <ELiteralValue>{\"B\"}}");
 
         validateExpr("\"A\" Eqv \"B\" Xor \"C\"", "<ELogicalOp>{<ELiteralValue>{\"A\"} Eqv <ELogicalOp>{<ELiteralValue>{\"B\"} Xor <ELiteralValue>{\"C\"}}}");
@@ -129,7 +129,7 @@ public class ExpressionatorTest extends TestCase {
 
     }
 
-    public void testSimpleMathExpressions() throws Exception {
+    public void testSimpleMathExpressions() {
         for (int i = -10; i <= 10; ++i) {
             assertEquals(-i, eval("=-(" + i + ")"));
         }
@@ -262,7 +262,7 @@ public class ExpressionatorTest extends TestCase {
         }
     }
 
-    public void testComparison() throws Exception {
+    public void testComparison() {
         assertEquals(TRUE_NUM, eval("='blah'<'fuzz'"));
         assertEquals(FALSE_NUM, eval("=23>56"));
         assertEquals(FALSE_NUM, eval("=23>=56"));
@@ -292,7 +292,7 @@ public class ExpressionatorTest extends TestCase {
         assertEquals(TRUE_NUM, eval("=Not(True Eqv False)"));
     }
 
-    public void testDateArith() throws Exception {
+    public void testDateArith() {
         assertEquals(LocalDateTime.of(2003, 1, 2, 7, 0), eval("=#01/02/2003# + #7:00:00 AM#"));
         assertEquals(LocalDateTime.of(2003, 1, 1, 17, 0), eval("=#01/02/2003# - #7:00:00 AM#"));
         assertEquals(LocalDateTime.of(2003, 2, 8, 0, 0), eval("=#01/02/2003# + '37'"));
@@ -304,7 +304,7 @@ public class ExpressionatorTest extends TestCase {
         assertEquals("1/2/2003 1:10:00 PM", eval("=CStr(#01/02/2003# + #13:10:00#)"));
     }
 
-    public void testNull() throws Exception {
+    public void testNull() {
         assertNull(eval("=37 + Null"));
         assertNull(eval("=37 - Null"));
         assertNull(eval("=37 / Null"));
@@ -338,7 +338,7 @@ public class ExpressionatorTest extends TestCase {
         assertNull(eval("=Null In (23, Null, 45)"));
     }
 
-    public void testTrickyMathExpressions() throws Exception {
+    public void testTrickyMathExpressions() {
         assertEquals(37, eval("=30+7"));
         assertEquals(23, eval("=30+-7"));
         assertEquals(23, eval("=30-+7"));
@@ -354,7 +354,7 @@ public class ExpressionatorTest extends TestCase {
         assertEquals(toBD(-101d), eval("=-10E-1-10e+1"));
     }
 
-    public void testTypeCoercion() throws Exception {
+    public void testTypeCoercion() {
         assertEquals("foobar", eval("=\"foo\" + \"bar\""));
 
         assertEquals("12foo", eval("=12 + \"foo\""));
@@ -380,7 +380,7 @@ public class ExpressionatorTest extends TestCase {
         assertEquals(128208, eval("=#1/1/2017# * 3"));
     }
 
-    public void testLikeExpression() throws Exception {
+    public void testLikeExpression() {
         validateExpr("Like \"[abc]*\"", "<ELikeOp>{<EThisValue>{<THIS_COL>} Like \"[abc]*\"([abc].*)}",
             "Like \"[abc]*\"");
         assertTrue(evalCondition("Like \"[abc]*\"", "afcd"));
@@ -394,7 +394,7 @@ public class ExpressionatorTest extends TestCase {
         assertFalse(evalCondition("Like \"[abc*\"", ""));
     }
 
-    public void testLiteralDefaultValue() throws Exception {
+    public void testLiteralDefaultValue() {
         assertEquals("-28 blah ", eval("=CDbl(9)-37 & \" blah \"",
             Value.Type.STRING));
         assertEquals("CDbl(9)-37 & \" blah \"",
@@ -443,7 +443,7 @@ public class ExpressionatorTest extends TestCase {
         br.close();
     }
 
-    public void testInvalidExpressions() throws Exception {
+    public void testInvalidExpressions() {
         doTestEvalFail("", "empty");
         doTestEvalFail("=", "found?");
         doTestEvalFail("=(34 + 5", "closing");
@@ -557,9 +557,8 @@ public class ExpressionatorTest extends TestCase {
 
         @Override
         public DateTimeFormatter createDateFormatter(String formatStr) {
-            DateTimeFormatter dtf = DateTimeFormatter.ofPattern(
+            return DateTimeFormatter.ofPattern(
                 formatStr, TemporalConfig.US_TEMPORAL_CONFIG.getLocale());
-            return dtf;
         }
 
         @Override

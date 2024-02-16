@@ -44,7 +44,7 @@ public abstract class TempBufferHolder {
         /**
          * no reference is maintained to a created buffer (new buffer every time)
          */
-        NONE;
+        NONE
     }
 
     /** whether or not every get automatically rewinds the buffer */

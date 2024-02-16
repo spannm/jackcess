@@ -43,7 +43,7 @@ public class CursorTest extends TestCase {
     static final List<TestDB> INDEX_CURSOR_DBS =
         TestDB.getSupportedForBasename(Basename.INDEX_CURSOR);
 
-    public CursorTest(String name) throws Exception {
+    public CursorTest(String name) {
         super(name);
     }
 
@@ -57,8 +57,7 @@ public class CursorTest extends TestCase {
         clearTestAutoSync();
     }
 
-    private static List<Map<String, Object>> createTestTableData()
-        throws Exception {
+    private static List<Map<String, Object>> createTestTableData() {
         List<Map<String, Object>> expectedRows =
             new ArrayList<>();
         for (int i = 0; i < 10; ++i) {
@@ -93,8 +92,7 @@ public class CursorTest extends TestCase {
         return db;
     }
 
-    private static List<Map<String, Object>> createUnorderedTestTableData()
-        throws Exception {
+    private static List<Map<String, Object>> createUnorderedTestTableData() {
         List<Map<String, Object>> expectedRows =
             new ArrayList<>();
         int[] ids = new int[] {3, 7, 6, 1, 2, 9, 0, 5, 4, 8};
@@ -104,8 +102,7 @@ public class CursorTest extends TestCase {
         return expectedRows;
     }
 
-    static Database createTestIndexTable(TestDB indexCursorDB)
-        throws Exception {
+    static Database createTestIndexTable(TestDB indexCursorDB) throws Exception {
         Database db = openMem(indexCursorDB);
 
         Table table = db.getTable("test");
@@ -117,8 +114,7 @@ public class CursorTest extends TestCase {
         return db;
     }
 
-    private static List<Map<String, Object>> createDupeTestTableData()
-        throws Exception {
+    private static List<Map<String, Object>> createDupeTestTableData() {
         List<Map<String, Object>> expectedRows =
             new ArrayList<>();
         int[] ids = new int[] {3, 7, 6, 1, 2, 9, 0, 5, 4, 8};
@@ -173,7 +169,7 @@ public class CursorTest extends TestCase {
             .toCursor();
     }
 
-    public void testRowId() throws Exception {
+    public void testRowId() {
         // test special cases
         RowIdImpl rowId1 = new RowIdImpl(1, 2);
         RowIdImpl rowId2 = new RowIdImpl(1, 3);
@@ -783,8 +779,7 @@ public class CursorTest extends TestCase {
         }
     }
 
-    private static void doTestFindAll(Table table, Cursor cursor, Index index)
-        throws Exception {
+    private static void doTestFindAll(Table table, Cursor cursor, Index index) {
         List<? extends Map<String, Object>> rows = RowFilterTest.toList(
             cursor.newIterable().withMatchPattern("value", "data2"));
 
@@ -937,9 +932,7 @@ public class CursorTest extends TestCase {
         }
     }
 
-    private static void doTestMatchers(Table table, ColumnMatcher columnMatcher,
-        boolean caseInsensitive)
-        throws Exception {
+    private static void doTestMatchers(Table table, ColumnMatcher columnMatcher, boolean caseInsensitive) {
         assertTrue(columnMatcher.matches(table, "value", null, null));
         assertFalse(columnMatcher.matches(table, "value", "foo", null));
         assertFalse(columnMatcher.matches(table, "value", null, "foo"));
@@ -951,10 +944,7 @@ public class CursorTest extends TestCase {
         assertTrue(columnMatcher.matches(table, "value", 13, 13));
     }
 
-    private static void doTestMatcher(Table table, Cursor cursor,
-        ColumnMatcher columnMatcher,
-        boolean caseInsensitive)
-        throws Exception {
+    private static void doTestMatcher(Table table, Cursor cursor, ColumnMatcher columnMatcher, boolean caseInsensitive) throws Exception {
         cursor.setColumnMatcher(columnMatcher);
 
         assertTrue(cursor.findFirstRow(table.getColumn("id"), 3));

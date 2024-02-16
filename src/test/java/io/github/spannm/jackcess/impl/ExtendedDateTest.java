@@ -39,7 +39,7 @@ import java.util.*;
  */
 public class ExtendedDateTest extends TestCase {
 
-    public ExtendedDateTest(String name) throws Exception {
+    public ExtendedDateTest(String name) {
         super(name);
     }
 

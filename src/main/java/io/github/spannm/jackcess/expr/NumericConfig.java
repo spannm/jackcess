@@ -40,7 +40,7 @@ public class NumericConfig {
         STANDARD,
         PERCENT,
         SCIENTIFIC,
-        EURO;
+        EURO
     }
 
     private final int                  _numDecDigits;

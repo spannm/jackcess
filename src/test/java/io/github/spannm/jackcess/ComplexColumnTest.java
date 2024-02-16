@@ -433,7 +433,7 @@ public class ComplexColumnTest extends TestCase {
         }
     }
 
-    private static byte[] getFileBytes(String fname) throws Exception {
+    private static byte[] getFileBytes(String fname) {
         if ("test_data.txt".equals(fname)) {
             return TEST_BYTES;
         }
@@ -443,7 +443,7 @@ public class ComplexColumnTest extends TestCase {
         throw new RuntimeException("unexpected bytes");
     }
 
-    private static byte[] getEncodedFileBytes(String fname) throws Exception {
+    private static byte[] getEncodedFileBytes(String fname) {
         if ("test_data.txt".equals(fname)) {
             return TEST_ENC_BYTES;
         }

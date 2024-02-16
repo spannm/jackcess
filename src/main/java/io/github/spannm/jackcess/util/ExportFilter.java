@@ -18,7 +18,6 @@ package io.github.spannm.jackcess.util;
 
 import io.github.spannm.jackcess.Column;
 
-import java.io.IOException;
 import java.util.List;
 
 /**
@@ -34,8 +33,7 @@ public interface ExportFilter {
      * @param columns the columns as determined by the export code, may be directly modified and returned
      * @return the columns to use when creating the export file
      */
-    List<Column> filterColumns(List<Column> columns)
-        throws IOException;
+    List<Column> filterColumns(List<Column> columns);
 
     /**
      * The desired values for the row.
@@ -43,6 +41,6 @@ public interface ExportFilter {
      * @param row the row data as determined by the import code, may be directly modified
      * @return the row data as it should be written to the import table. if {@code null}, the row will be skipped
      */
-    Object[] filterRow(Object[] row) throws IOException;
+    Object[] filterRow(Object[] row);
 
 }

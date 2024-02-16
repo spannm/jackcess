@@ -35,7 +35,7 @@ import java.util.Map;
  */
 public class CalcFieldTest extends TestCase {
 
-    public CalcFieldTest(String name) throws Exception {
+    public CalcFieldTest(String name) {
         super(name);
     }
 

@@ -196,7 +196,7 @@ class CalculatedColumnUtil {
         }
 
         @Override
-        public Object read(byte[] data, ByteOrder order) throws IOException {
+        public Object read(byte[] data, ByteOrder order) {
             data = unwrapCalculatedValue(data);
             if (data.length == 0) {
                 return Boolean.FALSE;
@@ -206,8 +206,7 @@ class CalculatedColumnUtil {
 
         @Override
         protected ByteBuffer writeRealData(Object obj, int remainingRowLength,
-            ByteOrder order)
-            throws IOException {
+            ByteOrder order) {
             return ByteBuffer.wrap(
                 toBooleanValue(obj) ? CALC_BOOL_TRUE : CALC_BOOL_FALSE).order(order);
         }
@@ -323,7 +322,7 @@ class CalculatedColumnUtil {
         }
 
         @Override
-        public Object read(byte[] data, ByteOrder order) throws IOException {
+        public Object read(byte[] data, ByteOrder order) {
             data = unwrapCalculatedValue(data);
             if (data.length == 0) {
                 // apparently "null" values can be written as actual data

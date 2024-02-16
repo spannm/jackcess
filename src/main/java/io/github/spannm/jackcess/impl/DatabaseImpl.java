@@ -925,7 +925,7 @@ public class DatabaseImpl implements Database, DateTimeContext {
     }
 
     /**
-     * @returns the current handler for reading/writing properties, creating if necessary
+     * @return the current handler for reading/writing properties, creating if necessary
      */
     private PropertyMaps.Handler getPropsHandler() {
         if (_propsHandler == null) {
@@ -2279,7 +2279,7 @@ public class DatabaseImpl implements Database, DateTimeContext {
         }
 
         @Override
-        public Table open(Database db) throws IOException {
+        public Table open(Database db) {
             return null;
         }
 
@@ -2293,7 +2293,7 @@ public class DatabaseImpl implements Database, DateTimeContext {
      * Table iterator for this database, unmodifiable.
      */
     private class TableIterator implements Iterator<Table> {
-        private Iterator<String> _tableNameIter;
+        private final Iterator<String> _tableNameIter;
 
         private TableIterator(Set<String> tableNames) {
             _tableNameIter = tableNames.iterator();
@@ -2541,7 +2541,7 @@ public class DatabaseImpl implements Database, DateTimeContext {
         }
 
         @Override
-        public TableInfo lookupTable(String tableName) throws IOException {
+        public TableInfo lookupTable(String tableName) {
 
             for (Row row : _systemCatalogCursor.newIterable().withColumnNames(SYSTEM_CATALOG_TABLE_DETAIL_COLUMNS)) {
 
@@ -2567,7 +2567,7 @@ public class DatabaseImpl implements Database, DateTimeContext {
         }
 
         @Override
-        protected Cursor getTableNamesCursor() throws IOException {
+        protected Cursor getTableNamesCursor() {
             return _systemCatalogCursor;
         }
 

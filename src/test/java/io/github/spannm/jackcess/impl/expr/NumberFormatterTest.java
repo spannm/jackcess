@@ -28,11 +28,11 @@ import java.math.BigDecimal;
  * @author James Ahlborn
  */
 public class NumberFormatterTest {
-    private NumberFormatter _numFmt = new NumberFormatter(
+    private final NumberFormatter _numFmt = new NumberFormatter(
         NumericConfig.US_NUMERIC_CONFIG.getDecimalFormatSymbols());
 
     @Test
-    public void testDoubleFormat() throws Exception {
+    public void testDoubleFormat() {
         assertEquals("894984737284944", _numFmt.format(894984737284944d));
         assertEquals("-894984737284944", _numFmt.format(-894984737284944d));
         assertEquals("8949.84737284944", _numFmt.format(8949.84737284944d));
@@ -59,7 +59,7 @@ public class NumberFormatterTest {
     }
 
     @Test
-    public void testFloatFormat() throws Exception {
+    public void testFloatFormat() {
         assertEquals("8949847", _numFmt.format(8949847f));
         assertEquals("-8949847", _numFmt.format(-8949847f));
         assertEquals("8949.847", _numFmt.format(8949.847f));
@@ -86,7 +86,7 @@ public class NumberFormatterTest {
     }
 
     @Test
-    public void testDecimalFormat() throws Exception {
+    public void testDecimalFormat() {
         assertEquals("9874539485972.2342342234234", _numFmt.format(new BigDecimal("9874539485972.2342342234234")));
         assertEquals("9874539485972.234234223423468", _numFmt.format(new BigDecimal("9874539485972.2342342234234678")));
         assertEquals("-9874539485972.234234223423468", _numFmt.format(new BigDecimal("-9874539485972.2342342234234678")));

@@ -34,7 +34,7 @@ import java.util.Map;
  */
 public class FKEnforcerTest extends TestCase {
 
-    public FKEnforcerTest(String name) throws Exception {
+    public FKEnforcerTest(String name) {
         super(name);
     }
 

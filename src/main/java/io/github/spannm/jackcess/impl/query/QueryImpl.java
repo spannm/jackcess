@@ -453,7 +453,7 @@ public abstract class QueryImpl implements Query {
     }
 
     protected static int getIntValue(Integer i, int def) {
-        return i != null ? (int) i : def;
+        return i != null ? i : def;
     }
 
     protected static StringBuilder toOptionalQuotedExpr(StringBuilder builder,

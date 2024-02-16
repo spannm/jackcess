@@ -34,7 +34,7 @@ public class IterableBuilder implements Iterable<Row> {
     public enum Type {
         SIMPLE,
         COLUMN_MATCH,
-        ROW_MATCH;
+        ROW_MATCH
     }
 
     private final Cursor       _cursor;

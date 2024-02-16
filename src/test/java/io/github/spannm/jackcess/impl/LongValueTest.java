@@ -35,7 +35,7 @@ import java.util.*;
  */
 public class LongValueTest extends TestCase {
 
-    public LongValueTest(String name) throws Exception {
+    public LongValueTest(String name) {
         super(name);
     }
 

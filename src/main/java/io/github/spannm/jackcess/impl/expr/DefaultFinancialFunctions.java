@@ -297,8 +297,7 @@ public class DefaultFinancialFunctions {
 
     private static double calculateSumOfYearsDepreciation(
         double cost, double salvage, double life, double period) {
-        double result = (cost - salvage) * (life - period + 1) * 2d / (life * (life + 1));
-        return result;
+        return (cost - salvage) * (life - period + 1) * 2d / (life * (life + 1));
     }
 
     private static double calculateLoanPaymentPeriods(

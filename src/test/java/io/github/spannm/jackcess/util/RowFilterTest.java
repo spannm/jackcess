@@ -39,7 +39,7 @@ public class RowFilterTest extends TestCase {
         super(name);
     }
 
-    public void testFilter() throws Exception {
+    public void testFilter() {
         Row row0 = createExpectedRow(ID_COL, 0, COL1, "foo", COL2, 13, COL3, "bar");
         Row row1 = createExpectedRow(ID_COL, 1, COL1, "bar", COL2, 42, COL3, null);
         Row row2 = createExpectedRow(ID_COL, 2, COL1, "foo", COL2, 55, COL3, "bar");

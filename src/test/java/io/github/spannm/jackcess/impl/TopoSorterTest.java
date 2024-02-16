@@ -30,7 +30,7 @@ public class TopoSorterTest extends TestCase {
         super(name);
     }
 
-    public void testTopoSort() throws Exception {
+    public void testTopoSort() {
         doTopoTest(List.of("A", "B", "C"),
             List.of("A", "B", "C"));
 

@@ -51,7 +51,7 @@ public class IndexCodesTest extends TestCase {
         SPECIAL_CHARS.put('\\', "\\\\");
     }
 
-    public IndexCodesTest(String name) throws Exception {
+    public IndexCodesTest(String name) {
         super(name);
     }
 
@@ -138,7 +138,7 @@ public class IndexCodesTest extends TestCase {
     //
     //////
 
-    public void testNothing() throws Exception {
+    public void testNothing() {
         // keep this so build doesn't fail if other tests are disabled
     }
 
@@ -644,25 +644,25 @@ public class IndexCodesTest extends TestCase {
         return str;
     }
 
-    private static void handleInlineEntry(String entryCodes, char c, Map<Character, String[]> inlineCodes) throws Exception {
+    private static void handleInlineEntry(String entryCodes, char c, Map<Character, String[]> inlineCodes) {
         inlineCodes.put(c, entryCodes.trim().split(" "));
     }
 
-    private static void handleUnprintableEntry(String entryCodes, char c, Map<Character, String[]> unprintCodes) throws Exception {
+    private static void handleUnprintableEntry(String entryCodes, char c, Map<Character, String[]> unprintCodes) {
         unprintCodes.put(c, entryCodes.trim().split(" "));
     }
 
-    private static void handleUnprintable2Entry(String entryCodes, char c, Map<Character, String[]> unprintCodes) throws Exception {
+    private static void handleUnprintable2Entry(String entryCodes, char c, Map<Character, String[]> unprintCodes) {
         unprintCodes.put(c, entryCodes.trim().split(" "));
     }
 
-    private static void handleInternationalEntry(String inlineCodes, String entryCodes, char c, Map<Character, String[]> inatInlineCodes, Map<Character, String[]> inatExtraCodes) throws Exception {
+    private static void handleInternationalEntry(String inlineCodes, String entryCodes, char c, Map<Character, String[]> inatInlineCodes, Map<Character, String[]> inatExtraCodes) {
         inatInlineCodes.put(c, inlineCodes.trim().split(" "));
         inatExtraCodes.put(c, entryCodes.trim().split(" "));
     }
 
     private static void handleInternational2Entry(String inlineCodes, String entryCodes, String crazyCodes, char c, Map<Character, String[]> inatInlineCodes, Map<Character, String[]> inatExtraCodes,
-        Map<Character, String[]> inatCrazyCodes) throws Exception {
+        Map<Character, String[]> inatCrazyCodes) {
         inatInlineCodes.put(c, inlineCodes.trim().split(" "));
         if (entryCodes != null) {
             inatExtraCodes.put(c, entryCodes.trim().split(" "));
@@ -680,7 +680,7 @@ public class IndexCodesTest extends TestCase {
         return sb.toString();
     }
 
-    private static String toUnicodeStr(char c) throws Exception {
+    private static String toUnicodeStr(char c) {
         String specialStr = SPECIAL_CHARS.get(c);
         if (specialStr != null) {
             return specialStr;

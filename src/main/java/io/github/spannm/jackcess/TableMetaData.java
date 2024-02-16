@@ -28,7 +28,7 @@ public interface TableMetaData {
     enum Type {
         LOCAL,
         LINKED,
-        LINKED_ODBC;
+        LINKED_ODBC
     }
 
     /**

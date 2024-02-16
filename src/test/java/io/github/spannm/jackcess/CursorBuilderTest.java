@@ -25,7 +25,7 @@ import junit.framework.TestCase;
  */
 public class CursorBuilderTest extends TestCase {
 
-    public CursorBuilderTest(String name) throws Exception {
+    public CursorBuilderTest(String name) {
         super(name);
     }
 

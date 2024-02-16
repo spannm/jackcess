@@ -25,5 +25,5 @@ public enum ComplexDataType {
     ATTACHMENT,
     MULTI_VALUE,
     VERSION_HISTORY,
-    UNSUPPORTED;
+    UNSUPPORTED
 }

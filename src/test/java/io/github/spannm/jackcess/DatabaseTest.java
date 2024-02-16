@@ -41,7 +41,7 @@ import java.util.stream.Collectors;
  */
 @SuppressWarnings("deprecation")
 public class DatabaseTest extends TestCase {
-    public DatabaseTest(String name) throws Exception {
+    public DatabaseTest(String name) {
         super(name);
     }
 
@@ -133,7 +133,7 @@ public class DatabaseTest extends TestCase {
         }
     }
 
-    private static void checkColumn(List<? extends Column> columns, int columnNumber, String name, DataType dataType) throws Exception {
+    private static void checkColumn(List<? extends Column> columns, int columnNumber, String name, DataType dataType) {
         Column column = columns.get(columnNumber);
         assertEquals(name, column.getName());
         assertEquals(dataType, column.getType());

@@ -74,7 +74,7 @@ public class Expressionator {
         DEFAULT_VALUE,
         EXPRESSION,
         FIELD_VALIDATOR,
-        RECORD_VALIDATOR;
+        RECORD_VALIDATOR
     }
 
     public interface ParseContext extends LocaleContext {
@@ -87,7 +87,7 @@ public class Expressionator {
         LOG_OP,
         CONST,
         SPEC_OP_PREFIX,
-        DELIM;
+        DELIM
     }
 
     private interface OpType {

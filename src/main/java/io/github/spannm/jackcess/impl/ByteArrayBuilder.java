@@ -105,7 +105,7 @@ public class ByteArrayBuilder {
     }
 
     private abstract static class Data {
-        private int _pos;
+        private final int _pos;
 
         protected Data(int pos) {
             _pos = pos;

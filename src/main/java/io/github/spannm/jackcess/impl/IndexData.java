@@ -103,7 +103,7 @@ public class IndexData {
         /**
          * comparable type indicating this Entry should always compare greater than valid RowIds
          */
-        ALWAYS_LAST;
+        ALWAYS_LAST
     }
 
     public static final Comparator<byte[]> BYTE_CODE_COMPARATOR = (left, right) -> {
@@ -183,7 +183,7 @@ public class IndexData {
     /**
      * Creates an IndexData appropriate for the given table, using information from the given table definition buffer.
      */
-    public static IndexData create(TableImpl table, ByteBuffer tableBuffer, int number, JetFormat format) throws IOException {
+    public static IndexData create(TableImpl table, ByteBuffer tableBuffer, int number, JetFormat format) {
         int uniqueEntryCountOffset = format.OFFSET_INDEX_DEF_BLOCK + number * format.SIZE_INDEX_DEFINITION + 4;
         int uniqueEntryCount = tableBuffer.getInt(uniqueEntryCountOffset);
 
@@ -1314,7 +1314,7 @@ public class IndexData {
      * Creates one of the special index entries.
      */
     private static Entry createSpecialEntry(RowIdImpl rowId) {
-        return new Entry((byte[]) null, rowId);
+        return new Entry(null, rowId);
     }
 
     /**
@@ -1406,7 +1406,7 @@ public class IndexData {
         private final ColumnImpl _column;
         private final byte       _flags;
 
-        private ColumnDescriptor(ColumnImpl column, byte flags) throws IOException {
+        private ColumnDescriptor(ColumnImpl column, byte flags) {
             _column = column;
             _flags = flags;
         }
@@ -1622,7 +1622,7 @@ public class IndexData {
         }
 
         @Override
-        protected void writeNonNullValue(Object value, ByteStream bout) throws IOException {
+        protected void writeNonNullValue(Object value, ByteStream bout) {
             bout.write(ColumnImpl.toBooleanValue(value) ? isAscending() ? ASC_BOOLEAN_TRUE : DESC_BOOLEAN_TRUE : isAscending() ? ASC_BOOLEAN_FALSE : DESC_BOOLEAN_FALSE);
         }
     }
@@ -1742,7 +1742,7 @@ public class IndexData {
         }
 
         @Override
-        protected void writeNonNullValue(Object value, ByteStream bout) throws IOException {
+        protected void writeNonNullValue(Object value, ByteStream bout) {
             throw new UnsupportedOperationException("Cannot write indexes of this type due to " + _unsupportedReason);
         }
     }
@@ -1791,7 +1791,7 @@ public class IndexData {
         /**
          * Read an existing entry in from a buffer
          */
-        private Entry(ByteBuffer buffer, int entryLen, int extraTrailingLen) throws IOException {
+        private Entry(ByteBuffer buffer, int entryLen, int extraTrailingLen) {
             // we need 4 trailing bytes for the rowId, plus whatever the caller
             // wants
             int colEntryLen = entryLen - (4 + extraTrailingLen);

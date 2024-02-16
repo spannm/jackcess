@@ -99,7 +99,7 @@ public class ToStringBuilder {
     void appendInternal(StringBuilder _buffer, String _fieldName, Object _value) {
         boolean primitiveWrapper = _value instanceof Number || _value instanceof Boolean || _value instanceof Character;
         if (OBJ_REGISTRY.containsKey(_value) && !primitiveWrapper) {
-            _buffer.append(_value.getClass().getName() + '@' + Integer.toHexString(System.identityHashCode(_value)));
+            _buffer.append(_value.getClass().getName()).append('@').append(Integer.toHexString(System.identityHashCode(_value)));
             return;
         }
 
@@ -114,10 +114,9 @@ public class ToStringBuilder {
                     _buffer.append("...");
                 }
             } else if (_value.getClass().isArray()) {
-                Object arr = _value;
                 _buffer.append('{');
-                for (int i = 0; i < Array.getLength(arr); i++) {
-                    Object item = Array.get(arr, i);
+                for (int i = 0; i < Array.getLength(_value); i++) {
+                    Object item = Array.get(_value, i);
                     if (i > 0) {
                         _buffer.append(fieldSeparator);
                     }

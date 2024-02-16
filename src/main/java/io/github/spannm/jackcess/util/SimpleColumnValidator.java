@@ -19,8 +19,6 @@ package io.github.spannm.jackcess.util;
 
 import io.github.spannm.jackcess.Column;
 
-import java.io.IOException;
-
 /**
  * Simple concrete implementation of ColumnValidator which simply returns the given value.
  *
@@ -30,7 +28,7 @@ public class SimpleColumnValidator implements ColumnValidator {
     public static final SimpleColumnValidator INSTANCE = new SimpleColumnValidator();
 
     @Override
-    public Object validate(Column col, Object val) throws IOException {
+    public Object validate(Column col, Object val) {
         return val;
     }
 }

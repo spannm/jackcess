@@ -92,7 +92,7 @@ public class CustomLinkResolverTest extends TestCase {
 
         @Override
         protected Object loadCustomFile(
-            Database linkerDb, String linkeeFileName) throws IOException {
+            Database linkerDb, String linkeeFileName) {
             return "testFile1.txt".equals(linkeeFileName)
                 || "testFile2.txt".equals(linkeeFileName) ? linkeeFileName : null;
         }

@@ -35,7 +35,7 @@ import java.util.Calendar;
 public class DefaultFunctionsTest {
 
     @Test
-    public void testFuncs() throws Exception {
+    public void testFuncs() {
         assertEval("foo", "=IIf(10 > 1, \"foo\", \"bar\")");
         assertEval("bar", "=IIf(10 < 1, \"foo\", \"bar\")");
         assertEval(102, "=Asc(\"foo\")");
@@ -262,7 +262,7 @@ public class DefaultFunctionsTest {
     }
 
     @Test
-    public void testFormat() throws Exception {
+    public void testFormat() {
         assertEval("12345.6789", "=Format(12345.6789, 'General Number')");
         assertEval("0.12345", "=Format(0.12345, 'General Number')");
         assertEval("-12345.6789", "=Format(-12345.6789, 'General Number')");
@@ -326,7 +326,7 @@ public class DefaultFunctionsTest {
     }
 
     @Test
-    public void testCustomFormat() throws Exception {
+    public void testCustomFormat() {
         assertEval("07:00 a", "=Format(#01/10/2003 7:00:00 AM#, 'hh:nn a/p')");
         assertEval("07:00 p", "=Format(#01/10/2003 7:00:00 PM#, 'hh:nn a/p')");
         assertEval("07:00 a 6 2", "=Format(#01/10/2003 7:00:00 AM#, 'hh:nn a/p w ww')");
@@ -558,7 +558,7 @@ public class DefaultFunctionsTest {
     }
 
     @Test
-    public void testNumberFuncs() throws Exception {
+    public void testNumberFuncs() {
         assertEval(1, "=Abs(1)");
         assertEval(1, "=Abs(-1)");
         assertEval(toBD(1.1), "=Abs(-1.1)");
@@ -599,7 +599,7 @@ public class DefaultFunctionsTest {
     }
 
     @Test
-    public void testDateFuncs() throws Exception {
+    public void testDateFuncs() {
         assertEval("1/2/2003", "=CStr(DateValue(#01/02/2003 7:00:00 AM#))");
         assertEval("7:00:00 AM", "=CStr(TimeValue(#01/02/2003 7:00:00 AM#))");
 
@@ -755,7 +755,7 @@ public class DefaultFunctionsTest {
     }
 
     @Test
-    public void testFinancialFuncs() throws Exception {
+    public void testFinancialFuncs() {
         assertEval("-9.57859403981306", "=CStr(NPer(0.12/12,-100,-1000))");
         assertEval("-9.48809500550578", "=CStr(NPer(0.12/12,-100,-1000,0,1))");
         assertEval("60.0821228537616", "=CStr(NPer(0.12/12,-100,-1000,10000))");

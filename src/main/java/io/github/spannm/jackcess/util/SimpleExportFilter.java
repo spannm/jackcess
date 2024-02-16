@@ -18,7 +18,6 @@ package io.github.spannm.jackcess.util;
 
 import io.github.spannm.jackcess.Column;
 
-import java.io.IOException;
 import java.util.List;
 
 /**
@@ -34,12 +33,12 @@ public class SimpleExportFilter implements ExportFilter {
     }
 
     @Override
-    public List<Column> filterColumns(List<Column> columns) throws IOException {
+    public List<Column> filterColumns(List<Column> columns) {
         return columns;
     }
 
     @Override
-    public Object[] filterRow(Object[] row) throws IOException {
+    public Object[] filterRow(Object[] row) {
         return row;
     }
 

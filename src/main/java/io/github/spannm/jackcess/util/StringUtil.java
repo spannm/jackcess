@@ -62,7 +62,7 @@ public final class StringUtil {
 
         int cp = str.codePointAt(0);
         int newCp = Character.toTitleCase(cp);
-        return cp == newCp ? str : new String(Character.toString((char) newCp)) + str.substring(1);
+        return cp == newCp ? str : Character.toString((char) newCp) + str.substring(1);
     }
 
     public static String replace(String text, CharSequence searchString, CharSequence replacement) {

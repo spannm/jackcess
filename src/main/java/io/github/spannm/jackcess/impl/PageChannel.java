@@ -89,7 +89,7 @@ public class PageChannel implements Channel, Flushable {
      * @param channel Channel containing the database
      * @param format Format of the database in the channel
      */
-    public PageChannel(FileChannel channel, boolean closeChannel, JetFormat format, boolean autoSync) throws IOException {
+    public PageChannel(FileChannel channel, boolean closeChannel, JetFormat format, boolean autoSync) {
         _channel = channel;
         _closeChannel = closeChannel;
         _format = format;

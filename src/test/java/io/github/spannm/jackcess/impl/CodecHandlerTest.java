@@ -22,7 +22,6 @@ import io.github.spannm.jackcess.*;
 import junit.framework.TestCase;
 
 import java.io.File;
-import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
@@ -36,7 +35,7 @@ public class CodecHandlerTest extends TestCase {
     private static final CodecProvider SIMPLE_PROVIDER = (channel, charset) -> new SimpleCodecHandler(channel);
     private static final CodecProvider FULL_PROVIDER   = (channel, charset) -> new FullCodecHandler(channel);
 
-    public CodecHandlerTest(String name) throws Exception {
+    public CodecHandlerTest(String name) {
         super(name);
     }
 
@@ -136,8 +135,7 @@ public class CodecHandlerTest extends TestCase {
         assertEquals(valuePrefix.length() + 100, value.length());
     }
 
-    private static void encodeFile(File dbFile, int pageSize, boolean simple)
-        throws Exception {
+    private static void encodeFile(File dbFile, int pageSize, boolean simple) throws Exception {
         long dbLen = dbFile.length();
         try (RandomAccessFile randomAccessFile = new RandomAccessFile(dbFile, "rw");
             FileChannel fileChannel = randomAccessFile.getChannel()) {
@@ -184,8 +182,7 @@ public class CodecHandlerTest extends TestCase {
         }
     }
 
-    private static void fullDecode(byte[] inBuffer, byte[] outBuffer,
-        int pageNumber) {
+    private static void fullDecode(byte[] inBuffer, byte[] outBuffer, int pageNumber) {
         int accum = 0;
         for (int i = 0; i < inBuffer.length; ++i) {
             int mask = (i + pageNumber + accum) % 256;
@@ -195,8 +192,7 @@ public class CodecHandlerTest extends TestCase {
     }
 
     private static final class SimpleCodecHandler implements CodecHandler {
-        private final TempBufferHolder _bufH = TempBufferHolder.newHolder(
-            TempBufferHolder.Type.HARD, true);
+        private final TempBufferHolder _bufH = TempBufferHolder.newHolder(TempBufferHolder.Type.HARD, true);
         private final PageChannel      _channel;
 
         private SimpleCodecHandler(PageChannel channel) {
@@ -214,28 +210,22 @@ public class CodecHandlerTest extends TestCase {
         }
 
         @Override
-        public void decodePage(ByteBuffer inPage, ByteBuffer outPage,
-            int pageNumber)
-            throws IOException {
+        public void decodePage(ByteBuffer inPage, ByteBuffer outPage, int pageNumber) {
             byte[] arr = inPage.array();
             simpleDecode(arr, arr, pageNumber);
         }
 
         @Override
-        public ByteBuffer encodePage(ByteBuffer page, int pageNumber,
-            int pageOffset)
-            throws IOException {
+        public ByteBuffer encodePage(ByteBuffer page, int pageNumber, int pageOffset) {
             ByteBuffer bb = _bufH.getPageBuffer(_channel);
             bb.clear();
-            simpleEncode(page.array(), bb.array(), pageNumber, pageOffset,
-                page.limit());
+            simpleEncode(page.array(), bb.array(), pageNumber, pageOffset, page.limit());
             return bb;
         }
     }
 
     private static final class FullCodecHandler implements CodecHandler {
-        private final TempBufferHolder _bufH = TempBufferHolder.newHolder(
-            TempBufferHolder.Type.HARD, true);
+        private final TempBufferHolder _bufH = TempBufferHolder.newHolder(TempBufferHolder.Type.HARD, true);
         private final PageChannel      _channel;
 
         private FullCodecHandler(PageChannel channel) {
@@ -254,16 +244,14 @@ public class CodecHandlerTest extends TestCase {
 
         @Override
         public void decodePage(ByteBuffer inPage, ByteBuffer outPage,
-            int pageNumber)
-            throws IOException {
+            int pageNumber) {
             byte[] arr = inPage.array();
             fullDecode(arr, arr, pageNumber);
         }
 
         @Override
         public ByteBuffer encodePage(ByteBuffer page, int pageNumber,
-            int pageOffset)
-            throws IOException {
+            int pageOffset) {
             assertEquals(0, pageOffset);
             assertEquals(_channel.getFormat().PAGE_SIZE, page.limit());
 
