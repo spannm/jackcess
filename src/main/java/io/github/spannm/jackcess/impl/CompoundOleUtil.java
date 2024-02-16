@@ -207,7 +207,7 @@ public class CompoundOleUtil implements CompoundPackageFactory {
 
             try {
                 sb.append("hasContentsEntry", hasContentsEntry())
-                  .append("entries", getEntries(new ArrayList<Entry>(), getFileSystem().getRoot(), ENTRY_SEPARATOR));
+                  .append("entries", getEntries(new ArrayList<>(), getFileSystem().getRoot(), ENTRY_SEPARATOR));
             } catch (IOException e) {
                 sb.append("entries", "<" + e + ">");
             }

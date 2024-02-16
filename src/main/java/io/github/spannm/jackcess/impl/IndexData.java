@@ -125,7 +125,7 @@ public class IndexData {
         if (pos < len) {
             return ByteUtil.asUnsignedByte(left[pos]) < ByteUtil.asUnsignedByte(right[pos]) ? -1 : 1;
         }
-        return left.length < right.length ? -1 : left.length > right.length ? 1 : 0;
+        return Integer.compare(left.length, right.length);
     };
 
     /** name, generated on demand */

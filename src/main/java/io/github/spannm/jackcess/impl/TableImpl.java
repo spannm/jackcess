@@ -72,12 +72,11 @@ public class TableImpl implements Table, PropertyMaps.Owner {
      * comparator which sorts variable length columns based on their index into the variable length offset table
      */
     private static final Comparator<ColumnImpl> VAR_LEN_COLUMN_COMPARATOR =
-            (c1, c2) -> c1.getVarLenTableIndex() < c2.getVarLenTableIndex() ? -1
-                : c1.getVarLenTableIndex() > c2.getVarLenTableIndex() ? 1 : 0;
+            (c1, c2) -> Integer.compare(c1.getVarLenTableIndex(), c2.getVarLenTableIndex());
 
     /** comparator which sorts columns based on their display index */
     private static final Comparator<ColumnImpl> DISPLAY_ORDER_COMPARATOR  =
-            (c1, c2) -> c1.getDisplayIndex() < c2.getDisplayIndex() ? -1 : c1.getDisplayIndex() > c2.getDisplayIndex() ? 1 : 0;
+            (c1, c2) -> Integer.compare(c1.getDisplayIndex(), c2.getDisplayIndex());
 
     /** owning database */
     private final DatabaseImpl                  _database;
