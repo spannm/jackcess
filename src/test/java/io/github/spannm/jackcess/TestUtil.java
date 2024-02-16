@@ -71,9 +71,7 @@ public class TestUtil {
         return open(fileFormat, file, inMem, null);
     }
 
-    public static Database open(FileFormat fileFormat, File file, boolean inMem,
-        Charset charset)
-        throws Exception {
+    public static Database open(FileFormat fileFormat, File file, boolean inMem, Charset charset) throws Exception {
         return openDB(fileFormat, file, inMem, charset, true);
     }
 
@@ -154,10 +152,8 @@ public class TestUtil {
     }
 
     private static Database openDB(FileFormat fileFormat, File file, boolean inMem, Charset charset, boolean readOnly) throws Exception {
-        FileChannel channel = inMem ? MemFileChannel.newChannel(
-            file, MemFileChannel.RW_CHANNEL_MODE)
-            : null;
-        final Database db = new DatabaseBuilder(file).withReadOnly(readOnly)
+        FileChannel channel = inMem ? MemFileChannel.newChannel(file, MemFileChannel.RW_CHANNEL_MODE) : null;
+        Database db = new DatabaseBuilder(file).withReadOnly(readOnly)
             .withAutoSync(getTestAutoSync()).withChannel(channel)
             .withCharset(charset).open();
         if (fileFormat != null) {

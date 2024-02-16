@@ -77,82 +77,84 @@ public class IndexTest extends TestCase {
 
     public void testPrimaryKey() throws Exception {
         for (final TestDB testDB : JetFormatTest.SUPPORTED_DBS_TEST_FOR_READ) {
-            Table table = TestUtil.open(testDB).getTable("Table1");
-            Map<String, Boolean> foundPKs = new HashMap<>();
-            Index pkIndex = null;
-            for (Index index : table.getIndexes()) {
-                foundPKs.put(index.getColumns().iterator().next().getName(),
-                    index.isPrimaryKey());
-                if (index.isPrimaryKey()) {
-                    pkIndex = index;
+            try (Database db = TestUtil.open(testDB)) {
+                Table table = db.getTable("Table1");
+                Map<String, Boolean> foundPKs = new HashMap<>();
+                Index pkIndex = null;
+                for (Index index : table.getIndexes()) {
+                    foundPKs.put(index.getColumns().iterator().next().getName(),
+                        index.isPrimaryKey());
+                    if (index.isPrimaryKey()) {
+                        pkIndex = index;
 
+                    }
                 }
+                Map<String, Boolean> expectedPKs = new HashMap<>();
+                expectedPKs.put("A", Boolean.TRUE);
+                expectedPKs.put("B", Boolean.FALSE);
+                assertEquals(expectedPKs, foundPKs);
+                assertSame(pkIndex, table.getPrimaryKeyIndex());
             }
-            Map<String, Boolean> expectedPKs = new HashMap<>();
-            expectedPKs.put("A", Boolean.TRUE);
-            expectedPKs.put("B", Boolean.FALSE);
-            assertEquals(expectedPKs, foundPKs);
-            assertSame(pkIndex, table.getPrimaryKeyIndex());
         }
     }
 
     public void testLogicalIndexes() throws Exception {
         for (final TestDB testDB : TestDB.getSupportedForBasename(Basename.INDEX, true)) {
-            Database mdb = TestUtil.open(testDB);
+            try (Database db = TestUtil.open(testDB)) {
+                TableImpl table = (TableImpl) db.getTable("Table1");
+                for (IndexImpl idx : table.getIndexes()) {
+                    idx.initialize();
+                }
+                assertEquals(4, table.getIndexes().size());
+                assertEquals(4, table.getLogicalIndexCount());
+                checkIndexColumns(table,
+                    "id", "id",
+                    "PrimaryKey", "id",
+                    "Table2Table1", "otherfk1",
+                    "Table3Table1", "otherfk2");
 
-            TableImpl table = (TableImpl) mdb.getTable("Table1");
-            for (IndexImpl idx : table.getIndexes()) {
-                idx.initialize();
+                table = (TableImpl) db.getTable("Table2");
+                for (IndexImpl idx : table.getIndexes()) {
+                    idx.initialize();
+                }
+                assertEquals(3, table.getIndexes().size());
+                assertEquals(2, table.getIndexDatas().size());
+                assertEquals(3, table.getLogicalIndexCount());
+                checkIndexColumns(table,
+                    "id", "id",
+                    "PrimaryKey", "id",
+                    ".rC", "id");
+
+                IndexImpl pkIdx = table.getIndex("PrimaryKey");
+                IndexImpl fkIdx = table.getIndex(".rC");
+                assertNotSame(pkIdx, fkIdx);
+                assertTrue(fkIdx.isForeignKey());
+                assertSame(pkIdx.getIndexData(), fkIdx.getIndexData());
+                IndexData indexData = pkIdx.getIndexData();
+                assertEquals(List.of(pkIdx, fkIdx), indexData.getIndexes());
+                assertSame(pkIdx, indexData.getPrimaryIndex());
+
+                table = (TableImpl) db.getTable("Table3");
+                for (IndexImpl idx : table.getIndexes()) {
+                    idx.initialize();
+                }
+                assertEquals(3, table.getIndexes().size());
+                assertEquals(2, table.getIndexDatas().size());
+                assertEquals(3, table.getLogicalIndexCount());
+                checkIndexColumns(table,
+                    "id", "id",
+                    "PrimaryKey", "id",
+                    ".rC", "id");
+
+                pkIdx = table.getIndex("PrimaryKey");
+                fkIdx = table.getIndex(".rC");
+                assertNotSame(pkIdx, fkIdx);
+                assertTrue(fkIdx.isForeignKey());
+                assertSame(pkIdx.getIndexData(), fkIdx.getIndexData());
+                indexData = pkIdx.getIndexData();
+                assertEquals(List.of(pkIdx, fkIdx), indexData.getIndexes());
+                assertSame(pkIdx, indexData.getPrimaryIndex());
             }
-            assertEquals(4, table.getIndexes().size());
-            assertEquals(4, table.getLogicalIndexCount());
-            checkIndexColumns(table,
-                "id", "id",
-                "PrimaryKey", "id",
-                "Table2Table1", "otherfk1",
-                "Table3Table1", "otherfk2");
-
-            table = (TableImpl) mdb.getTable("Table2");
-            for (IndexImpl idx : table.getIndexes()) {
-                idx.initialize();
-            }
-            assertEquals(3, table.getIndexes().size());
-            assertEquals(2, table.getIndexDatas().size());
-            assertEquals(3, table.getLogicalIndexCount());
-            checkIndexColumns(table,
-                "id", "id",
-                "PrimaryKey", "id",
-                ".rC", "id");
-
-            IndexImpl pkIdx = table.getIndex("PrimaryKey");
-            IndexImpl fkIdx = table.getIndex(".rC");
-            assertNotSame(pkIdx, fkIdx);
-            assertTrue(fkIdx.isForeignKey());
-            assertSame(pkIdx.getIndexData(), fkIdx.getIndexData());
-            IndexData indexData = pkIdx.getIndexData();
-            assertEquals(List.of(pkIdx, fkIdx), indexData.getIndexes());
-            assertSame(pkIdx, indexData.getPrimaryIndex());
-
-            table = (TableImpl) mdb.getTable("Table3");
-            for (IndexImpl idx : table.getIndexes()) {
-                idx.initialize();
-            }
-            assertEquals(3, table.getIndexes().size());
-            assertEquals(2, table.getIndexDatas().size());
-            assertEquals(3, table.getLogicalIndexCount());
-            checkIndexColumns(table,
-                "id", "id",
-                "PrimaryKey", "id",
-                ".rC", "id");
-
-            pkIdx = table.getIndex("PrimaryKey");
-            fkIdx = table.getIndex(".rC");
-            assertNotSame(pkIdx, fkIdx);
-            assertTrue(fkIdx.isForeignKey());
-            assertSame(pkIdx.getIndexData(), fkIdx.getIndexData());
-            indexData = pkIdx.getIndexData();
-            assertEquals(List.of(pkIdx, fkIdx), indexData.getIndexes());
-            assertSame(pkIdx, indexData.getPrimaryIndex());
         }
     }
 
@@ -178,38 +180,40 @@ public class IndexTest extends TestCase {
 
     public void testEntryDeletion() throws Exception {
         for (final TestDB testDB : JetFormatTest.SUPPORTED_DBS_TEST) {
-            Table table = TestUtil.openCopy(testDB).getTable("Table1");
+            try (Database db = TestUtil.openCopy(testDB)) {
+                Table table = db.getTable("Table1");
 
-            for (int i = 0; i < 10; ++i) {
-                table.addRow("foo" + i, "bar" + i, (byte) 42 + i, (short) 53 + i, 13 * i,
-                    6.7d / i, null, null, true);
-            }
-            table.reset();
-            TestUtil.assertRowCount(12, table);
+                for (int i = 0; i < 10; ++i) {
+                    table.addRow("foo" + i, "bar" + i, (byte) 42 + i, (short) 53 + i, 13 * i,
+                        6.7d / i, null, null, true);
+                }
+                table.reset();
+                TestUtil.assertRowCount(12, table);
 
-            for (Index index : table.getIndexes()) {
-                assertEquals(12, ((IndexImpl) index).getIndexData().getEntryCount());
-            }
+                for (Index index : table.getIndexes()) {
+                    assertEquals(12, ((IndexImpl) index).getIndexData().getEntryCount());
+                }
 
-            table.reset();
-            table.getNextRow();
-            table.getNextRow();
-            table.getDefaultCursor().deleteCurrentRow();
-            table.getNextRow();
-            table.getDefaultCursor().deleteCurrentRow();
-            table.getNextRow();
-            table.getNextRow();
-            table.getDefaultCursor().deleteCurrentRow();
-            table.getNextRow();
-            table.getNextRow();
-            table.getNextRow();
-            table.getDefaultCursor().deleteCurrentRow();
+                table.reset();
+                table.getNextRow();
+                table.getNextRow();
+                table.getDefaultCursor().deleteCurrentRow();
+                table.getNextRow();
+                table.getDefaultCursor().deleteCurrentRow();
+                table.getNextRow();
+                table.getNextRow();
+                table.getDefaultCursor().deleteCurrentRow();
+                table.getNextRow();
+                table.getNextRow();
+                table.getNextRow();
+                table.getDefaultCursor().deleteCurrentRow();
 
-            table.reset();
-            TestUtil.assertRowCount(8, table);
+                table.reset();
+                TestUtil.assertRowCount(8, table);
 
-            for (Index index : table.getIndexes()) {
-                assertEquals(8, ((IndexImpl) index).getIndexData().getEntryCount());
+                for (Index index : table.getIndexes()) {
+                    assertEquals(8, ((IndexImpl) index).getIndexData().getEntryCount());
+                }
             }
         }
     }
@@ -493,32 +497,33 @@ public class IndexTest extends TestCase {
 
     public void testGetForeignKeyIndex() throws Exception {
         for (final TestDB testDB : TestDB.getSupportedForBasename(Basename.INDEX, true)) {
-            Database db = TestUtil.open(testDB);
-            Table t1 = db.getTable("Table1");
-            Table t2 = db.getTable("Table2");
-            Table t3 = db.getTable("Table3");
+            try (Database db = TestUtil.open(testDB)) {
+                Table t1 = db.getTable("Table1");
+                Table t2 = db.getTable("Table2");
+                Table t3 = db.getTable("Table3");
 
-            IndexImpl t2t1 = (IndexImpl) t1.getIndex("Table2Table1");
-            IndexImpl t3t1 = (IndexImpl) t1.getIndex("Table3Table1");
+                IndexImpl t2t1 = (IndexImpl) t1.getIndex("Table2Table1");
+                IndexImpl t3t1 = (IndexImpl) t1.getIndex("Table3Table1");
 
-            assertTrue(t2t1.isForeignKey());
-            assertNotNull(t2t1.getReference());
-            assertFalse(t2t1.getReference().isPrimaryTable());
-            assertFalse(t2t1.getReference().isCascadeUpdates());
-            assertTrue(t2t1.getReference().isCascadeDeletes());
-            doCheckForeignKeyIndex(t2t1, t2);
+                assertTrue(t2t1.isForeignKey());
+                assertNotNull(t2t1.getReference());
+                assertFalse(t2t1.getReference().isPrimaryTable());
+                assertFalse(t2t1.getReference().isCascadeUpdates());
+                assertTrue(t2t1.getReference().isCascadeDeletes());
+                doCheckForeignKeyIndex(t2t1, t2);
 
-            assertTrue(t3t1.isForeignKey());
-            assertNotNull(t3t1.getReference());
-            assertFalse(t3t1.getReference().isPrimaryTable());
-            assertTrue(t3t1.getReference().isCascadeUpdates());
-            assertFalse(t3t1.getReference().isCascadeDeletes());
-            doCheckForeignKeyIndex(t3t1, t3);
+                assertTrue(t3t1.isForeignKey());
+                assertNotNull(t3t1.getReference());
+                assertFalse(t3t1.getReference().isPrimaryTable());
+                assertTrue(t3t1.getReference().isCascadeUpdates());
+                assertFalse(t3t1.getReference().isCascadeDeletes());
+                doCheckForeignKeyIndex(t3t1, t3);
 
-            Index t1pk = t1.getIndex(IndexBuilder.PRIMARY_KEY_NAME);
-            assertNotNull(t1pk);
-            assertNull(((IndexImpl) t1pk).getReference());
-            assertNull(t1pk.getReferencedIndex());
+                Index t1pk = t1.getIndex(IndexBuilder.PRIMARY_KEY_NAME);
+                assertNotNull(t1pk);
+                assertNull(((IndexImpl) t1pk).getReference());
+                assertNull(t1pk.getReferencedIndex());
+            }
         }
     }
 

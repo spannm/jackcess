@@ -104,30 +104,32 @@ public class DatabaseTest extends TestCase {
 
     public void testReadDeletedRows() throws Exception {
         for (final TestDB testDB : TestDB.getSupportedForBasename(Basename.DEL, true)) {
-            Table table = open(testDB).getTable("Table");
-            int rows = 0;
-            while (table.getNextRow() != null) {
-                rows++;
+            try (Database db = open(testDB)) {
+                Table table = db.getTable("Table");
+                int rows = 0;
+                while (table.getNextRow() != null) {
+                    rows++;
+                }
+                assertEquals(2, rows);
             }
-            assertEquals(2, rows);
-            table.getDatabase().close();
         }
     }
 
     public void testGetColumns() throws Exception {
         for (final TestDB testDB : JetFormatTest.SUPPORTED_DBS_TEST_FOR_READ) {
-
-            List<? extends Column> columns = open(testDB).getTable("Table1").getColumns();
-            assertEquals(9, columns.size());
-            checkColumn(columns, 0, "A", DataType.TEXT);
-            checkColumn(columns, 1, "B", DataType.TEXT);
-            checkColumn(columns, 2, "C", DataType.BYTE);
-            checkColumn(columns, 3, "D", DataType.INT);
-            checkColumn(columns, 4, "E", DataType.LONG);
-            checkColumn(columns, 5, "F", DataType.DOUBLE);
-            checkColumn(columns, 6, "G", DataType.SHORT_DATE_TIME);
-            checkColumn(columns, 7, "H", DataType.MONEY);
-            checkColumn(columns, 8, "I", DataType.BOOLEAN);
+            try (Database db = open(testDB)) {
+                List<? extends Column> columns = db.getTable("Table1").getColumns();
+                assertEquals(9, columns.size());
+                checkColumn(columns, 0, "A", DataType.TEXT);
+                checkColumn(columns, 1, "B", DataType.TEXT);
+                checkColumn(columns, 2, "C", DataType.BYTE);
+                checkColumn(columns, 3, "D", DataType.INT);
+                checkColumn(columns, 4, "E", DataType.LONG);
+                checkColumn(columns, 5, "F", DataType.DOUBLE);
+                checkColumn(columns, 6, "G", DataType.SHORT_DATE_TIME);
+                checkColumn(columns, 7, "H", DataType.MONEY);
+                checkColumn(columns, 8, "I", DataType.BOOLEAN);
+            }
         }
     }
 
@@ -274,42 +276,44 @@ public class DatabaseTest extends TestCase {
         File bogusFile = new File("fooby-dooby.mdb");
         assertTrue(!bogusFile.exists());
         try {
-            DatabaseBuilder.newDatabase(bogusFile).withReadOnly(true).withAutoSync(getTestAutoSync()).open();
-            fail("FileNotFoundException should have been thrown");
+            DatabaseBuilder dbb = DatabaseBuilder.newDatabase(bogusFile).withReadOnly(true).withAutoSync(getTestAutoSync());
+            try (Database db = dbb.open()) {
+                fail("FileNotFoundException should have been thrown");
+            }
         } catch (FileNotFoundException e) {}
         assertTrue(!bogusFile.exists());
     }
 
     public void testReadWithDeletedCols() throws Exception {
         for (final TestDB testDB : TestDB.getSupportedForBasename(Basename.DEL_COL, true)) {
-            Table table = open(testDB).getTable("Table1");
+            try (Database db = open(testDB)) {
+                Table table = db.getTable("Table1");
 
-            Map<String, Object> expectedRow0 = new LinkedHashMap<>();
-            expectedRow0.put("id", 0);
-            expectedRow0.put("id2", 2);
-            expectedRow0.put("data", "foo");
-            expectedRow0.put("data2", "foo2");
+                Map<String, Object> expectedRow0 = new LinkedHashMap<>();
+                expectedRow0.put("id", 0);
+                expectedRow0.put("id2", 2);
+                expectedRow0.put("data", "foo");
+                expectedRow0.put("data2", "foo2");
 
-            Map<String, Object> expectedRow1 = new LinkedHashMap<>();
-            expectedRow1.put("id", 3);
-            expectedRow1.put("id2", 5);
-            expectedRow1.put("data", "bar");
-            expectedRow1.put("data2", "bar2");
+                Map<String, Object> expectedRow1 = new LinkedHashMap<>();
+                expectedRow1.put("id", 3);
+                expectedRow1.put("id2", 5);
+                expectedRow1.put("data", "bar");
+                expectedRow1.put("data2", "bar2");
 
-            int rowNum = 0;
-            Map<String, Object> row = null;
-            while ((row = table.getNextRow()) != null) {
-                if (rowNum == 0) {
-                    assertEquals(expectedRow0, row);
-                } else if (rowNum == 1) {
-                    assertEquals(expectedRow1, row);
-                } else if (rowNum >= 2) {
-                    fail("should only have 2 rows");
+                int rowNum = 0;
+                Map<String, Object> row = null;
+                while ((row = table.getNextRow()) != null) {
+                    if (rowNum == 0) {
+                        assertEquals(expectedRow0, row);
+                    } else if (rowNum == 1) {
+                        assertEquals(expectedRow1, row);
+                    } else if (rowNum >= 2) {
+                        fail("should only have 2 rows");
+                    }
+                    rowNum++;
                 }
-                rowNum++;
             }
-
-            table.getDatabase().close();
         }
     }
 
@@ -489,8 +493,10 @@ public class DatabaseTest extends TestCase {
 
     public void testMultiPageTableDef() throws Exception {
         for (final TestDB testDB : JetFormatTest.SUPPORTED_DBS_TEST_FOR_READ) {
-            List<? extends Column> columns = open(testDB).getTable("Table2").getColumns();
-            assertEquals(89, columns.size());
+            try (Database db = open(testDB)) {
+                List<? extends Column> columns = db.getTable("Table2").getColumns();
+                assertEquals(89, columns.size());
+            }
         }
     }
 
@@ -898,63 +904,65 @@ public class DatabaseTest extends TestCase {
 
     public void testIterateTableNames() throws Exception {
         for (final TestDB testDB : JetFormatTest.SUPPORTED_DBS_TEST_FOR_READ) {
-            final Database db = open(testDB);
-
-            Set<String> names = new HashSet<>();
-            int sysCount = 0;
-            for (TableMetaData tmd : db.newTableMetaDataIterable()) {
-                if (tmd.isSystem()) {
-                    ++sysCount;
-                    continue;
-                }
-                assertFalse(tmd.isLinked());
-                assertNull(tmd.getLinkedTableName());
-                assertNull(tmd.getLinkedDbName());
-                names.add(tmd.getName());
-            }
-
-            assertTrue(sysCount > 4);
-            assertEquals(Set.of("Table1", "Table2", "Table3", "Table4"), names);
-        }
-
-        for (final TestDB testDB : TestDB.getSupportedForBasename(Basename.LINKED)) {
-            final Database db = open(testDB);
-
-            Set<String> names = new HashSet<>();
-            for (TableMetaData tmd : db.newTableMetaDataIterable()) {
-                if (tmd.isSystem()) {
-                    continue;
-                }
-                if ("Table1".equals(tmd.getName())) {
+            try (Database db = open(testDB)) {
+                Set<String> names = new HashSet<>();
+                int sysCount = 0;
+                for (TableMetaData tmd : db.newTableMetaDataIterable()) {
+                    if (tmd.isSystem()) {
+                        ++sysCount;
+                        continue;
+                    }
                     assertFalse(tmd.isLinked());
                     assertNull(tmd.getLinkedTableName());
                     assertNull(tmd.getLinkedDbName());
-                } else {
-                    assertTrue(tmd.isLinked());
-                    assertEquals("Table1", tmd.getLinkedTableName());
-                    assertEquals("Z:\\jackcess_test\\linkeeTest.accdb", tmd.getLinkedDbName());
+                    names.add(tmd.getName());
                 }
-                names.add(tmd.getName());
-            }
 
-            assertEquals(Set.of("Table1", "Table2"), names);
+                assertTrue(sysCount > 4);
+                assertEquals(Set.of("Table1", "Table2", "Table3", "Table4"), names);
+            }
+        }
+
+        for (final TestDB testDB : TestDB.getSupportedForBasename(Basename.LINKED)) {
+            try (Database db = open(testDB)) {
+                Set<String> names = new HashSet<>();
+                for (TableMetaData tmd : db.newTableMetaDataIterable()) {
+                    if (tmd.isSystem()) {
+                        continue;
+                    }
+                    if ("Table1".equals(tmd.getName())) {
+                        assertFalse(tmd.isLinked());
+                        assertNull(tmd.getLinkedTableName());
+                        assertNull(tmd.getLinkedDbName());
+                    } else {
+                        assertTrue(tmd.isLinked());
+                        assertEquals("Table1", tmd.getLinkedTableName());
+                        assertEquals("Z:\\jackcess_test\\linkeeTest.accdb", tmd.getLinkedDbName());
+                    }
+                    names.add(tmd.getName());
+                }
+
+                assertEquals(Set.of("Table1", "Table2"), names);
+            }
         }
     }
 
     public void testTableDates() throws Exception {
         for (final TestDB testDB : JetFormatTest.SUPPORTED_DBS_TEST_FOR_READ) {
-            Table table = open(testDB).getTable("Table1");
-            String expectedCreateDate = null;
-            String expectedUpdateDate = null;
-            if (testDB.getExpectedFileFormat() == FileFormat.V1997) {
-                expectedCreateDate = "2010-03-05T14:48:26.420";
-                expectedUpdateDate = "2010-03-05T14:48:26.607";
-            } else {
-                expectedCreateDate = "2004-05-28T17:51:48.701";
-                expectedUpdateDate = "2006-07-24T09:56:19.701";
+            try (Database db = open(testDB)) {
+                Table table = db.getTable("Table1");
+                String expectedCreateDate = null;
+                String expectedUpdateDate = null;
+                if (testDB.getExpectedFileFormat() == FileFormat.V1997) {
+                    expectedCreateDate = "2010-03-05T14:48:26.420";
+                    expectedUpdateDate = "2010-03-05T14:48:26.607";
+                } else {
+                    expectedCreateDate = "2004-05-28T17:51:48.701";
+                    expectedUpdateDate = "2006-07-24T09:56:19.701";
+                }
+                assertEquals(expectedCreateDate, table.getCreatedDate().toString());
+                assertEquals(expectedUpdateDate, table.getUpdatedDate().toString());
             }
-            assertEquals(expectedCreateDate, table.getCreatedDate().toString());
-            assertEquals(expectedUpdateDate, table.getUpdatedDate().toString());
         }
     }
 
