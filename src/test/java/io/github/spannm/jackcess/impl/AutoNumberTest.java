@@ -20,6 +20,7 @@ import static io.github.spannm.jackcess.DatabaseBuilder.newColumn;
 import static io.github.spannm.jackcess.DatabaseBuilder.newTable;
 import static io.github.spannm.jackcess.TestUtil.*;
 import static io.github.spannm.jackcess.impl.JetFormatTest.SUPPORTED_FILEFORMATS;
+import static org.junit.Assert.assertNotEquals;
 
 import io.github.spannm.jackcess.*;
 import io.github.spannm.jackcess.Database.FileFormat;
@@ -465,7 +466,7 @@ public class AutoNumberTest extends TestCase {
 
             row2 = table.updateRow(row2);
             assertTrue(ColumnImpl.isGUIDValue(row2.get("a")));
-            assertFalse(row2Guid.equals(row2.get("a")));
+            assertNotEquals(row2Guid, row2.get("a"));
 
             db.close();
         }

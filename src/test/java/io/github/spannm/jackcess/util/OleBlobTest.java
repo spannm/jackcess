@@ -18,6 +18,7 @@ package io.github.spannm.jackcess.util;
 
 import static io.github.spannm.jackcess.TestUtil.*;
 import static io.github.spannm.jackcess.impl.JetFormatTest.SUPPORTED_FILEFORMATS;
+import static org.junit.Assert.assertArrayEquals;
 
 import io.github.spannm.jackcess.*;
 import io.github.spannm.jackcess.Database.FileFormat;
@@ -34,7 +35,6 @@ import org.apache.poi.poifs.filesystem.POIFSFileSystem;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
-import java.util.Arrays;
 
 /**
  *
@@ -98,8 +98,7 @@ public class OleBlobTest extends TestCase {
                             assertEquals(OleBlob.Builder.PACKAGE_TYPE_NAME,
                                 spc.getClassName());
                             assertEquals(sampleFileBytes.length, spc.length());
-                            assertTrue(Arrays.equals(sampleFileBytes,
-                                toByteArray(spc.getStream(), spc.length())));
+                            assertArrayEquals(sampleFileBytes, toByteArray(spc.getStream(), spc.length()));
                             break;
 
                         case 2:
@@ -120,8 +119,7 @@ public class OleBlobTest extends TestCase {
                             assertEquals("Text.File", oc.getClassName());
                             assertEquals("TextFile", oc.getTypeName());
                             assertEquals(sampleFileBytes.length, oc.length());
-                            assertTrue(Arrays.equals(sampleFileBytes,
-                                toByteArray(oc.getStream(), oc.length())));
+                            assertArrayEquals(sampleFileBytes, toByteArray(oc.getStream(), oc.length()));
                             break;
                         default:
                             throw new RuntimeException("unexpected id " + row);
@@ -162,7 +160,7 @@ public class OleBlobTest extends TestCase {
                         case SIMPLE_PACKAGE:
                             OleBlob.SimplePackageContent spc = (OleBlob.SimplePackageContent) content;
                             byte[] packageBytes = toByteArray(spc.getStream(), spc.length());
-                            assertTrue(Arrays.equals(attach.getFileData(), packageBytes));
+                            assertArrayEquals(attach.getFileData(), packageBytes);
                             break;
 
                         case COMPOUND_STORAGE:
@@ -170,7 +168,7 @@ public class OleBlobTest extends TestCase {
                             if (cc.hasContentsEntry()) {
                                 OleBlob.CompoundContent.Entry entry = cc.getContentsEntry();
                                 byte[] entryBytes = toByteArray(entry.getStream(), entry.length());
-                                assertTrue(Arrays.equals(attach.getFileData(), entryBytes));
+                                assertArrayEquals(attach.getFileData(), entryBytes);
                             } else {
 
                                 if ("test_word.doc".equals(name)) {
@@ -206,7 +204,7 @@ public class OleBlobTest extends TestCase {
                         case OTHER:
                             OleBlob.OtherContent oc = (OleBlob.OtherContent) content;
                             byte[] otherBytes = toByteArray(oc.getStream(), oc.length());
-                            assertTrue(Arrays.equals(attach.getFileData(), otherBytes));
+                            assertArrayEquals(attach.getFileData(), otherBytes);
                             break;
 
                         default:
@@ -258,7 +256,7 @@ public class OleBlobTest extends TestCase {
                     attachE.getSize());
                 byte[] entryBytes = toByteArray(e.getStream(), e.length());
 
-                assertTrue(Arrays.equals(attachEBytes, entryBytes));
+                assertArrayEquals(attachEBytes, entryBytes);
             }
 
             ByteUtil.closeQuietly(attachFs);

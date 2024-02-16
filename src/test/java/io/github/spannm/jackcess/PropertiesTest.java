@@ -16,6 +16,8 @@ limitations under the License.
 
 package io.github.spannm.jackcess;
 
+import static org.junit.Assert.assertArrayEquals;
+
 import io.github.spannm.jackcess.Database.FileFormat;
 import io.github.spannm.jackcess.impl.*;
 import io.github.spannm.jackcess.impl.JetFormatTest.TestDB;
@@ -124,7 +126,7 @@ public class PropertiesTest extends TestCase {
                 if (nameMapBytes == null) {
                     nameMapBytes = (byte[]) tProps.getValue("NameMap");
                 } else {
-                    assertTrue(Arrays.equals(nameMapBytes, (byte[]) tProps.getValue("NameMap")));
+                    assertArrayEquals(nameMapBytes, (byte[]) tProps.getValue("NameMap"));
                 }
                 expectedNumProps += 2;
             }
@@ -489,7 +491,7 @@ public class PropertiesTest extends TestCase {
             Object v2 = prop2.getValue();
 
             if (v1 instanceof byte[]) {
-                assertTrue(Arrays.equals((byte[]) v1, (byte[]) v2));
+                assertArrayEquals((byte[]) v1, (byte[]) v2);
             } else {
                 assertEquals(v1, v2);
             }

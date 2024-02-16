@@ -16,6 +16,8 @@ limitations under the License.
 
 package io.github.spannm.jackcess;
 
+import static org.junit.Assert.assertArrayEquals;
+
 import io.github.spannm.jackcess.Database.FileFormat;
 import io.github.spannm.jackcess.impl.*;
 import io.github.spannm.jackcess.impl.JetFormatTest.Basename;
@@ -252,7 +254,7 @@ public class IndexTest extends TestCase {
         while (true) {
             boolean origHasNext = origC.moveToNextRow();
             boolean tempHasNext = tempC.moveToNextRow();
-            assertTrue(origHasNext == tempHasNext);
+            assertEquals(origHasNext, tempHasNext);
             if (!origHasNext) {
                 break;
             }
@@ -704,7 +706,7 @@ public class IndexTest extends TestCase {
             boolean found = false;
             for (Row idxRow : ic.newEntryIterable(data)) {
 
-                assertTrue(Arrays.equals(data, idxRow.getBytes(colName)));
+                assertArrayEquals(data, idxRow.getBytes(colName));
                 if (id == idxRow.getInt("ID")) {
                     found = true;
                 }

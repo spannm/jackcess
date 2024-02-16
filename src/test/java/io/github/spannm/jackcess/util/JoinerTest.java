@@ -17,6 +17,7 @@ limitations under the License.
 package io.github.spannm.jackcess.util;
 
 import static io.github.spannm.jackcess.TestUtil.*;
+import static org.junit.Assert.assertNotEquals;
 
 import io.github.spannm.jackcess.Database;
 import io.github.spannm.jackcess.Index;
@@ -136,7 +137,7 @@ public class JoinerTest extends TestCase {
 
         assertEquals(2, countRows(t2t1Join.getToTable()));
         for (Row t1Row : t2t1Join.getToTable()) {
-            assertFalse(t1Row.get("otherfk1").equals(1));
+            assertNotEquals(1, t1Row.get("otherfk1"));
         }
     }
 

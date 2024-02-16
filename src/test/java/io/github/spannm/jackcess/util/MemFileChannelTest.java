@@ -16,6 +16,8 @@ limitations under the License.
 
 package io.github.spannm.jackcess.util;
 
+import static org.junit.Assert.assertArrayEquals;
+
 import io.github.spannm.jackcess.TestUtil;
 import junit.framework.TestCase;
 
@@ -25,7 +27,6 @@ import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
 import java.nio.channels.NonWritableChannelException;
-import java.util.Arrays;
 
 /**
  *
@@ -126,8 +127,7 @@ public class MemFileChannelTest extends TestCase {
 
         assertEquals(testFile.length(), tmpFile.length());
 
-        assertTrue(Arrays.equals(TestUtil.toByteArray(testFile),
-            TestUtil.toByteArray(tmpFile)));
+        assertArrayEquals(TestUtil.toByteArray(testFile), TestUtil.toByteArray(tmpFile));
 
         ch2.truncate(0L);
         assertTrue(ch2.isOpen());

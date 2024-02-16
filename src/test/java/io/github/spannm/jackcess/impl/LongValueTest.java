@@ -18,6 +18,7 @@ package io.github.spannm.jackcess.impl;
 
 import static io.github.spannm.jackcess.TestUtil.*;
 import static io.github.spannm.jackcess.impl.JetFormatTest.SUPPORTED_FILEFORMATS;
+import static org.junit.Assert.assertArrayEquals;
 
 import io.github.spannm.jackcess.*;
 import io.github.spannm.jackcess.Database.FileFormat;
@@ -56,7 +57,7 @@ public class LongValueTest extends TestCase {
             byte[] foundBinaryData = row.getBytes("RESERVED_BINARY_DATA");
             byte[] expectedBinaryData =
                 toByteArray(new File("src/test/data/test2BinData.dat"));
-            assertTrue(Arrays.equals(expectedBinaryData, foundBinaryData));
+            assertArrayEquals(expectedBinaryData, foundBinaryData);
 
             db.close();
         }
@@ -95,13 +96,13 @@ public class LongValueTest extends TestCase {
 
             assertEquals(testStr, row.get("A"));
             assertEquals(longMemo, row.get("B"));
-            assertTrue(Arrays.equals(oleValue, row.getBytes("C")));
+            assertArrayEquals(oleValue, row.getBytes("C"));
 
             row = table.getNextRow();
 
             assertEquals("", row.get("A"));
             assertEquals("", row.get("B"));
-            assertTrue(Arrays.equals(new byte[0], row.getBytes("C")));
+            assertArrayEquals(new byte[0], row.getBytes("C"));
 
             row = table.getNextRow();
 

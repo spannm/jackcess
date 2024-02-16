@@ -274,14 +274,14 @@ public class DatabaseTest extends TestCase {
 
     public void testMissingFile() throws Exception {
         File bogusFile = new File("fooby-dooby.mdb");
-        assertTrue(!bogusFile.exists());
+        assertFalse(bogusFile.exists());
         try {
             DatabaseBuilder dbb = DatabaseBuilder.newDatabase(bogusFile).withReadOnly(true).withAutoSync(getTestAutoSync());
             try (Database db = dbb.open()) {
                 fail("FileNotFoundException should have been thrown");
             }
         } catch (FileNotFoundException e) {}
-        assertTrue(!bogusFile.exists());
+        assertFalse(bogusFile.exists());
     }
 
     public void testReadWithDeletedCols() throws Exception {
@@ -782,7 +782,7 @@ public class DatabaseTest extends TestCase {
             Table t = db.getTable("users");
             Column c = t.getColumn("c_flag_");
             assertEquals(DataType.TEXT, c.getType());
-            assertEquals(false, c.isVariableLength());
+            assertFalse(c.isVariableLength());
             assertEquals(2, c.getLength());
 
             Map<String, Object> row = t.getNextRow();

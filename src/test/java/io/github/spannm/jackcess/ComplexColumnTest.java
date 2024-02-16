@@ -17,6 +17,7 @@ limitations under the License.
 package io.github.spannm.jackcess;
 
 import static io.github.spannm.jackcess.TestUtil.*;
+import static org.junit.Assert.assertArrayEquals;
 
 import io.github.spannm.jackcess.complex.*;
 import io.github.spannm.jackcess.impl.ByteUtil;
@@ -28,7 +29,6 @@ import junit.framework.TestCase;
 
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
-import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
@@ -95,7 +95,7 @@ public class ComplexColumnTest extends TestCase {
                     checkVersions(4, complexValueFk, curValue,
                         "row4-memo", new Date(1315876945758L));
                 } else {
-                    assertTrue(false);
+                    fail();
                 }
             }
 
@@ -186,7 +186,7 @@ public class ComplexColumnTest extends TestCase {
                 } else if (rowId.equals("row4")) {
                     checkAttachments(4, complexValueFk, "test_data2.txt");
                 } else {
-                    assertTrue(false);
+                    fail();
                 }
             }
 
@@ -221,7 +221,7 @@ public class ComplexColumnTest extends TestCase {
             assertNotSame(updated, a);
             assertEquals("zip", updated.getFileType());
             assertEquals("some_data.zip", updated.getFileName());
-            assertTrue(Arrays.equals(newBytes, updated.getFileData()));
+            assertArrayEquals(newBytes, updated.getFileData());
             byte[] encBytes = updated.getEncodedFileData();
             assertEquals(newBytes.length + 28, encBytes.length);
             ByteBuffer bb = PageChannel.wrap(encBytes);
@@ -267,7 +267,7 @@ public class ComplexColumnTest extends TestCase {
                 } else if (rowId.equals("row4")) {
                     checkMultiValues(4, complexValueFk);
                 } else {
-                    assertTrue(false);
+                    fail();
                 }
             }
 
@@ -338,7 +338,7 @@ public class ComplexColumnTest extends TestCase {
                 } else if (rowId.equals(3)) {
                     checkUnsupportedValues(3, complexValueFk);
                 } else {
-                    assertTrue(false);
+                    fail();
                 }
             }
 
@@ -385,9 +385,8 @@ public class ComplexColumnTest extends TestCase {
                 Attachment a = attachments.get(i);
                 assertEquals(fname, a.getFileName());
                 assertEquals("txt", a.getFileType());
-                assertTrue(Arrays.equals(getFileBytes(fname), a.getFileData()));
-                assertTrue(Arrays.equals(getEncodedFileBytes(fname),
-                    a.getEncodedFileData()));
+                assertArrayEquals(getFileBytes(fname), a.getFileData());
+                assertArrayEquals(getEncodedFileBytes(fname), a.getEncodedFileData());
             }
         }
     }

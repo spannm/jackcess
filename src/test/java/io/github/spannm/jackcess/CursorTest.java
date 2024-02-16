@@ -933,7 +933,7 @@ public class CursorTest extends TestCase {
         assertFalse(columnMatcher.matches(table, "value", "foo", null));
         assertFalse(columnMatcher.matches(table, "value", null, "foo"));
         assertTrue(columnMatcher.matches(table, "value", "foo", "foo"));
-        assertTrue(columnMatcher.matches(table, "value", "foo", "Foo") == caseInsensitive);
+        assertEquals(columnMatcher.matches(table, "value", "foo", "Foo"), caseInsensitive);
 
         assertFalse(columnMatcher.matches(table, "value", 13, null));
         assertFalse(columnMatcher.matches(table, "value", null, 13));
@@ -955,9 +955,9 @@ public class CursorTest extends TestCase {
             "value", "data" + 6),
             cursor.getCurrentRow());
 
-        assertTrue(cursor.findFirstRow(createExpectedRow(
+        assertEquals(cursor.findFirstRow(createExpectedRow(
             "id", 6,
-            "value", "Data" + 6)) == caseInsensitive);
+            "value", "Data" + 6)), caseInsensitive);
         if (caseInsensitive) {
             assertEquals(createExpectedRow("id", 6,
                 "value", "data" + 6),
@@ -978,8 +978,8 @@ public class CursorTest extends TestCase {
             "value", "data" + 7),
             cursor.getCurrentRow());
 
-        assertTrue(cursor.findFirstRow(createExpectedRow(
-            "value", "Data" + 7)) == caseInsensitive);
+        assertEquals(cursor.findFirstRow(createExpectedRow(
+            "value", "Data" + 7)), caseInsensitive);
         if (caseInsensitive) {
             assertEquals(createExpectedRow("id", 7,
                 "value", "data" + 7),
@@ -991,7 +991,7 @@ public class CursorTest extends TestCase {
             "value", "data" + 4),
             cursor.getCurrentRow());
 
-        assertTrue(cursor.findFirstRow(table.getColumn("value"), "Data" + 4) == caseInsensitive);
+        assertEquals(cursor.findFirstRow(table.getColumn("value"), "Data" + 4), caseInsensitive);
         if (caseInsensitive) {
             assertEquals(createExpectedRow("id", 4,
                 "value", "data" + 4),

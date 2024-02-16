@@ -16,6 +16,8 @@ limitations under the License.
 
 package io.github.spannm.jackcess;
 
+import static org.junit.Assert.assertArrayEquals;
+
 import io.github.spannm.jackcess.impl.ColumnImpl;
 import io.github.spannm.jackcess.impl.JetFormat;
 import io.github.spannm.jackcess.impl.PageChannel;
@@ -26,7 +28,6 @@ import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.TimeZone;
 
@@ -101,7 +102,7 @@ public class TableTest extends TestCase {
             bufCmp1[1].remaining() + large.length() - 2);
 
         for (int i = 0; i < buf2.length; ++i) {
-            assertTrue(Arrays.equals(toBytes(buf2[i]), toBytes(bufCmp2[i])));
+            assertArrayEquals(toBytes(buf2[i]), toBytes(bufCmp2[i]));
         }
 
         assertEquals(List.of(small, large),
