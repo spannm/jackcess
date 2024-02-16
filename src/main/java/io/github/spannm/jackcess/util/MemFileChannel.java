@@ -34,7 +34,7 @@ import java.nio.file.StandardOpenOption;
  * heap space to fit the file data. Use one of the {@code newChannel()} methods to construct an instance of this class.
  * <p>
  * In order to use this class with a Database, you <i>must</i> use the {@link DatabaseBuilder} to open/create the
- * Database instance, passing an instance of this class to the {@link DatabaseBuilder#setChannel} method.
+ * Database instance, passing an instance of this class to the {@link DatabaseBuilder#withChannel} method.
  * <p>
  * Implementation note: this class is optimized for use with {@link Database}. Therefore not all methods may be
  * implemented and individual read/write operations are only supported within page boundaries.

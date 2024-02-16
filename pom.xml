@@ -106,7 +106,7 @@
         <basepom.check.skip-spotbugs>true</basepom.check.skip-spotbugs>
         <basepom.check.skip-license>true</basepom.check.skip-license>
 
-        <basepom.javadoc.skip>true</basepom.javadoc.skip>
+        <basepom.javadoc.skip>false</basepom.javadoc.skip>
         <basepom.javadoc.show>protected</basepom.javadoc.show>
 
         <basepom.site.scm.branch>master</basepom.site.scm.branch>
