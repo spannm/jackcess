@@ -113,8 +113,7 @@ public abstract class JetFormat {
         private static final Map<String, Database.FileFormat> POSSIBLE_VERSION_3      =
             Collections.singletonMap(null, Database.FileFormat.V1997);
 
-        private static final Map<String, Database.FileFormat> POSSIBLE_VERSION_4      =
-            new HashMap<>();
+        private static final Map<String, Database.FileFormat> POSSIBLE_VERSION_4      = new HashMap<>();
 
         private static final Map<String, Database.FileFormat> POSSIBLE_VERSION_12     =
             Collections.singletonMap(null, Database.FileFormat.V2007);

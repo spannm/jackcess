@@ -364,17 +364,13 @@ public class ColumnBuilder {
      * @throws IllegalArgumentException if this column definition is invalid.
      */
     public void validate(JetFormat format) {
-        DatabaseImpl.validateIdentifierName(
-            getName(), format.MAX_COLUMN_NAME_LENGTH, "column");
+        DatabaseImpl.validateIdentifierName(getName(), format.MAX_COLUMN_NAME_LENGTH, "column");
 
         if (getType() == null) {
             throw new IllegalArgumentException(withErrorContext("must have type"));
-        }
-        if (getType().isUnsupported()) {
-            throw new IllegalArgumentException(withErrorContext(
-                "Cannot create column with unsupported type " + getType()));
-        }
-        if (!format.isSupportedDataType(getType())) {
+        } else if (!getType().isSupported()) {
+            throw new IllegalArgumentException(withErrorContext("Cannot create column with unsupported type " + getType()));
+        } else if (!format.isSupportedDataType(getType())) {
             throw new IllegalArgumentException(withErrorContext(
                 "Database format " + format + " does not support type " + getType()));
         }

@@ -39,17 +39,17 @@ import java.util.regex.Pattern;
 @SuppressWarnings("checkstyle:MethodNameCheck")
 public class IndexCodesTest extends TestCase {
 
-    private static final Map<Character, String> SPECIAL_CHARS = new HashMap<>();
-    static {
-        SPECIAL_CHARS.put('\b', "\\b");
-        SPECIAL_CHARS.put('\t', "\\t");
-        SPECIAL_CHARS.put('\n', "\\n");
-        SPECIAL_CHARS.put('\f', "\\f");
-        SPECIAL_CHARS.put('\r', "\\r");
-        SPECIAL_CHARS.put('\"', "\\\"");
-        SPECIAL_CHARS.put('\'', "\\'");
-        SPECIAL_CHARS.put('\\', "\\\\");
-    }
+    @SuppressWarnings("serial")
+    private static final Map<Character, String> SPECIAL_CHARS = new HashMap<>() {{
+        put('\b', "\\b");
+        put('\t', "\\t");
+        put('\n', "\\n");
+        put('\f', "\\f");
+        put('\r', "\\r");
+        put('\"', "\\\"");
+        put('\'', "\\'");
+        put('\\', "\\\\");
+    }};
 
     public IndexCodesTest(String name) {
         super(name);

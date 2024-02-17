@@ -18,10 +18,12 @@ package io.github.spannm.jackcess.impl.query;
 
 import io.github.spannm.jackcess.DataType;
 import io.github.spannm.jackcess.query.Query;
+import io.github.spannm.jackcess.query.Query.Type;
 
-import java.util.HashMap;
+import java.util.Arrays;
 import java.util.Map;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 /**
  * Constants used by the query data parsing.
@@ -104,40 +106,12 @@ public class QueryFormat {
 
     public static final String             NEWLINE                       = System.lineSeparator();
 
-    public static final Map<Short, String> PARAM_TYPE_MAP                =
-        new HashMap<>();
-    static {
-        PARAM_TYPE_MAP.put((short) 0, "Value");
-        PARAM_TYPE_MAP.put((short) DataType.BOOLEAN.getValue(), "Bit");
-        PARAM_TYPE_MAP.put((short) DataType.TEXT.getValue(), "Text");
-        PARAM_TYPE_MAP.put((short) DataType.BYTE.getValue(), "Byte");
-        PARAM_TYPE_MAP.put((short) DataType.INT.getValue(), "Short");
-        PARAM_TYPE_MAP.put((short) DataType.LONG.getValue(), "Long");
-        PARAM_TYPE_MAP.put((short) DataType.MONEY.getValue(), "Currency");
-        PARAM_TYPE_MAP.put((short) DataType.FLOAT.getValue(), "IEEESingle");
-        PARAM_TYPE_MAP.put((short) DataType.DOUBLE.getValue(), "IEEEDouble");
-        PARAM_TYPE_MAP.put((short) DataType.SHORT_DATE_TIME.getValue(), "DateTime");
-        PARAM_TYPE_MAP.put((short) DataType.BINARY.getValue(), "Binary");
-        PARAM_TYPE_MAP.put((short) DataType.OLE.getValue(), "LongBinary");
-        PARAM_TYPE_MAP.put((short) DataType.GUID.getValue(), "Guid");
-    }
+    public static final Map<Short, String> JOIN_TYPE_MAP = Map.of(
+        (short) 1, " INNER JOIN ",
+        (short) 2, " LEFT JOIN ",
+        (short) 3, " RIGHT JOIN ");
 
-    public static final Map<Short, String> JOIN_TYPE_MAP =
-        new HashMap<>();
-    static {
-        JOIN_TYPE_MAP.put((short) 1, " INNER JOIN ");
-        JOIN_TYPE_MAP.put((short) 2, " LEFT JOIN ");
-        JOIN_TYPE_MAP.put((short) 3, " RIGHT JOIN ");
-    }
-
-    public static final Map<Short, Query.Type> TYPE_MAP =
-        new HashMap<>();
-    static {
-        for (Query.Type type : Query.Type.values()) {
-            if (type != Query.Type.UNKNOWN) {
-                TYPE_MAP.put(type.getValue(), type);
-            }
-        }
-    }
+    public static final Map<Short, Query.Type> TYPE_MAP      = Arrays.stream(Query.Type.values())
+        .filter(Type::isUnknown).collect(Collectors.toMap(Type::getValue, v -> v));
 
 }

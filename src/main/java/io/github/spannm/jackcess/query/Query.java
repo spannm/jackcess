@@ -55,6 +55,10 @@ public interface Query {
         public short getValue() {
             return _value;
         }
+
+        public static boolean isUnknown(Type type) {
+            return type == null || type == Type.UNKNOWN;
+        }
     }
 
     /**

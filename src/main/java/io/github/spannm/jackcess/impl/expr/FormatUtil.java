@@ -108,32 +108,20 @@ public class FormatUtil {
     private static final Map<String, Fmt> PREDEF_FMTS = new HashMap<>();
 
     static {
-        putPredefFormat("General Date", args -> ValueSupport.toValue(
-            args.coerceToDateTimeValue().getAsString()));
-        putPredefFormat("Long Date",
-            new PredefDateFmt(TemporalConfig.Type.LONG_DATE));
-        putPredefFormat("Medium Date",
-            new PredefDateFmt(TemporalConfig.Type.MEDIUM_DATE));
-        putPredefFormat("Short Date",
-            new PredefDateFmt(TemporalConfig.Type.SHORT_DATE));
-        putPredefFormat("Long Time",
-            new PredefDateFmt(TemporalConfig.Type.LONG_TIME));
-        putPredefFormat("Medium Time",
-            new PredefDateFmt(TemporalConfig.Type.MEDIUM_TIME));
-        putPredefFormat("Short Time",
-            new PredefDateFmt(TemporalConfig.Type.SHORT_TIME));
+        putPredefFormat("General Date", args -> ValueSupport.toValue(args.coerceToDateTimeValue().getAsString()));
+        putPredefFormat("Long Date", new PredefDateFmt(TemporalConfig.Type.LONG_DATE));
+        putPredefFormat("Medium Date", new PredefDateFmt(TemporalConfig.Type.MEDIUM_DATE));
+        putPredefFormat("Short Date", new PredefDateFmt(TemporalConfig.Type.SHORT_DATE));
+        putPredefFormat("Long Time", new PredefDateFmt(TemporalConfig.Type.LONG_TIME));
+        putPredefFormat("Medium Time", new PredefDateFmt(TemporalConfig.Type.MEDIUM_TIME));
+        putPredefFormat("Short Time", new PredefDateFmt(TemporalConfig.Type.SHORT_TIME));
 
-        putPredefFormat("General Number", args -> ValueSupport.toValue(
-            args.coerceToNumberValue().getAsString()));
-        putPredefFormat("Currency",
-            new PredefNumberFmt(NumericConfig.Type.CURRENCY));
+        putPredefFormat("General Number", args -> ValueSupport.toValue(args.coerceToNumberValue().getAsString()));
+        putPredefFormat("Currency", new PredefNumberFmt(NumericConfig.Type.CURRENCY));
         putPredefFormat("Euro", new PredefNumberFmt(NumericConfig.Type.EURO));
-        putPredefFormat("Fixed",
-            new PredefNumberFmt(NumericConfig.Type.FIXED));
-        putPredefFormat("Standard",
-            new PredefNumberFmt(NumericConfig.Type.STANDARD));
-        putPredefFormat("Percent",
-            new PredefNumberFmt(NumericConfig.Type.PERCENT));
+        putPredefFormat("Fixed", new PredefNumberFmt(NumericConfig.Type.FIXED));
+        putPredefFormat("Standard", new PredefNumberFmt(NumericConfig.Type.STANDARD));
+        putPredefFormat("Percent", new PredefNumberFmt(NumericConfig.Type.PERCENT));
         putPredefFormat("Scientific", new ScientificPredefNumberFmt());
 
         putPredefFormat("True/False", new PredefBoolFmt("True", "False"));
@@ -200,8 +188,7 @@ public class FormatUtil {
     private static final Map<String, DateFormatBuilder> DATE_FMT_BUILDERS = new HashMap<>();
 
     static {
-        DATE_FMT_BUILDERS.put("c",
-                (dtfb, args, hasAmPm, dtType) -> dtfb.append(ValueSupport.getDateFormatForType(args._ctx, dtType)));
+        DATE_FMT_BUILDERS.put("c", (dtfb, args, hasAmPm, dtType) -> dtfb.append(ValueSupport.getDateFormatForType(args._ctx, dtType)));
         DATE_FMT_BUILDERS.put("d", new SimpleDFB("d"));
         DATE_FMT_BUILDERS.put("dd", new SimpleDFB("dd"));
         DATE_FMT_BUILDERS.put("ddd", new SimpleDFB("eee"));
@@ -1185,7 +1172,7 @@ public class FormatUtil {
 
     private static void putPredefFormat(String key, Fmt fmt) {
         // predefined formats return empty string for null
-        Fmt wrapFmt = args -> (args.isNullOrEmptyString() ? ValueSupport.EMPTY_STR_VAL : fmt.format(args));
+        Fmt wrapFmt = args -> args.isNullOrEmptyString() ? ValueSupport.EMPTY_STR_VAL : fmt.format(args);
         PREDEF_FMTS.put(key, wrapFmt);
     }
 

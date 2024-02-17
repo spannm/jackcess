@@ -42,193 +42,124 @@ public enum DataType {
      * Corresponds to a java {@link Boolean}. Accepts Boolean or {@code null} (which is considered {@code false}).
      * Equivalent to SQL {@link Types#BOOLEAN}.
      */
-    BOOLEAN((byte) 0x01, Types.BOOLEAN, 0),
+    BOOLEAN((byte) 0x01, "Bit", Types.BOOLEAN, 0),
     /**
      * Corresponds to a java {@link Byte}. Accepts any {@link Number} (using {@link Number#byteValue}), Boolean as 1 or
      * 0, any Object converted to a String and parsed as Double, or {@code null}. Equivalent to SQL
      * {@link Types#TINYINT}, {@link Types#BIT}.
      */
-    BYTE((byte) 0x02, Types.TINYINT, 1),
+    BYTE((byte) 0x02, "Byte", Types.TINYINT, 1),
     /**
      * Corresponds to a java {@link Short}. Accepts any {@link Number} (using {@link Number#shortValue}), Boolean as 1
      * or 0, any Object converted to a String and parsed as Double, or {@code null}. Equivalent to SQL
      * {@link Types#SMALLINT}.
      */
-    INT((byte) 0x03, Types.SMALLINT, 2),
+    INT((byte) 0x03, "Short", Types.SMALLINT, 2),
     /**
      * Corresponds to a java {@link Integer}. Accepts any {@link Number} (using {@link Number#intValue}), Boolean as 1
      * or 0, any Object converted to a String and parsed as Double, or {@code null}. Equivalent to SQL
      * {@link Types#INTEGER}, {@link Types#BIGINT}.
      */
-    LONG((byte) 0x04, Types.INTEGER, 4),
+    LONG((byte) 0x04, "Long", Types.INTEGER, 4),
     /**
      * Corresponds to a java {@link BigDecimal} with at most 4 decimal places. Accepts any {@link Number} (using
      * {@link Number#doubleValue}), a BigInteger, a BigDecimal (with at most 4 decimal places), Boolean as 1 or 0, any
      * Object converted to a String and parsed as BigDecimal, or {@code
      * null}. Equivalent to SQL {@link Types#DECIMAL}.
      */
-    MONEY(
-        (byte) 0x05,
-        Types.DECIMAL,
-        8,
-        false,
-        false,
-        0,
-        0,
-        0,
-        false,
-        4,
-        4,
-        4,
-        19,
-        19,
-        19,
-        1),
+    MONEY((byte) 0x05, "Currency", Types.DECIMAL, 8, false, false, 0, 0, 0, false, 4, 4, 4, 19, 19, 19, 1),
     /**
      * Corresponds to a java {@link Float}. Accepts any {@link Number} (using {@link Number#floatValue}), Boolean as 1
      * or 0, any Object converted to a String and parsed as Double, or {@code null}. Equivalent to SQL
      * {@link Types#FLOAT}.
      */
-    FLOAT((byte) 0x06, Types.FLOAT, 4),
+    FLOAT((byte) 0x06, "IEEESingle", Types.FLOAT, 4),
     /**
      * Corresponds to a java {@link Double}. Accepts any {@link Number} (using {@link Number#doubleValue}), Boolean as 1
      * or 0, any Object converted to a String and parsed as Double, or {@code null}. Equivalent to SQL
      * {@link Types#DOUBLE}, {@link Types#REAL}.
      */
-    DOUBLE((byte) 0x07, Types.DOUBLE, 8),
+    DOUBLE((byte) 0x07, "IEEEDouble", Types.DOUBLE, 8),
     /**
      * Corresponds to a java {@link Date} or {@link LocalDateTime}. Accepts a Date, LocalDateTime (or related types),
      * any {@link Number} (using {@link Number#longValue}), or {@code null}. Equivalent to SQL {@link Types#TIMESTAMP},
      * {@link Types#DATE}, {@link Types#TIME}.
      */
-    SHORT_DATE_TIME((byte) 0x08, Types.TIMESTAMP, 8),
+    SHORT_DATE_TIME((byte) 0x08, "DateTime", Types.TIMESTAMP, 8),
     /**
      * Corresponds to a java {@code byte[]} of max length 255 bytes. Accepts a {@code byte[]}, or {@code null}.
      * Equivalent to SQL {@link Types#BINARY}, {@link Types#VARBINARY}.
      */
-    BINARY((byte) 0x09, Types.BINARY, null, true, false, 0, 255, 255, 1),
+    BINARY((byte) 0x09, "Binary", Types.BINARY, null, true, false, 0, 255, 255, 1),
     /**
      * Corresponds to a java {@link String} of max length 255 chars. Accepts any {@link CharSequence}, any Object
      * converted to a String , or {@code
      * null}. Equivalent to SQL {@link Types#VARCHAR}, {@link Types#CHAR}.
      */
-    TEXT(
-        (byte) 0x0A,
-        Types.VARCHAR,
-        null,
-        true,
-        false,
-        0,
-        JetFormat.TEXT_FIELD_MAX_LENGTH,
-        JetFormat.TEXT_FIELD_MAX_LENGTH,
-        JetFormat.TEXT_FIELD_UNIT_SIZE),
+    TEXT((byte) 0x0A, "Text", Types.VARCHAR, null, true, false, 0, JetFormat.TEXT_FIELD_MAX_LENGTH, JetFormat.TEXT_FIELD_MAX_LENGTH, JetFormat.TEXT_FIELD_UNIT_SIZE),
     /**
      * Corresponds to a java {@code byte[]} of max length 16777215 bytes. Accepts a {@code byte[]}, or {@code null}.
      * Equivalent to SQL {@link Types#LONGVARBINARY}, {@link Types#BLOB}.
      */
-    OLE(
-        (byte) 0x0B,
-        Types.LONGVARBINARY,
-        null,
-        true,
-        true,
-        0,
-        0,
-        0x3FFFFFFF,
-        1),
+    OLE((byte) 0x0B, "LongBinary", Types.LONGVARBINARY, null, true, true, 0, 0, 0x3FFFFFFF, 1),
     /**
      * Corresponds to a java {@link String} of max length 8388607 chars. Accepts any {@link CharSequence}, any Object
      * converted to a String , or {@code null}. Equivalent to SQL {@link Types#LONGVARCHAR}, {@link Types#CLOB}.
      */
-    MEMO(
-        (byte) 0x0C,
-        Types.LONGVARCHAR,
-        null,
-        true,
-        true,
-        0,
-        0,
-        0x3FFFFFFF,
-        JetFormat.TEXT_FIELD_UNIT_SIZE),
+    MEMO((byte) 0x0C, null, Types.LONGVARCHAR, null, true, true, 0, 0, 0x3FFFFFFF, JetFormat.TEXT_FIELD_UNIT_SIZE),
     /**
      * Unknown data. Handled like {@link #BINARY}.
      */
-    UNKNOWN_0D((byte) 0x0D, null, null, true, false, 0, 255, 255, 1),
+    UNKNOWN_0D((byte) 0x0D, null, null, null, true, false, 0, 255, 255, 1),
     /**
      * Corresponds to a java {@link String} with the pattern <code>"{xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx}"</code>, also
      * known as a "Replication ID" in Access. Accepts any Object converted to a String matching this pattern
      * (surrounding "{}" are optional, so {@link java.util.UUID}s are supported), or {@code null}.
      */
-    GUID((byte) 0x0F, null, 16),
+    GUID((byte) 0x0F, "Guid", null, 16),
     /**
      * Corresponds to a java {@link BigDecimal}. Accepts any {@link Number} (using {@link Number#doubleValue}), a
      * {@link BigInteger}, a BigDecimal, Boolean as 1 or 0, any Object converted to a String and parsed as BigDecimal,
      * or {@code null}. Equivalent to SQL {@link Types#NUMERIC}.
      */
     // for some reason numeric is "var len" even though it has a fixed size...
-    NUMERIC(
-        (byte) 0x10,
-        Types.NUMERIC,
-        17,
-        true,
-        false,
-        17,
-        17,
-        17,
-        true,
-        0,
-        0,
-        28,
-        1,
-        18,
-        28,
-        1),
+    NUMERIC((byte) 0x10, null, Types.NUMERIC, 17, true, false, 17, 17, 17, true, 0, 0, 28, 1, 18, 28, 1),
     /**
      * Unknown data (seems to be an alternative {@link #OLE} type, used by MSysAccessObjects table). Handled like a
      * fixed length BINARY/OLE.
      */
-    UNKNOWN_11((byte) 0x11, null, 3992),
+    UNKNOWN_11((byte) 0x11, "TYPENAME", null, 3992),
     /**
      * Complex type corresponds to a special {@link #LONG} autonumber field which is the key for a secondary table which
      * holds the "real" data.
      */
-    COMPLEX_TYPE((byte) 0x12, null, 4),
+    COMPLEX_TYPE((byte) 0x12, "TYPENAME", null, 4),
     /**
      * Corresponds to a java {@link Long}. Accepts any {@link Number} (using {@link Number#longValue}), Boolean as 1 or
      * 0, any Object converted to a String and parsed as Double, or {@code null}. Equivalent to SQL
      * {@link Types#BIGINT}.
      */
-    BIG_INT((byte) 0x13, Types.BIGINT, 8),
+    BIG_INT((byte) 0x13, "TYPENAME", Types.BIGINT, 8),
     /**
      * Corresponds to a java {@link LocalDateTime} (with 7 digits of nanosecond precision). Accepts a Date,
      * LocalDateTime (or related types), any {@link Number} (using {@link Number#longValue}), or {@code null}.
      * Equivalent to SQL {@link Types#TIMESTAMP}, {@link Types#DATE}, {@link Types#TIME}.
      */
-    EXT_DATE_TIME((byte) 0x14, null, 42),
+    EXT_DATE_TIME((byte) 0x14, "TYPENAME", null, 42),
     /**
      * Dummy type for a fixed length type which is not currently supported. Handled like a fixed length {@link #BINARY}.
      */
-    UNSUPPORTED_FIXEDLEN((byte) 0xFE, null, null),
+    UNSUPPORTED_FIXEDLEN((byte) 0xFE, "TYPENAME", null, null),
     /**
      * Placeholder type for a variable length type which is not currently supported. Handled like {@link #BINARY}.
      */
-    UNSUPPORTED_VARLEN(
-        (byte) 0xFF,
-        null,
-        null,
-        true,
-        false,
-        0,
-        0,
-        0x3FFFFFFF,
-        1);
+    UNSUPPORTED_VARLEN((byte) 0xFF, null, null, null, true, false, 0, 0, 0x3FFFFFFF, 1);
 
     /** Map of SQL types to Access data types */
-    private static final Map<Integer, DataType[]> SQL_TYPES     =
-        new HashMap<>();
+    private static final Map<Integer, DataType[]> SQL_TYPES     = new HashMap<>();
     /** Alternate map of SQL types to Access data types */
-    private static final Map<Integer, DataType>   ALT_SQL_TYPES =
-        new HashMap<>();
+    private static final Map<Integer, DataType>   ALT_SQL_TYPES = new HashMap<>();
+
     static {
         for (DataType type : DataType.values()) {
             if (type._sqlType != null) {
@@ -259,77 +190,58 @@ public enum DataType {
         addNewSqlType("TIMESTAMP_WITH_TIMEZONE", SHORT_DATE_TIME, null);
     }
 
-    private static final Map<Byte, DataType> DATA_TYPES =
-        Arrays.stream(DataType.values()).filter(dt -> !dt.isUnsupported()).collect(Collectors.toMap(k -> k._value, v -> v));
+    private static final Map<Byte, DataType> DATA_TYPES_BY_VALUE =
+        Arrays.stream(DataType.values()).filter(DataType::isSupported).collect(Collectors.toMap(k -> k._value, v -> v));
 
     /** is this a variable length field */
-    private final boolean _variableLength;
+    private final boolean                    _variableLength;
     /** is this a long value field */
-    private final boolean _longValue;
+    private final boolean                    _longValue;
     /** does this field have scale/precision */
-    private final boolean _hasScalePrecision;
+    private final boolean                    _hasScalePrecision;
     /** Internal Access value */
-    private final byte    _value;
+    private final byte                       _value;
+    /** TODO */
+    private final String                     _typeName;
     /** Size in bytes of fixed length columns */
-    private final Integer _fixedSize;
+    private final Integer                    _fixedSize;
     /** min in bytes size for var length columns */
-    private final int     _minSize;
+    private final int                        _minSize;
     /** default size in bytes for var length columns */
-    private final int     _defaultSize;
+    private final int                        _defaultSize;
     /** Max size in bytes for var length columns */
-    private final int     _maxSize;
+    private final int                        _maxSize;
     /** SQL type equivalent, or null if none defined */
-    private final Integer _sqlType;
+    private final Integer                    _sqlType;
     /** min scale value */
-    private final int     _minScale;
+    private final int                        _minScale;
     /** the default scale value */
-    private final int     _defaultScale;
+    private final int                        _defaultScale;
     /** max scale value */
-    private final int     _maxScale;
+    private final int                        _maxScale;
     /** min precision value */
-    private final int     _minPrecision;
+    private final int                        _minPrecision;
     /** the default precision value */
-    private final int     _defaultPrecision;
+    private final int                        _defaultPrecision;
     /** max precision value */
-    private final int     _maxPrecision;
+    private final int                        _maxPrecision;
     /** the number of bytes per "unit" for this data type */
-    private final int     _unitSize;
+    private final int                        _unitSize;
 
-    DataType(byte value) {
-        this(value, null, null);
+    DataType(byte value, String typeName, Integer sqlType, Integer fixedSize) {
+        this(value, typeName, sqlType, fixedSize, false, false, 0, 0, 0, 1);
     }
 
-    DataType(byte value, Integer sqlType, Integer fixedSize) {
-        this(value, sqlType, fixedSize, false, false, 0, 0, 0, 1);
+    DataType(byte value, String typeName, Integer sqlType, Integer fixedSize, boolean variableLength, boolean longValue,
+        int minSize, int defaultSize, int maxSize, int unitSize) {
+        this(value, typeName, sqlType, fixedSize, variableLength, longValue, minSize, defaultSize, maxSize, false, 0, 0, 0, 0, 0, 0, unitSize);
     }
 
-    DataType(byte value, Integer sqlType, Integer fixedSize,
-        boolean variableLength,
-        boolean longValue,
-        int minSize,
-        int defaultSize,
-        int maxSize,
-        int unitSize) {
-        this(value, sqlType, fixedSize, variableLength, longValue,
-            minSize, defaultSize, maxSize,
-            false, 0, 0, 0, 0, 0, 0, unitSize);
-    }
-
-    DataType(byte value, Integer sqlType, Integer fixedSize,
-        boolean variableLength,
-        boolean longValue,
-        int minSize,
-        int defaultSize,
-        int maxSize,
-        boolean hasScalePrecision,
-        int minScale,
-        int defaultScale,
-        int maxScale,
-        int minPrecision,
-        int defaultPrecision,
-        int maxPrecision,
-        int unitSize) {
+    DataType(byte value, String typeName, Integer sqlType, Integer fixedSize, boolean variableLength, boolean longValue,
+        int minSize, int defaultSize, int maxSize, boolean hasScalePrecision,
+        int minScale, int defaultScale, int maxScale, int minPrecision, int defaultPrecision, int maxPrecision, int unitSize) {
         _value = value;
+        _typeName = typeName;
         _sqlType = sqlType;
         _fixedSize = fixedSize;
         _variableLength = variableLength;
@@ -349,6 +261,10 @@ public enum DataType {
 
     public byte getValue() {
         return _value;
+    }
+
+    public String getTypeName() {
+        return _typeName;
     }
 
     public boolean isVariableLength() {
@@ -496,8 +412,8 @@ public enum DataType {
         return this == COMPLEX_TYPE;
     }
 
-    public boolean isUnsupported() {
-        return this == UNSUPPORTED_FIXEDLEN || this == UNSUPPORTED_VARLEN;
+    public boolean isSupported() {
+        return this != UNSUPPORTED_FIXEDLEN && this != UNSUPPORTED_VARLEN;
     }
 
     private static int toValidRange(int value, int minValue, int maxValue) {
@@ -505,25 +421,30 @@ public enum DataType {
     }
 
     public static DataType fromByte(byte b) throws IOException {
-        DataType rtn = DATA_TYPES.get(b);
+        DataType rtn = DATA_TYPES_BY_VALUE.get(b);
         if (rtn != null) {
             return rtn;
         }
         throw new IOException("Unrecognized data type: " + b);
     }
 
-    public static DataType fromSQLType(int sqlType)
-        throws IOException {
+    public static String getTypeName(short value) {
+        if (value == 0) {
+            return "Value";
+        }
+        DataType dt = DATA_TYPES_BY_VALUE.get((byte) value);
+        return dt == null ? null : dt.getTypeName();
+    }
+
+    public static DataType fromSQLType(int sqlType) throws IOException {
         return fromSQLType(sqlType, 0, null);
     }
 
-    public static DataType fromSQLType(int sqlType, int lengthInUnits)
-        throws IOException {
+    public static DataType fromSQLType(int sqlType, int lengthInUnits) throws IOException {
         return fromSQLType(sqlType, lengthInUnits, null);
     }
 
-    public static DataType fromSQLType(int sqlType, int lengthInUnits,
-        Database.FileFormat fileFormat)
+    public static DataType fromSQLType(int sqlType, int lengthInUnits, Database.FileFormat fileFormat)
         throws IOException {
         DataType[] rtnArr = SQL_TYPES.get(sqlType);
         if (rtnArr == null) {

@@ -26,6 +26,7 @@ import java.time.LocalDateTime;
 import java.util.*;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
+import java.util.stream.Stream;
 
 /**
  * @author James Ahlborn
@@ -48,16 +49,14 @@ public class Expressionator {
     private static final Map<String, WordType> WORD_TYPES       = new HashMap<>();
 
     static {
-        setWordType(WordType.OP, "+", "-", "*", "/", "\\", "^", "&", "mod");
-        setWordType(WordType.COMP, "<", "<=", ">", ">=", "=", "<>");
-        setWordType(WordType.LOG_OP, "and", "or", "eqv", "xor", "imp");
-        setWordType(WordType.CONST, "true", "false", "null", "on", "off",
-            "yes", "no");
-        setWordType(WordType.SPEC_OP_PREFIX, "is", "like", "between", "in", "not");
+        Stream.of("+", "-", "*", "/", "\\", "^", "&", "mod").forEach(w -> WORD_TYPES.put(w, WordType.OP));
+        Stream.of("<", "<=", ">", ">=", "=", "<>").forEach(w -> WORD_TYPES.put(w, WordType.COMP));
+        Stream.of("and", "or", "eqv", "xor", "imp").forEach(w -> WORD_TYPES.put(w, WordType.LOG_OP));
+        Stream.of("true", "false", "null", "on", "off", "yes", "no").forEach(w -> WORD_TYPES.put(w, WordType.CONST));
+        Stream.of("is", "like", "between", "in", "not").forEach(w -> WORD_TYPES.put(w, WordType.SPEC_OP_PREFIX));
         // "X is null", "X is not null", "X like P", "X between A and B",
-        // "X not between A and B", "X in (A, B, C...)", "X not in (A, B, C...)",
-        // "not X"
-        setWordType(WordType.DELIM, ".", "!", ",", "(", ")");
+        // "X not between A and B", "X in (A, B, C...)", "X not in (A, B, C...)", "not X"
+        Stream.of(".", "!", ",", "(", ")").forEach(w -> WORD_TYPES.put(w, WordType.DELIM));
     }
 
     private static final Collection<String> TRUE_STRS  = List.of("true", "yes", "on");
@@ -1022,12 +1021,6 @@ public class Expressionator {
         return WORD_TYPES.get(t.getValueStr().toLowerCase());
     }
 
-    private static void setWordType(WordType type, String... words) {
-        for (String w : words) {
-            WORD_TYPES.put(w, type);
-        }
-    }
-
     private static <T extends Enum<T>> T getOpType(Token t, Class<T> opClazz) {
         String str = t.getValueStr();
         for (T op : opClazz.getEnumConstants()) {
@@ -1190,8 +1183,7 @@ public class Expressionator {
         return prec1 < prec2;
     }
 
-    private static Map<OpType, Integer> buildPrecedenceMap(
-        OpType[]... opArrs) {
+    private static Map<OpType, Integer> buildPrecedenceMap(OpType[]... opArrs) {
         Map<OpType, Integer> prec = new HashMap<>();
 
         int level = 0;

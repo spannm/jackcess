@@ -18,6 +18,7 @@ package io.github.spannm.jackcess.impl.query;
 
 import static io.github.spannm.jackcess.impl.query.QueryFormat.*;
 
+import io.github.spannm.jackcess.DataType;
 import io.github.spannm.jackcess.RowId;
 import io.github.spannm.jackcess.impl.DatabaseImpl;
 import io.github.spannm.jackcess.impl.RowIdImpl;
@@ -171,10 +172,9 @@ public abstract class QueryImpl implements Query {
         return new RowFormatter(getParameterRows()) {
             @Override
             protected void format(StringBuilder builder, Row row) {
-                String typeName = PARAM_TYPE_MAP.get(row._flag);
+                String typeName = DataType.getTypeName(row._flag);
                 if (typeName == null) {
-                    throw new IllegalStateException(withErrorContext(
-                        "Unknown param type " + row._flag));
+                    throw new IllegalStateException(withErrorContext("Unknown param type " + row._flag));
                 }
 
                 builder.append(row._name1).append(' ').append(typeName);

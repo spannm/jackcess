@@ -131,8 +131,7 @@ public class PropertyMaps implements Iterable<PropertyMapImpl> {
         /** the system table "property" column */
         private final ColumnImpl                _propCol;
         /** cache of PropColumns used to read/write property values */
-        private final Map<DataType, PropColumn> _columns =
-            new HashMap<>();
+        private final Map<DataType, PropColumn> _columns = new HashMap<>();
 
         Handler(DatabaseImpl database) {
             _database = database;

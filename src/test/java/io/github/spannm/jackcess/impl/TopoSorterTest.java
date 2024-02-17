@@ -127,8 +127,7 @@ public class TopoSorterTest extends TestCase {
     }
 
     private static class TestTopoSorter extends TopoSorter<String> {
-        private final Map<String, List<String>> _descMap =
-            new HashMap<>();
+        private final Map<String, List<String>> _descMap = new HashMap<>();
 
         TestTopoSorter(List<String> values, boolean reverse) {
             super(values, reverse);
