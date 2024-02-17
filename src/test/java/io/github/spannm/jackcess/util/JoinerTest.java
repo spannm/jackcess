@@ -42,7 +42,7 @@ public class JoinerTest extends TestCase {
     }
 
     public void testJoiner() throws Exception {
-        for (final TestDB testDB : TestDB.getSupportedForBasename(Basename.INDEX)) {
+        for (TestDB testDB : TestDB.getSupportedForBasename(Basename.INDEX)) {
 
             try (Database db = openCopy(testDB)) {
                 Table t1 = db.getTable("Table1");

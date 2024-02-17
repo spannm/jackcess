@@ -44,7 +44,7 @@ public class ImportTest extends TestCase {
     }
 
     public void testImportFromFile() throws Exception {
-        for (final FileFormat fileFormat : JetFormatTest.SUPPORTED_FILEFORMATS) {
+        for (FileFormat fileFormat : JetFormatTest.SUPPORTED_FILEFORMATS) {
             Database db = create(fileFormat);
             String tableName = new ImportUtil.Builder(db, "test")
                 .withDelimiter("\\t")
@@ -168,7 +168,7 @@ public class ImportTest extends TestCase {
     }
 
     public void testImportFromFileWithOnlyHeaders() throws Exception {
-        for (final FileFormat fileFormat : JetFormatTest.SUPPORTED_FILEFORMATS) {
+        for (FileFormat fileFormat : JetFormatTest.SUPPORTED_FILEFORMATS) {
             Database db = create(fileFormat);
             String tableName = new ImportUtil.Builder(db, "test")
                 .withDelimiter("\\t")
@@ -191,7 +191,7 @@ public class ImportTest extends TestCase {
     }
 
     public void testCopySqlHeaders() throws Exception {
-        for (final FileFormat fileFormat : JetFormatTest.SUPPORTED_FILEFORMATS) {
+        for (FileFormat fileFormat : JetFormatTest.SUPPORTED_FILEFORMATS) {
 
             TestResultSet rs = new TestResultSet();
 

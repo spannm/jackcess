@@ -38,7 +38,7 @@ public class CustomLinkResolverTest extends TestCase {
     }
 
     public void testCustomLinkResolver() throws Exception {
-        for (final FileFormat fileFormat : SUPPORTED_FILEFORMATS) {
+        for (FileFormat fileFormat : SUPPORTED_FILEFORMATS) {
             Database db = create(fileFormat);
 
             db.setLinkResolver(new TestLinkResolver());

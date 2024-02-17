@@ -46,7 +46,7 @@ public class PropertyExpressionTest extends TestCase {
     }
 
     public void testDefaultValue() throws Exception {
-        for (final FileFormat fileFormat : SUPPORTED_FILEFORMATS) {
+        for (FileFormat fileFormat : SUPPORTED_FILEFORMATS) {
             Database db = create(fileFormat);
             db.setEvaluateExpressions(true);
 
@@ -152,7 +152,7 @@ public class PropertyExpressionTest extends TestCase {
     }
 
     public void testColumnValidator() throws Exception {
-        for (final FileFormat fileFormat : SUPPORTED_FILEFORMATS) {
+        for (FileFormat fileFormat : SUPPORTED_FILEFORMATS) {
             Database db = create(fileFormat);
             db.setEvaluateExpressions(true);
 
@@ -224,7 +224,7 @@ public class PropertyExpressionTest extends TestCase {
     }
 
     public void testRowValidator() throws Exception {
-        for (final FileFormat fileFormat : SUPPORTED_FILEFORMATS) {
+        for (FileFormat fileFormat : SUPPORTED_FILEFORMATS) {
             Database db = create(fileFormat);
             db.setEvaluateExpressions(true);
 
@@ -301,7 +301,7 @@ public class PropertyExpressionTest extends TestCase {
         Bindings bindings = new SimpleBindings();
         bindings.put("someKey", "someVal");
 
-        for (final FileFormat fileFormat : SUPPORTED_FILEFORMATS) {
+        for (FileFormat fileFormat : SUPPORTED_FILEFORMATS) {
             Database db = create(fileFormat);
 
             EvalConfig ec = db.getEvalConfig();

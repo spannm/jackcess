@@ -41,7 +41,7 @@ public class BigIntTest extends TestCase {
 
     public void testBigInt() throws Exception {
 
-        for (final Database.FileFormat fileFormat : SUPPORTED_FILEFORMATS) {
+        for (Database.FileFormat fileFormat : SUPPORTED_FILEFORMATS) {
             JetFormat format = DatabaseImpl.getFileFormatDetails(fileFormat)
                 .getFormat();
 

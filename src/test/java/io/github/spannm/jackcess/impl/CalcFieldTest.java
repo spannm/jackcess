@@ -53,7 +53,7 @@ public class CalcFieldTest extends TestCase {
 
         cb.validate(JetFormat.VERSION_14);
 
-        for (final Database.FileFormat fileFormat : SUPPORTED_FILEFORMATS) {
+        for (Database.FileFormat fileFormat : SUPPORTED_FILEFORMATS) {
             JetFormat format = DatabaseImpl.getFileFormatDetails(fileFormat).getFormat();
             if (!format.isSupportedCalculatedDataType(DataType.TEXT)) {
                 continue;

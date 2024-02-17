@@ -18,7 +18,7 @@ import java.util.List;
 public final class UsageMapTest extends TestCase {
 
     public void testRead() throws Exception {
-        for (final TestDB testDB : JetFormatTest.SUPPORTED_DBS_TEST) {
+        for (TestDB testDB : JetFormatTest.SUPPORTED_DBS_TEST) {
             final int expectedFirstPage;
             final int expectedLastPage;
             final Database.FileFormat expectedFileFormat = testDB.getExpectedFileFormat();

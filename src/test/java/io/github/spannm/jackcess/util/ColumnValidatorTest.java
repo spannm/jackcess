@@ -37,7 +37,7 @@ public class ColumnValidatorTest extends TestCase {
     }
 
     public void testValidate() throws Exception {
-        for (final FileFormat fileFormat : SUPPORTED_FILEFORMATS) {
+        for (FileFormat fileFormat : SUPPORTED_FILEFORMATS) {
             Database db = create(fileFormat);
 
             ColumnValidatorFactory initFact = db.getColumnValidatorFactory();

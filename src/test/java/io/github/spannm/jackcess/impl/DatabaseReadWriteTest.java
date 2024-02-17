@@ -42,7 +42,7 @@ public class DatabaseReadWriteTest extends TestCase {
     }
 
     public void testWriteAndRead() throws Exception {
-        for (final FileFormat fileFormat : SUPPORTED_FILEFORMATS) {
+        for (FileFormat fileFormat : SUPPORTED_FILEFORMATS) {
             Database db = create(fileFormat);
             doTestWriteAndRead(db);
             db.close();
@@ -50,7 +50,7 @@ public class DatabaseReadWriteTest extends TestCase {
     }
 
     public void testWriteAndReadInMem() throws Exception {
-        for (final FileFormat fileFormat : SUPPORTED_FILEFORMATS) {
+        for (FileFormat fileFormat : SUPPORTED_FILEFORMATS) {
             Database db = createMem(fileFormat);
             doTestWriteAndRead(db);
             db.close();
@@ -85,7 +85,7 @@ public class DatabaseReadWriteTest extends TestCase {
     }
 
     public void testWriteAndReadInBatch() throws Exception {
-        for (final FileFormat fileFormat : SUPPORTED_FILEFORMATS) {
+        for (FileFormat fileFormat : SUPPORTED_FILEFORMATS) {
             Database db = createMem(fileFormat);
             createTestTable(db);
             int count = 1000;
@@ -113,7 +113,7 @@ public class DatabaseReadWriteTest extends TestCase {
     }
 
     public void testUpdateRow() throws Exception {
-        for (final FileFormat fileFormat : SUPPORTED_FILEFORMATS) {
+        for (FileFormat fileFormat : SUPPORTED_FILEFORMATS) {
             Database db = createMem(fileFormat);
 
             Table t = new TableBuilder("test")

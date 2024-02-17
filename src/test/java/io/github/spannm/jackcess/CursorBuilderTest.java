@@ -42,7 +42,7 @@ public class CursorBuilderTest extends TestCase {
     }
 
     public void test() throws Exception {
-        for (final TestDB indexCursorDB : CursorTest.INDEX_CURSOR_DBS) {
+        for (TestDB indexCursorDB : CursorTest.INDEX_CURSOR_DBS) {
             Database db = CursorTest.createTestIndexTable(indexCursorDB);
 
             Table table = db.getTable("test");

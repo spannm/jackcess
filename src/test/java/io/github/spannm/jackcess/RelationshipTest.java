@@ -39,7 +39,7 @@ public class RelationshipTest extends TestCase {
     }
 
     public void testTwoTables() throws Exception {
-        for (final TestDB testDB : TestDB.getSupportedForBasename(Basename.INDEX, true)) {
+        for (TestDB testDB : TestDB.getSupportedForBasename(Basename.INDEX, true)) {
             try (Database db = open(testDB)) {
                 Table t1 = db.getTable("Table1");
                 Table t2 = db.getTable("Table2");
@@ -90,7 +90,7 @@ public class RelationshipTest extends TestCase {
     }
 
     public void testOneTable() throws Exception {
-        for (final TestDB testDB : TestDB.getSupportedForBasename(Basename.INDEX, true)) {
+        for (TestDB testDB : TestDB.getSupportedForBasename(Basename.INDEX, true)) {
             try (Database db = open(testDB)) {
                 Table t1 = db.getTable("Table1");
                 Table t2 = db.getTable("Table2");
@@ -106,7 +106,7 @@ public class RelationshipTest extends TestCase {
     }
 
     public void testNoTables() throws Exception {
-        for (final TestDB testDB : TestDB.getSupportedForBasename(Basename.INDEX, true)) {
+        for (TestDB testDB : TestDB.getSupportedForBasename(Basename.INDEX, true)) {
             try (Database db = open(testDB)) {
                 Table t1 = db.getTable("Table1");
                 Table t2 = db.getTable("Table2");

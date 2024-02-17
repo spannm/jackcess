@@ -39,7 +39,7 @@ public class FKEnforcerTest extends TestCase {
     }
 
     public void testNoEnforceForeignKeys() throws Exception {
-        for (final TestDB testDB : TestDB.getSupportedForBasename(Basename.INDEX)) {
+        for (TestDB testDB : TestDB.getSupportedForBasename(Basename.INDEX)) {
 
             Database db = openCopy(testDB);
             db.setEnforceForeignKeys(false);
@@ -63,7 +63,7 @@ public class FKEnforcerTest extends TestCase {
     }
 
     public void testEnforceForeignKeys() throws Exception {
-        for (final TestDB testDB : TestDB.getSupportedForBasename(Basename.INDEX)) {
+        for (TestDB testDB : TestDB.getSupportedForBasename(Basename.INDEX)) {
 
             Database db = openCopy(testDB);
             db.setEvaluateExpressions(false);

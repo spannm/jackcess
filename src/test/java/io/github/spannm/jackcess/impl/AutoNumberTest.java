@@ -46,7 +46,7 @@ public class AutoNumberTest extends TestCase {
     }
 
     public void testAutoNumber() throws Exception {
-        for (final FileFormat fileFormat : SUPPORTED_FILEFORMATS) {
+        for (FileFormat fileFormat : SUPPORTED_FILEFORMATS) {
             Database db = createMem(fileFormat);
 
             Table table = newTable("test")
@@ -62,7 +62,7 @@ public class AutoNumberTest extends TestCase {
     }
 
     public void testAutoNumberPK() throws Exception {
-        for (final TestDB testDB : JetFormatTest.SUPPORTED_DBS_TEST) {
+        for (TestDB testDB : JetFormatTest.SUPPORTED_DBS_TEST) {
             Database db = openMem(testDB);
 
             Table table = db.getTable("Table3");
@@ -121,7 +121,7 @@ public class AutoNumberTest extends TestCase {
     }
 
     public void testAutoNumberGuid() throws Exception {
-        for (final FileFormat fileFormat : SUPPORTED_FILEFORMATS) {
+        for (FileFormat fileFormat : SUPPORTED_FILEFORMATS) {
             Database db = createMem(fileFormat);
 
             Table table = newTable("test")
@@ -148,7 +148,7 @@ public class AutoNumberTest extends TestCase {
     }
 
     public void testInsertLongAutoNumber() throws Exception {
-        for (final FileFormat fileFormat : SUPPORTED_FILEFORMATS) {
+        for (FileFormat fileFormat : SUPPORTED_FILEFORMATS) {
             Database db = createMem(fileFormat);
 
             Table table = newTable("test")
@@ -164,7 +164,7 @@ public class AutoNumberTest extends TestCase {
     }
 
     public void testInsertLongAutoNumberPK() throws Exception {
-        for (final FileFormat fileFormat : SUPPORTED_FILEFORMATS) {
+        for (FileFormat fileFormat : SUPPORTED_FILEFORMATS) {
             Database db = createMem(fileFormat);
 
             Table table = newTable("test")
@@ -265,7 +265,7 @@ public class AutoNumberTest extends TestCase {
     }
 
     public void testInsertComplexAutoNumber() throws Exception {
-        for (final TestDB testDB : TestDB.getSupportedForBasename(Basename.COMPLEX)) {
+        for (TestDB testDB : TestDB.getSupportedForBasename(Basename.COMPLEX)) {
 
             Database db = openMem(testDB);
 
@@ -391,7 +391,7 @@ public class AutoNumberTest extends TestCase {
     }
 
     public void testInsertGuidAutoNumber() throws Exception {
-        for (final FileFormat fileFormat : SUPPORTED_FILEFORMATS) {
+        for (FileFormat fileFormat : SUPPORTED_FILEFORMATS) {
             Database db = createMem(fileFormat);
 
             Table table = newTable("test")

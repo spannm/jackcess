@@ -377,7 +377,7 @@ public class PropertiesTest extends TestCase {
     }
 
     public void testEnforceProperties() throws Exception {
-        for (final FileFormat fileFormat : JetFormatTest.SUPPORTED_FILEFORMATS) {
+        for (FileFormat fileFormat : JetFormatTest.SUPPORTED_FILEFORMATS) {
             Database db = TestUtil.create(fileFormat);
 
             Table t = DatabaseBuilder.newTable("testReq")

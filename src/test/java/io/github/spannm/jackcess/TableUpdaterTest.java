@@ -38,7 +38,7 @@ public class TableUpdaterTest extends TestCase {
     }
 
     public void testTableUpdating() throws Exception {
-        for (final FileFormat fileFormat : SUPPORTED_FILEFORMATS) {
+        for (FileFormat fileFormat : SUPPORTED_FILEFORMATS) {
             Database db = create(fileFormat);
 
             doTestUpdating(db, false, true, null);
@@ -48,7 +48,7 @@ public class TableUpdaterTest extends TestCase {
     }
 
     public void testTableUpdatingOneToOne() throws Exception {
-        for (final FileFormat fileFormat : SUPPORTED_FILEFORMATS) {
+        for (FileFormat fileFormat : SUPPORTED_FILEFORMATS) {
             Database db = create(fileFormat);
 
             doTestUpdating(db, true, true, null);
@@ -58,7 +58,7 @@ public class TableUpdaterTest extends TestCase {
     }
 
     public void testTableUpdatingNoEnforce() throws Exception {
-        for (final FileFormat fileFormat : SUPPORTED_FILEFORMATS) {
+        for (FileFormat fileFormat : SUPPORTED_FILEFORMATS) {
             Database db = create(fileFormat);
 
             doTestUpdating(db, false, false, null);
@@ -68,7 +68,7 @@ public class TableUpdaterTest extends TestCase {
     }
 
     public void testTableUpdatingNamedRelationship() throws Exception {
-        for (final FileFormat fileFormat : SUPPORTED_FILEFORMATS) {
+        for (FileFormat fileFormat : SUPPORTED_FILEFORMATS) {
             Database db = create(fileFormat);
 
             doTestUpdating(db, false, true, "FKnun3jvv47l9kyl74h85y8a0if");
@@ -189,7 +189,7 @@ public class TableUpdaterTest extends TestCase {
     }
 
     public void testInvalidUpdate() throws Exception {
-        for (final FileFormat fileFormat : SUPPORTED_FILEFORMATS) {
+        for (FileFormat fileFormat : SUPPORTED_FILEFORMATS) {
             Database db = create(fileFormat);
 
             Table t1 = newTable("TestTable")
@@ -230,7 +230,7 @@ public class TableUpdaterTest extends TestCase {
     }
 
     public void testUpdateLargeTableDef() throws Exception {
-        for (final FileFormat fileFormat : SUPPORTED_FILEFORMATS) {
+        for (FileFormat fileFormat : SUPPORTED_FILEFORMATS) {
             Database db = create(fileFormat);
 
             final int numColumns = 89;

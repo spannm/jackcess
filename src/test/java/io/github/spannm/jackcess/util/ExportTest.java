@@ -43,7 +43,7 @@ public class ExportTest extends TestCase {
         DateFormat df = new SimpleDateFormat("yyyyMMdd HH:mm:ss");
         df.setTimeZone(TEST_TZ);
 
-        for (final FileFormat fileFormat : JetFormatTest.SUPPORTED_FILEFORMATS) {
+        for (FileFormat fileFormat : JetFormatTest.SUPPORTED_FILEFORMATS) {
             Database db = create(fileFormat);
             db.setDateTimeType(DateTimeType.DATE);
             db.setTimeZone(TEST_TZ);

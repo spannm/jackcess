@@ -61,7 +61,7 @@ public class ComplexColumnTest extends TestCase {
     }
 
     public void testVersions() throws Exception {
-        for (final TestDB testDB : TestDB.getSupportedForBasename(Basename.COMPLEX)) {
+        for (TestDB testDB : TestDB.getSupportedForBasename(Basename.COMPLEX)) {
             Database db = openCopy(testDB);
             db.setDateTimeType(DateTimeType.DATE);
             db.setTimeZone(TEST_TZ);
@@ -163,7 +163,7 @@ public class ComplexColumnTest extends TestCase {
     }
 
     public void testAttachments() throws Exception {
-        for (final TestDB testDB : TestDB.getSupportedForBasename(Basename.COMPLEX)) {
+        for (TestDB testDB : TestDB.getSupportedForBasename(Basename.COMPLEX)) {
 
             Database db = openCopy(testDB);
 
@@ -243,7 +243,7 @@ public class ComplexColumnTest extends TestCase {
     }
 
     public void testMultiValues() throws Exception {
-        for (final TestDB testDB : TestDB.getSupportedForBasename(Basename.COMPLEX)) {
+        for (TestDB testDB : TestDB.getSupportedForBasename(Basename.COMPLEX)) {
 
             Database db = openCopy(testDB);
 
@@ -316,7 +316,7 @@ public class ComplexColumnTest extends TestCase {
     }
 
     public void testUnsupported() throws Exception {
-        for (final TestDB testDB : TestDB.getSupportedForBasename(Basename.UNSUPPORTED)) {
+        for (TestDB testDB : TestDB.getSupportedForBasename(Basename.UNSUPPORTED)) {
 
             Database db = openCopy(testDB);
 

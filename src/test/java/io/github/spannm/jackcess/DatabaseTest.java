@@ -46,7 +46,7 @@ public class DatabaseTest extends TestCase {
     }
 
     public void testInvalidTableDefs() throws Exception {
-        for (final FileFormat fileFormat : SUPPORTED_FILEFORMATS) {
+        for (FileFormat fileFormat : SUPPORTED_FILEFORMATS) {
             Database db = create(fileFormat);
 
             try {
@@ -103,7 +103,7 @@ public class DatabaseTest extends TestCase {
     }
 
     public void testReadDeletedRows() throws Exception {
-        for (final TestDB testDB : TestDB.getSupportedForBasename(Basename.DEL, true)) {
+        for (TestDB testDB : TestDB.getSupportedForBasename(Basename.DEL, true)) {
             try (Database db = open(testDB)) {
                 Table table = db.getTable("Table");
                 int rows = 0;
@@ -116,7 +116,7 @@ public class DatabaseTest extends TestCase {
     }
 
     public void testGetColumns() throws Exception {
-        for (final TestDB testDB : JetFormatTest.SUPPORTED_DBS_TEST_FOR_READ) {
+        for (TestDB testDB : JetFormatTest.SUPPORTED_DBS_TEST_FOR_READ) {
             try (Database db = open(testDB)) {
                 List<? extends Column> columns = db.getTable("Table1").getColumns();
                 assertEquals(9, columns.size());
@@ -140,7 +140,7 @@ public class DatabaseTest extends TestCase {
     }
 
     public void testGetNextRow() throws Exception {
-        for (final TestDB testDB : JetFormatTest.SUPPORTED_DBS_TEST_FOR_READ) {
+        for (TestDB testDB : JetFormatTest.SUPPORTED_DBS_TEST_FOR_READ) {
             final Database db = open(testDB);
             db.setDateTimeType(DateTimeType.DATE);
 
@@ -164,7 +164,7 @@ public class DatabaseTest extends TestCase {
     }
 
     public void testCreate() throws Exception {
-        for (final FileFormat fileFormat : SUPPORTED_FILEFORMATS) {
+        for (FileFormat fileFormat : SUPPORTED_FILEFORMATS) {
             Database db = create(fileFormat);
             assertEquals(0, db.getTableNames().size());
             db.close();
@@ -174,7 +174,7 @@ public class DatabaseTest extends TestCase {
     public void testDeleteCurrentRow() throws Exception {
 
         // make sure correct row is deleted
-        for (final FileFormat fileFormat : SUPPORTED_FILEFORMATS) {
+        for (FileFormat fileFormat : SUPPORTED_FILEFORMATS) {
             Database db = createMem(fileFormat);
             createTestTable(db);
             Map<String, Object> row1 = createTestRowMap("Tim1");
@@ -243,7 +243,7 @@ public class DatabaseTest extends TestCase {
     public void testDeleteRow() throws Exception {
 
         // make sure correct row is deleted
-        for (final FileFormat fileFormat : SUPPORTED_FILEFORMATS) {
+        for (FileFormat fileFormat : SUPPORTED_FILEFORMATS) {
             Database db = createMem(fileFormat);
             createTestTable(db);
             Table table = db.getTable("Test");
@@ -285,7 +285,7 @@ public class DatabaseTest extends TestCase {
     }
 
     public void testReadWithDeletedCols() throws Exception {
-        for (final TestDB testDB : TestDB.getSupportedForBasename(Basename.DEL_COL, true)) {
+        for (TestDB testDB : TestDB.getSupportedForBasename(Basename.DEL_COL, true)) {
             try (Database db = open(testDB)) {
                 Table table = db.getTable("Table1");
 
@@ -318,7 +318,7 @@ public class DatabaseTest extends TestCase {
     }
 
     public void testCurrency() throws Exception {
-        for (final FileFormat fileFormat : SUPPORTED_FILEFORMATS) {
+        for (FileFormat fileFormat : SUPPORTED_FILEFORMATS) {
             Database db = create(fileFormat);
 
             Table table = DatabaseBuilder.newTable("test")
@@ -355,7 +355,7 @@ public class DatabaseTest extends TestCase {
     }
 
     public void testGUID() throws Exception {
-        for (final FileFormat fileFormat : SUPPORTED_FILEFORMATS) {
+        for (FileFormat fileFormat : SUPPORTED_FILEFORMATS) {
             Database db = create(fileFormat);
 
             Table table = DatabaseBuilder.newTable("test")
@@ -396,7 +396,7 @@ public class DatabaseTest extends TestCase {
     }
 
     public void testNumeric() throws Exception {
-        for (final FileFormat fileFormat : SUPPORTED_FILEFORMATS) {
+        for (FileFormat fileFormat : SUPPORTED_FILEFORMATS) {
             Database db = create(fileFormat);
 
             ColumnBuilder col = DatabaseBuilder.newColumn("A", DataType.NUMERIC)
@@ -448,7 +448,7 @@ public class DatabaseTest extends TestCase {
     }
 
     public void testFixedNumeric() throws Exception {
-        for (final TestDB testDB : TestDB.getSupportedForBasename(Basename.FIXED_NUMERIC)) {
+        for (TestDB testDB : TestDB.getSupportedForBasename(Basename.FIXED_NUMERIC)) {
             Database db = openCopy(testDB);
             Table t = db.getTable("test");
 
@@ -492,7 +492,7 @@ public class DatabaseTest extends TestCase {
     }
 
     public void testMultiPageTableDef() throws Exception {
-        for (final TestDB testDB : JetFormatTest.SUPPORTED_DBS_TEST_FOR_READ) {
+        for (TestDB testDB : JetFormatTest.SUPPORTED_DBS_TEST_FOR_READ) {
             try (Database db = open(testDB)) {
                 List<? extends Column> columns = db.getTable("Table2").getColumns();
                 assertEquals(89, columns.size());
@@ -501,7 +501,7 @@ public class DatabaseTest extends TestCase {
     }
 
     public void testOverflow() throws Exception {
-        for (final TestDB testDB : TestDB.getSupportedForBasename(Basename.OVERFLOW, true)) {
+        for (TestDB testDB : TestDB.getSupportedForBasename(Basename.OVERFLOW, true)) {
             Database mdb = open(testDB);
             Table table = mdb.getTable("Table1");
 
@@ -527,7 +527,7 @@ public class DatabaseTest extends TestCase {
     }
 
     public void testUsageMapPromotion() throws Exception {
-        for (final TestDB testDB : TestDB.getSupportedForBasename(Basename.PROMOTION)) {
+        for (TestDB testDB : TestDB.getSupportedForBasename(Basename.PROMOTION)) {
             Database db = openMem(testDB);
             Table t = db.getTable("jobDB1");
 
@@ -558,7 +558,7 @@ public class DatabaseTest extends TestCase {
     }
 
     public void testLargeTableDef() throws Exception {
-        for (final FileFormat fileFormat : SUPPORTED_FILEFORMATS) {
+        for (FileFormat fileFormat : SUPPORTED_FILEFORMATS) {
             Database db = create(fileFormat);
 
             final int numColumns = 90;
@@ -593,7 +593,7 @@ public class DatabaseTest extends TestCase {
     }
 
     public void testWriteAndReadDate() throws Exception {
-        for (final FileFormat fileFormat : SUPPORTED_FILEFORMATS) {
+        for (FileFormat fileFormat : SUPPORTED_FILEFORMATS) {
             Database db = createMem(fileFormat);
             db.setDateTimeType(DateTimeType.DATE);
 
@@ -658,7 +658,7 @@ public class DatabaseTest extends TestCase {
         List<String> dates = List.of("1582-10-15", "1582-10-14",
             "1492-01-10", "1392-01-10");
 
-        for (final FileFormat fileFormat : SUPPORTED_FILEFORMATS) {
+        for (FileFormat fileFormat : SUPPORTED_FILEFORMATS) {
             Database db = createMem(fileFormat);
             db.setDateTimeType(DateTimeType.DATE);
 
@@ -694,7 +694,7 @@ public class DatabaseTest extends TestCase {
         List<String> dates = List.of("1582-10-15", "1582-10-14",
             "1492-01-10", "1392-01-10");
 
-        for (final TestDB testDB : TestDB.getSupportedForBasename(Basename.OLD_DATES)) {
+        for (TestDB testDB : TestDB.getSupportedForBasename(Basename.OLD_DATES)) {
             Database db = openCopy(testDB);
             db.setTimeZone(tz); // explicitly set database time zone
             db.setDateTimeType(DateTimeType.DATE);
@@ -714,7 +714,7 @@ public class DatabaseTest extends TestCase {
     }
 
     public void testSystemTable() throws Exception {
-        for (final FileFormat fileFormat : SUPPORTED_FILEFORMATS) {
+        for (FileFormat fileFormat : SUPPORTED_FILEFORMATS) {
             Database db = create(fileFormat);
 
             Set<String> sysTables = new TreeSet<>(
@@ -776,7 +776,7 @@ public class DatabaseTest extends TestCase {
     }
 
     public void testFixedText() throws Exception {
-        for (final TestDB testDB : TestDB.getSupportedForBasename(Basename.FIXED_TEXT)) {
+        for (TestDB testDB : TestDB.getSupportedForBasename(Basename.FIXED_TEXT)) {
             Database db = openCopy(testDB);
 
             Table t = db.getTable("users");
@@ -802,7 +802,7 @@ public class DatabaseTest extends TestCase {
 
     public void testDbSortOrder() throws Exception {
 
-        for (final TestDB testDB : JetFormatTest.SUPPORTED_DBS_TEST_FOR_READ) {
+        for (TestDB testDB : JetFormatTest.SUPPORTED_DBS_TEST_FOR_READ) {
 
             Database db = open(testDB);
             assertEquals(((DatabaseImpl) db).getFormat().DEFAULT_SORT_ORDER,
@@ -812,7 +812,7 @@ public class DatabaseTest extends TestCase {
     }
 
     public void testUnsupportedColumns() throws Exception {
-        for (final TestDB testDB : TestDB.getSupportedForBasename(Basename.UNSUPPORTED)) {
+        for (TestDB testDB : TestDB.getSupportedForBasename(Basename.UNSUPPORTED)) {
 
             Database db = open(testDB);
             Table t = db.getTable("Test");
@@ -903,7 +903,7 @@ public class DatabaseTest extends TestCase {
     }
 
     public void testIterateTableNames() throws Exception {
-        for (final TestDB testDB : JetFormatTest.SUPPORTED_DBS_TEST_FOR_READ) {
+        for (TestDB testDB : JetFormatTest.SUPPORTED_DBS_TEST_FOR_READ) {
             try (Database db = open(testDB)) {
                 Set<String> names = new HashSet<>();
                 int sysCount = 0;
@@ -923,7 +923,7 @@ public class DatabaseTest extends TestCase {
             }
         }
 
-        for (final TestDB testDB : TestDB.getSupportedForBasename(Basename.LINKED)) {
+        for (TestDB testDB : TestDB.getSupportedForBasename(Basename.LINKED)) {
             try (Database db = open(testDB)) {
                 Set<String> names = new HashSet<>();
                 for (TableMetaData tmd : db.newTableMetaDataIterable()) {
@@ -948,7 +948,7 @@ public class DatabaseTest extends TestCase {
     }
 
     public void testTableDates() throws Exception {
-        for (final TestDB testDB : JetFormatTest.SUPPORTED_DBS_TEST_FOR_READ) {
+        for (TestDB testDB : JetFormatTest.SUPPORTED_DBS_TEST_FOR_READ) {
             try (Database db = open(testDB)) {
                 Table table = db.getTable("Table1");
                 String expectedCreateDate = null;

@@ -38,7 +38,7 @@ public class PatternColumnPredicateTest extends TestCase {
     }
 
     public void testRegexPredicate() throws Exception {
-        for (final FileFormat fileFormat : SUPPORTED_FILEFORMATS) {
+        for (FileFormat fileFormat : SUPPORTED_FILEFORMATS) {
             Database db = createTestDb(fileFormat);
 
             Table t = db.getTable("Test");

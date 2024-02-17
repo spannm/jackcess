@@ -42,7 +42,7 @@ public class LongValueTest extends TestCase {
 
     public void testReadLongValue() throws Exception {
 
-        for (final TestDB testDB : TestDB.getSupportedForBasename(Basename.TEST2, true)) {
+        for (TestDB testDB : TestDB.getSupportedForBasename(Basename.TEST2, true)) {
             Database db = openMem(testDB);
             Table table = db.getTable("MSP_PROJECTS");
             Row row = table.getNextRow();
@@ -65,7 +65,7 @@ public class LongValueTest extends TestCase {
 
     public void testWriteLongValue() throws Exception {
 
-        for (final FileFormat fileFormat : SUPPORTED_FILEFORMATS) {
+        for (FileFormat fileFormat : SUPPORTED_FILEFORMATS) {
             Database db = createMem(fileFormat);
 
             Table table =
@@ -115,7 +115,7 @@ public class LongValueTest extends TestCase {
     }
 
     public void testManyMemos() throws Exception {
-        for (final FileFormat fileFormat : SUPPORTED_FILEFORMATS) {
+        for (FileFormat fileFormat : SUPPORTED_FILEFORMATS) {
             Database db = createMem(fileFormat);
             final int numColumns = 126;
             TableBuilder bigTableBuilder = new TableBuilder("test");
@@ -176,7 +176,7 @@ public class LongValueTest extends TestCase {
     }
 
     public void testLongValueAsMiddleColumn() throws Exception {
-        for (final FileFormat fileFormat : SUPPORTED_FILEFORMATS) {
+        for (FileFormat fileFormat : SUPPORTED_FILEFORMATS) {
             Database db = createMem(fileFormat);
             Table newTable = new TableBuilder("NewTable")
                 .addColumn(new ColumnBuilder("a").withSqlType(Types.INTEGER))

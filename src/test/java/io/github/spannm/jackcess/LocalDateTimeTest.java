@@ -44,7 +44,7 @@ public class LocalDateTimeTest extends TestCase {
     }
 
     public void testWriteAndReadLocalDate() throws Exception {
-        for (final FileFormat fileFormat : SUPPORTED_FILEFORMATS) {
+        for (FileFormat fileFormat : SUPPORTED_FILEFORMATS) {
             Database db = createMem(fileFormat);
 
             db.setDateTimeType(DateTimeType.LOCAL_DATE_TIME);
@@ -111,7 +111,7 @@ public class LocalDateTimeTest extends TestCase {
 
         List<String> dates = List.of("1582-10-15", "1582-10-14", "1492-01-10", "1392-01-10");
 
-        for (final FileFormat fileFormat : SUPPORTED_FILEFORMATS) {
+        for (FileFormat fileFormat : SUPPORTED_FILEFORMATS) {
             Database db = createMem(fileFormat);
             db.setZoneId(zoneId);
             db.setDateTimeType(DateTimeType.LOCAL_DATE_TIME);
@@ -136,7 +136,7 @@ public class LocalDateTimeTest extends TestCase {
             db.close();
         }
 
-        for (final TestDB testDB : TestDB.getSupportedForBasename(Basename.OLD_DATES)) {
+        for (TestDB testDB : TestDB.getSupportedForBasename(Basename.OLD_DATES)) {
             Database db = openCopy(testDB);
             db.setDateTimeType(DateTimeType.LOCAL_DATE_TIME);
 
@@ -208,7 +208,7 @@ public class LocalDateTimeTest extends TestCase {
 
     public void testWriteAndReadTemporals() throws Exception {
         ZoneId zoneId = ZoneId.of("America/New_York");
-        for (final FileFormat fileFormat : SUPPORTED_FILEFORMATS) {
+        for (FileFormat fileFormat : SUPPORTED_FILEFORMATS) {
             Database db = createMem(fileFormat);
             db.setZoneId(zoneId);
             db.setDateTimeType(DateTimeType.LOCAL_DATE_TIME);

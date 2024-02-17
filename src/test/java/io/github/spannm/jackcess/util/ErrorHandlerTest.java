@@ -41,7 +41,7 @@ public class ErrorHandlerTest extends TestCase {
     }
 
     public void testErrorHandler() throws Exception {
-        for (final FileFormat fileFormat : JetFormatTest.SUPPORTED_FILEFORMATS) {
+        for (FileFormat fileFormat : JetFormatTest.SUPPORTED_FILEFORMATS) {
             Database db = create(fileFormat);
 
             Table table =

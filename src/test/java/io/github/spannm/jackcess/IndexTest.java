@@ -78,7 +78,7 @@ public class IndexTest extends TestCase {
     }
 
     public void testPrimaryKey() throws Exception {
-        for (final TestDB testDB : JetFormatTest.SUPPORTED_DBS_TEST_FOR_READ) {
+        for (TestDB testDB : JetFormatTest.SUPPORTED_DBS_TEST_FOR_READ) {
             try (Database db = TestUtil.open(testDB)) {
                 Table table = db.getTable("Table1");
                 Map<String, Boolean> foundPKs = new HashMap<>();
@@ -101,7 +101,7 @@ public class IndexTest extends TestCase {
     }
 
     public void testLogicalIndexes() throws Exception {
-        for (final TestDB testDB : TestDB.getSupportedForBasename(Basename.INDEX, true)) {
+        for (TestDB testDB : TestDB.getSupportedForBasename(Basename.INDEX, true)) {
             try (Database db = TestUtil.open(testDB)) {
                 TableImpl table = (TableImpl) db.getTable("Table1");
                 for (IndexImpl idx : table.getIndexes()) {
@@ -161,7 +161,7 @@ public class IndexTest extends TestCase {
     }
 
     public void testComplexIndex() throws Exception {
-        for (final TestDB testDB : TestDB.getSupportedForBasename(Basename.COMP_INDEX)) {
+        for (TestDB testDB : TestDB.getSupportedForBasename(Basename.COMP_INDEX)) {
             // this file has an index with "compressed" entries and node pages
             Database db = TestUtil.open(testDB);
             TableImpl t = (TableImpl) db.getTable("Table1");
@@ -181,7 +181,7 @@ public class IndexTest extends TestCase {
     }
 
     public void testEntryDeletion() throws Exception {
-        for (final TestDB testDB : JetFormatTest.SUPPORTED_DBS_TEST) {
+        for (TestDB testDB : JetFormatTest.SUPPORTED_DBS_TEST) {
             try (Database db = TestUtil.openCopy(testDB)) {
                 Table table = db.getTable("Table1");
 
@@ -221,7 +221,7 @@ public class IndexTest extends TestCase {
     }
 
     public void testIgnoreNulls() throws Exception {
-        for (final TestDB testDB : TestDB.getSupportedForBasename(Basename.INDEX_PROPERTIES)) {
+        for (TestDB testDB : TestDB.getSupportedForBasename(Basename.INDEX_PROPERTIES)) {
             Database db = TestUtil.openCopy(testDB);
 
             db.setEvaluateExpressions(false);
@@ -271,7 +271,7 @@ public class IndexTest extends TestCase {
     }
 
     public void testUnique() throws Exception {
-        for (final TestDB testDB : TestDB.getSupportedForBasename(Basename.INDEX_PROPERTIES)) {
+        for (TestDB testDB : TestDB.getSupportedForBasename(Basename.INDEX_PROPERTIES)) {
             Database db = TestUtil.openCopy(testDB);
 
             Table t = db.getTable("TableUnique1_temp");
@@ -333,7 +333,7 @@ public class IndexTest extends TestCase {
     }
 
     public void testUniqueEntryCount() throws Exception {
-        for (final TestDB testDB : JetFormatTest.SUPPORTED_DBS_TEST) {
+        for (TestDB testDB : JetFormatTest.SUPPORTED_DBS_TEST) {
             Database db = TestUtil.openCopy(testDB);
             db.setDateTimeType(DateTimeType.DATE);
             Table table = db.getTable("Table1");
@@ -394,7 +394,7 @@ public class IndexTest extends TestCase {
     }
 
     public void testReplId() throws Exception {
-        for (final TestDB testDB : JetFormatTest.SUPPORTED_DBS_TEST) {
+        for (TestDB testDB : JetFormatTest.SUPPORTED_DBS_TEST) {
             Database db = TestUtil.openCopy(testDB);
             Table table = db.getTable("Table4");
 
@@ -409,7 +409,7 @@ public class IndexTest extends TestCase {
     }
 
     public void testIndexCreation() throws Exception {
-        for (final FileFormat fileFormat : JetFormatTest.SUPPORTED_FILEFORMATS) {
+        for (FileFormat fileFormat : JetFormatTest.SUPPORTED_FILEFORMATS) {
             Database db = TestUtil.create(fileFormat);
 
             Table t = DatabaseBuilder.newTable("TestTable")
@@ -447,7 +447,7 @@ public class IndexTest extends TestCase {
     }
 
     public void testIndexCreationSharedData() throws Exception {
-        for (final FileFormat fileFormat : JetFormatTest.SUPPORTED_FILEFORMATS) {
+        for (FileFormat fileFormat : JetFormatTest.SUPPORTED_FILEFORMATS) {
             Database db = TestUtil.create(fileFormat);
 
             Table t = DatabaseBuilder.newTable("TestTable")
@@ -496,7 +496,7 @@ public class IndexTest extends TestCase {
     }
 
     public void testGetForeignKeyIndex() throws Exception {
-        for (final TestDB testDB : TestDB.getSupportedForBasename(Basename.INDEX, true)) {
+        for (TestDB testDB : TestDB.getSupportedForBasename(Basename.INDEX, true)) {
             try (Database db = TestUtil.open(testDB)) {
                 Table t1 = db.getTable("Table1");
                 Table t2 = db.getTable("Table2");
@@ -528,7 +528,7 @@ public class IndexTest extends TestCase {
     }
 
     public void testConstraintViolation() throws Exception {
-        for (final FileFormat fileFormat : JetFormatTest.SUPPORTED_FILEFORMATS) {
+        for (FileFormat fileFormat : JetFormatTest.SUPPORTED_FILEFORMATS) {
             Database db = TestUtil.create(fileFormat);
 
             Table t = DatabaseBuilder.newTable("TestTable")
@@ -614,7 +614,7 @@ public class IndexTest extends TestCase {
     }
 
     public void testAutoNumberRecover() throws Exception {
-        for (final FileFormat fileFormat : JetFormatTest.SUPPORTED_FILEFORMATS) {
+        for (FileFormat fileFormat : JetFormatTest.SUPPORTED_FILEFORMATS) {
             Database db = TestUtil.create(fileFormat);
 
             Table t = DatabaseBuilder.newTable("TestTable")
@@ -681,7 +681,7 @@ public class IndexTest extends TestCase {
     }
 
     public void testBinaryIndex() throws Exception {
-        for (final TestDB testDB : TestDB.getSupportedForBasename(Basename.BINARY_INDEX)) {
+        for (TestDB testDB : TestDB.getSupportedForBasename(Basename.BINARY_INDEX)) {
             Database db = TestUtil.open(testDB);
 
             Table table = db.getTable("Test");

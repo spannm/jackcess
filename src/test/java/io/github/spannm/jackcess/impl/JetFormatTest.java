@@ -201,7 +201,7 @@ public class JetFormatTest extends TestCase {
             // success
         }
 
-        for (final TestDB testDB : SUPPORTED_DBS_TEST_FOR_READ) {
+        for (TestDB testDB : SUPPORTED_DBS_TEST_FOR_READ) {
 
             try (FileChannel channel = DatabaseImpl.openChannel(
                     testDB.dbFile.toPath(), false, false)) {
@@ -215,7 +215,7 @@ public class JetFormatTest extends TestCase {
 
     public void testReadOnlyFormat() {
 
-        for (final TestDB testDB : SUPPORTED_DBS_TEST_FOR_READ) {
+        for (TestDB testDB : SUPPORTED_DBS_TEST_FOR_READ) {
 
             Exception failure = null;
             try (Database db = openCopy(testDB)) {
@@ -240,7 +240,7 @@ public class JetFormatTest extends TestCase {
 
     public void testFileFormat() throws Exception {
 
-        for (final TestDB testDB : SUPPORTED_DBS_TEST_FOR_READ) {
+        for (TestDB testDB : SUPPORTED_DBS_TEST_FOR_READ) {
 
             try (Database db = open(testDB)) {
                 assertEquals(testDB.getExpectedFileFormat(), db.getFileFormat());

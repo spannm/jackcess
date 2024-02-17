@@ -35,7 +35,7 @@ import java.util.Map;
 public class LinkedTableTest extends TestCase {
 
     public void testLinkedTables() throws Exception {
-        for (final TestDB testDB : TestDB.getSupportedForBasename(Basename.LINKED)) {
+        for (TestDB testDB : TestDB.getSupportedForBasename(Basename.LINKED)) {
             Database db = openCopy(testDB);
 
             try {
@@ -151,7 +151,7 @@ public class LinkedTableTest extends TestCase {
     }
 
     public void testOdbcLinkedTables() throws Exception {
-        for (final TestDB testDB : TestDB.getSupportedForBasename(Basename.LINKED_ODBC)) {
+        for (TestDB testDB : TestDB.getSupportedForBasename(Basename.LINKED_ODBC)) {
             Database db = openCopy(testDB);
 
             TableMetaData tmd = db.getTableMetaData("Ordrar");

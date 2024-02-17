@@ -39,7 +39,7 @@ public class BigIndexTest extends TestCase {
     }
 
     public void testComplexIndex() throws Exception {
-        for (final TestDB testDB : TestDB.getSupportedForBasename(Basename.COMP_INDEX, true)) {
+        for (TestDB testDB : TestDB.getSupportedForBasename(Basename.COMP_INDEX, true)) {
             // this file has an index with "compressed" entries and node pages
             Database db = openMem(testDB);
             TableImpl t = (TableImpl) db.getTable("Table1");
@@ -52,7 +52,7 @@ public class BigIndexTest extends TestCase {
     }
 
     public void testBigIndex() throws Exception {
-        for (final TestDB testDB : TestDB.getSupportedForBasename(Basename.BIG_INDEX)) {
+        for (TestDB testDB : TestDB.getSupportedForBasename(Basename.BIG_INDEX)) {
             // this file has an index with "compressed" entries and node pages
             Database db = openMem(testDB);
             TableImpl t = (TableImpl) db.getTable("Table1");

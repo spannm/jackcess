@@ -34,7 +34,7 @@ public class ColumnFormatterTest extends TestCase {
 
     public void testFormat() throws Exception {
 
-        for (final FileFormat fileFormat : SUPPORTED_FILEFORMATS) {
+        for (FileFormat fileFormat : SUPPORTED_FILEFORMATS) {
             Database db = create(fileFormat);
             db.setEvaluateExpressions(true);
 
