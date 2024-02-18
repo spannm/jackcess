@@ -276,7 +276,7 @@ public class AutoNumberTest extends TestCase {
             int lastAutoNum = ((TableImpl) t1).getLastComplexTypeAutoNumber();
 
             Object[] row = t1.addRow("arow");
-            ++lastAutoNum;
+            lastAutoNum++;
             checkAllComplexAutoNums(lastAutoNum, row);
 
             assertEquals(lastAutoNum, ((TableImpl) t1).getLastComplexTypeAutoNumber());
@@ -286,7 +286,7 @@ public class AutoNumberTest extends TestCase {
             assertTrue(t1.isAllowAutoNumberInsert());
 
             row = t1.addRow("anotherrow");
-            ++lastAutoNum;
+            lastAutoNum++;
             checkAllComplexAutoNums(lastAutoNum, row);
 
             assertEquals(lastAutoNum, ((TableImpl) t1).getLastComplexTypeAutoNumber());

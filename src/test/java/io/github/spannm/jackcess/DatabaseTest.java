@@ -833,7 +833,7 @@ public class DatabaseTest extends TestCase {
             for (Map<String, Object> row : t) {
                 checkRawValue(varVals.get(idx), varCol.getRowValue(row));
                 checkRawValue(fixVals.get(idx), fixCol.getRowValue(row));
-                ++idx;
+                idx++;
             }
             db.close();
         }
@@ -909,7 +909,7 @@ public class DatabaseTest extends TestCase {
                 int sysCount = 0;
                 for (TableMetaData tmd : db.newTableMetaDataIterable()) {
                     if (tmd.isSystem()) {
-                        ++sysCount;
+                        sysCount++;
                         continue;
                     }
                     assertFalse(tmd.isLinked());

@@ -118,7 +118,7 @@ public class General97IndexCodes extends GeneralLegacyIndexCodes {
             }
 
             if (ch.isSignificantChar()) {
-                ++sigCharCount;
+                sigCharCount++;
                 // significant chars never have extra bytes
                 continue;
             }
@@ -243,7 +243,7 @@ public class General97IndexCodes extends GeneralLegacyIndexCodes {
 
             if (!nextIsHi()) {
                 writeLowNibble(b);
-                --length;
+                length--;
             }
 
             if (length > 1) {

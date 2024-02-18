@@ -802,7 +802,7 @@ public class IndexPageCache {
                 idx = missingIndexToInsertionPoint(idx);
                 if (idx == extra._entryView.size()) {
                     // just move to last child page
-                    --idx;
+                    idx--;
                 }
             }
 
@@ -844,7 +844,7 @@ public class IndexPageCache {
 
         int len = 0;
         while (len < maxLen && b1[len] == b2[len]) {
-            ++len;
+            len++;
         }
 
         if (len < prefix.length) {
@@ -1190,7 +1190,7 @@ public class IndexPageCache {
         public int size() {
             int size = getEntries().size();
             if (hasChildTail()) {
-                ++size;
+                size++;
             }
             return size;
         }

@@ -116,7 +116,7 @@ public class DefaultTextFunctions {
             if (params.length > 2) {
                 // 1 based offsets
                 start = params[0].getAsLongInt(ctx) - 1;
-                ++idx;
+                idx++;
             }
             Value param1 = params[idx++];
             if (param1.isNull()) {
@@ -144,7 +144,7 @@ public class DefaultTextFunctions {
                     // 1 based offsets
                     return ValueSupport.toValue(start + 1);
                 }
-                ++start;
+                start++;
             }
             return ValueSupport.ZERO_VAL;
         }
@@ -179,7 +179,7 @@ public class DefaultTextFunctions {
                     start = s1Len;
                 }
                 // 1 based offsets
-                --start;
+                start--;
             }
             boolean ignoreCase = getIgnoreCase(ctx, params, 3);
             start = Math.min(s1Len - s2Len, start - s2Len + 1);
@@ -188,7 +188,7 @@ public class DefaultTextFunctions {
                     // 1 based offsets
                     return ValueSupport.toValue(start + 1);
                 }
-                --start;
+                start--;
             }
             return ValueSupport.ZERO_VAL;
         }
@@ -322,7 +322,7 @@ public class DefaultTextFunctions {
                 if (matchCount < count
                     && str.regionMatches(ignoreCase, i, searchStr, 0, searchLen)) {
                     result.append(replStr);
-                    ++matchCount;
+                    matchCount++;
                     i += searchLen - 1;
                 } else {
                     result.append(str.charAt(i));
@@ -451,12 +451,12 @@ public class DefaultTextFunctions {
 
         if (doLeft) {
             while (start < end && str.charAt(start) == ' ') {
-                ++start;
+                start++;
             }
         }
         if (doRight) {
             while (start < end && str.charAt(end - 1) == ' ') {
-                --end;
+                end--;
             }
         }
         return str.substring(start, end);

@@ -111,12 +111,12 @@ public class CodecHandlerTest extends TestCase {
                 if (i1.hasNext()) {
                     checkRow(i1.next());
                     i1.remove();
-                    ++t1rows;
+                    t1rows++;
                 }
                 if (i2.hasNext()) {
                     checkRow(i2.next());
                     i2.remove();
-                    ++t2rows;
+                    t2rows++;
                 }
             }
         } finally {

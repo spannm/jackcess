@@ -226,7 +226,7 @@ public class DefaultDateFunctions {
                 int q2 = getQuarter(ldt2);
                 while (y2 > y1) {
                     q2 += 4;
-                    --y2;
+                    y2--;
                 }
                 result = q2 - q1;
             } else if (intv.equalsIgnoreCase(INTV_MONTH)) {
@@ -236,7 +236,7 @@ public class DefaultDateFunctions {
                 int m2 = ldt2.getMonthValue();
                 while (y2 > y1) {
                     m2 += 12;
-                    --y2;
+                    y2--;
                 }
                 result = m2 - m1;
             } else if (intv.equalsIgnoreCase(INTV_DAY_OF_YEAR)
@@ -254,7 +254,7 @@ public class DefaultDateFunctions {
                 int w2 = ldt2.get(weekFields.weekOfWeekBasedYear());
                 int y2 = ldt2.get(weekFields.weekBasedYear());
                 while (y2 > y1) {
-                    --y2;
+                    y2--;
                     w2 += weeksInYear(y2, weekFields);
                 }
                 result = w2 - w1;

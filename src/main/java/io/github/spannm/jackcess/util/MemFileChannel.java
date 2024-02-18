@@ -301,7 +301,7 @@ public class MemFileChannel extends FileChannel {
                 count -= bytesWritten;
             } while (src.hasRemaining());
 
-            ++chunkIndex;
+            chunkIndex++;
             chunkOffset = 0;
         }
 
@@ -350,7 +350,7 @@ public class MemFileChannel extends FileChannel {
                 _size = Math.max(_size, position + numBytes);
             } while (dst.hasRemaining());
 
-            ++chunkIndex;
+            chunkIndex++;
             chunkOffset = 0;
         }
 

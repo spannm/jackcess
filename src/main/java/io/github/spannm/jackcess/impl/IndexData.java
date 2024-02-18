@@ -120,7 +120,7 @@ public class IndexData {
         int len = Math.min(left.length, right.length);
         int pos = 0;
         while (pos < len && left[pos] == right[pos]) {
-            ++pos;
+            pos++;
         }
         if (pos < len) {
             return ByteUtil.asUnsignedByte(left[pos]) < ByteUtil.asUnsignedByte(right[pos]) ? -1 : 1;
@@ -248,7 +248,7 @@ public class IndexData {
                 if (!_indexes.get(pos - 1).isForeignKey()) {
                     break;
                 }
-                --pos;
+                pos--;
             }
             _indexes.add(pos, index);
 
@@ -376,7 +376,7 @@ public class IndexData {
         Entry endEntry = cursor.getLastEntry();
         int count = 0;
         while (!endEntry.equals(cursor.getNextEntry())) {
-            ++count;
+            count++;
         }
         return count;
     }
@@ -875,7 +875,7 @@ public class IndexData {
         Object[] idxRow = new Object[getTable().getColumnCount()];
         for (ColumnDescriptor col : _columns) {
             idxRow[col.getColumnIndex()] = valIdx < values.length ? values[valIdx] : filler;
-            ++valIdx;
+            valIdx++;
         }
         return idxRow;
     }
@@ -935,7 +935,7 @@ public class IndexData {
                 }
                 break;
             }
-            ++numCols;
+            numCols++;
         }
 
         // fill in the row with either the prefix values or the filler value, as
@@ -944,7 +944,7 @@ public class IndexData {
         int valIdx = 0;
         for (ColumnDescriptor col : _columns) {
             idxRow[col.getColumnIndex()] = valIdx < numCols ? row.get(col.getName()) : filler;
-            ++valIdx;
+            valIdx++;
         }
         return idxRow;
     }
@@ -1150,7 +1150,7 @@ public class IndexData {
         for (ColumnDescriptor col : _columns) {
             Object value = values[col.getColumnIndex()];
             if (col.isNullValue(value)) {
-                ++nullCount;
+                nullCount++;
             }
         }
 

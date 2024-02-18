@@ -89,7 +89,7 @@ public class BigIndexTest extends TestCase {
                             rows.add(new Object[] {nextVal, "this is some row data " + nextInt});
                         }
                         t.addRows(rows);
-                        --i;
+                        i--;
                     } else {
                         int nextInt = rand.nextInt(Integer.MAX_VALUE);
                         String nextVal = nextInt + extraText;
@@ -126,7 +126,7 @@ public class BigIndexTest extends TestCase {
                         firstTwo.add(origVal);
                     }
                     prevValue = val;
-                    ++rowCount;
+                    rowCount++;
                 }
 
                 assertEquals(2000, rowCount);
@@ -139,7 +139,7 @@ public class BigIndexTest extends TestCase {
                     assertTrue(cursor.moveToNextRow());
                 }
                 cursor.deleteCurrentRow();
-                --rowCount;
+                rowCount--;
 
                 // remove all but the first two entries (from the end)
                 cursor.afterLast();

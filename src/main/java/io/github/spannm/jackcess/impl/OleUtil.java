@@ -384,7 +384,7 @@ public class OleUtil {
                         // ignore
                 }
 
-                ++strNum;
+                strNum++;
             }
 
             return new SimplePackageContentImpl(

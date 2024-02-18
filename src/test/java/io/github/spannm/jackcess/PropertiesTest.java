@@ -140,7 +140,7 @@ public class PropertiesTest extends TestCase {
             expectedNumProps = 9;
             if (db.getFileFormat() != Database.FileFormat.V1997) {
                 assertEquals("{E9EDD90C-CE55-4151-ABE1-A1ACE1007515}", colProps.getValue(PropertyMap.GUID_PROP));
-                ++expectedNumProps;
+                expectedNumProps++;
             }
             assertEquals(expectedNumProps, colProps.getSize());
             assertEquals((short) -1, colProps.getValue("ColumnWidth"));

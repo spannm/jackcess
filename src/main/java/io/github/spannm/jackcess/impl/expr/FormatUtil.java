@@ -1041,7 +1041,7 @@ public class FormatUtil {
                     switch (c) {
                         case REQ_PLACEHOLDER_CHAR:
                             flushPendingTextLiteral(pendingLiteral, subFmts);
-                            ++numPlaceholders;
+                            numPlaceholders++;
                             subFmts.add((sb, cs) -> {
                                 int tmp = cs.next();
                                 sb.append(tmp != NO_CHAR ? (char) tmp : ' ');
@@ -1049,7 +1049,7 @@ public class FormatUtil {
                             break;
                         case OPT_PLACEHOLDER_CHAR:
                             flushPendingTextLiteral(pendingLiteral, subFmts);
-                            ++numPlaceholders;
+                            numPlaceholders++;
                             subFmts.add((sb, cs) -> {
                                 int tmp = cs.next();
                                 if (tmp != NO_CHAR) {
@@ -1163,7 +1163,7 @@ public class FormatUtil {
         for (String validPrefix : validPrefixes) {
             int len = validPrefix.length();
             while (len > 1) {
-                --len;
+                len--;
                 validPrefix = validPrefix.substring(0, len);
                 DATE_FMT_BUILDERS.putIfAbsent(validPrefix, PARTIAL_PREFIX);
             }
@@ -1589,7 +1589,7 @@ public class FormatUtil {
             int maxDecDigits = df.getMaximumFractionDigits();
             int mult = df.getMultiplier();
             while (mult > 1) {
-                ++maxDecDigits;
+                maxDecDigits++;
                 mult /= 10;
             }
             _maxDecDigits = maxDecDigits;

@@ -353,7 +353,7 @@ public class DefaultFinancialFunctions {
 
             y0 = y1;
             y1 = y;
-            ++i;
+            i++;
         }
 
         return rate;

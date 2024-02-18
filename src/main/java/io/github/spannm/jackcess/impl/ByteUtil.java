@@ -771,7 +771,7 @@ public final class ByteUtil {
             while (idx >= 0) {
                 int val = asUnsignedByte(get(idx));
                 if (val >= minTrim && val <= maxTrim) {
-                    --idx;
+                    idx--;
                 } else {
                     break;
                 }

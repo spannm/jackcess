@@ -549,7 +549,7 @@ public class GeneralLegacyIndexCodes {
                 bout.write(bytes);
 
                 // only increment the charOffset for chars with inline codes
-                ++charOffset;
+                charOffset++;
             }
 
             if (ch.getType() == Type.SIMPLE) {
@@ -666,7 +666,7 @@ public class GeneralLegacyIndexCodes {
         // trailing spaces are ignored for text index entries
         if (len > 0 && str.charAt(len - 1) == ' ') {
             do {
-                --len;
+                len--;
             } while (len > 0 && str.charAt(len - 1) == ' ');
 
             str = str.substring(0, len);
@@ -785,7 +785,7 @@ public class GeneralLegacyIndexCodes {
                 nextByte <<= (2 - idx) * 2;
                 curByte |= nextByte;
 
-                ++idx;
+                idx++;
                 if (idx == 3) {
                     // write current byte and reset
                     bout.write(curByte);

@@ -498,7 +498,7 @@ public class Expressionator {
                     continue;
                 } else {
                     tokens.remove(i);
-                    --i;
+                    i--;
                 }
             }
         }
@@ -742,11 +742,11 @@ public class Expressionator {
 
             if (isDelim(t, OPEN_PAREN)) {
 
-                ++level;
+                level++;
 
             } else if (isDelim(t, CLOSE_PAREN)) {
 
-                --level;
+                level--;
                 if (level == 0) {
                     TokBuf subBuf = buf.subBuf(startPos, buf.prevPos());
                     exprs.add(parseExpression(subBuf, false));
@@ -1191,7 +1191,7 @@ public class Expressionator {
             for (OpType op : ops) {
                 prec.put(op, level);
             }
-            ++level;
+            level++;
         }
 
         return prec;

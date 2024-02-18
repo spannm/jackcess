@@ -1382,7 +1382,7 @@ public class CursorTest extends TestCase {
                     // for(int i = 0; i < 5; ++i) {
                     for (int j = 1; j < 3; ++j) {
                         t.addRow(id, str, i, "K" + j, "value" + id);
-                        ++id;
+                        id++;
                     }
                 }
             }

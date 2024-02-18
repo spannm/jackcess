@@ -454,7 +454,7 @@ public class ImportUtil {
 
                 // find quoted value
                 sb.setLength(0);
-                ++idx;
+                idx++;
                 while (true) {
 
                     int endIdx = line.indexOf(quote, idx);
@@ -462,7 +462,7 @@ public class ImportUtil {
                     if (endIdx >= 0) {
 
                         sb.append(line, idx, endIdx);
-                        ++endIdx;
+                        endIdx++;
                         if (endIdx < line.length() && line.charAt(endIdx) == quote) {
 
                             // embedded quote

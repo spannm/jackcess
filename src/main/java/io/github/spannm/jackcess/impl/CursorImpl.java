@@ -663,7 +663,7 @@ public abstract class CursorImpl implements Cursor {
         throws IOException {
         int numMovedRows = 0;
         while (numMovedRows < numRows && moveToAnotherRow(moveForward)) {
-            ++numMovedRows;
+            numMovedRows++;
         }
         return numMovedRows;
     }

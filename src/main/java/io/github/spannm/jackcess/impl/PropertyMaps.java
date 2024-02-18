@@ -366,7 +366,7 @@ public class PropertyMaps implements Iterable<PropertyMapImpl> {
                     }
                 }
 
-                ++nameIdx;
+                nameIdx++;
             }
         }
 

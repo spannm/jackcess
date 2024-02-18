@@ -131,19 +131,19 @@ public class ComplexColumnSupport {
         for (Column col : typeCols) {
             switch (col.getType()) {
                 case TEXT:
-                    ++numText;
+                    numText++;
                     break;
                 case LONG:
-                    ++numLong;
+                    numLong++;
                     break;
                 case SHORT_DATE_TIME:
-                    ++numDate;
+                    numDate++;
                     break;
                 case OLE:
-                    ++numOle;
+                    numOle++;
                     break;
                 case MEMO:
-                    ++numMemo;
+                    numMemo++;
                     break;
                 default:
                     // ignore
@@ -168,10 +168,10 @@ public class ComplexColumnSupport {
         for (Column col : typeCols) {
             switch (col.getType()) {
                 case SHORT_DATE_TIME:
-                    ++numDate;
+                    numDate++;
                     break;
                 case MEMO:
-                    ++numMemo;
+                    numMemo++;
                     break;
                 default:
                     // ignore

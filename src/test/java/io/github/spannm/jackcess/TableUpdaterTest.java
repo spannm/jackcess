@@ -102,7 +102,7 @@ public class TableUpdaterTest extends TestCase {
 
         int t2idxs = 0;
         if (oneToOne) {
-            ++t2idxs;
+            t2idxs++;
             newPrimaryKey("id2")
                 .addToTable(t2);
         }
@@ -110,8 +110,8 @@ public class TableUpdaterTest extends TestCase {
         RelationshipBuilder rb = newRelationship("TestTable", "TestTable2")
             .addColumns("id", "id2");
         if (enforce) {
-            ++t1idxs;
-            ++t2idxs;
+            t1idxs++;
+            t2idxs++;
             rb.withReferentialIntegrity()
                 .withCascadeDeletes();
         }
@@ -172,18 +172,18 @@ public class TableUpdaterTest extends TestCase {
         int id = 0;
         for (Row r : t1) {
             assertEquals(id, r.get("id"));
-            ++id;
+            id++;
             if (id == 5) {
-                ++id;
+                id++;
             }
         }
 
         id = 0;
         for (Row r : t2) {
             assertEquals(id, r.get("id2"));
-            ++id;
+            id++;
             if (enforce && id == 5) {
-                ++id;
+                id++;
             }
         }
     }

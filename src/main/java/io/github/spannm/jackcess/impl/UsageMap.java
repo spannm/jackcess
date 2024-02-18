@@ -224,9 +224,9 @@ public class UsageMap {
     }
 
     protected int getPrevBitIndex(int curIndex) {
-        --curIndex;
+        curIndex--;
         while (curIndex >= 0 && !_pageNumbers.get(curIndex)) {
-            --curIndex;
+            curIndex--;
         }
         return curIndex;
     }

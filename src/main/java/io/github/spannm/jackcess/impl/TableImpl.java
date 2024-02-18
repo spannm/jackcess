@@ -1604,7 +1604,7 @@ public class TableImpl implements Table, PropertyMaps.Owner {
             ByteUtil.clearRange(umapBuf, dataOffset, rowStart + umapRowLength);
 
             rowStart -= umapRowLength;
-            ++umapRowNum;
+            umapRowNum++;
         }
 
         // finish the page
@@ -1773,7 +1773,7 @@ public class TableImpl implements Table, PropertyMaps.Owner {
                 if (umapType == 1 && umapPageNumber != colState.getUmapPageNumber()) {
                     // we want to force both usage maps for a column to be on the same
                     // data page, so just discard the previous one we wrote
-                    --i;
+                    i--;
                     umapType = 0;
                 }
 
@@ -1789,7 +1789,7 @@ public class TableImpl implements Table, PropertyMaps.Owner {
 
             rowStart -= umapRowLength;
             freeSpace -= umapSpaceUsage;
-            ++umapRowNum;
+            umapRowNum++;
 
             if (freeSpace <= umapSpaceUsage || i == umapNum - 1) {
                 // finish current page
@@ -2007,7 +2007,7 @@ public class TableImpl implements Table, PropertyMaps.Owner {
         boolean returnRowId) {
         int len = _columns.size();
         if (returnRowId) {
-            ++len;
+            len++;
         }
         Object[] row = new Object[len];
         if (defaultValue != null) {
@@ -2134,7 +2134,7 @@ public class TableImpl implements Table, PropertyMaps.Owner {
 
                     // fill in autonumbers
                     handleAutoNumbersForAdd(row, writeRowState);
-                    ++autoNumAssignCount;
+                    autoNumAssignCount++;
 
                     // need to assign calculated values after all the other fields are
                     // filled in but before final validation
@@ -2197,7 +2197,7 @@ public class TableImpl implements Table, PropertyMaps.Owner {
                         row[numCols] = rowId;
                     }
 
-                    ++updateCount;
+                    updateCount++;
                 }
 
                 writeDataPage(dataPage, pageNumber);

@@ -1484,11 +1484,11 @@ public class ColumnImpl implements Column, Comparable<ColumnImpl>, DateTimeConte
                     decodeTextSegment(data, dataStart, dataEnd, inCompressedMode,
                         textBuf);
                     inCompressedMode = !inCompressedMode;
-                    ++dataEnd;
+                    dataEnd++;
                     dataStart = dataEnd;
 
                 } else {
-                    ++dataEnd;
+                    dataEnd++;
                 }
             }
             // handle last segment
