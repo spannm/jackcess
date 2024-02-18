@@ -192,6 +192,25 @@
                     </configuration>
                 </plugin>
 
+                <plugin>
+                    <artifactId>maven-javadoc-plugin</artifactId>
+                    <version>${dep.plugin.javadoc.version}</version>
+                    <configuration>
+                        <useStandardDocletOptions>true</useStandardDocletOptions>
+                        <nocomment>false</nocomment>
+                        <detectJavaApiLink>false</detectJavaApiLink>
+                        <detectLinks>false</detectLinks>
+                        <doclint>all,-missing</doclint>
+                        <!-- add all modules of module-path so javadoc generation will
+                             not fail on modularized projects (includes use of automatic module names) -->
+                        <additionalOptions>
+                            <option>--add-modules</option>
+                            <option>ALL-MODULE-PATH</option>
+                            <option>-Xmaxwarns 500</option>
+                        </additionalOptions>
+                    </configuration>
+                </plugin>
+
             </plugins>
 
         </pluginManagement>
