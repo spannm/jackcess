@@ -96,6 +96,8 @@
 
         <dep.poi.version>4.1.2</dep.poi.version>
 
+        <dep.slf4j.version>2.0.12</dep.slf4j.version>
+
         <dep.junit.version>4.13.2</dep.junit.version>
 
         <dep.plugin.sortpom.version>3.3.0</dep.plugin.sortpom.version>
@@ -118,6 +120,20 @@
             <groupId>org.apache.poi</groupId>
             <artifactId>poi</artifactId>
             <version>${dep.poi.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-jdk-platform-logging</artifactId>
+            <version>${dep.slf4j.version}</version>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-simple</artifactId>
+            <version>${dep.slf4j.version}</version>
+            <scope>test</scope>
         </dependency>
 
         <dependency>
