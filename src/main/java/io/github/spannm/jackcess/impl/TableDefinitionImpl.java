@@ -41,15 +41,13 @@ public class TableDefinitionImpl extends TableImpl {
     protected List<? extends Object[]> addRows(List<? extends Object[]> rows,
         final boolean isBatchWrite) {
         // all row additions eventually flow through this method
-        throw new UnsupportedOperationException(
-            withErrorContext("TableDefinition has no data access"));
+        throw new UnsupportedOperationException(withErrorContext("TableDefinition has no data access"));
     }
 
     @Override
     public RowState createRowState() {
         // RowState is needed for all traversal operations, so this kills any data
         // reading as well as update/delete methods
-        throw new UnsupportedOperationException(
-            withErrorContext("TableDefinition has no data access"));
+        throw new UnsupportedOperationException(withErrorContext("TableDefinition has no data access"));
     }
 }

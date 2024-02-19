@@ -23,11 +23,11 @@ import io.github.spannm.jackcess.Index;
 import io.github.spannm.jackcess.IndexBuilder;
 import io.github.spannm.jackcess.impl.ByteUtil.ByteStream;
 import io.github.spannm.jackcess.util.ToStringBuilder;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 
 import java.io.IOException;
 import java.io.UncheckedIOException;
+import java.lang.System.Logger;
+import java.lang.System.Logger.Level;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.util.*;
@@ -39,7 +39,7 @@ import java.util.*;
  */
 public class IndexData {
 
-    protected static final Log     LOG                       = LogFactory.getLog(Index.class);
+    protected static final Logger  LOGGER                    = System.getLogger(Index.class.getName());
 
     /** special entry which is less than any other entry */
     public static final Entry      FIRST_ENTRY               = createSpecialEntry(RowIdImpl.FIRST_ROW_ID);
@@ -326,13 +326,7 @@ public class IndexData {
 
     private void setUnsupportedReason(String reason, ColumnImpl col) {
         _unsupportedReason = withErrorContext(reason);
-        if (!col.getTable().isSystem()) {
-            LOG.warn(_unsupportedReason + ", making read-only");
-        } else {
-            if (LOG.isDebugEnabled()) {
-                LOG.debug(_unsupportedReason + ", making read-only");
-            }
-        }
+        LOGGER.log(col.getTable().isSystem() ? Level.DEBUG : Level.WARNING, _unsupportedReason + ", making read-only");
     }
 
     String getUnsupportedReason() {
@@ -610,7 +604,7 @@ public class IndexData {
             }
             ++_modCount;
         } else {
-            LOG.warn(withErrorContext("Added duplicate index entry " + oldEntry));
+            LOGGER.log(Level.WARNING, withErrorContext("Added duplicate index entry " + oldEntry));
         }
     }
 
@@ -662,7 +656,7 @@ public class IndexData {
         if (removedEntry != null) {
             ++_modCount;
         } else {
-            LOG.warn(withErrorContext("Failed removing index entry " + oldEntry + " for row: " + Arrays.toString(row)));
+            LOGGER.log(Level.WARNING, withErrorContext("Failed removing index entry " + oldEntry + " for row: " + Arrays.toString(row)));
         }
         return removedEntry;
     }

@@ -21,10 +21,10 @@ import io.github.spannm.jackcess.expr.EvalConfig;
 import io.github.spannm.jackcess.impl.query.QueryImpl;
 import io.github.spannm.jackcess.query.Query;
 import io.github.spannm.jackcess.util.*;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 
 import java.io.*;
+import java.lang.System.Logger;
+import java.lang.System.Logger.Level;
 import java.lang.ref.ReferenceQueue;
 import java.lang.ref.WeakReference;
 import java.nio.ByteBuffer;
@@ -46,7 +46,7 @@ import java.util.regex.Pattern;
  * @author Tim McCune
  */
 public class DatabaseImpl implements Database, DateTimeContext {
-    private static final Log                                         LOG                   = LogFactory.getLog(DatabaseImpl.class);
+    private static final Logger                                      LOGGER                = System.getLogger(DatabaseImpl.class.getName());
 
     /**
      * this is the default "userId" used if we cannot find existing info. this seems to be some standard "Admin" userId for access files
@@ -1047,16 +1047,12 @@ public class DatabaseImpl implements Database, DateTimeContext {
                 _tableFinder = new DefaultTableFinder(
                     _systemCatalog.newCursor().withIndexByColumnNames(CAT_COL_PARENT_ID, CAT_COL_NAME).withColumnMatcher(CaseInsensitiveColumnMatcher.INSTANCE).toIndexCursor());
             } catch (IllegalArgumentException e) {
-                if (LOG.isDebugEnabled()) {
-                    LOG.debug(withErrorContext("Could not find expected index on table " + _systemCatalog.getName()));
-                }
+                LOGGER.log(Level.DEBUG, () -> withErrorContext("Could not find expected index on table " + _systemCatalog.getName()));
                 // use table scan instead
                 _tableFinder = new FallbackTableFinder(_systemCatalog.newCursor().withColumnMatcher(CaseInsensitiveColumnMatcher.INSTANCE).toCursor());
             }
         } else {
-            if (LOG.isDebugEnabled()) {
-                LOG.debug(withErrorContext("Ignoring index on table " + _systemCatalog.getName()));
-            }
+            LOGGER.log(Level.DEBUG, () -> withErrorContext("Ignoring index on table " + _systemCatalog.getName()));
             // use table scan instead
             _tableFinder = new FallbackTableFinder(_systemCatalog.newCursor().withColumnMatcher(CaseInsensitiveColumnMatcher.INSTANCE).toCursor());
         }
@@ -1067,9 +1063,7 @@ public class DatabaseImpl implements Database, DateTimeContext {
             throw new IOException(withErrorContext("Did not find required parent table id"));
         }
 
-        if (LOG.isDebugEnabled()) {
-            LOG.debug(withErrorContext("Finished reading system catalog.  Tables: " + getTableNames()));
-        }
+        LOGGER.log(Level.DEBUG, withErrorContext("Finished reading system catalog. Tables: " + getTableNames()));
     }
 
     @Override
@@ -1427,7 +1421,7 @@ public class DatabaseImpl implements Database, DateTimeContext {
             QueryImpl.Row queryRow = new QueryImpl.Row(row);
             List<QueryImpl.Row> queryRows = queryRowMap.get(queryRow._objectId);
             if (queryRows == null) {
-                LOG.warn(withErrorContext("Found rows for query with id " + queryRow._objectId + " missing from system catalog"));
+                LOGGER.log(Level.WARNING, withErrorContext("Found rows for query with id " + queryRow._objectId + " missing from system catalog"));
                 continue;
             }
             queryRows.add(queryRow);
@@ -1794,9 +1788,7 @@ public class DatabaseImpl implements Database, DateTimeContext {
         try {
             return table.newCursor().withIndexByColumnNames(colName).withSpecificEntry(colValue).toCursor();
         } catch (IllegalArgumentException e) {
-            if (LOG.isDebugEnabled()) {
-                LOG.debug(withErrorContext("Could not find expected index on table " + table.getName()));
-            }
+            LOGGER.log(Level.DEBUG, () -> withErrorContext("Could not find expected index on table " + table.getName()));
         }
         // use table scan instead
         return CursorImpl.createCursor(table);

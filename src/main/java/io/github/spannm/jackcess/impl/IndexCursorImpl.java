@@ -24,11 +24,11 @@ import io.github.spannm.jackcess.util.CaseInsensitiveColumnMatcher;
 import io.github.spannm.jackcess.util.ColumnMatcher;
 import io.github.spannm.jackcess.util.EntryIterableBuilder;
 import io.github.spannm.jackcess.util.SimpleColumnMatcher;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 
 import java.io.IOException;
 import java.io.UncheckedIOException;
+import java.lang.System.Logger;
+import java.lang.System.Logger.Level;
 import java.util.*;
 
 /**
@@ -37,7 +37,7 @@ import java.util.*;
  * @author James Ahlborn
  */
 public class IndexCursorImpl extends CursorImpl implements IndexCursor {
-    private static final Log            LOG                = LogFactory.getLog(IndexCursorImpl.class);
+    private static final Logger         LOGGER             = System.getLogger(IndexCursorImpl.class.getName());
 
     /** IndexDirHandler for forward traversal */
     private final IndexDirHandler       _forwardDirHandler =
@@ -137,8 +137,8 @@ public class IndexCursorImpl extends CursorImpl implements IndexCursor {
             if (!found) {
                 try {
                     restorePosition(curPos, prevPos);
-                } catch (IOException e) {
-                    LOG.error("Failed restoring position", e);
+                } catch (IOException ex) {
+                    LOGGER.log(Level.ERROR, "Failed to restore position", ex);
                 }
             }
         }
@@ -151,15 +151,14 @@ public class IndexCursorImpl extends CursorImpl implements IndexCursor {
         PositionImpl prevPos = _prevPos;
         boolean found = false;
         try {
-            findFirstRowByEntryImpl(toRowValues(entryValues), false,
-                _columnMatcher);
+            findFirstRowByEntryImpl(toRowValues(entryValues), false, _columnMatcher);
             found = true;
         } finally {
             if (!found) {
                 try {
                     restorePosition(curPos, prevPos);
                 } catch (IOException e) {
-                    LOG.error("Failed restoring position", e);
+                    LOGGER.log(Level.ERROR, "Failed to restore position", e);
                 }
             }
         }

@@ -23,10 +23,10 @@ import io.github.spannm.jackcess.impl.complex.AttachmentColumnInfoImpl;
 import io.github.spannm.jackcess.impl.complex.MultiValueColumnInfoImpl;
 import io.github.spannm.jackcess.impl.complex.UnsupportedColumnInfoImpl;
 import io.github.spannm.jackcess.impl.complex.VersionHistoryColumnInfoImpl;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 
 import java.io.IOException;
+import java.lang.System.Logger;
+import java.lang.System.Logger.Level;
 import java.nio.ByteBuffer;
 import java.util.EnumSet;
 import java.util.List;
@@ -38,7 +38,7 @@ import java.util.Set;
  * @author James Ahlborn
  */
 public class ComplexColumnSupport {
-    private static final Log           LOG                        = LogFactory.getLog(ComplexColumnSupport.class);
+    private static final Logger        LOGGER                     = System.getLogger(ComplexColumnSupport.class.getName());
 
     private static final String        COL_COMPLEX_TYPE_OBJECT_ID = "ComplexTypeObjectID";
     private static final String        COL_TABLE_ID               = "ConceptualTableID";
@@ -100,7 +100,7 @@ public class ComplexColumnSupport {
                 flatTable);
         }
 
-        LOG.warn(column.withErrorContext(
+        LOGGER.log(Level.WARNING, column.withErrorContext(
             "Unsupported complex column type " + typeObjTable.getName()));
         return new UnsupportedColumnInfoImpl(column, complexTypeId, typeObjTable,
             flatTable);

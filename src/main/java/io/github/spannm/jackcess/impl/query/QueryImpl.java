@@ -24,9 +24,9 @@ import io.github.spannm.jackcess.impl.DatabaseImpl;
 import io.github.spannm.jackcess.impl.RowIdImpl;
 import io.github.spannm.jackcess.impl.RowImpl;
 import io.github.spannm.jackcess.query.Query;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 
+import java.lang.System.Logger;
+import java.lang.System.Logger.Level;
 import java.util.*;
 
 /**
@@ -36,15 +36,15 @@ import java.util.*;
  * @author James Ahlborn
  */
 public abstract class QueryImpl implements Query {
-    protected static final Log LOG       = LogFactory.getLog(QueryImpl.class);
+    protected static final Logger LOGGER    = System.getLogger(QueryImpl.class.getName());
 
-    private static final Row   EMPTY_ROW = new Row();
+    private static final Row      EMPTY_ROW = new Row();
 
-    private final String       _name;
-    private final List<Row>    _rows;
-    private final int          _objectId;
-    private final int          _objectFlag;
-    private final Type         _type;
+    private final String          _name;
+    private final List<Row>       _rows;
+    private final int             _objectId;
+    private final int             _objectFlag;
+    private final Type            _type;
 
     protected QueryImpl(String name, List<Row> rows, int objectId, int objectFlag, Type type) {
         _name = name;
@@ -383,7 +383,7 @@ public abstract class QueryImpl implements Query {
                     throw new IllegalStateException(withErrorContext("unknown query object flag " + objTypeFlag, name));
             }
         } catch (IllegalStateException e) {
-            LOG.warn(withErrorContext("Failed parsing query", name), e);
+            LOGGER.log(Level.WARNING, withErrorContext("Failed parsing query", name), e);
         }
 
         // return unknown query

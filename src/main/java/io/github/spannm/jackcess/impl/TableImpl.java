@@ -21,12 +21,12 @@ import io.github.spannm.jackcess.expr.Identifier;
 import io.github.spannm.jackcess.util.ErrorHandler;
 import io.github.spannm.jackcess.util.ExportUtil;
 import io.github.spannm.jackcess.util.ToStringBuilder;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 
 import java.io.BufferedWriter;
 import java.io.IOException;
 import java.io.StringWriter;
+import java.lang.System.Logger;
+import java.lang.System.Logger.Level;
 import java.nio.BufferOverflowException;
 import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
@@ -41,7 +41,7 @@ import java.util.*;
  * @author Tim McCune
  */
 public class TableImpl implements Table, PropertyMaps.Owner {
-    private static final Log   LOG                = LogFactory.getLog(TableImpl.class);
+    private static final Logger   LOGGER                = System.getLogger(TableImpl.class.getName());
 
     private static final short OFFSET_MASK        = (short) 0x1FFF;
 
@@ -396,8 +396,7 @@ public class TableImpl implements Table, PropertyMaps.Owner {
                 return column;
             }
         }
-        throw new IllegalArgumentException(withErrorContext(
-            "Column with name " + name + " does not exist in this table"));
+        throw new IllegalArgumentException(withErrorContext("Column with name " + name + " does not exist in this table"));
     }
 
     public boolean hasColumn(String name) {
@@ -464,8 +463,7 @@ public class TableImpl implements Table, PropertyMaps.Owner {
                 return index;
             }
         }
-        throw new IllegalArgumentException(withErrorContext(
-            "Index with name " + name + " does not exist on this table"));
+        throw new IllegalArgumentException(withErrorContext("Index with name " + name + " does not exist on this table"));
     }
 
     @Override
@@ -475,8 +473,7 @@ public class TableImpl implements Table, PropertyMaps.Owner {
                 return index;
             }
         }
-        throw new IllegalArgumentException(withErrorContext(
-            "No primary key index found"));
+        throw new IllegalArgumentException(withErrorContext("No primary key index found"));
     }
 
     @Override
@@ -661,8 +658,7 @@ public class TableImpl implements Table, PropertyMaps.Owner {
         ColumnImpl column)
         throws IOException {
         if (this != column.getTable()) {
-            throw new IllegalArgumentException(withErrorContext(
-                "Given column " + column + " is not from this table"));
+            throw new IllegalArgumentException(withErrorContext("Given column " + column + " is not from this table"));
         }
         requireValidRowId(rowId);
 
@@ -955,8 +951,7 @@ public class TableImpl implements Table, PropertyMaps.Owner {
             if (overflowRow) {
 
                 if (rowEnd - rowStart < 4) {
-                    throw new IOException(rowState.getTable().withErrorContext(
-                        "invalid overflow row info"));
+                    throw new IOException(rowState.getTable().withErrorContext("invalid overflow row info"));
                 }
 
                 // Overflow page. the "row" data in the current page points to
@@ -1487,8 +1482,7 @@ public class TableImpl implements Table, PropertyMaps.Owner {
 
     private void validateTableDefUpdate(TableUpdater mutator, ByteBuffer tableBuffer) {
         if (!mutator.validateUpdatedTdef(tableBuffer)) {
-            throw new IllegalStateException(
-                withErrorContext("Failed updating table definition (unexpected length)"));
+            throw new IllegalStateException(withErrorContext("Failed updating table definition (unexpected length)"));
         }
     }
 
@@ -1925,7 +1919,7 @@ public class TableImpl implements Table, PropertyMaps.Owner {
             colOwnedPages = null;
             colFreeSpacePages = null;
             tableBuffer.position(pos + 8);
-            LOG.warn(withErrorContext("Invalid column " + umapColNum + " usage map definition: " + e));
+            LOGGER.log(Level.WARNING, withErrorContext("Invalid column " + umapColNum + " usage map definition: " + e));
         }
 
         for (ColumnImpl col : _columns) {
@@ -2151,8 +2145,7 @@ public class TableImpl implements Table, PropertyMaps.Owner {
 
                     int rowSize = rowData.remaining();
                     if (rowSize > getFormat().MAX_ROW_SIZE) {
-                        throw new InvalidValueException(withErrorContext(
-                            "Row size " + rowSize + " is too large"));
+                        throw new InvalidValueException(withErrorContext("Row size " + rowSize + " is too large"));
                     }
 
                     // get page with space
@@ -2245,9 +2238,7 @@ public class TableImpl implements Table, PropertyMaps.Owner {
                         // corruption (failed write vs. a row failure which was not a
                         // write failure). we don't know the status of any rows at this
                         // point (and the original failure is probably irrelevant)
-                        LOG.warn(withErrorContext(
-                            "Secondary row failure which preceded the write failure"),
-                            rowWriteFailure);
+                        LOGGER.log(Level.WARNING, withErrorContext("Secondary row failure which preceded the write failure"), rowWriteFailure);
                         updateCount = 0;
                         rowWriteFailure = flushFailure;
                     }
@@ -2399,8 +2390,7 @@ public class TableImpl implements Table, PropertyMaps.Owner {
                 keepRawVarValues);
 
             if (newRowData.limit() > getFormat().MAX_ROW_SIZE) {
-                throw new InvalidValueException(withErrorContext(
-                    "Row size " + newRowData.limit() + " is too large"));
+                throw new InvalidValueException(withErrorContext("Row size " + newRowData.limit() + " is too large"));
             }
 
             if (!_indexDatas.isEmpty()) {
@@ -2731,8 +2721,7 @@ public class TableImpl implements Table, PropertyMaps.Owner {
                     } catch (BufferOverflowException e) {
                         // if the data is too big for the buffer, then we have gone over
                         // the max row size
-                        throw new InvalidValueException(withErrorContext(
-                            "Row size " + buffer.limit() + " is too large"));
+                        throw new InvalidValueException(withErrorContext("Row size " + buffer.limit() + " is too large"));
                     }
                 }
 
@@ -2998,8 +2987,7 @@ public class TableImpl implements Table, PropertyMaps.Owner {
      */
     private void requireValidRowId(RowIdImpl rowId) {
         if (!rowId.isValid()) {
-            throw new IllegalArgumentException(withErrorContext(
-                "Given rowId is invalid: " + rowId));
+            throw new IllegalArgumentException(withErrorContext("Given rowId is invalid: " + rowId));
         }
     }
 
@@ -3008,12 +2996,10 @@ public class TableImpl implements Table, PropertyMaps.Owner {
      */
     private void requireNonDeletedRow(RowState rowState, RowIdImpl rowId) {
         if (!rowState.isValid()) {
-            throw new IllegalArgumentException(withErrorContext(
-                "Given rowId is invalid for this table: " + rowId));
+            throw new IllegalArgumentException(withErrorContext("Given rowId is invalid for this table: " + rowId));
         }
         if (rowState.isDeleted()) {
-            throw new IllegalStateException(withErrorContext(
-                "Row is deleted: " + rowId));
+            throw new IllegalStateException(withErrorContext("Row is deleted: " + rowId));
         }
     }
 
@@ -3096,12 +3082,7 @@ public class TableImpl implements Table, PropertyMaps.Owner {
     }
 
     String withErrorContext(String msg) {
-        return withErrorContext(msg, getDatabase(), getName());
-    }
-
-    private static String withErrorContext(String msg, DatabaseImpl db,
-        String tableName) {
-        return msg + " (Db=" + db.getName() + ";Table=" + tableName + ")";
+        return msg + " (Db=" + getDatabase().getName() + "; Table=" + getName() + ")";
     }
 
     /** various statuses for the row data */
@@ -3372,12 +3353,10 @@ public class TableImpl implements Table, PropertyMaps.Owner {
             // this should never see modifications because it only happens within
             // the positionAtRowData method
             if (!isUpToDate()) {
-                throw new IllegalStateException(getTable().withErrorContext(
-                    "Table modified while searching?"));
+                throw new IllegalStateException(getTable().withErrorContext("Table modified while searching?"));
             }
             if (_rowStatus != RowStatus.OVERFLOW) {
-                throw new IllegalStateException(getTable().withErrorContext(
-                    "Row is not an overflow row?"));
+                throw new IllegalStateException(getTable().withErrorContext("Row is not an overflow row?"));
             }
             _finalRowId = rowId;
             _finalRowBuffer = _overflowRowBufferH.withPage(getPageChannel(),

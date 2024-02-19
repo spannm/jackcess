@@ -19,6 +19,7 @@ package io.github.spannm.jackcess.impl;
 import io.github.spannm.jackcess.InvalidValueException;
 
 import java.io.IOException;
+import java.lang.System.Logger.Level;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.util.Collection;
@@ -149,7 +150,7 @@ class LongValueColumnImpl extends ColumnImpl {
             int rowLen = def.remaining();
             if (rowLen < length) {
                 // warn the caller, but return whatever we can
-                LOG.warn(withErrorContext(
+                LOGGER.log(Level.WARNING, withErrorContext(
                     "Value may be truncated: expected length " + length + " found " + rowLen));
                 rtn = new byte[rowLen];
             }
@@ -175,7 +176,7 @@ class LongValueColumnImpl extends ColumnImpl {
                 int rowLen = rowEnd - rowStart;
                 if (rowLen < length) {
                     // warn the caller, but return whatever we can
-                    LOG.warn(withErrorContext("Value may be truncated: expected length " + length + " found " + rowLen));
+                    LOGGER.log(Level.WARNING, withErrorContext("Value may be truncated: expected length " + length + " found " + rowLen));
                     rtn = new byte[rowLen];
                 }
                 lvalPage.position(rowStart);

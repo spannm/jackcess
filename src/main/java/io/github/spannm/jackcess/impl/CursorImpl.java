@@ -22,11 +22,11 @@ import io.github.spannm.jackcess.util.ColumnMatcher;
 import io.github.spannm.jackcess.util.ErrorHandler;
 import io.github.spannm.jackcess.util.IterableBuilder;
 import io.github.spannm.jackcess.util.SimpleColumnMatcher;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 
 import java.io.IOException;
 import java.io.UncheckedIOException;
+import java.lang.System.Logger;
+import java.lang.System.Logger.Level;
 import java.util.*;
 import java.util.function.Predicate;
 
@@ -43,7 +43,7 @@ import java.util.function.Predicate;
  * @author James Ahlborn
  */
 public abstract class CursorImpl implements Cursor {
-    private static final Log    LOG            = LogFactory.getLog(CursorImpl.class);
+    private static final Logger LOGGER         = System.getLogger(CursorImpl.class.getName());
 
     /** boolean value indicating forward movement */
     public static final boolean MOVE_FORWARD   = true;
@@ -413,8 +413,8 @@ public abstract class CursorImpl implements Cursor {
             if (!found) {
                 try {
                     restorePosition(curPos, prevPos);
-                } catch (IOException e) {
-                    LOG.error("Failed restoring position", e);
+                } catch (IOException ex) {
+                    LOGGER.log(Level.ERROR, "Failed restoring position", ex);
                 }
             }
         }
@@ -464,8 +464,8 @@ public abstract class CursorImpl implements Cursor {
             if (!found) {
                 try {
                     restorePosition(curPos, prevPos);
-                } catch (IOException e) {
-                    LOG.error("Failed restoring position", e);
+                } catch (IOException ex) {
+                    LOGGER.log(Level.ERROR, "Failed restoring position", ex);
                 }
             }
         }
@@ -502,8 +502,8 @@ public abstract class CursorImpl implements Cursor {
             if (!found) {
                 try {
                     restorePosition(curPos, prevPos);
-                } catch (IOException e) {
-                    LOG.error("Failed restoring position", e);
+                } catch (IOException ex) {
+                    LOGGER.log(Level.ERROR, "Failed restoring position", ex);
                 }
             }
         }

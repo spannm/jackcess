@@ -20,10 +20,9 @@ import io.github.spannm.jackcess.CursorBuilder;
 import io.github.spannm.jackcess.Index;
 import io.github.spannm.jackcess.IndexBuilder;
 import io.github.spannm.jackcess.util.ToStringBuilder;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 
 import java.io.IOException;
+import java.lang.System.Logger;
 import java.nio.ByteBuffer;
 import java.util.Collections;
 import java.util.List;
@@ -36,7 +35,7 @@ import java.util.Map;
  * @author Tim McCune
  */
 public class IndexImpl implements Index, Comparable<IndexImpl> {
-    protected static final Log        LOG                     = LogFactory.getLog(IndexImpl.class);
+    protected static final Logger     LOGGER                  = System.getLogger(IndexImpl.class.getName());
 
     /** index type for primary key indexes */
     public static final byte          PRIMARY_KEY_INDEX_TYPE  = (byte) 1;

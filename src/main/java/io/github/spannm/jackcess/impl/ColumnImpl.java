@@ -26,10 +26,10 @@ import io.github.spannm.jackcess.impl.expr.NumberFormatter;
 import io.github.spannm.jackcess.util.ColumnValidator;
 import io.github.spannm.jackcess.util.SimpleColumnValidator;
 import io.github.spannm.jackcess.util.ToStringBuilder;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 
 import java.io.*;
+import java.lang.System.Logger;
+import java.lang.System.Logger.Level;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.nio.ByteBuffer;
@@ -51,7 +51,7 @@ import java.util.regex.Pattern;
  */
 public class ColumnImpl implements Column, Comparable<ColumnImpl>, DateTimeContext {
 
-    protected static final Log           LOG                              = LogFactory.getLog(ColumnImpl.class);
+    protected static final Logger       LOGGER                            = System.getLogger(ColumnImpl.class.getName());
 
     /**
      * Placeholder object for adding rows which indicates that the caller wants the RowId of the new row. Must be added
@@ -279,8 +279,7 @@ public class ColumnImpl implements Column, Comparable<ColumnImpl>, DateTimeConte
         try {
             args.type = DataType.fromByte(colType);
         } catch (IOException e) {
-            LOG.warn(withErrorContext("Unsupported column type " + colType,
-                table.getDatabase(), table.getName(), name));
+            LOGGER.log(Level.WARNING, withErrorContext("Unsupported column type " + colType, table.getDatabase(), table.getName(), name));
             boolean variableLength = (args.flags & FIXED_LEN_FLAG_MASK) == 0;
             args.type = variableLength ? DataType.UNSUPPORTED_VARLEN : DataType.UNSUPPORTED_FIXEDLEN;
             return new UnsupportedColumnImpl(args);
@@ -634,7 +633,7 @@ public class ColumnImpl implements Column, Comparable<ColumnImpl>, DateTimeConte
             case COMPLEX_TYPE:
                 return new ComplexTypeAutoNumberGenerator();
             default:
-                LOG.warn(withErrorContext("Unknown auto number column type " + _type));
+                LOGGER.log(Level.WARNING, withErrorContext("Unknown auto number column type " + _type));
                 return new UnsupportedAutoNumberGenerator(_type);
         }
     }
