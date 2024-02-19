@@ -19,10 +19,7 @@ package io.github.spannm.jackcess;
 import io.github.spannm.jackcess.impl.*;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 /**
  * Builder style class for constructing an {@link Index}. See {@link TableBuilder} for example usage. Additionally, an
@@ -99,6 +96,14 @@ public class IndexBuilder {
      * Adds the columns with the given ordering to the index.
      */
     public IndexBuilder withColumns(boolean ascending, String... names) {
+        return names != null ? withColumns(ascending, Arrays.asList(names)) : this;
+    }
+
+    public IndexBuilder withColumns(Iterable<String> names) {
+        return withColumns(true, names);
+    }
+
+    public IndexBuilder withColumns(boolean ascending, Iterable<String> names) {
         if (names != null) {
             for (String name : names) {
                 _columns.add(new Column(name, ascending));
@@ -130,7 +135,7 @@ public class IndexBuilder {
     }
 
     /**
-     * Sets this index to encforce required.
+     * Sets this index to enforce required.
      */
     public IndexBuilder withRequired() {
         _flags |= IndexData.REQUIRED_INDEX_FLAG;
