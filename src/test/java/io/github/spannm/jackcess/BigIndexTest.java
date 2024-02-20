@@ -16,14 +16,14 @@ limitations under the License.
 
 package io.github.spannm.jackcess;
 
-import static io.github.spannm.jackcess.TestUtil.countRows;
-import static io.github.spannm.jackcess.TestUtil.openMem;
+import static io.github.spannm.jackcess.test.TestUtil.countRows;
 
 import io.github.spannm.jackcess.impl.IndexImpl;
-import io.github.spannm.jackcess.impl.JetFormatTest.Basename;
-import io.github.spannm.jackcess.impl.JetFormatTest.TestDB;
 import io.github.spannm.jackcess.impl.TableImpl;
-import junit.framework.TestCase;
+import io.github.spannm.jackcess.test.AbstractBaseTest;
+import io.github.spannm.jackcess.test.Basename;
+import io.github.spannm.jackcess.test.TestDB;
+import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -32,29 +32,27 @@ import java.util.Random;
 /**
  * @author james
  */
-public class BigIndexTest extends TestCase {
+class BigIndexTest extends AbstractBaseTest {
 
-    public BigIndexTest(String name) {
-        super(name);
-    }
-
-    public void testComplexIndex() throws Exception {
-        for (TestDB testDB : TestDB.getSupportedForBasename(Basename.COMP_INDEX, true)) {
-            // this file has an index with "compressed" entries and node pages
-            Database db = openMem(testDB);
-            TableImpl t = (TableImpl) db.getTable("Table1");
-            IndexImpl index = t.getIndex("CD_AGENTE");
-            assertFalse(index.isInitialized());
-            assertEquals(512, countRows(t));
-            assertEquals(512, index.getIndexData().getEntryCount());
-            db.close();
+    @Test
+    void testComplexIndex() throws Exception {
+        for (TestDB testDB : TestDB.getSupportedTestDbsForRead(Basename.COMP_INDEX)) {
+            try (// this file has an index with "compressed" entries and node pages
+            Database db = testDB.openMem()) {
+                TableImpl t = (TableImpl) db.getTable("Table1");
+                IndexImpl index = t.getIndex("CD_AGENTE");
+                assertFalse(index.isInitialized());
+                assertEquals(512, countRows(t));
+                assertEquals(512, index.getIndexData().getEntryCount());
+            }
         }
     }
 
-    public void testBigIndex() throws Exception {
-        for (TestDB testDB : TestDB.getSupportedForBasename(Basename.BIG_INDEX)) {
+    @Test
+    void testBigIndex() throws Exception {
+        for (TestDB testDB : TestDB.getSupportedTestDbs(Basename.BIG_INDEX)) {
             // this file has an index with "compressed" entries and node pages
-            Database db = openMem(testDB);
+            Database db = testDB.openMem();
             TableImpl t = (TableImpl) db.getTable("Table1");
             IndexImpl index = t.getIndex("col1");
             assertFalse(index.isInitialized());
@@ -62,7 +60,7 @@ public class BigIndexTest extends TestCase {
             assertEquals(0, index.getIndexData().getEntryCount());
             db.close();
 
-            TestUtil.setTestAutoSync(false);
+            setTestAutoSync(false);
             try {
 
                 String extraText
@@ -70,7 +68,7 @@ public class BigIndexTest extends TestCase {
                     + "so i will keep typing until i think that i probably have enough text in the index entry so that i do not need to add as many entries in order";
 
                 // copy to temp file and attempt to edit
-                db = openMem(testDB);
+                db = testDB.openMem();
                 t = (TableImpl) db.getTable("Table1");
                 index = t.getIndex("col1");
 
@@ -120,8 +118,7 @@ public class BigIndexTest extends TestCase {
                     if (val == null) {
                         val = firstValue;
                     }
-                    assertTrue(prevValue + " <= " + val + " " + rowCount,
-                        prevValue.compareTo(val) <= 0);
+                    assertTrue(prevValue.compareTo(val) <= 0, prevValue + " <= " + val + " " + rowCount);
                     if (firstTwo.size() < 2) {
                         firstTwo.add(origVal);
                     }
@@ -192,7 +189,7 @@ public class BigIndexTest extends TestCase {
                 db.close();
 
             } finally {
-                TestUtil.clearTestAutoSync();
+                clearTestAutoSync();
             }
         }
     }

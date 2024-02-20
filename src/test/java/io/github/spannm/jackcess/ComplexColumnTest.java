@@ -16,16 +16,17 @@ limitations under the License.
 
 package io.github.spannm.jackcess;
 
-import static io.github.spannm.jackcess.TestUtil.*;
-import static org.junit.Assert.assertArrayEquals;
+import static io.github.spannm.jackcess.test.TestUtil.TEST_TZ;
+import static io.github.spannm.jackcess.test.TestUtil.assertSameDate;
 
 import io.github.spannm.jackcess.complex.*;
 import io.github.spannm.jackcess.impl.ByteUtil;
 import io.github.spannm.jackcess.impl.ColumnImpl;
-import io.github.spannm.jackcess.impl.JetFormatTest.Basename;
-import io.github.spannm.jackcess.impl.JetFormatTest.TestDB;
 import io.github.spannm.jackcess.impl.PageChannel;
-import junit.framework.TestCase;
+import io.github.spannm.jackcess.test.AbstractBaseTest;
+import io.github.spannm.jackcess.test.Basename;
+import io.github.spannm.jackcess.test.TestDB;
+import org.junit.jupiter.api.Test;
 
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
@@ -36,7 +37,7 @@ import java.util.List;
  * @author James Ahlborn
  */
 @SuppressWarnings("deprecation")
-public class ComplexColumnTest extends TestCase {
+class ComplexColumnTest extends AbstractBaseTest {
 
     private static final byte[] TEST_ENC_BYTES  =
     new byte[] {b(0x01), b(0x00), b(0x00), b(0x00), b(0x3A), b(0x00), b(0x00), b(0x00), b(0x78), b(0x5E), b(0x13), b(0x61), b(0x60), b(0x60), b(0x60), b(0x04), b(0x62), b(0x16), b(0x20), b(
@@ -56,13 +57,10 @@ public class ComplexColumnTest extends TestCase {
 
     private static final byte[] TEST2_BYTES     = getAsciiBytes("this is some more test data for attachment.");
 
-    public ComplexColumnTest(String name) {
-        super(name);
-    }
-
-    public void testVersions() throws Exception {
-        for (TestDB testDB : TestDB.getSupportedForBasename(Basename.COMPLEX)) {
-            Database db = openCopy(testDB);
+    @Test
+    void testVersions() throws Exception {
+        for (TestDB testDB : TestDB.getSupportedTestDbs(Basename.COMPLEX)) {
+            Database db = testDB.openCopy();
             db.setDateTimeType(DateTimeType.DATE);
             db.setTimeZone(TEST_TZ);
 
@@ -162,10 +160,11 @@ public class ComplexColumnTest extends TestCase {
         }
     }
 
-    public void testAttachments() throws Exception {
-        for (TestDB testDB : TestDB.getSupportedForBasename(Basename.COMPLEX)) {
+    @Test
+    void testAttachments() throws Exception {
+        for (TestDB testDB : TestDB.getSupportedTestDbs(Basename.COMPLEX)) {
 
-            Database db = openCopy(testDB);
+            Database db = testDB.openCopy();
 
             Table t1 = db.getTable("Table1");
             Column col = t1.getColumn("attach-data");
@@ -242,10 +241,11 @@ public class ComplexColumnTest extends TestCase {
         }
     }
 
-    public void testMultiValues() throws Exception {
-        for (TestDB testDB : TestDB.getSupportedForBasename(Basename.COMPLEX)) {
+    @Test
+    void testMultiValues() throws Exception {
+        for (TestDB testDB : TestDB.getSupportedTestDbs(Basename.COMPLEX)) {
 
-            Database db = openCopy(testDB);
+            Database db = testDB.openCopy();
 
             Table t1 = db.getTable("Table1");
             Column col = t1.getColumn("multi-value-data");
@@ -315,10 +315,11 @@ public class ComplexColumnTest extends TestCase {
         }
     }
 
-    public void testUnsupported() throws Exception {
-        for (TestDB testDB : TestDB.getSupportedForBasename(Basename.UNSUPPORTED)) {
+    @Test
+    void testUnsupported() throws Exception {
+        for (TestDB testDB : TestDB.getSupportedTestDbs(Basename.UNSUPPORTED)) {
 
-            Database db = openCopy(testDB);
+            Database db = testDB.openCopy();
 
             Table t1 = db.getTable("Test");
             Column col = t1.getColumn("UnknownComplex");

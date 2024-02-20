@@ -73,7 +73,7 @@ public class DatabaseImpl implements Database, DateTimeContext {
     /**
      * additional internal details about each FileFormat
      */
-    private static final Map<Database.FileFormat, FileFormatDetails> FILE_FORMAT_DETAILS   = new EnumMap<>(Database.FileFormat.class);
+    private static final Map<FileFormat, FileFormatDetails> FILE_FORMAT_DETAILS   = new EnumMap<>(FileFormat.class);
 
     static {
         addFileFormatDetails(FileFormat.V1997, null, JetFormat.VERSION_3);
@@ -2027,7 +2027,7 @@ public class DatabaseImpl implements Database, DateTimeContext {
     /**
      * Copies the given db InputStream to the given channel using the most efficient means possible.
      */
-    protected static void transferDbFrom(FileChannel channel, InputStream in) throws IOException {
+    public static void transferDbFrom(FileChannel channel, InputStream in) throws IOException {
         ReadableByteChannel readChannel = Channels.newChannel(in);
         if (!BROKEN_NIO) {
             // sane implementation
@@ -2626,7 +2626,7 @@ public class DatabaseImpl implements Database, DateTimeContext {
     }
 
     /**
-     * Internal details for each FileForrmat
+     * Internal details for each FileFormat
      */
     public static final class FileFormatDetails {
         private final String    _emptyFile;

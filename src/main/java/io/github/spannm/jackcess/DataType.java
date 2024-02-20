@@ -16,6 +16,7 @@ limitations under the License.
 
 package io.github.spannm.jackcess;
 
+import io.github.spannm.jackcess.Database.FileFormat;
 import io.github.spannm.jackcess.impl.DatabaseImpl;
 import io.github.spannm.jackcess.impl.JetFormat;
 import io.github.spannm.jackcess.impl.SqlHelper;
@@ -444,7 +445,7 @@ public enum DataType {
         return fromSQLType(sqlType, lengthInUnits, null);
     }
 
-    public static DataType fromSQLType(int sqlType, int lengthInUnits, Database.FileFormat fileFormat)
+    public static DataType fromSQLType(int sqlType, int lengthInUnits, FileFormat fileFormat)
         throws IOException {
         DataType[] rtnArr = SQL_TYPES.get(sqlType);
         if (rtnArr == null) {

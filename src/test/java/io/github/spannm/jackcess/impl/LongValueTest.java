@@ -16,15 +16,16 @@ limitations under the License.
 
 package io.github.spannm.jackcess.impl;
 
-import static io.github.spannm.jackcess.TestUtil.*;
-import static io.github.spannm.jackcess.impl.JetFormatTest.SUPPORTED_FILEFORMATS;
-import static org.junit.Assert.assertArrayEquals;
+import static io.github.spannm.jackcess.test.TestUtil.*;
 
 import io.github.spannm.jackcess.*;
 import io.github.spannm.jackcess.Database.FileFormat;
-import io.github.spannm.jackcess.impl.JetFormatTest.Basename;
-import io.github.spannm.jackcess.impl.JetFormatTest.TestDB;
-import junit.framework.TestCase;
+import io.github.spannm.jackcess.test.AbstractBaseTest;
+import io.github.spannm.jackcess.test.Basename;
+import io.github.spannm.jackcess.test.TestDB;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
 
 import java.io.File;
 import java.nio.ByteBuffer;
@@ -34,40 +35,36 @@ import java.util.*;
 /**
  * @author James Ahlborn
  */
-public class LongValueTest extends TestCase {
+class LongValueTest extends AbstractBaseTest {
 
-    public LongValueTest(String name) {
-        super(name);
-    }
+    @Test
+    void testReadLongValue() throws Exception {
 
-    public void testReadLongValue() throws Exception {
-
-        for (TestDB testDB : TestDB.getSupportedForBasename(Basename.TEST2, true)) {
-            Database db = openMem(testDB);
-            Table table = db.getTable("MSP_PROJECTS");
-            Row row = table.getNextRow();
-            assertEquals("Jon Iles this is a a vawesrasoih aksdkl fas dlkjflkasjd flkjaslkdjflkajlksj dfl lkasjdf lkjaskldfj "
-                + "lkas dlk lkjsjdfkl; aslkdf lkasjkldjf lka skldf lka sdkjfl;kasjd falksjdfljaslkdjf laskjdfk jalskjd "
-                + "flkj aslkdjflkjkjasljdflkjas jf;lkasjd fjkas dasdf asd fasdf asdf asdmhf lksaiyudfoi jasodfj902384jsdf9 "
-                + "aw90se fisajldkfj lkasj dlkfslkd jflksjadf as",
-                row.get("PROJ_PROP_AUTHOR"));
-            assertEquals("T", row.get("PROJ_PROP_COMPANY"));
-            assertEquals("Standard", row.get("PROJ_INFO_CAL_NAME"));
-            assertEquals("Project1", row.get("PROJ_PROP_TITLE"));
-            byte[] foundBinaryData = row.getBytes("RESERVED_BINARY_DATA");
-            byte[] expectedBinaryData =
-                toByteArray(new File("src/test/data/test2BinData.dat"));
-            assertArrayEquals(expectedBinaryData, foundBinaryData);
-
-            db.close();
+        for (TestDB testDB : TestDB.getSupportedTestDbsForRead(Basename.TEST2)) {
+            try (Database db = testDB.openMem()) {
+                Table table = db.getTable("MSP_PROJECTS");
+                Row row = table.getNextRow();
+                assertEquals("Jon Iles this is a a vawesrasoih aksdkl fas dlkjflkasjd flkjaslkdjflkajlksj dfl lkasjdf lkjaskldfj "
+                    + "lkas dlk lkjsjdfkl; aslkdf lkasjkldjf lka skldf lka sdkjfl;kasjd falksjdfljaslkdjf laskjdfk jalskjd "
+                    + "flkj aslkdjflkjkjasljdflkjas jf;lkasjd fjkas dasdf asd fasdf asdf asdmhf lksaiyudfoi jasodfj902384jsdf9 "
+                    + "aw90se fisajldkfj lkasj dlkfslkd jflksjadf as",
+                    row.get("PROJ_PROP_AUTHOR"));
+                assertEquals("T", row.get("PROJ_PROP_COMPANY"));
+                assertEquals("Standard", row.get("PROJ_INFO_CAL_NAME"));
+                assertEquals("Project1", row.get("PROJ_PROP_TITLE"));
+                byte[] foundBinaryData = row.getBytes("RESERVED_BINARY_DATA");
+                byte[] expectedBinaryData =
+                    toByteArray(new File("src/test/data/test2BinData.dat"));
+                assertArrayEquals(expectedBinaryData, foundBinaryData);
+            }
         }
     }
 
-    public void testWriteLongValue() throws Exception {
+    @ParameterizedTest(name = "[{index}] {0}")
+    @MethodSource("getSupportedFileformats")
+    void testWriteLongValue(FileFormat fileFormat) throws Exception {
 
-        for (FileFormat fileFormat : SUPPORTED_FILEFORMATS) {
-            Database db = createMem(fileFormat);
-
+        try (Database db = createMem(fileFormat)) {
             Table table =
                 new TableBuilder("test")
                     .addColumn(new ColumnBuilder("A", DataType.TEXT))
@@ -109,14 +106,13 @@ public class LongValueTest extends TestCase {
             assertNull(row.get("A"));
             assertNull(row.get("B"));
             assertNull(row.getBytes("C"));
-
-            db.close();
         }
     }
 
-    public void testManyMemos() throws Exception {
-        for (FileFormat fileFormat : SUPPORTED_FILEFORMATS) {
-            Database db = createMem(fileFormat);
+    @ParameterizedTest(name = "[{index}] {0}")
+    @MethodSource("getSupportedFileformats")
+    void testManyMemos(FileFormat fileFormat) throws Exception {
+        try (Database db = createMem(fileFormat)) {
             final int numColumns = 126;
             TableBuilder bigTableBuilder = new TableBuilder("test");
 
@@ -170,14 +166,13 @@ public class LongValueTest extends TestCase {
                 Object[] expectedRow = expIter.next();
                 assertEquals(Arrays.asList(expectedRow), new ArrayList<>(row.values()));
             }
-
-            db.close();
         }
     }
 
-    public void testLongValueAsMiddleColumn() throws Exception {
-        for (FileFormat fileFormat : SUPPORTED_FILEFORMATS) {
-            Database db = createMem(fileFormat);
+    @ParameterizedTest(name = "[{index}] {0}")
+    @MethodSource("getSupportedFileformats")
+    void testLongValueAsMiddleColumn(FileFormat fileFormat) throws Exception {
+        try (Database db = createMem(fileFormat)) {
             Table newTable = new TableBuilder("NewTable")
                 .addColumn(new ColumnBuilder("a").withSqlType(Types.INTEGER))
                 .addColumn(new ColumnBuilder("b").withSqlType(Types.LONGVARCHAR))
@@ -193,58 +188,55 @@ public class LongValueTest extends TestCase {
             assertEquals(1, readRow.get("a"));
             assertEquals(lval, readRow.get("b"));
             assertEquals(tval, readRow.get("c"));
-
-            db.close();
         }
     }
 
-    public void testUnicodeCompression() throws Exception {
+    @Test
+    void testUnicodeCompression() throws Exception {
         File dbFile = new File("src/test/data/V2003/testUnicodeCompV2003.mdb");
-        Database db = open(Database.FileFormat.V2003, dbFile, true);
+        try (Database db = open(FileFormat.V2003, dbFile, true)) {
+            StringBuilder sb = new StringBuilder(127);
+            for (int i = 1; i <= 0xFF; ++i) {
+                sb.append((char) i);
+            }
+            String longStr = sb.toString();
 
-        StringBuilder sb = new StringBuilder(127);
-        for (int i = 1; i <= 0xFF; ++i) {
-            sb.append((char) i);
+            String[] expectedStrs = {
+                "only ascii chars",
+                "\u00E4\u00E4kk\u00F6si\u00E4",
+                "\u041C\u0438\u0440",
+                "\u03F0\u03B1\u1F76 \u03C4\u1F79\u03C4' \u1F10\u03B3\u1F7C \u039A\u1F7B\u03F0\u03BB\u03C9\u03C0\u03B1",
+                "\u6F22\u5B57\u4EEE\u540D\u4EA4\u3058\u308A\u6587",
+                "3L9\u001D52\u0002_AB(\u00A5\u0005!!V",
+                "\u00FCmlaut",
+                longStr};
+
+            Table t = db.getTable("Table");
+            for (Row row : t) {
+                int id = (Integer) row.get("ID");
+                String str = (String) row.get("Unicode");
+                assertEquals(expectedStrs[id - 1], str);
+            }
+
+            ColumnImpl col = (ColumnImpl) t.getColumn("Unicode");
+
+            ByteBuffer bb = col.write(longStr, 1000);
+
+            assertEquals(longStr.length() + 2, bb.remaining());
+
+            byte[] bytes = new byte[bb.remaining()];
+            bb.get(bytes);
+            assertEquals(longStr, col.read(bytes));
+
+            longStr = longStr.replace('a', '\u0440');
+
+            bb = col.write(longStr, 1000);
+
+            assertEquals(longStr.length() * 2, bb.remaining());
+
+            bytes = new byte[bb.remaining()];
+            bb.get(bytes);
+            assertEquals(longStr, col.read(bytes));
         }
-        String longStr = sb.toString();
-
-        String[] expectedStrs = {
-            "only ascii chars",
-            "\u00E4\u00E4kk\u00F6si\u00E4",
-            "\u041C\u0438\u0440",
-            "\u03F0\u03B1\u1F76 \u03C4\u1F79\u03C4' \u1F10\u03B3\u1F7C \u039A\u1F7B\u03F0\u03BB\u03C9\u03C0\u03B1",
-            "\u6F22\u5B57\u4EEE\u540D\u4EA4\u3058\u308A\u6587",
-            "3L9\u001D52\u0002_AB(\u00A5\u0005!!V",
-            "\u00FCmlaut",
-            longStr};
-
-        Table t = db.getTable("Table");
-        for (Row row : t) {
-            int id = (Integer) row.get("ID");
-            String str = (String) row.get("Unicode");
-            assertEquals(expectedStrs[id - 1], str);
-        }
-
-        ColumnImpl col = (ColumnImpl) t.getColumn("Unicode");
-
-        ByteBuffer bb = col.write(longStr, 1000);
-
-        assertEquals(longStr.length() + 2, bb.remaining());
-
-        byte[] bytes = new byte[bb.remaining()];
-        bb.get(bytes);
-        assertEquals(longStr, col.read(bytes));
-
-        longStr = longStr.replace('a', '\u0440');
-
-        bb = col.write(longStr, 1000);
-
-        assertEquals(longStr.length() * 2, bb.remaining());
-
-        bytes = new byte[bb.remaining()];
-        bb.get(bytes);
-        assertEquals(longStr, col.read(bytes));
-
-        db.close();
     }
 }

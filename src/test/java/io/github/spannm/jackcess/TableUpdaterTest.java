@@ -17,13 +17,14 @@ limitations under the License.
 package io.github.spannm.jackcess;
 
 import static io.github.spannm.jackcess.DatabaseBuilder.*;
-import static io.github.spannm.jackcess.TestUtil.create;
-import static io.github.spannm.jackcess.impl.JetFormatTest.SUPPORTED_FILEFORMATS;
+import static io.github.spannm.jackcess.test.TestUtil.create;
 
 import io.github.spannm.jackcess.Database.FileFormat;
 import io.github.spannm.jackcess.impl.DatabaseImpl;
 import io.github.spannm.jackcess.impl.TableImpl;
-import junit.framework.TestCase;
+import io.github.spannm.jackcess.test.AbstractBaseTest;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
 
 import java.util.*;
 
@@ -31,49 +32,37 @@ import java.util.*;
  *
  * @author James Ahlborn
  */
-public class TableUpdaterTest extends TestCase {
+class TableUpdaterTest extends AbstractBaseTest {
 
-    public TableUpdaterTest(String name) {
-        super(name);
-    }
-
-    public void testTableUpdating() throws Exception {
-        for (FileFormat fileFormat : SUPPORTED_FILEFORMATS) {
-            Database db = create(fileFormat);
-
+    @ParameterizedTest(name = "[{index}] {0}")
+    @MethodSource("getSupportedFileformats")
+    void testTableUpdating(FileFormat fileFormat) throws Exception {
+        try (Database db = create(fileFormat)) {
             doTestUpdating(db, false, true, null);
-
-            db.close();
         }
     }
 
-    public void testTableUpdatingOneToOne() throws Exception {
-        for (FileFormat fileFormat : SUPPORTED_FILEFORMATS) {
-            Database db = create(fileFormat);
-
+    @ParameterizedTest(name = "[{index}] {0}")
+    @MethodSource("getSupportedFileformats")
+    void testTableUpdatingOneToOne(FileFormat fileFormat) throws Exception {
+        try (Database db = create(fileFormat)) {
             doTestUpdating(db, true, true, null);
-
-            db.close();
         }
     }
 
-    public void testTableUpdatingNoEnforce() throws Exception {
-        for (FileFormat fileFormat : SUPPORTED_FILEFORMATS) {
-            Database db = create(fileFormat);
-
+    @ParameterizedTest(name = "[{index}] {0}")
+    @MethodSource("getSupportedFileformats")
+    void testTableUpdatingNoEnforce(FileFormat fileFormat) throws Exception {
+        try (Database db = create(fileFormat)) {
             doTestUpdating(db, false, false, null);
-
-            db.close();
         }
     }
 
-    public void testTableUpdatingNamedRelationship() throws Exception {
-        for (FileFormat fileFormat : SUPPORTED_FILEFORMATS) {
-            Database db = create(fileFormat);
-
+    @ParameterizedTest(name = "[{index}] {0}")
+    @MethodSource("getSupportedFileformats")
+    void testTableUpdatingNamedRelationship(FileFormat fileFormat) throws Exception {
+        try (Database db = create(fileFormat)) {
             doTestUpdating(db, false, true, "FKnun3jvv47l9kyl74h85y8a0if");
-
-            db.close();
         }
     }
 
@@ -188,10 +177,10 @@ public class TableUpdaterTest extends TestCase {
         }
     }
 
-    public void testInvalidUpdate() throws Exception {
-        for (FileFormat fileFormat : SUPPORTED_FILEFORMATS) {
-            Database db = create(fileFormat);
-
+    @ParameterizedTest(name = "[{index}] {0}")
+    @MethodSource("getSupportedFileformats")
+    void testInvalidUpdate(FileFormat fileFormat) throws Exception {
+        try (Database db = create(fileFormat)) {
             Table t1 = newTable("TestTable")
                 .addColumn(newColumn("id", DataType.LONG))
                 .toTable(db);
@@ -224,15 +213,13 @@ public class TableUpdaterTest extends TestCase {
             } catch (IllegalArgumentException e) {
                 // success
             }
-
-            db.close();
         }
     }
 
-    public void testUpdateLargeTableDef() throws Exception {
-        for (FileFormat fileFormat : SUPPORTED_FILEFORMATS) {
-            Database db = create(fileFormat);
-
+    @ParameterizedTest(name = "[{index}] {0}")
+    @MethodSource("getSupportedFileformats")
+    void testUpdateLargeTableDef(FileFormat fileFormat) throws Exception {
+        try (Database db = create(fileFormat)) {
             final int numColumns = 89;
 
             Table t = newTable("test")
@@ -261,8 +248,6 @@ public class TableUpdaterTest extends TestCase {
 
             t.reset();
             assertEquals(expectedRowData, t.getNextRow());
-
-            db.close();
         }
     }
 }

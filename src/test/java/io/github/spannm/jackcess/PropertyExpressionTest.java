@@ -18,15 +18,17 @@ package io.github.spannm.jackcess;
 
 import static io.github.spannm.jackcess.DatabaseBuilder.newColumn;
 import static io.github.spannm.jackcess.DatabaseBuilder.newTable;
-import static io.github.spannm.jackcess.TestUtil.*;
-import static io.github.spannm.jackcess.impl.JetFormatTest.SUPPORTED_FILEFORMATS;
+import static io.github.spannm.jackcess.test.TestUtil.*;
 
 import io.github.spannm.jackcess.Database.FileFormat;
 import io.github.spannm.jackcess.expr.*;
 import io.github.spannm.jackcess.impl.expr.DefaultFunctions;
 import io.github.spannm.jackcess.impl.expr.FunctionSupport;
 import io.github.spannm.jackcess.impl.expr.ValueSupport;
-import junit.framework.TestCase;
+import io.github.spannm.jackcess.test.AbstractBaseTest;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -39,15 +41,12 @@ import javax.script.SimpleBindings;
  *
  * @author James Ahlborn
  */
-public class PropertyExpressionTest extends TestCase {
+class PropertyExpressionTest extends AbstractBaseTest {
 
-    public PropertyExpressionTest(String name) {
-        super(name);
-    }
-
-    public void testDefaultValue() throws Exception {
-        for (FileFormat fileFormat : SUPPORTED_FILEFORMATS) {
-            Database db = create(fileFormat);
+    @ParameterizedTest(name = "[{index}] {0}")
+    @MethodSource("getSupportedFileformats")
+    void testDefaultValue(FileFormat fileFormat) throws Exception {
+        try (Database db = create(fileFormat)) {
             db.setEvaluateExpressions(true);
 
             Table t = newTable("test")
@@ -103,57 +102,56 @@ public class PropertyExpressionTest extends TestCase {
                     "data2", 42));
 
             assertTable(expectedRows, t);
-
-            db.close();
         }
     }
 
-    public void testCalculatedValue() throws Exception {
-        Database db = create(FileFormat.V2016);
-        db.setEvaluateExpressions(true);
+    @Test
+    void testCalculatedValue() throws Exception {
+        try (Database db = create(FileFormat.V2016)) {
+            db.setEvaluateExpressions(true);
 
-        Table t = newTable("test")
-            .addColumn(newColumn("id", DataType.LONG).withAutoNumber(true))
-            .addColumn(newColumn("c1", DataType.LONG)
-                .withCalculatedInfo("[c2]+[c3]"))
-            .addColumn(newColumn("c2", DataType.LONG)
-                .withCalculatedInfo("[c3]*5"))
-            .addColumn(newColumn("c3", DataType.LONG)
-                .withCalculatedInfo("[c4]-6"))
-            .addColumn(newColumn("c4", DataType.LONG))
-            .toTable(db);
+            Table t = newTable("test")
+                .addColumn(newColumn("id", DataType.LONG).withAutoNumber(true))
+                .addColumn(newColumn("c1", DataType.LONG)
+                    .withCalculatedInfo("[c2]+[c3]"))
+                .addColumn(newColumn("c2", DataType.LONG)
+                    .withCalculatedInfo("[c3]*5"))
+                .addColumn(newColumn("c3", DataType.LONG)
+                    .withCalculatedInfo("[c4]-6"))
+                .addColumn(newColumn("c4", DataType.LONG))
+                .toTable(db);
 
-        t.addRow(Column.AUTO_NUMBER, null, null, null, 16);
+            t.addRow(Column.AUTO_NUMBER, null, null, null, 16);
 
-        setProp(t, "c1", PropertyMap.EXPRESSION_PROP, "[c4]+2");
-        setProp(t, "c2", PropertyMap.EXPRESSION_PROP, "[c1]+[c3]");
-        setProp(t, "c3", PropertyMap.EXPRESSION_PROP, "[c1]*7");
+            setProp(t, "c1", PropertyMap.EXPRESSION_PROP, "[c4]+2");
+            setProp(t, "c2", PropertyMap.EXPRESSION_PROP, "[c1]+[c3]");
+            setProp(t, "c3", PropertyMap.EXPRESSION_PROP, "[c1]*7");
 
-        t.addRow(Column.AUTO_NUMBER, null, null, null, 7);
+            t.addRow(Column.AUTO_NUMBER, null, null, null, 7);
 
-        List<Row> expectedRows =
-            createExpectedTable(
-                createExpectedRow(
-                    "id", 1,
-                    "c1", 60,
-                    "c2", 50,
-                    "c3", 10,
-                    "c4", 16),
-                createExpectedRow(
-                    "id", 2,
-                    "c1", 9,
-                    "c2", 72,
-                    "c3", 63,
-                    "c4", 7));
+            List<Row> expectedRows =
+                createExpectedTable(
+                    createExpectedRow(
+                        "id", 1,
+                        "c1", 60,
+                        "c2", 50,
+                        "c3", 10,
+                        "c4", 16),
+                    createExpectedRow(
+                        "id", 2,
+                        "c1", 9,
+                        "c2", 72,
+                        "c3", 63,
+                        "c4", 7));
 
-        assertTable(expectedRows, t);
-
-        db.close();
+            assertTable(expectedRows, t);
+        }
     }
 
-    public void testColumnValidator() throws Exception {
-        for (FileFormat fileFormat : SUPPORTED_FILEFORMATS) {
-            Database db = create(fileFormat);
+    @ParameterizedTest(name = "[{index}] {0}")
+    @MethodSource("getSupportedFileformats")
+    void testColumnValidator(FileFormat fileFormat) throws Exception {
+        try (Database db = create(fileFormat)) {
             db.setEvaluateExpressions(true);
 
             Table t = newTable("test")
@@ -218,14 +216,13 @@ public class PropertyExpressionTest extends TestCase {
                         "data2", 9));
 
             assertTable(expectedRows, t);
-
-            db.close();
         }
     }
 
-    public void testRowValidator() throws Exception {
-        for (FileFormat fileFormat : SUPPORTED_FILEFORMATS) {
-            Database db = create(fileFormat);
+    @ParameterizedTest(name = "[{index}] {0}")
+    @MethodSource("getSupportedFileformats")
+    void testRowValidator(FileFormat fileFormat) throws Exception {
+        try (Database db = create(fileFormat)) {
             db.setEvaluateExpressions(true);
 
             Table t = newTable("test")
@@ -279,12 +276,12 @@ public class PropertyExpressionTest extends TestCase {
                         "data2", 9));
 
             assertTable(expectedRows, t);
-
-            db.close();
         }
     }
 
-    public void testCustomEvalConfig() throws Exception {
+    @ParameterizedTest(name = "[{index}] {0}")
+    @MethodSource("getSupportedFileformats")
+    void testCustomEvalConfig(FileFormat fileFormat) throws Exception {
         TemporalConfig tempConf = new TemporalConfig("[uuuu/]M/d",
             "uuuu-MMM-d",
             "hh.mm.ss a",
@@ -301,9 +298,7 @@ public class PropertyExpressionTest extends TestCase {
         Bindings bindings = new SimpleBindings();
         bindings.put("someKey", "someVal");
 
-        for (FileFormat fileFormat : SUPPORTED_FILEFORMATS) {
-            Database db = create(fileFormat);
-
+        try (Database db = create(fileFormat)) {
             EvalConfig ec = db.getEvalConfig();
             ec.setTemporalConfig(tempConf);
             ec.setFunctionLookup(lookup);
@@ -334,8 +329,6 @@ public class PropertyExpressionTest extends TestCase {
                 .matches("\\d{4}/\\d{1,2}/\\d{1,2}"));
             assertTrue(((String) row.get("data3"))
                 .matches("\\d{2}.\\d{2}.\\d{2} (AM|PM)"));
-
-            db.close();
         }
     }
 

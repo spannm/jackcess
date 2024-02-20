@@ -16,12 +16,13 @@ limitations under the License.
 
 package io.github.spannm.jackcess.impl;
 
-import static io.github.spannm.jackcess.TestUtil.*;
+import static io.github.spannm.jackcess.test.TestUtil.*;
 
 import io.github.spannm.jackcess.*;
-import io.github.spannm.jackcess.impl.JetFormatTest.Basename;
-import io.github.spannm.jackcess.impl.JetFormatTest.TestDB;
-import junit.framework.TestCase;
+import io.github.spannm.jackcess.test.AbstractBaseTest;
+import io.github.spannm.jackcess.test.Basename;
+import io.github.spannm.jackcess.test.TestDB;
+import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
 import java.util.Iterator;
@@ -32,102 +33,98 @@ import java.util.Map;
  *
  * @author James Ahlborn
  */
-public class FKEnforcerTest extends TestCase {
+class FKEnforcerTest extends AbstractBaseTest {
 
-    public FKEnforcerTest(String name) {
-        super(name);
-    }
+    @Test
+    void testNoEnforceForeignKeys() throws Exception {
+        for (TestDB testDB : TestDB.getSupportedTestDbs(Basename.INDEX)) {
 
-    public void testNoEnforceForeignKeys() throws Exception {
-        for (TestDB testDB : TestDB.getSupportedForBasename(Basename.INDEX)) {
+            try (Database db = testDB.openCopy()) {
+                db.setEnforceForeignKeys(false);
+                Table t1 = db.getTable("Table1");
+                Table t2 = db.getTable("Table2");
+                Table t3 = db.getTable("Table3");
 
-            Database db = openCopy(testDB);
-            db.setEnforceForeignKeys(false);
-            Table t1 = db.getTable("Table1");
-            Table t2 = db.getTable("Table2");
-            Table t3 = db.getTable("Table3");
+                t1.addRow(20, 0, 20, "some data", 20);
 
-            t1.addRow(20, 0, 20, "some data", 20);
+                Cursor c = CursorBuilder.createCursor(t2);
+                c.moveToNextRow();
+                c.updateCurrentRow(30, "foo30");
 
-            Cursor c = CursorBuilder.createCursor(t2);
-            c.moveToNextRow();
-            c.updateCurrentRow(30, "foo30");
-
-            c = CursorBuilder.createCursor(t3);
-            c.moveToNextRow();
-            c.deleteCurrentRow();
-
-            db.close();
+                c = CursorBuilder.createCursor(t3);
+                c.moveToNextRow();
+                c.deleteCurrentRow();
+            }
         }
 
     }
 
-    public void testEnforceForeignKeys() throws Exception {
-        for (TestDB testDB : TestDB.getSupportedForBasename(Basename.INDEX)) {
+    @Test
+    void testEnforceForeignKeys() throws Exception {
+        for (TestDB testDB : TestDB.getSupportedTestDbs(Basename.INDEX)) {
 
-            Database db = openCopy(testDB);
-            db.setEvaluateExpressions(false);
-            Table t1 = db.getTable("Table1");
-            Table t2 = db.getTable("Table2");
-            Table t3 = db.getTable("Table3");
+            try (Database db = testDB.openCopy()) {
+                db.setEvaluateExpressions(false);
+                Table t1 = db.getTable("Table1");
+                Table t2 = db.getTable("Table2");
+                Table t3 = db.getTable("Table3");
 
-            try {
-                t1.addRow(20, 0, 20, "some data", 20);
-                fail("IOException should have been thrown");
-            } catch (IOException ignored) {
-                // success
-                assertTrue(ignored.getMessage().contains("Table1[otherfk2]"));
-            }
+                try {
+                    t1.addRow(20, 0, 20, "some data", 20);
+                    fail("IOException should have been thrown");
+                } catch (IOException ignored) {
+                    // success
+                    assertTrue(ignored.getMessage().contains("Table1[otherfk2]"));
+                }
 
-            try {
-                Cursor c = CursorBuilder.createCursor(t2);
-                c.moveToNextRow();
-                c.updateCurrentRow(30, "foo30");
-                fail("IOException should have been thrown");
-            } catch (IOException ignored) {
-                // success
-                assertTrue(ignored.getMessage().contains("Table2[id]"));
-            }
+                try {
+                    Cursor c = CursorBuilder.createCursor(t2);
+                    c.moveToNextRow();
+                    c.updateCurrentRow(30, "foo30");
+                    fail("IOException should have been thrown");
+                } catch (IOException ignored) {
+                    // success
+                    assertTrue(ignored.getMessage().contains("Table2[id]"));
+                }
 
-            try {
+                try {
+                    Cursor c = CursorBuilder.createCursor(t3);
+                    c.moveToNextRow();
+                    c.deleteCurrentRow();
+                    fail("IOException should have been thrown");
+                } catch (IOException ignored) {
+                    // success
+                    assertTrue(ignored.getMessage().contains("Table3[id]"));
+                }
+
+                t1.addRow(21, null, null, "null fks", null);
+
                 Cursor c = CursorBuilder.createCursor(t3);
-                c.moveToNextRow();
-                c.deleteCurrentRow();
-                fail("IOException should have been thrown");
-            } catch (IOException ignored) {
-                // success
-                assertTrue(ignored.getMessage().contains("Table3[id]"));
+                Column col = t3.getColumn("id");
+                for (Row row : c) {
+                    int id = row.getInt("id");
+                    id += 20;
+                    c.setCurrentRowValue(col, id);
+                }
+
+                List<? extends Map<String, Object>> expectedRows =
+                    createExpectedTable(
+                        createT1Row(0, 0, 30, "baz0", 0),
+                        createT1Row(1, 1, 31, "baz11", 0),
+                        createT1Row(2, 1, 31, "baz11-2", 0),
+                        createT1Row(3, 2, 33, "baz13", 0),
+                        createT1Row(21, null, null, "null fks", null));
+
+                assertTable(expectedRows, t1);
+
+                c = CursorBuilder.createCursor(t2);
+                for (Iterator<?> iter = c.iterator(); iter.hasNext();) {
+                    iter.next();
+                    iter.remove();
+                }
+
+                assertEquals(1, t1.getRowCount());
             }
-
-            t1.addRow(21, null, null, "null fks", null);
-
-            Cursor c = CursorBuilder.createCursor(t3);
-            Column col = t3.getColumn("id");
-            for (Row row : c) {
-                int id = row.getInt("id");
-                id += 20;
-                c.setCurrentRowValue(col, id);
-            }
-
-            List<? extends Map<String, Object>> expectedRows =
-                createExpectedTable(
-                    createT1Row(0, 0, 30, "baz0", 0),
-                    createT1Row(1, 1, 31, "baz11", 0),
-                    createT1Row(2, 1, 31, "baz11-2", 0),
-                    createT1Row(3, 2, 33, "baz13", 0),
-                    createT1Row(21, null, null, "null fks", null));
-
-            assertTable(expectedRows, t1);
-
-            c = CursorBuilder.createCursor(t2);
-            for (Iterator<?> iter = c.iterator(); iter.hasNext();) {
-                iter.next();
-                iter.remove();
-            }
-
-            assertEquals(1, t1.getRowCount());
-
-            db.close();
         }
 
     }

@@ -16,12 +16,13 @@ limitations under the License.
 
 package io.github.spannm.jackcess.util;
 
-import static io.github.spannm.jackcess.TestUtil.*;
-import static io.github.spannm.jackcess.impl.JetFormatTest.SUPPORTED_FILEFORMATS;
+import static io.github.spannm.jackcess.test.TestUtil.*;
 
 import io.github.spannm.jackcess.*;
 import io.github.spannm.jackcess.Database.FileFormat;
-import junit.framework.TestCase;
+import io.github.spannm.jackcess.test.AbstractBaseTest;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
 
 import java.util.List;
 import java.util.Map;
@@ -30,16 +31,12 @@ import java.util.Map;
  *
  * @author James Ahlborn
  */
-public class ColumnValidatorTest extends TestCase {
+class ColumnValidatorTest extends AbstractBaseTest {
 
-    public ColumnValidatorTest(String name) {
-        super(name);
-    }
-
-    public void testValidate() throws Exception {
-        for (FileFormat fileFormat : SUPPORTED_FILEFORMATS) {
-            Database db = create(fileFormat);
-
+    @ParameterizedTest(name = "[{index}] {0}")
+    @MethodSource("getSupportedFileformats")
+    void testValidate(FileFormat fileFormat) throws Exception {
+        try (Database db = create(fileFormat)) {
             ColumnValidatorFactory initFact = db.getColumnValidatorFactory();
             assertNotNull(initFact);
 
@@ -189,8 +186,6 @@ public class ColumnValidatorTest extends TestCase {
 
             assertEquals(createExpectedRow("id", 3, "data", "row3", "num", 0),
                 pkCursor.getCurrentRow());
-
-            db.close();
         }
     }
 }

@@ -16,12 +16,13 @@ limitations under the License.
 
 package io.github.spannm.jackcess.util;
 
-import static io.github.spannm.jackcess.TestUtil.*;
-import static io.github.spannm.jackcess.impl.JetFormatTest.SUPPORTED_FILEFORMATS;
+import static io.github.spannm.jackcess.test.TestUtil.*;
 
 import io.github.spannm.jackcess.*;
 import io.github.spannm.jackcess.Database.FileFormat;
-import junit.framework.TestCase;
+import io.github.spannm.jackcess.test.AbstractBaseTest;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -31,16 +32,12 @@ import java.nio.file.Path;
  *
  * @author James Ahlborn
  */
-public class CustomLinkResolverTest extends TestCase {
+class CustomLinkResolverTest extends AbstractBaseTest {
 
-    public CustomLinkResolverTest(String name) {
-        super(name);
-    }
-
-    public void testCustomLinkResolver() throws Exception {
-        for (FileFormat fileFormat : SUPPORTED_FILEFORMATS) {
-            Database db = create(fileFormat);
-
+    @ParameterizedTest(name = "[{index}] {0}")
+    @MethodSource("getSupportedFileformats")
+    void testCustomLinkResolver(FileFormat fileFormat) throws Exception {
+        try (Database db = create(fileFormat)) {
             db.setLinkResolver(new TestLinkResolver());
 
             db.createLinkedTable("Table1", "testFile1.txt", "Table1");
@@ -80,8 +77,6 @@ public class CustomLinkResolverTest extends TestCase {
             } catch (FileNotFoundException e) {
                 // success
             }
-
-            db.close();
         }
     }
 

@@ -16,10 +16,9 @@ limitations under the License.
 
 package io.github.spannm.jackcess.util;
 
-import static org.junit.Assert.assertArrayEquals;
-
-import io.github.spannm.jackcess.TestUtil;
-import junit.framework.TestCase;
+import io.github.spannm.jackcess.test.AbstractBaseTest;
+import io.github.spannm.jackcess.test.TestUtil;
+import org.junit.jupiter.api.Test;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -32,13 +31,10 @@ import java.nio.channels.NonWritableChannelException;
  *
  * @author James Ahlborn
  */
-public class MemFileChannelTest extends TestCase {
+class MemFileChannelTest extends AbstractBaseTest {
 
-    public MemFileChannelTest(String name) {
-        super(name);
-    }
-
-    public void testReadOnlyChannel() throws Exception {
+    @Test
+    void testReadOnlyChannel() throws Exception {
         File testFile = new File("src/test/data/V1997/compIndexTestV1997.mdb");
         MemFileChannel ch = MemFileChannel.newChannel(testFile, "r");
         assertEquals(testFile.length(), ch.size());
@@ -72,7 +68,8 @@ public class MemFileChannelTest extends TestCase {
         ch.close();
     }
 
-    public void testChannel() throws Exception {
+    @Test
+    void testChannel() throws Exception {
         ByteBuffer bb = ByteBuffer.allocate(1024);
 
         MemFileChannel ch = MemFileChannel.newChannel();

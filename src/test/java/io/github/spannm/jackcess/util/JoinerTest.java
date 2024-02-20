@@ -16,17 +16,17 @@ limitations under the License.
 
 package io.github.spannm.jackcess.util;
 
-import static io.github.spannm.jackcess.TestUtil.*;
-import static org.junit.Assert.assertNotEquals;
+import static io.github.spannm.jackcess.test.TestUtil.*;
 
 import io.github.spannm.jackcess.Database;
 import io.github.spannm.jackcess.Index;
 import io.github.spannm.jackcess.Row;
 import io.github.spannm.jackcess.Table;
-import io.github.spannm.jackcess.impl.JetFormatTest.Basename;
-import io.github.spannm.jackcess.impl.JetFormatTest.TestDB;
 import io.github.spannm.jackcess.impl.RowImpl;
-import junit.framework.TestCase;
+import io.github.spannm.jackcess.test.AbstractBaseTest;
+import io.github.spannm.jackcess.test.Basename;
+import io.github.spannm.jackcess.test.TestDB;
+import org.junit.jupiter.api.Test;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -35,16 +35,13 @@ import java.util.stream.Collectors;
  *
  * @author James Ahlborn
  */
-public class JoinerTest extends TestCase {
+class JoinerTest extends AbstractBaseTest {
 
-    public JoinerTest(String name) {
-        super(name);
-    }
+    @Test
+    void testJoiner() throws Exception {
+        for (TestDB testDB : TestDB.getSupportedTestDbs(Basename.INDEX)) {
 
-    public void testJoiner() throws Exception {
-        for (TestDB testDB : TestDB.getSupportedForBasename(Basename.INDEX)) {
-
-            try (Database db = openCopy(testDB)) {
+            try (Database db = testDB.openCopy()) {
                 Table t1 = db.getTable("Table1");
                 Table t2 = db.getTable("Table2");
                 Table t3 = db.getTable("Table3");

@@ -14,15 +14,19 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package io.github.spannm.jackcess;
+package io.github.spannm.jackcess.impl;
 
-import static org.junit.Assert.assertArrayEquals;
-
+import io.github.spannm.jackcess.*;
 import io.github.spannm.jackcess.Database.FileFormat;
-import io.github.spannm.jackcess.impl.*;
-import io.github.spannm.jackcess.impl.JetFormatTest.Basename;
-import io.github.spannm.jackcess.impl.JetFormatTest.TestDB;
-import junit.framework.TestCase;
+import io.github.spannm.jackcess.test.AbstractBaseTest;
+import io.github.spannm.jackcess.test.Basename;
+import io.github.spannm.jackcess.test.TestDB;
+import io.github.spannm.jackcess.test.TestUtil;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
 
 import java.io.IOException;
 import java.util.*;
@@ -30,23 +34,20 @@ import java.util.*;
 /**
  * @author James Ahlborn
  */
-public class IndexTest extends TestCase {
+class IndexTest extends AbstractBaseTest {
 
-    public IndexTest(String name) {
-        super(name);
+    @BeforeEach
+    void setAutoSyncOff() {
+        setTestAutoSync(false);
     }
 
-    @Override
-    protected void setUp() {
-        TestUtil.setTestAutoSync(false);
+    @AfterEach
+    void clearAutoSync() {
+        clearTestAutoSync();
     }
 
-    @Override
-    protected void tearDown() {
-        TestUtil.clearTestAutoSync();
-    }
-
-    public void testByteOrder() {
+    @Test
+    void testByteOrder() {
         byte b1 = (byte) 0x00;
         byte b2 = (byte) 0x01;
         byte b3 = (byte) 0x7F;
@@ -59,7 +60,8 @@ public class IndexTest extends TestCase {
         assertTrue(ByteUtil.asUnsignedByte(b4) < ByteUtil.asUnsignedByte(b5));
     }
 
-    public void testByteCodeComparator() {
+    @Test
+    void testByteCodeComparator() {
         byte[] b0 = null;
         byte[] b1 = new byte[] {(byte) 0x00};
         byte[] b2 = new byte[] {(byte) 0x00, (byte) 0x00};
@@ -77,9 +79,10 @@ public class IndexTest extends TestCase {
 
     }
 
-    public void testPrimaryKey() throws Exception {
-        for (TestDB testDB : JetFormatTest.SUPPORTED_DBS_TEST_FOR_READ) {
-            try (Database db = TestUtil.open(testDB)) {
+    @Test
+    void testPrimaryKey() throws Exception {
+        for (TestDB testDB : getSupportedReadOnlyTestDbs()) {
+            try (Database db = testDB.open()) {
                 Table table = db.getTable("Table1");
                 Map<String, Boolean> foundPKs = new HashMap<>();
                 Index pkIndex = null;
@@ -100,9 +103,10 @@ public class IndexTest extends TestCase {
         }
     }
 
-    public void testLogicalIndexes() throws Exception {
-        for (TestDB testDB : TestDB.getSupportedForBasename(Basename.INDEX, true)) {
-            try (Database db = TestUtil.open(testDB)) {
+    @Test
+    void testLogicalIndexes() throws Exception {
+        for (TestDB testDB : TestDB.getSupportedTestDbsForRead(Basename.INDEX)) {
+            try (Database db = testDB.open()) {
                 TableImpl table = (TableImpl) db.getTable("Table1");
                 for (IndexImpl idx : table.getIndexes()) {
                     idx.initialize();
@@ -160,81 +164,79 @@ public class IndexTest extends TestCase {
         }
     }
 
-    public void testComplexIndex() throws Exception {
-        for (TestDB testDB : TestDB.getSupportedForBasename(Basename.COMP_INDEX)) {
-            // this file has an index with "compressed" entries and node pages
-            Database db = TestUtil.open(testDB);
-            TableImpl t = (TableImpl) db.getTable("Table1");
-            IndexImpl index = t.getIndexes().get(0);
-            assertFalse(index.isInitialized());
-            assertEquals(512, TestUtil.countRows(t));
-            assertEquals(512, index.getIndexData().getEntryCount());
-            db.close();
+    @Test
+    void testComplexIndex() throws Exception {
+        for (TestDB testDB : TestDB.getSupportedTestDbs(Basename.COMP_INDEX)) {
+            try (// this file has an index with "compressed" entries and node pages
+            Database db1 = testDB.open()) {
+                TableImpl t1 = (TableImpl) db1.getTable("Table1");
+                IndexImpl idx1 = t1.getIndexes().get(0);
+                assertFalse(idx1.isInitialized());
+                assertEquals(512, TestUtil.countRows(t1));
+                assertEquals(512, idx1.getIndexData().getEntryCount());
+            }
 
-            // copy to temp file and attempt to edit
-            db = TestUtil.openCopy(testDB);
-            t = (TableImpl) db.getTable("Table1");
-            index = t.getIndexes().get(0);
-
-            t.addRow(99, "abc", "def");
-        }
-    }
-
-    public void testEntryDeletion() throws Exception {
-        for (TestDB testDB : JetFormatTest.SUPPORTED_DBS_TEST) {
-            try (Database db = TestUtil.openCopy(testDB)) {
-                Table table = db.getTable("Table1");
-
-                for (int i = 0; i < 10; ++i) {
-                    table.addRow("foo" + i, "bar" + i, (byte) 42 + i, (short) 53 + i, 13 * i,
-                        6.7d / i, null, null, true);
-                }
-                table.reset();
-                TestUtil.assertRowCount(12, table);
-
-                for (Index index : table.getIndexes()) {
-                    assertEquals(12, ((IndexImpl) index).getIndexData().getEntryCount());
-                }
-
-                table.reset();
-                table.getNextRow();
-                table.getNextRow();
-                table.getDefaultCursor().deleteCurrentRow();
-                table.getNextRow();
-                table.getDefaultCursor().deleteCurrentRow();
-                table.getNextRow();
-                table.getNextRow();
-                table.getDefaultCursor().deleteCurrentRow();
-                table.getNextRow();
-                table.getNextRow();
-                table.getNextRow();
-                table.getDefaultCursor().deleteCurrentRow();
-
-                table.reset();
-                TestUtil.assertRowCount(8, table);
-
-                for (Index index : table.getIndexes()) {
-                    assertEquals(8, ((IndexImpl) index).getIndexData().getEntryCount());
-                }
+            try (// copy to temp file and attempt to edit
+            Database db2 = testDB.openCopy()) {
+                TableImpl t2 = (TableImpl) db2.getTable("Table1");
+                t2.addRow(99, "abc", "def");
             }
         }
     }
 
-    public void testIgnoreNulls() throws Exception {
-        for (TestDB testDB : TestDB.getSupportedForBasename(Basename.INDEX_PROPERTIES)) {
-            Database db = TestUtil.openCopy(testDB);
+    @ParameterizedTest(name = "[{index}] {0}")
+    @MethodSource("getSupportedTestDbs")
+    void testEntryDeletion(TestDB testDB) throws Exception {
+        try (Database db = testDB.openCopy()) {
+            Table table = db.getTable("Table1");
 
-            db.setEvaluateExpressions(false);
+            for (int i = 0; i < 10; ++i) {
+                table.addRow("foo" + i, "bar" + i, (byte) 42 + i, (short) 53 + i, 13 * i,
+                    6.7d / i, null, null, true);
+            }
+            table.reset();
+            TestUtil.assertRowCount(12, table);
 
-            doTestIgnoreNulls(db, "TableIgnoreNulls1");
-            doTestIgnoreNulls(db, "TableIgnoreNulls2");
+            for (Index index : table.getIndexes()) {
+                assertEquals(12, ((IndexImpl) index).getIndexData().getEntryCount());
+            }
 
-            db.close();
+            table.reset();
+            table.getNextRow();
+            table.getNextRow();
+            table.getDefaultCursor().deleteCurrentRow();
+            table.getNextRow();
+            table.getDefaultCursor().deleteCurrentRow();
+            table.getNextRow();
+            table.getNextRow();
+            table.getDefaultCursor().deleteCurrentRow();
+            table.getNextRow();
+            table.getNextRow();
+            table.getNextRow();
+            table.getDefaultCursor().deleteCurrentRow();
+
+            table.reset();
+            TestUtil.assertRowCount(8, table);
+
+            for (Index index : table.getIndexes()) {
+                assertEquals(8, ((IndexImpl) index).getIndexData().getEntryCount());
+            }
         }
     }
 
-    private void doTestIgnoreNulls(Database db, String tableName)
-        throws Exception {
+    @Test
+    void testIgnoreNulls() throws Exception {
+        for (TestDB testDB : TestDB.getSupportedTestDbs(Basename.INDEX_PROPERTIES)) {
+            try (Database db = testDB.openCopy()) {
+                db.setEvaluateExpressions(false);
+
+                doTestIgnoreNulls(db, "TableIgnoreNulls1");
+                doTestIgnoreNulls(db, "TableIgnoreNulls2");
+            }
+        }
+    }
+
+    private void doTestIgnoreNulls(Database db, String tableName) throws Exception {
         Table orig = db.getTable(tableName);
         IndexImpl origI = (IndexImpl) orig.getIndex("DataIndex");
         Table temp = db.getTable(tableName + "_temp");
@@ -265,14 +267,14 @@ public class IndexTest extends TestCase {
             Cursor.Position tempCurPos = tempC.getSavepoint().getCurrentPosition();
 
             assertEquals(origRow, tempRow);
-            assertEquals(IndexCodesTest.entryToString(origCurPos),
-                IndexCodesTest.entryToString(tempCurPos));
+            assertEquals(IndexCodesTest.entryToString(origCurPos), IndexCodesTest.entryToString(tempCurPos));
         }
     }
 
-    public void testUnique() throws Exception {
-        for (TestDB testDB : TestDB.getSupportedForBasename(Basename.INDEX_PROPERTIES)) {
-            Database db = TestUtil.openCopy(testDB);
+    @Test
+    void testUnique() throws Exception {
+        for (TestDB testDB : TestDB.getSupportedTestDbs(Basename.INDEX_PROPERTIES)) {
+            Database db = testDB.openCopy();
 
             Table t = db.getTable("TableUnique1_temp");
             Index index = t.getIndex("DataIndex");
@@ -332,9 +334,10 @@ public class IndexTest extends TestCase {
         }
     }
 
-    public void testUniqueEntryCount() throws Exception {
-        for (TestDB testDB : JetFormatTest.SUPPORTED_DBS_TEST) {
-            Database db = TestUtil.openCopy(testDB);
+    @ParameterizedTest(name = "[{index}] {0}")
+    @MethodSource("getSupportedTestDbs")
+    void testUniqueEntryCount(TestDB testDB) throws Exception {
+        try (Database db = testDB.openCopy()) {
             db.setDateTimeType(DateTimeType.DATE);
             Table table = db.getTable("Table1");
             IndexImpl indA = (IndexImpl) table.getIndex("PrimaryKey");
@@ -343,12 +346,10 @@ public class IndexTest extends TestCase {
             assertEquals(2, indA.getUniqueEntryCount());
             assertEquals(2, indB.getUniqueEntryCount());
 
-            List<String> bElems = Arrays.asList(
-                "bar", null, "baz", "argle", null, "bazzle", "37", "bar", "bar", "BAZ");
+            List<String> bElems = Arrays.asList("bar", null, "baz", "argle", null, "bazzle", "37", "bar", "bar", "BAZ");
 
             for (int i = 0; i < 10; ++i) {
-                table.addRow("foo" + i, bElems.get(i), (byte) 42 + i, (short) 53 + i,
-                    13 * i, 6.7d / i, null, null, true);
+                table.addRow("foo" + i, bElems.get(i), (byte) 42 + i, (short) 53 + i, 13 * i, 6.7d / i, null, null, true);
             }
 
             assertEquals(12, indA.getIndexData().getEntryCount());
@@ -376,7 +377,7 @@ public class IndexTest extends TestCase {
 
             final Row row = c.getCurrentRow();
             // Row order is arbitrary, so v2007 row order difference is valid
-            if (testDB.getExpectedFileFormat().ordinal() >= Database.FileFormat.V2007.ordinal()) {
+            if (testDB.getExpectedFileFormat().ordinal() >= FileFormat.V2007.ordinal()) {
                 TestUtil.checkTestDBTable1RowA(testDB, table, row);
             } else {
                 TestUtil.checkTestDBTable1RowABCDEFG(testDB, table, row);
@@ -388,14 +389,13 @@ public class IndexTest extends TestCase {
 
             assertEquals(12, indA.getUniqueEntryCount());
             assertEquals(8, indB.getUniqueEntryCount());
-
-            db.close();
         }
     }
 
-    public void testReplId() throws Exception {
-        for (TestDB testDB : JetFormatTest.SUPPORTED_DBS_TEST) {
-            Database db = TestUtil.openCopy(testDB);
+    @ParameterizedTest(name = "[{index}] {0}")
+    @MethodSource("getSupportedTestDbs")
+    void testReplId(TestDB testDB) throws Exception {
+        try (Database db = testDB.openCopy()) {
             Table table = db.getTable("Table4");
 
             for (int i = 0; i < 20; ++i) {
@@ -403,15 +403,13 @@ public class IndexTest extends TestCase {
             }
 
             assertEquals(20, table.getRowCount());
-
-            db.close();
         }
     }
 
-    public void testIndexCreation() throws Exception {
-        for (FileFormat fileFormat : JetFormatTest.SUPPORTED_FILEFORMATS) {
-            Database db = TestUtil.create(fileFormat);
-
+    @ParameterizedTest(name = "[{index}] {0}")
+    @MethodSource("getSupportedFileformats")
+    void testIndexCreation(FileFormat fileFormat) throws Exception {
+        try (Database db = TestUtil.create(fileFormat)) {
             Table t = DatabaseBuilder.newTable("TestTable")
                 .addColumn(DatabaseBuilder.newColumn("id", DataType.LONG))
                 .addColumn(DatabaseBuilder.newColumn("data", DataType.TEXT))
@@ -446,10 +444,10 @@ public class IndexTest extends TestCase {
         }
     }
 
-    public void testIndexCreationSharedData() throws Exception {
-        for (FileFormat fileFormat : JetFormatTest.SUPPORTED_FILEFORMATS) {
-            Database db = TestUtil.create(fileFormat);
-
+    @ParameterizedTest(name = "[{index}] {0}")
+    @MethodSource("getSupportedFileformats")
+    void testIndexCreationSharedData(FileFormat fileFormat) throws Exception {
+        try (Database db = TestUtil.create(fileFormat)) {
             Table t = DatabaseBuilder.newTable("TestTable")
                 .addColumn(DatabaseBuilder.newColumn("id", DataType.LONG))
                 .addColumn(DatabaseBuilder.newColumn("data", DataType.TEXT))
@@ -495,9 +493,10 @@ public class IndexTest extends TestCase {
         }
     }
 
-    public void testGetForeignKeyIndex() throws Exception {
-        for (TestDB testDB : TestDB.getSupportedForBasename(Basename.INDEX, true)) {
-            try (Database db = TestUtil.open(testDB)) {
+    @Test
+    void testGetForeignKeyIndex() throws Exception {
+        for (TestDB testDB : TestDB.getSupportedTestDbsForRead(Basename.INDEX)) {
+            try (Database db = testDB.open()) {
                 Table t1 = db.getTable("Table1");
                 Table t2 = db.getTable("Table2");
                 Table t3 = db.getTable("Table3");
@@ -527,10 +526,11 @@ public class IndexTest extends TestCase {
         }
     }
 
-    public void testConstraintViolation() throws Exception {
-        for (FileFormat fileFormat : JetFormatTest.SUPPORTED_FILEFORMATS) {
-            Database db = TestUtil.create(fileFormat);
+    @ParameterizedTest(name = "[{index}] {0}")
+    @MethodSource("getSupportedFileformats")
+    void testConstraintViolation(FileFormat fileFormat) throws Exception {
 
+        try (Database db = TestUtil.create(fileFormat)) {
             Table t = DatabaseBuilder.newTable("TestTable")
                 .addColumn(DatabaseBuilder.newColumn("id", DataType.LONG))
                 .addColumn(DatabaseBuilder.newColumn("data", DataType.TEXT))
@@ -608,15 +608,13 @@ public class IndexTest extends TestCase {
             TestUtil.assertCursor(expectedRows, pkCursor);
 
             TestUtil.assertCursor(expectedRows, CursorBuilder.createCursor(t.getIndex("data_ind")));
-
-            db.close();
         }
     }
 
-    public void testAutoNumberRecover() throws Exception {
-        for (FileFormat fileFormat : JetFormatTest.SUPPORTED_FILEFORMATS) {
-            Database db = TestUtil.create(fileFormat);
-
+    @ParameterizedTest(name = "[{index}] {0}")
+    @MethodSource("getSupportedFileformats")
+    void testAutoNumberRecover(FileFormat fileFormat) throws Exception {
+        try (Database db = TestUtil.create(fileFormat)) {
             Table t = DatabaseBuilder.newTable("TestTable")
                 .addColumn(DatabaseBuilder.newColumn("id", DataType.LONG).withAutoNumber(true))
                 .addColumn(DatabaseBuilder.newColumn("data", DataType.TEXT))
@@ -675,14 +673,14 @@ public class IndexTest extends TestCase {
             TestUtil.assertCursor(expectedRows, pkCursor);
 
             TestUtil.assertCursor(expectedRows, CursorBuilder.createCursor(t.getIndex("data_ind")));
-
-            db.close();
         }
+
     }
 
-    public void testBinaryIndex() throws Exception {
-        for (TestDB testDB : TestDB.getSupportedForBasename(Basename.BINARY_INDEX)) {
-            Database db = TestUtil.open(testDB);
+    @Test
+    void testBinaryIndex() throws Exception {
+        for (TestDB testDB : TestDB.getSupportedTestDbs(Basename.BINARY_INDEX)) {
+            Database db = testDB.open();
 
             Table table = db.getTable("Test");
 

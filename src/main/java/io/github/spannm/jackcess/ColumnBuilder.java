@@ -16,6 +16,7 @@ limitations under the License.
 
 package io.github.spannm.jackcess;
 
+import io.github.spannm.jackcess.Database.FileFormat;
 import io.github.spannm.jackcess.impl.*;
 
 import java.io.IOException;
@@ -100,8 +101,7 @@ public class ColumnBuilder {
      * Sets the type for the new column based on the given SQL type, target data length (in type specific units), and
      * target FileFormat.
      */
-    public ColumnBuilder withSqlType(int type, int lengthInUnits,
-        Database.FileFormat fileFormat)
+    public ColumnBuilder withSqlType(int type, int lengthInUnits, FileFormat fileFormat)
         throws IOException {
         return withType(DataType.fromSQLType(type, lengthInUnits, fileFormat));
     }

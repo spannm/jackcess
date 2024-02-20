@@ -16,12 +16,11 @@ limitations under the License.
 
 package io.github.spannm.jackcess;
 
-import static io.github.spannm.jackcess.TestUtil.open;
-
-import io.github.spannm.jackcess.impl.JetFormatTest.Basename;
-import io.github.spannm.jackcess.impl.JetFormatTest.TestDB;
 import io.github.spannm.jackcess.impl.RelationshipImpl;
-import junit.framework.TestCase;
+import io.github.spannm.jackcess.test.AbstractBaseTest;
+import io.github.spannm.jackcess.test.Basename;
+import io.github.spannm.jackcess.test.TestDB;
+import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -30,17 +29,14 @@ import java.util.List;
 /**
  * @author James Ahlborn
  */
-public class RelationshipTest extends TestCase {
+class RelationshipTest extends AbstractBaseTest {
 
     private static final Comparator<Relationship> REL_COMP = (r1, r2) -> String.CASE_INSENSITIVE_ORDER.compare(r1.getName(), r2.getName());
 
-    public RelationshipTest(String name) {
-        super(name);
-    }
-
-    public void testTwoTables() throws Exception {
-        for (TestDB testDB : TestDB.getSupportedForBasename(Basename.INDEX, true)) {
-            try (Database db = open(testDB)) {
+    @Test
+    void testTwoTables() throws Exception {
+        for (TestDB testDB : TestDB.getSupportedTestDbsForRead(Basename.INDEX)) {
+            try (Database db = testDB.open()) {
                 Table t1 = db.getTable("Table1");
                 Table t2 = db.getTable("Table2");
                 Table t3 = db.getTable("Table3");
@@ -89,9 +85,10 @@ public class RelationshipTest extends TestCase {
         }
     }
 
-    public void testOneTable() throws Exception {
-        for (TestDB testDB : TestDB.getSupportedForBasename(Basename.INDEX, true)) {
-            try (Database db = open(testDB)) {
+    @Test
+    void testOneTable() throws Exception {
+        for (TestDB testDB : TestDB.getSupportedTestDbsForRead(Basename.INDEX)) {
+            try (Database db = testDB.open()) {
                 Table t1 = db.getTable("Table1");
                 Table t2 = db.getTable("Table2");
                 Table t3 = db.getTable("Table3");
@@ -105,9 +102,10 @@ public class RelationshipTest extends TestCase {
         }
     }
 
-    public void testNoTables() throws Exception {
-        for (TestDB testDB : TestDB.getSupportedForBasename(Basename.INDEX, true)) {
-            try (Database db = open(testDB)) {
+    @Test
+    void testNoTables() throws Exception {
+        for (TestDB testDB : TestDB.getSupportedTestDbsForRead(Basename.INDEX)) {
+            try (Database db = testDB.open()) {
                 Table t1 = db.getTable("Table1");
                 Table t2 = db.getTable("Table2");
                 Table t3 = db.getTable("Table3");

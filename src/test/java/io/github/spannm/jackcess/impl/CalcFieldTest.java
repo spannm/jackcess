@@ -16,13 +16,16 @@ limitations under the License.
 
 package io.github.spannm.jackcess.impl;
 
-import static io.github.spannm.jackcess.TestUtil.*;
-import static io.github.spannm.jackcess.impl.JetFormatTest.SUPPORTED_FILEFORMATS;
+import static io.github.spannm.jackcess.test.TestUtil.*;
 
 import io.github.spannm.jackcess.*;
-import io.github.spannm.jackcess.impl.JetFormatTest.Basename;
-import io.github.spannm.jackcess.impl.JetFormatTest.TestDB;
-import junit.framework.TestCase;
+import io.github.spannm.jackcess.Database.FileFormat;
+import io.github.spannm.jackcess.test.AbstractBaseTest;
+import io.github.spannm.jackcess.test.Basename;
+import io.github.spannm.jackcess.test.TestDB;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -33,14 +36,10 @@ import java.util.Map;
  *
  * @author James Ahlborn
  */
-public class CalcFieldTest extends TestCase {
+class CalcFieldTest extends AbstractBaseTest {
 
-    public CalcFieldTest(String name) {
-        super(name);
-    }
-
-    public void testCreateCalcField() throws Exception {
-
+    @Test
+    void testColumnBuilder() {
         ColumnBuilder cb = new ColumnBuilder("calc_data", DataType.TEXT)
             .withCalculatedInfo("[id] & \"_\" & [data]");
 
@@ -52,15 +51,17 @@ public class CalcFieldTest extends TestCase {
         }
 
         cb.validate(JetFormat.VERSION_14);
+    }
 
-        for (Database.FileFormat fileFormat : SUPPORTED_FILEFORMATS) {
-            JetFormat format = DatabaseImpl.getFileFormatDetails(fileFormat).getFormat();
-            if (!format.isSupportedCalculatedDataType(DataType.TEXT)) {
-                continue;
-            }
+    @ParameterizedTest(name = "[{index}] {0}")
+    @MethodSource("getSupportedFileformats")
+    void testCreateCalcField(FileFormat fileFormat) throws Exception {
+        JetFormat format = DatabaseImpl.getFileFormatDetails(fileFormat).getFormat();
+        if (!format.isSupportedCalculatedDataType(DataType.TEXT)) {
+            return;
+        }
 
-            Database db = create(fileFormat);
-
+        try (Database db = create(fileFormat)) {
             db.setEvaluateExpressions(false);
 
             Table t = new TableBuilder("Test")
@@ -133,32 +134,30 @@ public class CalcFieldTest extends TestCase {
                         "calc_numeric", null));
 
             assertTable(expectedRows, t);
-
-            db.close();
         }
     }
 
     @SuppressWarnings("checkstyle:LineLengthCheck")
-    public void testReadCalcFields() throws Exception {
+    @Test
+    void testReadCalcFields() throws Exception {
 
-        for (TestDB testDB : TestDB.getSupportedForBasename(Basename.CALC_FIELD)) {
-            Database db = open(testDB);
-            Table t = db.getTable("Table1");
+        for (TestDB testDB : TestDB.getSupportedTestDbs(Basename.CALC_FIELD)) {
+            try (Database db = testDB.open()) {
+                Table t = db.getTable("Table1");
 
-            List<String> rows = new ArrayList<>();
-            for (Row r : t) {
-                rows.add(r.entrySet().toString());
+                List<String> rows = new ArrayList<>();
+                for (Row r : t) {
+                    rows.add(r.entrySet().toString());
+                }
+
+                List<String> expectedRows = List.of(
+                    "[ID=1, FirstName=Bruce, LastName=Wayne, LastFirst=Wayne, Bruce, City=Gotham, LastFirstLen=12, Salary=1000000.0000, MonthlySalary=83333.3333, IsRich=true, AllNames=Wayne, Bruce=Wayne, Bruce, WeeklySalary=19230.7692307692, SalaryTest=1000000.0000, BoolTest=true, Popularity=50.325000, DecimalTest=50.325000, FloatTest=2583.2092, BigNumTest=56505085819.424791296572280180]",
+                    "[ID=2, FirstName=Bart, LastName=Simpson, LastFirst=Simpson, Bart, City=Springfield, LastFirstLen=13, Salary=-1.0000, MonthlySalary=-0.0833, IsRich=false, AllNames=Simpson, Bart=Simpson, Bart, WeeklySalary=-0.0192307692307692, SalaryTest=-1.0000, BoolTest=true, Popularity=-36.222200, DecimalTest=-36.222200, FloatTest=0.0035889593, BigNumTest=-0.0784734499180612994241100748]",
+                    "[ID=3, FirstName=John, LastName=Doe, LastFirst=Doe, John, City=Nowhere, LastFirstLen=9, Salary=0.0000, MonthlySalary=0.0000, IsRich=false, AllNames=Doe, John=Doe, John, WeeklySalary=0, SalaryTest=0.0000, BoolTest=true, Popularity=0.012300, DecimalTest=0.012300, FloatTest=0.0, BigNumTest=0E-8]",
+                    "[ID=4, FirstName=Test, LastName=User, LastFirst=User, Test, City=Hockessin, LastFirstLen=10, Salary=100.0000, MonthlySalary=8.3333, IsRich=false, AllNames=User, Test=User, Test, WeeklySalary=1.92307692307692, SalaryTest=100.0000, BoolTest=true, Popularity=102030405060.654321, DecimalTest=102030405060.654321, FloatTest=1.27413E-10, BigNumTest=2.787019289824216980830E-7]");
+
+                assertEquals(expectedRows, rows);
             }
-
-            List<String> expectedRows = List.of(
-                "[ID=1, FirstName=Bruce, LastName=Wayne, LastFirst=Wayne, Bruce, City=Gotham, LastFirstLen=12, Salary=1000000.0000, MonthlySalary=83333.3333, IsRich=true, AllNames=Wayne, Bruce=Wayne, Bruce, WeeklySalary=19230.7692307692, SalaryTest=1000000.0000, BoolTest=true, Popularity=50.325000, DecimalTest=50.325000, FloatTest=2583.2092, BigNumTest=56505085819.424791296572280180]",
-                "[ID=2, FirstName=Bart, LastName=Simpson, LastFirst=Simpson, Bart, City=Springfield, LastFirstLen=13, Salary=-1.0000, MonthlySalary=-0.0833, IsRich=false, AllNames=Simpson, Bart=Simpson, Bart, WeeklySalary=-0.0192307692307692, SalaryTest=-1.0000, BoolTest=true, Popularity=-36.222200, DecimalTest=-36.222200, FloatTest=0.0035889593, BigNumTest=-0.0784734499180612994241100748]",
-                "[ID=3, FirstName=John, LastName=Doe, LastFirst=Doe, John, City=Nowhere, LastFirstLen=9, Salary=0.0000, MonthlySalary=0.0000, IsRich=false, AllNames=Doe, John=Doe, John, WeeklySalary=0, SalaryTest=0.0000, BoolTest=true, Popularity=0.012300, DecimalTest=0.012300, FloatTest=0.0, BigNumTest=0E-8]",
-                "[ID=4, FirstName=Test, LastName=User, LastFirst=User, Test, City=Hockessin, LastFirstLen=10, Salary=100.0000, MonthlySalary=8.3333, IsRich=false, AllNames=User, Test=User, Test, WeeklySalary=1.92307692307692, SalaryTest=100.0000, BoolTest=true, Popularity=102030405060.654321, DecimalTest=102030405060.654321, FloatTest=1.27413E-10, BigNumTest=2.787019289824216980830E-7]");
-
-            assertEquals(expectedRows, rows);
-
-            db.close();
         }
     }
 

@@ -17,17 +17,14 @@ limitations under the License.
 package io.github.spannm.jackcess;
 
 import io.github.spannm.jackcess.impl.IndexImpl;
-import io.github.spannm.jackcess.impl.JetFormatTest.TestDB;
-import junit.framework.TestCase;
+import io.github.spannm.jackcess.test.AbstractBaseTest;
+import io.github.spannm.jackcess.test.TestDB;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author James Ahlborn
  */
-public class CursorBuilderTest extends TestCase {
-
-    public CursorBuilderTest(String name) {
-        super(name);
-    }
+class CursorBuilderTest extends AbstractBaseTest {
 
     private static void assertCursor(
         Cursor expected, Cursor found) {
@@ -41,7 +38,8 @@ public class CursorBuilderTest extends TestCase {
             found.getSavepoint().getCurrentPosition());
     }
 
-    public void test() throws Exception {
+    @Test
+    void test() throws Exception {
         for (TestDB indexCursorDB : CursorTest.INDEX_CURSOR_DBS) {
             Database db = CursorTest.createTestIndexTable(indexCursorDB);
 

@@ -17,13 +17,15 @@ limitations under the License.
 package io.github.spannm.jackcess.impl;
 
 import static io.github.spannm.jackcess.DatabaseBuilder.*;
-import static io.github.spannm.jackcess.TestUtil.assertCursor;
-import static io.github.spannm.jackcess.TestUtil.create;
-import static io.github.spannm.jackcess.TestUtil.createExpectedRow;
-import static io.github.spannm.jackcess.impl.JetFormatTest.SUPPORTED_FILEFORMATS;
+import static io.github.spannm.jackcess.test.TestUtil.assertCursor;
+import static io.github.spannm.jackcess.test.TestUtil.create;
+import static io.github.spannm.jackcess.test.TestUtil.createExpectedRow;
 
 import io.github.spannm.jackcess.*;
-import junit.framework.TestCase;
+import io.github.spannm.jackcess.Database.FileFormat;
+import io.github.spannm.jackcess.test.AbstractBaseTest;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -33,24 +35,19 @@ import java.util.Map;
  *
  * @author James Ahlborn
  */
-public class BigIntTest extends TestCase {
+class BigIntTest extends AbstractBaseTest {
 
-    public BigIntTest(String name) {
-        super(name);
-    }
+    @ParameterizedTest(name = "[{index}] {0}")
+    @MethodSource("getSupportedFileformats")
+    void testBigInt(FileFormat fileFormat) throws Exception {
+        JetFormat format = DatabaseImpl.getFileFormatDetails(fileFormat)
+            .getFormat();
 
-    public void testBigInt() throws Exception {
+        if (!format.isSupportedDataType(DataType.BIG_INT)) {
+            return;
+        }
 
-        for (Database.FileFormat fileFormat : SUPPORTED_FILEFORMATS) {
-            JetFormat format = DatabaseImpl.getFileFormatDetails(fileFormat)
-                .getFormat();
-
-            if (!format.isSupportedDataType(DataType.BIG_INT)) {
-                continue;
-            }
-
-            Database db = create(fileFormat);
-
+        try (Database db = create(fileFormat)) {
             Table t = newTable("Test")
                 .addColumn(newColumn("id", DataType.LONG)
                     .withAutoNumber(true))
@@ -83,8 +80,6 @@ public class BigIntTest extends TestCase {
             Cursor c = t.newCursor().withIndexByName("idx").toIndexCursor();
 
             assertCursor(expectedTable, c);
-
-            db.close();
         }
     }
 }

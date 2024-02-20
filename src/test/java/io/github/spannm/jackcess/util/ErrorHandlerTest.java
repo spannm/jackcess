@@ -16,14 +16,15 @@ limitations under the License.
 
 package io.github.spannm.jackcess.util;
 
-import static io.github.spannm.jackcess.TestUtil.*;
+import static io.github.spannm.jackcess.test.TestUtil.*;
 
 import io.github.spannm.jackcess.*;
 import io.github.spannm.jackcess.Database.FileFormat;
 import io.github.spannm.jackcess.impl.ColumnImpl;
-import io.github.spannm.jackcess.impl.JetFormatTest;
 import io.github.spannm.jackcess.impl.TableImpl;
-import junit.framework.TestCase;
+import io.github.spannm.jackcess.test.AbstractBaseTest;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
 
 import java.io.IOException;
 import java.lang.reflect.Field;
@@ -34,16 +35,12 @@ import java.util.List;
 /**
  * @author James Ahlborn
  */
-public class ErrorHandlerTest extends TestCase {
+class ErrorHandlerTest extends AbstractBaseTest {
 
-    public ErrorHandlerTest(String name) {
-        super(name);
-    }
-
-    public void testErrorHandler() throws Exception {
-        for (FileFormat fileFormat : JetFormatTest.SUPPORTED_FILEFORMATS) {
-            Database db = create(fileFormat);
-
+    @ParameterizedTest(name = "[{index}] {0}")
+    @MethodSource("getSupportedFileformats")
+    void testErrorHandler(FileFormat fileFormat) throws Exception {
+        try (Database db = create(fileFormat)) {
             Table table =
                 new TableBuilder("test")
                     .addColumn(new ColumnBuilder("col", DataType.TEXT))
@@ -126,8 +123,6 @@ public class ErrorHandlerTest extends TestCase {
             } catch (IOException e) {
                 // success
             }
-
-            db.close();
         }
     }
 

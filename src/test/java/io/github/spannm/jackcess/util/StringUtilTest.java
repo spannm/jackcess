@@ -1,13 +1,12 @@
 package io.github.spannm.jackcess.util;
 
-import static org.junit.Assert.*;
+import io.github.spannm.jackcess.test.AbstractBaseTest;
+import org.junit.jupiter.api.Test;
 
-import org.junit.Test;
-
-public class StringUtilTest {
+public class StringUtilTest extends AbstractBaseTest {
 
     @Test
-    public void testLength() {
+    void testLength() {
         assertEquals(0, StringUtil.length(null));
         assertEquals(0, StringUtil.length(""));
         assertEquals(1, StringUtil.length("A"));
@@ -16,7 +15,7 @@ public class StringUtilTest {
     }
 
     @Test
-    public void testIsEmpty() {
+    void testIsEmpty() {
         assertTrue(StringUtil.isEmpty(null));
         assertTrue(StringUtil.isEmpty(""));
         assertFalse(StringUtil.isEmpty(" "));
@@ -24,7 +23,7 @@ public class StringUtilTest {
     }
 
     @Test
-    public void testIsBlank() {
+    void testIsBlank() {
         assertTrue(StringUtil.isBlank(null));
         assertTrue(StringUtil.isBlank(""));
         assertTrue(StringUtil.isBlank("   "));
@@ -32,7 +31,7 @@ public class StringUtilTest {
     }
 
     @Test
-    public void testTrimToNull() {
+    void testTrimToNull() {
         assertNull(StringUtil.trimToNull(null));
         assertNull(StringUtil.trimToNull(""));
         assertNull(StringUtil.trimToNull("   "));
@@ -41,7 +40,7 @@ public class StringUtilTest {
     }
 
     @Test
-    public void testCapitalize() {
+    void testCapitalize() {
         assertNull(StringUtil.capitalize(null));
         assertEquals("", StringUtil.capitalize(""));
         assertEquals("Hello", StringUtil.capitalize("hello"));
@@ -50,15 +49,15 @@ public class StringUtilTest {
     }
 
     @Test
-    public void testReplace() {
-        assertNull(null, StringUtil.replace(null, null, null));
+    void testReplace() {
+        assertNull(StringUtil.replace(null, null, null));
         assertEquals(" ", StringUtil.replace(" ", " ", " "));
         assertEquals("text", StringUtil.replace("text", "", "newText"));
         assertEquals(" txt txt ", StringUtil.replace(" text text ", "text", "txt"));
     }
 
     @Test
-    public void testRemove() {
+    void testRemove() {
         assertNull(StringUtil.remove(null, null));
         assertNull(StringUtil.remove(null, ""));
         assertNull(StringUtil.remove(null, "remove"));

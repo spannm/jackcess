@@ -59,115 +59,59 @@ public interface Database extends Iterable<Table>, Closeable, Flushable {
     /**
      * the default sort order for table columns.
      */
-    Table.ColumnOrder DEFAULT_COLUMN_ORDER                  =
-        Table.ColumnOrder.DATA;
+    Table.ColumnOrder DEFAULT_COLUMN_ORDER                  = Table.ColumnOrder.DATA;
 
     /**
      * system property which can be used to set the default TimeZone used for date calculations.
      */
-    String            TIMEZONE_PROPERTY                     =
-        "jackcess.timeZone";
+    String            TIMEZONE_PROPERTY                     = "jackcess.timeZone";
 
     /**
      * system property prefix which can be used to set the default Charset used for text data (full property includes
      * the JetFormat version).
      */
-    String            CHARSET_PROPERTY_PREFIX               =
-        "jackcess.charset.";
+    String            CHARSET_PROPERTY_PREFIX               = "jackcess.charset.";
 
     /**
      * system property which can be used to set the path from which classpath resources are loaded (must end with a "/"
      * if non-empty). Default value is {@value io.github.spannm.jackcess.impl.DatabaseImpl#DEFAULT_RESOURCE_PATH}
      * if unspecified.
      */
-    String            RESOURCE_PATH_PROPERTY                =
-        "jackcess.resourcePath";
+    String            RESOURCE_PATH_PROPERTY                = "jackcess.resourcePath";
 
     /**
      * (boolean) system property which can be used to indicate that the current vm has a poor nio implementation
      * (specifically for {@code FileChannel.transferFrom})
      */
-    String            BROKEN_NIO_PROPERTY                   =
-        "jackcess.brokenNio";
+    String            BROKEN_NIO_PROPERTY                   = "jackcess.brokenNio";
 
     /**
      * system property which can be used to set the default sort order for table columns. Value should be one of
      * {@link Table.ColumnOrder} enum values.
      */
-    String            COLUMN_ORDER_PROPERTY                 =
-        "jackcess.columnOrder";
+    String            COLUMN_ORDER_PROPERTY                 = "jackcess.columnOrder";
 
     /**
      * system property which can be used to set the default enforcement of foreign-key relationships. Defaults to
      * {@code true}.
      */
-    String            FK_ENFORCE_PROPERTY                   =
-        "jackcess.enforceForeignKeys";
+    String            FK_ENFORCE_PROPERTY                   = "jackcess.enforceForeignKeys";
 
     /**
      * system property which can be used to set the default allow auto number insert policy. Defaults to {@code false}.
      */
-    String            ALLOW_AUTONUM_INSERT_PROPERTY         =
-        "jackcess.allowAutoNumberInsert";
+    String            ALLOW_AUTONUM_INSERT_PROPERTY         = "jackcess.allowAutoNumberInsert";
 
     /**
      * system property which can be used to disable expression evaluation if necessary. Defaults to {@code true}.
      */
-    String            ENABLE_EXPRESSION_EVALUATION_PROPERTY =
-        "jackcess.enableExpressionEvaluation";
+    String            ENABLE_EXPRESSION_EVALUATION_PROPERTY = "jackcess.enableExpressionEvaluation";
 
     /**
      * system property which can be used to set the default date/Time type. Value should be one of {@link DateTimeType}
      * enum values.
      */
-    String            DATE_TIME_TYPE_PROPERTY               =
-        "jackcess.dateTimeType";
-
-    /**
-     * Enum which indicates which version of Access created the database.
-     *
-     */
-    enum FileFormat {
-
-        /** A database which was created by MS Access 97 */
-        V1997(".mdb"),
-        /**
-         * A database which was most likely created programmatically (e.g. using windows ADOX)
-         */
-        GENERIC_JET4(".mdb"),
-        /** A database which was created by MS Access 2000 */
-        V2000(".mdb"),
-        /** A database which was created by MS Access 2002/2003 */
-        V2003(".mdb"),
-        /** A database which was created by MS Access 2007 */
-        V2007(".accdb"),
-        /** A database which was created by MS Access 2010+ */
-        V2010(".accdb"),
-        /** A database which was created by MS Access 2016+ */
-        V2016(".accdb"),
-        /** A database which was created by MS Access 2019+ (Office 365) */
-        V2019(".accdb"),
-        /** A database which was created by MS Money */
-        MSISAM(".mny");
-
-        private final String _ext;
-
-        FileFormat(String ext) {
-            _ext = ext;
-        }
-
-        /**
-         * @return the file extension used for database files with this format.
-         */
-        public String getFileExtension() {
-            return _ext;
-        }
-
-        @Override
-        public String toString() {
-            return name() + " [" + DatabaseImpl.getFileFormatDetails(this).getFormat() + "]";
-        }
-    }
+    String            DATE_TIME_TYPE_PROPERTY               = "jackcess.dateTimeType";
 
     /**
      * Returns the File underlying this Database
@@ -225,8 +169,7 @@ public interface Database extends Iterable<Table>, Closeable, Flushable {
      * @return a Stream using the {@link #newTableMetaDataIterable}
      */
     default Stream<TableMetaData> newTableMetaDataStream() {
-        return StreamSupport.stream(
-            newTableMetaDataIterable().spliterator(), false);
+        return StreamSupport.stream(newTableMetaDataIterable().spliterator(), false);
     }
 
     /**
@@ -244,8 +187,7 @@ public interface Database extends Iterable<Table>, Closeable, Flushable {
     /**
      * Finds all the relationships in the database between the given tables.
      */
-    List<Relationship> getRelationships(Table table1, Table table2)
-        throws IOException;
+    List<Relationship> getRelationships(Table table1, Table table2) throws IOException;
 
     /**
      * Finds all the relationships in the database for the given table.
@@ -266,8 +208,7 @@ public interface Database extends Iterable<Table>, Closeable, Flushable {
      * Warning, this may load <i>all</i> the Tables (metadata, not data) in the database which could cause memory
      * issues.
      */
-    List<Relationship> getSystemRelationships()
-        throws IOException;
+    List<Relationship> getSystemRelationships() throws IOException;
 
     /**
      * Finds all the queries in the database.
@@ -313,9 +254,7 @@ public interface Database extends Iterable<Table>, Closeable, Flushable {
      * @param linkedDbName path to the linked database
      * @param linkedTableName name of the table in the linked database
      */
-    void createLinkedTable(String name, String linkedDbName,
-        String linkedTableName)
-        throws IOException;
+    void createLinkedTable(String name, String linkedDbName, String linkedTableName) throws IOException;
 
     /**
      * Flushes any current changes to the database file (and any linked databases) to disk.
@@ -480,4 +419,48 @@ public interface Database extends Iterable<Table>, Closeable, Flushable {
      * Sets the DateTimeType. If {@code null}, resets to the default value.
      */
     void setDateTimeType(DateTimeType dateTimeType);
+
+    /**
+     * Enum which indicates which version of Access created the database.
+     */
+    enum FileFormat {
+
+        /** A database which was created by MS Access 97 */
+        V1997(".mdb"),
+        /** A database which was most likely created programmatically (e.g. using windows ADOX) */
+        GENERIC_JET4(".mdb"),
+        /** A database which was created by MS Access 2000 */
+        V2000(".mdb"),
+        /** A database which was created by MS Access 2002/2003 */
+        V2003(".mdb"),
+        /** A database which was created by MS Access 2007 */
+        V2007(".accdb"),
+        /** A database which was created by MS Access 2010+ */
+        V2010(".accdb"),
+        /** A database which was created by MS Access 2016+ */
+        V2016(".accdb"),
+        /** A database which was created by MS Access 2019+ (Office 365) */
+        V2019(".accdb"),
+        /** A database which was created by MS Money */
+        MSISAM(".mny");
+
+        private final String ext;
+
+        FileFormat(String _ext) {
+            ext = _ext;
+        }
+
+        /**
+         * @return the file extension used for database files with this format.
+         */
+        public String getFileExtension() {
+            return ext;
+        }
+
+        @Override
+        public String toString() {
+            return name() + " [" + DatabaseImpl.getFileFormatDetails(this).getFormat() + "]";
+        }
+    }
+
 }

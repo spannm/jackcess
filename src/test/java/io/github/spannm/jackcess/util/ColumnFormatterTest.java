@@ -16,12 +16,13 @@ limitations under the License.
 
 package io.github.spannm.jackcess.util;
 
-import static io.github.spannm.jackcess.TestUtil.create;
-import static io.github.spannm.jackcess.impl.JetFormatTest.SUPPORTED_FILEFORMATS;
+import static io.github.spannm.jackcess.test.TestUtil.create;
 
 import io.github.spannm.jackcess.*;
 import io.github.spannm.jackcess.Database.FileFormat;
-import junit.framework.TestCase;
+import io.github.spannm.jackcess.test.AbstractBaseTest;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -30,12 +31,12 @@ import java.util.List;
  *
  * @author James Ahlborn
  */
-public class ColumnFormatterTest extends TestCase {
+class ColumnFormatterTest extends AbstractBaseTest {
 
-    public void testFormat() throws Exception {
-
-        for (FileFormat fileFormat : SUPPORTED_FILEFORMATS) {
-            Database db = create(fileFormat);
+    @ParameterizedTest(name = "[{index}] {0}")
+    @MethodSource("getSupportedFileformats")
+    void testFormat(FileFormat fileFormat) throws Exception {
+        try (Database db = create(fileFormat)) {
             db.setEvaluateExpressions(true);
 
             Table t = new TableBuilder("test")
@@ -96,8 +97,6 @@ public class ColumnFormatterTest extends TestCase {
                 "foobarbaz", "-37", "11/23/1899 3:07:12 AM",
                 "", "", ""),
                 found);
-
-            db.close();
         }
     }
 }

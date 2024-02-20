@@ -16,7 +16,8 @@ limitations under the License.
 
 package io.github.spannm.jackcess.impl;
 
-import junit.framework.TestCase;
+import io.github.spannm.jackcess.test.AbstractBaseTest;
+import org.junit.jupiter.api.Test;
 
 import java.util.*;
 
@@ -24,13 +25,10 @@ import java.util.*;
  *
  * @author James Ahlborn
  */
-public class TopoSorterTest extends TestCase {
+class TopoSorterTest extends AbstractBaseTest {
 
-    public TopoSorterTest(String name) {
-        super(name);
-    }
-
-    public void testTopoSort() {
+    @Test
+    void testTopoSort() {
         doTopoTest(List.of("A", "B", "C"),
             List.of("A", "B", "C"));
 

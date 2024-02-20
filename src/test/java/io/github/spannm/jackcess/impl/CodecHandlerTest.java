@@ -16,10 +16,12 @@ limitations under the License.
 
 package io.github.spannm.jackcess.impl;
 
-import static io.github.spannm.jackcess.impl.JetFormatTest.SUPPORTED_FILEFORMATS;
-
 import io.github.spannm.jackcess.*;
-import junit.framework.TestCase;
+import io.github.spannm.jackcess.Database.FileFormat;
+import io.github.spannm.jackcess.test.AbstractBaseTest;
+import io.github.spannm.jackcess.test.TestUtil;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
 
 import java.io.File;
 import java.io.RandomAccessFile;
@@ -31,54 +33,54 @@ import java.util.Iterator;
  *
  * @author James Ahlborn
  */
-public class CodecHandlerTest extends TestCase {
+class CodecHandlerTest extends AbstractBaseTest {
     private static final CodecProvider SIMPLE_PROVIDER = (channel, charset) -> new SimpleCodecHandler(channel);
     private static final CodecProvider FULL_PROVIDER   = (channel, charset) -> new FullCodecHandler(channel);
 
-    public CodecHandlerTest(String name) {
-        super(name);
+    @ParameterizedTest(name = "[{index}] {0}")
+    @MethodSource("getSupportedFileformats")
+    void testCodecHandlerSimple(FileFormat fileFormat) throws Exception {
+        doTestCodecHandler(fileFormat, true);
     }
 
-    public void testCodecHandler() throws Exception {
-        doTestCodecHandler(true);
-        doTestCodecHandler(false);
+    @ParameterizedTest(name = "[{index}] {0}")
+    @MethodSource("getSupportedFileformats")
+    void testCodecHandlerNotSimple(FileFormat fileFormat) throws Exception {
+        doTestCodecHandler(fileFormat, false);
     }
 
-    private static void doTestCodecHandler(boolean simple) throws Exception {
-        for (Database.FileFormat ff : SUPPORTED_FILEFORMATS) {
-            Database db = TestUtil.createFile(ff);
-            int pageSize = ((DatabaseImpl) db).getFormat().PAGE_SIZE;
-            File dbFile = db.getFile();
-            db.close();
+    private static void doTestCodecHandler(FileFormat fileFormat, boolean simple) throws Exception {
+        File dbFile;
+        try (Database db1 = TestUtil.createFile(fileFormat)) {
+            int pageSize = ((DatabaseImpl) db1).getFormat().PAGE_SIZE;
+            dbFile = db1.getFile();
 
             // apply encoding to file
             encodeFile(dbFile, pageSize, simple);
+        }
 
-            db = new DatabaseBuilder(dbFile)
-                .withCodecProvider(simple ? SIMPLE_PROVIDER : FULL_PROVIDER)
-                .open();
-
+        try (Database db2 = new DatabaseBuilder(dbFile)
+            .withCodecProvider(simple ? SIMPLE_PROVIDER : FULL_PROVIDER)
+            .open()) {
             Table t1 = new TableBuilder("test1")
                 .addColumn(new ColumnBuilder("id", DataType.LONG).withAutoNumber(true))
                 .addColumn(new ColumnBuilder("data", DataType.TEXT).withLength(250))
                 .withPrimaryKey("id")
                 .addIndex(new IndexBuilder("data_idx").withColumns("data"))
-                .toTable(db);
+                .toTable(db2);
 
             Table t2 = new TableBuilder("test2")
                 .addColumn(new ColumnBuilder("id", DataType.LONG).withAutoNumber(true))
                 .addColumn(new ColumnBuilder("data", DataType.TEXT).withLength(250))
                 .withPrimaryKey("id")
                 .addIndex(new IndexBuilder("data_idx").withColumns("data"))
-                .toTable(db);
+                .toTable(db2);
 
             int autonum = 1;
             for (int i = 1; i < 2; ++i) {
                 writeData(t1, t2, autonum, autonum + 100);
                 autonum += 100;
             }
-
-            db.close();
         }
     }
 

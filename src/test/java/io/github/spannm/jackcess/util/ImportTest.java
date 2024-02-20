@@ -16,12 +16,13 @@ limitations under the License.
 
 package io.github.spannm.jackcess.util;
 
-import static io.github.spannm.jackcess.TestUtil.*;
+import static io.github.spannm.jackcess.test.TestUtil.*;
 
 import io.github.spannm.jackcess.*;
 import io.github.spannm.jackcess.Database.FileFormat;
-import io.github.spannm.jackcess.impl.JetFormatTest;
-import junit.framework.TestCase;
+import io.github.spannm.jackcess.test.AbstractBaseTest;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
 
 import java.io.File;
 import java.lang.reflect.InvocationHandler;
@@ -37,15 +38,12 @@ import java.util.Map;
 /**
  * @author Rob Di Marco
  */
-public class ImportTest extends TestCase {
+class ImportTest extends AbstractBaseTest {
 
-    public ImportTest(String name) {
-        super(name);
-    }
-
-    public void testImportFromFile() throws Exception {
-        for (FileFormat fileFormat : JetFormatTest.SUPPORTED_FILEFORMATS) {
-            Database db = create(fileFormat);
+    @ParameterizedTest(name = "[{index}] {0}")
+    @MethodSource("getSupportedFileformats")
+    void testImportFromFile(FileFormat fileFormat) throws Exception {
+        try (Database db = create(fileFormat)) {
             String tableName = new ImportUtil.Builder(db, "test")
                 .withDelimiter("\\t")
                 .importFile(new File("src/test/data/sample-input.tab"));
@@ -162,14 +160,13 @@ public class ImportTest extends TestCase {
                         "Test2", "embedded\tseparator",
                         "Test3", "long"));
             assertTable(expectedRows, t);
-
-            db.close();
         }
     }
 
-    public void testImportFromFileWithOnlyHeaders() throws Exception {
-        for (FileFormat fileFormat : JetFormatTest.SUPPORTED_FILEFORMATS) {
-            Database db = create(fileFormat);
+    @ParameterizedTest(name = "[{index}] {0}")
+    @MethodSource("getSupportedFileformats")
+    void testImportFromFileWithOnlyHeaders(FileFormat fileFormat) throws Exception {
+        try (Database db = create(fileFormat)) {
             String tableName = new ImportUtil.Builder(db, "test")
                 .withDelimiter("\\t")
                 .importFile(new File("src/test/data/sample-input-only-headers.tab"));
@@ -185,70 +182,67 @@ public class ImportTest extends TestCase {
                 "RANK", "CLAIM_COUNT", "PROCEDURE_COUNT",
                 "WEIGHTED_CLAIM_COUNT", "WEIGHTED_PROCEDURE_COUNT"),
                 colNames);
-
-            db.close();
         }
     }
 
-    public void testCopySqlHeaders() throws Exception {
-        for (FileFormat fileFormat : JetFormatTest.SUPPORTED_FILEFORMATS) {
+    @ParameterizedTest(name = "[{index}] {0}")
+    @MethodSource("getSupportedFileformats")
+    void testCopySqlHeaders(FileFormat fileFormat) throws Exception {
+        TestResultSet rs = new TestResultSet();
 
-            TestResultSet rs = new TestResultSet();
+        rs.addColumn(Types.INTEGER, "col1");
+        rs.addColumn(Types.VARCHAR, "col2", 60, 0, 0);
+        rs.addColumn(Types.VARCHAR, "col3", 500, 0, 0);
+        rs.addColumn(Types.BINARY, "col4", 128, 0, 0);
+        rs.addColumn(Types.BINARY, "col5", 512, 0, 0);
+        rs.addColumn(Types.NUMERIC, "col6", 0, 7, 15);
+        rs.addColumn(Types.VARCHAR, "col7", Integer.MAX_VALUE, 0, 0);
 
-            rs.addColumn(Types.INTEGER, "col1");
-            rs.addColumn(Types.VARCHAR, "col2", 60, 0, 0);
-            rs.addColumn(Types.VARCHAR, "col3", 500, 0, 0);
-            rs.addColumn(Types.BINARY, "col4", 128, 0, 0);
-            rs.addColumn(Types.BINARY, "col5", 512, 0, 0);
-            rs.addColumn(Types.NUMERIC, "col6", 0, 7, 15);
-            rs.addColumn(Types.VARCHAR, "col7", Integer.MAX_VALUE, 0, 0);
+        Database db = create(fileFormat);
+        ImportUtil.importResultSet((ResultSet) Proxy.newProxyInstance(
+            Thread.currentThread().getContextClassLoader(),
+            new Class<?>[] {ResultSet.class},
+            rs), db, "Test1");
 
-            Database db = create(fileFormat);
-            ImportUtil.importResultSet((ResultSet) Proxy.newProxyInstance(
-                Thread.currentThread().getContextClassLoader(),
-                new Class<?>[] {ResultSet.class},
-                rs), db, "Test1");
+        Table t = db.getTable("Test1");
+        List<? extends Column> columns = t.getColumns();
+        assertEquals(7, columns.size());
 
-            Table t = db.getTable("Test1");
-            List<? extends Column> columns = t.getColumns();
-            assertEquals(7, columns.size());
+        Column c = columns.get(0);
+        assertEquals("col1", c.getName());
+        assertEquals(DataType.LONG, c.getType());
 
-            Column c = columns.get(0);
-            assertEquals("col1", c.getName());
-            assertEquals(DataType.LONG, c.getType());
+        c = columns.get(1);
+        assertEquals("col2", c.getName());
+        assertEquals(DataType.TEXT, c.getType());
+        assertEquals(120, c.getLength());
 
-            c = columns.get(1);
-            assertEquals("col2", c.getName());
-            assertEquals(DataType.TEXT, c.getType());
-            assertEquals(120, c.getLength());
+        c = columns.get(2);
+        assertEquals("col3", c.getName());
+        assertEquals(DataType.MEMO, c.getType());
+        assertEquals(0, c.getLength());
 
-            c = columns.get(2);
-            assertEquals("col3", c.getName());
-            assertEquals(DataType.MEMO, c.getType());
-            assertEquals(0, c.getLength());
+        c = columns.get(3);
+        assertEquals("col4", c.getName());
+        assertEquals(DataType.BINARY, c.getType());
+        assertEquals(128, c.getLength());
 
-            c = columns.get(3);
-            assertEquals("col4", c.getName());
-            assertEquals(DataType.BINARY, c.getType());
-            assertEquals(128, c.getLength());
+        c = columns.get(4);
+        assertEquals("col5", c.getName());
+        assertEquals(DataType.OLE, c.getType());
+        assertEquals(0, c.getLength());
 
-            c = columns.get(4);
-            assertEquals("col5", c.getName());
-            assertEquals(DataType.OLE, c.getType());
-            assertEquals(0, c.getLength());
+        c = columns.get(5);
+        assertEquals("col6", c.getName());
+        assertEquals(DataType.NUMERIC, c.getType());
+        assertEquals(17, c.getLength());
+        assertEquals(7, c.getScale());
+        assertEquals(15, c.getPrecision());
 
-            c = columns.get(5);
-            assertEquals("col6", c.getName());
-            assertEquals(DataType.NUMERIC, c.getType());
-            assertEquals(17, c.getLength());
-            assertEquals(7, c.getScale());
-            assertEquals(15, c.getPrecision());
-
-            c = columns.get(6);
-            assertEquals("col7", c.getName());
-            assertEquals(DataType.MEMO, c.getType());
-            assertEquals(0, c.getLength());
-        }
+        c = columns.get(6);
+        assertEquals("col7", c.getName());
+        assertEquals(DataType.MEMO, c.getType());
+        assertEquals(0, c.getLength());
     }
 
     private static class TestResultSet implements InvocationHandler {

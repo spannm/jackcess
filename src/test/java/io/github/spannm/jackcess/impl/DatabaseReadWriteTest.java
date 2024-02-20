@@ -16,13 +16,14 @@ limitations under the License.
 
 package io.github.spannm.jackcess.impl;
 
-import static io.github.spannm.jackcess.TestUtil.*;
-import static io.github.spannm.jackcess.impl.JetFormatTest.SUPPORTED_FILEFORMATS;
+import static io.github.spannm.jackcess.test.TestUtil.*;
 
 import io.github.spannm.jackcess.*;
 import io.github.spannm.jackcess.Database.FileFormat;
-import io.github.spannm.jackcess.util.RowFilterTest;
-import junit.framework.TestCase;
+import io.github.spannm.jackcess.test.AbstractBaseTest;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
 
 import java.time.Instant;
 import java.time.LocalDateTime;
@@ -35,25 +36,21 @@ import java.util.Map;
  *
  * @author James Ahlborn
  */
-public class DatabaseReadWriteTest extends TestCase {
+class DatabaseReadWriteTest extends AbstractBaseTest {
 
-    public DatabaseReadWriteTest(String name) {
-        super(name);
-    }
-
-    public void testWriteAndRead() throws Exception {
-        for (FileFormat fileFormat : SUPPORTED_FILEFORMATS) {
-            Database db = create(fileFormat);
+    @ParameterizedTest(name = "[{index}] {0}")
+    @MethodSource("getSupportedFileformats")
+    void testWriteAndRead(FileFormat fileFormat) throws Exception {
+        try (Database db = create(fileFormat)) {
             doTestWriteAndRead(db);
-            db.close();
         }
     }
 
-    public void testWriteAndReadInMem() throws Exception {
-        for (FileFormat fileFormat : SUPPORTED_FILEFORMATS) {
-            Database db = createMem(fileFormat);
+    @ParameterizedTest(name = "[{index}] {0}")
+    @MethodSource("getSupportedFileformats")
+    void testWriteAndReadInMem(FileFormat fileFormat) throws Exception {
+        try (Database db = createMem(fileFormat)) {
             doTestWriteAndRead(db);
-            db.close();
         }
     }
 
@@ -84,9 +81,10 @@ public class DatabaseReadWriteTest extends TestCase {
         }
     }
 
-    public void testWriteAndReadInBatch() throws Exception {
-        for (FileFormat fileFormat : SUPPORTED_FILEFORMATS) {
-            Database db = createMem(fileFormat);
+    @ParameterizedTest(name = "[{index}] {0}")
+    @MethodSource("getSupportedFileformats")
+    void testWriteAndReadInBatch(FileFormat fileFormat) throws Exception {
+        try (Database db = createMem(fileFormat)) {
             createTestTable(db);
             int count = 1000;
             List<Object[]> rows = new ArrayList<>(count);
@@ -107,15 +105,13 @@ public class DatabaseReadWriteTest extends TestCase {
                 assertEquals(row[6], readRow.get("G"));
                 assertEquals(row[7], readRow.get("H"));
             }
-
-            db.close();
         }
     }
 
-    public void testUpdateRow() throws Exception {
-        for (FileFormat fileFormat : SUPPORTED_FILEFORMATS) {
-            Database db = createMem(fileFormat);
-
+    @ParameterizedTest(name = "[{index}] {0}")
+    @MethodSource("getSupportedFileformats")
+    void testUpdateRow(FileFormat fileFormat) throws Exception {
+        try (Database db = createMem(fileFormat)) {
             Table t = new TableBuilder("test")
                 .addColumn(new ColumnBuilder("name", DataType.TEXT))
                 .addColumn(new ColumnBuilder("id", DataType.LONG)
@@ -204,7 +200,7 @@ public class DatabaseReadWriteTest extends TestCase {
                 "data", newText),
                 row);
 
-            List<Row> rows = RowFilterTest.toList(t);
+            List<Row> rows = toList(t);
             assertEquals(50, rows.size());
 
             for (Row r : rows) {
@@ -220,12 +216,12 @@ public class DatabaseReadWriteTest extends TestCase {
             for (Row r : t) {
                 assertEquals("final data " + r.get("id"), r.get("data"));
             }
-
-            db.close();
         }
+
     }
 
-    public void testDateMath() {
+    @Test
+    void testDateMath() {
         long now = System.currentTimeMillis();
 
         // test around current time

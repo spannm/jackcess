@@ -20,12 +20,12 @@ import static io.github.spannm.jackcess.impl.query.QueryFormat.*;
 
 import io.github.spannm.jackcess.DataType;
 import io.github.spannm.jackcess.Database;
-import io.github.spannm.jackcess.TestUtil;
-import io.github.spannm.jackcess.impl.JetFormatTest.Basename;
-import io.github.spannm.jackcess.impl.JetFormatTest.TestDB;
 import io.github.spannm.jackcess.impl.query.QueryImpl;
 import io.github.spannm.jackcess.impl.query.QueryImpl.Row;
-import junit.framework.TestCase;
+import io.github.spannm.jackcess.test.AbstractBaseTest;
+import io.github.spannm.jackcess.test.Basename;
+import io.github.spannm.jackcess.test.TestDB;
+import org.junit.jupiter.api.Test;
 
 import java.util.*;
 
@@ -33,13 +33,10 @@ import java.util.*;
  * @author James Ahlborn
  */
 @SuppressWarnings("checkstyle:LineLengthCheck")
-public class QueryTest extends TestCase {
+class QueryTest extends AbstractBaseTest {
 
-    public QueryTest(String name) {
-        super(name);
-    }
-
-    public void testUnionQuery() {
+    @Test
+    void testUnionQuery() {
         String expr1 = "Select * from Table1";
         String expr2 = "Select * from Table2";
 
@@ -78,7 +75,8 @@ public class QueryTest extends TestCase {
 
     }
 
-    public void testPassthroughQuery() {
+    @Test
+    void testPassthroughQuery() {
         String expr = "Select * from Table1";
         String constr = "ODBC;";
 
@@ -89,7 +87,8 @@ public class QueryTest extends TestCase {
         assertEquals(constr, query.getConnectionString());
     }
 
-    public void testDataDefinitionQuery() {
+    @Test
+    void testDataDefinitionQuery() {
         String expr = "Drop table Table1";
 
         DataDefinitionQuery query = (DataDefinitionQuery) newQuery(
@@ -98,7 +97,8 @@ public class QueryTest extends TestCase {
         assertEquals(expr, query.toSQLString());
     }
 
-    public void testUpdateQuery() {
+    @Test
+    void testUpdateQuery() {
         UpdateQuery query = (UpdateQuery) newQuery(
             Query.Type.UPDATE,
             newRow(TABLE_ATTRIBUTE, null, "Table1", null),
@@ -120,7 +120,8 @@ public class QueryTest extends TestCase {
             query.toSQLString());
     }
 
-    public void testSelectQuery() {
+    @Test
+    void testSelectQuery() {
         SelectQuery query = (SelectQuery) newQuery(
             Query.Type.SELECT,
             newRow(TABLE_ATTRIBUTE, null, "Table1", null));
@@ -142,7 +143,8 @@ public class QueryTest extends TestCase {
         doTestOrderings(query);
     }
 
-    public void testBadQueries() {
+    @Test
+    void testBadQueries() {
         List<Row> rowList = new ArrayList<>();
         rowList.add(newRow(TYPE_ATTRIBUTE, null, -1, null, null));
         QueryImpl query = QueryImpl.create(-1, "TestQuery", rowList, 13);
@@ -177,8 +179,9 @@ public class QueryTest extends TestCase {
 
     }
 
-    public void testReadQueries() throws Exception {
-        for (TestDB testDB : TestDB.getSupportedForBasename(Basename.QUERY, true)) {
+    @Test
+    void testReadQueries() throws Exception {
+        for (TestDB testDB : TestDB.getSupportedTestDbsForRead(Basename.QUERY)) {
             Map<String, String> expectedQueries = new HashMap<>();
             expectedQueries.put(
                 "SelectQuery", multiline(
@@ -232,19 +235,18 @@ public class QueryTest extends TestCase {
                 "DataDefinitionQuery", multiline(
                     "CREATE TABLE Table5 (col1 CHAR, col2 CHAR);\0"));
 
-            Database db = TestUtil.open(testDB);
+            try (Database db = testDB.open()) {
+                for (Query q : db.getQueries()) {
+                    assertEquals(expectedQueries.remove(q.getName()), q.toSQLString());
+                }
 
-            for (Query q : db.getQueries()) {
-                assertEquals(expectedQueries.remove(q.getName()), q.toSQLString());
+                assertTrue(expectedQueries.isEmpty());
             }
-
-            assertTrue(expectedQueries.isEmpty());
-
-            db.close();
         }
     }
 
-    public void testAppendQuery() {
+    @Test
+    void testAppendQuery() {
         AppendQuery query = (AppendQuery) newQuery(
             Query.Type.APPEND, null, "Table2",
             // newRow(TABLE_ATTRIBUTE, null, "Table1", null),
@@ -440,7 +442,8 @@ public class QueryTest extends TestCase {
             query.toSQLString());
     }
 
-    public void testComplexJoins() {
+    @Test
+    void testComplexJoins() {
         SelectQuery query = (SelectQuery) newQuery(
             Query.Type.SELECT);
         setFlag(query, 1);

@@ -16,12 +16,14 @@ limitations under the License.
 
 package io.github.spannm.jackcess.impl;
 
-import static io.github.spannm.jackcess.TestUtil.*;
+import static io.github.spannm.jackcess.test.TestUtil.*;
 
 import io.github.spannm.jackcess.*;
-import io.github.spannm.jackcess.impl.JetFormatTest.Basename;
-import io.github.spannm.jackcess.impl.JetFormatTest.TestDB;
-import junit.framework.TestCase;
+import io.github.spannm.jackcess.Database.FileFormat;
+import io.github.spannm.jackcess.test.AbstractBaseTest;
+import io.github.spannm.jackcess.test.Basename;
+import io.github.spannm.jackcess.test.TestDB;
+import org.junit.jupiter.api.Test;
 
 import java.io.File;
 import java.lang.reflect.Field;
@@ -37,7 +39,7 @@ import java.util.regex.Pattern;
  * @author James Ahlborn
  */
 @SuppressWarnings("checkstyle:MethodNameCheck")
-public class IndexCodesTest extends TestCase {
+public class IndexCodesTest extends AbstractBaseTest {
 
     @SuppressWarnings("serial")
     private static final Map<Character, String> SPECIAL_CHARS = new HashMap<>() {{
@@ -51,23 +53,19 @@ public class IndexCodesTest extends TestCase {
         put('\\', "\\\\");
     }};
 
-    public IndexCodesTest(String name) {
-        super(name);
-    }
+    @Test
+    void testIndexCodes() throws Exception {
+        for (TestDB testDB : TestDB.getSupportedTestDbsForRead(Basename.INDEX_CODES)) {
+            try (Database db = testDB.openMem()) {
+                db.setDateTimeType(DateTimeType.DATE);
 
-    public void testIndexCodes() throws Exception {
-        for (TestDB testDB : TestDB.getSupportedForBasename(Basename.INDEX_CODES, true)) {
-            Database db = openMem(testDB);
-            db.setDateTimeType(DateTimeType.DATE);
-
-            for (Table t : db) {
-                for (Index index : t.getIndexes()) {
-                    // System.out.println("Checking " + t.getName() + "." + index.getName());
-                    checkIndexEntries(testDB, t, index);
+                for (Table t : db) {
+                    for (Index index : t.getIndexes()) {
+                        // System.out.println("Checking " + t.getName() + "." + index.getName());
+                        checkIndexEntries(testDB, t, index);
+                    }
                 }
             }
-
-            db.close();
         }
     }
 
@@ -81,7 +79,7 @@ public class IndexCodesTest extends TestCase {
             Row row = cursor.getCurrentRow();
 
             Object data = row.get("data");
-            if (testDB.getExpectedFileFormat() == Database.FileFormat.V1997 && data instanceof String && ((String) data).contains("\uFFFD")) {
+            if (testDB.getExpectedFileFormat() == FileFormat.V1997 && data instanceof String && ((String) data).contains("\uFFFD")) {
                 // this row has a character not supported in the v1997 charset
                 continue;
             }
@@ -120,7 +118,7 @@ public class IndexCodesTest extends TestCase {
 
         // TODO long rows not handled completely yet in V2010
         // seems to truncate entry at 508 bytes with some trailing 2 byte seq
-        if (testDB != null && testDB.getExpectedFileFormat() == Database.FileFormat.V2010) {
+        if (testDB != null && testDB.getExpectedFileFormat() == FileFormat.V2010) {
             String rowId = expectedRow.getString("name");
             String tName = t.getName();
             if (("Table11".equals(tName) || "Table11_desc".equals(tName)) && ("row10".equals(rowId) || "row11".equals(rowId) || "row12".equals(rowId))) {
@@ -138,39 +136,36 @@ public class IndexCodesTest extends TestCase {
     //
     //////
 
-    public void testNothing() {
+    @Test
+    void testNothing() {
         // keep this so build doesn't fail if other tests are disabled
     }
 
     public void x_testCreateIsoFile() throws Exception {
-        Database db = create(Database.FileFormat.V2000, true);
+        try (Database db = create(FileFormat.V2000, true)) {
+            Table t = new TableBuilder("test").addColumn(new ColumnBuilder("row", DataType.TEXT)).addColumn(new ColumnBuilder("data", DataType.TEXT)).toTable(db);
 
-        Table t = new TableBuilder("test").addColumn(new ColumnBuilder("row", DataType.TEXT)).addColumn(new ColumnBuilder("data", DataType.TEXT)).toTable(db);
-
-        for (int i = 0; i < 256; ++i) {
-            String str = "AA" + (char) i + "AA";
-            t.addRow("row" + i, str);
+            for (int i = 0; i < 256; ++i) {
+                String str = "AA" + (char) i + "AA";
+                t.addRow("row" + i, str);
+            }
         }
-
-        db.close();
     }
 
     public void x_testCreateAltIsoFile() throws Exception {
-        Database db = openCopy(Database.FileFormat.V2000, new File("/tmp/test_ind.mdb"), true);
+        try (Database db = openCopy(FileFormat.V2000, new File("/tmp/test_ind.mdb"), true)) {
+            Table t = db.getTable("Table1");
 
-        Table t = db.getTable("Table1");
-
-        for (int i = 0; i < 256; ++i) {
-            String str = "AA" + (char) i + "AA";
-            t.addRow("row" + i, str, (byte) 42 + i, (short) 53 + i, 13 * i, 6.7d / i, null, null, true);
+            for (int i = 0; i < 256; ++i) {
+                String str = "AA" + (char) i + "AA";
+                t.addRow("row" + i, str, (byte) 42 + i, (short) 53 + i, 13 * i, 6.7d / i, null, null, true);
+            }
         }
-
-        db.close();
     }
 
     @SuppressWarnings("unused")
     public void x_testWriteAllCodesMdb() throws Exception {
-        Database db = create(Database.FileFormat.V2000, true);
+        Database db = create(FileFormat.V2000, true);
 
         // Table t = new TableBuilder("Table1")
         // .addColumn(new ColumnBuilder("key", DataType.TEXT))
@@ -233,26 +228,25 @@ public class IndexCodesTest extends TestCase {
     }
 
     public void x_testReadAllCodesMdb() throws Exception {
-        // Database db = openCopy(new File("/data2/jackcess_test/testAllIndexCodes.mdb"));
-        // Database db = openCopy(new File("/data2/jackcess_test/testAllIndexCodes_orig.mdb"));
-        // Database db = openCopy(new File("/data2/jackcess_test/testSomeMoreCodes.mdb"));
-        Database db = openCopy(Database.FileFormat.V2000, new File("/data2/jackcess_test/testStillMoreCodes.mdb"));
-        Table t = db.getTable("Table5");
+        try (// Database db = openCopy(new File("/data2/jackcess_test/testAllIndexCodes.mdb"));
+                // Database db = openCopy(new File("/data2/jackcess_test/testAllIndexCodes_orig.mdb"));
+                // Database db = openCopy(new File("/data2/jackcess_test/testSomeMoreCodes.mdb"));
+        Database db = openCopy(FileFormat.V2000, new File("/data2/jackcess_test/testStillMoreCodes.mdb"))) {
+            Table t = db.getTable("Table5");
 
-        Index ind = t.getIndexes().iterator().next();
-        ((IndexImpl) ind).initialize();
+            Index ind = t.getIndexes().iterator().next();
+            ((IndexImpl) ind).initialize();
 
-        System.out.println("Ind " + ind);
+            System.out.println("Ind " + ind);
 
-        Cursor cursor = CursorBuilder.createCursor(ind);
-        while (cursor.moveToNextRow()) {
-            System.out.println("=======");
-            String entryStr = entryToString(cursor.getSavepoint().getCurrentPosition());
-            System.out.println("Entry Bytes: " + entryStr);
-            System.out.println("Value: " + cursor.getCurrentRow() + "; " + toUnicodeStr(cursor.getCurrentRow().get("data")));
+            Cursor cursor = CursorBuilder.createCursor(ind);
+            while (cursor.moveToNextRow()) {
+                System.out.println("=======");
+                String entryStr = entryToString(cursor.getSavepoint().getCurrentPosition());
+                System.out.println("Entry Bytes: " + entryStr);
+                System.out.println("Value: " + cursor.getCurrentRow() + "; " + toUnicodeStr(cursor.getCurrentRow().get("data")));
+            }
         }
-
-        db.close();
     }
 
     private int addCombos(Table t, int rowNum, String s, char[] cs, int len) throws Exception {
@@ -280,28 +274,26 @@ public class IndexCodesTest extends TestCase {
     }
 
     public void x_testReadIsoMdb() throws Exception {
-        // Database db = open(new File("/tmp/test_ind.mdb"));
-        // Database db = open(new File("/tmp/test_ind2.mdb"));
-        Database db = open(Database.FileFormat.V2000, new File("/tmp/test_ind3.mdb"));
-        // Database db = open(new File("/tmp/test_ind4.mdb"));
+        try (// Database db = open(new File("/tmp/test_ind.mdb"));
+                // Database db = open(new File("/tmp/test_ind2.mdb"));
+                // Database db = open(new File("/tmp/test_ind4.mdb"));
+        Database db = open(FileFormat.V2000, new File("/tmp/test_ind3.mdb"))) {
+            Table t = db.getTable("Table1");
+            Index index = t.getIndex("B");
+            ((IndexImpl) index).initialize();
+            System.out.println("Ind " + index);
 
-        Table t = db.getTable("Table1");
-        Index index = t.getIndex("B");
-        ((IndexImpl) index).initialize();
-        System.out.println("Ind " + index);
-
-        Cursor cursor = CursorBuilder.createCursor(index);
-        while (cursor.moveToNextRow()) {
-            System.out.println("=======");
-            System.out.println("Savepoint: " + cursor.getSavepoint());
-            System.out.println("Value: " + cursor.getCurrentRow());
+            Cursor cursor = CursorBuilder.createCursor(index);
+            while (cursor.moveToNextRow()) {
+                System.out.println("=======");
+                System.out.println("Savepoint: " + cursor.getSavepoint());
+                System.out.println("Value: " + cursor.getCurrentRow());
+            }
         }
-
-        db.close();
     }
 
     public void x_testReverseIsoMdb2010() throws Exception {
-        Database db = open(Database.FileFormat.V2010, new File("/data2/jackcess_test/testAllIndexCodes3_2010.accdb"));
+        Database db = open(FileFormat.V2010, new File("/data2/jackcess_test/testAllIndexCodes3_2010.accdb"));
 
         Table t = db.getTable("Table1");
         Index index = t.getIndexes().iterator().next();
@@ -470,7 +462,7 @@ public class IndexCodesTest extends TestCase {
     }
 
     public void x_testReverseIsoMdb() throws Exception {
-        Database db = open(Database.FileFormat.V2000, new File("/data2/jackcess_test/testAllIndexCodes3.mdb"));
+        Database db = open(FileFormat.V2000, new File("/data2/jackcess_test/testAllIndexCodes3.mdb"));
 
         Table t = db.getTable("Table1");
         Index index = t.getIndexes().iterator().next();

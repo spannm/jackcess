@@ -16,30 +16,27 @@ limitations under the License.
 
 package io.github.spannm.jackcess.util;
 
-import static io.github.spannm.jackcess.TestUtil.createExpectedRow;
+import static io.github.spannm.jackcess.test.TestUtil.createExpectedRow;
 
 import io.github.spannm.jackcess.DataType;
 import io.github.spannm.jackcess.Row;
 import io.github.spannm.jackcess.impl.ColumnImpl;
-import junit.framework.TestCase;
+import io.github.spannm.jackcess.test.AbstractBaseTest;
+import org.junit.jupiter.api.Test;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /**
  * @author James Ahlborn
  */
-public class RowFilterTest extends TestCase {
+class RowFilterTest extends AbstractBaseTest {
     private static final String ID_COL = "id";
     private static final String COL1   = "col1";
     private static final String COL2   = "col2";
     private static final String COL3   = "col3";
 
-    public RowFilterTest(String name) {
-        super(name);
-    }
-
-    public void testFilter() {
+    @Test
+    void testFilter() {
         Row row0 = createExpectedRow(ID_COL, 0, COL1, "foo", COL2, 13, COL3, "bar");
         Row row1 = createExpectedRow(ID_COL, 1, COL1, "bar", COL2, 42, COL3, null);
         Row row2 = createExpectedRow(ID_COL, 2, COL1, "foo", COL2, 55, COL3, "bar");
@@ -51,48 +48,17 @@ public class RowFilterTest extends TestCase {
 
         ColumnImpl testCol = new ColumnImpl(null, COL1, DataType.TEXT, 0, 0, 0) {
         };
-        assertEquals(List.of(row0, row2, row4),
-            toList(RowFilter.matchPattern(testCol,
-                "foo").apply(rows)));
-        assertEquals(List.of(row1, row3, row5),
-            toList(RowFilter.invert(
-                RowFilter.matchPattern(
-                    testCol,
-                    "foo"))
-                .apply(rows)));
+        assertEquals(List.of(row0, row2, row4), toList(RowFilter.matchPattern(testCol, "foo").apply(rows)));
+        assertEquals(List.of(row1, row3, row5), toList(RowFilter.invert(RowFilter.matchPattern(testCol, "foo")).apply(rows)));
 
-        assertEquals(List.of(row0, row2, row4),
-            toList(RowFilter.matchPattern(
-                createExpectedRow(COL1, "foo"))
-                .apply(rows)));
-        assertEquals(List.of(row0, row2),
-            toList(RowFilter.matchPattern(
-                createExpectedRow(COL1, "foo", COL3, "bar"))
-                .apply(rows)));
-        assertEquals(List.of(row4),
-            toList(RowFilter.matchPattern(
-                createExpectedRow(COL1, "foo", COL3, null))
-                .apply(rows)));
-        assertEquals(List.of(row0, row4, row5),
-            toList(RowFilter.matchPattern(
-                createExpectedRow(COL2, 13))
-                .apply(rows)));
-        assertEquals(List.of(row1),
-            toList(RowFilter.matchPattern(row1)
-                .apply(rows)));
+        assertEquals(List.of(row0, row2, row4), toList(RowFilter.matchPattern(createExpectedRow(COL1, "foo")).apply(rows)));
+        assertEquals(List.of(row0, row2), toList(RowFilter.matchPattern(createExpectedRow(COL1, "foo", COL3, "bar")).apply(rows)));
+        assertEquals(List.of(row4), toList(RowFilter.matchPattern(createExpectedRow(COL1, "foo", COL3, null)).apply(rows)));
+        assertEquals(List.of(row0, row4, row5), toList(RowFilter.matchPattern(createExpectedRow(COL2, 13)).apply(rows)));
+        assertEquals(List.of(row1), toList(RowFilter.matchPattern(row1).apply(rows)));
 
         assertEquals(rows, toList(RowFilter.apply(null, rows)));
-        assertEquals(List.of(row1),
-            toList(RowFilter.apply(RowFilter.matchPattern(row1),
-                rows)));
-    }
-
-    public static List<Row> toList(Iterable<Row> rows) {
-        List<Row> rowList = new ArrayList<>();
-        for (Row row : rows) {
-            rowList.add(row);
-        }
-        return rowList;
+        assertEquals(List.of(row1), toList(RowFilter.apply(RowFilter.matchPattern(row1), rows)));
     }
 
 }

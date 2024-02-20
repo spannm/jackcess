@@ -16,13 +16,13 @@ limitations under the License.
 
 package io.github.spannm.jackcess;
 
-import static org.junit.Assert.assertArrayEquals;
-
 import io.github.spannm.jackcess.impl.ColumnImpl;
 import io.github.spannm.jackcess.impl.JetFormat;
 import io.github.spannm.jackcess.impl.PageChannel;
 import io.github.spannm.jackcess.impl.TableImpl;
-import junit.framework.TestCase;
+import io.github.spannm.jackcess.test.AbstractBaseTest;
+import io.github.spannm.jackcess.test.TestUtil;
+import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
@@ -34,7 +34,7 @@ import java.util.TimeZone;
 /**
  * @author Tim McCune
  */
-public class TableTest extends TestCase {
+class TableTest extends AbstractBaseTest {
 
     private final PageChannel _pageChannel = new PageChannel(true) {
                                            };
@@ -43,10 +43,6 @@ public class TableTest extends TestCase {
     private int               _varLenIdx;
     private int               _fixedOffset;
 
-    public TableTest(String name) {
-        super(name);
-    }
-
     private void reset() {
         _testTable = null;
         _columns = new ArrayList<>();
@@ -54,7 +50,8 @@ public class TableTest extends TestCase {
         _fixedOffset = 0;
     }
 
-    public void testCreateRow() throws Exception {
+    @Test
+    void testCreateRow() throws Exception {
         reset();
         newTestColumn(DataType.INT, false);
         newTestColumn(DataType.TEXT, false);
@@ -74,7 +71,8 @@ public class TableTest extends TestCase {
         assertEquals((byte) 7, buffer.get(30));
     }
 
-    public void testUnicodeCompression() throws Exception {
+    @Test
+    void testUnicodeCompression() throws Exception {
         reset();
         newTestColumn(DataType.TEXT, false);
         newTestColumn(DataType.TEXT, false);

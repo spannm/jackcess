@@ -17,10 +17,11 @@ limitations under the License.
 package io.github.spannm.jackcess.impl.expr;
 
 import io.github.spannm.jackcess.DataType;
-import io.github.spannm.jackcess.TestUtil;
 import io.github.spannm.jackcess.expr.*;
 import io.github.spannm.jackcess.impl.BaseEvalContext;
-import junit.framework.TestCase;
+import io.github.spannm.jackcess.test.AbstractBaseTest;
+import io.github.spannm.jackcess.test.TestUtil;
+import org.junit.jupiter.api.Test;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
@@ -36,7 +37,7 @@ import javax.script.SimpleBindings;
 /**
  * @author James Ahlborn
  */
-public class ExpressionatorTest extends TestCase {
+class ExpressionatorTest extends AbstractBaseTest {
     private static final double[] DBLS      =
         {-10.3d, -9.0d, -8.234d, -7.11111d, -6.99999d, -5.5d, -4.0d, -3.4159265d, -2.84d, -1.0000002d, -1.0d, -0.0002013d, 0.0d,
          0.9234d, 1.0d, 1.954d, 2.200032d, 3.001d, 4.9321d, 5.0d, 6.66666d, 7.396d, 8.1d, 9.20456200d, 10.325d};
@@ -44,11 +45,8 @@ public class ExpressionatorTest extends TestCase {
     private static final int      TRUE_NUM  = -1;
     private static final int      FALSE_NUM = 0;
 
-    public ExpressionatorTest(String name) {
-        super(name);
-    }
-
-    public void testParseSimpleExprs() {
+    @Test
+    void testParseSimpleExprs() {
         validateExpr("\"A\"", "<ELiteralValue>{\"A\"}");
 
         validateExpr("13", "<ELiteralValue>{13}");
@@ -100,7 +98,8 @@ public class ExpressionatorTest extends TestCase {
     }
 
     @SuppressWarnings("checkstyle:LineLengthCheck")
-    public void testOrderOfOperations() {
+    @Test
+    void testOrderOfOperations() {
         validateExpr("\"A\" Eqv \"B\"", "<ELogicalOp>{<ELiteralValue>{\"A\"} Eqv <ELiteralValue>{\"B\"}}");
 
         validateExpr("\"A\" Eqv \"B\" Xor \"C\"", "<ELogicalOp>{<ELiteralValue>{\"A\"} Eqv <ELogicalOp>{<ELiteralValue>{\"B\"} Xor <ELiteralValue>{\"C\"}}}");
@@ -129,7 +128,8 @@ public class ExpressionatorTest extends TestCase {
 
     }
 
-    public void testSimpleMathExpressions() {
+    @Test
+    void testSimpleMathExpressions() {
         for (int i = -10; i <= 10; ++i) {
             assertEquals(-i, eval("=-(" + i + ")"));
         }
@@ -262,7 +262,8 @@ public class ExpressionatorTest extends TestCase {
         }
     }
 
-    public void testComparison() {
+    @Test
+    void testComparison() {
         assertEquals(TRUE_NUM, eval("='blah'<'fuzz'"));
         assertEquals(FALSE_NUM, eval("=23>56"));
         assertEquals(FALSE_NUM, eval("=23>=56"));
@@ -292,7 +293,8 @@ public class ExpressionatorTest extends TestCase {
         assertEquals(TRUE_NUM, eval("=Not(True Eqv False)"));
     }
 
-    public void testDateArith() {
+    @Test
+    void testDateArith() {
         assertEquals(LocalDateTime.of(2003, 1, 2, 7, 0), eval("=#01/02/2003# + #7:00:00 AM#"));
         assertEquals(LocalDateTime.of(2003, 1, 1, 17, 0), eval("=#01/02/2003# - #7:00:00 AM#"));
         assertEquals(LocalDateTime.of(2003, 2, 8, 0, 0), eval("=#01/02/2003# + '37'"));
@@ -304,7 +306,8 @@ public class ExpressionatorTest extends TestCase {
         assertEquals("1/2/2003 1:10:00 PM", eval("=CStr(#01/02/2003# + #13:10:00#)"));
     }
 
-    public void testNull() {
+    @Test
+    void testNull() {
         assertNull(eval("=37 + Null"));
         assertNull(eval("=37 - Null"));
         assertNull(eval("=37 / Null"));
@@ -338,7 +341,8 @@ public class ExpressionatorTest extends TestCase {
         assertNull(eval("=Null In (23, Null, 45)"));
     }
 
-    public void testTrickyMathExpressions() {
+    @Test
+    void testTrickyMathExpressions() {
         assertEquals(37, eval("=30+7"));
         assertEquals(23, eval("=30+-7"));
         assertEquals(23, eval("=30-+7"));
@@ -354,7 +358,8 @@ public class ExpressionatorTest extends TestCase {
         assertEquals(toBD(-101d), eval("=-10E-1-10e+1"));
     }
 
-    public void testTypeCoercion() {
+    @Test
+    void testTypeCoercion() {
         assertEquals("foobar", eval("=\"foo\" + \"bar\""));
 
         assertEquals("12foo", eval("=12 + \"foo\""));
@@ -380,7 +385,8 @@ public class ExpressionatorTest extends TestCase {
         assertEquals(128208, eval("=#1/1/2017# * 3"));
     }
 
-    public void testLikeExpression() {
+    @Test
+    void testLikeExpression() {
         validateExpr("Like \"[abc]*\"", "<ELikeOp>{<EThisValue>{<THIS_COL>} Like \"[abc]*\"([abc].*)}",
             "Like \"[abc]*\"");
         assertTrue(evalCondition("Like \"[abc]*\"", "afcd"));
@@ -394,7 +400,8 @@ public class ExpressionatorTest extends TestCase {
         assertFalse(evalCondition("Like \"[abc*\"", ""));
     }
 
-    public void testLiteralDefaultValue() {
+    @Test
+    void testLiteralDefaultValue() {
         assertEquals("-28 blah ", eval("=CDbl(9)-37 & \" blah \"",
             Value.Type.STRING));
         assertEquals("CDbl(9)-37 & \" blah \"",
@@ -404,7 +411,8 @@ public class ExpressionatorTest extends TestCase {
         assertEquals(-28d, eval("CDbl(9)-37", Value.Type.DOUBLE));
     }
 
-    public void testParseSomeExprs() throws Exception {
+    @Test
+    void testParseSomeExprs() throws Exception {
         BufferedReader br = new BufferedReader(new FileReader("src/test/resources/test_exprs.txt"));
 
         TestContext tc = new TestContext() {
@@ -443,7 +451,8 @@ public class ExpressionatorTest extends TestCase {
         br.close();
     }
 
-    public void testInvalidExpressions() {
+    @Test
+    void testInvalidExpressions() {
         doTestEvalFail("", "empty");
         doTestEvalFail("=", "found?");
         doTestEvalFail("=(34 + 5", "closing");

@@ -18,15 +18,18 @@ package io.github.spannm.jackcess;
 
 import static io.github.spannm.jackcess.DatabaseBuilder.newColumn;
 import static io.github.spannm.jackcess.DatabaseBuilder.newTable;
-import static io.github.spannm.jackcess.TestUtil.*;
-import static io.github.spannm.jackcess.impl.JetFormatTest.SUPPORTED_FILEFORMATS;
+import static io.github.spannm.jackcess.test.TestUtil.assertSameDate;
+import static io.github.spannm.jackcess.test.TestUtil.createMem;
 
 import io.github.spannm.jackcess.Database.FileFormat;
 import io.github.spannm.jackcess.impl.ColumnImpl;
 import io.github.spannm.jackcess.impl.DatabaseImpl;
-import io.github.spannm.jackcess.impl.JetFormatTest.Basename;
-import io.github.spannm.jackcess.impl.JetFormatTest.TestDB;
-import junit.framework.TestCase;
+import io.github.spannm.jackcess.test.AbstractBaseTest;
+import io.github.spannm.jackcess.test.Basename;
+import io.github.spannm.jackcess.test.TestDB;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -38,15 +41,12 @@ import java.util.*;
  *
  * @author James Ahlborn
  */
-public class LocalDateTimeTest extends TestCase {
-    public LocalDateTimeTest(String name) {
-        super(name);
-    }
+class LocalDateTimeTest extends AbstractBaseTest {
 
-    public void testWriteAndReadLocalDate() throws Exception {
-        for (FileFormat fileFormat : SUPPORTED_FILEFORMATS) {
-            Database db = createMem(fileFormat);
-
+    @ParameterizedTest(name = "[{index}] {0}")
+    @MethodSource("getSupportedFileformats")
+    void testWriteAndReadLocalDate(FileFormat fileFormat) throws Exception {
+        try (Database db = createMem(fileFormat)) {
             db.setDateTimeType(DateTimeType.LOCAL_DATE_TIME);
 
             Table table = newTable("test")
@@ -100,20 +100,17 @@ public class LocalDateTimeTest extends TestCase {
                 LocalDateTime found = foundDates.get(i);
                 assertSameDate(expected, found);
             }
-
-            db.close();
         }
     }
 
-    public void testAncientLocalDates() throws Exception {
-        ZoneId zoneId = ZoneId.of("America/New_York");
+    @ParameterizedTest(name = "[{index}] {0}")
+    @MethodSource("getSupportedFileformats")
+    void testAncientLocalDates1(FileFormat fileFormat) throws Exception {
         DateTimeFormatter sdf = DateTimeFormatter.ofPattern("uuuu-MM-dd");
-
         List<String> dates = List.of("1582-10-15", "1582-10-14", "1492-01-10", "1392-01-10");
 
-        for (FileFormat fileFormat : SUPPORTED_FILEFORMATS) {
-            Database db = createMem(fileFormat);
-            db.setZoneId(zoneId);
+        try (Database db = createMem(fileFormat)) {
+            db.setZoneId(ZoneId.of("America/New_York"));
             db.setDateTimeType(DateTimeType.LOCAL_DATE_TIME);
 
             Table table = newTable("test")
@@ -132,29 +129,32 @@ public class LocalDateTimeTest extends TestCase {
             }
 
             assertEquals(dates, foundDates);
-
-            db.close();
         }
+    }
 
-        for (TestDB testDB : TestDB.getSupportedForBasename(Basename.OLD_DATES)) {
-            Database db = openCopy(testDB);
-            db.setDateTimeType(DateTimeType.LOCAL_DATE_TIME);
+    void testAncientLocalDates2() throws Exception {
+        DateTimeFormatter sdf = DateTimeFormatter.ofPattern("uuuu-MM-dd");
+        List<String> dates = List.of("1582-10-15", "1582-10-14", "1492-01-10", "1392-01-10");
 
-            Table t = db.getTable("Table1");
+        for (TestDB testDB : TestDB.getSupportedTestDbs(Basename.OLD_DATES)) {
+            try (Database db = testDB.openCopy()) {
+                db.setDateTimeType(DateTimeType.LOCAL_DATE_TIME);
 
-            List<String> foundDates = new ArrayList<>();
-            for (Row row : t) {
-                foundDates.add(sdf.format(row.getLocalDateTime("DateField")));
+                Table t = db.getTable("Table1");
+
+                List<String> foundDates = new ArrayList<>();
+                for (Row row : t) {
+                    foundDates.add(sdf.format(row.getLocalDateTime("DateField")));
+                }
+
+                assertEquals(dates, foundDates);
             }
-
-            assertEquals(dates, foundDates);
-
-            db.close();
         }
 
     }
 
-    public void testZoneId() throws Exception {
+    @Test
+    void testZoneId() throws Exception {
         ZoneId zoneId = ZoneId.of("America/New_York");
         doTestZoneId(zoneId);
 
@@ -206,10 +206,12 @@ public class LocalDateTimeTest extends TestCase {
         }
     }
 
-    public void testWriteAndReadTemporals() throws Exception {
+    @ParameterizedTest(name = "[{index}] {0}")
+    @MethodSource("getSupportedFileformats")
+    void testWriteAndReadTemporals(FileFormat fileFormat) throws Exception {
         ZoneId zoneId = ZoneId.of("America/New_York");
-        for (FileFormat fileFormat : SUPPORTED_FILEFORMATS) {
-            Database db = createMem(fileFormat);
+
+        try (Database db = createMem(fileFormat)) {
             db.setZoneId(zoneId);
             db.setDateTimeType(DateTimeType.LOCAL_DATE_TIME);
 
@@ -260,8 +262,6 @@ public class LocalDateTimeTest extends TestCase {
             }
 
             assertEquals(expected, foundDates);
-
-            db.close();
         }
     }
 

@@ -16,15 +16,16 @@ limitations under the License.
 
 package io.github.spannm.jackcess;
 
-import static io.github.spannm.jackcess.TestUtil.*;
-import static io.github.spannm.jackcess.impl.JetFormatTest.SUPPORTED_FILEFORMATS;
+import static io.github.spannm.jackcess.test.TestUtil.*;
 
 import io.github.spannm.jackcess.Database.FileFormat;
 import io.github.spannm.jackcess.impl.*;
-import io.github.spannm.jackcess.impl.JetFormatTest.Basename;
-import io.github.spannm.jackcess.impl.JetFormatTest.TestDB;
-import io.github.spannm.jackcess.util.RowFilterTest;
-import junit.framework.TestCase;
+import io.github.spannm.jackcess.test.AbstractBaseTest;
+import io.github.spannm.jackcess.test.Basename;
+import io.github.spannm.jackcess.test.TestDB;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -40,15 +41,12 @@ import java.util.stream.Collectors;
  * @author Tim McCune
  */
 @SuppressWarnings("deprecation")
-public class DatabaseTest extends TestCase {
-    public DatabaseTest(String name) {
-        super(name);
-    }
+class DatabaseTest extends AbstractBaseTest {
 
-    public void testInvalidTableDefs() throws Exception {
-        for (FileFormat fileFormat : SUPPORTED_FILEFORMATS) {
-            Database db = create(fileFormat);
-
+    @ParameterizedTest(name = "[{index}] {0}")
+    @MethodSource("getSupportedFileformats")
+    void testInvalidTableDefs(FileFormat fileFormat) throws Exception {
+        try (Database db = create(fileFormat)) {
             try {
                 DatabaseBuilder.newTable("test").toTable(db);
                 fail("created table with no columns?");
@@ -97,14 +95,13 @@ public class DatabaseTest extends TestCase {
             } catch (IllegalArgumentException e) {
                 // success
             }
-
-            db.close();
         }
     }
 
-    public void testReadDeletedRows() throws Exception {
-        for (TestDB testDB : TestDB.getSupportedForBasename(Basename.DEL, true)) {
-            try (Database db = open(testDB)) {
+    @Test
+    void testReadDeletedRows() throws Exception {
+        for (TestDB testDB : TestDB.getSupportedTestDbsForRead(Basename.DEL)) {
+            try (Database db = testDB.open()) {
                 Table table = db.getTable("Table");
                 int rows = 0;
                 while (table.getNextRow() != null) {
@@ -115,9 +112,10 @@ public class DatabaseTest extends TestCase {
         }
     }
 
-    public void testGetColumns() throws Exception {
-        for (TestDB testDB : JetFormatTest.SUPPORTED_DBS_TEST_FOR_READ) {
-            try (Database db = open(testDB)) {
+    @Test
+    void testGetColumns() throws Exception {
+        for (TestDB testDB : getSupportedReadOnlyTestDbs()) {
+            try (Database db = testDB.open()) {
                 List<? extends Column> columns = db.getTable("Table1").getColumns();
                 assertEquals(9, columns.size());
                 checkColumn(columns, 0, "A", DataType.TEXT);
@@ -139,112 +137,112 @@ public class DatabaseTest extends TestCase {
         assertEquals(dataType, column.getType());
     }
 
-    public void testGetNextRow() throws Exception {
-        for (TestDB testDB : JetFormatTest.SUPPORTED_DBS_TEST_FOR_READ) {
-            final Database db = open(testDB);
-            db.setDateTimeType(DateTimeType.DATE);
+    @Test
+    void testGetNextRow() throws Exception {
+        for (TestDB testDB : getSupportedReadOnlyTestDbs()) {
+            try (Database db = testDB.open()) {
+                db.setDateTimeType(DateTimeType.DATE);
 
-            assertEquals(4, db.getTableNames().size());
-            final Table table = db.getTable("Table1");
+                assertEquals(4, db.getTableNames().size());
+                final Table table = db.getTable("Table1");
 
-            Row row1 = table.getNextRow();
-            Row row2 = table.getNextRow();
+                Row row1 = table.getNextRow();
+                Row row2 = table.getNextRow();
 
-            if (!"abcdefg".equals(row1.get("A"))) {
-                Row tmpRow = row1;
-                row1 = row2;
-                row2 = tmpRow;
+                if (!"abcdefg".equals(row1.get("A"))) {
+                    Row tmpRow = row1;
+                    row1 = row2;
+                    row2 = tmpRow;
+                }
+
+                checkTestDBTable1RowABCDEFG(testDB, table, row1);
+                checkTestDBTable1RowA(testDB, table, row2);
             }
-
-            checkTestDBTable1RowABCDEFG(testDB, table, row1);
-            checkTestDBTable1RowA(testDB, table, row2);
-
-            db.close();
         }
     }
 
-    public void testCreate() throws Exception {
-        for (FileFormat fileFormat : SUPPORTED_FILEFORMATS) {
-            Database db = create(fileFormat);
+    @ParameterizedTest(name = "[{index}] {0}")
+    @MethodSource("getSupportedFileformats")
+    void testCreate(FileFormat fileFormat) throws Exception {
+        try (Database db = create(fileFormat)) {
             assertEquals(0, db.getTableNames().size());
-            db.close();
         }
     }
 
-    public void testDeleteCurrentRow() throws Exception {
-
+    @ParameterizedTest(name = "[{index}] {0}")
+    @MethodSource("getSupportedFileformats")
+    void testDeleteCurrentRow(FileFormat fileFormat) throws Exception {
         // make sure correct row is deleted
-        for (FileFormat fileFormat : SUPPORTED_FILEFORMATS) {
-            Database db = createMem(fileFormat);
-            createTestTable(db);
-            Map<String, Object> row1 = createTestRowMap("Tim1");
-            Map<String, Object> row2 = createTestRowMap("Tim2");
-            Map<String, Object> row3 = createTestRowMap("Tim3");
-            Table table = db.getTable("Test");
-            List<Map<String, Object>> rows = List.of(row1, row2, row3);
-            table.addRowsFromMaps(rows);
-            assertRowCount(3, table);
+        Database db = createMem(fileFormat);
+        createTestTable(db);
+        Map<String, Object> row1 = createTestRowMap("Tim1");
+        Map<String, Object> row2 = createTestRowMap("Tim2");
+        Map<String, Object> row3 = createTestRowMap("Tim3");
+        Table table = db.getTable("Test");
+        List<Map<String, Object>> rows = List.of(row1, row2, row3);
+        table.addRowsFromMaps(rows);
+        assertRowCount(3, table);
 
-            table.reset();
-            table.getNextRow();
-            table.getNextRow();
-            table.getDefaultCursor().deleteCurrentRow();
+        table.reset();
+        table.getNextRow();
+        table.getNextRow();
+        table.getDefaultCursor().deleteCurrentRow();
 
-            table.reset();
+        table.reset();
 
-            Map<String, Object> outRow = table.getNextRow();
-            assertEquals("Tim1", outRow.get("A"));
-            outRow = table.getNextRow();
-            assertEquals("Tim3", outRow.get("A"));
-            assertRowCount(2, table);
+        Map<String, Object> outRow = table.getNextRow();
+        assertEquals("Tim1", outRow.get("A"));
+        outRow = table.getNextRow();
+        assertEquals("Tim3", outRow.get("A"));
+        assertRowCount(2, table);
 
-            db.close();
+        db.close();
 
-            // test multi row delete/add
-            db = createMem(fileFormat);
-            createTestTable(db);
-            Object[] row = createTestRow();
-            table = db.getTable("Test");
-            for (int i = 0; i < 10; i++) {
-                row[3] = i;
-                table.addRow(row);
-            }
-            row[3] = 1974;
-            assertRowCount(10, table);
-            table.reset();
-            table.getNextRow();
-            table.getDefaultCursor().deleteCurrentRow();
-            assertRowCount(9, table);
-            table.reset();
-            table.getNextRow();
-            table.getDefaultCursor().deleteCurrentRow();
-            assertRowCount(8, table);
-            table.reset();
-            for (int i = 0; i < 8; i++) {
-                table.getNextRow();
-            }
-            table.getDefaultCursor().deleteCurrentRow();
-            assertRowCount(7, table);
+        // test multi row delete/add
+        db = createMem(fileFormat);
+        createTestTable(db);
+        Object[] row = createTestRow();
+        table = db.getTable("Test");
+        for (int i = 0; i < 10; i++) {
+            row[3] = i;
             table.addRow(row);
-            assertRowCount(8, table);
-            table.reset();
-            for (int i = 0; i < 3; i++) {
-                table.getNextRow();
-            }
-            table.getDefaultCursor().deleteCurrentRow();
-            assertRowCount(7, table);
-            table.reset();
-            assertEquals(2, table.getNextRow().get("D"));
-
-            db.close();
         }
+        row[3] = 1974;
+        assertRowCount(10, table);
+        table.reset();
+        table.getNextRow();
+        table.getDefaultCursor().deleteCurrentRow();
+        assertRowCount(9, table);
+        table.reset();
+        table.getNextRow();
+        table.getDefaultCursor().deleteCurrentRow();
+        assertRowCount(8, table);
+        table.reset();
+        for (int i = 0; i < 8; i++) {
+            table.getNextRow();
+        }
+        table.getDefaultCursor().deleteCurrentRow();
+        assertRowCount(7, table);
+        table.addRow(row);
+        assertRowCount(8, table);
+        table.reset();
+        for (int i = 0; i < 3; i++) {
+            table.getNextRow();
+        }
+        table.getDefaultCursor().deleteCurrentRow();
+        assertRowCount(7, table);
+        table.reset();
+        assertEquals(2, table.getNextRow().get("D"));
+
+        db.close();
     }
 
-    public void testDeleteRow() throws Exception {
-
+    @ParameterizedTest(name = "[{index}] {0}")
+    @MethodSource("getSupportedFileformats")
+    void testDeleteRow(FileFormat fileFormat) throws Exception {
         // make sure correct row is deleted
-        for (FileFormat fileFormat : SUPPORTED_FILEFORMATS) {
-            Database db = createMem(fileFormat);
+        try (
+        Database db = createMem(fileFormat)) {
             createTestTable(db);
             Table table = db.getTable("Test");
             for (int i = 0; i < 10; ++i) {
@@ -254,7 +252,7 @@ public class DatabaseTest extends TestCase {
 
             table.reset();
 
-            List<Row> rows = RowFilterTest.toList(table);
+            List<Row> rows = toList(table);
 
             Row r1 = rows.remove(7);
             Row r2 = rows.remove(3);
@@ -272,7 +270,8 @@ public class DatabaseTest extends TestCase {
         }
     }
 
-    public void testMissingFile() throws Exception {
+    @Test
+    void testMissingFile() throws Exception {
         File bogusFile = new File("fooby-dooby.mdb");
         assertFalse(bogusFile.exists());
         try {
@@ -284,9 +283,10 @@ public class DatabaseTest extends TestCase {
         assertFalse(bogusFile.exists());
     }
 
-    public void testReadWithDeletedCols() throws Exception {
-        for (TestDB testDB : TestDB.getSupportedForBasename(Basename.DEL_COL, true)) {
-            try (Database db = open(testDB)) {
+    @Test
+    void testReadWithDeletedCols() throws Exception {
+        for (TestDB testDB : TestDB.getSupportedTestDbsForRead(Basename.DEL_COL)) {
+            try (Database db = testDB.open()) {
                 Table table = db.getTable("Table1");
 
                 Map<String, Object> expectedRow0 = new LinkedHashMap<>();
@@ -317,10 +317,10 @@ public class DatabaseTest extends TestCase {
         }
     }
 
-    public void testCurrency() throws Exception {
-        for (FileFormat fileFormat : SUPPORTED_FILEFORMATS) {
-            Database db = create(fileFormat);
-
+    @ParameterizedTest(name = "[{index}] {0}")
+    @MethodSource("getSupportedFileformats")
+    void testCurrency(FileFormat fileFormat) throws Exception {
+        try (Database db = create(fileFormat)) {
             Table table = DatabaseBuilder.newTable("test")
                 .addColumn(DatabaseBuilder.newColumn("A", DataType.MONEY))
                 .toTable(db);
@@ -349,252 +349,246 @@ public class DatabaseTest extends TestCase {
             } catch (IOException e) {
                 // ignored
             }
-
-            db.close();
         }
     }
 
-    public void testGUID() throws Exception {
-        for (FileFormat fileFormat : SUPPORTED_FILEFORMATS) {
-            Database db = create(fileFormat);
+    @ParameterizedTest(name = "[{index}] {0}")
+    @MethodSource("getSupportedFileformats")
+    void testGUID(FileFormat fileFormat) throws Exception {
+        Database db = create(fileFormat);
 
-            Table table = DatabaseBuilder.newTable("test")
-                .addColumn(DatabaseBuilder.newColumn("A", DataType.GUID))
-                .toTable(db);
+        Table table = DatabaseBuilder.newTable("test")
+            .addColumn(DatabaseBuilder.newColumn("A", DataType.GUID))
+            .toTable(db);
 
-            table.addRow("{32A59F01-AA34-3E29-453F-4523453CD2E6}");
-            table.addRow("{32a59f01-aa34-3e29-453f-4523453cd2e6}");
-            table.addRow("{11111111-1111-1111-1111-111111111111}");
-            table.addRow("   {FFFFFFFF-FFFF-FFFF-FFFF-FFFFFFFFFFFF}   ");
-            table.addRow(UUID.fromString("32a59f01-1234-3e29-4aaf-4523453cd2e6"));
+        table.addRow("{32A59F01-AA34-3E29-453F-4523453CD2E6}");
+        table.addRow("{32a59f01-aa34-3e29-453f-4523453cd2e6}");
+        table.addRow("{11111111-1111-1111-1111-111111111111}");
+        table.addRow("   {FFFFFFFF-FFFF-FFFF-FFFF-FFFFFFFFFFFF}   ");
+        table.addRow(UUID.fromString("32a59f01-1234-3e29-4aaf-4523453cd2e6"));
 
-            table.reset();
+        table.reset();
 
-            List<Object> foundValues = new ArrayList<>();
-            Map<String, Object> row = null;
-            while ((row = table.getNextRow()) != null) {
-                foundValues.add(row.get("A"));
-            }
+        List<Object> foundValues = new ArrayList<>();
+        Map<String, Object> row = null;
+        while ((row = table.getNextRow()) != null) {
+            foundValues.add(row.get("A"));
+        }
 
-            assertEquals(List.of(
-                "{32A59F01-AA34-3E29-453F-4523453CD2E6}",
-                "{32A59F01-AA34-3E29-453F-4523453CD2E6}",
-                "{11111111-1111-1111-1111-111111111111}",
-                "{FFFFFFFF-FFFF-FFFF-FFFF-FFFFFFFFFFFF}",
-                "{32A59F01-1234-3E29-4AAF-4523453CD2E6}"),
-                foundValues);
+        assertEquals(List.of(
+            "{32A59F01-AA34-3E29-453F-4523453CD2E6}",
+            "{32A59F01-AA34-3E29-453F-4523453CD2E6}",
+            "{11111111-1111-1111-1111-111111111111}",
+            "{FFFFFFFF-FFFF-FFFF-FFFF-FFFFFFFFFFFF}",
+            "{32A59F01-1234-3E29-4AAF-4523453CD2E6}"),
+            foundValues);
 
-            try {
-                table.addRow("3245234");
-                fail("IOException should have been thrown");
-            } catch (IOException e) {
-                // ignored
-            }
-
-            db.close();
+        try {
+            table.addRow("3245234");
+            fail("IOException should have been thrown");
+        } catch (IOException e) {
+            // ignored
         }
     }
 
-    public void testNumeric() throws Exception {
-        for (FileFormat fileFormat : SUPPORTED_FILEFORMATS) {
-            Database db = create(fileFormat);
+    @ParameterizedTest(name = "[{index}] {0}")
+    @MethodSource("getSupportedFileformats")
+    void testNumeric(FileFormat fileFormat) throws Exception {
+        Database db = create(fileFormat);
 
-            ColumnBuilder col = DatabaseBuilder.newColumn("A", DataType.NUMERIC)
-                .withScale(4).withPrecision(8).toColumn();
-            assertTrue(col.getType().isVariableLength());
+        ColumnBuilder col = DatabaseBuilder.newColumn("A", DataType.NUMERIC)
+            .withScale(4).withPrecision(8).toColumn();
+        assertTrue(col.getType().isVariableLength());
 
-            Table table = DatabaseBuilder.newTable("test")
-                .addColumn(col)
-                .addColumn(DatabaseBuilder.newColumn("B", DataType.NUMERIC)
-                    .withScale(8).withPrecision(28))
-                .toTable(db);
+        Table table = DatabaseBuilder.newTable("test")
+            .addColumn(col)
+            .addColumn(DatabaseBuilder.newColumn("B", DataType.NUMERIC)
+                .withScale(8).withPrecision(28))
+            .toTable(db);
 
-            table.addRow(new BigDecimal("-1234.03450"),
-                new BigDecimal("23923434453436.36234219"));
-            table.addRow(37L, 37L);
-            table.addRow("1000.45", "-3452345321000");
+        table.addRow(new BigDecimal("-1234.03450"),
+            new BigDecimal("23923434453436.36234219"));
+        table.addRow(37L, 37L);
+        table.addRow("1000.45", "-3452345321000");
 
-            table.reset();
+        table.reset();
 
-            List<Object> foundSmallValues = new ArrayList<>();
-            List<Object> foundBigValues = new ArrayList<>();
-            Map<String, Object> row = null;
-            while ((row = table.getNextRow()) != null) {
-                foundSmallValues.add(row.get("A"));
-                foundBigValues.add(row.get("B"));
-            }
+        List<Object> foundSmallValues = new ArrayList<>();
+        List<Object> foundBigValues = new ArrayList<>();
+        Map<String, Object> row = null;
+        while ((row = table.getNextRow()) != null) {
+            foundSmallValues.add(row.get("A"));
+            foundBigValues.add(row.get("B"));
+        }
 
-            assertEquals(List.of(
-                new BigDecimal("-1234.0345"),
-                new BigDecimal("37.0000"),
-                new BigDecimal("1000.4500")),
-                foundSmallValues);
-            assertEquals(List.of(
-                new BigDecimal("23923434453436.36234219"),
-                new BigDecimal("37.00000000"),
-                new BigDecimal("-3452345321000.00000000")),
-                foundBigValues);
+        assertEquals(List.of(
+            new BigDecimal("-1234.0345"),
+            new BigDecimal("37.0000"),
+            new BigDecimal("1000.4500")),
+            foundSmallValues);
+        assertEquals(List.of(
+            new BigDecimal("23923434453436.36234219"),
+            new BigDecimal("37.00000000"),
+            new BigDecimal("-3452345321000.00000000")),
+            foundBigValues);
 
-            try {
-                table.addRow(new BigDecimal("3245234.234"),
-                    new BigDecimal("3245234.234"));
-                fail("IOException should have been thrown");
-            } catch (IOException e) {
-                // ignored
-            }
-
-            db.close();
+        try {
+            table.addRow(new BigDecimal("3245234.234"),
+                new BigDecimal("3245234.234"));
+            fail("IOException should have been thrown");
+        } catch (IOException e) {
+            // ignored
         }
     }
 
-    public void testFixedNumeric() throws Exception {
-        for (TestDB testDB : TestDB.getSupportedForBasename(Basename.FIXED_NUMERIC)) {
-            Database db = openCopy(testDB);
-            Table t = db.getTable("test");
+    @Test
+    void testFixedNumeric() throws Exception {
+        for (TestDB testDB : TestDB.getSupportedTestDbs(Basename.FIXED_NUMERIC)) {
+            try (Database db = testDB.openCopy()) {
+                Table t = db.getTable("test");
 
-            boolean first = true;
-            for (Column col : t.getColumns()) {
-                if (first) {
-                    assertTrue(col.isVariableLength());
-                    assertEquals(DataType.MEMO, col.getType());
-                    first = false;
-                } else {
-                    assertFalse(col.isVariableLength());
-                    assertEquals(DataType.NUMERIC, col.getType());
+                boolean first = true;
+                for (Column col : t.getColumns()) {
+                    if (first) {
+                        assertTrue(col.isVariableLength());
+                        assertEquals(DataType.MEMO, col.getType());
+                        first = false;
+                    } else {
+                        assertFalse(col.isVariableLength());
+                        assertEquals(DataType.NUMERIC, col.getType());
+                    }
                 }
+
+                Map<String, Object> row = t.getNextRow();
+                assertEquals("some data", row.get("col1"));
+                assertEquals(BigDecimal.ONE, row.get("col2"));
+                assertEquals(BigDecimal.ZERO, row.get("col3"));
+                assertEquals(BigDecimal.ZERO, row.get("col4"));
+                assertEquals(new BigDecimal("4"), row.get("col5"));
+                assertEquals(new BigDecimal("-1"), row.get("col6"));
+                assertEquals(BigDecimal.ONE, row.get("col7"));
+
+                Object[] tmpRow = new Object[] {"foo", BigDecimal.ONE, new BigDecimal(3), new BigDecimal("13"), new BigDecimal("-17"), BigDecimal.ZERO, new BigDecimal("8734")};
+                t.addRow(tmpRow);
+                t.reset();
+
+                t.getNextRow();
+                row = t.getNextRow();
+                assertEquals(tmpRow[0], row.get("col1"));
+                assertEquals(tmpRow[1], row.get("col2"));
+                assertEquals(tmpRow[2], row.get("col3"));
+                assertEquals(tmpRow[3], row.get("col4"));
+                assertEquals(tmpRow[4], row.get("col5"));
+                assertEquals(tmpRow[5], row.get("col6"));
+                assertEquals(tmpRow[6], row.get("col7"));
             }
-
-            Map<String, Object> row = t.getNextRow();
-            assertEquals("some data", row.get("col1"));
-            assertEquals(BigDecimal.ONE, row.get("col2"));
-            assertEquals(BigDecimal.ZERO, row.get("col3"));
-            assertEquals(BigDecimal.ZERO, row.get("col4"));
-            assertEquals(new BigDecimal("4"), row.get("col5"));
-            assertEquals(new BigDecimal("-1"), row.get("col6"));
-            assertEquals(BigDecimal.ONE, row.get("col7"));
-
-            Object[] tmpRow = new Object[] {"foo", BigDecimal.ONE, new BigDecimal(3), new BigDecimal("13"), new BigDecimal("-17"), BigDecimal.ZERO, new BigDecimal("8734")};
-            t.addRow(tmpRow);
-            t.reset();
-
-            t.getNextRow();
-            row = t.getNextRow();
-            assertEquals(tmpRow[0], row.get("col1"));
-            assertEquals(tmpRow[1], row.get("col2"));
-            assertEquals(tmpRow[2], row.get("col3"));
-            assertEquals(tmpRow[3], row.get("col4"));
-            assertEquals(tmpRow[4], row.get("col5"));
-            assertEquals(tmpRow[5], row.get("col6"));
-            assertEquals(tmpRow[6], row.get("col7"));
-
-            db.close();
         }
     }
 
-    public void testMultiPageTableDef() throws Exception {
-        for (TestDB testDB : JetFormatTest.SUPPORTED_DBS_TEST_FOR_READ) {
-            try (Database db = open(testDB)) {
+    @Test
+    void testMultiPageTableDef() throws Exception {
+        for (TestDB testDB : getSupportedReadOnlyTestDbs()) {
+            try (Database db = testDB.open()) {
                 List<? extends Column> columns = db.getTable("Table2").getColumns();
                 assertEquals(89, columns.size());
             }
         }
     }
 
-    public void testOverflow() throws Exception {
-        for (TestDB testDB : TestDB.getSupportedForBasename(Basename.OVERFLOW, true)) {
-            Database mdb = open(testDB);
-            Table table = mdb.getTable("Table1");
+    @Test
+    void testOverflow() throws Exception {
+        for (TestDB testDB : TestDB.getSupportedTestDbsForRead(Basename.OVERFLOW)) {
+            try (Database db = testDB.open()) {
+                Table table = db.getTable("Table1");
 
-            // 7 rows, 3 and 5 are overflow
-            table.getNextRow();
-            table.getNextRow();
+                // 7 rows, 3 and 5 are overflow
+                table.getNextRow();
+                table.getNextRow();
 
-            Map<String, Object> row = table.getNextRow();
-            assertEquals(Arrays.asList(null, "row3col3", null, null, null, null, null, "row3col9", null),
-                new ArrayList<>(row.values()));
+                Map<String, Object> row = table.getNextRow();
+                assertEquals(Arrays.asList(null, "row3col3", null, null, null, null, null, "row3col9", null),
+                    new ArrayList<>(row.values()));
 
-            table.getNextRow();
+                table.getNextRow();
 
-            row = table.getNextRow();
-            assertEquals(Arrays.asList(null, "row5col2", null, null, null, null, null, null, null),
-                new ArrayList<>(row.values()));
+                row = table.getNextRow();
+                assertEquals(Arrays.asList(null, "row5col2", null, null, null, null, null, null, null),
+                    new ArrayList<>(row.values()));
 
-            table.reset();
-            assertRowCount(7, table);
-
-            mdb.close();
+                table.reset();
+                assertRowCount(7, table);
+            }
         }
     }
 
-    public void testUsageMapPromotion() throws Exception {
-        for (TestDB testDB : TestDB.getSupportedForBasename(Basename.PROMOTION)) {
-            Database db = openMem(testDB);
-            Table t = db.getTable("jobDB1");
+    @Test
+    void testUsageMapPromotion() throws Exception {
+        for (TestDB testDB : TestDB.getSupportedTestDbs(Basename.PROMOTION)) {
+            try (Database db = testDB.openMem()) {
+                Table t = db.getTable("jobDB1");
 
-            assertTrue(((TableImpl) t).getOwnedPagesCursor().getUsageMap().toString()
-                .startsWith("InlineHandler"));
+                assertTrue(((TableImpl) t).getOwnedPagesCursor().getUsageMap().toString()
+                    .startsWith("InlineHandler"));
 
-            String lval = createNonAsciiString(255); // "--255 chars long text--";
+                String lval = createNonAsciiString(255); // "--255 chars long text--";
 
-            ((DatabaseImpl) db).getPageChannel().startWrite();
-            try {
-                for (int i = 0; i < 1000; ++i) {
-                    t.addRow(i, 13, 57, lval, lval, lval, lval, lval, lval, 47.0d);
+                ((DatabaseImpl) db).getPageChannel().startWrite();
+                try {
+                    for (int i = 0; i < 1000; ++i) {
+                        t.addRow(i, 13, 57, lval, lval, lval, lval, lval, lval, 47.0d);
+                    }
+                } finally {
+                    ((DatabaseImpl) db).getPageChannel().finishWrite();
                 }
-            } finally {
-                ((DatabaseImpl) db).getPageChannel().finishWrite();
+
+                Set<Integer> ids = t.stream()
+                    .map(r -> r.getInt("ID"))
+                    .collect(Collectors.toSet());
+                assertEquals(1000, ids.size());
+
+                assertTrue(((TableImpl) t).getOwnedPagesCursor().getUsageMap().toString()
+                    .startsWith("ReferenceHandler"));
             }
-
-            Set<Integer> ids = t.stream()
-                .map(r -> r.getInt("ID"))
-                .collect(Collectors.toSet());
-            assertEquals(1000, ids.size());
-
-            assertTrue(((TableImpl) t).getOwnedPagesCursor().getUsageMap().toString()
-                .startsWith("ReferenceHandler"));
-
-            db.close();
         }
     }
 
-    public void testLargeTableDef() throws Exception {
-        for (FileFormat fileFormat : SUPPORTED_FILEFORMATS) {
-            Database db = create(fileFormat);
+    @ParameterizedTest(name = "[{index}] {0}")
+    @MethodSource("getSupportedFileformats")
+    void testLargeTableDef(FileFormat fileFormat) throws Exception {
+        Database db = create(fileFormat);
 
-            final int numColumns = 90;
+        final int numColumns = 90;
 
-            List<ColumnBuilder> columns = new ArrayList<>();
-            List<String> colNames = new ArrayList<>();
-            for (int i = 0; i < numColumns; ++i) {
-                String colName = "MyColumnName" + i;
-                colNames.add(colName);
-                columns.add(DatabaseBuilder.newColumn(colName, DataType.TEXT).toColumn());
-            }
-
-            Table t = DatabaseBuilder.newTable("test")
-                .addColumns(columns)
-                .toTable(db);
-
-            List<String> row = new ArrayList<>();
-            Map<String, Object> expectedRowData = new LinkedHashMap<>();
-            for (int i = 0; i < numColumns; ++i) {
-                String value = i + " some row data";
-                row.add(value);
-                expectedRowData.put(colNames.get(i), value);
-            }
-
-            t.addRow(row.toArray());
-
-            t.reset();
-            assertEquals(expectedRowData, t.getNextRow());
-
-            db.close();
+        List<ColumnBuilder> columns = new ArrayList<>();
+        List<String> colNames = new ArrayList<>();
+        for (int i = 0; i < numColumns; ++i) {
+            String colName = "MyColumnName" + i;
+            colNames.add(colName);
+            columns.add(DatabaseBuilder.newColumn(colName, DataType.TEXT).toColumn());
         }
+
+        Table t = DatabaseBuilder.newTable("test")
+            .addColumns(columns)
+            .toTable(db);
+
+        List<String> row = new ArrayList<>();
+        Map<String, Object> expectedRowData = new LinkedHashMap<>();
+        for (int i = 0; i < numColumns; ++i) {
+            String value = i + " some row data";
+            row.add(value);
+            expectedRowData.put(colNames.get(i), value);
+        }
+
+        t.addRow(row.toArray());
+
+        t.reset();
+        assertEquals(expectedRowData, t.getNextRow());
     }
 
-    public void testWriteAndReadDate() throws Exception {
-        for (FileFormat fileFormat : SUPPORTED_FILEFORMATS) {
-            Database db = createMem(fileFormat);
+    @ParameterizedTest(name = "[{index}] {0}")
+    @MethodSource("getSupportedFileformats")
+    void testWriteAndReadDate(FileFormat fileFormat) throws Exception {
+        try (Database db = createMem(fileFormat)) {
             db.setDateTimeType(DateTimeType.DATE);
 
             Table table = DatabaseBuilder.newTable("test")
@@ -647,46 +641,41 @@ public class DatabaseTest extends TestCase {
                 Date found = foundDates.get(i);
                 assertSameDate(expected, found);
             }
-
-            db.close();
         }
     }
 
-    public void testAncientDatesWrite() throws Exception {
+    @ParameterizedTest(name = "[{index}] {0}")
+    @MethodSource("getSupportedFileformats")
+    void testAncientDatesWrite(FileFormat fileFormat) throws Exception {
         SimpleDateFormat sdf = DatabaseBuilder.createDateFormat("yyyy-MM-dd");
 
-        List<String> dates = List.of("1582-10-15", "1582-10-14",
-            "1492-01-10", "1392-01-10");
+        List<String> dates = List.of("1582-10-15", "1582-10-14", "1492-01-10", "1392-01-10");
 
-        for (FileFormat fileFormat : SUPPORTED_FILEFORMATS) {
-            Database db = createMem(fileFormat);
-            db.setDateTimeType(DateTimeType.DATE);
+        Database db = createMem(fileFormat);
+        db.setDateTimeType(DateTimeType.DATE);
 
-            Table table = DatabaseBuilder.newTable("test")
-                .addColumn(DatabaseBuilder.newColumn("name", DataType.TEXT))
-                .addColumn(DatabaseBuilder.newColumn("date", DataType.SHORT_DATE_TIME))
-                .toTable(db);
+        Table table = DatabaseBuilder.newTable("test")
+            .addColumn(DatabaseBuilder.newColumn("name", DataType.TEXT))
+            .addColumn(DatabaseBuilder.newColumn("date", DataType.SHORT_DATE_TIME))
+            .toTable(db);
 
-            for (String dateStr : dates) {
-                Date d = sdf.parse(dateStr);
-                table.addRow("row " + dateStr, d);
-            }
-
-            List<String> foundDates = table.stream()
-                .map(r -> sdf.format(r.getDate("date")))
-                .collect(Collectors.toList());
-
-            assertEquals(dates, foundDates);
-
-            db.close();
+        for (String dateStr : dates) {
+            Date d = sdf.parse(dateStr);
+            table.addRow("row " + dateStr, d);
         }
 
+        List<String> foundDates = table.stream()
+            .map(r -> sdf.format(r.getDate("date")))
+            .collect(Collectors.toList());
+
+        assertEquals(dates, foundDates);
     }
 
     /**
      * Test ancient date handling against test database {@code oldDates*.accdb}.
      */
-    public void testAncientDatesRead() throws Exception {
+    @Test
+    void testAncientDatesRead() throws Exception {
         TimeZone tz = TimeZone.getTimeZone("America/New_York");
         SimpleDateFormat sdf = DatabaseBuilder.createDateFormat("yyyy-MM-dd");
         sdf.getCalendar().setTimeZone(tz);
@@ -694,148 +683,135 @@ public class DatabaseTest extends TestCase {
         List<String> dates = List.of("1582-10-15", "1582-10-14",
             "1492-01-10", "1392-01-10");
 
-        for (TestDB testDB : TestDB.getSupportedForBasename(Basename.OLD_DATES)) {
-            Database db = openCopy(testDB);
-            db.setTimeZone(tz); // explicitly set database time zone
-            db.setDateTimeType(DateTimeType.DATE);
+        for (TestDB testDB : TestDB.getSupportedTestDbs(Basename.OLD_DATES)) {
+            try (Database db = testDB.openCopy()) {
+                db.setTimeZone(tz); // explicitly set database time zone
+                db.setDateTimeType(DateTimeType.DATE);
 
-            Table t = db.getTable("Table1");
+                Table t = db.getTable("Table1");
 
-            List<String> foundDates = new ArrayList<>();
-            for (Row row : t) {
-                foundDates.add(sdf.format(row.getDate("DateField")));
-            }
-
-            assertEquals(dates, foundDates);
-
-            db.close();
-        }
-
-    }
-
-    public void testSystemTable() throws Exception {
-        for (FileFormat fileFormat : SUPPORTED_FILEFORMATS) {
-            Database db = create(fileFormat);
-
-            Set<String> sysTables = new TreeSet<>(
-                String.CASE_INSENSITIVE_ORDER);
-            sysTables.addAll(
-                List.of("MSysObjects", "MSysQueries", "MSysACES",
-                    "MSysRelationships"));
-
-            if (fileFormat == FileFormat.GENERIC_JET4) {
-                assertNull("file format: " + fileFormat, db.getSystemTable("MSysAccessObjects"));
-            } else if (fileFormat.ordinal() < FileFormat.V2003.ordinal()) {
-                assertNotNull("file format: " + fileFormat, db.getSystemTable("MSysAccessObjects"));
-                sysTables.add("MSysAccessObjects");
-            } else {
-                // v2003+ template files have no "MSysAccessObjects" table
-                assertNull("file format: " + fileFormat, db.getSystemTable("MSysAccessObjects"));
-                sysTables.addAll(
-                    List.of("MSysNavPaneGroupCategories",
-                        "MSysNavPaneGroups", "MSysNavPaneGroupToObjects",
-                        "MSysNavPaneObjectIDs", "MSysAccessStorage"));
-                if (fileFormat.ordinal() >= FileFormat.V2007.ordinal()) {
-                    sysTables.addAll(
-                        List.of(
-                            "MSysComplexColumns", "MSysComplexType_Attachment",
-                            "MSysComplexType_Decimal", "MSysComplexType_GUID",
-                            "MSysComplexType_IEEEDouble", "MSysComplexType_IEEESingle",
-                            "MSysComplexType_Long", "MSysComplexType_Short",
-                            "MSysComplexType_Text", "MSysComplexType_UnsignedByte"));
+                List<String> foundDates = new ArrayList<>();
+                for (Row row : t) {
+                    foundDates.add(sdf.format(row.getDate("DateField")));
                 }
-                if (fileFormat.ordinal() >= FileFormat.V2010.ordinal()) {
-                    sysTables.add("f_12D7448B56564D8AAE333BCC9B3718E5_Data");
-                    sysTables.add("MSysResources");
-                }
-                if (fileFormat.ordinal() >= FileFormat.V2019.ordinal()) {
-                    sysTables.remove("f_12D7448B56564D8AAE333BCC9B3718E5_Data");
-                    sysTables.add("f_8FA5340F56044616AE380F64A2FEC135_Data");
-                    sysTables.add("MSysWSDPCacheComplexColumnMapping");
-                    sysTables.add("MSysWSDPChangeTokenMapping");
-                    sysTables.add("MSysWSDPRelationshipMapping");
+
+                assertEquals(dates, foundDates);
+            }
+        }
+
+    }
+
+    @ParameterizedTest(name = "[{index}] {0}")
+    @MethodSource("getSupportedFileformats")
+    void testSystemTable(FileFormat fileFormat) throws Exception {
+        Database db = create(fileFormat);
+
+        Set<String> sysTables = new TreeSet<>(String.CASE_INSENSITIVE_ORDER);
+        sysTables.addAll(List.of("MSysObjects", "MSysQueries", "MSysACES", "MSysRelationships"));
+
+        if (fileFormat == FileFormat.GENERIC_JET4) {
+            assertNull(db.getSystemTable("MSysAccessObjects"), "file format: " + fileFormat);
+        } else if (fileFormat.ordinal() < FileFormat.V2003.ordinal()) {
+            assertNotNull(db.getSystemTable("MSysAccessObjects"), "file format: " + fileFormat);
+            sysTables.add("MSysAccessObjects");
+        } else {
+            // v2003+ template files have no "MSysAccessObjects" table
+            assertNull(db.getSystemTable("MSysAccessObjects"), "file format: " + fileFormat);
+            sysTables.addAll(List.of("MSysNavPaneGroupCategories", "MSysNavPaneGroups", "MSysNavPaneGroupToObjects", "MSysNavPaneObjectIDs", "MSysAccessStorage"));
+            if (fileFormat.ordinal() >= FileFormat.V2007.ordinal()) {
+                sysTables.addAll(List.of("MSysComplexColumns", "MSysComplexType_Attachment", "MSysComplexType_Decimal", "MSysComplexType_GUID", "MSysComplexType_IEEEDouble",
+                    "MSysComplexType_IEEESingle", "MSysComplexType_Long", "MSysComplexType_Short", "MSysComplexType_Text", "MSysComplexType_UnsignedByte"));
+            }
+            if (fileFormat.ordinal() >= FileFormat.V2010.ordinal()) {
+                sysTables.add("f_12D7448B56564D8AAE333BCC9B3718E5_Data");
+                sysTables.add("MSysResources");
+            }
+            if (fileFormat.ordinal() >= FileFormat.V2019.ordinal()) {
+                sysTables.remove("f_12D7448B56564D8AAE333BCC9B3718E5_Data");
+                sysTables.add("f_8FA5340F56044616AE380F64A2FEC135_Data");
+                sysTables.add("MSysWSDPCacheComplexColumnMapping");
+                sysTables.add("MSysWSDPChangeTokenMapping");
+                sysTables.add("MSysWSDPRelationshipMapping");
+            }
+        }
+
+        assertEquals(sysTables, db.getSystemTableNames());
+
+        assertNotNull(db.getSystemTable("MSysObjects"));
+        assertNotNull(db.getSystemTable("MSysQueries"));
+        assertNotNull(db.getSystemTable("MSysACES"));
+        assertNotNull(db.getSystemTable("MSysRelationships"));
+
+        assertNull(db.getSystemTable("MSysBogus"));
+
+        TableMetaData tmd = db.getTableMetaData("MSysObjects");
+        assertEquals("MSysObjects", tmd.getName());
+        assertFalse(tmd.isLinked());
+        assertTrue(tmd.isSystem());
+    }
+
+    @Test
+    void testFixedText() throws Exception {
+        for (TestDB testDB : TestDB.getSupportedTestDbs(Basename.FIXED_TEXT)) {
+            try (Database db = testDB.openCopy()) {
+                Table t = db.getTable("users");
+                Column c = t.getColumn("c_flag_");
+                assertEquals(DataType.TEXT, c.getType());
+                assertFalse(c.isVariableLength());
+                assertEquals(2, c.getLength());
+
+                Map<String, Object> row = t.getNextRow();
+                assertEquals("N", row.get("c_flag_"));
+
+                t.addRow(3, "testFixedText", "boo", "foo", "bob", 3, 5, 9, "Y",
+                    new Date());
+
+                t.getNextRow();
+                row = t.getNextRow();
+                assertEquals("testFixedText", row.get("c_user_login"));
+                assertEquals("Y", row.get("c_flag_"));
+            }
+        }
+    }
+
+    @Test
+    void testDbSortOrder() throws Exception {
+
+        for (TestDB testDB : getSupportedReadOnlyTestDbs()) {
+
+            try (Database db = testDB.open()) {
+                assertEquals(((DatabaseImpl) db).getFormat().DEFAULT_SORT_ORDER,
+                    ((DatabaseImpl) db).getDefaultSortOrder());
+            }
+        }
+    }
+
+    @Test
+    void testUnsupportedColumns() throws Exception {
+        for (TestDB testDB : TestDB.getSupportedTestDbs(Basename.UNSUPPORTED)) {
+
+            try (Database db = testDB.open()) {
+                Table t = db.getTable("Test");
+                Column varCol = t.getColumn("UnknownVar");
+                assertEquals(DataType.UNSUPPORTED_VARLEN, varCol.getType());
+                Column fixCol = t.getColumn("UnknownFix");
+                assertEquals(DataType.UNSUPPORTED_FIXEDLEN, fixCol.getType());
+
+                List<String> varVals = Arrays.asList(
+                    "RawData[(10) FF FE 73 6F  6D 65 64 61  74 61]",
+                    "RawData[(12) FF FE 6F 74  68 65 72 20  64 61 74 61]",
+                    null);
+                List<String> fixVals = Arrays.asList("RawData[(4) 37 00 00 00]",
+                    "RawData[(4) F3 FF FF FF]",
+                    "RawData[(4) 02 00 00 00]");
+
+                int idx = 0;
+                for (Map<String, Object> row : t) {
+                    checkRawValue(varVals.get(idx), varCol.getRowValue(row));
+                    checkRawValue(fixVals.get(idx), fixCol.getRowValue(row));
+                    idx++;
                 }
             }
-
-            assertEquals(sysTables, db.getSystemTableNames());
-
-            assertNotNull(db.getSystemTable("MSysObjects"));
-            assertNotNull(db.getSystemTable("MSysQueries"));
-            assertNotNull(db.getSystemTable("MSysACES"));
-            assertNotNull(db.getSystemTable("MSysRelationships"));
-
-            assertNull(db.getSystemTable("MSysBogus"));
-
-            TableMetaData tmd = db.getTableMetaData("MSysObjects");
-            assertEquals("MSysObjects", tmd.getName());
-            assertFalse(tmd.isLinked());
-            assertTrue(tmd.isSystem());
-
-            db.close();
-        }
-    }
-
-    public void testFixedText() throws Exception {
-        for (TestDB testDB : TestDB.getSupportedForBasename(Basename.FIXED_TEXT)) {
-            Database db = openCopy(testDB);
-
-            Table t = db.getTable("users");
-            Column c = t.getColumn("c_flag_");
-            assertEquals(DataType.TEXT, c.getType());
-            assertFalse(c.isVariableLength());
-            assertEquals(2, c.getLength());
-
-            Map<String, Object> row = t.getNextRow();
-            assertEquals("N", row.get("c_flag_"));
-
-            t.addRow(3, "testFixedText", "boo", "foo", "bob", 3, 5, 9, "Y",
-                new Date());
-
-            t.getNextRow();
-            row = t.getNextRow();
-            assertEquals("testFixedText", row.get("c_user_login"));
-            assertEquals("Y", row.get("c_flag_"));
-
-            db.close();
-        }
-    }
-
-    public void testDbSortOrder() throws Exception {
-
-        for (TestDB testDB : JetFormatTest.SUPPORTED_DBS_TEST_FOR_READ) {
-
-            Database db = open(testDB);
-            assertEquals(((DatabaseImpl) db).getFormat().DEFAULT_SORT_ORDER,
-                ((DatabaseImpl) db).getDefaultSortOrder());
-            db.close();
-        }
-    }
-
-    public void testUnsupportedColumns() throws Exception {
-        for (TestDB testDB : TestDB.getSupportedForBasename(Basename.UNSUPPORTED)) {
-
-            Database db = open(testDB);
-            Table t = db.getTable("Test");
-            Column varCol = t.getColumn("UnknownVar");
-            assertEquals(DataType.UNSUPPORTED_VARLEN, varCol.getType());
-            Column fixCol = t.getColumn("UnknownFix");
-            assertEquals(DataType.UNSUPPORTED_FIXEDLEN, fixCol.getType());
-
-            List<String> varVals = Arrays.asList(
-                "RawData[(10) FF FE 73 6F  6D 65 64 61  74 61]",
-                "RawData[(12) FF FE 6F 74  68 65 72 20  64 61 74 61]",
-                null);
-            List<String> fixVals = Arrays.asList("RawData[(4) 37 00 00 00]",
-                "RawData[(4) F3 FF FF FF]",
-                "RawData[(4) 02 00 00 00]");
-
-            int idx = 0;
-            for (Map<String, Object> row : t) {
-                checkRawValue(varVals.get(idx), varCol.getRowValue(row));
-                checkRawValue(fixVals.get(idx), fixCol.getRowValue(row));
-                idx++;
-            }
-            db.close();
         }
     }
 
@@ -847,7 +823,8 @@ public class DatabaseTest extends TestCase {
         return tableList;
     }
 
-    public void testTimeZone() throws Exception {
+    @Test
+    void testTimeZone() throws Exception {
         TimeZone tz = TimeZone.getTimeZone("America/New_York");
         doTestTimeZone(tz);
 
@@ -895,16 +872,18 @@ public class DatabaseTest extends TestCase {
         }
     }
 
-    public void testToString() {
+    @Test
+    void testToString() {
         RowImpl row = new RowImpl(new RowIdImpl(1, 1));
         row.put("id", 37);
         row.put("data", null);
         assertEquals("Row[1:1][{id=37,data=<null>}]", row.toString());
     }
 
-    public void testIterateTableNames() throws Exception {
-        for (TestDB testDB : JetFormatTest.SUPPORTED_DBS_TEST_FOR_READ) {
-            try (Database db = open(testDB)) {
+    @Test
+    void testIterateTableNames() throws Exception {
+        for (TestDB testDB : getSupportedReadOnlyTestDbs()) {
+            try (Database db = testDB.open()) {
                 Set<String> names = new HashSet<>();
                 int sysCount = 0;
                 for (TableMetaData tmd : db.newTableMetaDataIterable()) {
@@ -923,8 +902,8 @@ public class DatabaseTest extends TestCase {
             }
         }
 
-        for (TestDB testDB : TestDB.getSupportedForBasename(Basename.LINKED)) {
-            try (Database db = open(testDB)) {
+        for (TestDB testDB : TestDB.getSupportedTestDbs(Basename.LINKED)) {
+            try (Database db = testDB.open()) {
                 Set<String> names = new HashSet<>();
                 for (TableMetaData tmd : db.newTableMetaDataIterable()) {
                     if (tmd.isSystem()) {
@@ -947,9 +926,10 @@ public class DatabaseTest extends TestCase {
         }
     }
 
-    public void testTableDates() throws Exception {
-        for (TestDB testDB : JetFormatTest.SUPPORTED_DBS_TEST_FOR_READ) {
-            try (Database db = open(testDB)) {
+    @Test
+    void testTableDates() throws Exception {
+        for (TestDB testDB : getSupportedReadOnlyTestDbs()) {
+            try (Database db = testDB.open()) {
                 Table table = db.getTable("Table1");
                 String expectedCreateDate = null;
                 String expectedUpdateDate = null;
@@ -966,15 +946,16 @@ public class DatabaseTest extends TestCase {
         }
     }
 
-    public void testBrokenIndex() throws Exception {
-        TestDB testDb = TestDB.getSupportedForBasename(Basename.TEST).get(0);
+    @Test
+    void testBrokenIndex() throws Exception {
+        TestDB testDb = TestDB.getSupportedTestDbs(Basename.TEST).get(0);
         try (Database db = new DatabaseBuilder(testDb.getFile())
             .withReadOnly(true).withIgnoreBrokenSystemCatalogIndex(true).open()) {
             Table test = db.getTable("Table1");
             assertNotNull(test);
             verifyFinderType(db, "FallbackTableFinder");
         }
-        try (Database db = openMem(testDb)) {
+        try (Database db = testDb.openMem()) {
             Table test = db.getTable("Table1");
             assertNotNull(test);
             verifyFinderType(db, "DefaultTableFinder");

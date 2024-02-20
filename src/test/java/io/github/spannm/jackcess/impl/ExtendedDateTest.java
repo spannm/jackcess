@@ -17,15 +17,18 @@ limitations under the License.
 package io.github.spannm.jackcess.impl;
 
 import static io.github.spannm.jackcess.DatabaseBuilder.*;
-import static io.github.spannm.jackcess.TestUtil.*;
-import static io.github.spannm.jackcess.TestUtil.create;
-import static io.github.spannm.jackcess.impl.JetFormatTest.SUPPORTED_FILEFORMATS;
+import static io.github.spannm.jackcess.test.TestUtil.assertCursor;
+import static io.github.spannm.jackcess.test.TestUtil.create;
+import static io.github.spannm.jackcess.test.TestUtil.createExpectedRow;
 
 import io.github.spannm.jackcess.*;
-import io.github.spannm.jackcess.impl.JetFormatTest.Basename;
-import io.github.spannm.jackcess.impl.JetFormatTest.TestDB;
-import junit.framework.TestCase;
-import org.junit.Assert;
+import io.github.spannm.jackcess.Database.FileFormat;
+import io.github.spannm.jackcess.test.AbstractBaseTest;
+import io.github.spannm.jackcess.test.Basename;
+import io.github.spannm.jackcess.test.TestDB;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -37,60 +40,54 @@ import java.util.*;
  *
  * @author James Ahlborn
  */
-public class ExtendedDateTest extends TestCase {
+class ExtendedDateTest extends AbstractBaseTest {
 
-    public ExtendedDateTest(String name) {
-        super(name);
-    }
-
-    public void testReadExtendedDate() throws Exception {
+    @Test
+    void testReadExtendedDate() throws Exception {
 
         ZoneId zoneId = ZoneId.of("America/New_York");
         DateTimeFormatter dtfNoTime = DateTimeFormatter.ofPattern("M/d/yyy", Locale.US);
         DateTimeFormatter dtfFull = DateTimeFormatter.ofPattern("M/d/yyy h:mm:ss.SSSSSSS a", Locale.US);
 
-        for (TestDB testDB : TestDB.getSupportedForBasename(Basename.EXT_DATE)) {
+        for (TestDB testDB : TestDB.getSupportedTestDbs(Basename.EXT_DATE)) {
 
-            Database db = openMem(testDB);
-            db.setZoneId(zoneId);
+            try (Database db = testDB.openMem()) {
+                db.setZoneId(zoneId);
 
-            Table t = db.getTable("Table1");
-            for (Row r : t) {
-                LocalDateTime ldt = r.getLocalDateTime("DateExt");
-                String str = r.getString("DateExtStr");
+                Table t = db.getTable("Table1");
+                for (Row r : t) {
+                    LocalDateTime ldt = r.getLocalDateTime("DateExt");
+                    String str = r.getString("DateExtStr");
 
-                if (ldt != null) {
-                    String str1 = dtfNoTime.format(ldt);
-                    String str2 = dtfFull.format(ldt);
+                    if (ldt != null) {
+                        String str1 = dtfNoTime.format(ldt);
+                        String str2 = dtfFull.format(ldt);
 
-                    Assert.assertTrue(str1.equals(str) || str2.equals(str));
-                } else {
-                    Assert.assertNull(str);
+                        assertTrue(str1.equals(str) || str2.equals(str));
+                    } else {
+                        assertNull(str);
+                    }
+
                 }
 
+                Index idx = t.getIndex("DateExtAsc");
+                IndexCodesTest.checkIndexEntries(testDB, t, idx);
+                idx = t.getIndex("DateExtDesc");
+                IndexCodesTest.checkIndexEntries(testDB, t, idx);
             }
-
-            Index idx = t.getIndex("DateExtAsc");
-            IndexCodesTest.checkIndexEntries(testDB, t, idx);
-            idx = t.getIndex("DateExtDesc");
-            IndexCodesTest.checkIndexEntries(testDB, t, idx);
-
-            db.close();
         }
     }
 
-    public void testWriteExtendedDate() throws Exception {
+    @ParameterizedTest(name = "[{index}] {0}")
+    @MethodSource("getSupportedFileformats")
+    void testWriteExtendedDate(FileFormat fileFormat) throws Exception {
+        JetFormat format = DatabaseImpl.getFileFormatDetails(fileFormat).getFormat();
 
-        for (Database.FileFormat fileFormat : SUPPORTED_FILEFORMATS) {
-            JetFormat format = DatabaseImpl.getFileFormatDetails(fileFormat)
-                .getFormat();
+        if (!format.isSupportedDataType(DataType.EXT_DATE_TIME)) {
+            return;
+        }
 
-            if (!format.isSupportedDataType(DataType.EXT_DATE_TIME)) {
-                continue;
-            }
-
-            Database db = create(fileFormat);
-
+        try (Database db = create(fileFormat)) {
             Table t = newTable("Test")
                 .addColumn(newColumn("id", DataType.LONG)
                     .withAutoNumber(true))
@@ -136,8 +133,6 @@ public class ExtendedDateTest extends TestCase {
             c = t.newCursor().withIndexByName("idxDesc").toIndexCursor();
 
             assertCursor(expectedTable, c);
-
-            db.close();
         }
     }
 }

@@ -16,6 +16,7 @@ limitations under the License.
 
 package io.github.spannm.jackcess;
 
+import io.github.spannm.jackcess.Database.FileFormat;
 import io.github.spannm.jackcess.impl.CodecProvider;
 import io.github.spannm.jackcess.impl.DatabaseImpl;
 import io.github.spannm.jackcess.impl.PropertyMapImpl;
@@ -62,7 +63,7 @@ public class DatabaseBuilder {
     /** optional CodecProvider for handling encoded mdbs */
     private CodecProvider                     _codecProvider;
     /** FileFormat to use when creating a new mdb */
-    private Database.FileFormat               _fileFormat;
+    private FileFormat               _fileFormat;
     /**
      * optional pre-opened FileChannel, will _not_ be closed by Database close
      */
@@ -153,7 +154,7 @@ public class DatabaseBuilder {
     /**
      * Sets the version of new database ({@link #create} only).
      */
-    public DatabaseBuilder withFileFormat(Database.FileFormat fileFormat) {
+    public DatabaseBuilder withFileFormat(FileFormat fileFormat) {
         _fileFormat = fileFormat;
         return this;
     }
@@ -304,7 +305,7 @@ public class DatabaseBuilder {
      *
      * @see DatabaseBuilder for more flexible Database creation
      */
-    public static Database create(Database.FileFormat fileFormat, File mdbFile)
+    public static Database create(FileFormat fileFormat, File mdbFile)
         throws IOException {
         return new DatabaseBuilder(mdbFile).withFileFormat(fileFormat).create();
     }
