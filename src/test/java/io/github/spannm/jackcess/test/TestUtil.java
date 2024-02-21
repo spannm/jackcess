@@ -16,13 +16,12 @@ limitations under the License.
 
 package io.github.spannm.jackcess.test;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-
 import io.github.spannm.jackcess.*;
 import io.github.spannm.jackcess.Database.FileFormat;
 import io.github.spannm.jackcess.complex.ComplexValueForeignKey;
 import io.github.spannm.jackcess.impl.*;
 import io.github.spannm.jackcess.util.MemFileChannel;
+import org.junit.jupiter.api.Assertions;
 
 import java.io.*;
 import java.lang.reflect.Field;
@@ -41,7 +40,7 @@ import java.util.stream.StreamSupport;
  * @author James Ahlborn
  */
 @SuppressWarnings("deprecation")
-public class TestUtil {
+public final class TestUtil extends Assertions {
     public static final TimeZone TEST_TZ = TimeZone.getTimeZone("America/New_York");
 
     private TestUtil() {
@@ -183,18 +182,12 @@ public class TestUtil {
         return (int) StreamSupport.stream(cursor.spliterator(), false).count();
     }
 
-    public static void assertTable(
-        List<? extends Map<String, Object>> expectedTable,
-        Table table)
-        throws IOException {
+    public static void assertTable(List<? extends Map<String, Object>> expectedTable, Table table) throws IOException {
         assertCursor(expectedTable, CursorBuilder.createCursor(table));
     }
 
-    public static void assertCursor(
-        List<? extends Map<String, Object>> expectedTable,
-        Cursor cursor) {
-        List<Map<String, Object>> foundTable =
-            new ArrayList<>();
+    public static void assertCursor(List<? extends Map<String, Object>> expectedTable, Cursor cursor) {
+        List<Map<String, Object>> foundTable = new ArrayList<>();
         for (Map<String, Object> row : cursor) {
             foundTable.add(row);
         }
@@ -207,8 +200,7 @@ public class TestUtil {
     public static RowImpl createExpectedRow(Object... rowElements) {
         RowImpl row = new RowImpl((RowIdImpl) null);
         for (int i = 0; i < rowElements.length; i += 2) {
-            row.put((String) rowElements[i],
-                rowElements[i + 1]);
+            row.put((String) rowElements[i], rowElements[i + 1]);
         }
         return row;
     }
@@ -302,27 +294,23 @@ public class TestUtil {
     public static void assertSameDate(Date expected, Date found) {
         if (expected == found) {
             return;
-        }
-        if (expected == null || found == null) {
-            throw new AssertionError("Expected " + expected + ", found " + found);
+        } else if (expected == null || found == null) {
+            fail("Expected " + expected + ", found " + found);
         }
         long expTime = expected.getTime();
         long foundTime = found.getTime();
         // there are some rounding issues due to dates being stored as doubles,
         // but it results in a 1 millisecond difference, so i'm not going to worry
         // about it
-        if (expTime != foundTime && Math.abs(expTime - foundTime) > 1) {
-            throw new AssertionError("Expected " + expTime + " (" + expected + "), found " + foundTime + " (" + found + ")");
-        }
+        assertFalse(expTime != foundTime && Math.abs(expTime - foundTime) > 1,
+            "Expected " + expTime + " (" + expected + "), found " + foundTime + " (" + found + ")");
     }
 
     public static void assertSameDate(Date expected, LocalDateTime found) {
         if (expected == null && found == null) {
             return;
         }
-        if (expected == null || found == null) {
-            throw new AssertionError("Expected " + expected + ", found " + found);
-        }
+        assertFalse(expected == null || found == null, "Expected " + expected + ", found " + found);
 
         LocalDateTime expectedLdt = LocalDateTime.ofInstant(
             Instant.ofEpochMilli(expected.getTime()),

@@ -54,12 +54,7 @@ class DefaultFunctionsTest extends AbstractBaseTest {
         assertEquals("-42", eval("=Str$(-42)"));
         assertNull(eval("=Str(Null)"));
 
-        try {
-            eval("=Str$(Null)");
-            fail("EvalException should have been thrown");
-        } catch (EvalException expected) {
-            // success
-        }
+        assertThrows(EvalException.class, () -> eval("=Str$(Null)"));
 
         assertEquals(-1, eval("=CBool(\"1\")"));
         assertEquals(13, eval("=CByte(\"13\")"));
@@ -178,19 +173,11 @@ class DefaultFunctionsTest extends AbstractBaseTest {
         assertEquals("bar", eval("=Switch(False,'foo', True, 'bar', True, 'blah')"));
         assertEquals("blah", eval("=Switch(False,'foo', False, 'bar', True, 'blah')"));
 
-        try {
-            eval("=StrReverse('blah', 1)");
-            fail("EvalException should have been thrown");
-        } catch (EvalException e) {
-            assertTrue(e.getMessage().contains("Invalid function call"));
-        }
+        EvalException ex1 = assertThrows(EvalException.class, () -> eval("=StrReverse('blah', 1)"));
+        assertTrue(ex1.getMessage().contains("Invalid function call"));
 
-        try {
-            eval("=StrReverse()");
-            fail("EvalException should have been thrown");
-        } catch (EvalException e) {
-            assertTrue(e.getMessage().contains("Invalid function call"));
-        }
+        EvalException ex2 = assertThrows(EvalException.class, () -> eval("=StrReverse()"));
+        assertTrue(ex2.getMessage().contains("Invalid function call"));
 
         assertEquals(1615198d, eval("=Val('    1615 198th Street N.E.')"));
         assertEquals(-1d, eval("=Val('  &HFFFFwhatever')"));

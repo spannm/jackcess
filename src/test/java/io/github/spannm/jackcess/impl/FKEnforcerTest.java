@@ -69,33 +69,20 @@ class FKEnforcerTest extends AbstractBaseTest {
                 Table t2 = db.getTable("Table2");
                 Table t3 = db.getTable("Table3");
 
-                try {
-                    t1.addRow(20, 0, 20, "some data", 20);
-                    fail("IOException should have been thrown");
-                } catch (IOException ignored) {
-                    // success
-                    assertTrue(ignored.getMessage().contains("Table1[otherfk2]"));
-                }
+                assertTrue(assertThrows(IOException.class, () ->
+                    t1.addRow(20, 0, 20, "some data", 20)).getMessage().contains("Table1[otherfk2]"));
 
-                try {
+                assertTrue(assertThrows(IOException.class, () -> {
                     Cursor c = CursorBuilder.createCursor(t2);
                     c.moveToNextRow();
                     c.updateCurrentRow(30, "foo30");
-                    fail("IOException should have been thrown");
-                } catch (IOException ignored) {
-                    // success
-                    assertTrue(ignored.getMessage().contains("Table2[id]"));
-                }
+                }).getMessage().contains("Table2[id]"));
 
-                try {
+                assertTrue(assertThrows(IOException.class, () -> {
                     Cursor c = CursorBuilder.createCursor(t3);
                     c.moveToNextRow();
                     c.deleteCurrentRow();
-                    fail("IOException should have been thrown");
-                } catch (IOException ignored) {
-                    // success
-                    assertTrue(ignored.getMessage().contains("Table3[id]"));
-                }
+                }).getMessage().contains("Table3[id]"));
 
                 t1.addRow(21, null, null, "null fks", null);
 
@@ -129,8 +116,7 @@ class FKEnforcerTest extends AbstractBaseTest {
 
     }
 
-    private static Row createT1Row(
-        int id1, Integer fk1, Integer fk2, String data, Integer fk3) {
+    private static Row createT1Row(int id1, Integer fk1, Integer fk2, String data, Integer fk3) {
         return createExpectedRow("id", id1, "otherfk1", fk1, "otherfk2", fk2,
             "data", data, "otherfk3", fk3);
     }

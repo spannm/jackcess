@@ -43,12 +43,7 @@ class CalcFieldTest extends AbstractBaseTest {
         ColumnBuilder cb = new ColumnBuilder("calc_data", DataType.TEXT)
             .withCalculatedInfo("[id] & \"_\" & [data]");
 
-        try {
-            cb.validate(JetFormat.VERSION_12);
-            fail("IllegalArgumentException should have been thrown");
-        } catch (IllegalArgumentException e) {
-            assertTrue(e.getMessage().contains(""));
-        }
+        assertThrows(IllegalArgumentException.class, () -> cb.validate(JetFormat.VERSION_12));
 
         cb.validate(JetFormat.VERSION_14);
     }

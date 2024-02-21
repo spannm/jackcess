@@ -432,9 +432,7 @@ public class Expressionator {
     private Expressionator() {
     }
 
-    public static Expression parse(Type exprType, String exprStr,
-        Value.Type resultType,
-        ParseContext context) {
+    public static Expression parse(Type exprType, String exprStr, Value.Type resultType, ParseContext context) {
 
         List<Token> tokens = trimSpaces(
             ExpressionTokenizer.tokenize(exprType, exprStr, context));

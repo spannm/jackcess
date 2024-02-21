@@ -469,24 +469,16 @@ class ExpressionatorTest extends AbstractBaseTest {
     }
 
     private static void doTestEvalFail(String exprStr, String msgStr) {
-        try {
-            eval(exprStr);
-            fail("ParseException should have been thrown");
-        } catch (ParseException pe) {
-            // success
-            assertTrue(pe.getMessage().contains(msgStr));
-        }
+        assertTrue(assertThrows(ParseException.class, () -> eval(exprStr)).getMessage().contains(msgStr));
     }
 
     private static void validateExpr(String exprStr, String debugStr) {
         validateExpr(exprStr, debugStr, exprStr);
     }
 
-    private static void validateExpr(String exprStr, String debugStr,
-        String cleanStr) {
+    private static void validateExpr(String exprStr, String debugStr, String cleanStr) {
         TestContext ctx = new TestContext();
-        Expression expr = Expressionator.parse(
-            Expressionator.Type.FIELD_VALIDATOR, exprStr, null, ctx);
+        Expression expr = Expressionator.parse(Expressionator.Type.FIELD_VALIDATOR, exprStr, null, ctx);
         String foundDebugStr = expr.toDebugString(ctx);
         if (foundDebugStr.startsWith("<EImplicitCompOp>")) {
             assertEquals("<EImplicitCompOp>{<EThisValue>{<THIS_COL>} = " + debugStr + "}", foundDebugStr);
@@ -508,23 +500,15 @@ class ExpressionatorTest extends AbstractBaseTest {
         return expr.eval(tc);
     }
 
-    private static void evalFail(
-        String exprStr, Class<? extends Exception> failure) {
+    private static void evalFail(String exprStr, Class<? extends Exception> failure) {
         TestContext tc = new TestContext();
-        Expression expr = Expressionator.parse(
-            Expressionator.Type.DEFAULT_VALUE, exprStr, null, tc);
-        try {
-            expr.eval(tc);
-            fail(failure + " should have been thrown");
-        } catch (Exception e) {
-            assertTrue(failure.isInstance(e));
-        }
+        Expression expr = Expressionator.parse(Expressionator.Type.DEFAULT_VALUE, exprStr, null, tc);
+        assertThrows(failure, () -> expr.eval(tc));
     }
 
     private static Boolean evalCondition(String exprStr, String thisVal) {
         TestContext tc = new TestContext(ValueSupport.toValue(thisVal));
-        Expression expr = Expressionator.parse(
-            Expressionator.Type.FIELD_VALIDATOR, exprStr, null, tc);
+        Expression expr = Expressionator.parse(Expressionator.Type.FIELD_VALIDATOR, exprStr, null, tc);
         return (Boolean) expr.eval(tc);
     }
 

@@ -543,12 +543,7 @@ class IndexTest extends AbstractBaseTest {
                 t.addRow(i, "row" + i);
             }
 
-            try {
-                t.addRow(3, "badrow");
-                fail("ConstraintViolationException should have been thrown");
-            } catch (ConstraintViolationException ce) {
-                // success
-            }
+            assertThrows(ConstraintViolationException.class, () -> t.addRow(3, "badrow"));
 
             assertEquals(5, t.getRowCount());
 
@@ -563,8 +558,7 @@ class IndexTest extends AbstractBaseTest {
             IndexCursor pkCursor = CursorBuilder.createPrimaryKeyCursor(t);
             TestUtil.assertCursor(expectedRows, pkCursor);
 
-            TestUtil.assertCursor(expectedRows,
-                CursorBuilder.createCursor(t.getIndex("data_ind")));
+            TestUtil.assertCursor(expectedRows, CursorBuilder.createCursor(t.getIndex("data_ind")));
 
             List<Object[]> batch = new ArrayList<>();
             batch.add(new Object[] {5, "row5"});
@@ -572,14 +566,9 @@ class IndexTest extends AbstractBaseTest {
             batch.add(new Object[] {7, "row2"});
             batch.add(new Object[] {8, "row8"});
 
-            try {
-                t.addRows(batch);
-                fail("BatchUpdateException should have been thrown");
-            } catch (BatchUpdateException be) {
-                // success
-                assertTrue(be.getCause() instanceof ConstraintViolationException);
-                assertEquals(2, be.getUpdateCount());
-            }
+            BatchUpdateException buex = assertThrows(BatchUpdateException.class, () -> t.addRows(batch));
+            assertInstanceOf(ConstraintViolationException.class, buex.getCause());
+            assertEquals(2, buex.getUpdateCount());
 
             expectedRows = new ArrayList<>(expectedRows);
             expectedRows.add(TestUtil.createExpectedRow("id", 5, "data", "row5"));
@@ -596,12 +585,7 @@ class IndexTest extends AbstractBaseTest {
 
             row4.put("id", 3);
 
-            try {
-                t.updateRow(row4);
-                fail("ConstraintViolationException should have been thrown");
-            } catch (ConstraintViolationException ce) {
-                // success
-            }
+            assertThrows(ConstraintViolationException.class, () -> t.updateRow(row4));
 
             TestUtil.assertTable(expectedRows, t);
 
@@ -627,12 +611,7 @@ class IndexTest extends AbstractBaseTest {
                 t.addRow(null, "row" + i);
             }
 
-            try {
-                t.addRow(null, "row1");
-                fail("ConstraintViolationException should have been thrown");
-            } catch (ConstraintViolationException ce) {
-                // success
-            }
+            assertThrows(ConstraintViolationException.class, () -> t.addRow(null, "row1"));
 
             t.addRow(null, "row3");
 
@@ -655,14 +634,9 @@ class IndexTest extends AbstractBaseTest {
             batch.add(new Object[] {null, "row5"});
             batch.add(new Object[] {null, "row3"});
 
-            try {
-                t.addRows(batch);
-                fail("BatchUpdateException should have been thrown");
-            } catch (BatchUpdateException be) {
-                // success
-                assertTrue(be.getCause() instanceof ConstraintViolationException);
-                assertEquals(2, be.getUpdateCount());
-            }
+            BatchUpdateException buex = assertThrows(BatchUpdateException.class, () -> t.addRows(batch));
+            assertInstanceOf(ConstraintViolationException.class, buex.getCause());
+            assertEquals(2, buex.getUpdateCount());
 
             expectedRows = new ArrayList<>(expectedRows);
             expectedRows.add(TestUtil.createExpectedRow("id", 4, "data", "row4"));

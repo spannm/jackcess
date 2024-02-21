@@ -210,12 +210,7 @@ class AutoNumberTest extends AbstractBaseTest {
 
         assertEquals(13, ((TableImpl) table).getLastLongAutoNumber());
 
-        try {
-            table.addRow("not a number", "nope");
-            fail("NumberFormatException should have been thrown");
-        } catch (NumberFormatException e) {
-            // success
-        }
+        assertThrows(NumberFormatException.class, () -> table.addRow("not a number", "nope"));
 
         assertEquals(13, ((TableImpl) table).getLastLongAutoNumber());
 
@@ -288,76 +283,54 @@ class AutoNumberTest extends AbstractBaseTest {
 
                 assertEquals(13, ((TableImpl) t1).getLastComplexTypeAutoNumber());
 
-                try {
-                    t1.addRow("nope", "not a number");
-                    fail("NumberFormatException should have been thrown");
-                } catch (NumberFormatException e) {
-                    // success
-                }
+                assertThrows(NumberFormatException.class, () ->
+                    t1.addRow("nope", "not a number"));
 
                 assertEquals(13, ((TableImpl) t1).getLastComplexTypeAutoNumber());
 
-                try {
-                    t1.addRow("uh-uh", -10);
-                    fail("IOException should have been thrown");
-                } catch (IOException e) {
-                    // success
-                }
+                assertThrows(IOException.class, () ->
+                    t1.addRow("uh-uh", -10));
 
                 assertEquals(13, ((TableImpl) t1).getLastComplexTypeAutoNumber());
 
-                try {
-                    t1.addRow("wut", 6, null, null, 40, 42);
-                    fail("IOException should have been thrown");
-                } catch (IOException e) {
-                    // success
-                }
+                assertThrows(IOException.class, () ->
+                    t1.addRow("wut", 6, null, null, 40, 42));
 
                 row = t1.addRow("morerows");
                 checkAllComplexAutoNums(14, row);
 
                 assertEquals(14, ((TableImpl) t1).getLastComplexTypeAutoNumber());
 
-                Row row13 = CursorBuilder.findRow(
-                    t1, Collections.singletonMap("id", "row13"));
+                Row row13 = CursorBuilder.findRow(t1, Collections.singletonMap("id", "row13"));
 
                 row13.put("VersionHistory_F5F8918F-0A3F-4DA9-AE71-184EE5012880", "45");
                 row13.put("multi-value-data", "45");
                 row13.put("attach-data", "45");
-                row13 = t1.updateRow(row13);
-                checkAllComplexAutoNums(45, row13);
+
+                final Row row13b = t1.updateRow(row13);
+                checkAllComplexAutoNums(45, row13b);
 
                 assertEquals(45, ((TableImpl) t1).getLastComplexTypeAutoNumber());
 
-                row13.put("attach-data", -1);
+                row13b.put("attach-data", -1);
 
-                try {
-                    t1.updateRow(row13);
-                    fail("IOException should have been thrown");
-                } catch (IOException e) {
-                    // success
-                }
+                assertThrows(IOException.class, () -> t1.updateRow(row13b));
 
                 assertEquals(45, ((TableImpl) t1).getLastComplexTypeAutoNumber());
 
-                row13.put("attach-data", 55);
+                row13b.put("attach-data", 55);
 
-                try {
-                    t1.updateRow(row13);
-                    fail("IOException should have been thrown");
-                } catch (IOException e) {
-                    // success
-                }
+                assertThrows(IOException.class, () -> t1.updateRow(row13b));
 
                 assertEquals(45, ((TableImpl) t1).getLastComplexTypeAutoNumber());
 
-                row13.put("VersionHistory_F5F8918F-0A3F-4DA9-AE71-184EE5012880", 55);
-                row13.put("multi-value-data", 55);
+                row13b.put("VersionHistory_F5F8918F-0A3F-4DA9-AE71-184EE5012880", 55);
+                row13b.put("multi-value-data", 55);
 
                 db.setAllowAutoNumberInsert(null);
 
-                row13 = t1.updateRow(row13);
-                checkAllComplexAutoNums(45, row13);
+                Row row13c = t1.updateRow(row13b);
+                checkAllComplexAutoNums(45, row13c);
 
                 assertEquals(45, ((TableImpl) t1).getLastComplexTypeAutoNumber());
             }
@@ -417,12 +390,7 @@ class AutoNumberTest extends AbstractBaseTest {
             row2 = CursorBuilder.findRow(table, Collections.singletonMap("a", row2Guid));
             assertEquals("row2-redux", row2.getString("b"));
 
-            try {
-                table.addRow("not a guid", "nope");
-                fail("IOException should have been thrown");
-            } catch (IOException e) {
-                // success
-            }
+            assertThrows(IOException.class, () -> table.addRow("not a guid", "nope"));
 
             row = table.addRow(Column.AUTO_NUMBER, "row5");
             assertTrue(ColumnImpl.isGUIDValue(row[0]));
@@ -430,23 +398,18 @@ class AutoNumberTest extends AbstractBaseTest {
             row2Guid = UUID.randomUUID().toString();
             row2.put("a", row2Guid);
 
-            row2 = table.updateRow(row2);
-            assertEquals(row2Guid, row2.get("a"));
+            Row row2b = table.updateRow(row2);
+            assertEquals(row2Guid, row2b.get("a"));
 
-            row2.put("a", "not a guid");
+            row2b.put("a", "not a guid");
 
-            try {
-                table.updateRow(row2);
-                fail("IOException should have been thrown");
-            } catch (IOException e) {
-                // success
-            }
+            assertThrows(IOException.class, () -> table.updateRow(row2b));
 
             table.setAllowAutoNumberInsert(false);
 
-            row2 = table.updateRow(row2);
-            assertTrue(ColumnImpl.isGUIDValue(row2.get("a")));
-            assertNotEquals(row2Guid, row2.get("a"));
+            Row row2c = table.updateRow(row2b);
+            assertTrue(ColumnImpl.isGUIDValue(row2c.get("a")));
+            assertNotEquals(row2Guid, row2c.get("a"));
         }
     }
 
