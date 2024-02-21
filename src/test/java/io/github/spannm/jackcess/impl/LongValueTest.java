@@ -54,7 +54,7 @@ class LongValueTest extends AbstractBaseTest {
                 assertEquals("Project1", row.get("PROJ_PROP_TITLE"));
                 byte[] foundBinaryData = row.getBytes("RESERVED_BINARY_DATA");
                 byte[] expectedBinaryData =
-                    toByteArray(new File("src/test/data/test2BinData.dat"));
+                    toByteArray(new File(DIR_TEST_DATA, "test2BinData.dat"));
                 assertArrayEquals(expectedBinaryData, foundBinaryData);
             }
         }
@@ -74,7 +74,7 @@ class LongValueTest extends AbstractBaseTest {
 
             String testStr = "This is a test";
             String longMemo = createString(2030);
-            byte[] oleValue = toByteArray(new File("src/test/data/test2BinData.dat"));
+            byte[] oleValue = toByteArray(new File(DIR_TEST_DATA, "test2BinData.dat"));
 
             table.addRow(testStr, testStr, null);
             table.addRow(testStr, longMemo, oleValue);
@@ -193,7 +193,7 @@ class LongValueTest extends AbstractBaseTest {
 
     @Test
     void testUnicodeCompression() throws Exception {
-        File dbFile = new File("src/test/data/V2003/testUnicodeCompV2003.mdb");
+        File dbFile = new File(DIR_TEST_DATA, "V2003/testUnicodeCompV2003.mdb");
         try (Database db = open(FileFormat.V2003, dbFile, true)) {
             StringBuilder sb = new StringBuilder(127);
             for (int i = 1; i <= 0xFF; ++i) {

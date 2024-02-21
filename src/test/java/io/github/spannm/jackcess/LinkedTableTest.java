@@ -61,8 +61,8 @@ class LinkedTableTest extends AbstractBaseTest {
 
                 assertTrue(db.getLinkedDatabases().isEmpty());
 
-                final String linkeeDbName = "Z:\\jackcess_test\\linkeeTest.accdb";
-                final File linkeeFile = new File("src/test/data/linkeeTest.accdb");
+                String linkeeDbName = "Z:\\jackcess_test\\linkeeTest.accdb";
+                File linkeeFile = new File(DIR_TEST_DATA, "linkeeTest.accdb");
                 db.setLinkResolver((linkerdb, dbName) -> {
                     assertEquals(linkeeDbName, dbName);
                     return DatabaseBuilder.open(linkeeFile);

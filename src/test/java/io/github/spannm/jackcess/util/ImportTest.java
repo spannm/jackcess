@@ -46,7 +46,7 @@ class ImportTest extends AbstractBaseTest {
         try (Database db = create(fileFormat)) {
             String tableName = new ImportUtil.Builder(db, "test")
                 .withDelimiter("\\t")
-                .importFile(new File("src/test/data/sample-input.tab"));
+                .importFile(new File(DIR_TEST_DATA, "sample-input.tab"));
             Table t = db.getTable(tableName);
 
             List<String> colNames = new ArrayList<>();
@@ -90,7 +90,7 @@ class ImportTest extends AbstractBaseTest {
                 .withDelimiter("\\t")
                 .withUseExistingTable(true)
                 .withHeader(false)
-                .importFile(new File("src/test/data/sample-input.tab"));
+                .importFile(new File(DIR_TEST_DATA, "sample-input.tab"));
 
             expectedRows =
                 createExpectedTable(
@@ -136,7 +136,7 @@ class ImportTest extends AbstractBaseTest {
             tableName = new ImportUtil.Builder(db, "test3")
                 .withDelimiter("\\t")
                 .withFilter(oddFilter)
-                .importFile(new File("src/test/data/sample-input.tab"));
+                .importFile(new File(DIR_TEST_DATA, "sample-input.tab"));
             t = db.getTable(tableName);
 
             colNames = new ArrayList<>();
@@ -169,7 +169,7 @@ class ImportTest extends AbstractBaseTest {
         try (Database db = create(fileFormat)) {
             String tableName = new ImportUtil.Builder(db, "test")
                 .withDelimiter("\\t")
-                .importFile(new File("src/test/data/sample-input-only-headers.tab"));
+                .importFile(new File(DIR_TEST_DATA, "sample-input-only-headers.tab"));
 
             Table t = db.getTable(tableName);
 

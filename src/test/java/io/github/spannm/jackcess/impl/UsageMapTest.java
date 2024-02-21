@@ -55,7 +55,7 @@ public class UsageMapTest extends AbstractBaseTest {
     void testGobalReferenceUsageMap() throws Exception {
         try (Database db = openCopy(
             FileFormat.V2000,
-            new File("src/test/data/V2000/testRefGlobalV2000.mdb"))) {
+            new File(DIR_TEST_DATA, "V2000/testRefGlobalV2000.mdb"))) {
             Table t = new TableBuilder("Test2")
                 .addColumn(new ColumnBuilder("id", DataType.LONG))
                 .addColumn(new ColumnBuilder("data1", DataType.TEXT))

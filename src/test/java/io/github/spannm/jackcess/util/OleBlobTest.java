@@ -47,7 +47,7 @@ class OleBlobTest extends AbstractBaseTest {
     @ParameterizedTest(name = "[{index}] {0}")
     @MethodSource("getSupportedFileformats")
     void testCreateBlob(FileFormat fileFormat) throws Exception {
-        File sampleFile = new File("src/test/data/sample-input.tab");
+        File sampleFile = new File(DIR_TEST_DATA, "sample-input.tab");
         String sampleFilePath = sampleFile.getAbsolutePath();
         String sampleFileName = sampleFile.getName();
         byte[] sampleFileBytes = toByteArray(sampleFile);

@@ -35,7 +35,7 @@ class MemFileChannelTest extends AbstractBaseTest {
 
     @Test
     void testReadOnlyChannel() throws Exception {
-        File testFile = new File("src/test/data/V1997/compIndexTestV1997.mdb");
+        File testFile = new File(DIR_TEST_DATA, "V1997/compIndexTestV1997.mdb");
         MemFileChannel ch = MemFileChannel.newChannel(testFile, "r");
         assertEquals(testFile.length(), ch.size());
         assertEquals(0L, ch.position());
@@ -82,7 +82,7 @@ class MemFileChannelTest extends AbstractBaseTest {
 
         assertFalse(ch.isOpen());
 
-        File testFile = new File("src/test/data/V1997/compIndexTestV1997.mdb");
+        File testFile = new File(DIR_TEST_DATA, "V1997/compIndexTestV1997.mdb");
         ch = MemFileChannel.newChannel(testFile, "r");
         assertEquals(testFile.length(), ch.size());
         assertEquals(0L, ch.position());
