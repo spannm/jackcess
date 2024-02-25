@@ -559,7 +559,7 @@ public class DefaultDateFunctions {
         int d2 = ldt2.getDayOfYear();
         while (y2 > y1) {
             ldt2 = ldt2.minusYears(1);
-            d2 += ldt2.range(ChronoField.DAY_OF_YEAR).getMaximum();
+            d2 += (int) ldt2.range(ChronoField.DAY_OF_YEAR).getMaximum();
             y2 = ldt2.getYear();
         }
         return d2 - d1;

@@ -142,7 +142,7 @@ public abstract class TableMutator extends DBMutator {
 
         public short getNextFixedOffset(ColumnBuilder col) {
             short offset = _fixedOffset;
-            _fixedOffset += col.getType().getFixedSize(col.getLength());
+            _fixedOffset += (short) col.getType().getFixedSize(col.getLength());
             return offset;
         }
     }

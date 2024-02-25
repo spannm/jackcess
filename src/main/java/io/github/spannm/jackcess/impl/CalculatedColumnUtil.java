@@ -38,7 +38,7 @@ class CalculatedColumnUtil {
     // offset to the actual data
     private static final int    CALC_DATA_OFFSET     = CALC_DATA_LEN_OFFSET + 4;
     // total amount of extra bytes added for calculated values
-    static final int            CALC_EXTRA_DATA_LEN  = 23;
+    static final short          CALC_EXTRA_DATA_LEN  = 23;
     // ms access seems to define all fixed-len calc fields as this length
     static final short          CALC_FIXED_FIELD_LEN = 39;
 
