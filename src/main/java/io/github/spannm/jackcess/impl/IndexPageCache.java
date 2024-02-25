@@ -1231,6 +1231,7 @@ public class IndexPageCache {
             return idx == getEntries().size();
         }
 
+        @SuppressWarnings("PMD.MissingOverride")
         public Entry getLast() {
             return hasChildTail() ? _childTailEntry : !getEntries().isEmpty() ? getEntries().get(getEntries().size() - 1) : null;
         }
