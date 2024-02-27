@@ -218,7 +218,7 @@ class CalculatedColumnUtil {
     private static class CalcTextColImpl extends TextColumnImpl {
         private CalcColEvalContext _calcCol;
 
-        CalcTextColImpl(InitArgs args) throws IOException {
+        CalcTextColImpl(InitArgs args) {
             super(args);
         }
 
@@ -302,7 +302,7 @@ class CalculatedColumnUtil {
     private static class CalcNumericColImpl extends NumericColumnImpl {
         private CalcColEvalContext _calcCol;
 
-        CalcNumericColImpl(InitArgs args) throws IOException {
+        CalcNumericColImpl(InitArgs args) {
             super(args);
         }
 

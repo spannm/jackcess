@@ -16,8 +16,6 @@ limitations under the License.
 
 package io.github.spannm.jackcess.impl;
 
-import java.io.IOException;
-
 /**
  * ColumnImpl subclass which is used for Memo data types.
  *
@@ -39,7 +37,7 @@ class MemoColumnImpl extends LongValueColumnImpl {
      */
     private final boolean   _hyperlink;
 
-    MemoColumnImpl(InitArgs args) throws IOException {
+    MemoColumnImpl(InitArgs args) {
         super(args);
 
         // co-located w/ precision/scale

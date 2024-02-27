@@ -674,8 +674,7 @@ public class UsageMap {
      */
     private class ReferenceHandler extends Handler {
         /** Buffer that contains the current reference map page */
-        private final TempPageHolder _mapPageHolder =
-            TempPageHolder.newHolder(TempBufferHolder.Type.SOFT);
+        private final TempPageHolder _mapPageHolder = TempPageHolder.newHolder(TempBufferHolder.Type.SOFT);
         private final int            _maxPagesPerUsageMapPage;
 
         private ReferenceHandler() throws IOException {

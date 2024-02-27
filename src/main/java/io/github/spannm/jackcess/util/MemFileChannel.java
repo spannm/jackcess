@@ -408,7 +408,7 @@ public class MemFileChannel extends FileChannel {
     }
 
     @Override
-    public long write(ByteBuffer[] srcs, int offset, int length) throws IOException {
+    public long write(ByteBuffer[] srcs, int offset, int length) {
         long numBytes = 0L;
         for (int i = offset; i < offset + length; ++i) {
             numBytes += write(srcs[i]);
@@ -417,7 +417,7 @@ public class MemFileChannel extends FileChannel {
     }
 
     @Override
-    public long read(ByteBuffer[] dsts, int offset, int length) throws IOException {
+    public long read(ByteBuffer[] dsts, int offset, int length) {
         long numBytes = 0L;
         for (int i = offset; i < offset + length; ++i) {
             if (_position >= _size) {

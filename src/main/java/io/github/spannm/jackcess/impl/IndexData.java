@@ -1094,7 +1094,7 @@ public class IndexData {
     /**
      * Returns a new Entry of the correct type for the given data and page type.
      */
-    private static Entry newEntry(ByteBuffer buffer, int entryLength, boolean isLeaf) throws IOException {
+    private static Entry newEntry(ByteBuffer buffer, int entryLength, boolean isLeaf) {
         if (isLeaf) {
             return new Entry(buffer, entryLength);
         }
@@ -1561,7 +1561,7 @@ public class IndexData {
      * ColumnDescriptor for new-style fixed point based columns.
      */
     private static final class FixedPointColumnDescriptor extends LegacyFixedPointColumnDescriptor {
-        private FixedPointColumnDescriptor(ColumnImpl column, byte flags) throws IOException {
+        private FixedPointColumnDescriptor(ColumnImpl column, byte flags) {
             super(column, flags);
         }
 

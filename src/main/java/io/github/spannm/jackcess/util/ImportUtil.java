@@ -383,57 +383,52 @@ public class ImportUtil {
 
         Pattern delimPat = Pattern.compile(delim);
 
-        try {
-            name = TableBuilder.escapeIdentifier(name);
-            Table table = null;
-            if (!useExistingTable || (table = db.getTable(name)) == null) {
+        name = TableBuilder.escapeIdentifier(name);
+        Table table = null;
+        if (!useExistingTable || (table = db.getTable(name)) == null) {
 
-                List<ColumnBuilder> columns = new ArrayList<>();
-                Object[] columnNames = splitLine(line, delimPat, quote, in, 0);
+            List<ColumnBuilder> columns = new ArrayList<>();
+            Object[] columnNames = splitLine(line, delimPat, quote, in, 0);
 
-                for (Object columnName : columnNames) {
-                    columns.add(new ColumnBuilder((String) columnName, DataType.TEXT).escapeName().withLength((short) DataType.TEXT.getMaxSize()).toColumn());
-                }
-
-                table = createUniqueTable(db, name, columns, null, filter);
-
-                // the first row was a header row
-                header = true;
+            for (Object columnName : columnNames) {
+                columns.add(new ColumnBuilder((String) columnName, DataType.TEXT).escapeName().withLength((short) DataType.TEXT.getMaxSize()).toColumn());
             }
 
-            List<Object[]> rows = new ArrayList<>(COPY_TABLE_BATCH_SIZE);
-            int numColumns = table.getColumnCount();
+            table = createUniqueTable(db, name, columns, null, filter);
 
-            if (!header) {
-                // first line is _not_ a header line
-                Object[] data = splitLine(line, delimPat, quote, in, numColumns);
-                data = filter.filterRow(data);
-                if (data != null) {
-                    rows.add(data);
-                }
-            }
-
-            while ((line = in.readLine()) != null) {
-                Object[] data = splitLine(line, delimPat, quote, in, numColumns);
-                data = filter.filterRow(data);
-                if (data == null) {
-                    continue;
-                }
-                rows.add(data);
-                if (rows.size() == COPY_TABLE_BATCH_SIZE) {
-                    table.addRows(rows);
-                    rows.clear();
-                }
-            }
-            if (!rows.isEmpty()) {
-                table.addRows(rows);
-            }
-
-            return table.getName();
-
-        } catch (SQLException e) {
-            throw new IOException(e.getMessage(), e);
+            // the first row was a header row
+            header = true;
         }
+
+        List<Object[]> rows = new ArrayList<>(COPY_TABLE_BATCH_SIZE);
+        int numColumns = table.getColumnCount();
+
+        if (!header) {
+            // first line is _not_ a header line
+            Object[] data = splitLine(line, delimPat, quote, in, numColumns);
+            data = filter.filterRow(data);
+            if (data != null) {
+                rows.add(data);
+            }
+        }
+
+        while ((line = in.readLine()) != null) {
+            Object[] data = splitLine(line, delimPat, quote, in, numColumns);
+            data = filter.filterRow(data);
+            if (data == null) {
+                continue;
+            }
+            rows.add(data);
+            if (rows.size() == COPY_TABLE_BATCH_SIZE) {
+                table.addRows(rows);
+                rows.clear();
+            }
+        }
+        if (!rows.isEmpty()) {
+            table.addRows(rows);
+        }
+
+        return table.getName();
     }
 
     /**
@@ -516,11 +511,8 @@ public class ImportUtil {
     /**
      * Returns a new table with a unique name and the given table definition.
      */
-    private static Table createUniqueTable(Database db, String name,
-        List<ColumnBuilder> columns,
-        ResultSetMetaData md,
-        ImportFilter filter)
-        throws IOException, SQLException {
+    private static Table createUniqueTable(Database db, String name, List<ColumnBuilder> columns,
+        ResultSetMetaData md, ImportFilter filter) throws IOException {
         // otherwise, find unique name and create new table
         String baseName = name;
         int counter = 2;

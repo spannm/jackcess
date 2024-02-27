@@ -36,16 +36,16 @@ import java.util.TimeZone;
  */
 class TableTest extends AbstractBaseTest {
 
-    private final PageChannel _pageChannel = new PageChannel(true) {
-                                           };
-    private List<ColumnImpl>  _columns     = new ArrayList<>();
-    private TestTable         _testTable;
-    private int               _varLenIdx;
-    private int               _fixedOffset;
+    private final PageChannel      _pageChannel = new PageChannel(true) {
+                                                };
+    private final List<ColumnImpl> _columns     = new ArrayList<>();
+    private TestTable              _testTable;
+    private int                    _varLenIdx;
+    private int                    _fixedOffset;
 
     private void reset() {
         _testTable = null;
-        _columns = new ArrayList<>();
+        _columns.clear();
         _varLenIdx = 0;
         _fixedOffset = 0;
     }
@@ -142,8 +142,7 @@ class TableTest extends AbstractBaseTest {
         return b;
     }
 
-    private TableImpl newTestTable()
-        throws Exception {
+    private TableImpl newTestTable() {
         _testTable = new TestTable();
         return _testTable;
     }
