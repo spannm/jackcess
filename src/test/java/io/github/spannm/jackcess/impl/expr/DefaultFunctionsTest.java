@@ -21,313 +21,386 @@ import static io.github.spannm.jackcess.impl.expr.ExpressionatorTest.toBD;
 
 import io.github.spannm.jackcess.expr.EvalException;
 import io.github.spannm.jackcess.test.AbstractBaseTest;
+import io.github.spannm.jackcess.test.converter.CsvToLocalDateTime;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.converter.ConvertWith;
+import org.junit.jupiter.params.provider.CsvSource;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.Calendar;
 
 /**
- *
  * @author James Ahlborn
  */
 class DefaultFunctionsTest extends AbstractBaseTest {
 
+    @ParameterizedTest(name = "[{index}] {1} --> {0}")
+    @CsvSource(delimiter = ';',
+        quoteCharacter = '\"',
+        value = {
+            "foo; IIf(10 > 1, \"foo\", \"bar\")",
+            "bar; IIf(10 < 1, \"foo\", \"bar\")",
+            "f; Chr(102)",
+            "☺; ChrW(9786)",
+            "263A; Hex(9786)",
+            "blah; Nz(\"blah\")",
+            "\"\"; Nz(Null)",
+            "blah; Nz(\"blah\",\"FOO\")",
+            "FOO; Nz(Null,\"FOO\")",
+            "23072; Oct(9786)",
+            "\" 9786\"; Str(9786)",
+            "-42; Str(-42)",
+            "-42; Str$(-42)",
+
+            "9786; CStr(9786)",
+            "-42; CStr(-42)",
+            "Null; TypeName(Null)",
+            "String; TypeName('blah')",
+            "Date; TypeName(#01/02/2003#)",
+            "Long; TypeName(42)",
+            "Double; TypeName(CDbl(42))",
+            "Decimal; TypeName(42.3)",
+
+            "FOOO; UCase(\"fOoO\")",
+            "fooo; LCase(\"fOoO\")",
+
+            "bl; Left(\"blah\", 2)",
+            "\"\"; Left(\"blah\", 0)",
+            "blah; Left(\"blah\", 17)",
+            "la; Mid(\"blah\", 2, 2)",
+
+            "ah; Right(\"blah\", 2)",
+            "\"\"; Right(\"blah\", 0)",
+            "blah; Right(\"blah\", 17)",
+
+            "\"blah  \"; LTrim(\"  blah  \")",
+            "\"  blah\"; RTrim(\"  blah  \")",
+            "blah; Trim(\"  blah  \")",
+            "\"   \"; Space(3)",
+            "ddd; String(3,'d')",
+
+            "FOO; StrConv('foo', 1)",
+            "foo; StrConv('foo', 2)",
+            "foo; StrConv('FOO', 2)",
+            "Foo Bar; StrConv('FOO bar', 3)",
+
+            "halb; StrReverse('blah')",
+
+            "foo; Choose(1,'foo','bar','blah')",
+
+            "blah; Choose(3,'foo','bar','blah')",
+            "bar; Switch(False,'foo', True, 'bar', True, 'blah')",
+            "blah; Switch(False,'foo', False, 'bar', True, 'blah')",
+            "faa; Replace('foo','o','a')",
+            "faa; Replace('fOo','o','a')",
+            "aa; Replace('foo','o','a',2)",
+            "oo; Replace('foo','o','a',2,0)",
+            "\"\"; Replace('foo','o','a',4)",
+            "foo; Replace('foo','','a')",
+            "o; Replace('foo','','a',3)",
+            "fahhabahhaahha; Replace('fooboooo','OO','ahha')",
+            "fahhaboooo; Replace('fooboooo','OO','ahha',1,1)",
+            "fooboooo; Replace('fooboooo','OO','ahha',1,1,0)",
+            "ahhabahhaahha; Replace('fooboooo','OO','ahha',2)",
+            "obahhaahha; Replace('fooboooo','OO','ahha',3)",
+            "fb; Replace('fooboooo','OO','')",
+            "\"\"; Replace('','o','a')",
+            "foo; Replace('foo','foobar','a')",
+            "12,345.00; FormatNumber(12345)",
+            "0.12; FormatNumber(0.12345)",
+            "12.34; FormatNumber(12.345)",
+            "-12,345.00; FormatNumber(-12345)",
+            "-0.12; FormatNumber(-0.12345)",
+            "-12.34; FormatNumber(-12.345)",
+            "12,345.000; FormatNumber(12345,3)",
+            "0.123; FormatNumber(0.12345,3)",
+            "12.345; FormatNumber(12.345,3)",
+            "12,345; FormatNumber(12345,0)",
+            "0; FormatNumber(0.12345,0)",
+            "12; FormatNumber(12.345,0)",
+            "0.123; FormatNumber(0.12345,3,True)",
+            ".123; FormatNumber(0.12345,3,False)",
+            "-0.123; FormatNumber(-0.12345,3,True)",
+            "-.123; FormatNumber(-0.12345,3,False)",
+            "-12.34; FormatNumber(-12.345,-1,True,False)",
+            "(12.34); FormatNumber(-12.345,-1,True,True)",
+            "(12); FormatNumber(-12.345,0,True,True)",
+            "12,345.00; FormatNumber(12345,-1,-2,-2,True)",
+            "12345.00; FormatNumber(12345,-1,-2,-2,False)",
+
+            "1,234,500.00%; FormatPercent(12345)",
+            "(1,234.50%); FormatPercent(-12.345,-1,True,True)",
+            "34%; FormatPercent(0.345,0,True,True)",
+            "-.123%; FormatPercent(-0.0012345,3,False)",
+
+            "$12,345.00; FormatCurrency(12345)",
+            "($12,345.00); FormatCurrency(-12345)",
+            "-$12.34; FormatCurrency(-12.345,-1,True,False)",
+            "$12; FormatCurrency(12.345,0,True,True)",
+            "($.123); FormatCurrency(-0.12345,3,False)",
+
+            "1/1/1973 1:37:25 PM; FormatDateTime(#1/1/1973 1:37:25 PM#)",
+            "1:37:25 PM; FormatDateTime(#1:37:25 PM#,0)",
+            "1/1/1973; FormatDateTime(#1/1/1973#,0)",
+            "Monday, January 01, 1973; FormatDateTime(#1/1/1973 1:37:25 PM#,1)",
+            "1/1/1973; FormatDateTime(#1/1/1973 1:37:25 PM#,2)",
+            "1:37:25 PM; FormatDateTime(#1/1/1973 1:37:25 PM#,3)",
+            "13:37; FormatDateTime(#1/1/1973 1:37:25 PM#,4)"
+    })
+    void testFuncsString(String expected, String exprStr) {
+        assertEquals(expected, eval('=' + exprStr));
+    }
+
     @Test
-    void testFuncs() {
-        assertEquals("foo", eval("=IIf(10 > 1, \"foo\", \"bar\")"));
-        assertEquals("bar", eval("=IIf(10 < 1, \"foo\", \"bar\")"));
-        assertEquals(102, eval("=Asc(\"foo\")"));
-        assertEquals(9786, eval("=AscW(\"☺\")"));
-        assertEquals("f", eval("=Chr(102)"));
-        assertEquals("☺", eval("=ChrW(9786)"));
-        assertEquals("263A", eval("=Hex(9786)"));
-
-        assertEquals("blah", eval("=Nz(\"blah\")"));
-        assertEquals("", eval("=Nz(Null)"));
-        assertEquals("blah", eval("=Nz(\"blah\",\"FOO\")"));
-        assertEquals("FOO", eval("=Nz(Null,\"FOO\")"));
-
-        assertEquals("23072", eval("=Oct(9786)"));
-        assertEquals(" 9786", eval("=Str(9786)"));
-        assertEquals("-42", eval("=Str(-42)"));
-        assertEquals("-42", eval("=Str$(-42)"));
-        assertNull(eval("=Str(Null)"));
-
-        assertThrows(EvalException.class, () -> eval("=Str$(Null)"));
-
-        assertEquals(-1, eval("=CBool(\"1\")"));
-        assertEquals(13, eval("=CByte(\"13\")"));
-        assertEquals(14, eval("=CByte(\"13.7\")"));
-        assertEquals(new BigDecimal("57.1235"), eval("=CCur(\"57.12346\")"));
-        assertEquals(Double.parseDouble("57.12345"), eval("=CDbl(\"57.12345\")"));
-        assertEquals(new BigDecimal("57.123456789"), eval("=CDec(\"57.123456789\")"));
-        assertEquals(513, eval("=CInt(\"513\")"));
-        assertEquals(514, eval("=CInt(\"513.7\")"));
-        assertEquals(345513, eval("=CLng(\"345513\")"));
-        assertEquals(345514, eval("=CLng(\"345513.7\")"));
-        assertEquals(Float.valueOf("57.12345").doubleValue(), eval("=CSng(\"57.12345\")"));
-        assertEquals("9786", eval("=CStr(9786)"));
-        assertEquals("-42", eval("=CStr(-42)"));
-        assertEquals(LocalDateTime.of(2003, 1, 2, 0, 0), eval("=CDate('01/02/2003')"));
-        assertEquals(LocalDateTime.of(2003, 1, 2, 7, 0), eval("=CDate('01/02/2003 7:00:00 AM')"));
-        assertEquals(LocalDateTime.of(1908, 3, 31, 10, 48), eval("=CDate(3013.45)"));
-
-        assertEquals(-1, eval("=IsNull(Null)"));
-        assertEquals(0, eval("=IsNull(13)"));
-        assertEquals(-1, eval("=IsDate(#01/02/2003#)"));
-        assertEquals(0, eval("=IsDate('foo')"));
-        assertEquals(0, eval("=IsDate('200')"));
-
-        assertEquals(0, eval("=IsNumeric(Null)"));
-        assertEquals(0, eval("=IsNumeric('foo')"));
-        assertEquals(0, eval("=IsNumeric(#01/02/2003#)"));
-        assertEquals(0, eval("=IsNumeric('01/02/2003')"));
-        assertEquals(-1, eval("=IsNumeric(37)"));
-        assertEquals(-1, eval("=IsNumeric(' 37 ')"));
-        assertEquals(-1, eval("=IsNumeric(' -37.5e2 ')"));
-        assertEquals(-1, eval("=IsNumeric(' &H37 ')"));
-        assertEquals(0, eval("=IsNumeric(' &H37foo ')"));
-        assertEquals(0, eval("=IsNumeric(' &o39 ')"));
-        assertEquals(-1, eval("=IsNumeric(' &o36 ')"));
-        assertEquals(0, eval("=IsNumeric(' &o36.1 ')"));
-
-        assertEquals(1, eval("=VarType(Null)"));
-        assertEquals(8, eval("=VarType('blah')"));
-        assertEquals(7, eval("=VarType(#01/02/2003#)"));
-        assertEquals(3, eval("=VarType(42)"));
-        assertEquals(5, eval("=VarType(CDbl(42))"));
-        assertEquals(14, eval("=VarType(42.3)"));
-
-        assertEquals("Null", eval("=TypeName(Null)"));
-        assertEquals("String", eval("=TypeName('blah')"));
-        assertEquals("Date", eval("=TypeName(#01/02/2003#)"));
-        assertEquals("Long", eval("=TypeName(42)"));
-        assertEquals("Double", eval("=TypeName(CDbl(42))"));
-        assertEquals("Decimal", eval("=TypeName(42.3)"));
-
-        assertEquals(2, eval("=InStr('AFOOBAR', 'FOO')"));
-        assertEquals(2, eval("=InStr('AFOOBAR', 'foo')"));
-        assertEquals(2, eval("=InStr(1, 'AFOOBAR', 'foo')"));
-        assertEquals(0, eval("=InStr(1, 'AFOOBAR', 'foo', 0)"));
-        assertEquals(2, eval("=InStr(1, 'AFOOBAR', 'foo', 1)"));
-        assertEquals(2, eval("=InStr(1, 'AFOOBAR', 'FOO', 0)"));
-        assertEquals(2, eval("=InStr(2, 'AFOOBAR', 'FOO')"));
-        assertEquals(0, eval("=InStr(3, 'AFOOBAR', 'FOO')"));
-        assertEquals(0, eval("=InStr(17, 'AFOOBAR', 'FOO')"));
-        assertEquals(2, eval("=InStr(1, 'AFOOBARFOOBAR', 'FOO')"));
-        assertEquals(8, eval("=InStr(3, 'AFOOBARFOOBAR', 'FOO')"));
-        assertNull(eval("=InStr(3, Null, 'FOO')"));
-
-        assertEquals(2, eval("=InStrRev('AFOOBAR', 'FOO')"));
-        assertEquals(2, eval("=InStrRev('AFOOBAR', 'foo')"));
-        assertEquals(2, eval("=InStrRev('AFOOBAR', 'foo', -1)"));
-        assertEquals(0, eval("=InStrRev('AFOOBAR', 'foo', -1, 0)"));
-        assertEquals(2, eval("=InStrRev('AFOOBAR', 'foo', -1, 1)"));
-        assertEquals(2, eval("=InStrRev('AFOOBAR', 'FOO', -1, 0)"));
-        assertEquals(2, eval("=InStrRev('AFOOBAR', 'FOO', 4)"));
-        assertEquals(0, eval("=InStrRev('AFOOBAR', 'FOO', 3)"));
-        assertEquals(2, eval("=InStrRev('AFOOBAR', 'FOO', 17)"));
-        assertEquals(2, eval("=InStrRev('AFOOBARFOOBAR', 'FOO', 9)"));
-        assertEquals(8, eval("=InStrRev('AFOOBARFOOBAR', 'FOO', 10)"));
-        assertNull(eval("=InStrRev(Null, 'FOO', 3)"));
-
-        assertEquals("FOOO", eval("=UCase(\"fOoO\")"));
-        assertEquals("fooo", eval("=LCase(\"fOoO\")"));
+    void testFuncsQuoting() {
         assertEquals(" FOO \" BAR ", eval("=UCase(\" foo \"\" bar \")"));
+    }
 
-        assertEquals("bl", eval("=Left(\"blah\", 2)"));
-        assertEquals("", eval("=Left(\"blah\", 0)"));
-        assertEquals("blah", eval("=Left(\"blah\", 17)"));
-        assertEquals("la", eval("=Mid(\"blah\", 2, 2)"));
+    @ParameterizedTest(name = "[{index}] {1} --> {0}")
+    @CsvSource(delimiter = ';',
+        quoteCharacter = '\"',
+        value = {
+            "102; Asc(\"foo\")",
+            "9786; AscW(\"☺\")",
+            "-1; CBool(\"1\")",
+            "13; CByte(\"13\")",
+            "14; CByte(\"13.7\")",
+            "513; CInt(\"513\")",
+            "514; CInt(\"513.7\")",
+            "345513; CLng(\"345513\")",
+            "345514; CLng(\"345513.7\")",
+            "-1; IsNull(Null)",
+            "0; IsNull(13)",
+            "-1; IsDate(#01/02/2003#)",
+            "0; IsDate('foo')",
+            "0; IsDate('200')",
 
-        assertEquals("ah", eval("=Right(\"blah\", 2)"));
-        assertEquals("", eval("=Right(\"blah\", 0)"));
-        assertEquals("blah", eval("=Right(\"blah\", 17)"));
+            "0; IsNumeric(Null)",
+            "0; IsNumeric('foo')",
+            "0; IsNumeric(#01/02/2003#)",
+            "0; IsNumeric('01/02/2003')",
+            "-1; IsNumeric(37)",
+            "-1; IsNumeric(' 37 ')",
+            "-1; IsNumeric(' -37.5e2 ')",
+            "-1; IsNumeric(' &H37 ')",
+            "0; IsNumeric(' &H37foo ')",
+            "0; IsNumeric(' &o39 ')",
+            "-1; IsNumeric(' &o36 ')",
+            "0; IsNumeric(' &o36.1 ')",
 
-        assertEquals("blah  ", eval("=LTrim(\"  blah  \")"));
-        assertEquals("  blah", eval("=RTrim(\"  blah  \")"));
-        assertEquals("blah", eval("=Trim(\"  blah  \")"));
-        assertEquals("   ", eval("=Space(3)"));
-        assertEquals("ddd", eval("=String(3,'d')"));
+            "1; VarType(Null)",
+            "8; VarType('blah')",
+            "7; VarType(#01/02/2003#)",
+            "3; VarType(42)",
+            "5; VarType(CDbl(42))",
+            "14; VarType(42.3)",
 
-        assertEquals(1, eval("=StrComp('FOO', 'bar')"));
-        assertEquals(-1, eval("=StrComp('bar', 'FOO')"));
-        assertEquals(0, eval("=StrComp('FOO', 'foo')"));
-        assertEquals(-1, eval("=StrComp('FOO', 'bar', 0)"));
-        assertEquals(1, eval("=StrComp('bar', 'FOO', 0)"));
-        assertEquals(-1, eval("=StrComp('FOO', 'foo', 0)"));
+            "2; InStr('AFOOBAR', 'FOO')",
+            "2; InStr('AFOOBAR', 'foo')",
+            "2; InStr(1, 'AFOOBAR', 'foo')",
+            "0; InStr(1, 'AFOOBAR', 'foo', 0)",
+            "2; InStr(1, 'AFOOBAR', 'foo', 1)",
+            "2; InStr(1, 'AFOOBAR', 'FOO', 0)",
+            "2; InStr(2, 'AFOOBAR', 'FOO')",
+            "0; InStr(3, 'AFOOBAR', 'FOO')",
+            "0; InStr(17, 'AFOOBAR', 'FOO')",
+            "2; InStr(1, 'AFOOBARFOOBAR', 'FOO')",
+            "8; InStr(3, 'AFOOBARFOOBAR', 'FOO')",
 
-        assertEquals("FOO", eval("=StrConv('foo', 1)"));
-        assertEquals("foo", eval("=StrConv('foo', 2)"));
-        assertEquals("foo", eval("=StrConv('FOO', 2)"));
-        assertEquals("Foo Bar", eval("=StrConv('FOO bar', 3)"));
+            "2; InStrRev('AFOOBAR', 'FOO')",
+            "2; InStrRev('AFOOBAR', 'foo')",
+            "2; InStrRev('AFOOBAR', 'foo', -1)",
+            "0; InStrRev('AFOOBAR', 'foo', -1, 0)",
+            "2; InStrRev('AFOOBAR', 'foo', -1, 1)",
+            "2; InStrRev('AFOOBAR', 'FOO', -1, 0)",
+            "2; InStrRev('AFOOBAR', 'FOO', 4)",
+            "0; InStrRev('AFOOBAR', 'FOO', 3)",
+            "2; InStrRev('AFOOBAR', 'FOO', 17)",
+            "2; InStrRev('AFOOBARFOOBAR', 'FOO', 9)",
+            "8; InStrRev('AFOOBARFOOBAR', 'FOO', 10)",
 
-        assertEquals("halb", eval("=StrReverse('blah')"));
+            "1; StrComp('FOO', 'bar')",
+            "-1; StrComp('bar', 'FOO')",
+            "0; StrComp('FOO', 'foo')",
+            "-1; StrComp('FOO', 'bar', 0)",
+            "1; StrComp('bar', 'FOO', 0)",
+            "-1; StrComp('FOO', 'foo', 0)"
+    })
+    void testFuncsInt(int expected, String exprStr) {
+        assertEquals(expected, eval('=' + exprStr));
+    }
 
-        assertEquals("foo", eval("=Choose(1,'foo','bar','blah')"));
-        assertEquals(null, eval("=Choose(-1,'foo','bar','blah')"));
-        assertEquals("blah", eval("=Choose(3,'foo','bar','blah')"));
+    @ParameterizedTest(name = "[{index}] {1} --> {0}")
+    @CsvSource(delimiter = ';',
+        quoteCharacter = '\"',
+        value = {
+            "Str(Null)",
+            "InStr(3, Null, 'FOO')",
+            "InStrRev(Null, 'FOO', 3)",
+            "Choose(-1,'foo','bar','blah')",
+            "Switch(False,'foo', False, 'bar', False, 'blah')"
+    })
+    void testFuncsNull(String exprStr) {
+        assertNull(eval('=' + exprStr));
+    }
 
-        assertEquals(null, eval("=Switch(False,'foo', False, 'bar', False, 'blah')"));
-        assertEquals("bar", eval("=Switch(False,'foo', True, 'bar', True, 'blah')"));
-        assertEquals("blah", eval("=Switch(False,'foo', False, 'bar', True, 'blah')"));
+    @ParameterizedTest(name = "[{index}] {1} --> {0}")
+    @CsvSource(delimiter = ';',
+        quoteCharacter = '\"',
+        value = {
+            "57.12345; CDbl(\"57.12345\")",
+            "1615198d; Val('    1615 198th Street N.E.')",
+            "-1d; Val('  &HFFFFwhatever')",
+            "131071d; Val('  &H1FFFFwhatever')",
+            "-1d; Val('  &HFFFFFFFFwhatever')",
+            "291d; Val('  &H123whatever')",
+            "83d; Val('  &O123whatever')",
+            "1.23d; Val('  1 2 3 e -2 whatever')",
+            "0d; Val('  whatever123 ')",
+            "0d; Val('')"
+    })
+    void testFuncsDouble(double expected, String exprStr) {
+        assertEquals(expected, eval('=' + exprStr));
+    }
 
-        EvalException ex1 = assertThrows(EvalException.class, () -> eval("=StrReverse('blah', 1)"));
-        assertTrue(ex1.getMessage().contains("Invalid function call"));
+    @ParameterizedTest(name = "[{index}] {1} --> {0}")
+    @CsvSource(delimiter = ';',
+        quoteCharacter = '\"',
+        value = {
+            "57.1235; CCur(\"57.12346\")",
+            "57.123456789; CDec(\"57.123456789\")"
+    })
+    void testFuncsBigDecimal(BigDecimal expected, String exprStr) {
+        assertEquals(expected, eval('=' + exprStr));
+    }
 
-        EvalException ex2 = assertThrows(EvalException.class, () -> eval("=StrReverse()"));
-        assertTrue(ex2.getMessage().contains("Invalid function call"));
+    @ParameterizedTest(name = "[{index}] {1} --> {0}")
+    @CsvSource(delimiter = ';',
+        quoteCharacter = '\"',
+        value = {
+            "57.12345; CSng(\"57.12345\")"
+    })
+    void testFuncsFloat(String expected, String exprStr) {
+        assertEquals(Float.valueOf(expected).doubleValue(), eval('=' + exprStr));
+    }
 
-        assertEquals(1615198d, eval("=Val('    1615 198th Street N.E.')"));
-        assertEquals(-1d, eval("=Val('  &HFFFFwhatever')"));
-        assertEquals(131071d, eval("=Val('  &H1FFFFwhatever')"));
-        assertEquals(-1d, eval("=Val('  &HFFFFFFFFwhatever')"));
-        assertEquals(291d, eval("=Val('  &H123whatever')"));
-        assertEquals(83d, eval("=Val('  &O123whatever')"));
-        assertEquals(1.23d, eval("=Val('  1 2 3 e -2 whatever')"));
-        assertEquals(0d, eval("=Val('  whatever123 ')"));
-        assertEquals(0d, eval("=Val('')"));
+    @ParameterizedTest(name = "[{index}] {0} --> {1}")
+    @CsvSource(delimiter = ';', value = {
+        "2003, 1, 2, 0, 0; CDate('01/02/2003')",
+        "2003, 1, 2, 7, 0; CDate('01/02/2003 7:00:00 AM')",
+        "1908, 3, 31, 10, 48; CDate(3013.45)"
+    })
+    void testFuncsLocalDateTime(@ConvertWith(CsvToLocalDateTime.class) LocalDateTime expected, String exprStr) {
+        assertEquals(expected, eval(exprStr));
+    }
 
-        assertEquals("faa", eval("=Replace('foo','o','a')"));
-        assertEquals("faa", eval("=Replace('fOo','o','a')"));
-        assertEquals("aa", eval("=Replace('foo','o','a',2)"));
-        assertEquals("oo", eval("=Replace('foo','o','a',2,0)"));
-        assertEquals("", eval("=Replace('foo','o','a',4)"));
-        assertEquals("foo", eval("=Replace('foo','','a')"));
-        assertEquals("o", eval("=Replace('foo','','a',3)"));
-        assertEquals("fahhabahhaahha", eval("=Replace('fooboooo','OO','ahha')"));
-        assertEquals("fahhaboooo", eval("=Replace('fooboooo','OO','ahha',1,1)"));
-        assertEquals("fooboooo", eval("=Replace('fooboooo','OO','ahha',1,1,0)"));
-        assertEquals("ahhabahhaahha", eval("=Replace('fooboooo','OO','ahha',2)"));
-        assertEquals("obahhaahha", eval("=Replace('fooboooo','OO','ahha',3)"));
-        assertEquals("fb", eval("=Replace('fooboooo','OO','')"));
-        assertEquals("", eval("=Replace('','o','a')"));
-        assertEquals("foo", eval("=Replace('foo','foobar','a')"));
+    @ParameterizedTest(name = "[{index}] {0} --> {1}")
+    @CsvSource(delimiter = ';', value = {
+        "Str$(Null); Value[NULL] 'null' cannot be converted to STRING",
+        "StrReverse('blah', 1); Invalid function call",
+        "StrReverse(); Invalid function call"
+    })
+    void testFuncsExceptions(String exprStr, String message) {
+        EvalException ex = assertThrows(EvalException.class, () -> eval('=' + exprStr));
+        assertTrue(ex.getMessage().contains(message));
+    }
 
-        assertEquals("12,345.00", eval("=FormatNumber(12345)"));
-        assertEquals("0.12", eval("=FormatNumber(0.12345)"));
-        assertEquals("12.34", eval("=FormatNumber(12.345)"));
-        assertEquals("-12,345.00", eval("=FormatNumber(-12345)"));
-        assertEquals("-0.12", eval("=FormatNumber(-0.12345)"));
-        assertEquals("-12.34", eval("=FormatNumber(-12.345)"));
-        assertEquals("12,345.000", eval("=FormatNumber(12345,3)"));
-        assertEquals("0.123", eval("=FormatNumber(0.12345,3)"));
-        assertEquals("12.345", eval("=FormatNumber(12.345,3)"));
-        assertEquals("12,345", eval("=FormatNumber(12345,0)"));
-        assertEquals("0", eval("=FormatNumber(0.12345,0)"));
-        assertEquals("12", eval("=FormatNumber(12.345,0)"));
-        assertEquals("0.123", eval("=FormatNumber(0.12345,3,True)"));
-        assertEquals(".123", eval("=FormatNumber(0.12345,3,False)"));
-        assertEquals("-0.123", eval("=FormatNumber(-0.12345,3,True)"));
-        assertEquals("-.123", eval("=FormatNumber(-0.12345,3,False)"));
-        assertEquals("-12.34", eval("=FormatNumber(-12.345,-1,True,False)"));
-        assertEquals("(12.34)", eval("=FormatNumber(-12.345,-1,True,True)"));
-        assertEquals("(12)", eval("=FormatNumber(-12.345,0,True,True)"));
-        assertEquals("12,345.00", eval("=FormatNumber(12345,-1,-2,-2,True)"));
-        assertEquals("12345.00", eval("=FormatNumber(12345,-1,-2,-2,False)"));
+    @ParameterizedTest(name = "[{index}] {1} --> {0}")
+    @CsvSource(delimiter = ';',
+        quoteCharacter = '\"',
+        value = {
+            "12345.6789; Format(12345.6789, 'General Number')",
+            "0.12345; Format(0.12345, 'General Number')",
+            "-12345.6789; Format(-12345.6789, 'General Number')",
+            "-0.12345; Format(-0.12345, 'General Number')",
+            "12345.6789; Format('12345.6789', 'General Number')",
+            "1678.9; Format('1.6789E+3', 'General Number')",
+            "37623.2916666667; Format(#01/02/2003 7:00:00 AM#, 'General Number')",
+            "foo; Format('foo', 'General Number')",
 
-        assertEquals("1,234,500.00%", eval("=FormatPercent(12345)"));
-        assertEquals("(1,234.50%)", eval("=FormatPercent(-12.345,-1,True,True)"));
-        assertEquals("34%", eval("=FormatPercent(0.345,0,True,True)"));
-        assertEquals("-.123%", eval("=FormatPercent(-0.0012345,3,False)"));
+            "12,345.68; Format(12345.6789, 'Standard')",
+            "0.12; Format(0.12345, 'Standard')",
+            "-12,345.68; Format(-12345.6789, 'Standard')",
+            "-0.12; Format(-0.12345, 'Standard')",
 
-        assertEquals("$12,345.00", eval("=FormatCurrency(12345)"));
-        assertEquals("($12,345.00)", eval("=FormatCurrency(-12345)"));
-        assertEquals("-$12.34", eval("=FormatCurrency(-12.345,-1,True,False)"));
-        assertEquals("$12", eval("=FormatCurrency(12.345,0,True,True)"));
-        assertEquals("($.123)", eval("=FormatCurrency(-0.12345,3,False)"));
+            "12345.68; Format(12345.6789, 'Fixed')",
+            "0.12; Format(0.12345, 'Fixed')",
+            "-12345.68; Format(-12345.6789, 'Fixed')",
+            "-0.12; Format(-0.12345, 'Fixed')",
 
-        assertEquals("1/1/1973 1:37:25 PM", eval("=FormatDateTime(#1/1/1973 1:37:25 PM#)"));
-        assertEquals("1:37:25 PM", eval("=FormatDateTime(#1:37:25 PM#,0)"));
-        assertEquals("1/1/1973", eval("=FormatDateTime(#1/1/1973#,0)"));
-        assertEquals("Monday, January 01, 1973", eval("=FormatDateTime(#1/1/1973 1:37:25 PM#,1)"));
-        assertEquals("1/1/1973", eval("=FormatDateTime(#1/1/1973 1:37:25 PM#,2)"));
-        assertEquals("1:37:25 PM", eval("=FormatDateTime(#1/1/1973 1:37:25 PM#,3)"));
-        assertEquals("13:37", eval("=FormatDateTime(#1/1/1973 1:37:25 PM#,4)"));
+            "€12,345.68; Format(12345.6789, 'Euro')",
+            "€0.12; Format(0.12345, 'Euro')",
+            "(€12,345.68); Format(-12345.6789, 'Euro')",
+            "(€0.12); Format(-0.12345, 'Euro')",
+
+            "$12,345.68; Format(12345.6789, 'Currency')",
+            "$0.12; Format(0.12345, 'Currency')",
+            "($12,345.68); Format(-12345.6789, 'Currency')",
+            "($0.12); Format(-0.12345, 'Currency')",
+
+            "1234567.89%; Format(12345.6789, 'Percent')",
+            "12.34%; Format(0.12345, 'Percent')",
+            "-1234567.89%; Format(-12345.6789, 'Percent')",
+            "-12.34%; Format(-0.12345, 'Percent')",
+
+            "1.23E+4; Format(12345.6789, 'Scientific')",
+            "1.23E-1; Format(0.12345, 'Scientific')",
+            "-1.23E+4; Format(-12345.6789, 'Scientific')",
+            "-1.23E-1; Format(-0.12345, 'Scientific')",
+
+            "Yes; Format(True, 'Yes/No')",
+            "No; Format(False, 'Yes/No')",
+            "True; Format(True, 'True/False')",
+            "False; Format(False, 'True/False')",
+            "On; Format(True, 'On/Off')",
+            "Off; Format(False, 'On/Off')",
+
+            "1/2/2003 7:00:00 AM; Format(#01/02/2003 7:00:00 AM#, 'General Date')",
+            "1/2/2003; Format(#01/02/2003#, 'General Date')",
+            "7:00:00 AM; Format(#7:00:00 AM#, 'General Date')",
+            "1/2/2003 7:00:00 AM; Format('37623.2916666667', 'General Date')",
+            "foo; Format('foo', 'General Date')",
+            "\"\"; Format('', 'General Date')",
+
+            "Thursday, January 02, 2003; Format(#01/02/2003 7:00:00 AM#, 'Long Date')",
+            "02-Jan-03; Format(#01/02/2003 7:00:00 AM#, 'Medium Date')",
+            "1/2/2003; Format(#01/02/2003 7:00:00 AM#, 'Short Date')",
+            "7:00:00 AM; Format(#01/02/2003 7:00:00 AM#, 'Long Time')",
+            "07:00 AM; Format(#01/02/2003 7:00:00 AM#, 'Medium Time')",
+            "07:00; Format(#01/02/2003 7:00:00 AM#, 'Short Time')",
+            "19:00; Format(#01/02/2003 7:00:00 PM#, 'Short Time')"
+    })
+    void testFormat(String expected, String exprStr) {
+        assertEquals(expected, eval('=' + exprStr));
+    }
+
+    @ParameterizedTest(name = "[{index}] {1} --> {0}")
+    @CsvSource(delimiter = '|',
+        quoteCharacter = '§',
+        value = {
+        "07:00 a| Format(#01/10/2003 7:00:00 AM#, 'hh:nn a/p')",
+        "07:00 p| Format(#01/10/2003 7:00:00 PM#, 'hh:nn a/p')",
+        "07:00 a 6 2| Format(#01/10/2003 7:00:00 AM#, 'hh:nn a/p w ww')",
+        "07:00 a 4 1| Format(#01/10/2003 7:00:00 AM#, 'hh:nn a/p w ww', 3, 3)",
+        "1313| Format(#01/10/2003 7:13:00 AM#, 'nnnn; foo bar')",
+        "1 1/10/2003 7:13:00 AM ttt this is text| Format(#01/10/2003 7:13:00 AM#, 'q c ttt \"this is text\"')",
+        "1 1/10/2003 ttt this is text| Format(#01/10/2003#, 'q c ttt \"this is text\"')",
+        "4 7:13:00 AM ttt this 'is' \"text\"| Format(#7:13:00 AM#, \"q c ttt \"\"this 'is' \"\"\"\"text\"\"\"\"\"\"\")",
+        "12/29/1899| Format('true', 'c')",
+        "Tuesday, 00 Jan 2, 21:36:00 Y| Format('3.9', '*~dddd, yy mmm d, hh:nn:ss \\Y[Yellow]')",
+        "Tuesday, 00 Jan 01/2, 09:36:00 PM| Format('3.9', 'dddd, yy mmm mm/d, hh:nn:ss AMPM')",
+        "9:36:00 PM| Format('3.9', 'ttttt')",
+        "9:36:00 PM| Format(3.9, 'ttttt')",
+        "foo| Format('foo', 'dddd, yy mmm mm d, hh:nn:ss AMPM')"
+    })
+    void testCustomFormat1(String expected, String exprStr) {
+        assertEquals(expected, eval('=' + exprStr));
     }
 
     @Test
-    void testFormat() {
-        assertEquals("12345.6789", eval("=Format(12345.6789, 'General Number')"));
-        assertEquals("0.12345", eval("=Format(0.12345, 'General Number')"));
-        assertEquals("-12345.6789", eval("=Format(-12345.6789, 'General Number')"));
-        assertEquals("-0.12345", eval("=Format(-0.12345, 'General Number')"));
-        assertEquals("12345.6789", eval("=Format('12345.6789', 'General Number')"));
-        assertEquals("1678.9", eval("=Format('1.6789E+3', 'General Number')"));
-        assertEquals("37623.2916666667", eval("=Format(#01/02/2003 7:00:00 AM#, 'General Number')"));
-        assertEquals("foo", eval("=Format('foo', 'General Number')"));
-
-        assertEquals("12,345.68", eval("=Format(12345.6789, 'Standard')"));
-        assertEquals("0.12", eval("=Format(0.12345, 'Standard')"));
-        assertEquals("-12,345.68", eval("=Format(-12345.6789, 'Standard')"));
-        assertEquals("-0.12", eval("=Format(-0.12345, 'Standard')"));
-
-        assertEquals("12345.68", eval("=Format(12345.6789, 'Fixed')"));
-        assertEquals("0.12", eval("=Format(0.12345, 'Fixed')"));
-        assertEquals("-12345.68", eval("=Format(-12345.6789, 'Fixed')"));
-        assertEquals("-0.12", eval("=Format(-0.12345, 'Fixed')"));
-
-        assertEquals("€12,345.68", eval("=Format(12345.6789, 'Euro')"));
-        assertEquals("€0.12", eval("=Format(0.12345, 'Euro')"));
-        assertEquals("(€12,345.68)", eval("=Format(-12345.6789, 'Euro')"));
-        assertEquals("(€0.12)", eval("=Format(-0.12345, 'Euro')"));
-
-        assertEquals("$12,345.68", eval("=Format(12345.6789, 'Currency')"));
-        assertEquals("$0.12", eval("=Format(0.12345, 'Currency')"));
-        assertEquals("($12,345.68)", eval("=Format(-12345.6789, 'Currency')"));
-        assertEquals("($0.12)", eval("=Format(-0.12345, 'Currency')"));
-
-        assertEquals("1234567.89%", eval("=Format(12345.6789, 'Percent')"));
-        assertEquals("12.34%", eval("=Format(0.12345, 'Percent')"));
-        assertEquals("-1234567.89%", eval("=Format(-12345.6789, 'Percent')"));
-        assertEquals("-12.34%", eval("=Format(-0.12345, 'Percent')"));
-
-        assertEquals("1.23E+4", eval("=Format(12345.6789, 'Scientific')"));
-        assertEquals("1.23E-1", eval("=Format(0.12345, 'Scientific')"));
-        assertEquals("-1.23E+4", eval("=Format(-12345.6789, 'Scientific')"));
-        assertEquals("-1.23E-1", eval("=Format(-0.12345, 'Scientific')"));
-
-        assertEquals("Yes", eval("=Format(True, 'Yes/No')"));
-        assertEquals("No", eval("=Format(False, 'Yes/No')"));
-        assertEquals("True", eval("=Format(True, 'True/False')"));
-        assertEquals("False", eval("=Format(False, 'True/False')"));
-        assertEquals("On", eval("=Format(True, 'On/Off')"));
-        assertEquals("Off", eval("=Format(False, 'On/Off')"));
-
-        assertEquals("1/2/2003 7:00:00 AM", eval("=Format(#01/02/2003 7:00:00 AM#, 'General Date')"));
-        assertEquals("1/2/2003", eval("=Format(#01/02/2003#, 'General Date')"));
-        assertEquals("7:00:00 AM", eval("=Format(#7:00:00 AM#, 'General Date')"));
-        assertEquals("1/2/2003 7:00:00 AM", eval("=Format('37623.2916666667', 'General Date')"));
-        assertEquals("foo", eval("=Format('foo', 'General Date')"));
-        assertEquals("", eval("=Format('', 'General Date')"));
-
-        assertEquals("Thursday, January 02, 2003", eval("=Format(#01/02/2003 7:00:00 AM#, 'Long Date')"));
-        assertEquals("02-Jan-03", eval("=Format(#01/02/2003 7:00:00 AM#, 'Medium Date')"));
-        assertEquals("1/2/2003", eval("=Format(#01/02/2003 7:00:00 AM#, 'Short Date')"));
-        assertEquals("7:00:00 AM", eval("=Format(#01/02/2003 7:00:00 AM#, 'Long Time')"));
-        assertEquals("07:00 AM", eval("=Format(#01/02/2003 7:00:00 AM#, 'Medium Time')"));
-        assertEquals("07:00", eval("=Format(#01/02/2003 7:00:00 AM#, 'Short Time')"));
-        assertEquals("19:00", eval("=Format(#01/02/2003 7:00:00 PM#, 'Short Time')"));
-    }
-
-    @Test
-    void testCustomFormat() {
-        assertEquals("07:00 a", eval("=Format(#01/10/2003 7:00:00 AM#, 'hh:nn a/p')"));
-        assertEquals("07:00 p", eval("=Format(#01/10/2003 7:00:00 PM#, 'hh:nn a/p')"));
-        assertEquals("07:00 a 6 2", eval("=Format(#01/10/2003 7:00:00 AM#, 'hh:nn a/p w ww')"));
-        assertEquals("07:00 a 4 1", eval("=Format(#01/10/2003 7:00:00 AM#, 'hh:nn a/p w ww', 3, 3)"));
-        assertEquals("1313", eval("=Format(#01/10/2003 7:13:00 AM#, 'nnnn; foo bar')"));
-        assertEquals("1 1/10/2003 7:13:00 AM ttt this is text", eval("=Format(#01/10/2003 7:13:00 AM#, 'q c ttt \"this is text\"')"));
-        assertEquals("1 1/10/2003 ttt this is text", eval("=Format(#01/10/2003#, 'q c ttt \"this is text\"')"));
-        assertEquals("4 7:13:00 AM ttt this 'is' \"text\"", eval("=Format(#7:13:00 AM#, \"q c ttt \"\"this 'is' \"\"\"\"text\"\"\"\"\"\"\")"));
-        assertEquals("12/29/1899", eval("=Format('true', 'c')"));
-        assertEquals("Tuesday, 00 Jan 2, 21:36:00 Y", eval("=Format('3.9', '*~dddd, yy mmm d, hh:nn:ss \\Y[Yellow]')"));
-        assertEquals("Tuesday, 00 Jan 01/2, 09:36:00 PM", eval("=Format('3.9', 'dddd, yy mmm mm/d, hh:nn:ss AMPM')"));
-        assertEquals("9:36:00 PM", eval("=Format('3.9', 'ttttt')"));
-        assertEquals("9:36:00 PM", eval("=Format(3.9, 'ttttt')"));
-        assertEquals("foo", eval("=Format('foo', 'dddd, yy mmm mm d, hh:nn:ss AMPM')"));
-
+    void testCustomFormat2() {
         assertEvalFormat("';\\y;\\n'",
             "foo", "'foo'",
             "", "''",

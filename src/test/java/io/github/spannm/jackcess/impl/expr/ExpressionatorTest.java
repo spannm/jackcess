@@ -431,19 +431,19 @@ class ExpressionatorTest extends AbstractBaseTest {
 
     @ParameterizedTest(name = "[{index}] {0} --> {1}")
     @CsvSource(delimiter = ';', value = {
-        "'';empty",
-        "=;found?",
-        "=(34 + 5;closing",
-        "=(34 + );found?",
-        "=(34 + [A].[B].[C].[D]);object reference",
-        "=34 + 5,;delimiter",
-        "=Foo();find function",
-        "=(/37);left expression",
-        "=(>37);left expression",
-        "=(And 37);left expression",
-        "=37 In 42;'In' expression",
-        "=37 Between 42;'Between' expression",
-        "=(3 + 5) Rnd();multiple expressions"
+        "''; empty",
+        "=; found?",
+        "=(34 + 5; closing",
+        "=(34 + ); found?",
+        "=(34 + [A].[B].[C].[D]); object reference",
+        "=34 + 5,; delimiter",
+        "=Foo(); find function",
+        "=(/37); left expression",
+        "=(>37); left expression",
+        "=(And 37); left expression",
+        "=37 In 42; 'In' expression",
+        "=37 Between 42; 'Between' expression",
+        "=(3 + 5) Rnd(); multiple expressions"
     })
     void testInvalidExpression(String exprStr, String msgStr) {
         ParseException ex = assertThrows(ParseException.class, () -> eval(exprStr));
