@@ -30,126 +30,126 @@ import org.junit.jupiter.params.provider.CsvSource;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.Calendar;
+import java.util.Map;
+import java.util.function.Supplier;
 
 /**
  * @author James Ahlborn
  */
 class DefaultFunctionsTest extends AbstractBaseTest {
 
-    @ParameterizedTest(name = "[{index}] {1} --> {0}")
-    @CsvSource(delimiter = ';',
-        quoteCharacter = '\"',
-        value = {
-            "foo; IIf(10 > 1, \"foo\", \"bar\")",
-            "bar; IIf(10 < 1, \"foo\", \"bar\")",
-            "f; Chr(102)",
-            "☺; ChrW(9786)",
-            "263A; Hex(9786)",
-            "blah; Nz(\"blah\")",
-            "\"\"; Nz(Null)",
-            "blah; Nz(\"blah\",\"FOO\")",
-            "FOO; Nz(Null,\"FOO\")",
-            "23072; Oct(9786)",
-            "\" 9786\"; Str(9786)",
-            "-42; Str(-42)",
-            "-42; Str$(-42)",
+    @ParameterizedTest(name = "[{index}] {0} --> {1}")
+    @CsvSource(delimiter = ';', quoteCharacter = '\"', value = {
+        "IIf(10 > 1, \"foo\", \"bar\"); foo",
+        "IIf(10 < 1, \"foo\", \"bar\"); bar",
+        "Chr(102); f",
+        "ChrW(9786); ☺",
+        "Hex(9786); 263A",
+        "Nz(\"blah\"); blah",
+        "Nz(Null); \"\"",
+        "Nz(\"blah\",\"FOO\"); blah",
+        "Nz(Null,\"FOO\"); FOO",
+        "Oct(9786); 23072",
+        "Str(9786); \" 9786\"",
+        "Str(-42); -42",
+        "Str$(-42); -42",
 
-            "9786; CStr(9786)",
-            "-42; CStr(-42)",
-            "Null; TypeName(Null)",
-            "String; TypeName('blah')",
-            "Date; TypeName(#01/02/2003#)",
-            "Long; TypeName(42)",
-            "Double; TypeName(CDbl(42))",
-            "Decimal; TypeName(42.3)",
+        "CStr(9786); 9786",
+        "CStr(-42); -42",
+        "TypeName(Null); Null",
+        "TypeName('blah'); String",
+        "TypeName(#01/02/2003#); Date",
+        "TypeName(42); Long",
+        "TypeName(CDbl(42)); Double",
+        "TypeName(42.3); Decimal",
 
-            "FOOO; UCase(\"fOoO\")",
-            "fooo; LCase(\"fOoO\")",
+        "UCase(\"fOoO\"); FOOO",
+        "LCase(\"fOoO\"); fooo",
 
-            "bl; Left(\"blah\", 2)",
-            "\"\"; Left(\"blah\", 0)",
-            "blah; Left(\"blah\", 17)",
-            "la; Mid(\"blah\", 2, 2)",
+        "Left(\"blah\", 2); bl",
+        "Left(\"blah\", 0); \"\"",
+        "Left(\"blah\", 17); blah",
+        "Mid(\"blah\", 2, 2); la",
 
-            "ah; Right(\"blah\", 2)",
-            "\"\"; Right(\"blah\", 0)",
-            "blah; Right(\"blah\", 17)",
+        "Right(\"blah\", 2); ah",
+        "Right(\"blah\", 0); \"\"",
+        "Right(\"blah\", 17); blah",
 
-            "\"blah  \"; LTrim(\"  blah  \")",
-            "\"  blah\"; RTrim(\"  blah  \")",
-            "blah; Trim(\"  blah  \")",
-            "\"   \"; Space(3)",
-            "ddd; String(3,'d')",
+        "LTrim(\"  blah  \"); \"blah  \"",
+        "RTrim(\"  blah  \"); \"  blah\"",
+        "Trim(\"  blah  \"); blah",
+        "Space(3); \"   \"",
+        "String(3,'d'); ddd",
 
-            "FOO; StrConv('foo', 1)",
-            "foo; StrConv('foo', 2)",
-            "foo; StrConv('FOO', 2)",
-            "Foo Bar; StrConv('FOO bar', 3)",
+        "StrConv('foo', 1); FOO",
+        "StrConv('foo', 2); foo",
+        "StrConv('FOO', 2); foo",
+        "StrConv('FOO bar', 3); Foo Bar",
 
-            "halb; StrReverse('blah')",
+        "StrReverse('blah'); halb",
 
-            "foo; Choose(1,'foo','bar','blah')",
+        "Choose(1,'foo','bar','blah'); foo",
 
-            "blah; Choose(3,'foo','bar','blah')",
-            "bar; Switch(False,'foo', True, 'bar', True, 'blah')",
-            "blah; Switch(False,'foo', False, 'bar', True, 'blah')",
-            "faa; Replace('foo','o','a')",
-            "faa; Replace('fOo','o','a')",
-            "aa; Replace('foo','o','a',2)",
-            "oo; Replace('foo','o','a',2,0)",
-            "\"\"; Replace('foo','o','a',4)",
-            "foo; Replace('foo','','a')",
-            "o; Replace('foo','','a',3)",
-            "fahhabahhaahha; Replace('fooboooo','OO','ahha')",
-            "fahhaboooo; Replace('fooboooo','OO','ahha',1,1)",
-            "fooboooo; Replace('fooboooo','OO','ahha',1,1,0)",
-            "ahhabahhaahha; Replace('fooboooo','OO','ahha',2)",
-            "obahhaahha; Replace('fooboooo','OO','ahha',3)",
-            "fb; Replace('fooboooo','OO','')",
-            "\"\"; Replace('','o','a')",
-            "foo; Replace('foo','foobar','a')",
-            "12,345.00; FormatNumber(12345)",
-            "0.12; FormatNumber(0.12345)",
-            "12.34; FormatNumber(12.345)",
-            "-12,345.00; FormatNumber(-12345)",
-            "-0.12; FormatNumber(-0.12345)",
-            "-12.34; FormatNumber(-12.345)",
-            "12,345.000; FormatNumber(12345,3)",
-            "0.123; FormatNumber(0.12345,3)",
-            "12.345; FormatNumber(12.345,3)",
-            "12,345; FormatNumber(12345,0)",
-            "0; FormatNumber(0.12345,0)",
-            "12; FormatNumber(12.345,0)",
-            "0.123; FormatNumber(0.12345,3,True)",
-            ".123; FormatNumber(0.12345,3,False)",
-            "-0.123; FormatNumber(-0.12345,3,True)",
-            "-.123; FormatNumber(-0.12345,3,False)",
-            "-12.34; FormatNumber(-12.345,-1,True,False)",
-            "(12.34); FormatNumber(-12.345,-1,True,True)",
-            "(12); FormatNumber(-12.345,0,True,True)",
-            "12,345.00; FormatNumber(12345,-1,-2,-2,True)",
-            "12345.00; FormatNumber(12345,-1,-2,-2,False)",
+        "Choose(3,'foo','bar','blah'); blah",
+        "Switch(False,'foo', True, 'bar', True, 'blah'); bar",
+        "Switch(False,'foo', False, 'bar', True, 'blah'); blah",
+        "Replace('foo','o','a'); faa",
+        "Replace('fOo','o','a'); faa",
+        "Replace('foo','o','a',2); aa",
+        "Replace('foo','o','a',2,0); oo",
+        "Replace('foo','o','a',4); \"\"",
+        "Replace('foo','','a'); foo",
+        "Replace('foo','','a',3); o",
+        "Replace('fooboooo','OO','ahha'); fahhabahhaahha",
+        "Replace('fooboooo','OO','ahha',1,1); fahhaboooo",
+        "Replace('fooboooo','OO','ahha',1,1,0); fooboooo",
+        "Replace('fooboooo','OO','ahha',2); ahhabahhaahha",
+        "Replace('fooboooo','OO','ahha',3); obahhaahha",
+        "Replace('fooboooo','OO',''); fb",
+        "Replace('','o','a'); \"\"",
+        "Replace('foo','foobar','a'); foo",
+        "FormatNumber(12345); 12,345.00",
+        "FormatNumber(0.12345); 0.12",
+        "FormatNumber(12.345); 12.34",
+        "FormatNumber(-12345); -12,345.00",
+        "FormatNumber(-0.12345); -0.12",
+        "FormatNumber(-12.345); -12.34",
+        "FormatNumber(12345,3); 12,345.000",
+        "FormatNumber(0.12345,3); 0.123",
+        "FormatNumber(12.345,3); 12.345",
+        "FormatNumber(12345,0); 12,345",
+        "FormatNumber(0.12345,0); 0",
+        "FormatNumber(12.345,0); 12",
+        "FormatNumber(0.12345,3,True); 0.123",
+        "FormatNumber(0.12345,3,False); .123",
+        "FormatNumber(-0.12345,3,True); -0.123",
+        "FormatNumber(-0.12345,3,False); -.123",
+        "FormatNumber(-12.345,-1,True,False); -12.34",
+        "FormatNumber(-12.345,-1,True,True); (12.34)",
+        "FormatNumber(-12.345,0,True,True); (12)",
+        "FormatNumber(12345,-1,-2,-2,True); 12,345.00",
+        "FormatNumber(12345,-1,-2,-2,False); 12345.00",
 
-            "1,234,500.00%; FormatPercent(12345)",
-            "(1,234.50%); FormatPercent(-12.345,-1,True,True)",
-            "34%; FormatPercent(0.345,0,True,True)",
-            "-.123%; FormatPercent(-0.0012345,3,False)",
+        "FormatPercent(12345); 1,234,500.00%",
+        "FormatPercent(-12.345,-1,True,True); (1,234.50%)",
+        "FormatPercent(0.345,0,True,True); 34%",
+        "FormatPercent(-0.0012345,3,False); -.123%",
 
-            "$12,345.00; FormatCurrency(12345)",
-            "($12,345.00); FormatCurrency(-12345)",
-            "-$12.34; FormatCurrency(-12.345,-1,True,False)",
-            "$12; FormatCurrency(12.345,0,True,True)",
-            "($.123); FormatCurrency(-0.12345,3,False)",
+        "FormatCurrency(12345); $12,345.00",
+        "FormatCurrency(-12345); ($12,345.00)",
+        "FormatCurrency(-12.345,-1,True,False); -$12.34",
+        "FormatCurrency(12.345,0,True,True); $12",
+        "FormatCurrency(-0.12345,3,False); ($.123)",
 
-            "1/1/1973 1:37:25 PM; FormatDateTime(#1/1/1973 1:37:25 PM#)",
-            "1:37:25 PM; FormatDateTime(#1:37:25 PM#,0)",
-            "1/1/1973; FormatDateTime(#1/1/1973#,0)",
-            "Monday, January 01, 1973; FormatDateTime(#1/1/1973 1:37:25 PM#,1)",
-            "1/1/1973; FormatDateTime(#1/1/1973 1:37:25 PM#,2)",
-            "1:37:25 PM; FormatDateTime(#1/1/1973 1:37:25 PM#,3)",
-            "13:37; FormatDateTime(#1/1/1973 1:37:25 PM#,4)"
+        "FormatDateTime(#1/1/1973 1:37:25 PM#); 1/1/1973 1:37:25 PM",
+        "FormatDateTime(#1:37:25 PM#,0); 1:37:25 PM",
+        "FormatDateTime(#1/1/1973#,0); 1/1/1973",
+        "FormatDateTime(#1/1/1973 1:37:25 PM#,1); Monday, January 01, 1973",
+        "FormatDateTime(#1/1/1973 1:37:25 PM#,2); 1/1/1973",
+        "FormatDateTime(#1/1/1973 1:37:25 PM#,3); 1:37:25 PM",
+        "FormatDateTime(#1/1/1973 1:37:25 PM#,4); 13:37"
     })
-    void testFuncsString(String expected, String exprStr) {
+    void testFuncsString(String exprStr, String expected) {
         assertEquals(expected, eval('=' + exprStr));
     }
 
@@ -158,131 +158,121 @@ class DefaultFunctionsTest extends AbstractBaseTest {
         assertEquals(" FOO \" BAR ", eval("=UCase(\" foo \"\" bar \")"));
     }
 
-    @ParameterizedTest(name = "[{index}] {1} --> {0}")
-    @CsvSource(delimiter = ';',
-        quoteCharacter = '\"',
-        value = {
-            "102; Asc(\"foo\")",
-            "9786; AscW(\"☺\")",
-            "-1; CBool(\"1\")",
-            "13; CByte(\"13\")",
-            "14; CByte(\"13.7\")",
-            "513; CInt(\"513\")",
-            "514; CInt(\"513.7\")",
-            "345513; CLng(\"345513\")",
-            "345514; CLng(\"345513.7\")",
-            "-1; IsNull(Null)",
-            "0; IsNull(13)",
-            "-1; IsDate(#01/02/2003#)",
-            "0; IsDate('foo')",
-            "0; IsDate('200')",
+    @ParameterizedTest(name = "[{index}] {0} --> {1}")
+    @CsvSource(delimiter = ';', quoteCharacter = '\"', value = {
+        "Asc(\"foo\"); 102",
+        "AscW(\"☺\"); 9786",
+        "CBool(\"1\"); -1",
+        "CByte(\"13\"); 13",
+        "CByte(\"13.7\"); 14",
+        "CInt(\"513\"); 513",
+        "CInt(\"513.7\"); 514",
+        "CLng(\"345513\"); 345513",
+        "CLng(\"345513.7\"); 345514",
+        "IsNull(Null); -1",
+        "IsNull(13); 0",
+        "IsDate(#01/02/2003#); -1",
+        "IsDate('foo'); 0",
+        "IsDate('200'); 0",
 
-            "0; IsNumeric(Null)",
-            "0; IsNumeric('foo')",
-            "0; IsNumeric(#01/02/2003#)",
-            "0; IsNumeric('01/02/2003')",
-            "-1; IsNumeric(37)",
-            "-1; IsNumeric(' 37 ')",
-            "-1; IsNumeric(' -37.5e2 ')",
-            "-1; IsNumeric(' &H37 ')",
-            "0; IsNumeric(' &H37foo ')",
-            "0; IsNumeric(' &o39 ')",
-            "-1; IsNumeric(' &o36 ')",
-            "0; IsNumeric(' &o36.1 ')",
+        "IsNumeric(Null); 0",
+        "IsNumeric('foo'); 0",
+        "IsNumeric(#01/02/2003#); 0",
+        "IsNumeric('01/02/2003'); 0",
+        "IsNumeric(37); -1",
+        "IsNumeric(' 37 '); -1",
+        "IsNumeric(' -37.5e2 '); -1",
+        "IsNumeric(' &H37 '); -1",
+        "IsNumeric(' &H37foo '); 0",
+        "IsNumeric(' &o39 '); 0",
+        "IsNumeric(' &o36 '); -1",
+        "IsNumeric(' &o36.1 '); 0",
 
-            "1; VarType(Null)",
-            "8; VarType('blah')",
-            "7; VarType(#01/02/2003#)",
-            "3; VarType(42)",
-            "5; VarType(CDbl(42))",
-            "14; VarType(42.3)",
+        "VarType(Null); 1",
+        "VarType('blah'); 8",
+        "VarType(#01/02/2003#); 7",
+        "VarType(42); 3",
+        "VarType(CDbl(42)); 5",
+        "VarType(42.3); 14",
 
-            "2; InStr('AFOOBAR', 'FOO')",
-            "2; InStr('AFOOBAR', 'foo')",
-            "2; InStr(1, 'AFOOBAR', 'foo')",
-            "0; InStr(1, 'AFOOBAR', 'foo', 0)",
-            "2; InStr(1, 'AFOOBAR', 'foo', 1)",
-            "2; InStr(1, 'AFOOBAR', 'FOO', 0)",
-            "2; InStr(2, 'AFOOBAR', 'FOO')",
-            "0; InStr(3, 'AFOOBAR', 'FOO')",
-            "0; InStr(17, 'AFOOBAR', 'FOO')",
-            "2; InStr(1, 'AFOOBARFOOBAR', 'FOO')",
-            "8; InStr(3, 'AFOOBARFOOBAR', 'FOO')",
+        "InStr('AFOOBAR', 'FOO'); 2",
+        "InStr('AFOOBAR', 'foo'); 2",
+        "InStr(1, 'AFOOBAR', 'foo'); 2",
+        "InStr(1, 'AFOOBAR', 'foo', 0); 0",
+        "InStr(1, 'AFOOBAR', 'foo', 1); 2",
+        "InStr(1, 'AFOOBAR', 'FOO', 0); 2",
+        "InStr(2, 'AFOOBAR', 'FOO'); 2",
+        "InStr(3, 'AFOOBAR', 'FOO'); 0",
+        "InStr(17, 'AFOOBAR', 'FOO'); 0",
+        "InStr(1, 'AFOOBARFOOBAR', 'FOO'); 2",
+        "InStr(3, 'AFOOBARFOOBAR', 'FOO'); 8",
 
-            "2; InStrRev('AFOOBAR', 'FOO')",
-            "2; InStrRev('AFOOBAR', 'foo')",
-            "2; InStrRev('AFOOBAR', 'foo', -1)",
-            "0; InStrRev('AFOOBAR', 'foo', -1, 0)",
-            "2; InStrRev('AFOOBAR', 'foo', -1, 1)",
-            "2; InStrRev('AFOOBAR', 'FOO', -1, 0)",
-            "2; InStrRev('AFOOBAR', 'FOO', 4)",
-            "0; InStrRev('AFOOBAR', 'FOO', 3)",
-            "2; InStrRev('AFOOBAR', 'FOO', 17)",
-            "2; InStrRev('AFOOBARFOOBAR', 'FOO', 9)",
-            "8; InStrRev('AFOOBARFOOBAR', 'FOO', 10)",
+        "InStrRev('AFOOBAR', 'FOO'); 2",
+        "InStrRev('AFOOBAR', 'foo'); 2",
+        "InStrRev('AFOOBAR', 'foo', -1); 2",
+        "InStrRev('AFOOBAR', 'foo', -1, 0); 0",
+        "InStrRev('AFOOBAR', 'foo', -1, 1); 2",
+        "InStrRev('AFOOBAR', 'FOO', -1, 0); 2",
+        "InStrRev('AFOOBAR', 'FOO', 4); 2",
+        "InStrRev('AFOOBAR', 'FOO', 3); 0",
+        "InStrRev('AFOOBAR', 'FOO', 17); 2",
+        "InStrRev('AFOOBARFOOBAR', 'FOO', 9); 2",
+        "InStrRev('AFOOBARFOOBAR', 'FOO', 10); 8",
 
-            "1; StrComp('FOO', 'bar')",
-            "-1; StrComp('bar', 'FOO')",
-            "0; StrComp('FOO', 'foo')",
-            "-1; StrComp('FOO', 'bar', 0)",
-            "1; StrComp('bar', 'FOO', 0)",
-            "-1; StrComp('FOO', 'foo', 0)"
+        "StrComp('FOO', 'bar'); 1",
+        "StrComp('bar', 'FOO'); -1",
+        "StrComp('FOO', 'foo'); 0",
+        "StrComp('FOO', 'bar', 0); -1",
+        "StrComp('bar', 'FOO', 0); 1",
+        "StrComp('FOO', 'foo', 0); -1"
     })
-    void testFuncsInt(int expected, String exprStr) {
+    void testFuncsInt(String exprStr, int expected) {
         assertEquals(expected, eval('=' + exprStr));
     }
 
-    @ParameterizedTest(name = "[{index}] {1} --> {0}")
-    @CsvSource(delimiter = ';',
-        quoteCharacter = '\"',
-        value = {
-            "Str(Null)",
-            "InStr(3, Null, 'FOO')",
-            "InStrRev(Null, 'FOO', 3)",
-            "Choose(-1,'foo','bar','blah')",
-            "Switch(False,'foo', False, 'bar', False, 'blah')"
+    @ParameterizedTest(name = "[{index}] {0}")
+    @CsvSource(delimiter = ';', quoteCharacter = '\"', value = {
+        "Str(Null)",
+        "InStr(3, Null, 'FOO')",
+        "InStrRev(Null, 'FOO', 3)",
+        "Choose(-1,'foo','bar','blah')",
+        "Switch(False,'foo', False, 'bar', False, 'blah')"
     })
     void testFuncsNull(String exprStr) {
         assertNull(eval('=' + exprStr));
     }
 
-    @ParameterizedTest(name = "[{index}] {1} --> {0}")
-    @CsvSource(delimiter = ';',
-        quoteCharacter = '\"',
-        value = {
-            "57.12345; CDbl(\"57.12345\")",
-            "1615198d; Val('    1615 198th Street N.E.')",
-            "-1d; Val('  &HFFFFwhatever')",
-            "131071d; Val('  &H1FFFFwhatever')",
-            "-1d; Val('  &HFFFFFFFFwhatever')",
-            "291d; Val('  &H123whatever')",
-            "83d; Val('  &O123whatever')",
-            "1.23d; Val('  1 2 3 e -2 whatever')",
-            "0d; Val('  whatever123 ')",
-            "0d; Val('')"
+    @ParameterizedTest(name = "[{index}] {0} --> {1}")
+    @CsvSource(delimiter = ';', quoteCharacter = '\"', value = {
+        "CDbl(\"57.12345\"); 57.12345",
+        "Val('    1615 198th Street N.E.'); 1615198d",
+        "Val('  &HFFFFwhatever'); -1d",
+        "Val('  &H1FFFFwhatever'); 131071d",
+        "Val('  &HFFFFFFFFwhatever'); -1d",
+        "Val('  &H123whatever'); 291d",
+        "Val('  &O123whatever'); 83d",
+        "Val('  1 2 3 e -2 whatever'); 1.23d",
+        "Val('  whatever123 '); 0d",
+        "Val(''); 0d"
     })
-    void testFuncsDouble(double expected, String exprStr) {
+    void testFuncsDouble(String exprStr, double expected) {
         assertEquals(expected, eval('=' + exprStr));
     }
 
-    @ParameterizedTest(name = "[{index}] {1} --> {0}")
-    @CsvSource(delimiter = ';',
-        quoteCharacter = '\"',
-        value = {
-            "57.1235; CCur(\"57.12346\")",
-            "57.123456789; CDec(\"57.123456789\")"
+    @ParameterizedTest(name = "[{index}] {0} --> {1}")
+    @CsvSource(delimiter = ';', quoteCharacter = '\"', value = {
+        "CCur(\"57.12346\"); 57.1235",
+        "CDec(\"57.123456789\"); 57.123456789"
     })
-    void testFuncsBigDecimal(BigDecimal expected, String exprStr) {
+    void testFuncsBigDecimal(String exprStr, BigDecimal expected) {
         assertEquals(expected, eval('=' + exprStr));
     }
 
-    @ParameterizedTest(name = "[{index}] {1} --> {0}")
-    @CsvSource(delimiter = ';',
-        quoteCharacter = '\"',
-        value = {
-            "57.12345; CSng(\"57.12345\")"
+    @ParameterizedTest(name = "[{index}] {0} --> {1}")
+    @CsvSource(delimiter = ';', quoteCharacter = '\"', value = {
+        "CSng(\"57.12345\"); 57.12345"
     })
-    void testFuncsFloat(String expected, String exprStr) {
+    void testFuncsFloat(String exprStr, String expected) {
         assertEquals(Float.valueOf(expected).doubleValue(), eval('=' + exprStr));
     }
 
@@ -307,100 +297,96 @@ class DefaultFunctionsTest extends AbstractBaseTest {
         assertTrue(ex.getMessage().contains(message));
     }
 
-    @ParameterizedTest(name = "[{index}] {1} --> {0}")
-    @CsvSource(delimiter = ';',
-        quoteCharacter = '\"',
-        value = {
-            "12345.6789; Format(12345.6789, 'General Number')",
-            "0.12345; Format(0.12345, 'General Number')",
-            "-12345.6789; Format(-12345.6789, 'General Number')",
-            "-0.12345; Format(-0.12345, 'General Number')",
-            "12345.6789; Format('12345.6789', 'General Number')",
-            "1678.9; Format('1.6789E+3', 'General Number')",
-            "37623.2916666667; Format(#01/02/2003 7:00:00 AM#, 'General Number')",
-            "foo; Format('foo', 'General Number')",
+    @ParameterizedTest(name = "[{index}] {0} --> {1}")
+    @CsvSource(delimiter = ';', quoteCharacter = '\"', value = {
+        "Format(12345.6789, 'General Number'); 12345.6789",
+        "Format(0.12345, 'General Number'); 0.12345",
+        "Format(-12345.6789, 'General Number'); -12345.6789",
+        "Format(-0.12345, 'General Number'); -0.12345",
+        "Format('12345.6789', 'General Number'); 12345.6789",
+        "Format('1.6789E+3', 'General Number'); 1678.9",
+        "Format(#01/02/2003 7:00:00 AM#, 'General Number'); 37623.2916666667",
+        "Format('foo', 'General Number'); foo",
 
-            "12,345.68; Format(12345.6789, 'Standard')",
-            "0.12; Format(0.12345, 'Standard')",
-            "-12,345.68; Format(-12345.6789, 'Standard')",
-            "-0.12; Format(-0.12345, 'Standard')",
+        "Format(12345.6789, 'Standard'); 12,345.68",
+        "Format(0.12345, 'Standard'); 0.12",
+        "Format(-12345.6789, 'Standard'); -12,345.68",
+        "Format(-0.12345, 'Standard'); -0.12",
 
-            "12345.68; Format(12345.6789, 'Fixed')",
-            "0.12; Format(0.12345, 'Fixed')",
-            "-12345.68; Format(-12345.6789, 'Fixed')",
-            "-0.12; Format(-0.12345, 'Fixed')",
+        "Format(12345.6789, 'Fixed'); 12345.68",
+        "Format(0.12345, 'Fixed'); 0.12",
+        "Format(-12345.6789, 'Fixed'); -12345.68",
+        "Format(-0.12345, 'Fixed'); -0.12",
 
-            "€12,345.68; Format(12345.6789, 'Euro')",
-            "€0.12; Format(0.12345, 'Euro')",
-            "(€12,345.68); Format(-12345.6789, 'Euro')",
-            "(€0.12); Format(-0.12345, 'Euro')",
+        "Format(12345.6789, 'Euro'); €12,345.68",
+        "Format(0.12345, 'Euro'); €0.12",
+        "Format(-12345.6789, 'Euro'); (€12,345.68)",
+        "Format(-0.12345, 'Euro'); (€0.12)",
 
-            "$12,345.68; Format(12345.6789, 'Currency')",
-            "$0.12; Format(0.12345, 'Currency')",
-            "($12,345.68); Format(-12345.6789, 'Currency')",
-            "($0.12); Format(-0.12345, 'Currency')",
+        "Format(12345.6789, 'Currency'); $12,345.68",
+        "Format(0.12345, 'Currency'); $0.12",
+        "Format(-12345.6789, 'Currency'); ($12,345.68)",
+        "Format(-0.12345, 'Currency'); ($0.12)",
 
-            "1234567.89%; Format(12345.6789, 'Percent')",
-            "12.34%; Format(0.12345, 'Percent')",
-            "-1234567.89%; Format(-12345.6789, 'Percent')",
-            "-12.34%; Format(-0.12345, 'Percent')",
+        "Format(12345.6789, 'Percent'); 1234567.89%",
+        "Format(0.12345, 'Percent'); 12.34%",
+        "Format(-12345.6789, 'Percent'); -1234567.89%",
+        "Format(-0.12345, 'Percent'); -12.34%",
 
-            "1.23E+4; Format(12345.6789, 'Scientific')",
-            "1.23E-1; Format(0.12345, 'Scientific')",
-            "-1.23E+4; Format(-12345.6789, 'Scientific')",
-            "-1.23E-1; Format(-0.12345, 'Scientific')",
+        "Format(12345.6789, 'Scientific'); 1.23E+4",
+        "Format(0.12345, 'Scientific'); 1.23E-1",
+        "Format(-12345.6789, 'Scientific'); -1.23E+4",
+        "Format(-0.12345, 'Scientific'); -1.23E-1",
 
-            "Yes; Format(True, 'Yes/No')",
-            "No; Format(False, 'Yes/No')",
-            "True; Format(True, 'True/False')",
-            "False; Format(False, 'True/False')",
-            "On; Format(True, 'On/Off')",
-            "Off; Format(False, 'On/Off')",
+        "Format(True, 'Yes/No'); Yes",
+        "Format(False, 'Yes/No'); No",
+        "Format(True, 'True/False'); True",
+        "Format(False, 'True/False'); False",
+        "Format(True, 'On/Off'); On",
+        "Format(False, 'On/Off'); Off",
 
-            "1/2/2003 7:00:00 AM; Format(#01/02/2003 7:00:00 AM#, 'General Date')",
-            "1/2/2003; Format(#01/02/2003#, 'General Date')",
-            "7:00:00 AM; Format(#7:00:00 AM#, 'General Date')",
-            "1/2/2003 7:00:00 AM; Format('37623.2916666667', 'General Date')",
-            "foo; Format('foo', 'General Date')",
-            "\"\"; Format('', 'General Date')",
+        "Format(#01/02/2003 7:00:00 AM#, 'General Date'); 1/2/2003 7:00:00 AM",
+        "Format(#01/02/2003#, 'General Date'); 1/2/2003",
+        "Format(#7:00:00 AM#, 'General Date'); 7:00:00 AM",
+        "Format('37623.2916666667', 'General Date'); 1/2/2003 7:00:00 AM",
+        "Format('foo', 'General Date'); foo",
+        "Format('', 'General Date'); \"\"",
 
-            "Thursday, January 02, 2003; Format(#01/02/2003 7:00:00 AM#, 'Long Date')",
-            "02-Jan-03; Format(#01/02/2003 7:00:00 AM#, 'Medium Date')",
-            "1/2/2003; Format(#01/02/2003 7:00:00 AM#, 'Short Date')",
-            "7:00:00 AM; Format(#01/02/2003 7:00:00 AM#, 'Long Time')",
-            "07:00 AM; Format(#01/02/2003 7:00:00 AM#, 'Medium Time')",
-            "07:00; Format(#01/02/2003 7:00:00 AM#, 'Short Time')",
-            "19:00; Format(#01/02/2003 7:00:00 PM#, 'Short Time')"
+        "Format(#01/02/2003 7:00:00 AM#, 'Long Date'); Thursday, January 02, 2003",
+        "Format(#01/02/2003 7:00:00 AM#, 'Medium Date'); 02-Jan-03",
+        "Format(#01/02/2003 7:00:00 AM#, 'Short Date'); 1/2/2003",
+        "Format(#01/02/2003 7:00:00 AM#, 'Long Time'); 7:00:00 AM",
+        "Format(#01/02/2003 7:00:00 AM#, 'Medium Time'); 07:00 AM",
+        "Format(#01/02/2003 7:00:00 AM#, 'Short Time'); 07:00",
+        "Format(#01/02/2003 7:00:00 PM#, 'Short Time'); 19:00"
     })
-    void testFormat(String expected, String exprStr) {
+    void testFormat(String exprStr, String expected) {
         assertEquals(expected, eval('=' + exprStr));
     }
 
-    @ParameterizedTest(name = "[{index}] {1} --> {0}")
-    @CsvSource(delimiter = '|',
-        quoteCharacter = '§',
-        value = {
-        "07:00 a| Format(#01/10/2003 7:00:00 AM#, 'hh:nn a/p')",
-        "07:00 p| Format(#01/10/2003 7:00:00 PM#, 'hh:nn a/p')",
-        "07:00 a 6 2| Format(#01/10/2003 7:00:00 AM#, 'hh:nn a/p w ww')",
-        "07:00 a 4 1| Format(#01/10/2003 7:00:00 AM#, 'hh:nn a/p w ww', 3, 3)",
-        "1313| Format(#01/10/2003 7:13:00 AM#, 'nnnn; foo bar')",
-        "1 1/10/2003 7:13:00 AM ttt this is text| Format(#01/10/2003 7:13:00 AM#, 'q c ttt \"this is text\"')",
-        "1 1/10/2003 ttt this is text| Format(#01/10/2003#, 'q c ttt \"this is text\"')",
-        "4 7:13:00 AM ttt this 'is' \"text\"| Format(#7:13:00 AM#, \"q c ttt \"\"this 'is' \"\"\"\"text\"\"\"\"\"\"\")",
-        "12/29/1899| Format('true', 'c')",
-        "Tuesday, 00 Jan 2, 21:36:00 Y| Format('3.9', '*~dddd, yy mmm d, hh:nn:ss \\Y[Yellow]')",
-        "Tuesday, 00 Jan 01/2, 09:36:00 PM| Format('3.9', 'dddd, yy mmm mm/d, hh:nn:ss AMPM')",
-        "9:36:00 PM| Format('3.9', 'ttttt')",
-        "9:36:00 PM| Format(3.9, 'ttttt')",
-        "foo| Format('foo', 'dddd, yy mmm mm d, hh:nn:ss AMPM')"
+    @ParameterizedTest(name = "[{index}] {0} --> {1}")
+    @CsvSource(delimiter = '|', quoteCharacter = '§', value = {
+        "Format(#01/10/2003 7:00:00 AM#, 'hh:nn a/p')| 07:00 a",
+        "Format(#01/10/2003 7:00:00 PM#, 'hh:nn a/p')| 07:00 p",
+        "Format(#01/10/2003 7:00:00 AM#, 'hh:nn a/p w ww')| 07:00 a 6 2",
+        "Format(#01/10/2003 7:00:00 AM#, 'hh:nn a/p w ww', 3, 3)| 07:00 a 4 1",
+        "Format(#01/10/2003 7:13:00 AM#, 'nnnn; foo bar')| 1313",
+        "Format(#01/10/2003 7:13:00 AM#, 'q c ttt \"this is text\"')| 1 1/10/2003 7:13:00 AM ttt this is text",
+        "Format(#01/10/2003#, 'q c ttt \"this is text\"')| 1 1/10/2003 ttt this is text",
+        "Format(#7:13:00 AM#, \"q c ttt \"\"this 'is' \"\"\"\"text\"\"\"\"\"\"\")| 4 7:13:00 AM ttt this 'is' \"text\"",
+        "Format('true', 'c')| 12/29/1899",
+        "Format('3.9', '*~dddd, yy mmm d, hh:nn:ss \\Y[Yellow]')| Tuesday, 00 Jan 2, 21:36:00 Y",
+        "Format('3.9', 'dddd, yy mmm mm/d, hh:nn:ss AMPM')| Tuesday, 00 Jan 01/2, 09:36:00 PM",
+        "Format('3.9', 'ttttt')| 9:36:00 PM",
+        "Format(3.9, 'ttttt')| 9:36:00 PM",
+        "Format('foo', 'dddd, yy mmm mm d, hh:nn:ss AMPM')| foo"
     })
-    void testCustomFormat1(String expected, String exprStr) {
+    void testCustomFormat1(String exprStr, String expected) {
         assertEquals(expected, eval('=' + exprStr));
     }
 
     @Test
-    void testCustomFormat2() {
+    void testCustomFormat() {
         assertEvalFormat("';\\y;\\n'",
             "foo", "'foo'",
             "", "''",
@@ -595,16 +581,29 @@ class DefaultFunctionsTest extends AbstractBaseTest {
             "xbarbazy", "'foobarbaz'");
     }
 
-    @Test
-    void testNumberFuncs() {
-        assertEquals(1, eval("=Abs(1)"));
-        assertEquals(1, eval("=Abs(-1)"));
-        assertEquals(toBD(1.1), eval("=Abs(-1.1)"));
+    @ParameterizedTest(name = "[{index}] {0} --> {1}")
+    @CsvSource(delimiter = ';', quoteCharacter = '\"', value = {
+        "Abs(1); 1",
+        "Abs(-1); 1",
+        "Abs(-1.1); 1.1"
+    })
+    void testNumberFuncsInt(String exprStr, double expected) {
+        Number result = (Number) eval('=' + exprStr);
+        assertEquals(expected, result.doubleValue());
+    }
 
-        assertEquals(Math.atan(0.2), eval("=Atan(0.2)"));
-        assertEquals(Math.sin(0.2), eval("=Sin(0.2)"));
-        assertEquals(Math.tan(0.2), eval("=Tan(0.2)"));
-        assertEquals(Math.cos(0.2), eval("=Cos(0.2)"));
+    void testNumberFuncsTrig(String exprStr, String expected) {
+        Map<String, Supplier<Double>> map = Map.of(
+            "Atan(0.2)", () -> Math.atan(0.2),
+            "Sin(0.2)", () -> Math.sin(0.2),
+            "Tan(0.2)", () -> Math.tan(0.2),
+            "Cos(0.2)", () -> Math.cos(0.2));
+        map.entrySet().forEach(e -> {
+            assertEquals(e.getKey(), e.getValue().get());
+        });
+    }
+
+    void testNumberFuncsRest(String exprStr, String expected) {
 
         assertEquals(Math.exp(0.2), eval("=Exp(0.2)"));
         assertEquals(Math.log(0.2), eval("=Log(0.2)"));
@@ -789,81 +788,84 @@ class DefaultFunctionsTest extends AbstractBaseTest {
         assertEquals(-83421497, eval("=DateDiff('s',#11/3/2018 2:15:30 PM#,#3/13/2016 1:37:13 AM#)"));
     }
 
-    @Test
-    void testFinancialFuncs() {
-        assertEquals("-9.57859403981306", eval("=CStr(NPer(0.12/12,-100,-1000))"));
-        assertEquals("-9.48809500550578", eval("=CStr(NPer(0.12/12,-100,-1000,0,1))"));
-        assertEquals("60.0821228537616", eval("=CStr(NPer(0.12/12,-100,-1000,10000))"));
-        assertEquals("59.6738656742947", eval("=CStr(NPer(0.12/12,-100,-1000,10000,1))"));
-        assertEquals("69.6607168935747", eval("=CStr(NPer(0.12/12,-100,0,10000))"));
-        assertEquals("69.1619606798005", eval("=CStr(NPer(0.12/12,-100,0,10000,1))"));
+    @ParameterizedTest(name = "[{index}] {0} --> {1}")
+    @CsvSource(delimiter = ';', quoteCharacter = '\"', value = {
+        "CStr(NPer(0.12/12,-100,-1000)); -9.57859403981306",
+        "CStr(NPer(0.12/12,-100,-1000,0,1)); -9.48809500550578",
+        "CStr(NPer(0.12/12,-100,-1000,10000)); 60.0821228537616",
+        "CStr(NPer(0.12/12,-100,-1000,10000,1)); 59.6738656742947",
+        "CStr(NPer(0.12/12,-100,0,10000)); 69.6607168935747",
+        "CStr(NPer(0.12/12,-100,0,10000,1)); 69.1619606798005",
 
-        assertEquals("8166.96698564091", eval("=CStr(FV(0.12/12,60,-100))"));
-        assertEquals("8248.63665549732", eval("=CStr(FV(0.12/12,60,-100,0,1))"));
-        assertEquals("6350.27028707682", eval("=CStr(FV(0.12/12,60,-100,1000))"));
-        assertEquals("6431.93995693323", eval("=CStr(FV(0.12/12,60,-100,1000,1))"));
+        "CStr(FV(0.12/12,60,-100)); 8166.96698564091",
+        "CStr(FV(0.12/12,60,-100,0,1)); 8248.63665549732",
+        "CStr(FV(0.12/12,60,-100,1000)); 6350.27028707682",
+        "CStr(FV(0.12/12,60,-100,1000,1)); 6431.93995693323",
 
-        assertEquals("4495.5038406224", eval("=CStr(PV(0.12/12,60,-100))"));
-        assertEquals("4540.45887902863", eval("=CStr(PV(0.12/12,60,-100,0,1))"));
-        assertEquals("-1008.99231875519", eval("=CStr(PV(0.12/12,60,-100,10000))"));
-        assertEquals("-964.03728034897", eval("=CStr(PV(0.12/12,60,-100,10000,1))"));
+        "CStr(PV(0.12/12,60,-100)); 4495.5038406224",
+        "CStr(PV(0.12/12,60,-100,0,1)); 4540.45887902863",
+        "CStr(PV(0.12/12,60,-100,10000)); -1008.99231875519",
+        "CStr(PV(0.12/12,60,-100,10000,1)); -964.03728034897",
 
-        assertEquals("22.2444476849018", eval("=CStr(Pmt(0.12/12,60,-1000))"));
-        assertEquals("22.0242056286156", eval("=CStr(Pmt(0.12/12,60,-1000,0,1))"));
-        assertEquals("-100.200029164116", eval("=CStr(Pmt(0.12/12,60,-1000,10000))"));
-        assertEquals("-99.2079496674414", eval("=CStr(Pmt(0.12/12,60,-1000,10000,1))"));
-        assertEquals("-122.444476849018", eval("=CStr(Pmt(0.12/12,60,0,10000))"));
-        assertEquals("-121.232155296057", eval("=CStr(Pmt(0.12/12,60,0,10000,1))"));
-        assertEquals("22.2444476849018", eval("=CStr(Pmt(0.12/12,60,-1000))"));
+        "CStr(Pmt(0.12/12,60,-1000)); 22.2444476849018",
+        "CStr(Pmt(0.12/12,60,-1000,0,1)); 22.0242056286156",
+        "CStr(Pmt(0.12/12,60,-1000,10000)); -100.200029164116",
+        "CStr(Pmt(0.12/12,60,-1000,10000,1)); -99.2079496674414",
+        "CStr(Pmt(0.12/12,60,0,10000)); -122.444476849018",
+        "CStr(Pmt(0.12/12,60,0,10000,1)); -121.232155296057",
+        "CStr(Pmt(0.12/12,60,-1000)); 22.2444476849018",
 
-        assertEquals("10", eval("=CStr(IPmt(0.12/12,1,60,-1000))"));
-        assertEquals("5.90418478297567", eval("=CStr(IPmt(0.12/12,30,60,-1000))"));
-        assertEquals("0", eval("=CStr(IPmt(0.12/12,1,60,-1000,0,1))"));
-        assertEquals("5.8457275078967", eval("=CStr(IPmt(0.12/12,30,60,-1000,0,1))"));
-        assertEquals("0", eval("=CStr(IPmt(0.12/12,1,60,0,10000))"));
-        assertEquals("40.9581521702433", eval("=CStr(IPmt(0.12/12,30,60,0,10000))"));
-        assertEquals("0", eval("=CStr(IPmt(0.12/12,1,60,0,10000,1))"));
-        assertEquals("40.552625911132", eval("=CStr(IPmt(0.12/12,30,60,0,10000,1))"));
-        assertEquals("10", eval("=CStr(IPmt(0.12/12,1,60,-1000,10000))"));
-        assertEquals("46.862336953219", eval("=CStr(IPmt(0.12/12,30,60,-1000,10000))"));
-        assertEquals("0", eval("=CStr(IPmt(0.12/12,1,60,-1000,10000,1))"));
-        assertEquals("46.3983534190287", eval("=CStr(IPmt(0.12/12,30,60,-1000,10000,1))"));
+        "CStr(IPmt(0.12/12,1,60,-1000)); 10",
+        "CStr(IPmt(0.12/12,30,60,-1000)); 5.90418478297567",
+        "CStr(IPmt(0.12/12,1,60,-1000,0,1)); 0",
+        "CStr(IPmt(0.12/12,30,60,-1000,0,1)); 5.8457275078967",
+        "CStr(IPmt(0.12/12,1,60,0,10000)); 0",
+        "CStr(IPmt(0.12/12,30,60,0,10000)); 40.9581521702433",
+        "CStr(IPmt(0.12/12,1,60,0,10000,1)); 0",
+        "CStr(IPmt(0.12/12,30,60,0,10000,1)); 40.552625911132",
+        "CStr(IPmt(0.12/12,1,60,-1000,10000)); 10",
+        "CStr(IPmt(0.12/12,30,60,-1000,10000)); 46.862336953219",
+        "CStr(IPmt(0.12/12,1,60,-1000,10000,1)); 0",
+        "CStr(IPmt(0.12/12,30,60,-1000,10000,1)); 46.3983534190287",
 
-        assertEquals("12.2444476849018", eval("=CStr(PPmt(0.12/12,1,60,-1000))"));
-        assertEquals("16.3402629019261", eval("=CStr(PPmt(0.12/12,30,60,-1000))"));
-        assertEquals("22.0242056286156", eval("=CStr(PPmt(0.12/12,1,60,-1000,0,1))"));
-        assertEquals("16.1784781207189", eval("=CStr(PPmt(0.12/12,30,60,-1000,0,1))"));
-        assertEquals("-122.444476849018", eval("=CStr(PPmt(0.12/12,1,60,0,10000))"));
-        assertEquals("-163.402629019261", eval("=CStr(PPmt(0.12/12,30,60,0,10000))"));
-        assertEquals("-121.232155296057", eval("=CStr(PPmt(0.12/12,1,60,0,10000,1))"));
-        assertEquals("-161.784781207189", eval("=CStr(PPmt(0.12/12,30,60,0,10000,1))"));
-        assertEquals("-110.200029164116", eval("=CStr(PPmt(0.12/12,1,60,-1000,10000))"));
-        assertEquals("-147.062366117335", eval("=CStr(PPmt(0.12/12,30,60,-1000,10000))"));
-        assertEquals("-99.2079496674414", eval("=CStr(PPmt(0.12/12,1,60,-1000,10000,1))"));
-        assertEquals("-145.60630308647", eval("=CStr(PPmt(0.12/12,30,60,-1000,10000,1))"));
+        "CStr(PPmt(0.12/12,1,60,-1000)); 12.2444476849018",
+        "CStr(PPmt(0.12/12,30,60,-1000)); 16.3402629019261",
+        "CStr(PPmt(0.12/12,1,60,-1000,0,1)); 22.0242056286156",
+        "CStr(PPmt(0.12/12,30,60,-1000,0,1)); 16.1784781207189",
+        "CStr(PPmt(0.12/12,1,60,0,10000)); -122.444476849018",
+        "CStr(PPmt(0.12/12,30,60,0,10000)); -163.402629019261",
+        "CStr(PPmt(0.12/12,1,60,0,10000,1)); -121.232155296057",
+        "CStr(PPmt(0.12/12,30,60,0,10000,1)); -161.784781207189",
+        "CStr(PPmt(0.12/12,1,60,-1000,10000)); -110.200029164116",
+        "CStr(PPmt(0.12/12,30,60,-1000,10000)); -147.062366117335",
+        "CStr(PPmt(0.12/12,1,60,-1000,10000,1)); -99.2079496674414",
+        "CStr(PPmt(0.12/12,30,60,-1000,10000,1)); -145.60630308647",
 
-        assertEquals("1.31506849315068", eval("=CStr(DDB(2400,300,10*365,1))"));
-        assertEquals("40", eval("=CStr(DDB(2400,300,10*12,1))"));
-        assertEquals("480", eval("=CStr(DDB(2400,300,10,1))"));
-        assertEquals("22.1225472000002", eval("=CStr(DDB(2400,300,10,10))"));
-        assertEquals("245.76", eval("=CStr(DDB(2400,300,10,4))"));
-        assertEquals("307.2", eval("=CStr(DDB(2400,300,10,3))"));
-        assertEquals("480", eval("=CStr(DDB(2400,300,10,0.1))"));
-        assertEquals("274.768033075174", eval("=CStr(DDB(2400,300,10,3.5))"));
+        "CStr(DDB(2400,300,10*365,1)); 1.31506849315068",
+        "CStr(DDB(2400,300,10*12,1)); 40",
+        "CStr(DDB(2400,300,10,1)); 480",
+        "CStr(DDB(2400,300,10,10)); 22.1225472000002",
+        "CStr(DDB(2400,300,10,4)); 245.76",
+        "CStr(DDB(2400,300,10,3)); 307.2",
+        "CStr(DDB(2400,300,10,0.1)); 480",
+        "CStr(DDB(2400,300,10,3.5)); 274.768033075174",
 
-        assertEquals("2250", eval("=CStr(SLN(30000,7500,10))"));
-        assertEquals("1000", eval("=CStr(SLN(10000,5000,5))"));
-        assertEquals("1142.85714285714", eval("=CStr(SLN(8000,0,7))"));
+        "CStr(SLN(30000,7500,10)); 2250",
+        "CStr(SLN(10000,5000,5)); 1000",
+        "CStr(SLN(8000,0,7)); 1142.85714285714",
 
-        assertEquals("4090.90909090909", eval("=CStr(SYD(30000,7500,10,1))"));
-        assertEquals("409.090909090909", eval("=CStr(SYD(30000,7500,10,10))"));
+        "CStr(SYD(30000,7500,10,1)); 4090.90909090909",
+        "CStr(SYD(30000,7500,10,10)); 409.090909090909",
 
-        assertEquals("-1.63048347266756E-02", eval("=CStr(Rate(3,200,-610,0,-20,0.1))"));
+        "CStr(Rate(3,200,-610,0,-20,0.1)); -1.63048347266756E-02",
         // the result of this varies slightly depending on the jvm impl, so we
         // round it to fewer decimal places (7.70147248820165E-03 or
         // 7.70147248820155E-03)
-        assertEquals("7.701472488202E-03", eval("=Format(CStr(Rate(4*12,-200,8000)), '#.############E+00')"));
-        assertEquals("-1.09802980531205", eval("=CStr(Rate(60,93.22,5000,0.1))"));
+        "Format(CStr(Rate(4*12,-200,8000)), '#.############E+00'); 7.701472488202E-03",
+        "CStr(Rate(60,93.22,5000,0.1)); -1.09802980531205"
+    })
+    void testFinancialFuncs(String exprStr, String expected) {
+        assertEquals(expected, eval('=' + exprStr));
     }
 
     private static void assertEvalFormat(String fmtStr, String... testStrs) {
