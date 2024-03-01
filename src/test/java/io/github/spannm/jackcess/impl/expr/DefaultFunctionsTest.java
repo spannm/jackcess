@@ -29,18 +29,16 @@ import org.junit.jupiter.api.extension.ExtensionContext;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.converter.ConvertWith;
 import org.junit.jupiter.params.provider.*;
-import org.junit.jupiter.params.support.AnnotationConsumer;
+import org.junit.platform.commons.support.AnnotationSupport;
 
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
+import java.lang.annotation.*;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeFormatterBuilder;
 import java.util.Calendar;
+import java.util.List;
 import java.util.Locale;
 import java.util.function.Supplier;
 import java.util.stream.IntStream;
@@ -398,18 +396,13 @@ class DefaultFunctionsTest extends AbstractBaseTest {
         assertEquals(expected, eval('=' + exprStr));
     }
 
-    @ParameterizedTest(name = "[{index}] Format({0}, {1}) --> '{2}'")
+    @ParameterizedTest(name = "[{index}] Format({0}, {1}) --> {2}")
     @CustomFormatSource(format = "';\\y;\\n'", testValues = {
         "foo", "'foo'",
         "", "''",
         "y", "True",
         "n", "'0'",
         "", "Null"})
-    void testCustomFormat2(String value, String fmtStr, String expected) {
-        assertEquals(expected, eval("=Format(" + value + ", " + fmtStr + ")"));
-    }
-
-    @ParameterizedTest(name = "[{index}] Format({0}, {1}) --> '{2}'")
     @CustomFormatSource(format = "'\\p;\"y\";!\\n;*~\\z[Blue];'", testValues = {
         "foo", "'foo'",
         "", "''",
@@ -418,11 +411,6 @@ class DefaultFunctionsTest extends AbstractBaseTest {
         "p", "'10'",
         "z", "Null"
     })
-    void testCustomFormat3(String value, String fmtStr, String expected) {
-        assertEquals(expected, eval("=Format(" + value + ", " + fmtStr + ")"));
-    }
-
-    @ParameterizedTest(name = "[{index}] Format({0}, {1}) --> '{2}'")
     @CustomFormatSource(format = "'\"p\"#.00#\"blah\"'", testValues = {
         "p13.00blah", "13",
         "-p13.00blah", "-13",
@@ -430,11 +418,6 @@ class DefaultFunctionsTest extends AbstractBaseTest {
         "", "''",
         "", "Null"
     })
-    void testCustomFormat4(String value, String fmtStr, String expected) {
-        assertEquals(expected, eval("=Format(" + value + ", " + fmtStr + ")"));
-    }
-
-    @ParameterizedTest(name = "[{index}] Format({0}, {1}) --> '{2}'")
     @CustomFormatSource(format = "'\"p\"#.00#\"blah\";(\"p\"#.00#\"blah\")'", testValues = {
         "p13.00blah", "13",
         "(p13.00blah)", "-13",
@@ -447,11 +430,6 @@ class DefaultFunctionsTest extends AbstractBaseTest {
         "", "''",
         "", "Null"
     })
-    void testCustomFormat5(String value, String fmtStr, String expected) {
-        assertEquals(expected, eval("=Format(" + value + ", " + fmtStr + ")"));
-    }
-
-    @ParameterizedTest(name = "[{index}] Format({0}, {1}) --> '{2}'")
     @CustomFormatSource(format = "'\"p\"#.00#\"blah\";!(\"p\"#.00#\"blah\")[Red];\"zero\"'", testValues = {
         "p13.00blah", "13",
         "(p13.00blah)", "-13",
@@ -459,11 +437,6 @@ class DefaultFunctionsTest extends AbstractBaseTest {
         "", "''",
         "", "Null"
     })
-    void testCustomFormat6(String value, String fmtStr, String expected) {
-        assertEquals(expected, eval("=Format(" + value + ", " + fmtStr + ")"));
-    }
-
-    @ParameterizedTest(name = "[{index}] Format({0}, {1}) --> '{2}'")
     @CustomFormatSource(format = "'\\p#.00#\"blah\";*~(\"p\"#.00#\"blah\");\"zero\";\"yuck\"'", testValues = {
         "p13.00blah", "13",
         "(p13.00blah)", "-13",
@@ -471,22 +444,12 @@ class DefaultFunctionsTest extends AbstractBaseTest {
         "", "''",
         "yuck", "Null"
     })
-    void testCustomFormat7(String value, String fmtStr, String expected) {
-        assertEquals(expected, eval("=Format(" + value + ", " + fmtStr + ")"));
-    }
-
-    @ParameterizedTest(name = "[{index}] Format({0}, {1}) --> '{2}'")
     @CustomFormatSource(format = "'0.##;(0.###);\"zero\";\"yuck\";'", testValues = {
         "0.03", "0.03",
         "zero", "0.003",
         "(0.003)", "-0.003",
         "zero", "-0.0003"
     })
-    void testCustomFormat8(String value, String fmtStr, String expected) {
-        assertEquals(expected, eval("=Format(" + value + ", " + fmtStr + ")"));
-    }
-
-    @ParameterizedTest(name = "[{index}] Format({0}, {1}) --> '{2}'")
     @CustomFormatSource(format = "'0.##;(0.###E+0)'", testValues = {
         "0.03", "0.03",
         "(3.E-4)", "-0.0003",
@@ -494,48 +457,23 @@ class DefaultFunctionsTest extends AbstractBaseTest {
         "34223.", "34223",
         "(3.422E+4)", "-34223"
     })
-    void testCustomFormat9(String value, String fmtStr, String expected) {
-        assertEquals(expected, eval("=Format(" + value + ", " + fmtStr + ")"));
-    }
-
-    @ParameterizedTest(name = "[{index}] Format({0}, {1}) --> '{2}'")
     @CustomFormatSource(format = "'0.###E-0'", testValues = {
         "3.E-4", "0.0003",
         "3.422E4", "34223"
     })
-    void testCustomFormat10(String value, String fmtStr, String expected) {
-        assertEquals(expected, eval("=Format(" + value + ", " + fmtStr + ")"));
-    }
-
-    @ParameterizedTest(name = "[{index}] Format({0}, {1}) --> '{2}'")
     @CustomFormatSource(format = "'0.###e+0'", testValues = {
         "3.e-4", "0.0003",
         "3.422e+4", "34223"
     })
-    void testCustomFormat11(String value, String fmtStr, String expected) {
-        assertEquals(expected, eval("=Format(" + value + ", " + fmtStr + ")"));
-    }
-
-    @ParameterizedTest(name = "[{index}] Format({0}, {1}) --> '{2}'")
     @CustomFormatSource(format = "'0.###e-0'", testValues = {
         "3.e-4", "0.0003",
         "3.422e4", "34223"
     })
-    void testCustomFormat12(String value, String fmtStr, String expected) {
-        assertEquals(expected, eval("=Format(" + value + ", " + fmtStr + ")"));
-    }
-
-    @ParameterizedTest(name = "[{index}] Format({0}, {1}) --> '{2}'")
     @CustomFormatSource(format = "'#,##0.###'", testValues = {
         "0.003", "0.003",
         "0.", "0.0003",
         "34,223.", "34223"
     })
-    void testCustomFormat13(String value, String fmtStr, String expected) {
-        assertEquals(expected, eval("=Format(" + value + ", " + fmtStr + ")"));
-    }
-
-    @ParameterizedTest(name = "[{index}] Format({0}, {1}) --> '{2}'")
     @CustomFormatSource(format = "'0.'", testValues = {
         "13.", "13",
         "0.", "0.003",
@@ -543,11 +481,6 @@ class DefaultFunctionsTest extends AbstractBaseTest {
         "0.", "-0.003",
         "0.", "0"
     })
-    void testCustomFormat14(String value, String fmtStr, String expected) {
-        assertEquals(expected, eval("=Format(" + value + ", " + fmtStr + ")"));
-    }
-
-    @ParameterizedTest(name = "[{index}] Format({0}, {1}) --> '{2}'")
     @CustomFormatSource(format = "'0.#'", testValues = {
         "13.", "13",
         "0.3", "0.3",
@@ -556,11 +489,6 @@ class DefaultFunctionsTest extends AbstractBaseTest {
         "0.", "-0.003",
         "0.", "0"
     })
-    void testCustomFormat15(String value, String fmtStr, String expected) {
-        assertEquals(expected, eval("=Format(" + value + ", " + fmtStr + ")"));
-    }
-
-    @ParameterizedTest(name = "[{index}] Format({0}, {1}) --> '{2}'")
     @CustomFormatSource(format = "'0'", testValues = {
         "13", "13",
         "0", "0.003",
@@ -568,11 +496,6 @@ class DefaultFunctionsTest extends AbstractBaseTest {
         "0", "-0.003",
         "0", "0"
     })
-    void testCustomFormat16(String value, String fmtStr, String expected) {
-        assertEquals(expected, eval("=Format(" + value + ", " + fmtStr + ")"));
-    }
-
-    @ParameterizedTest(name = "[{index}] Format({0}, {1}) --> '{2}'")
     @CustomFormatSource(format = "'%0'", testValues = {
         "%13", "0.13",
         "%0", "0.003",
@@ -580,11 +503,6 @@ class DefaultFunctionsTest extends AbstractBaseTest {
         "%0", "-0.003",
         "%0", "0"
     })
-    void testCustomFormat17(String value, String fmtStr, String expected) {
-        assertEquals(expected, eval("=Format(" + value + ", " + fmtStr + ")"));
-    }
-
-    @ParameterizedTest(name = "[{index}] Format({0}, {1}) --> '{2}'")
     @CustomFormatSource(format = "'#'", testValues = {
         "13", "13",
         "", "0.003",
@@ -592,11 +510,6 @@ class DefaultFunctionsTest extends AbstractBaseTest {
         "", "-0.003",
         "", "0"
     })
-    void testCustomFormat18(String value, String fmtStr, String expected) {
-        assertEquals(expected, eval("=Format(" + value + ", " + fmtStr + ")"));
-    }
-
-    @ParameterizedTest(name = "[{index}] Format({0}, {1}) --> '{2}'")
     @CustomFormatSource(format = "'\\0\\[#.#\\]\\0'", testValues = {
         "0[13.]0", "13",
         "0[.]0", "0.003",
@@ -606,29 +519,14 @@ class DefaultFunctionsTest extends AbstractBaseTest {
         "-0[.3]0", "-0.3",
         "0[.]0", "0"
     })
-    void testCustomFormat19(String value, String fmtStr, String expected) {
-        assertEquals(expected, eval("=Format(" + value + ", " + fmtStr + ")"));
-    }
-
-    @ParameterizedTest(name = "[{index}] Format({0}, {1}) --> '{2}'")
     @CustomFormatSource(format = "\"#;n'g;'\"", testValues = {
         "5", "5",
         "n'g", "-5",
         "'", "0"
     })
-    void testCustomFormat20(String value, String fmtStr, String expected) {
-        assertEquals(expected, eval("=Format(" + value + ", " + fmtStr + ")"));
-    }
-
-    @ParameterizedTest(name = "[{index}] Format({0}, {1}) --> '{2}'")
     @CustomFormatSource(format = "'$0.0#'", testValues = {
         "$213.0", "213"
     })
-    void testCustomFormat21(String value, String fmtStr, String expected) {
-        assertEquals(expected, eval("=Format(" + value + ", " + fmtStr + ")"));
-    }
-
-    @ParameterizedTest(name = "[{index}] Format({0}, {1}) --> '{2}'")
     @CustomFormatSource(format = "'@'", testValues = {
         "foo", "'foo'",
         "-13", "-13",
@@ -636,11 +534,6 @@ class DefaultFunctionsTest extends AbstractBaseTest {
         "", "''",
         "", "Null"
     })
-    void testCustomFormat22(String value, String fmtStr, String expected) {
-        assertEquals(expected, eval("=Format(" + value + ", " + fmtStr + ")"));
-    }
-
-    @ParameterizedTest(name = "[{index}] Format({0}, {1}) --> '{2}'")
     @CustomFormatSource(format = "'>@'", testValues = {
         "FOO", "'foo'",
         "-13", "-13",
@@ -648,11 +541,6 @@ class DefaultFunctionsTest extends AbstractBaseTest {
         "", "''",
         "", "Null"
     })
-    void testCustomFormat23(String value, String fmtStr, String expected) {
-        assertEquals(expected, eval("=Format(" + value + ", " + fmtStr + ")"));
-    }
-
-    @ParameterizedTest(name = "[{index}] Format({0}, {1}) --> '{2}'")
     @CustomFormatSource(format = "'<@'", testValues = {
         "foo", "'FOO'",
         "-13", "-13",
@@ -660,11 +548,6 @@ class DefaultFunctionsTest extends AbstractBaseTest {
         "", "''",
         "", "Null"
     })
-    void testCustomFormat24(String value, String fmtStr, String expected) {
-        assertEquals(expected, eval("=Format(" + value + ", " + fmtStr + ")"));
-    }
-
-    @ParameterizedTest(name = "[{index}] Format({0}, {1}) --> '{2}'")
     @CustomFormatSource(format = "'!>@;'", testValues = {
         "O", "'foo'",
         "3", "-13",
@@ -672,11 +555,6 @@ class DefaultFunctionsTest extends AbstractBaseTest {
         "", "''",
         "", "Null"
     })
-    void testCustomFormat25(String value, String fmtStr, String expected) {
-        assertEquals(expected, eval("=Format(" + value + ", " + fmtStr + ")"));
-    }
-
-    @ParameterizedTest(name = "[{index}] Format({0}, {1}) --> '{2}'")
     @CustomFormatSource(format = "'!>*~@[Red];\"empty\";'", testValues = {
         "O", "'foo'",
         "3", "-13",
@@ -684,59 +562,34 @@ class DefaultFunctionsTest extends AbstractBaseTest {
         "empty", "''",
         "empty", "Null"
     })
-    void testCustomFormat26(String value, String fmtStr, String expected) {
-        assertEquals(expected, eval("=Format(" + value + ", " + fmtStr + ")"));
-    }
-
-    @ParameterizedTest(name = "[{index}] Format({0}, {1}) --> '{2}'")
     @CustomFormatSource(format = "'><@'", testValues = {
         "fOo", "'fOo'"
     })
-    void testCustomFormat27(String value, String fmtStr, String expected) {
-        assertEquals(expected, eval("=Format(" + value + ", " + fmtStr + ")"));
-    }
-
-    @ParameterizedTest(name = "[{index}] Format({0}, {1}) --> '{2}'")
     @CustomFormatSource(format = "'\\x@@@&&&\\y'", testValues = {
         "x   fy", "'f'",
         "x   fooy", "'foo'",
         "x foobay", "'fooba'",
         "xfoobarybaz", "'foobarbaz'"
     })
-    void testCustomFormat28(String value, String fmtStr, String expected) {
-        assertEquals(expected, eval("=Format(" + value + ", " + fmtStr + ")"));
-    }
-
-    @ParameterizedTest(name = "[{index}] Format({0}, {1}) --> '{2}'")
     @CustomFormatSource(format = "'!\\x@@@&&&\\y'", testValues = {
         "xf  y", "'f'",
         "xfooy", "'foo'",
         "xfoobay", "'fooba'",
         "xbarbazy", "'foobarbaz'"
     })
-    void testCustomFormat29(String value, String fmtStr, String expected) {
-        assertEquals(expected, eval("=Format(" + value + ", " + fmtStr + ")"));
-    }
-
-    @ParameterizedTest(name = "[{index}] Format({0}, {1}) --> '{2}'")
     @CustomFormatSource(format = "'\\x&&&@@@\\y'", testValues = {
         "x  fy", "'f'",
         "xfooy", "'foo'",
         "xfoobay", "'fooba'",
         "xfoobarybaz", "'foobarbaz'"
     })
-    void testCustomFormat30(String value, String fmtStr, String expected) {
-        assertEquals(expected, eval("=Format(" + value + ", " + fmtStr + ")"));
-    }
-
-    @ParameterizedTest(name = "[{index}] Format({0}, {1}) --> '{2}'")
     @CustomFormatSource(format = "'!\\x&&&@@@\\y'", testValues = {
         "xf   y", "'f'",
         "xfoo   y", "'foo'",
         "xfooba y", "'fooba'",
         "xbarbazy", "'foobarbaz'"
     })
-    void testCustomFormat31(String value, String fmtStr, String expected) {
+    void testCustomFormat2(String value, String fmtStr, String expected) {
         assertEquals(expected, eval("=Format(" + value + ", " + fmtStr + ")"));
     }
 
@@ -1050,29 +903,28 @@ class DefaultFunctionsTest extends AbstractBaseTest {
     @Target(ElementType.METHOD)
     @Retention(RetentionPolicy.RUNTIME)
     @ArgumentsSource(CustomFormatArgumentsProvider.class)
+    @Repeatable(CustomFormatSources.class)
     static @interface CustomFormatSource {
         String format();
 
         String[] testValues() default {};
     }
 
-    static class CustomFormatArgumentsProvider implements ArgumentsProvider, AnnotationConsumer<CustomFormatSource> {
-        private CustomFormatSource config;
+    @Target(ElementType.METHOD)
+    @Retention(RetentionPolicy.RUNTIME)
+    static @interface CustomFormatSources {
+        CustomFormatSource[] value();
+    }
 
+    static class CustomFormatArgumentsProvider implements ArgumentsProvider {
         @Override
         public Stream<Arguments> provideArguments(ExtensionContext context) {
-            // context.getElement().ifPresent(annotatedElement -> System.out.println("Element (CustomFormatSource.class): " + AnnotationSupport.findRepeatableAnnotations(annotatedElement, CustomFormatSource.class)));
-            String[] testValues = config.testValues();
-            return IntStream.range(0, testValues.length).filter(i -> i % 2 == 0).mapToObj(i -> {
-                String expected = testValues[i];
-                String val = testValues[i + 1];
-                return Arguments.of(val, config.format(), expected);
-            });
-        }
-
-        @Override
-        public void accept(CustomFormatSource source) {
-            config = source;
+            return context.getElement().map(elem -> AnnotationSupport.findRepeatableAnnotations(elem, CustomFormatSource.class)).orElse(List.of()).stream()
+                .flatMap(src -> IntStream.range(0, src.testValues().length).filter(i -> i % 2 == 0).mapToObj(i -> {
+                    String expected = src.testValues()[i];
+                    String val = src.testValues()[i + 1];
+                    return Arguments.of(val, src.format(), expected);
+                }));
         }
     }
 
