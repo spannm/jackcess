@@ -159,7 +159,7 @@ class DefaultFunctionsTest extends AbstractBaseTest {
     }
 
     @ParameterizedTest(name = "[{index}] {0} --> {1}")
-    @CsvSource(delimiter = ';', quoteCharacter = '\"', value = {
+    @CsvSource(delimiter = ';', value = {
         "Asc(\"foo\"); 102",
         "AscW(\"☺\"); 9786",
         "CBool(\"1\"); -1",
@@ -231,7 +231,7 @@ class DefaultFunctionsTest extends AbstractBaseTest {
     }
 
     @ParameterizedTest(name = "[{index}] {0}")
-    @CsvSource(delimiter = ';', quoteCharacter = '\"', value = {
+    @CsvSource(delimiter = ';', value = {
         "Str(Null)",
         "InStr(3, Null, 'FOO')",
         "InStrRev(Null, 'FOO', 3)",
@@ -243,7 +243,7 @@ class DefaultFunctionsTest extends AbstractBaseTest {
     }
 
     @ParameterizedTest(name = "[{index}] {0} --> {1}")
-    @CsvSource(delimiter = ';', quoteCharacter = '\"', value = {
+    @CsvSource(delimiter = ';', value = {
         "CDbl(\"57.12345\"); 57.12345",
         "Val('    1615 198th Street N.E.'); 1615198d",
         "Val('  &HFFFFwhatever'); -1d",
@@ -260,7 +260,7 @@ class DefaultFunctionsTest extends AbstractBaseTest {
     }
 
     @ParameterizedTest(name = "[{index}] {0} --> {1}")
-    @CsvSource(delimiter = ';', quoteCharacter = '\"', value = {
+    @CsvSource(delimiter = ';', value = {
         "CCur(\"57.12346\"); 57.1235",
         "CDec(\"57.123456789\"); 57.123456789"
     })
@@ -269,7 +269,7 @@ class DefaultFunctionsTest extends AbstractBaseTest {
     }
 
     @ParameterizedTest(name = "[{index}] {0} --> {1}")
-    @CsvSource(delimiter = ';', quoteCharacter = '\"', value = {
+    @CsvSource(delimiter = ';', value = {
         "CSng(\"57.12345\"); 57.12345"
     })
     void testFuncsFloat(String exprStr, String expected) {
@@ -582,9 +582,9 @@ class DefaultFunctionsTest extends AbstractBaseTest {
     }
 
     @ParameterizedTest(name = "[{index}] {0} --> {1}")
-    @CsvSource(delimiter = ';', quoteCharacter = '\"', value = {
-        "Abs(1); 1",
-        "Abs(-1); 1",
+    @CsvSource(delimiter = ';', value = {
+        "Abs(1)   ; 1",
+        "Abs(-1)  ; 1",
         "Abs(-1.1); 1.1"
     })
     void testNumberFuncsInt(String exprStr, double expected) {
@@ -592,7 +592,7 @@ class DefaultFunctionsTest extends AbstractBaseTest {
         assertEquals(expected, result.doubleValue());
     }
 
-    void testNumberFuncsTrig(String exprStr, String expected) {
+    void testNumberFuncsTrig() {
         Map<String, Supplier<Double>> map = Map.of(
             "Atan(0.2)", () -> Math.atan(0.2),
             "Sin(0.2)", () -> Math.sin(0.2),
@@ -603,36 +603,51 @@ class DefaultFunctionsTest extends AbstractBaseTest {
         });
     }
 
-    void testNumberFuncsRest(String exprStr, String expected) {
+    void testNumberFuncsMath() {
+        Map<String, Supplier<Double>> map = Map.of(
+            "Exp(0.2)", () -> Math.exp(0.2),
+            "Log(0.2)", () -> Math.log(0.2),
+            "Sqr(4.3)", () -> Math.sqrt(4.3));
+        map.entrySet().forEach(e -> {
+            assertEquals(e.getKey(), e.getValue().get());
+        });
+    }
 
-        assertEquals(Math.exp(0.2), eval("=Exp(0.2)"));
-        assertEquals(Math.log(0.2), eval("=Log(0.2)"));
-        assertEquals(Math.sqrt(4.3), eval("=Sqr(4.3)"));
+    @ParameterizedTest(name = "[{index}] {0} --> {1}")
+    @CsvSource(delimiter = ';', value = {
+        "Fix(3.5) ; 3",
+        "Fix(4)   ; 4",
+        "Fix(-3.5); -3",
+        "Fix(-4)  ; -4",
 
-        assertEquals(3, eval("=Fix(3.5)"));
-        assertEquals(4, eval("=Fix(4)"));
-        assertEquals(-3, eval("=Fix(-3.5)"));
-        assertEquals(-4, eval("=Fix(-4)"));
+        "Sgn(3.5) ; 1",
+        "Sgn(4)   ; 1",
+        "Sgn(-3.5); -1",
+        "Sgn(-4)  ; -1",
 
-        assertEquals(1, eval("=Sgn(3.5)"));
-        assertEquals(1, eval("=Sgn(4)"));
-        assertEquals(-1, eval("=Sgn(-3.5)"));
-        assertEquals(-1, eval("=Sgn(-4)"));
+        "Int(3.5) ; 3",
+        "Int(4)   ; 4",
+        "Int(-3.5); -4",
+        "Int(-4)  ; -4 "
+    })
+    void testNumberFuncsInt2(String exprStr, int expected) {
+        assertEquals(expected, eval('=' + exprStr));
+    }
 
-        assertEquals(3, eval("=Int(3.5)"));
-        assertEquals(4, eval("=Int(4)"));
-        assertEquals(-4, eval("=Int(-3.5)"));
-        assertEquals(-4, eval("=Int(-4)"));
+    @ParameterizedTest(name = "[{index}] {0} --> {1}")
+    @CsvSource(delimiter = ';', value = {
+        "Round(3.7) ;  4; true",
+        "Round(4)   ;  4; false",
+        "Round(-3.7); -4; true",
+        "Round(-4)  ; -4; false",
 
-        assertEquals(toBD(4), eval("=Round(3.7)"));
-        assertEquals(4, eval("=Round(4)"));
-        assertEquals(toBD(-4), eval("=Round(-3.7)"));
-        assertEquals(-4, eval("=Round(-4)"));
-
-        assertEquals(toBD(3.73), eval("=Round(3.7345, 2)"));
-        assertEquals(4, eval("=Round(4, 2)"));
-        assertEquals(toBD(-3.73), eval("=Round(-3.7345, 2)"));
-        assertEquals(-4, eval("=Round(-4, 2)"));
+        "Round(3.7345, 2) ;  3.73; true",
+        "Round(4, 2)      ;     4; false",
+        "Round(-3.7345, 2); -3.73; true",
+        "Round(-4, 2)     ;    -4; false"
+    })
+    void testNumberFuncsRound(String exprStr, Double expected, boolean bd) {
+        assertEquals(bd ? toBD(expected) : expected.intValue(), eval('=' + exprStr));
     }
 
     @Test
@@ -668,8 +683,8 @@ class DefaultFunctionsTest extends AbstractBaseTest {
         assertEquals("Tuesday", eval("=WeekdayName(1,False,3)"));
         assertEquals("Thu", eval("=WeekdayName(3,True,3)"));
 
-        assertTrue(((String) eval("=CStr(Date())")).matches("\\d{1,2}/\\d{1,2}/\\d{4}"));
-        assertTrue(((String) eval("=CStr(Time())")).matches("\\d{1,2}:\\d{2}:\\d{2} (AM|PM)"));
+        assertTrue(((String) eval("=CStr(Date())")).matches("[0-9]{1,2}/[0-9]{1,2}/[0-9]{4}"));
+        assertTrue(((String) eval("=CStr(Time())")).matches("[0-9]{1,2}:[0-9]{2}:[0-9]{2} (AM|PM)"));
 
         assertEquals("3:57:34 AM", eval("=CStr(TimeSerial(3,57,34))"));
         assertEquals("3:57:34 PM", eval("=CStr(TimeSerial(15,57,34))"));
@@ -789,7 +804,7 @@ class DefaultFunctionsTest extends AbstractBaseTest {
     }
 
     @ParameterizedTest(name = "[{index}] {0} --> {1}")
-    @CsvSource(delimiter = ';', quoteCharacter = '\"', value = {
+    @CsvSource(delimiter = ';', value = {
         "CStr(NPer(0.12/12,-100,-1000)); -9.57859403981306",
         "CStr(NPer(0.12/12,-100,-1000,0,1)); -9.48809500550578",
         "CStr(NPer(0.12/12,-100,-1000,10000)); 60.0821228537616",
