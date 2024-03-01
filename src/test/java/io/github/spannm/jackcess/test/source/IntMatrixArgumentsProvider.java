@@ -13,15 +13,15 @@ public class IntMatrixArgumentsProvider implements ArgumentsProvider, Annotation
     private IntMatrixSource cfg;
 
     @Override
-    public Stream<Arguments> provideArguments(ExtensionContext _context) {
+    public Stream<Arguments> provideArguments(ExtensionContext context) {
         int end = cfg.end() + (cfg.endInclusive() ? 1 : 0);
         return IntStream.range(cfg.start(), end).boxed()
             .flatMap(x -> IntStream.range(cfg.start(), end).mapToObj(y -> Arguments.of(x, y)));
     }
 
     @Override
-    public void accept(IntMatrixSource _matrixSource) {
-        cfg = _matrixSource;
+    public void accept(IntMatrixSource source) {
+        cfg = source;
     }
 
     @Override

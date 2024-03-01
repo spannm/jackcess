@@ -10,26 +10,22 @@ import java.util.stream.Stream;
 
 public class IntRangeArgumentsProvider implements ArgumentsProvider, AnnotationConsumer<IntRangeSource> {
 
-    private int     start;
-    private int     end;
-    private boolean endInclusive;
+    private IntRangeSource cfg;
 
     @Override
     public Stream<Arguments> provideArguments(ExtensionContext _context) {
-        return IntStream.range(start, endInclusive ? end + 1 : end).boxed().map(Arguments::of);
+        return IntStream.range(cfg.start(), cfg.endInclusive() ? cfg.end() + 1 : cfg.end()).boxed().map(Arguments::of);
     }
 
     @Override
-    public void accept(IntRangeSource _rangeSource) {
-        start = _rangeSource.start();
-        end = _rangeSource.end();
-        endInclusive = _rangeSource.endInclusive();
+    public void accept(IntRangeSource source) {
+        cfg = source;
     }
 
     @Override
     public String toString() {
         return String.format("%s[start=%d, end=%d (inclusive=%s)]",
-            getClass().getSimpleName(), start, end, endInclusive);
+            getClass().getSimpleName(), cfg.start(), cfg.end(), cfg.endInclusive());
     }
 
 }
