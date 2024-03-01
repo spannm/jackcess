@@ -18,20 +18,33 @@ package io.github.spannm.jackcess.impl.expr;
 
 import static io.github.spannm.jackcess.impl.expr.ExpressionatorTest.eval;
 import static io.github.spannm.jackcess.impl.expr.ExpressionatorTest.toBD;
+import static org.junit.jupiter.params.provider.Arguments.arguments;
 
 import io.github.spannm.jackcess.expr.EvalException;
 import io.github.spannm.jackcess.test.AbstractBaseTest;
+import io.github.spannm.jackcess.test.TestUtil;
 import io.github.spannm.jackcess.test.converter.CsvToLocalDateTime;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtensionContext;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.converter.ConvertWith;
-import org.junit.jupiter.params.provider.CsvSource;
+import org.junit.jupiter.params.provider.*;
+import org.junit.jupiter.params.support.AnnotationConsumer;
 
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeFormatterBuilder;
 import java.util.Calendar;
-import java.util.Map;
+import java.util.Locale;
 import java.util.function.Supplier;
+import java.util.stream.IntStream;
+import java.util.stream.Stream;
 
 /**
  * @author James Ahlborn
@@ -385,200 +398,346 @@ class DefaultFunctionsTest extends AbstractBaseTest {
         assertEquals(expected, eval('=' + exprStr));
     }
 
-    @Test
-    void testCustomFormat() {
-        assertEvalFormat("';\\y;\\n'",
-            "foo", "'foo'",
-            "", "''",
-            "y", "True",
-            "n", "'0'",
-            "", "Null");
+    @ParameterizedTest(name = "[{index}] Format({0}, {1}) --> '{2}'")
+    @CustomFormatSource(format = "';\\y;\\n'", testValues = {
+        "foo", "'foo'",
+        "", "''",
+        "y", "True",
+        "n", "'0'",
+        "", "Null"})
+    void testCustomFormat2(String value, String fmtStr, String expected) {
+        assertEquals(expected, eval("=Format(" + value + ", " + fmtStr + ")"));
+    }
 
-        assertEvalFormat("'\\p;\"y\";!\\n;*~\\z[Blue];'",
-            "foo", "'foo'",
-            "", "''",
-            "y", "True",
-            "n", "'0'",
-            "p", "'10'",
-            "z", "Null");
+    @ParameterizedTest(name = "[{index}] Format({0}, {1}) --> '{2}'")
+    @CustomFormatSource(format = "'\\p;\"y\";!\\n;*~\\z[Blue];'", testValues = {
+        "foo", "'foo'",
+        "", "''",
+        "y", "True",
+        "n", "'0'",
+        "p", "'10'",
+        "z", "Null"
+    })
+    void testCustomFormat3(String value, String fmtStr, String expected) {
+        assertEquals(expected, eval("=Format(" + value + ", " + fmtStr + ")"));
+    }
 
-        assertEvalFormat("'\"p\"#.00#\"blah\"'",
-            "p13.00blah", "13",
-            "-p13.00blah", "-13",
-            "p.00blah", "0",
-            "", "''",
-            "", "Null");
+    @ParameterizedTest(name = "[{index}] Format({0}, {1}) --> '{2}'")
+    @CustomFormatSource(format = "'\"p\"#.00#\"blah\"'", testValues = {
+        "p13.00blah", "13",
+        "-p13.00blah", "-13",
+        "p.00blah", "0",
+        "", "''",
+        "", "Null"
+    })
+    void testCustomFormat4(String value, String fmtStr, String expected) {
+        assertEquals(expected, eval("=Format(" + value + ", " + fmtStr + ")"));
+    }
 
-        assertEvalFormat("'\"p\"#.00#\"blah\";(\"p\"#.00#\"blah\")'",
-            "p13.00blah", "13",
-            "(p13.00blah)", "-13",
-            "p.00blah", "0",
-            "(p1.00blah)", "True",
-            "p.00blah", "'false'",
-            "p37623.292blah", "#01/02/2003 7:00:00 AM#",
-            "p37623.292blah", "'01/02/2003 7:00:00 AM'",
-            "NotANumber", "'NotANumber'",
-            "", "''",
-            "", "Null");
+    @ParameterizedTest(name = "[{index}] Format({0}, {1}) --> '{2}'")
+    @CustomFormatSource(format = "'\"p\"#.00#\"blah\";(\"p\"#.00#\"blah\")'", testValues = {
+        "p13.00blah", "13",
+        "(p13.00blah)", "-13",
+        "p.00blah", "0",
+        "(p1.00blah)", "True",
+        "p.00blah", "'false'",
+        "p37623.292blah", "#01/02/2003 7:00:00 AM#",
+        "p37623.292blah", "'01/02/2003 7:00:00 AM'",
+        "NotANumber", "'NotANumber'",
+        "", "''",
+        "", "Null"
+    })
+    void testCustomFormat5(String value, String fmtStr, String expected) {
+        assertEquals(expected, eval("=Format(" + value + ", " + fmtStr + ")"));
+    }
 
-        assertEvalFormat("'\"p\"#.00#\"blah\";!(\"p\"#.00#\"blah\")[Red];\"zero\"'",
-            "p13.00blah", "13",
-            "(p13.00blah)", "-13",
-            "zero", "0",
-            "", "''",
-            "", "Null");
+    @ParameterizedTest(name = "[{index}] Format({0}, {1}) --> '{2}'")
+    @CustomFormatSource(format = "'\"p\"#.00#\"blah\";!(\"p\"#.00#\"blah\")[Red];\"zero\"'", testValues = {
+        "p13.00blah", "13",
+        "(p13.00blah)", "-13",
+        "zero", "0",
+        "", "''",
+        "", "Null"
+    })
+    void testCustomFormat6(String value, String fmtStr, String expected) {
+        assertEquals(expected, eval("=Format(" + value + ", " + fmtStr + ")"));
+    }
 
-        assertEvalFormat("'\\p#.00#\"blah\";*~(\"p\"#.00#\"blah\");\"zero\";\"yuck\"'",
-            "p13.00blah", "13",
-            "(p13.00blah)", "-13",
-            "zero", "0",
-            "", "''",
-            "yuck", "Null");
+    @ParameterizedTest(name = "[{index}] Format({0}, {1}) --> '{2}'")
+    @CustomFormatSource(format = "'\\p#.00#\"blah\";*~(\"p\"#.00#\"blah\");\"zero\";\"yuck\"'", testValues = {
+        "p13.00blah", "13",
+        "(p13.00blah)", "-13",
+        "zero", "0",
+        "", "''",
+        "yuck", "Null"
+    })
+    void testCustomFormat7(String value, String fmtStr, String expected) {
+        assertEquals(expected, eval("=Format(" + value + ", " + fmtStr + ")"));
+    }
 
-        assertEvalFormat("'0.##;(0.###);\"zero\";\"yuck\";'",
-            "0.03", "0.03",
-            "zero", "0.003",
-            "(0.003)", "-0.003",
-            "zero", "-0.0003");
+    @ParameterizedTest(name = "[{index}] Format({0}, {1}) --> '{2}'")
+    @CustomFormatSource(format = "'0.##;(0.###);\"zero\";\"yuck\";'", testValues = {
+        "0.03", "0.03",
+        "zero", "0.003",
+        "(0.003)", "-0.003",
+        "zero", "-0.0003"
+    })
+    void testCustomFormat8(String value, String fmtStr, String expected) {
+        assertEquals(expected, eval("=Format(" + value + ", " + fmtStr + ")"));
+    }
 
-        assertEvalFormat("'0.##;(0.###E+0)'",
-            "0.03", "0.03",
-            "(3.E-4)", "-0.0003",
-            "0.", "0",
-            "34223.", "34223",
-            "(3.422E+4)", "-34223");
+    @ParameterizedTest(name = "[{index}] Format({0}, {1}) --> '{2}'")
+    @CustomFormatSource(format = "'0.##;(0.###E+0)'", testValues = {
+        "0.03", "0.03",
+        "(3.E-4)", "-0.0003",
+        "0.", "0",
+        "34223.", "34223",
+        "(3.422E+4)", "-34223"
+    })
+    void testCustomFormat9(String value, String fmtStr, String expected) {
+        assertEquals(expected, eval("=Format(" + value + ", " + fmtStr + ")"));
+    }
 
-        assertEvalFormat("'0.###E-0'",
-            "3.E-4", "0.0003",
-            "3.422E4", "34223");
+    @ParameterizedTest(name = "[{index}] Format({0}, {1}) --> '{2}'")
+    @CustomFormatSource(format = "'0.###E-0'", testValues = {
+        "3.E-4", "0.0003",
+        "3.422E4", "34223"
+    })
+    void testCustomFormat10(String value, String fmtStr, String expected) {
+        assertEquals(expected, eval("=Format(" + value + ", " + fmtStr + ")"));
+    }
 
-        assertEvalFormat("'0.###e+0'",
-            "3.e-4", "0.0003",
-            "3.422e+4", "34223");
+    @ParameterizedTest(name = "[{index}] Format({0}, {1}) --> '{2}'")
+    @CustomFormatSource(format = "'0.###e+0'", testValues = {
+        "3.e-4", "0.0003",
+        "3.422e+4", "34223"
+    })
+    void testCustomFormat11(String value, String fmtStr, String expected) {
+        assertEquals(expected, eval("=Format(" + value + ", " + fmtStr + ")"));
+    }
 
-        assertEvalFormat("'0.###e-0'",
-            "3.e-4", "0.0003",
-            "3.422e4", "34223");
+    @ParameterizedTest(name = "[{index}] Format({0}, {1}) --> '{2}'")
+    @CustomFormatSource(format = "'0.###e-0'", testValues = {
+        "3.e-4", "0.0003",
+        "3.422e4", "34223"
+    })
+    void testCustomFormat12(String value, String fmtStr, String expected) {
+        assertEquals(expected, eval("=Format(" + value + ", " + fmtStr + ")"));
+    }
 
-        assertEvalFormat("'#,##0.###'",
-            "0.003", "0.003",
-            "0.", "0.0003",
-            "34,223.", "34223");
+    @ParameterizedTest(name = "[{index}] Format({0}, {1}) --> '{2}'")
+    @CustomFormatSource(format = "'#,##0.###'", testValues = {
+        "0.003", "0.003",
+        "0.", "0.0003",
+        "34,223.", "34223"
+    })
+    void testCustomFormat13(String value, String fmtStr, String expected) {
+        assertEquals(expected, eval("=Format(" + value + ", " + fmtStr + ")"));
+    }
 
-        assertEvalFormat("'0.'",
-            "13.", "13",
-            "0.", "0.003",
-            "-45.", "-45",
-            "0.", "-0.003",
-            "0.", "0");
+    @ParameterizedTest(name = "[{index}] Format({0}, {1}) --> '{2}'")
+    @CustomFormatSource(format = "'0.'", testValues = {
+        "13.", "13",
+        "0.", "0.003",
+        "-45.", "-45",
+        "0.", "-0.003",
+        "0.", "0"
+    })
+    void testCustomFormat14(String value, String fmtStr, String expected) {
+        assertEquals(expected, eval("=Format(" + value + ", " + fmtStr + ")"));
+    }
 
-        assertEvalFormat("'0.#'",
-            "13.", "13",
-            "0.3", "0.3",
-            "0.", "0.003",
-            "-45.", "-45",
-            "0.", "-0.003",
-            "0.", "0");
+    @ParameterizedTest(name = "[{index}] Format({0}, {1}) --> '{2}'")
+    @CustomFormatSource(format = "'0.#'", testValues = {
+        "13.", "13",
+        "0.3", "0.3",
+        "0.", "0.003",
+        "-45.", "-45",
+        "0.", "-0.003",
+        "0.", "0"
+    })
+    void testCustomFormat15(String value, String fmtStr, String expected) {
+        assertEquals(expected, eval("=Format(" + value + ", " + fmtStr + ")"));
+    }
 
-        assertEvalFormat("'0'",
-            "13", "13",
-            "0", "0.003",
-            "-45", "-45",
-            "0", "-0.003",
-            "0", "0");
+    @ParameterizedTest(name = "[{index}] Format({0}, {1}) --> '{2}'")
+    @CustomFormatSource(format = "'0'", testValues = {
+        "13", "13",
+        "0", "0.003",
+        "-45", "-45",
+        "0", "-0.003",
+        "0", "0"
+    })
+    void testCustomFormat16(String value, String fmtStr, String expected) {
+        assertEquals(expected, eval("=Format(" + value + ", " + fmtStr + ")"));
+    }
 
-        assertEvalFormat("'%0'",
-            "%13", "0.13",
-            "%0", "0.003",
-            "-%45", "-0.45",
-            "%0", "-0.003",
-            "%0", "0");
+    @ParameterizedTest(name = "[{index}] Format({0}, {1}) --> '{2}'")
+    @CustomFormatSource(format = "'%0'", testValues = {
+        "%13", "0.13",
+        "%0", "0.003",
+        "-%45", "-0.45",
+        "%0", "-0.003",
+        "%0", "0"
+    })
+    void testCustomFormat17(String value, String fmtStr, String expected) {
+        assertEquals(expected, eval("=Format(" + value + ", " + fmtStr + ")"));
+    }
 
-        assertEvalFormat("'#'",
-            "13", "13",
-            "", "0.003",
-            "-45", "-45",
-            "", "-0.003",
-            "", "0");
+    @ParameterizedTest(name = "[{index}] Format({0}, {1}) --> '{2}'")
+    @CustomFormatSource(format = "'#'", testValues = {
+        "13", "13",
+        "", "0.003",
+        "-45", "-45",
+        "", "-0.003",
+        "", "0"
+    })
+    void testCustomFormat18(String value, String fmtStr, String expected) {
+        assertEquals(expected, eval("=Format(" + value + ", " + fmtStr + ")"));
+    }
 
-        assertEvalFormat("'\\0\\[#.#\\]\\0'",
-            "0[13.]0", "13",
-            "0[.]0", "0.003",
-            "0[.3]0", "0.3",
-            "-0[45.]0", "-45",
-            "0[.]0", "-0.003",
-            "-0[.3]0", "-0.3",
-            "0[.]0", "0");
+    @ParameterizedTest(name = "[{index}] Format({0}, {1}) --> '{2}'")
+    @CustomFormatSource(format = "'\\0\\[#.#\\]\\0'", testValues = {
+        "0[13.]0", "13",
+        "0[.]0", "0.003",
+        "0[.3]0", "0.3",
+        "-0[45.]0", "-45",
+        "0[.]0", "-0.003",
+        "-0[.3]0", "-0.3",
+        "0[.]0", "0"
+    })
+    void testCustomFormat19(String value, String fmtStr, String expected) {
+        assertEquals(expected, eval("=Format(" + value + ", " + fmtStr + ")"));
+    }
 
-        assertEvalFormat("\"#;n'g;'\"",
-            "5", "5",
-            "n'g", "-5",
-            "'", "0");
+    @ParameterizedTest(name = "[{index}] Format({0}, {1}) --> '{2}'")
+    @CustomFormatSource(format = "\"#;n'g;'\"", testValues = {
+        "5", "5",
+        "n'g", "-5",
+        "'", "0"
+    })
+    void testCustomFormat20(String value, String fmtStr, String expected) {
+        assertEquals(expected, eval("=Format(" + value + ", " + fmtStr + ")"));
+    }
 
-        assertEvalFormat("'$0.0#'",
-            "$213.0", "213");
+    @ParameterizedTest(name = "[{index}] Format({0}, {1}) --> '{2}'")
+    @CustomFormatSource(format = "'$0.0#'", testValues = {
+        "$213.0", "213"
+    })
+    void testCustomFormat21(String value, String fmtStr, String expected) {
+        assertEquals(expected, eval("=Format(" + value + ", " + fmtStr + ")"));
+    }
 
-        assertEvalFormat("'@'",
-            "foo", "'foo'",
-            "-13", "-13",
-            "0", "0",
-            "", "''",
-            "", "Null");
+    @ParameterizedTest(name = "[{index}] Format({0}, {1}) --> '{2}'")
+    @CustomFormatSource(format = "'@'", testValues = {
+        "foo", "'foo'",
+        "-13", "-13",
+        "0", "0",
+        "", "''",
+        "", "Null"
+    })
+    void testCustomFormat22(String value, String fmtStr, String expected) {
+        assertEquals(expected, eval("=Format(" + value + ", " + fmtStr + ")"));
+    }
 
-        assertEvalFormat("'>@'",
-            "FOO", "'foo'",
-            "-13", "-13",
-            "0", "0",
-            "", "''",
-            "", "Null");
+    @ParameterizedTest(name = "[{index}] Format({0}, {1}) --> '{2}'")
+    @CustomFormatSource(format = "'>@'", testValues = {
+        "FOO", "'foo'",
+        "-13", "-13",
+        "0", "0",
+        "", "''",
+        "", "Null"
+    })
+    void testCustomFormat23(String value, String fmtStr, String expected) {
+        assertEquals(expected, eval("=Format(" + value + ", " + fmtStr + ")"));
+    }
 
-        assertEvalFormat("'<@'",
-            "foo", "'FOO'",
-            "-13", "-13",
-            "0", "0",
-            "", "''",
-            "", "Null");
+    @ParameterizedTest(name = "[{index}] Format({0}, {1}) --> '{2}'")
+    @CustomFormatSource(format = "'<@'", testValues = {
+        "foo", "'FOO'",
+        "-13", "-13",
+        "0", "0",
+        "", "''",
+        "", "Null"
+    })
+    void testCustomFormat24(String value, String fmtStr, String expected) {
+        assertEquals(expected, eval("=Format(" + value + ", " + fmtStr + ")"));
+    }
 
-        assertEvalFormat("'!>@;'",
-            "O", "'foo'",
-            "3", "-13",
-            "0", "0",
-            "", "''",
-            "", "Null");
+    @ParameterizedTest(name = "[{index}] Format({0}, {1}) --> '{2}'")
+    @CustomFormatSource(format = "'!>@;'", testValues = {
+        "O", "'foo'",
+        "3", "-13",
+        "0", "0",
+        "", "''",
+        "", "Null"
+    })
+    void testCustomFormat25(String value, String fmtStr, String expected) {
+        assertEquals(expected, eval("=Format(" + value + ", " + fmtStr + ")"));
+    }
 
-        assertEvalFormat("'!>*~@[Red];\"empty\";'",
-            "O", "'foo'",
-            "3", "-13",
-            "0", "0",
-            "empty", "''",
-            "empty", "Null");
+    @ParameterizedTest(name = "[{index}] Format({0}, {1}) --> '{2}'")
+    @CustomFormatSource(format = "'!>*~@[Red];\"empty\";'", testValues = {
+        "O", "'foo'",
+        "3", "-13",
+        "0", "0",
+        "empty", "''",
+        "empty", "Null"
+    })
+    void testCustomFormat26(String value, String fmtStr, String expected) {
+        assertEquals(expected, eval("=Format(" + value + ", " + fmtStr + ")"));
+    }
 
-        assertEvalFormat("'><@'",
-            "fOo", "'fOo'");
+    @ParameterizedTest(name = "[{index}] Format({0}, {1}) --> '{2}'")
+    @CustomFormatSource(format = "'><@'", testValues = {
+        "fOo", "'fOo'"
+    })
+    void testCustomFormat27(String value, String fmtStr, String expected) {
+        assertEquals(expected, eval("=Format(" + value + ", " + fmtStr + ")"));
+    }
 
-        assertEvalFormat("'\\x@@@&&&\\y'",
-            "x   fy", "'f'",
-            "x   fooy", "'foo'",
-            "x foobay", "'fooba'",
-            "xfoobarybaz", "'foobarbaz'");
+    @ParameterizedTest(name = "[{index}] Format({0}, {1}) --> '{2}'")
+    @CustomFormatSource(format = "'\\x@@@&&&\\y'", testValues = {
+        "x   fy", "'f'",
+        "x   fooy", "'foo'",
+        "x foobay", "'fooba'",
+        "xfoobarybaz", "'foobarbaz'"
+    })
+    void testCustomFormat28(String value, String fmtStr, String expected) {
+        assertEquals(expected, eval("=Format(" + value + ", " + fmtStr + ")"));
+    }
 
-        assertEvalFormat("'!\\x@@@&&&\\y'",
-            "xf  y", "'f'",
-            "xfooy", "'foo'",
-            "xfoobay", "'fooba'",
-            "xbarbazy", "'foobarbaz'");
+    @ParameterizedTest(name = "[{index}] Format({0}, {1}) --> '{2}'")
+    @CustomFormatSource(format = "'!\\x@@@&&&\\y'", testValues = {
+        "xf  y", "'f'",
+        "xfooy", "'foo'",
+        "xfoobay", "'fooba'",
+        "xbarbazy", "'foobarbaz'"
+    })
+    void testCustomFormat29(String value, String fmtStr, String expected) {
+        assertEquals(expected, eval("=Format(" + value + ", " + fmtStr + ")"));
+    }
 
-        assertEvalFormat("'\\x&&&@@@\\y'",
-            "x  fy", "'f'",
-            "xfooy", "'foo'",
-            "xfoobay", "'fooba'",
-            "xfoobarybaz", "'foobarbaz'");
+    @ParameterizedTest(name = "[{index}] Format({0}, {1}) --> '{2}'")
+    @CustomFormatSource(format = "'\\x&&&@@@\\y'", testValues = {
+        "x  fy", "'f'",
+        "xfooy", "'foo'",
+        "xfoobay", "'fooba'",
+        "xfoobarybaz", "'foobarbaz'"
+    })
+    void testCustomFormat30(String value, String fmtStr, String expected) {
+        assertEquals(expected, eval("=Format(" + value + ", " + fmtStr + ")"));
+    }
 
-        assertEvalFormat("'!\\x&&&@@@\\y'",
-            "xf   y", "'f'",
-            "xfoo   y", "'foo'",
-            "xfooba y", "'fooba'",
-            "xbarbazy", "'foobarbaz'");
+    @ParameterizedTest(name = "[{index}] Format({0}, {1}) --> '{2}'")
+    @CustomFormatSource(format = "'!\\x&&&@@@\\y'", testValues = {
+        "xf   y", "'f'",
+        "xfoo   y", "'foo'",
+        "xfooba y", "'fooba'",
+        "xbarbazy", "'foobarbaz'"
+    })
+    void testCustomFormat31(String value, String fmtStr, String expected) {
+        assertEquals(expected, eval("=Format(" + value + ", " + fmtStr + ")"));
     }
 
     @ParameterizedTest(name = "[{index}] {0} --> {1}")
@@ -592,25 +751,17 @@ class DefaultFunctionsTest extends AbstractBaseTest {
         assertEquals(expected, result.doubleValue());
     }
 
-    void testNumberFuncsTrig() {
-        Map<String, Supplier<Double>> map = Map.of(
-            "Atan(0.2)", () -> Math.atan(0.2),
-            "Sin(0.2)", () -> Math.sin(0.2),
-            "Tan(0.2)", () -> Math.tan(0.2),
-            "Cos(0.2)", () -> Math.cos(0.2));
-        map.entrySet().forEach(e -> {
-            assertEquals(e.getKey(), e.getValue().get());
-        });
-    }
-
+    @Test
     void testNumberFuncsMath() {
-        Map<String, Supplier<Double>> map = Map.of(
-            "Exp(0.2)", () -> Math.exp(0.2),
-            "Log(0.2)", () -> Math.log(0.2),
-            "Sqr(4.3)", () -> Math.sqrt(4.3));
-        map.entrySet().forEach(e -> {
-            assertEquals(e.getKey(), e.getValue().get());
-        });
+        assertAll("trig",
+            () -> assertEquals(Math.atan(0.2), eval("=Atan(0.2)")),
+            () -> assertEquals(Math.sin(0.2), eval("=Sin(0.2)")),
+            () -> assertEquals(Math.tan(0.2), eval("=Tan(0.2)")),
+            () -> assertEquals(Math.cos(0.2), eval("=Cos(0.2)")),
+            () -> assertEquals(Math.exp(0.2), eval("=Exp(0.2)")),
+            () -> assertEquals(Math.log(0.2), eval("=Log(0.2)")),
+            () -> assertEquals(Math.sqrt(4.3), eval("=Sqr(4.3)"))
+        );
     }
 
     @ParameterizedTest(name = "[{index}] {0} --> {1}")
@@ -650,157 +801,170 @@ class DefaultFunctionsTest extends AbstractBaseTest {
         assertEquals(bd ? toBD(expected) : expected.intValue(), eval('=' + exprStr));
     }
 
-    @Test
-    void testDateFuncs() {
-        assertEquals("1/2/2003", eval("=CStr(DateValue(#01/02/2003 7:00:00 AM#))"));
-        assertEquals("7:00:00 AM", eval("=CStr(TimeValue(#01/02/2003 7:00:00 AM#))"));
+    static Stream<Arguments> getDateFuncsTestData() {
+        return Stream.of(
+            arguments("CStr(DateValue(#01/02/2003 7:00:00 AM#))", "1/2/2003"),
+            arguments("CStr(TimeValue(#01/02/2003 7:00:00 AM#))", "7:00:00 AM"),
 
-        assertEquals("1:10:00 PM", eval("=CStr(#13:10:00#)"));
+            arguments("CStr(#13:10:00#)", "1:10:00 PM"),
 
-        assertEquals(2003, eval("=Year(#01/02/2003 7:00:00 AM#)"));
-        assertEquals(1, eval("=Month(#01/02/2003 7:00:00 AM#)"));
-        assertEquals(2, eval("=Day(#01/02/2003 7:00:00 AM#)"));
+            arguments("Year(#01/02/2003 7:00:00 AM#)", 2003),
+            arguments("Month(#01/02/2003 7:00:00 AM#)", 1),
+            arguments("Day(#01/02/2003 7:00:00 AM#)", 2),
 
-        assertEquals(2003, eval("=Year('01/02/2003 7:00:00 AM')"));
-        assertEquals(1899, eval("=Year(#7:00:00 AM#)"));
-        assertEquals(Calendar.getInstance().get(Calendar.YEAR), eval("=Year('01/02 7:00:00 AM')"));
+            arguments("Year('01/02/2003 7:00:00 AM')", 2003),
+            arguments("Year(#7:00:00 AM#)", 1899),
+            arguments("Year('01/02 7:00:00 AM')", Calendar.getInstance().get(Calendar.YEAR)),
 
-        assertEquals("January", eval("=MonthName(1)"));
-        assertEquals("Feb", eval("=MonthName(2,True)"));
-        assertEquals("March", eval("=MonthName(3,False)"));
+            arguments("MonthName(1)", "January"),
+            arguments("MonthName(2,True)", "Feb"),
+            arguments("MonthName(3,False)", "March"),
 
-        assertEquals(7, eval("=Hour(#01/02/2003 7:10:27 AM#)"));
-        assertEquals(19, eval("=Hour(#01/02/2003 7:10:27 PM#)"));
-        assertEquals(10, eval("=Minute(#01/02/2003 7:10:27 AM#)"));
-        assertEquals(27, eval("=Second(#01/02/2003 7:10:27 AM#)"));
+            arguments("Hour(#01/02/2003 7:10:27 AM#)", 7),
+            arguments("Hour(#01/02/2003 7:10:27 PM#)", 19),
+            arguments("Minute(#01/02/2003 7:10:27 AM#)", 10),
+            arguments("Second(#01/02/2003 7:10:27 AM#)", 27),
 
-        assertEquals(7, eval("=Weekday(#11/22/2003#)"));
-        assertEquals(3, eval("=Weekday(#11/22/2003#, 5)"));
-        assertEquals(1, eval("=Weekday(#11/22/2003#, 7)"));
+            arguments("Weekday(#11/22/2003#)", 7),
+            arguments("Weekday(#11/22/2003#, 5)", 3),
+            arguments("Weekday(#11/22/2003#, 7)", 1),
 
-        assertEquals("Sunday", eval("=WeekdayName(1)"));
-        assertEquals("Sun", eval("=WeekdayName(1,True)"));
-        assertEquals("Tuesday", eval("=WeekdayName(1,False,3)"));
-        assertEquals("Thu", eval("=WeekdayName(3,True,3)"));
+            arguments("WeekdayName(1)", "Sunday"),
+            arguments("WeekdayName(1,True)", "Sun"),
+            arguments("WeekdayName(1,False,3)", "Tuesday"),
+            arguments("WeekdayName(3,True,3)", "Thu"),
 
-        assertTrue(((String) eval("=CStr(Date())")).matches("[0-9]{1,2}/[0-9]{1,2}/[0-9]{4}"));
-        assertTrue(((String) eval("=CStr(Time())")).matches("[0-9]{1,2}:[0-9]{2}:[0-9]{2} (AM|PM)"));
+            arguments("CStr(Date())", (Supplier<?>) () ->
+                DateTimeFormatter.ofPattern("M/d/yyyy").format(LocalDate.now(TestUtil.TEST_TZ.toZoneId()))),
+            arguments("CStr(Time())", (Supplier<?>) () ->
+                new DateTimeFormatterBuilder().appendPattern("h:mm:ss a").toFormatter(Locale.US).format(LocalDateTime.now(TestUtil.TEST_TZ.toZoneId()))),
 
-        assertEquals("3:57:34 AM", eval("=CStr(TimeSerial(3,57,34))"));
-        assertEquals("3:57:34 PM", eval("=CStr(TimeSerial(15,57,34))"));
-        assertEquals("5:45:00 AM", eval("=CStr(TimeSerial(6,-15,0))"));
-        assertEquals("12:00:00 AM", eval("=CStr(TimeSerial(0,0,0))"));
-        assertEquals("2:00:00 PM", eval("=CStr(TimeSerial(-10,0,0))"));
-        assertEquals("6:00:00 AM", eval("=CStr(TimeSerial(30,0,0))"));
+            arguments("CStr(TimeSerial(3,57,34))", "3:57:34 AM"),
+            arguments("CStr(TimeSerial(15,57,34))", "3:57:34 PM"),
+            arguments("CStr(TimeSerial(6,-15,0))", "5:45:00 AM"),
+            arguments("CStr(TimeSerial(0,0,0))", "12:00:00 AM"),
+            arguments("CStr(TimeSerial(-10,0,0))", "2:00:00 PM"),
+            arguments("CStr(TimeSerial(30,0,0))", "6:00:00 AM"),
 
-        assertEquals("2/12/1969", eval("=CStr(DateSerial(69,2,12))"));
-        assertEquals("2/12/2010", eval("=CStr(DateSerial(10,2,12))"));
-        assertEquals("7/12/2013", eval("=CStr(DateSerial(2014,-5,12))"));
-        assertEquals("8/7/2013", eval("=CStr(DateSerial(2014,-5,38))"));
+            arguments("CStr(DateSerial(69,2,12))", "2/12/1969"),
+            arguments("CStr(DateSerial(10,2,12))", "2/12/2010"),
+            arguments("CStr(DateSerial(2014,-5,12))", "7/12/2013"),
+            arguments("CStr(DateSerial(2014,-5,38))", "8/7/2013"),
 
-        assertEquals(1, eval("=DatePart('ww',#01/03/2018#)"));
-        assertEquals(2, eval("=DatePart('ww',#01/03/2018#,4)"));
-        assertEquals(1, eval("=DatePart('ww',#01/03/2018#,5)"));
-        assertEquals(1, eval("=DatePart('ww',#01/03/2018#,4,3)"));
-        assertEquals(52, eval("=DatePart('ww',#01/03/2018#,5,3)"));
-        assertEquals(1, eval("=DatePart('ww',#01/03/2018#,4,2)"));
-        assertEquals(53, eval("=DatePart('ww',#01/03/2018#,5,2)"));
-        assertEquals(2003, eval("=DatePart('yyyy',#11/22/2003 5:45:13 AM#)"));
-        assertEquals(4, eval("=DatePart('q',#11/22/2003 5:45:13 AM#)"));
-        assertEquals(11, eval("=DatePart('m',#11/22/2003 5:45:13 AM#)"));
-        assertEquals(326, eval("=DatePart('y',#11/22/2003 5:45:13 AM#)"));
-        assertEquals(22, eval("=DatePart('d',#11/22/2003 5:45:13 AM#)"));
-        assertEquals(7, eval("=DatePart('w',#11/22/2003 5:45:13 AM#)"));
-        assertEquals(3, eval("=DatePart('w',#11/22/2003 5:45:13 AM#, 5)"));
-        assertEquals(5, eval("=DatePart('h',#11/22/2003 5:45:13 AM#)"));
-        assertEquals(45, eval("=DatePart('n',#11/22/2003 5:45:13 AM#)"));
-        assertEquals(13, eval("=DatePart('s',#11/22/2003 5:45:13 AM#)"));
+            arguments("DatePart('ww',#01/03/2018#)", 1),
+            arguments("DatePart('ww',#01/03/2018#,4)", 2),
+            arguments("DatePart('ww',#01/03/2018#,5)", 1),
+            arguments("DatePart('ww',#01/03/2018#,4,3)", 1),
+            arguments("DatePart('ww',#01/03/2018#,5,3)", 52),
+            arguments("DatePart('ww',#01/03/2018#,4,2)", 1),
+            arguments("DatePart('ww',#01/03/2018#,5,2)", 53),
+            arguments("DatePart('yyyy',#11/22/2003 5:45:13 AM#)", 2003),
+            arguments("DatePart('q',#11/22/2003 5:45:13 AM#)", 4),
+            arguments("DatePart('m',#11/22/2003 5:45:13 AM#)", 11),
+            arguments("DatePart('y',#11/22/2003 5:45:13 AM#)", 326),
+            arguments("DatePart('d',#11/22/2003 5:45:13 AM#)", 22),
+            arguments("DatePart('w',#11/22/2003 5:45:13 AM#)", 7),
+            arguments("DatePart('w',#11/22/2003 5:45:13 AM#, 5)", 3),
+            arguments("DatePart('h',#11/22/2003 5:45:13 AM#)", 5),
+            arguments("DatePart('n',#11/22/2003 5:45:13 AM#)", 45),
+            arguments("DatePart('s',#11/22/2003 5:45:13 AM#)", 13),
 
-        assertEquals("11/22/2005 5:45:13 AM", eval("CStr(DateAdd('yyyy',2,#11/22/2003 5:45:13 AM#))"));
-        assertEquals("2/22/2004 5:45:13 AM", eval("CStr(DateAdd('q',1,#11/22/2003 5:45:13 AM#))"));
-        assertEquals("1/22/2004 5:45:13 AM", eval("CStr(DateAdd('m',2,#11/22/2003 5:45:13 AM#))"));
-        assertEquals("12/12/2003 5:45:13 AM", eval("CStr(DateAdd('d',20,#11/22/2003 5:45:13 AM#))"));
-        assertEquals("12/12/2003 5:45:13 AM", eval("CStr(DateAdd('w',20,#11/22/2003 5:45:13 AM#))"));
-        assertEquals("12/12/2003 5:45:13 AM", eval("CStr(DateAdd('y',20,#11/22/2003 5:45:13 AM#))"));
-        assertEquals("12/27/2003 5:45:13 AM", eval("CStr(DateAdd('ww',5,#11/22/2003 5:45:13 AM#))"));
-        assertEquals("11/22/2003 3:45:13 PM", eval("CStr(DateAdd('h',10,#11/22/2003 5:45:13 AM#))"));
-        assertEquals("11/22/2003 6:19:13 AM", eval("CStr(DateAdd('n',34,#11/22/2003 5:45:13 AM#))"));
-        assertEquals("11/22/2003 5:46:27 AM", eval("CStr(DateAdd('s',74,#11/22/2003 5:45:13 AM#))"));
+            arguments("CStr(DateAdd('yyyy',2,#11/22/2003 5:45:13 AM#))", "11/22/2005 5:45:13 AM"),
+            arguments("CStr(DateAdd('q',1,#11/22/2003 5:45:13 AM#))", "2/22/2004 5:45:13 AM"),
+            arguments("CStr(DateAdd('m',2,#11/22/2003 5:45:13 AM#))", "1/22/2004 5:45:13 AM"),
+            arguments("CStr(DateAdd('d',20,#11/22/2003 5:45:13 AM#))", "12/12/2003 5:45:13 AM"),
+            arguments("CStr(DateAdd('w',20,#11/22/2003 5:45:13 AM#))", "12/12/2003 5:45:13 AM"),
+            arguments("CStr(DateAdd('y',20,#11/22/2003 5:45:13 AM#))", "12/12/2003 5:45:13 AM"),
+            arguments("CStr(DateAdd('ww',5,#11/22/2003 5:45:13 AM#))", "12/27/2003 5:45:13 AM"),
+            arguments("CStr(DateAdd('h',10,#11/22/2003 5:45:13 AM#))", "11/22/2003 3:45:13 PM"),
+            arguments("CStr(DateAdd('n',34,#11/22/2003 5:45:13 AM#))", "11/22/2003 6:19:13 AM"),
+            arguments("CStr(DateAdd('s',74,#11/22/2003 5:45:13 AM#))", "11/22/2003 5:46:27 AM"),
 
-        assertEquals("12/12/2003", eval("CStr(DateAdd('d',20,#11/22/2003#))"));
-        assertEquals("11/22/2003 10:00:00 AM", eval("CStr(DateAdd('h',10,#11/22/2003#))"));
-        assertEquals("11/23/2003", eval("CStr(DateAdd('h',24,#11/22/2003#))"));
-        assertEquals("3:45:13 PM", eval("CStr(DateAdd('h',10,#5:45:13 AM#))"));
-        assertEquals("12/31/1899 11:45:13 AM", eval("CStr(DateAdd('h',30,#5:45:13 AM#))"));
+            arguments("CStr(DateAdd('d',20,#11/22/2003#))", "12/12/2003"),
+            arguments("CStr(DateAdd('h',10,#11/22/2003#))", "11/22/2003 10:00:00 AM"),
+            arguments("CStr(DateAdd('h',24,#11/22/2003#))", "11/23/2003"),
+            arguments("CStr(DateAdd('h',10,#5:45:13 AM#))", "3:45:13 PM"),
+            arguments("CStr(DateAdd('h',30,#5:45:13 AM#))", "12/31/1899 11:45:13 AM"),
 
-        assertEquals(0, eval("=DateDiff('yyyy',#10/22/2003#,#11/22/2003#)"));
-        assertEquals(4, eval("=DateDiff('yyyy',#10/22/2003#,#11/22/2007#)"));
-        assertEquals(-4, eval("=DateDiff('yyyy',#11/22/2007#,#10/22/2003#)"));
+            arguments("DateDiff('yyyy',#10/22/2003#,#11/22/2003#)", 0),
+            arguments("DateDiff('yyyy',#10/22/2003#,#11/22/2007#)", 4),
+            arguments("DateDiff('yyyy',#11/22/2007#,#10/22/2003#)", -4),
 
-        assertEquals(0, eval("=DateDiff('q',#10/22/2003#,#11/22/2003#)"));
-        assertEquals(3, eval("=DateDiff('q',#03/01/2003#,#11/22/2003#)"));
-        assertEquals(16, eval("=DateDiff('q',#10/22/2003#,#11/22/2007#)"));
-        assertEquals(-13, eval("=DateDiff('q',#03/22/2007#,#10/22/2003#)"));
+            arguments("DateDiff('q',#10/22/2003#,#11/22/2003#)", 0),
+            arguments("DateDiff('q',#03/01/2003#,#11/22/2003#)", 3),
+            arguments("DateDiff('q',#10/22/2003#,#11/22/2007#)", 16),
+            arguments("DateDiff('q',#03/22/2007#,#10/22/2003#)", -13),
 
-        assertEquals(1, eval("=DateDiff('m',#10/22/2003#,#11/01/2003#)"));
-        assertEquals(8, eval("=DateDiff('m',#03/22/2003#,#11/01/2003#)"));
-        assertEquals(49, eval("=DateDiff('m',#10/22/2003#,#11/22/2007#)"));
-        assertEquals(-41, eval("=DateDiff('m',#03/22/2007#,#10/01/2003#)"));
+            arguments("DateDiff('m',#10/22/2003#,#11/01/2003#)", 1),
+            arguments("DateDiff('m',#03/22/2003#,#11/01/2003#)", 8),
+            arguments("DateDiff('m',#10/22/2003#,#11/22/2007#)", 49),
+            arguments("DateDiff('m',#03/22/2007#,#10/01/2003#)", -41),
 
-        assertEquals(10, eval("=DateDiff('d','10/22','11/01')"));
-        assertEquals(0, eval("=DateDiff('y',#1:37:00 AM#,#2:15:00 AM#)"));
-        assertEquals(10, eval("=DateDiff('d',#10/22/2003#,#11/01/2003#)"));
-        assertEquals(1, eval("=DateDiff('d',#10/22/2003 11:00:00 PM#,#10/23/2003 1:00:00 AM#)"));
-        assertEquals(224, eval("=DateDiff('d',#03/22/2003#,#11/01/2003#)"));
-        assertEquals(1492, eval("=DateDiff('y',#10/22/2003#,#11/22/2007#)"));
-        assertEquals(-1268, eval("=DateDiff('d',#03/22/2007#,#10/01/2003#)"));
-        assertEquals(366, eval("=DateDiff('d',#1/1/2000#,#1/1/2001#)"));
-        assertEquals(365, eval("=DateDiff('d',#1/1/2001#,#1/1/2002#)"));
+            arguments("DateDiff('d','10/22','11/01')", 10),
+            arguments("DateDiff('y',#1:37:00 AM#,#2:15:00 AM#)", 0),
+            arguments("DateDiff('d',#10/22/2003#,#11/01/2003#)", 10),
+            arguments("DateDiff('d',#10/22/2003 11:00:00 PM#,#10/23/2003 1:00:00 AM#)", 1),
+            arguments("DateDiff('d',#03/22/2003#,#11/01/2003#)", 224),
+            arguments("DateDiff('y',#10/22/2003#,#11/22/2007#)", 1492),
+            arguments("DateDiff('d',#03/22/2007#,#10/01/2003#)", -1268),
+            arguments("DateDiff('d',#1/1/2000#,#1/1/2001#)", 366),
+            arguments("DateDiff('d',#1/1/2001#,#1/1/2002#)", 365),
 
-        assertEquals(0, eval("=DateDiff('w',#11/3/2018#,#11/04/2018#)"));
-        assertEquals(1, eval("=DateDiff('w',#11/3/2018#,#11/10/2018#)"));
-        assertEquals(0, eval("=DateDiff('w',#12/31/2017#,#1/1/2018#)"));
-        assertEquals(32, eval("=DateDiff('w',#03/22/2003#,#11/01/2003#)"));
-        assertEquals(213, eval("=DateDiff('w',#10/22/2003#,#11/22/2007#)"));
-        assertEquals(-181, eval("=DateDiff('w',#03/22/2007#,#10/01/2003#)"));
+            arguments("DateDiff('w',#11/3/2018#,#11/04/2018#)", 0),
+            arguments("DateDiff('w',#11/3/2018#,#11/10/2018#)", 1),
+            arguments("DateDiff('w',#12/31/2017#,#1/1/2018#)", 0),
+            arguments("DateDiff('w',#03/22/2003#,#11/01/2003#)", 32),
+            arguments("DateDiff('w',#10/22/2003#,#11/22/2007#)", 213),
+            arguments("DateDiff('w',#03/22/2007#,#10/01/2003#)", -181),
 
-        assertEquals(1, eval("=DateDiff('ww',#11/3/2018#,#11/04/2018#)"));
-        assertEquals(1, eval("=DateDiff('ww',#11/3/2018#,#11/10/2018#)"));
-        assertEquals(0, eval("=DateDiff('ww',#12/31/2017#,#1/1/2018#)"));
-        assertEquals(1, eval("=DateDiff('ww',#12/31/2017#,#1/1/2018#,2)"));
-        assertEquals(0, eval("=DateDiff('ww',#12/31/2017#,#1/1/2018#,1,3)"));
-        assertEquals(53, eval("=DateDiff('ww',#1/1/2000#,#1/1/2001#)"));
-        assertEquals(32, eval("=DateDiff('ww',#03/22/2003#,#11/01/2003#)"));
-        assertEquals(213, eval("=DateDiff('ww',#10/22/2003#,#11/22/2007#)"));
-        assertEquals(-181, eval("=DateDiff('ww',#03/22/2007#,#10/01/2003#)"));
+            arguments("DateDiff('ww',#11/3/2018#,#11/04/2018#)", 1),
+            arguments("DateDiff('ww',#11/3/2018#,#11/10/2018#)", 1),
+            arguments("DateDiff('ww',#12/31/2017#,#1/1/2018#)", 0),
+            arguments("DateDiff('ww',#12/31/2017#,#1/1/2018#,2)", 1),
+            arguments("DateDiff('ww',#12/31/2017#,#1/1/2018#,1,3)", 0),
+            arguments("DateDiff('ww',#1/1/2000#,#1/1/2001#)", 53),
+            arguments("DateDiff('ww',#03/22/2003#,#11/01/2003#)", 32),
+            arguments("DateDiff('ww',#10/22/2003#,#11/22/2007#)", 213),
+            arguments("DateDiff('ww',#03/22/2007#,#10/01/2003#)", -181),
 
-        assertEquals(1, eval("=DateDiff('h',#1:37:00 AM#,#2:15:00 AM#)"));
-        assertEquals(13, eval("=DateDiff('h',#1:37:00 AM#,#2:15:00 PM#)"));
-        assertEquals(1, eval("=DateDiff('h',#11/3/2018 1:37:00 AM#,#11/3/2018 2:15:00 AM#)"));
-        assertEquals(13, eval("=DateDiff('h',#11/3/2018 1:37:00 AM#,#11/3/2018 2:15:00 PM#)"));
-        assertEquals(24, eval("=DateDiff('h',#11/3/2018#,#11/4/2018#)"));
-        assertEquals(5641, eval("=DateDiff('h',#3/13/2018 1:37:00 AM#,#11/3/2018 2:15:00 AM#)"));
-        assertEquals(23161, eval("=DateDiff('h',#3/13/2016 1:37:00 AM#,#11/3/2018 2:15:00 AM#)"));
-        assertEquals(-23173, eval("=DateDiff('h',#11/3/2018 2:15:00 PM#,#3/13/2016 1:37:00 AM#)"));
+            arguments("DateDiff('h',#1:37:00 AM#,#2:15:00 AM#)", 1),
+            arguments("DateDiff('h',#1:37:00 AM#,#2:15:00 PM#)", 13),
+            arguments("DateDiff('h',#11/3/2018 1:37:00 AM#,#11/3/2018 2:15:00 AM#)", 1),
+            arguments("DateDiff('h',#11/3/2018 1:37:00 AM#,#11/3/2018 2:15:00 PM#)", 13),
+            arguments("DateDiff('h',#11/3/2018#,#11/4/2018#)", 24),
+            arguments("DateDiff('h',#3/13/2018 1:37:00 AM#,#11/3/2018 2:15:00 AM#)", 5641),
+            arguments("DateDiff('h',#3/13/2016 1:37:00 AM#,#11/3/2018 2:15:00 AM#)", 23161),
+            arguments("DateDiff('h',#11/3/2018 2:15:00 PM#,#3/13/2016 1:37:00 AM#)", -23173),
 
-        assertEquals(1, eval("=DateDiff('n',#1:37:59 AM#,#1:38:00 AM#)"));
-        assertEquals(758, eval("=DateDiff('n',#1:37:30 AM#,#2:15:13 PM#)"));
-        assertEquals(1, eval("=DateDiff('n',#11/3/2018 1:37:59 AM#,#11/3/2018 1:38:00 AM#)"));
-        assertEquals(758, eval("=DateDiff('n',#11/3/2018 1:37:59 AM#,#11/3/2018 2:15:00 PM#)"));
-        assertEquals(1440, eval("=DateDiff('n',#11/3/2018#,#11/4/2018#)"));
-        assertEquals(338438, eval("=DateDiff('n',#3/13/2018 1:37:59 AM#,#11/3/2018 2:15:00 AM#)"));
-        assertEquals(1389638, eval("=DateDiff('n',#3/13/2016 1:37:30 AM#,#11/3/2018 2:15:13 AM#)"));
-        assertEquals(-1390358, eval("=DateDiff('n',#11/3/2018 2:15:30 PM#,#3/13/2016 1:37:13 AM#)"));
+            arguments("DateDiff('n',#1:37:59 AM#,#1:38:00 AM#)", 1),
+            arguments("DateDiff('n',#1:37:30 AM#,#2:15:13 PM#)", 758),
+            arguments("DateDiff('n',#11/3/2018 1:37:59 AM#,#11/3/2018 1:38:00 AM#)", 1),
+            arguments("DateDiff('n',#11/3/2018 1:37:59 AM#,#11/3/2018 2:15:00 PM#)", 758),
+            arguments("DateDiff('n',#11/3/2018#,#11/4/2018#)", 1440),
+            arguments("DateDiff('n',#3/13/2018 1:37:59 AM#,#11/3/2018 2:15:00 AM#)", 338438),
+            arguments("DateDiff('n',#3/13/2016 1:37:30 AM#,#11/3/2018 2:15:13 AM#)", 1389638),
+            arguments("DateDiff('n',#11/3/2018 2:15:30 PM#,#3/13/2016 1:37:13 AM#)", -1390358),
 
-        assertEquals(1, eval("=DateDiff('s',#1:37:59 AM#,#1:38:00 AM#)"));
-        assertEquals(35, eval("=DateDiff('s',#1:37:10 AM#,#1:37:45 AM#)"));
-        assertEquals(45463, eval("=DateDiff('s',#1:37:30 AM#,#2:15:13 PM#)"));
-        assertEquals(1, eval("=DateDiff('s',#11/3/2018 1:37:59 AM#,#11/3/2018 1:38:00 AM#)"));
-        assertEquals(45463, eval("=DateDiff('s',#11/3/2018 1:37:30 AM#,#11/3/2018 2:15:13 PM#)"));
-        assertEquals(86400, eval("=DateDiff('s',#11/3/2018#,#11/4/2018#)"));
-        assertEquals(20306221, eval("=DateDiff('s',#3/13/2018 1:37:59 AM#,#11/3/2018 2:15:00 AM#)"));
-        assertEquals(83378263, eval("=DateDiff('s',#3/13/2016 1:37:30 AM#,#11/3/2018 2:15:13 AM#)"));
-        assertEquals(-83421497, eval("=DateDiff('s',#11/3/2018 2:15:30 PM#,#3/13/2016 1:37:13 AM#)"));
+            arguments("DateDiff('s',#1:37:59 AM#,#1:38:00 AM#)", 1),
+            arguments("DateDiff('s',#1:37:10 AM#,#1:37:45 AM#)", 35),
+            arguments("DateDiff('s',#1:37:30 AM#,#2:15:13 PM#)", 45463),
+            arguments("DateDiff('s',#11/3/2018 1:37:59 AM#,#11/3/2018 1:38:00 AM#)", 1),
+            arguments("DateDiff('s',#11/3/2018 1:37:30 AM#,#11/3/2018 2:15:13 PM#)", 45463),
+            arguments("DateDiff('s',#11/3/2018#,#11/4/2018#)", 86400),
+            arguments("DateDiff('s',#3/13/2018 1:37:59 AM#,#11/3/2018 2:15:00 AM#)", 20306221),
+            arguments("DateDiff('s',#3/13/2016 1:37:30 AM#,#11/3/2018 2:15:13 AM#)", 83378263),
+            arguments("DateDiff('s',#11/3/2018 2:15:30 PM#,#3/13/2016 1:37:13 AM#)", -83421497)
+            );
+    }
+
+    @SuppressWarnings("unchecked")
+    @ParameterizedTest(name = "[{index}] {0} --> {1}")
+    @MethodSource("getDateFuncsTestData")
+    void testDateFuncs(String exprStr, Object expected) {
+        if (expected instanceof Supplier) {
+            expected = ((Supplier<Object>) expected).get();
+        }
+        assertEquals(expected, eval('=' + exprStr));
     }
 
     @ParameterizedTest(name = "[{index}] {0} --> {1}")
@@ -883,11 +1047,32 @@ class DefaultFunctionsTest extends AbstractBaseTest {
         assertEquals(expected, eval('=' + exprStr));
     }
 
-    private static void assertEvalFormat(String fmtStr, String... testStrs) {
-        for (int i = 0; i < testStrs.length; i += 2) {
-            String expected = testStrs[i];
-            String val = testStrs[i + 1];
-            assertEquals(expected, eval("=Format(" + val + ", " + fmtStr + ")"), "Input " + val);
+    @Target(ElementType.METHOD)
+    @Retention(RetentionPolicy.RUNTIME)
+    @ArgumentsSource(CustomFormatArgumentsProvider.class)
+    static @interface CustomFormatSource {
+        String format();
+
+        String[] testValues() default {};
+    }
+
+    static class CustomFormatArgumentsProvider implements ArgumentsProvider, AnnotationConsumer<CustomFormatSource> {
+        private CustomFormatSource config;
+
+        @Override
+        public Stream<Arguments> provideArguments(ExtensionContext context) {
+            // context.getElement().ifPresent(annotatedElement -> System.out.println("Element (CustomFormatSource.class): " + AnnotationSupport.findRepeatableAnnotations(annotatedElement, CustomFormatSource.class)));
+            String[] testValues = config.testValues();
+            return IntStream.range(0, testValues.length).filter(i -> i % 2 == 0).mapToObj(i -> {
+                String expected = testValues[i];
+                String val = testValues[i + 1];
+                return Arguments.of(val, config.format(), expected);
+            });
+        }
+
+        @Override
+        public void accept(CustomFormatSource source) {
+            config = source;
         }
     }
 

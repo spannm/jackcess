@@ -128,16 +128,20 @@ class ExpressionatorTest extends AbstractBaseTest {
     @ParameterizedTest(name = "[{index}] {0}")
     @IntRangeSource(start = -10, end = 10, endInclusive = true)
     void testSimpleMathExpressions1(int i) {
-        assertEquals(-i, eval("=-(" + i + ")"));
-        assertEquals(i, eval("=+(" + i + ")"));
+        assertAll("math1",
+            () -> assertEquals(-i, eval("=-(" + i + ")")),
+            () -> assertEquals(i, eval("=+(" + i + ")"))
+        );
     }
 
     @ParameterizedTest(name = "[{index}] {0}")
     @MethodSource("getDoublesTestData")
     void testSimpleMathExpressions2(double d) {
         BigDecimal bd = toBD(d);
-        assertEquals(bd.negate(), eval("=-(" + d + ")"));
-        assertEquals(bd, eval("=+(" + d + ")"));
+        assertAll("math2",
+            () -> assertEquals(bd.negate(), eval("=-(" + d + ")")),
+            () -> assertEquals(bd, eval("=+(" + d + ")"))
+        );
     }
 
     @ParameterizedTest(name = "[{index}] {0}, {1}")
