@@ -462,10 +462,10 @@ public interface Database extends Iterable<Table>, Closeable, Flushable {
             return name() + " [" + DatabaseImpl.getFileFormatDetails(this).getFormat() + "]";
         }
 
-        public static FileFormat parse(String _fileFormat) {
+        public static FileFormat parse(String _str) {
             return Arrays.stream(FileFormat.values())
-                    .filter(e -> _fileFormat != null)
-                    .filter(e -> e.name().equalsIgnoreCase(_fileFormat))
+                    .filter(e -> _str != null)
+                    .filter(e -> e.name().equalsIgnoreCase(_str))
                     .findFirst().orElse(null);
         }
 
