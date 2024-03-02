@@ -461,6 +461,14 @@ public interface Database extends Iterable<Table>, Closeable, Flushable {
         public String toString() {
             return name() + " [" + DatabaseImpl.getFileFormatDetails(this).getFormat() + "]";
         }
+
+        public static FileFormat parse(String _fileFormat) {
+            return Arrays.stream(FileFormat.values())
+                    .filter(e -> _fileFormat != null)
+                    .filter(e -> e.name().equalsIgnoreCase(_fileFormat))
+                    .findFirst().orElse(null);
+        }
+
     }
 
 }
