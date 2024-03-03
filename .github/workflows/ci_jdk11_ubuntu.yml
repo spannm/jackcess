@@ -60,6 +60,6 @@ jobs:
                 java-version: '11'
                 distribution: 'temurin'
         -   name: Deploy snapshot to Github packages
-            run: mvn -X --batch-mode --file pom.xml --activate-profiles fast,github-deploy-snapshot-package deploy
+            run: mvn --batch-mode --file pom.xml --activate-profiles fast,github-deploy-snapshot-package deploy
             env:
                 GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
