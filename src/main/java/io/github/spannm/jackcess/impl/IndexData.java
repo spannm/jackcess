@@ -1314,7 +1314,7 @@ public class IndexData {
     /**
      * Constructs a ColumnDescriptor of the relevant type for the given Column.
      */
-    private ColumnDescriptor newColumnDescriptor(ColumnImpl col, byte flags) throws IOException {
+    private ColumnDescriptor newColumnDescriptor(ColumnImpl col, byte flags) {
         switch (col.getType()) {
             case TEXT:
             case MEMO:

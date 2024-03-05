@@ -507,46 +507,44 @@ public class FormatUtil {
         BUF_LOOP: while (buf.hasNext()) {
             char c = buf.next();
             int fmtType = getFormatCodeType(c);
-            switch (fmtType) {
-                case FCT_GENERAL:
-                    switch (c) {
-                        case LEFT_ALIGN_CHAR:
-                            // no effect
-                            break;
-                        case QUOTE_CHAR:
-                            parseQuotedString(buf, sb);
-                            break;
-                        case START_COLOR_CHAR:
-                            // color strings seem to be ignored
-                            parseColorString(buf);
-                            break;
-                        case ESCAPE_CHAR:
-                            if (buf.hasNext()) {
-                                sb.append(buf.next());
-                            }
-                            break;
-                        case FILL_ESCAPE_CHAR:
-                            // unclear what this actually does. online examples don't seem to
-                            // match with experimental results. for now, ignore
-                            if (buf.hasNext()) {
-                                buf.next();
-                            }
-                            break;
-                        case CHOICE_SEP_CHAR:
-                            // yes/no (number) format supports up to 4 formats: pos, neg, zero,
-                            // null. after that, ignore the rest
-                            if (fmtIdx == NUM_NF_FMTS - 1) {
-                                // last possible format, ignore remaining
-                                break BUF_LOOP;
-                            }
-                            addCustomGeneralFormat(fmtStrs, fmtIdx++, sb);
-                            break;
-                        default:
-                            sb.append(c);
-                    }
-                    break;
-                default:
-                    sb.append(c);
+            if (fmtType == FCT_GENERAL) {
+                switch (c) {
+                    case LEFT_ALIGN_CHAR:
+                        // no effect
+                        break;
+                    case QUOTE_CHAR:
+                        parseQuotedString(buf, sb);
+                        break;
+                    case START_COLOR_CHAR:
+                        // color strings seem to be ignored
+                        parseColorString(buf);
+                        break;
+                    case ESCAPE_CHAR:
+                        if (buf.hasNext()) {
+                            sb.append(buf.next());
+                        }
+                        break;
+                    case FILL_ESCAPE_CHAR:
+                        // unclear what this actually does. online examples don't seem to
+                        // match with experimental results. for now, ignore
+                        if (buf.hasNext()) {
+                            buf.next();
+                        }
+                        break;
+                    case CHOICE_SEP_CHAR:
+                        // yes/no (number) format supports up to 4 formats: pos, neg, zero,
+                        // null. after that, ignore the rest
+                        if (fmtIdx == NUM_NF_FMTS - 1) {
+                            // last possible format, ignore remaining
+                            break BUF_LOOP;
+                        }
+                        addCustomGeneralFormat(fmtStrs, fmtIdx++, sb);
+                        break;
+                    default:
+                        sb.append(c);
+                }
+            } else {
+                sb.append(c);
             }
         }
 

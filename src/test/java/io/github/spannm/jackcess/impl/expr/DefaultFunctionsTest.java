@@ -904,7 +904,7 @@ class DefaultFunctionsTest extends AbstractBaseTest {
     @Retention(RetentionPolicy.RUNTIME)
     @ArgumentsSource(CustomFormatArgumentsProvider.class)
     @Repeatable(CustomFormatSources.class)
-    static @interface CustomFormatSource {
+    @interface CustomFormatSource {
         String format();
 
         String[] testValues() default {};
@@ -912,7 +912,7 @@ class DefaultFunctionsTest extends AbstractBaseTest {
 
     @Target(ElementType.METHOD)
     @Retention(RetentionPolicy.RUNTIME)
-    static @interface CustomFormatSources {
+    @interface CustomFormatSources {
         CustomFormatSource[] value();
     }
 

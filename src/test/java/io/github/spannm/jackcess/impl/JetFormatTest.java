@@ -61,7 +61,7 @@ class JetFormatTest extends AbstractBaseTest {
             if (!testDB.getExpectedJetFormat().READ_ONLY) {
                 assertNull(failure);
             } else {
-                assertTrue(failure instanceof NonWritableChannelException);
+                assertInstanceOf(NonWritableChannelException.class, failure);
             }
 
         }

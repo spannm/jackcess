@@ -128,7 +128,7 @@ public abstract class CustomLinkResolver implements LinkResolver {
         Object customFile = loadCustomFile(linkerDb, linkeeFileName);
         if (customFile != null) {
             // if linker is read-only, open linkee read-only
-            boolean readOnly = linkerDb instanceof DatabaseImpl ? ((DatabaseImpl) linkerDb).isReadOnly() : false;
+            boolean readOnly = linkerDb instanceof DatabaseImpl && ((DatabaseImpl) linkerDb).isReadOnly();
             return createTempDb(customFile, getDefaultFormat(), isDefaultInMemory(),
                 getDefaultTempDirectory(), readOnly);
         }

@@ -19,7 +19,7 @@ public class CsvToLocalDateTime extends TypedArgumentConverter<String, LocalDate
         if (_source == null || _source.isBlank()) {
             return LocalDateTime.now();
         }
-        List<Integer> list = Arrays.stream(_source.split("\\s*,\\s*")).map(s -> Integer.parseInt(s)).collect(Collectors.toList());
+        List<Integer> list = Arrays.stream(_source.split("\\s*,\\s*")).map(Integer::parseInt).collect(Collectors.toList());
         if (list.size() < 5 || list.size() > 6) {
             throw new IllegalArgumentException("5 or 6 integer parameters required to create " + LocalDateTime.class.getSimpleName());
         }

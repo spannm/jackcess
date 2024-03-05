@@ -260,7 +260,7 @@ class CalculatedColumnUtil {
     private static class CalcMemoColImpl extends MemoColumnImpl {
         private CalcColEvalContext _calcCol;
 
-        CalcMemoColImpl(InitArgs args) throws IOException {
+        CalcMemoColImpl(InitArgs args) {
             super(args);
         }
 
