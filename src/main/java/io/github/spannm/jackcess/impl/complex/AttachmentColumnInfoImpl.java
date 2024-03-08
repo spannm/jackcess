@@ -217,7 +217,6 @@ public class AttachmentColumnInfoImpl extends ComplexColumnInfoImpl<Attachment> 
             null, timeStamp, flags, encodedData);
     }
 
-    @SuppressWarnings("deprecation")
     private static class AttachmentImpl extends ComplexValueImpl implements Attachment {
         private String  _url;
         private String  _name;
@@ -230,6 +229,7 @@ public class AttachmentColumnInfoImpl extends ComplexColumnInfoImpl<Attachment> 
         private AttachmentImpl(Id id, ComplexValueForeignKey complexValueFk,
             String url, String name, String type, byte[] data,
             Object timeStamp, Integer flags, byte[] encodedData) {
+
             super(id, complexValueFk);
             _url = url;
             _name = name;

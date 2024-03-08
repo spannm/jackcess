@@ -2110,7 +2110,6 @@ public class ColumnImpl implements Column, Comparable<ColumnImpl>, DateTimeConte
      * Date subclass which stashes the original date bits, in case we attempt to re-write the value (will not lose
      * precision). Also, this implementation is immutable.
      */
-    @SuppressWarnings("deprecation")
     private static final class DateExt extends Date {
         private static final long    serialVersionUID = 0L;
 

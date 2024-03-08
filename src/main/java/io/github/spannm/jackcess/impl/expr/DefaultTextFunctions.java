@@ -358,7 +358,6 @@ public class DefaultTextFunctions {
         }
     });
 
-    @SuppressWarnings("deprecation")
     public static final Function STRCONV    = registerStringFunc(new FuncVar("StrConv", 2, 3) {
         @Override
         protected Value evalVar(EvalContext ctx, Value[] params) {
