@@ -127,7 +127,7 @@ class RelationshipTest extends AbstractBaseTest {
             expected.sort(REL_COMP);
             found.sort(REL_COMP);
         }
-        for (int i = 0; i < expected.size(); ++i) {
+        for (int i = 0; i < expected.size(); i++) {
             Relationship eRel = expected.get(i);
             Relationship fRel = found.get(i);
             assertEquals(eRel.getName(), fRel.getName());

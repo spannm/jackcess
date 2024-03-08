@@ -191,7 +191,7 @@ public final class TestUtil extends Assertions {
             foundTable.add(row);
         }
         assertEquals(expectedTable.size(), foundTable.size());
-        for (int i = 0; i < expectedTable.size(); ++i) {
+        for (int i = 0; i < expectedTable.size(); i++) {
             assertEquals(expectedTable.get(i), foundTable.get(i));
         }
     }

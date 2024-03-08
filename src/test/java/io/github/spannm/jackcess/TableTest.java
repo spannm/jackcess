@@ -99,7 +99,7 @@ class TableTest extends AbstractBaseTest {
         assertEquals(buf1[1].remaining(),
             bufCmp1[1].remaining() + large.length() - 2);
 
-        for (int i = 0; i < buf2.length; ++i) {
+        for (int i = 0; i < buf2.length; i++) {
             assertArrayEquals(toBytes(buf2[i]), toBytes(bufCmp2[i]));
         }
 
@@ -116,7 +116,7 @@ class TableTest extends AbstractBaseTest {
 
     private ByteBuffer[] encodeColumns(Object... row) throws IOException {
         ByteBuffer[] result = new ByteBuffer[_columns.size()];
-        for (int i = 0; i < _columns.size(); ++i) {
+        for (int i = 0; i < _columns.size(); i++) {
             ColumnImpl col = _columns.get(i);
             result[i] = col.write(row[i], _testTable.getFormat().MAX_ROW_SIZE);
         }
@@ -125,7 +125,7 @@ class TableTest extends AbstractBaseTest {
 
     private Object[] decodeColumns(ByteBuffer[] buffers) throws IOException {
         Object[] result = new Object[_columns.size()];
-        for (int i = 0; i < _columns.size(); ++i) {
+        for (int i = 0; i < _columns.size(); i++) {
             ColumnImpl col = _columns.get(i);
             result[i] = col.read(toBytes(buffers[i]));
         }

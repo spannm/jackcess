@@ -65,7 +65,7 @@ public class UsageMapTest extends AbstractBaseTest {
             ((DatabaseImpl) db).getPageChannel().startWrite();
             try {
                 List<Object[]> rows = new ArrayList<>();
-                for (int i = 0; i < 300000; ++i) {
+                for (int i = 0; i < 300000; i++) {
                     String s1 = "r" + i + "-" + createString(100);
                     String s2 = "r" + i + "-" + createString(200);
 

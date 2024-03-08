@@ -77,7 +77,7 @@ class CodecHandlerTest extends AbstractBaseTest {
                 .toTable(db2);
 
             int autonum = 1;
-            for (int i = 1; i < 2; ++i) {
+            for (int i = 1; i < 2; i++) {
                 writeData(t1, t2, autonum, autonum + 100);
                 autonum += 100;
             }
@@ -88,7 +88,7 @@ class CodecHandlerTest extends AbstractBaseTest {
         Database db = t1.getDatabase();
         ((DatabaseImpl) db).getPageChannel().startWrite();
         try {
-            for (int i = start; i < end; ++i) {
+            for (int i = start; i < end; i++) {
                 t1.addRow(null, "rowdata-" + i + TestUtil.createString(100));
                 t2.addRow(null, "rowdata-" + i + TestUtil.createString(100));
             }
@@ -162,7 +162,7 @@ class CodecHandlerTest extends AbstractBaseTest {
 
     private static void simpleEncode(byte[] inBuffer, byte[] outBuffer,
         int pageNumber, int offset, int limit) {
-        for (int i = offset; i < limit; ++i) {
+        for (int i = offset; i < limit; i++) {
             int mask = (i + pageNumber) % 256;
             outBuffer[i] = (byte) (inBuffer[i] ^ mask);
         }
@@ -176,7 +176,7 @@ class CodecHandlerTest extends AbstractBaseTest {
     private static void fullEncode(byte[] inBuffer, byte[] outBuffer,
         int pageNumber) {
         int accum = 0;
-        for (int i = 0; i < inBuffer.length; ++i) {
+        for (int i = 0; i < inBuffer.length; i++) {
             int mask = (i + pageNumber + accum) % 256;
             accum += inBuffer[i];
             outBuffer[i] = (byte) (inBuffer[i] ^ mask);
@@ -185,7 +185,7 @@ class CodecHandlerTest extends AbstractBaseTest {
 
     private static void fullDecode(byte[] inBuffer, byte[] outBuffer, int pageNumber) {
         int accum = 0;
-        for (int i = 0; i < inBuffer.length; ++i) {
+        for (int i = 0; i < inBuffer.length; i++) {
             int mask = (i + pageNumber + accum) % 256;
             outBuffer[i] = (byte) (inBuffer[i] ^ mask);
             accum += outBuffer[i];

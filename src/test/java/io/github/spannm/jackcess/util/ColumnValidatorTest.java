@@ -52,7 +52,7 @@ class ColumnValidatorTest extends AbstractBaseTest {
             }
 
             int val = -1;
-            for (int i = 1; i <= 3; ++i) {
+            for (int i = 1; i <= 3; i++) {
                 table.addRow(Column.AUTO_NUMBER, "row" + i, val++);
             }
 

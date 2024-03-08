@@ -58,7 +58,7 @@ class CursorTest extends AbstractBaseTest {
     private static List<Map<String, Object>> createTestTableData() {
         List<Map<String, Object>> expectedRows =
             new ArrayList<>();
-        for (int i = 0; i < 10; ++i) {
+        for (int i = 0; i < 10; i++) {
             expectedRows.add(createExpectedRow("id", i, "value", "data" + i));
         }
         return expectedRows;
@@ -272,7 +272,7 @@ class CursorTest extends AbstractBaseTest {
 
         Iterator<Row> iter = cursor.newIterable().iterator();
 
-        for (int i = 0; i < 6; ++i) {
+        for (int i = 0; i < 6; i++) {
             foundRows.add(iter.next());
         }
 
@@ -288,7 +288,7 @@ class CursorTest extends AbstractBaseTest {
         iter.next();
 
         iter = cursor.newIterable().reset(false).iterator();
-        for (int i = 6; i < 10; ++i) {
+        for (int i = 6; i < 10; i++) {
             foundRows.add(iter.next());
         }
 
@@ -600,7 +600,7 @@ class CursorTest extends AbstractBaseTest {
     @Test
     void testSimpleIndexSubRange() throws Exception {
         for (TestDB indexCursorDB : INDEX_CURSOR_DBS) {
-            for (int i = 0; i < 2; ++i) {
+            for (int i = 0; i < 2; i++) {
                 try (Database db = createTestIndexTable(indexCursorDB)) {
                     Table table = db.getTable("test");
                     Index idx = table.getIndexes().get(0);
@@ -619,7 +619,7 @@ class CursorTest extends AbstractBaseTest {
     @Test
     void testMoveIndexSubRange() throws Exception {
         for (TestDB indexCursorDB : INDEX_CURSOR_DBS) {
-            for (int i = 0; i < 2; ++i) {
+            for (int i = 0; i < 2; i++) {
                 try (Database db = createTestIndexTable(indexCursorDB)) {
                     Table table = db.getTable("test");
                     Index idx = table.getIndexes().get(0);
@@ -638,7 +638,7 @@ class CursorTest extends AbstractBaseTest {
     @Test
     void testSearchIndexSubRange() throws Exception {
         for (TestDB indexCursorDB : INDEX_CURSOR_DBS) {
-            for (int i = 0; i < 2; ++i) {
+            for (int i = 0; i < 2; i++) {
                 try (Database db = createTestIndexTable(indexCursorDB)) {
                     Table table = db.getTable("test");
                     Index idx = table.getIndexes().get(0);
@@ -654,7 +654,7 @@ class CursorTest extends AbstractBaseTest {
     @Test
     void testReverseIndexSubRange() throws Exception {
         for (TestDB indexCursorDB : INDEX_CURSOR_DBS) {
-            for (int i = 0; i < 2; ++i) {
+            for (int i = 0; i < 2; i++) {
                 try (Database db = createTestIndexTable(indexCursorDB)) {
                     Table table = db.getTable("test");
                     Index idx = table.getIndexes().get(0);
@@ -673,7 +673,7 @@ class CursorTest extends AbstractBaseTest {
     @Test
     void testLiveAdditionIndexSubRange() throws Exception {
         for (TestDB indexCursorDB : INDEX_CURSOR_DBS) {
-            for (int i = 0; i < 2; ++i) {
+            for (int i = 0; i < 2; i++) {
                 try (Database db = createTestIndexTable(indexCursorDB)) {
                     Table table = db.getTable("test");
                     Index idx = table.getIndexes().get(0);
@@ -690,7 +690,7 @@ class CursorTest extends AbstractBaseTest {
     @Test
     void testLiveDeletionIndexSubRange() throws Exception {
         for (TestDB indexCursorDB : INDEX_CURSOR_DBS) {
-            for (int i = 0; i < 2; ++i) {
+            for (int i = 0; i < 2; i++) {
                 try (Database db = createTestIndexTable(indexCursorDB)) {
                     Table table = db.getTable("test");
                     Index idx = table.getIndexes().get(0);
@@ -1133,13 +1133,13 @@ class CursorTest extends AbstractBaseTest {
     }
 
     private static void doTestFindByRowId(Cursor cursor) throws Exception {
-        for (int i = 0; i < 3; ++i) {
+        for (int i = 0; i < 3; i++) {
             cursor.moveToNextRow();
         }
 
         Row r1 = cursor.getCurrentRow();
 
-        for (int i = 0; i < 3; ++i) {
+        for (int i = 0; i < 3; i++) {
             cursor.moveToNextRow();
         }
 
@@ -1183,7 +1183,7 @@ class CursorTest extends AbstractBaseTest {
                     .withColumns("value"))
                 .toTable(db);
 
-            for (int i = 0; i < 20; ++i) {
+            for (int i = 0; i < 20; i++) {
                 Object memo = "memo-" + i;
                 table.addRow(i, "val-" + i / 2, memo);
             }
@@ -1295,8 +1295,8 @@ class CursorTest extends AbstractBaseTest {
             int id = 1;
             for (String str : List.of("A", "B", "C", "D")) {
                 for (int i = 4; i >= 0; --i) {
-                    // for(int i = 0; i < 5; ++i) {
-                    for (int j = 1; j < 3; ++j) {
+                    // for(int i = 0; i < 5; i++) {
+                    for (int j = 1; j < 3; j++) {
                         t.addRow(id, str, i, "K" + j, "value" + id);
                         id++;
                     }
@@ -1398,7 +1398,7 @@ class CursorTest extends AbstractBaseTest {
     private static void doFindByEntryRange(IndexCursor c, int start, int end,
         Object... entry) {
         List<Integer> expectedIds = new ArrayList<>();
-        for (int i = start; i <= end; ++i) {
+        for (int i = start; i <= end; i++) {
             expectedIds.add(i);
         }
         doFindByEntry(c, expectedIds, entry);

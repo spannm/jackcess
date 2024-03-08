@@ -134,7 +134,7 @@ class ErrorHandlerTest extends AbstractBaseTest {
 
         Column srcCol = null;
         ColumnImpl destCol = new BogusColumn(t, colName);
-        for (int i = 0; i < cols.size(); ++i) {
+        for (int i = 0; i < cols.size(); i++) {
             srcCol = cols.get(i);
             if (srcCol.getName().equals(colName)) {
                 cols.set(i, destCol);

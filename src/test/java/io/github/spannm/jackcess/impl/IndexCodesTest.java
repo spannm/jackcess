@@ -145,7 +145,7 @@ public class IndexCodesTest extends AbstractBaseTest {
         try (Database db = create(FileFormat.V2000, true)) {
             Table t = new TableBuilder("test").addColumn(new ColumnBuilder("row", DataType.TEXT)).addColumn(new ColumnBuilder("data", DataType.TEXT)).toTable(db);
 
-            for (int i = 0; i < 256; ++i) {
+            for (int i = 0; i < 256; i++) {
                 String str = "AA" + (char) i + "AA";
                 t.addRow("row" + i, str);
             }
@@ -156,7 +156,7 @@ public class IndexCodesTest extends AbstractBaseTest {
         try (Database db = openCopy(FileFormat.V2000, new File("/tmp/test_ind.mdb"), true)) {
             Table t = db.getTable("Table1");
 
-            for (int i = 0; i < 256; ++i) {
+            for (int i = 0; i < 256; i++) {
                 String str = "AA" + (char) i + "AA";
                 t.addRow("row" + i, str, (byte) 42 + i, (short) 53 + i, 13 * i, 6.7d / i, null, null, true);
             }
@@ -172,7 +172,7 @@ public class IndexCodesTest extends AbstractBaseTest {
         // .addColumn(new ColumnBuilder("data", DataType.TEXT))
         // .toTable(db);
 
-        // for(int i = 0; i <= 0xFFFF; ++i) {
+        // for(int i = 0; i <= 0xFFFF; i++) {
         // // skip non-char chars
         // char c = (char)i;
         // if(Character.isHighSurrogate(c) || Character.isLowSurrogate(c)) {
@@ -266,7 +266,7 @@ public class IndexCodesTest extends AbstractBaseTest {
 
     void writeChars(int hibyte, Table t) throws Exception {
         char other = (char) (hibyte | 0x41);
-        for (int i = 0; i < 0xFF; ++i) {
+        for (int i = 0; i < 0xFF; i++) {
             char c = (char) (hibyte | i);
             String str = "" + other + c + other;
             t.addRow(str);
@@ -385,7 +385,7 @@ public class IndexCodesTest extends AbstractBaseTest {
         }
 
         System.out.println("\n***CODES");
-        for (int i = 0; i <= 0xFFFF; ++i) {
+        for (int i = 0; i <= 0xFFFF; i++) {
 
             if (i == 256) {
                 System.out.println("\n***EXTENDED CODES");
@@ -552,7 +552,7 @@ public class IndexCodesTest extends AbstractBaseTest {
         }
 
         System.out.println("\n***CODES");
-        for (int i = 0; i <= 0xFFFF; ++i) {
+        for (int i = 0; i <= 0xFFFF; i++) {
 
             if (i == 256) {
                 System.out.println("\n***EXTENDED CODES");
@@ -690,7 +690,7 @@ public class IndexCodesTest extends AbstractBaseTest {
             return "";
         }
         StringBuilder builder = new StringBuilder();
-        for (int i = 0; i < strs.length; ++i) {
+        for (int i = 0; i < strs.length; i++) {
             if (strs[i].isEmpty()) {
                 continue;
             }

@@ -95,7 +95,7 @@ class LocalDateTimeTest extends AbstractBaseTest {
             }
 
             assertEquals(dates.size(), foundDates.size());
-            for (int i = 0; i < dates.size(); ++i) {
+            for (int i = 0; i < dates.size(); i++) {
                 Date expected = dates.get(i);
                 LocalDateTime found = foundDates.get(i);
                 assertSameDate(expected, found);
@@ -242,7 +242,7 @@ class LocalDateTimeTest extends AbstractBaseTest {
                 LocalDateTime ldt = zdt.toLocalDateTime();
                 objs.add(ldt);
 
-                for (int i = 0; i < 3; ++i) {
+                for (int i = 0; i < 3; i++) {
                     expected.add(ldt);
                 }
             }

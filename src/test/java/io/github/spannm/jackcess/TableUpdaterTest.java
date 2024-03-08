@@ -130,11 +130,11 @@ class TableUpdaterTest extends AbstractBaseTest {
         ((DatabaseImpl) db).getPageChannel().startWrite();
         try {
 
-            for (int i = 0; i < 10; ++i) {
+            for (int i = 0; i < 10; i++) {
                 t1.addRow(i, "row" + i, "row-data" + i);
             }
 
-            for (int i = 0; i < 10; ++i) {
+            for (int i = 0; i < 10; i++) {
                 t2.addRow(i, "row2_" + i, "row-data2_" + i);
             }
 
@@ -227,7 +227,7 @@ class TableUpdaterTest extends AbstractBaseTest {
 
             List<String> colNames = new ArrayList<>();
             colNames.add("first");
-            for (int i = 0; i < numColumns; ++i) {
+            for (int i = 0; i < numColumns; i++) {
                 String colName = "MyColumnName" + i;
                 colNames.add(colName);
                 DataType type = i % 3 == 0 ? DataType.MEMO : DataType.TEXT;
@@ -237,7 +237,7 @@ class TableUpdaterTest extends AbstractBaseTest {
 
             List<String> row = new ArrayList<>();
             Map<String, Object> expectedRowData = new LinkedHashMap<>();
-            for (int i = 0; i < colNames.size(); ++i) {
+            for (int i = 0; i < colNames.size(); i++) {
                 String value = i + " some row data";
                 row.add(value);
                 expectedRowData.put(colNames.get(i), value);

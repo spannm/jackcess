@@ -245,7 +245,7 @@ class DatabaseTest extends AbstractBaseTest {
         Database db = createMem(fileFormat)) {
             createTestTable(db);
             Table table = db.getTable("Test");
-            for (int i = 0; i < 10; ++i) {
+            for (int i = 0; i < 10; i++) {
                 table.addRowFromMap(createTestRowMap("Tim" + i));
             }
             assertRowCount(10, table);
@@ -534,7 +534,7 @@ class DatabaseTest extends AbstractBaseTest {
 
                 ((DatabaseImpl) db).getPageChannel().startWrite();
                 try {
-                    for (int i = 0; i < 1000; ++i) {
+                    for (int i = 0; i < 1000; i++) {
                         t.addRow(i, 13, 57, lval, lval, lval, lval, lval, lval, 47.0d);
                     }
                 } finally {
@@ -561,7 +561,7 @@ class DatabaseTest extends AbstractBaseTest {
 
         List<ColumnBuilder> columns = new ArrayList<>();
         List<String> colNames = new ArrayList<>();
-        for (int i = 0; i < numColumns; ++i) {
+        for (int i = 0; i < numColumns; i++) {
             String colName = "MyColumnName" + i;
             colNames.add(colName);
             columns.add(DatabaseBuilder.newColumn(colName, DataType.TEXT).toColumn());
@@ -573,7 +573,7 @@ class DatabaseTest extends AbstractBaseTest {
 
         List<String> row = new ArrayList<>();
         Map<String, Object> expectedRowData = new LinkedHashMap<>();
-        for (int i = 0; i < numColumns; ++i) {
+        for (int i = 0; i < numColumns; i++) {
             String value = i + " some row data";
             row.add(value);
             expectedRowData.put(colNames.get(i), value);
@@ -636,7 +636,7 @@ class DatabaseTest extends AbstractBaseTest {
                 .collect(Collectors.toList());
 
             assertEquals(dates.size(), foundDates.size());
-            for (int i = 0; i < dates.size(); ++i) {
+            for (int i = 0; i < dates.size(); i++) {
                 Date expected = dates.get(i);
                 Date found = foundDates.get(i);
                 assertSameDate(expected, found);

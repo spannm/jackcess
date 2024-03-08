@@ -74,11 +74,11 @@ class BigIndexTest extends AbstractBaseTest {
 
                 // add 2,000 (pseudo) random entries to the table
                 Random rand = new Random(13L);
-                for (int i = 0; i < 2000; ++i) {
+                for (int i = 0; i < 2000; i++) {
                     if (i == 850 || i == 1850) {
                         int end = i + 50;
                         List<Object[]> rows = new ArrayList<>(50);
-                        for (; i < end; ++i) {
+                        for (; i < end; i++) {
                             int nextInt = rand.nextInt(Integer.MAX_VALUE);
                             String nextVal = nextInt + extraText;
                             if ((i + 1) % 333 == 0) {
@@ -132,7 +132,7 @@ class BigIndexTest extends AbstractBaseTest {
 
                 // delete an entry in the middle
                 Cursor cursor = CursorBuilder.createCursor(index);
-                for (int i = 0; i < rowCount / 2; ++i) {
+                for (int i = 0; i < rowCount / 2; i++) {
                     assertTrue(cursor.moveToNextRow());
                 }
                 cursor.deleteCurrentRow();
@@ -140,7 +140,7 @@ class BigIndexTest extends AbstractBaseTest {
 
                 // remove all but the first two entries (from the end)
                 cursor.afterLast();
-                for (int i = 0; i < rowCount - 2; ++i) {
+                for (int i = 0; i < rowCount - 2; i++) {
                     assertTrue(cursor.moveToPreviousRow());
                     cursor.deleteCurrentRow();
                 }
@@ -156,7 +156,7 @@ class BigIndexTest extends AbstractBaseTest {
 
                 // remove remaining entries
                 cursor = CursorBuilder.createCursor(t);
-                for (int i = 0; i < 2; ++i) {
+                for (int i = 0; i < 2; i++) {
                     assertTrue(cursor.moveToNextRow());
                     cursor.deleteCurrentRow();
                 }
@@ -168,7 +168,7 @@ class BigIndexTest extends AbstractBaseTest {
 
                 // add 50 (pseudo) random entries to the table
                 rand = new Random(42L);
-                for (int i = 0; i < 50; ++i) {
+                for (int i = 0; i < 50; i++) {
                     int nextInt = rand.nextInt(Integer.MAX_VALUE);
                     String nextVal = "some prefix " + nextInt + extraText;
                     if ((i + 1) % 3333 == 0) {

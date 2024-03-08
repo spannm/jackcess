@@ -196,7 +196,7 @@ class LongValueTest extends AbstractBaseTest {
         File dbFile = new File(DIR_TEST_DATA, "V2003/testUnicodeCompV2003.mdb");
         try (Database db = open(FileFormat.V2003, dbFile, true)) {
             StringBuilder sb = new StringBuilder(127);
-            for (int i = 1; i <= 0xFF; ++i) {
+            for (int i = 1; i <= 0xFF; i++) {
                 sb.append((char) i);
             }
             String longStr = sb.toString();

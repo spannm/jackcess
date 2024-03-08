@@ -120,7 +120,7 @@ class DatabaseReadWriteTest extends AbstractBaseTest {
                     .withLength(JetFormat.TEXT_FIELD_MAX_LENGTH))
                 .toTable(db);
 
-            for (int i = 0; i < 10; ++i) {
+            for (int i = 0; i < 10; i++) {
                 t.addRow("row" + i, Column.AUTO_NUMBER, "initial data");
             }
 
@@ -174,7 +174,7 @@ class DatabaseReadWriteTest extends AbstractBaseTest {
             t.reset();
 
             String str = createString(100);
-            for (int i = 10; i < 50; ++i) {
+            for (int i = 10; i < 50; i++) {
                 t.addRow("row" + i, Column.AUTO_NUMBER, "big data_" + str);
             }
 

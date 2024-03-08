@@ -190,7 +190,7 @@ class IndexTest extends AbstractBaseTest {
         try (Database db = testDB.openCopy()) {
             Table table = db.getTable("Table1");
 
-            for (int i = 0; i < 10; ++i) {
+            for (int i = 0; i < 10; i++) {
                 table.addRow("foo" + i, "bar" + i, (byte) 42 + i, (short) 53 + i, 13 * i,
                     6.7d / i, null, null, true);
             }
@@ -348,7 +348,7 @@ class IndexTest extends AbstractBaseTest {
 
             List<String> bElems = Arrays.asList("bar", null, "baz", "argle", null, "bazzle", "37", "bar", "bar", "BAZ");
 
-            for (int i = 0; i < 10; ++i) {
+            for (int i = 0; i < 10; i++) {
                 table.addRow("foo" + i, bElems.get(i), (byte) 42 + i, (short) 53 + i, 13 * i, 6.7d / i, null, null, true);
             }
 
@@ -398,7 +398,7 @@ class IndexTest extends AbstractBaseTest {
         try (Database db = testDB.openCopy()) {
             Table table = db.getTable("Table4");
 
-            for (int i = 0; i < 20; ++i) {
+            for (int i = 0; i < 20; i++) {
                 table.addRow("row" + i, Column.AUTO_NUMBER);
             }
 
@@ -435,7 +435,7 @@ class IndexTest extends AbstractBaseTest {
             Cursor c = t.newCursor()
                 .withIndexByName(IndexBuilder.PRIMARY_KEY_NAME).toCursor();
 
-            for (int i = 1; i <= 3; ++i) {
+            for (int i = 1; i <= 3; i++) {
                 Map<String, Object> row = c.getNextRow();
                 assertEquals(i, row.get("id"));
                 assertEquals("row" + i, row.get("data"));
@@ -484,7 +484,7 @@ class IndexTest extends AbstractBaseTest {
             Cursor c = t.newCursor()
                 .withIndexByName(IndexBuilder.PRIMARY_KEY_NAME).toCursor();
 
-            for (int i = 1; i <= 3; ++i) {
+            for (int i = 1; i <= 3; i++) {
                 Map<String, Object> row = c.getNextRow();
                 assertEquals(i, row.get("id"));
                 assertEquals("row" + i, row.get("data"));
@@ -539,7 +539,7 @@ class IndexTest extends AbstractBaseTest {
                     .withColumns("data").withUnique())
                 .toTable(db);
 
-            for (int i = 0; i < 5; ++i) {
+            for (int i = 0; i < 5; i++) {
                 t.addRow(i, "row" + i);
             }
 
@@ -607,7 +607,7 @@ class IndexTest extends AbstractBaseTest {
                     .withColumns("data").withUnique())
                 .toTable(db);
 
-            for (int i = 1; i < 3; ++i) {
+            for (int i = 1; i < 3; i++) {
                 t.addRow(null, "row" + i);
             }
 

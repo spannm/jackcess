@@ -379,7 +379,7 @@ class ComplexColumnTest extends AbstractBaseTest {
             assertTrue(attachments.isEmpty());
         } else {
             assertEquals(fileNames.length, attachments.size());
-            for (int i = 0; i < fileNames.length; ++i) {
+            for (int i = 0; i < fileNames.length; i++) {
                 String fname = fileNames[i];
                 Attachment a = attachments.get(i);
                 assertEquals(fname, a.getFileName());
@@ -400,7 +400,7 @@ class ComplexColumnTest extends AbstractBaseTest {
             assertTrue(values.isEmpty());
         } else {
             assertEquals(expectedValues.length, values.size());
-            for (int i = 0; i < expectedValues.length; ++i) {
+            for (int i = 0; i < expectedValues.length; i++) {
                 Object value = expectedValues[i];
                 SingleValue v = values.get(i);
                 assertEquals(value, v.get());
@@ -418,7 +418,7 @@ class ComplexColumnTest extends AbstractBaseTest {
             assertTrue(values.isEmpty());
         } else {
             assertEquals(expectedValues.length, values.size());
-            for (int i = 0; i < expectedValues.length; ++i) {
+            for (int i = 0; i < expectedValues.length; i++) {
                 String value = expectedValues[i];
                 UnsupportedValue v = values.get(i);
                 assertEquals(1, v.getValues().size());

@@ -104,7 +104,7 @@ class CustomLinkResolverTest extends AbstractBaseTest {
                     .addColumn(new ColumnBuilder("data1", DataType.TEXT))
                     .toTable(tempDb);
 
-                for (int i = 0; i < 3; ++i) {
+                for (int i = 0; i < 3; i++) {
                     t.addRow(i, "row" + i);
                 }
 
@@ -118,7 +118,7 @@ class CustomLinkResolverTest extends AbstractBaseTest {
                     .addColumn(new ColumnBuilder("data2", DataType.TEXT))
                     .toTable(tempDb);
 
-                for (int i = 3; i < 6; ++i) {
+                for (int i = 3; i < 6; i++) {
                     t.addRow(i, "row" + i);
                 }
 
