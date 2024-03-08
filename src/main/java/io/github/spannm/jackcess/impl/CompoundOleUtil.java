@@ -82,8 +82,7 @@ public class CompoundOleUtil implements CompoundPackageFactory {
      * @throws IOException if some other io error occurs
      */
     public static DocumentEntry getDocumentEntry(String entryName,
-        DirectoryEntry dir)
-        throws IOException {
+        DirectoryEntry dir) throws IOException {
         // split entry name into individual components and decode them
         List<String> entryNames = new ArrayList<>();
         for (String str : entryName.split(ENTRY_SEPARATOR)) {
@@ -130,8 +129,7 @@ public class CompoundOleUtil implements CompoundPackageFactory {
     }
 
     private static final class CompoundContentImpl
-        extends EmbeddedPackageContentImpl
-        implements CompoundContent {
+        extends EmbeddedPackageContentImpl implements CompoundContent {
         private POIFSFileSystem _fs;
 
         private CompoundContentImpl(

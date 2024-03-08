@@ -58,8 +58,7 @@ public final class TempPageHolder {
     /**
      * @return the page for the current page number, reading as necessary, position and limit are unchanged
      */
-    public ByteBuffer getPage(PageChannel pageChannel)
-        throws IOException {
+    public ByteBuffer getPage(PageChannel pageChannel) throws IOException {
         return withPage(pageChannel, _pageNumber, false);
     }
 
@@ -68,14 +67,12 @@ public final class TempPageHolder {
      *
      * @return the page for the new page number, reading as necessary, resets position
      */
-    public ByteBuffer withPage(PageChannel pageChannel, int pageNumber)
-        throws IOException {
+    public ByteBuffer withPage(PageChannel pageChannel, int pageNumber) throws IOException {
         return withPage(pageChannel, pageNumber, true);
     }
 
     private ByteBuffer withPage(PageChannel pageChannel, int pageNumber,
-        boolean rewind)
-        throws IOException {
+        boolean rewind) throws IOException {
         ByteBuffer buffer = _buffer.getPageBuffer(pageChannel);
         int modCount = _buffer.getModCount();
         if (pageNumber != _pageNumber || _bufferModCount != modCount) {
@@ -92,8 +89,7 @@ public final class TempPageHolder {
     /**
      * Allocates a new buffer in the database (with undefined data) and returns a new empty buffer.
      */
-    public ByteBuffer withNewPage(PageChannel pageChannel)
-        throws IOException {
+    public ByteBuffer withNewPage(PageChannel pageChannel) throws IOException {
         // ditch any current data
         clear();
         // allocate a new page in the database

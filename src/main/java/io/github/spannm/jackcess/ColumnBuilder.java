@@ -92,8 +92,7 @@ public class ColumnBuilder {
     /**
      * Sets the type for the new column based on the given SQL type and target data length (in type specific units).
      */
-    public ColumnBuilder withSqlType(int type, int lengthInUnits)
-        throws IOException {
+    public ColumnBuilder withSqlType(int type, int lengthInUnits) throws IOException {
         return withSqlType(type, lengthInUnits, null);
     }
 
@@ -101,8 +100,7 @@ public class ColumnBuilder {
      * Sets the type for the new column based on the given SQL type, target data length (in type specific units), and
      * target FileFormat.
      */
-    public ColumnBuilder withSqlType(int type, int lengthInUnits, FileFormat fileFormat)
-        throws IOException {
+    public ColumnBuilder withSqlType(int type, int lengthInUnits, FileFormat fileFormat) throws IOException {
         return withType(DataType.fromSQLType(type, lengthInUnits, fileFormat));
     }
 
@@ -282,8 +280,7 @@ public class ColumnBuilder {
     /**
      * Sets all attributes except name from the given Column template (including all column properties except GUID).
      */
-    public ColumnBuilder withFromColumn(Column template)
-        throws IOException {
+    public ColumnBuilder withFromColumn(Column template) throws IOException {
         DataType type = template.getType();
         withType(type);
         withLength(template.getLength());

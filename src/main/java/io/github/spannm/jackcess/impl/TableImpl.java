@@ -195,8 +195,7 @@ public class TableImpl implements Table, PropertyMaps.Owner {
      * @param name Table name
      */
     protected TableImpl(DatabaseImpl database, ByteBuffer tableBuffer,
-        int pageNumber, String name, int flags)
-        throws IOException {
+        int pageNumber, String name, int flags) throws IOException {
         _database = database;
         _tableDefPageNumber = pageNumber;
         _name = name;
@@ -585,8 +584,7 @@ public class TableImpl implements Table, PropertyMaps.Owner {
     /**
      * Delete the row for the given rowId.
      */
-    public void deleteRow(RowState rowState, RowIdImpl rowId)
-        throws IOException {
+    public void deleteRow(RowState rowState, RowIdImpl rowId) throws IOException {
         requireValidRowId(rowId);
 
         getPageChannel().startWrite();
@@ -655,8 +653,7 @@ public class TableImpl implements Table, PropertyMaps.Owner {
      * Reads a single column from the given row.
      */
     public Object getRowValue(RowState rowState, RowIdImpl rowId,
-        ColumnImpl column)
-        throws IOException {
+        ColumnImpl column) throws IOException {
         if (this != column.getTable()) {
             throw new IllegalArgumentException(withErrorContext("Given column " + column + " is not from this table"));
         }
@@ -675,8 +672,7 @@ public class TableImpl implements Table, PropertyMaps.Owner {
      * @param columnNames Only column names in this collection will be returned
      */
     public RowImpl getRow(
-        RowState rowState, RowIdImpl rowId, Collection<String> columnNames)
-        throws IOException {
+        RowState rowState, RowIdImpl rowId, Collection<String> columnNames) throws IOException {
         requireValidRowId(rowId);
 
         // position at correct row
@@ -695,8 +691,7 @@ public class TableImpl implements Table, PropertyMaps.Owner {
         RowState rowState,
         ByteBuffer rowBuffer,
         Collection<ColumnImpl> columns,
-        Collection<String> columnNames)
-        throws IOException {
+        Collection<String> columnNames) throws IOException {
         RowImpl rtn = new RowImpl(rowState.getHeaderRowId(), columns.size());
         for (ColumnImpl column : columns) {
 
@@ -717,8 +712,7 @@ public class TableImpl implements Table, PropertyMaps.Owner {
         ByteBuffer rowBuffer,
         ColumnImpl column,
         RowState rowState,
-        Map<ColumnImpl, byte[]> rawVarValues)
-        throws IOException {
+        Map<ColumnImpl, byte[]> rawVarValues) throws IOException {
         byte[] columnData = null;
         try {
 
@@ -872,8 +866,7 @@ public class TableImpl implements Table, PropertyMaps.Owner {
      * @return a ByteBuffer of the relevant page, or null if row was invalid
      */
     public static ByteBuffer positionAtRowHeader(RowState rowState,
-        RowIdImpl rowId)
-        throws IOException {
+        RowIdImpl rowId) throws IOException {
         ByteBuffer rowBuffer = rowState.withHeaderRow(rowId);
 
         if (rowState.isAtHeaderRow()) {
@@ -913,8 +906,7 @@ public class TableImpl implements Table, PropertyMaps.Owner {
      * @return a ByteBuffer narrowed to the actual row data, or null if row was invalid or deleted
      */
     public static ByteBuffer positionAtRowData(RowState rowState,
-        RowIdImpl rowId)
-        throws IOException {
+        RowIdImpl rowId) throws IOException {
         positionAtRowHeader(rowState, rowId);
         if (!rowState.isValid() || rowState.isDeleted()) {
             // row is invalid or deleted
@@ -978,8 +970,7 @@ public class TableImpl implements Table, PropertyMaps.Owner {
     /**
      * Writes a new table defined by the given TableCreator to the database.
      */
-    protected static void writeTableDefinition(TableCreator creator)
-        throws IOException {
+    protected static void writeTableDefinition(TableCreator creator) throws IOException {
         // first, create the usage map page
         createUsageMapDefinitionBuffer(creator);
 
@@ -1035,8 +1026,7 @@ public class TableImpl implements Table, PropertyMaps.Owner {
 
     private static void writeTableDefinitionBuffer(
         ByteBuffer buffer, int tdefPageNumber,
-        TableMutator mutator, List<Integer> reservedPages)
-        throws IOException {
+        TableMutator mutator, List<Integer> reservedPages) throws IOException {
         buffer.rewind();
         int totalTableDefSize = buffer.remaining();
         JetFormat format = mutator.getFormat();
@@ -1376,8 +1366,7 @@ public class TableImpl implements Table, PropertyMaps.Owner {
         return newIdxData;
     }
 
-    private void populateIndexData(IndexData idxData)
-        throws IOException {
+    private void populateIndexData(IndexData idxData) throws IOException {
         // grab the columns involved in this index
         List<ColumnImpl> idxCols = new ArrayList<>();
         for (IndexData.ColumnDescriptor col : idxData.getColumns()) {
@@ -1508,8 +1497,7 @@ public class TableImpl implements Table, PropertyMaps.Owner {
     }
 
     private ByteBuffer loadCompleteTableDefinitionBufferForUpdate(
-        TableUpdater mutator)
-        throws IOException {
+        TableUpdater mutator) throws IOException {
         // load complete table definition
         ByteBuffer tableBuffer = _tableDefBufferH.withPage(getPageChannel(),
             _tableDefPageNumber);
@@ -1540,8 +1528,7 @@ public class TableImpl implements Table, PropertyMaps.Owner {
      * requested usage maps.
      */
     private Map.Entry<Integer, Integer> addUsageMaps(
-        int numMaps, Integer firstUsedPage)
-        throws IOException {
+        int numMaps, Integer firstUsedPage) throws IOException {
         JetFormat format = getFormat();
         PageChannel pageChannel = getPageChannel();
         int umapRowLength = format.OFFSET_USAGE_MAP_START + format.USAGE_MAP_TABLE_BYTE_LENGTH;
@@ -1680,8 +1667,7 @@ public class TableImpl implements Table, PropertyMaps.Owner {
      * Create the usage map definition page buffer. The "used pages" map is in row 0, the "pages with free space" map is
      * in row 1. Index usage maps are in subsequent rows.
      */
-    private static void createUsageMapDefinitionBuffer(TableCreator creator)
-        throws IOException {
+    private static void createUsageMapDefinitionBuffer(TableCreator creator) throws IOException {
         List<ColumnBuilder> lvalCols = creator.getLongValueColumns();
 
         // 2 table usage maps plus 1 for each index and 2 for each lval col
@@ -1812,8 +1798,7 @@ public class TableImpl implements Table, PropertyMaps.Owner {
      * Returns a single ByteBuffer which contains the entire table definition (which may span multiple database pages).
      */
     private ByteBuffer loadCompleteTableDefinitionBuffer(
-        ByteBuffer tableBuffer, List<Integer> pages)
-        throws IOException {
+        ByteBuffer tableBuffer, List<Integer> pages) throws IOException {
         int nextPage = tableBuffer.getInt(getFormat().OFFSET_NEXT_TABLE_DEF_PAGE);
         ByteBuffer nextPageBuffer = null;
         while (nextPage != 0) {
@@ -1839,8 +1824,7 @@ public class TableImpl implements Table, PropertyMaps.Owner {
         return newBuffer;
     }
 
-    private void readColumnDefinitions(ByteBuffer tableBuffer, short columnCount)
-        throws IOException {
+    private void readColumnDefinitions(ByteBuffer tableBuffer, short columnCount) throws IOException {
         int colOffset = getFormat().OFFSET_INDEX_DEF_BLOCK + _indexCount * getFormat().SIZE_INDEX_DEFINITION;
 
         tableBuffer.position(colOffset + columnCount * getFormat().SIZE_COLUMN_HEADER);
@@ -1901,8 +1885,7 @@ public class TableImpl implements Table, PropertyMaps.Owner {
         Collections.sort(_indexes);
     }
 
-    private boolean readColumnUsageMaps(ByteBuffer tableBuffer)
-        throws IOException {
+    private boolean readColumnUsageMaps(ByteBuffer tableBuffer) throws IOException {
         short umapColNum = tableBuffer.getShort();
         if (umapColNum == IndexData.COLUMN_UNUSED) {
             return false;
@@ -1935,8 +1918,7 @@ public class TableImpl implements Table, PropertyMaps.Owner {
     /**
      * Writes the given page data to the given page number, clears any other relevant buffers.
      */
-    private void writeDataPage(ByteBuffer pageBuffer, int pageNumber)
-        throws IOException {
+    private void writeDataPage(ByteBuffer pageBuffer, int pageNumber) throws IOException {
         // write the page data
         getPageChannel().writePage(pageBuffer, pageNumber);
 
@@ -2027,8 +2009,7 @@ public class TableImpl implements Table, PropertyMaps.Owner {
     }
 
     @Override
-    public <M extends Map<String, Object>> M addRowFromMap(M row)
-        throws IOException {
+    public <M extends Map<String, Object>> M addRowFromMap(M row) throws IOException {
         Object[] rowValues = asRow(row);
 
         addRow(rowValues);
@@ -2038,14 +2019,12 @@ public class TableImpl implements Table, PropertyMaps.Owner {
     }
 
     @Override
-    public List<? extends Object[]> addRows(List<? extends Object[]> rows)
-        throws IOException {
+    public List<? extends Object[]> addRows(List<? extends Object[]> rows) throws IOException {
         return addRows(rows, true);
     }
 
     @Override
-    public <M extends Map<String, Object>> List<M> addRowsFromMaps(List<M> rows)
-        throws IOException {
+    public <M extends Map<String, Object>> List<M> addRowsFromMaps(List<M> rows) throws IOException {
         List<Object[]> rowValuesList = new ArrayList<>(rows.size());
         for (Map<String, Object> row : rows) {
             rowValuesList.add(asRow(row));
@@ -2075,8 +2054,7 @@ public class TableImpl implements Table, PropertyMaps.Owner {
      * @param rows List of Object[] row values
      */
     protected List<? extends Object[]> addRows(List<? extends Object[]> rows,
-        final boolean isBatchWrite)
-        throws IOException {
+        final boolean isBatchWrite) throws IOException {
         if (rows.isEmpty()) {
             return rows;
         }
@@ -2290,8 +2268,7 @@ public class TableImpl implements Table, PropertyMaps.Owner {
      *
      * @throws IllegalStateException if the given row is not valid, or deleted.
      */
-    public void updateValue(Column column, RowId rowId, Object value)
-        throws IOException {
+    public void updateValue(Column column, RowId rowId, Object value) throws IOException {
         Object[] row = new Object[_columns.size()];
         Arrays.fill(row, Column.KEEP_VALUE);
         column.setRowValue(row, value);
@@ -2300,8 +2277,7 @@ public class TableImpl implements Table, PropertyMaps.Owner {
     }
 
     public <M extends Map<String, Object>> M updateRowFromMap(
-        RowState rowState, RowIdImpl rowId, M row)
-        throws IOException {
+        RowState rowState, RowIdImpl rowId, M row) throws IOException {
         Object[] rowValues = updateRow(rowState, rowId, asUpdateRow(row));
         returnRowValues(row, rowValues, _columns);
         return row;
@@ -2310,8 +2286,7 @@ public class TableImpl implements Table, PropertyMaps.Owner {
     /**
      * Update the row for the given rowId.
      */
-    public Object[] updateRow(RowState rowState, RowIdImpl rowId, Object... row)
-        throws IOException {
+    public Object[] updateRow(RowState rowState, RowIdImpl rowId, Object... row) throws IOException {
         requireValidRowId(rowId);
 
         getPageChannel().startWrite();
@@ -2487,8 +2462,7 @@ public class TableImpl implements Table, PropertyMaps.Owner {
     }
 
     private ByteBuffer findFreeRowSpace(int rowSize, ByteBuffer dataPage,
-        int pageNumber)
-        throws IOException {
+        int pageNumber) throws IOException {
         // assume incoming page is modified
         boolean modifiedPage = true;
 
@@ -2525,8 +2499,7 @@ public class TableImpl implements Table, PropertyMaps.Owner {
 
     static ByteBuffer findFreeRowSpace(
         UsageMap ownedPages, UsageMap freeSpacePages,
-        TempPageHolder rowBufferH)
-        throws IOException {
+        TempPageHolder rowBufferH) throws IOException {
         // find last data page (Not bothering to check other pages for free
         // space.)
         UsageMap.PageCursor revPageCursor = ownedPages.cursor();
@@ -2603,8 +2576,7 @@ public class TableImpl implements Table, PropertyMaps.Owner {
     }
 
     // exposed for unit tests
-    protected ByteBuffer createRow(Object[] rowArray, ByteBuffer buffer)
-        throws IOException {
+    protected ByteBuffer createRow(Object[] rowArray, ByteBuffer buffer) throws IOException {
         return createRow(rowArray, buffer, 0, Map.of());
     }
 
@@ -2620,8 +2592,7 @@ public class TableImpl implements Table, PropertyMaps.Owner {
      */
     private ByteBuffer createRow(Object[] rowArray, ByteBuffer buffer,
         int minRowSize,
-        Map<ColumnImpl, byte[]> rawVarValues)
-        throws IOException {
+        Map<ColumnImpl, byte[]> rawVarValues) throws IOException {
         buffer.putShort(_maxColumnCount);
         NullMask nullMask = new NullMask(_maxColumnCount);
 
@@ -2765,8 +2736,7 @@ public class TableImpl implements Table, PropertyMaps.Owner {
     /**
      * Fill in all autonumber column values for add.
      */
-    private void handleAutoNumbersForAdd(Object[] row, WriteRowState writeRowState)
-        throws IOException {
+    private void handleAutoNumbersForAdd(Object[] row, WriteRowState writeRowState) throws IOException {
         if (_autoNumColumns.isEmpty()) {
             return;
         }
@@ -2790,8 +2760,7 @@ public class TableImpl implements Table, PropertyMaps.Owner {
      * Fill in all autonumber column values for update.
      */
     private void handleAutoNumbersForUpdate(Object[] row, ByteBuffer rowBuffer,
-        RowState rowState)
-        throws IOException {
+        RowState rowState) throws IOException {
         if (_autoNumColumns.isEmpty()) {
             return;
         }
@@ -3125,8 +3094,7 @@ public class TableImpl implements Table, PropertyMaps.Owner {
     /**
      * Maintains the state of reading/updating a row of data.
      */
-    public final class RowState extends WriteRowState
-        implements ErrorHandler.Location {
+    public final class RowState extends WriteRowState implements ErrorHandler.Location {
         /** Buffer used for reading the header row data pages */
         private final TempPageHolder _headerRowBufferH;
         /** the header rowId */

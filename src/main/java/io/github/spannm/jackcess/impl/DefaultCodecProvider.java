@@ -46,8 +46,7 @@ public class DefaultCodecProvider implements CodecProvider {
      * with any encoding.
      */
     @Override
-    public CodecHandler createHandler(PageChannel channel, Charset charset)
-        throws IOException {
+    public CodecHandler createHandler(PageChannel channel, Charset charset) throws IOException {
         JetFormat format = channel.getFormat();
         switch (format.CODEC_TYPE) {
             case NONE:

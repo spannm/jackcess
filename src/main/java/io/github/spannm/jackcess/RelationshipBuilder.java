@@ -177,8 +177,7 @@ public class RelationshipBuilder {
     /**
      * Creates a new Relationship in the given Database with the currently configured attributes.
      */
-    public Relationship toRelationship(Database db)
-        throws IOException {
+    public Relationship toRelationship(Database db) throws IOException {
         return new RelationshipCreator((DatabaseImpl) db).createRelationship(this);
     }
 

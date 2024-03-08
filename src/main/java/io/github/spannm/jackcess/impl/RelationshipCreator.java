@@ -73,8 +73,7 @@ public class RelationshipCreator extends DBMutator {
     /**
      * Creates the relationship in the database.
      */
-    public RelationshipImpl createRelationship(RelationshipBuilder relationship)
-        throws IOException {
+    public RelationshipImpl createRelationship(RelationshipBuilder relationship) throws IOException {
         _relationship = relationship;
         _name = relationship.getName();
 

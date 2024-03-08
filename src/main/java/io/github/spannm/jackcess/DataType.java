@@ -445,8 +445,7 @@ public enum DataType {
         return fromSQLType(sqlType, lengthInUnits, null);
     }
 
-    public static DataType fromSQLType(int sqlType, int lengthInUnits, FileFormat fileFormat)
-        throws IOException {
+    public static DataType fromSQLType(int sqlType, int lengthInUnits, FileFormat fileFormat) throws IOException {
         DataType[] rtnArr = SQL_TYPES.get(sqlType);
         if (rtnArr == null) {
             throw new JackcessException("Unsupported SQL type: " + sqlType);

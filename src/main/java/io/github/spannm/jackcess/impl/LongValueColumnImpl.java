@@ -110,8 +110,7 @@ class LongValueColumnImpl extends ColumnImpl {
 
     @Override
     protected ByteBuffer writeRealData(Object obj, int remainingRowLength,
-        ByteOrder order)
-        throws IOException {
+        ByteOrder order) throws IOException {
         switch (getType()) {
             case OLE:
                 // should already be "encoded"
@@ -132,8 +131,7 @@ class LongValueColumnImpl extends ColumnImpl {
      * @param lvalDefinition Column value that points to an LVAL record
      * @return The LVAL data
      */
-    protected byte[] readLongValue(byte[] lvalDefinition)
-        throws IOException {
+    protected byte[] readLongValue(byte[] lvalDefinition) throws IOException {
         ByteBuffer def = PageChannel.wrap(lvalDefinition);
         int lengthWithFlags = def.getInt();
         int length = lengthWithFlags & ~LONG_VALUE_TYPE_MASK;
@@ -220,8 +218,7 @@ class LongValueColumnImpl extends ColumnImpl {
      * @param lvalDefinition Column value that points to an LVAL record
      * @return The LVAL data
      */
-    private String readLongStringValue(byte[] lvalDefinition)
-        throws IOException {
+    private String readLongStringValue(byte[] lvalDefinition) throws IOException {
         byte[] binData = readLongValue(lvalDefinition);
         if (binData == null) {
             return null;
@@ -238,8 +235,7 @@ class LongValueColumnImpl extends ColumnImpl {
      * @param value Value of the LVAL column
      * @return A buffer containing the LVAL definition and (possibly) the column value (unless written to other pages)
      */
-    protected ByteBuffer writeLongValue(byte[] value, int remainingRowLength)
-        throws IOException {
+    protected ByteBuffer writeLongValue(byte[] value, int remainingRowLength) throws IOException {
         if (value.length > getType().getMaxSize()) {
             throw new InvalidValueException(withErrorContext(
                 "value too big for column, max " + getType().getMaxSize() + ", got " + value.length));

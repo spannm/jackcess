@@ -305,8 +305,7 @@ public class DatabaseBuilder {
      *
      * @see DatabaseBuilder for more flexible Database creation
      */
-    public static Database create(FileFormat fileFormat, File mdbFile)
-        throws IOException {
+    public static Database create(FileFormat fileFormat, File mdbFile) throws IOException {
         return new DatabaseBuilder(mdbFile).withFileFormat(fileFormat).create();
     }
 

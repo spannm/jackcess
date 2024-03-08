@@ -171,8 +171,7 @@ public final class TestUtil extends Assertions {
         return builder.toString();
     }
 
-    public static void assertRowCount(int expectedRowCount, Table table)
-        throws Exception {
+    public static void assertRowCount(int expectedRowCount, Table table) throws Exception {
         assertEquals(expectedRowCount, countRows(table));
         assertEquals(expectedRowCount, table.getRowCount());
     }
@@ -213,8 +212,7 @@ public final class TestUtil extends Assertions {
         dumpDatabase(mdb, false);
     }
 
-    public static void dumpDatabase(Database mdb, boolean systemTables)
-        throws Exception {
+    public static void dumpDatabase(Database mdb, boolean systemTables) throws Exception {
         dumpDatabase(mdb, systemTables, new PrintWriter(System.out, true));
     }
 
@@ -259,8 +257,7 @@ public final class TestUtil extends Assertions {
         }
     }
 
-    private static Map<String, Object> massageRow(Map<String, Object> row)
-        throws IOException {
+    private static Map<String, Object> massageRow(Map<String, Object> row) throws IOException {
         for (Map.Entry<String, Object> entry : row.entrySet()) {
             Object v = entry.getValue();
             if (v instanceof byte[]) {
@@ -319,8 +316,7 @@ public final class TestUtil extends Assertions {
         assertEquals(expectedLdt, found);
     }
 
-    public static void copyFile(File srcFile, File dstFile)
-        throws IOException {
+    public static void copyFile(File srcFile, File dstFile) throws IOException {
         // FIXME should really be using commons io FileUtils here, but don't want
         // to add dep for one simple test method
         try (OutputStream ostream = new FileOutputStream(dstFile)) {
@@ -329,8 +325,7 @@ public final class TestUtil extends Assertions {
         }
     }
 
-    public static void copyStream(InputStream istream, OutputStream ostream)
-        throws IOException {
+    public static void copyStream(InputStream istream, OutputStream ostream) throws IOException {
         // FIXME should really be using commons io FileUtils here, but don't want
         // to add dep for one simple test method
         byte[] buf = new byte[1024];
@@ -360,13 +355,11 @@ public final class TestUtil extends Assertions {
         ((Map<?, ?>) val).clear();
     }
 
-    public static byte[] toByteArray(File file)
-        throws IOException {
+    public static byte[] toByteArray(File file) throws IOException {
         return toByteArray(new FileInputStream(file), file.length());
     }
 
-    public static byte[] toByteArray(InputStream in, long length)
-        throws IOException {
+    public static byte[] toByteArray(InputStream in, long length) throws IOException {
         // FIXME should really be using commons io IOUtils here, but don't want
         // to add dep for one simple test method
         try (in) {

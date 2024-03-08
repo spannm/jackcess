@@ -33,8 +33,7 @@ public class MultiValueColumnInfoImpl extends ComplexColumnInfoImpl<SingleValue>
     private final Column _valueCol;
 
     public MultiValueColumnInfoImpl(Column column, int complexId,
-        Table typeObjTable, Table flatTable)
-        throws IOException {
+        Table typeObjTable, Table flatTable) throws IOException {
         super(column, complexId, typeObjTable, flatTable);
 
         _valueCol = getTypeColumns().get(0);
@@ -75,8 +74,7 @@ public class MultiValueColumnInfoImpl extends ComplexColumnInfoImpl<SingleValue>
         return new SingleValueImpl(INVALID_ID, complexValueFk, value);
     }
 
-    private static class SingleValueImpl extends ComplexValueImpl
-        implements SingleValue {
+    private static class SingleValueImpl extends ComplexValueImpl implements SingleValue {
         private Object _value;
 
         private SingleValueImpl(Id id, ComplexValueForeignKey complexValueFk,

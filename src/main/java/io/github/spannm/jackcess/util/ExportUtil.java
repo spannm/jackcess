@@ -52,8 +52,7 @@ public class ExportUtil {
      * @see #exportAll(Database,File,String)
      * @see Builder
      */
-    public static void exportAll(Database db, File dir)
-        throws IOException {
+    public static void exportAll(Database db, File dir) throws IOException {
         exportAll(db, dir, DEFAULT_FILE_EXT);
     }
 
@@ -91,8 +90,7 @@ public class ExportUtil {
      * @see Builder
      */
     public static void exportAll(Database db, File dir,
-        String ext, boolean header)
-        throws IOException {
+        String ext, boolean header) throws IOException {
         for (String tableName : db.getTableNames()) {
             exportFile(db, tableName, new File(dir, tableName + "." + ext), header,
                 DEFAULT_DELIMITER, DEFAULT_QUOTE_CHAR, SimpleExportFilter.INSTANCE);
@@ -117,8 +115,7 @@ public class ExportUtil {
      */
     public static void exportAll(Database db, File dir,
         String ext, boolean header, String delim,
-        char quote, ExportFilter filter)
-        throws IOException {
+        char quote, ExportFilter filter) throws IOException {
         for (String tableName : db.getTableNames()) {
             exportFile(db, tableName, new File(dir, tableName + "." + ext), header,
                 delim, quote, filter);
@@ -221,8 +218,7 @@ public class ExportUtil {
      */
     public static void exportWriter(Cursor cursor,
         BufferedWriter out, boolean header, String delim,
-        char quote, ExportFilter filter)
-        throws IOException {
+        char quote, ExportFilter filter) throws IOException {
         String delimiter = delim == null ? DEFAULT_DELIMITER : delim;
 
         // create pattern which will indicate whether or not a value needs to be
@@ -304,8 +300,7 @@ public class ExportUtil {
     }
 
     private static void writeValue(BufferedWriter out, String value, char quote,
-        Pattern needsQuotePattern)
-        throws IOException {
+        Pattern needsQuotePattern) throws IOException {
         if (!needsQuotePattern.matcher(value).find()) {
 
             // no quotes necessary

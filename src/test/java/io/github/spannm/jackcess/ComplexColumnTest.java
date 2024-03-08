@@ -349,8 +349,7 @@ class ComplexColumnTest extends AbstractBaseTest {
 
     private static void checkVersions(
         int cValId, ComplexValueForeignKey complexValueFk,
-        String curValue, Object... versionInfos)
-        throws Exception {
+        String curValue, Object... versionInfos) throws Exception {
         assertEquals(cValId, complexValueFk.get());
 
         List<Version> versions = complexValueFk.getVersions();
@@ -372,8 +371,7 @@ class ComplexColumnTest extends AbstractBaseTest {
 
     private static void checkAttachments(
         int cValId, ComplexValueForeignKey complexValueFk,
-        String... fileNames)
-        throws Exception {
+        String... fileNames) throws Exception {
         assertEquals(cValId, complexValueFk.get());
 
         List<Attachment> attachments = complexValueFk.getAttachments();
@@ -394,8 +392,7 @@ class ComplexColumnTest extends AbstractBaseTest {
 
     private static void checkMultiValues(
         int cValId, ComplexValueForeignKey complexValueFk,
-        Object... expectedValues)
-        throws Exception {
+        Object... expectedValues) throws Exception {
         assertEquals(cValId, complexValueFk.get());
 
         List<SingleValue> values = complexValueFk.getMultiValues();
@@ -413,8 +410,7 @@ class ComplexColumnTest extends AbstractBaseTest {
 
     private static void checkUnsupportedValues(
         int cValId, ComplexValueForeignKey complexValueFk,
-        String... expectedValues)
-        throws Exception {
+        String... expectedValues) throws Exception {
         assertEquals(cValId, complexValueFk.get());
 
         List<UnsupportedValue> values = complexValueFk.getUnsupportedValues();

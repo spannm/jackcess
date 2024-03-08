@@ -37,6 +37,5 @@ public interface CodecProvider {
      *
      * @return a new CodecHandler, may not be {@code null}
      */
-    CodecHandler createHandler(PageChannel channel, Charset charset)
-        throws IOException;
+    CodecHandler createHandler(PageChannel channel, Charset charset) throws IOException;
 }

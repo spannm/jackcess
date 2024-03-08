@@ -294,8 +294,7 @@ public class CursorBuilder {
      *
      * @param index index for the table which will define traversal order as well as enhance certain lookups
      */
-    public static IndexCursor createCursor(Index index)
-        throws IOException {
+    public static IndexCursor createCursor(Index index) throws IOException {
         return index.getTable().newCursor().withIndex(index).toIndexCursor();
     }
 
@@ -304,8 +303,7 @@ public class CursorBuilder {
      *
      * @param table the table over which this cursor will traverse
      */
-    public static IndexCursor createPrimaryKeyCursor(Table table)
-        throws IOException {
+    public static IndexCursor createPrimaryKeyCursor(Table table) throws IOException {
         return createCursor(table.getPrimaryKeyIndex());
     }
 
@@ -320,8 +318,7 @@ public class CursorBuilder {
      * @param endRow the last row of data for the cursor (inclusive), or {@code null} for the last entry
      */
     public static IndexCursor createCursor(Index index,
-        Object[] startRow, Object[] endRow)
-        throws IOException {
+        Object[] startRow, Object[] endRow) throws IOException {
         return index.getTable().newCursor().withIndex(index)
             .withStartRow(startRow)
             .withEndRow(endRow)
@@ -344,8 +341,7 @@ public class CursorBuilder {
         Object[] startRow,
         boolean startInclusive,
         Object[] endRow,
-        boolean endInclusive)
-        throws IOException {
+        boolean endInclusive) throws IOException {
         return index.getTable().newCursor().withIndex(index)
             .withStartRow(startRow)
             .withStartRowInclusive(startInclusive)
@@ -365,8 +361,7 @@ public class CursorBuilder {
      * @param rowPattern pattern to be used to find the row
      * @return the matching row or {@code null} if a match could not be found.
      */
-    public static Row findRow(Table table, Map<String, ?> rowPattern)
-        throws IOException {
+    public static Row findRow(Table table, Map<String, ?> rowPattern) throws IOException {
         Cursor cursor = createCursor(table);
         if (cursor.findFirstRow(rowPattern)) {
             return cursor.getCurrentRow();
@@ -382,8 +377,7 @@ public class CursorBuilder {
      * @param entryValues the column values for the index's columns.
      * @return the matching row or {@code null} if a match could not be found.
      */
-    public static Row findRowByEntry(Index index, Object... entryValues)
-        throws IOException {
+    public static Row findRowByEntry(Index index, Object... entryValues) throws IOException {
         return createCursor(index).findRowByEntry(entryValues);
     }
 
@@ -395,8 +389,7 @@ public class CursorBuilder {
      * @param entryValues the column values for the table's primary key columns.
      * @return the matching row or {@code null} if a match could not be found.
      */
-    public static Row findRowByPrimaryKey(Table table, Object... entryValues)
-        throws IOException {
+    public static Row findRowByPrimaryKey(Table table, Object... entryValues) throws IOException {
         return findRowByEntry(table.getPrimaryKeyIndex(), entryValues);
     }
 
@@ -415,8 +408,7 @@ public class CursorBuilder {
      * @return the matching row or {@code null} if a match could not be found.
      */
     public static Object findValue(Table table, Column column,
-        Column columnPattern, Object valuePattern)
-        throws IOException {
+        Column columnPattern, Object valuePattern) throws IOException {
         Cursor cursor = createCursor(table);
         if (cursor.findFirstRow(columnPattern, valuePattern)) {
             return cursor.getCurrentRowValue(column);
@@ -435,8 +427,7 @@ public class CursorBuilder {
      * @param rowPattern pattern to be used to find the row
      * @return the matching row or {@code null} if a match could not be found.
      */
-    public static Row findRow(Index index, Map<String, ?> rowPattern)
-        throws IOException {
+    public static Row findRow(Index index, Map<String, ?> rowPattern) throws IOException {
         Cursor cursor = createCursor(index);
         if (cursor.findFirstRow(rowPattern)) {
             return cursor.getCurrentRow();
@@ -459,8 +450,7 @@ public class CursorBuilder {
      * @return the matching row or {@code null} if a match could not be found.
      */
     public static Object findValue(Index index, Column column,
-        Column columnPattern, Object valuePattern)
-        throws IOException {
+        Column columnPattern, Object valuePattern) throws IOException {
         Cursor cursor = createCursor(index);
         if (cursor.findFirstRow(columnPattern, valuePattern)) {
             return cursor.getCurrentRowValue(column);

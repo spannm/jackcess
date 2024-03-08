@@ -50,8 +50,7 @@ public abstract class ComplexColumnInfoImpl<V extends ComplexValue>
     private IndexCursor                        _complexValIdCursor;
 
     protected ComplexColumnInfoImpl(Column column, int complexTypeId,
-        Table typeObjTable, Table flatTable)
-        throws IOException {
+        Table typeObjTable, Table flatTable) throws IOException {
         _column = column;
         _complexTypeId = complexTypeId;
         _flatTable = flatTable;
@@ -116,14 +115,12 @@ public abstract class ComplexColumnInfoImpl<V extends ComplexValue>
     }
 
     @Override
-    public List<Row> getRawValues(int complexValueFk)
-        throws IOException {
+    public List<Row> getRawValues(int complexValueFk) throws IOException {
         return getRawValues(complexValueFk, null);
     }
 
     private Iterator<Row> getComplexValFkIter(
-        int complexValueFk, Collection<String> columnNames)
-        throws IOException {
+        int complexValueFk, Collection<String> columnNames) throws IOException {
         if (_complexValIdCursor == null) {
             _complexValIdCursor = _flatTable.newCursor()
                 .withIndexByColumns(_complexValFkCol)
@@ -136,8 +133,7 @@ public abstract class ComplexColumnInfoImpl<V extends ComplexValue>
 
     @Override
     public List<Row> getRawValues(int complexValueFk,
-        Collection<String> columnNames)
-        throws IOException {
+        Collection<String> columnNames) throws IOException {
         Iterator<Row> entryIter =
             getComplexValFkIter(complexValueFk, columnNames);
         if (!entryIter.hasNext()) {
@@ -153,8 +149,7 @@ public abstract class ComplexColumnInfoImpl<V extends ComplexValue>
     }
 
     @Override
-    public List<V> getValues(ComplexValueForeignKey complexValueFk)
-        throws IOException {
+    public List<V> getValues(ComplexValueForeignKey complexValueFk) throws IOException {
         List<Row> rawValues = getRawValues(complexValueFk.get());
         if (rawValues.isEmpty()) {
             return List.of();
@@ -164,8 +159,7 @@ public abstract class ComplexColumnInfoImpl<V extends ComplexValue>
     }
 
     protected List<V> toValues(ComplexValueForeignKey complexValueFk,
-        List<Row> rawValues)
-        throws IOException {
+        List<Row> rawValues) throws IOException {
         List<V> values = new ArrayList<>();
         for (Row rawValue : rawValues) {
             values.add(toValue(complexValueFk, rawValue));
@@ -175,8 +169,7 @@ public abstract class ComplexColumnInfoImpl<V extends ComplexValue>
     }
 
     @Override
-    public ComplexValue.Id addRawValue(Map<String, ?> rawValue)
-        throws IOException {
+    public ComplexValue.Id addRawValue(Map<String, ?> rawValue) throws IOException {
         Object[] row = ((TableImpl) _flatTable).asRowWithRowId(rawValue);
         _flatTable.addRow(row);
         return getValueId(row);
@@ -245,8 +238,7 @@ public abstract class ComplexColumnInfoImpl<V extends ComplexValue>
     }
 
     @Override
-    public void deleteAllValues(ComplexValueForeignKey complexValueFk)
-        throws IOException {
+    public void deleteAllValues(ComplexValueForeignKey complexValueFk) throws IOException {
         deleteAllValues(complexValueFk.get());
     }
 

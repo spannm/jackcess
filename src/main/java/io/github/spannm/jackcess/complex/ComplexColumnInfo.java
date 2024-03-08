@@ -33,18 +33,14 @@ public interface ComplexColumnInfo<V extends ComplexValue> {
 
     int countValues(int complexValueFk) throws IOException;
 
-    List<Row> getRawValues(int complexValueFk)
-        throws IOException;
+    List<Row> getRawValues(int complexValueFk) throws IOException;
 
     List<Row> getRawValues(int complexValueFk,
-        Collection<String> columnNames)
-        throws IOException;
+        Collection<String> columnNames) throws IOException;
 
-    List<V> getValues(ComplexValueForeignKey complexValueFk)
-        throws IOException;
+    List<V> getValues(ComplexValueForeignKey complexValueFk) throws IOException;
 
-    ComplexValue.Id addRawValue(Map<String, ?> rawValue)
-        throws IOException;
+    ComplexValue.Id addRawValue(Map<String, ?> rawValue) throws IOException;
 
     ComplexValue.Id addValue(V value) throws IOException;
 
@@ -64,7 +60,6 @@ public interface ComplexColumnInfo<V extends ComplexValue> {
 
     void deleteAllValues(int complexValueFk) throws IOException;
 
-    void deleteAllValues(ComplexValueForeignKey complexValueFk)
-        throws IOException;
+    void deleteAllValues(ComplexValueForeignKey complexValueFk) throws IOException;
 
 }

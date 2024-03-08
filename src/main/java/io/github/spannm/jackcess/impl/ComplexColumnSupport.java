@@ -56,8 +56,7 @@ public class ComplexColumnSupport {
      * Creates a ComplexColumnInfo for a complex column.
      */
     public static ComplexColumnInfo<? extends ComplexValue> create(
-        ColumnImpl column, ByteBuffer buffer, int offset)
-        throws IOException {
+        ColumnImpl column, ByteBuffer buffer, int offset) throws IOException {
         int complexTypeId = buffer.getInt(
             offset + column.getFormat().OFFSET_COLUMN_COMPLEX_ID);
 

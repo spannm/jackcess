@@ -53,8 +53,7 @@ public class IndexCursorImpl extends CursorImpl implements IndexCursor {
     private Set<String>                 _indexEntryPattern;
 
     private IndexCursorImpl(TableImpl table, IndexImpl index,
-        IndexData.EntryCursor entryCursor)
-        throws IOException {
+        IndexData.EntryCursor entryCursor) throws IOException {
         super(new IdImpl(table, index), table,
             new IndexPosition(entryCursor.getFirstEntry()),
             new IndexPosition(entryCursor.getLastEntry()));
@@ -80,8 +79,7 @@ public class IndexCursorImpl extends CursorImpl implements IndexCursor {
         Object[] startRow,
         boolean startInclusive,
         Object[] endRow,
-        boolean endInclusive)
-        throws IOException {
+        boolean endInclusive) throws IOException {
         if (table != index.getTable()) {
             throw new IllegalArgumentException(
                 "Given index is not for given table: " + index + ", " + table);
@@ -115,8 +113,7 @@ public class IndexCursorImpl extends CursorImpl implements IndexCursor {
     }
 
     @Override
-    public Row findRowByEntry(Object... entryValues)
-        throws IOException {
+    public Row findRowByEntry(Object... entryValues) throws IOException {
         if (findFirstRowByEntry(entryValues)) {
             return getCurrentRow();
         }
@@ -124,8 +121,7 @@ public class IndexCursorImpl extends CursorImpl implements IndexCursor {
     }
 
     @Override
-    public boolean findFirstRowByEntry(Object... entryValues)
-        throws IOException {
+    public boolean findFirstRowByEntry(Object... entryValues) throws IOException {
         PositionImpl curPos = _curPos;
         PositionImpl prevPos = _prevPos;
         boolean found = false;
@@ -145,8 +141,7 @@ public class IndexCursorImpl extends CursorImpl implements IndexCursor {
     }
 
     @Override
-    public void findClosestRowByEntry(Object... entryValues)
-        throws IOException {
+    public void findClosestRowByEntry(Object... entryValues) throws IOException {
         PositionImpl curPos = _curPos;
         PositionImpl prevPos = _prevPos;
         boolean found = false;
@@ -165,8 +160,7 @@ public class IndexCursorImpl extends CursorImpl implements IndexCursor {
     }
 
     @Override
-    public boolean currentRowMatchesEntry(Object... entryValues)
-        throws IOException {
+    public boolean currentRowMatchesEntry(Object... entryValues) throws IOException {
         return currentRowMatchesEntryImpl(toRowValues(entryValues), _columnMatcher);
     }
 
@@ -198,8 +192,7 @@ public class IndexCursorImpl extends CursorImpl implements IndexCursor {
     }
 
     @Override
-    protected void restorePositionImpl(PositionImpl curPos, PositionImpl prevPos)
-        throws IOException {
+    protected void restorePositionImpl(PositionImpl curPos, PositionImpl prevPos) throws IOException {
         if (!(curPos instanceof IndexPosition) || !(prevPos instanceof IndexPosition)) {
             throw new IllegalArgumentException(
                 "Restored positions must be index positions");
@@ -220,8 +213,7 @@ public class IndexCursorImpl extends CursorImpl implements IndexCursor {
     @Override
     protected boolean findAnotherRowImpl(
         ColumnImpl columnPattern, Object valuePattern, boolean moveForward,
-        ColumnMatcher columnMatcher, Object searchInfo)
-        throws IOException {
+        ColumnMatcher columnMatcher, Object searchInfo) throws IOException {
         Object[] rowValues = (Object[]) searchInfo;
 
         if (rowValues == null || !isAtBeginning(moveForward)) {
@@ -250,8 +242,7 @@ public class IndexCursorImpl extends CursorImpl implements IndexCursor {
      */
     protected boolean findFirstRowByEntryImpl(Object[] rowValues,
         boolean requireMatch,
-        ColumnMatcher columnMatcher)
-        throws IOException {
+        ColumnMatcher columnMatcher) throws IOException {
         if (!findPotentialRow(rowValues, requireMatch)) {
             return false;
         } else if (!requireMatch) {
@@ -265,8 +256,7 @@ public class IndexCursorImpl extends CursorImpl implements IndexCursor {
     @Override
     protected boolean findAnotherRowImpl(
         Map<String, ?> rowPattern, boolean moveForward,
-        ColumnMatcher columnMatcher, Object searchInfo)
-        throws IOException {
+        ColumnMatcher columnMatcher, Object searchInfo) throws IOException {
         Object[] rowValues = (Object[]) searchInfo;
 
         if (rowValues == null || !isAtBeginning(moveForward)) {
@@ -311,8 +301,7 @@ public class IndexCursorImpl extends CursorImpl implements IndexCursor {
     }
 
     private boolean currentRowMatchesEntryImpl(Object[] rowValues,
-        ColumnMatcher columnMatcher)
-        throws IOException {
+        ColumnMatcher columnMatcher) throws IOException {
         // check the next row to see if it actually matches
         Row row = getCurrentRow(getIndexEntryPattern());
 
@@ -335,8 +324,7 @@ public class IndexCursorImpl extends CursorImpl implements IndexCursor {
         return true;
     }
 
-    private boolean findPotentialRow(Object[] rowValues, boolean requireMatch)
-        throws IOException {
+    private boolean findPotentialRow(Object[] rowValues, boolean requireMatch) throws IOException {
         _entryCursor.beforeEntry(rowValues);
         IndexData.Entry startEntry = _entryCursor.getNextEntry();
         if (requireMatch && !startEntry.getRowId().isValid()) {
@@ -364,8 +352,7 @@ public class IndexCursorImpl extends CursorImpl implements IndexCursor {
 
     @Override
     protected boolean keepSearching(ColumnMatcher columnMatcher,
-        Object searchInfo)
-        throws IOException {
+        Object searchInfo) throws IOException {
         if (searchInfo instanceof Object[]) {
             // if we have a lookup row for this index, then we only need to continue
             // searching while we are looking at rows which match the index lookup
@@ -384,8 +371,7 @@ public class IndexCursorImpl extends CursorImpl implements IndexCursor {
 
     @Override
     protected PositionImpl findAnotherPosition(
-        RowState rowState, PositionImpl curPos, boolean moveForward)
-        throws IOException {
+        RowState rowState, PositionImpl curPos, boolean moveForward) throws IOException {
         IndexDirHandler handler = getDirHandler(moveForward);
         IndexPosition endPos = (IndexPosition) handler.getEndPosition();
         IndexData.Entry entry = handler.getAnotherEntry();

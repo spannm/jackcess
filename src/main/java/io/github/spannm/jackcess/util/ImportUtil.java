@@ -51,8 +51,7 @@ public class ImportUtil {
      *
      * @return a List of Columns
      */
-    public static List<ColumnBuilder> toColumns(ResultSetMetaData md)
-        throws SQLException, IOException {
+    public static List<ColumnBuilder> toColumns(ResultSetMetaData md) throws SQLException, IOException {
         List<ColumnBuilder> columns = new ArrayList<>();
         for (int i = 1; i <= md.getColumnCount(); i++) {
             ColumnBuilder column = new ColumnBuilder(md.getColumnLabel(i))
@@ -95,8 +94,7 @@ public class ImportUtil {
      * @see Builder
      */
     public static String importResultSet(ResultSet source, Database db,
-        String name)
-        throws SQLException, IOException {
+        String name) throws SQLException, IOException {
         return importResultSet(source, db, name, SimpleImportFilter.INSTANCE);
     }
 
@@ -115,8 +113,7 @@ public class ImportUtil {
      * @see Builder
      */
     public static String importResultSet(ResultSet source, Database db,
-        String name, ImportFilter filter)
-        throws SQLException, IOException {
+        String name, ImportFilter filter) throws SQLException, IOException {
         return importResultSet(source, db, name, filter, false);
     }
 
@@ -135,8 +132,7 @@ public class ImportUtil {
      */
     public static String importResultSet(ResultSet source, Database db,
         String name, ImportFilter filter,
-        boolean useExistingTable)
-        throws SQLException, IOException {
+        boolean useExistingTable) throws SQLException, IOException {
         ResultSetMetaData md = source.getMetaData();
 
         name = TableBuilder.escapeIdentifier(name);
@@ -186,8 +182,7 @@ public class ImportUtil {
      * @see Builder
      */
     public static String importFile(File f, Database db, String name,
-        String delim)
-        throws IOException {
+        String delim) throws IOException {
         return importFile(f, db, name, delim, SimpleImportFilter.INSTANCE);
     }
 
@@ -207,8 +202,7 @@ public class ImportUtil {
      * @see Builder
      */
     public static String importFile(File f, Database db, String name,
-        String delim, ImportFilter filter)
-        throws IOException {
+        String delim, ImportFilter filter) throws IOException {
         return importFile(f, db, name, delim, ExportUtil.DEFAULT_QUOTE_CHAR,
             filter, false);
     }
@@ -235,8 +229,7 @@ public class ImportUtil {
     public static String importFile(File f, Database db, String name,
         String delim, char quote,
         ImportFilter filter,
-        boolean useExistingTable)
-        throws IOException {
+        boolean useExistingTable) throws IOException {
         return importFile(f, db, name, delim, quote, filter, useExistingTable, true);
     }
 
@@ -282,8 +275,7 @@ public class ImportUtil {
      * @see Builder
      */
     public static String importReader(BufferedReader in, Database db,
-        String name, String delim)
-        throws IOException {
+        String name, String delim) throws IOException {
         return importReader(in, db, name, delim, SimpleImportFilter.INSTANCE);
     }
 
@@ -304,8 +296,7 @@ public class ImportUtil {
      */
     public static String importReader(BufferedReader in, Database db,
         String name, String delim,
-        ImportFilter filter)
-        throws IOException {
+        ImportFilter filter) throws IOException {
         return importReader(in, db, name, delim, filter, false);
     }
 
@@ -328,8 +319,7 @@ public class ImportUtil {
     public static String importReader(BufferedReader in, Database db,
         String name, String delim,
         ImportFilter filter,
-        boolean useExistingTable)
-        throws IOException {
+        boolean useExistingTable) throws IOException {
         return importReader(in, db, name, delim, ExportUtil.DEFAULT_QUOTE_CHAR,
             filter, useExistingTable);
     }
@@ -354,8 +344,7 @@ public class ImportUtil {
     public static String importReader(BufferedReader in, Database db,
         String name, String delim, char quote,
         ImportFilter filter,
-        boolean useExistingTable)
-        throws IOException {
+        boolean useExistingTable) throws IOException {
         return importReader(in, db, name, delim, quote, filter, useExistingTable,
             true);
     }
@@ -436,8 +425,7 @@ public class ImportUtil {
      * spanning newlines.
      */
     private static Object[] splitLine(String line, Pattern delim, char quote,
-        BufferedReader in, int numColumns)
-        throws IOException {
+        BufferedReader in, int numColumns) throws IOException {
         List<String> tokens = new ArrayList<>();
         StringBuilder sb = new StringBuilder();
         Matcher m = delim.matcher(line);

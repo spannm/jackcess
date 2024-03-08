@@ -523,8 +523,7 @@ public class GeneralLegacyIndexCodes {
      * Converts an index value for a text column into the entry value (which is based on a variety of nifty codes).
      */
     void writeNonNullIndexTextValue(
-        Object value, ByteStream bout, boolean isAscending)
-        throws IOException {
+        Object value, ByteStream bout, boolean isAscending) throws IOException {
         // convert to string
         String str = toIndexCharSequence(value);
 
@@ -649,8 +648,7 @@ public class GeneralLegacyIndexCodes {
         bout.write(END_EXTRA_TEXT);
     }
 
-    protected static String toIndexCharSequence(Object value)
-        throws IOException {
+    protected static String toIndexCharSequence(Object value) throws IOException {
 
         // first, convert to string
         String str = ColumnImpl.toCharSequence(value).toString();

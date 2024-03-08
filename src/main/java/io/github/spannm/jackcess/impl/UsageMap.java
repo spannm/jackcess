@@ -98,8 +98,7 @@ public class UsageMap {
      * @param buf buffer which contains the usage map row info
      * @return Either an InlineUsageMap or a ReferenceUsageMap, depending on which type of map is found
      */
-    public static UsageMap read(DatabaseImpl database, ByteBuffer buf)
-        throws IOException {
+    public static UsageMap read(DatabaseImpl database, ByteBuffer buf) throws IOException {
         int umapRowNum = buf.get();
         int umapPageNum = ByteUtil.get3ByteInt(buf);
         return read(database, umapPageNum, umapRowNum, false);
@@ -113,8 +112,7 @@ public class UsageMap {
      * @return Either an InlineUsageMap or a ReferenceUsageMap, depending on which type of map is found
      */
     static UsageMap read(DatabaseImpl database, int pageNum,
-        int rowNum, boolean isGlobal)
-        throws IOException {
+        int rowNum, boolean isGlobal) throws IOException {
         if (pageNum <= 0) {
             // usage maps will never appear on page 0 (or less)
             throw new IllegalStateException("Invalid usage map page number " + pageNum);
@@ -133,8 +131,7 @@ public class UsageMap {
         return rtn;
     }
 
-    private void initHandler(byte mapType, boolean isGlobal)
-        throws IOException {
+    private void initHandler(byte mapType, boolean isGlobal) throws IOException {
         if (mapType == MAP_TYPE_INLINE) {
             _handler = isGlobal ? new GlobalInlineHandler() : new InlineHandler();
         } else if (mapType == MAP_TYPE_REFERENCE) {
@@ -253,8 +250,7 @@ public class UsageMap {
         ByteUtil.clearRange(_tableBuffer, tableStart, tableEnd);
     }
 
-    protected void writeTable()
-        throws IOException {
+    protected void writeTable() throws IOException {
         // note, we only want to write the row data with which we are working
         getPageChannel().writePage(_tableBuffer, _tablePageNum, _rowStart);
     }
@@ -303,21 +299,18 @@ public class UsageMap {
     /**
      * Remove a page number from this usage map
      */
-    public void removePageNumber(int pageNumber)
-        throws IOException {
+    public void removePageNumber(int pageNumber) throws IOException {
         removePageNumber(pageNumber, true);
     }
 
-    private void removePageNumber(int pageNumber, boolean force)
-        throws IOException {
+    private void removePageNumber(int pageNumber, boolean force) throws IOException {
         ++_modCount;
         _handler.addOrRemovePageNumber(pageNumber, false, force);
     }
 
     protected void updateMap(int absolutePageNumber,
         int bufferRelativePageNumber,
-        ByteBuffer buffer, boolean add, boolean force)
-        throws IOException {
+        ByteBuffer buffer, boolean add, boolean force) throws IOException {
         // Find the byte to which to apply the bitmask and create the bitmask
         int offset = bufferRelativePageNumber / 8;
         int bitmask = 1 << bufferRelativePageNumber % 8;
@@ -344,8 +337,7 @@ public class UsageMap {
     /**
      * Promotes and inline usage map to a reference usage map.
      */
-    private void promoteInlineHandlerToReferenceHandler(int newPageNumber)
-        throws IOException {
+    private void promoteInlineHandlerToReferenceHandler(int newPageNumber) throws IOException {
         // copy current page number info to new references and then clear old
         int oldStartPage = _startPage;
         BitSet oldPageNumbers = (BitSet) _pageNumbers.clone();
@@ -367,8 +359,7 @@ public class UsageMap {
     }
 
     private void reAddPages(int oldStartPage, BitSet oldPageNumbers,
-        int newPageNumber)
-        throws IOException {
+        int newPageNumber) throws IOException {
         // add all the old pages back in
         for (int i = oldPageNumbers.nextSetBit(0); i >= 0; i = oldPageNumbers.nextSetBit(i + 1)) {
             addPageNumber(oldStartPage + i);

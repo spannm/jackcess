@@ -37,8 +37,7 @@ public interface IndexCursor extends Cursor {
      * @param entryValues the column values for the index's columns.
      * @return the matching row or {@code null} if a match could not be found.
      */
-    Row findRowByEntry(Object... entryValues)
-        throws IOException;
+    Row findRowByEntry(Object... entryValues) throws IOException;
 
     /**
      * Moves to the first row (as defined by the cursor) where the index entries match the given values. If a match is
@@ -50,8 +49,7 @@ public interface IndexCursor extends Cursor {
      * @param entryValues the column values for the index's columns.
      * @return {@code true} if a valid row was found with the given values, {@code false} if no row was found
      */
-    boolean findFirstRowByEntry(Object... entryValues)
-        throws IOException;
+    boolean findFirstRowByEntry(Object... entryValues) throws IOException;
 
     /**
      * Moves to the first row (as defined by the cursor) where the index entries are &gt;= the given values. If a an
@@ -59,16 +57,14 @@ public interface IndexCursor extends Cursor {
      *
      * @param entryValues the column values for the index's columns.
      */
-    void findClosestRowByEntry(Object... entryValues)
-        throws IOException;
+    void findClosestRowByEntry(Object... entryValues) throws IOException;
 
     /**
      * Returns {@code true} if the current row matches the given index entries.
      *
      * @param entryValues the column values for the index's columns.
      */
-    boolean currentRowMatchesEntry(Object... entryValues)
-        throws IOException;
+    boolean currentRowMatchesEntry(Object... entryValues) throws IOException;
 
     /**
      * Convenience method for constructing a new EntryIterableBuilder for this cursor. An EntryIterableBuilder provides

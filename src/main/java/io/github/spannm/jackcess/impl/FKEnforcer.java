@@ -219,8 +219,7 @@ final class FKEnforcer {
         }
     }
 
-    private static void requirePrimaryValues(Joiner joiner, Object[] row)
-        throws IOException {
+    private static void requirePrimaryValues(Joiner joiner, Object[] row) throws IOException {
         // ensure that the relevant rows exist in the primary tables for which
         // this table is a secondary table. however, null values are allowed
         if (!areNull(joiner, row) && !joiner.hasRows(row)) {
@@ -229,8 +228,7 @@ final class FKEnforcer {
         }
     }
 
-    private static void requireNoSecondaryValues(Joiner joiner, Object[] row)
-        throws IOException {
+    private static void requireNoSecondaryValues(Joiner joiner, Object[] row) throws IOException {
         // ensure that no rows exist in the secondary table for which this table is
         // the primary table.
         if (joiner.hasRows(row)) {
@@ -240,8 +238,7 @@ final class FKEnforcer {
     }
 
     private static void updateSecondaryValues(Joiner joiner, Object[] oldFromRow,
-        Object[] newFromRow)
-        throws IOException {
+        Object[] newFromRow) throws IOException {
         IndexCursor toCursor = joiner.getToCursor();
         List<? extends Index.Column> fromCols = joiner.getColumns();
         List<? extends Index.Column> toCols = joiner.getToIndex().getColumns();
@@ -263,8 +260,7 @@ final class FKEnforcer {
         }
     }
 
-    private static void nullSecondaryValues(Joiner joiner, Object[] oldFromRow)
-        throws IOException {
+    private static void nullSecondaryValues(Joiner joiner, Object[] oldFromRow) throws IOException {
         IndexCursor toCursor = joiner.getToCursor();
         List<? extends Index.Column> fromCols = joiner.getColumns();
         List<? extends Index.Column> toCols = joiner.getToIndex().getColumns();

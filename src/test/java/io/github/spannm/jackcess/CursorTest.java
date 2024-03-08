@@ -121,8 +121,7 @@ class CursorTest extends AbstractBaseTest {
         return expectedRows;
     }
 
-    private static Database createDupeTestTable(FileFormat fileFormat)
-        throws Exception {
+    private static Database createDupeTestTable(FileFormat fileFormat) throws Exception {
         Database db = createMem(fileFormat);
 
         Table table = DatabaseBuilder.newTable("test")
@@ -137,8 +136,7 @@ class CursorTest extends AbstractBaseTest {
         return db;
     }
 
-    static Database createDupeTestTable(TestDB indexCursorDB)
-        throws Exception {
+    static Database createDupeTestTable(TestDB indexCursorDB) throws Exception {
         Database db = indexCursorDB.openMem();
 
         Table table = db.getTable("test");
@@ -152,8 +150,7 @@ class CursorTest extends AbstractBaseTest {
 
     private static Cursor createIndexSubRangeCursor(Table table,
         Index idx,
-        int type)
-        throws Exception {
+        int type) throws Exception {
         return table.newCursor()
             .withIndex(idx)
             .withStartEntry(3 - type)
@@ -215,8 +212,7 @@ class CursorTest extends AbstractBaseTest {
     }
 
     private static void doTestMove(Cursor cursor,
-        List<Map<String, Object>> expectedRows)
-        throws Exception {
+        List<Map<String, Object>> expectedRows) throws Exception {
         if (expectedRows == null) {
             expectedRows = createTestTableData();
         }
@@ -309,8 +305,7 @@ class CursorTest extends AbstractBaseTest {
         }
     }
 
-    private static void doTestSearch(Table table, Cursor cursor, Index index, Integer... outOfRangeValues)
-        throws Exception {
+    private static void doTestSearch(Table table, Cursor cursor, Index index, Integer... outOfRangeValues) throws Exception {
         assertTrue(cursor.findFirstRow(table.getColumn("id"), 3));
         assertEquals(createExpectedRow("id", 3,
             "value", "data" + 3),
@@ -1137,8 +1132,7 @@ class CursorTest extends AbstractBaseTest {
         }
     }
 
-    private static void doTestFindByRowId(Cursor cursor)
-        throws Exception {
+    private static void doTestFindByRowId(Cursor cursor) throws Exception {
         for (int i = 0; i < 3; ++i) {
             cursor.moveToNextRow();
         }
@@ -1156,8 +1150,7 @@ class CursorTest extends AbstractBaseTest {
         doTestFindByRowId(cursor, r2, 5);
     }
 
-    private static void doTestFindByRowId(Cursor cursor, Row row, int id)
-        throws Exception {
+    private static void doTestFindByRowId(Cursor cursor, Row row, int id) throws Exception {
         cursor.reset();
         assertTrue(cursor.findRow(row.getId()));
         Row rFound = cursor.getCurrentRow();
@@ -1393,8 +1386,7 @@ class CursorTest extends AbstractBaseTest {
     }
 
     private static void doFindFirstByEntry(IndexCursor c, Integer expectedId,
-        Object... entry)
-        throws Exception {
+        Object... entry) throws Exception {
         if (expectedId != null) {
             assertTrue(c.findFirstRowByEntry(entry));
             assertEquals(expectedId, c.getCurrentRow().get("id"));
@@ -1430,8 +1422,7 @@ class CursorTest extends AbstractBaseTest {
         assertEquals(expectedIds, foundIds);
     }
 
-    private static void doFindByRow(Index idx, Integer id, Object... rowPairs)
-        throws Exception {
+    private static void doFindByRow(Index idx, Integer id, Object... rowPairs) throws Exception {
         Map<String, Object> map = createExpectedRow(
             rowPairs);
         Row r = CursorBuilder.findRow(idx, map);
@@ -1443,8 +1434,7 @@ class CursorTest extends AbstractBaseTest {
     }
 
     private static void doFindValue(Index idx, Integer id,
-        Column columnPattern, Object valuePattern)
-        throws Exception {
+        Column columnPattern, Object valuePattern) throws Exception {
         Object value = CursorBuilder.findValue(
             idx, idx.getTable().getColumn("id"), columnPattern, valuePattern);
         if (id != null) {

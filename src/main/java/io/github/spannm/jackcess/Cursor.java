@@ -84,8 +84,7 @@ public interface Cursor extends Iterable<Row> {
      *
      * @throws IllegalArgumentException if the given savepoint does not have a cursorId equal to this cursor's id
      */
-    void restoreSavepoint(Savepoint savepoint)
-        throws IOException;
+    void restoreSavepoint(Savepoint savepoint) throws IOException;
 
     /**
      * Resets this cursor for forward traversal. Calls {@link #beforeFirst}.
@@ -166,8 +165,7 @@ public interface Cursor extends Iterable<Row> {
      * @return the given row, updated with the current row values
      * @throws IllegalStateException if the current row is not valid (at beginning or end of table), or deleted.
      */
-    <M extends Map<String, Object>> M updateCurrentRowFromMap(M row)
-        throws IOException;
+    <M extends Map<String, Object>> M updateCurrentRowFromMap(M row) throws IOException;
 
     /**
      * Moves to the next row in the table and returns it.
@@ -182,8 +180,7 @@ public interface Cursor extends Iterable<Row> {
      * @param columnNames Only column names in this collection will be returned
      * @return The next row in this table (Column name -&gt; Column value), or {@code null} if no next row is found
      */
-    Row getNextRow(Collection<String> columnNames)
-        throws IOException;
+    Row getNextRow(Collection<String> columnNames) throws IOException;
 
     /**
      * Moves to the previous row in the table and returns it.
@@ -200,8 +197,7 @@ public interface Cursor extends Iterable<Row> {
      * @return The previous row in this table (Column name -&gt; Column value), or {@code null} if no previous row is
      *         found
      */
-    Row getPreviousRow(Collection<String> columnNames)
-        throws IOException;
+    Row getPreviousRow(Collection<String> columnNames) throws IOException;
 
     /**
      * Moves to the next row as defined by this cursor.
@@ -239,8 +235,7 @@ public interface Cursor extends Iterable<Row> {
      *            instead (overriding any configured ColumnMatcher)
      * @return {@code true} if a valid row was found with the given value, {@code false} if no row was found
      */
-    boolean findFirstRow(Column columnPattern, Object valuePattern)
-        throws IOException;
+    boolean findFirstRow(Column columnPattern, Object valuePattern) throws IOException;
 
     /**
      * Moves to the next row (as defined by the cursor) where the given column has the given value. This may be more
@@ -253,8 +248,7 @@ public interface Cursor extends Iterable<Row> {
      *            instead (overriding any configured ColumnMatcher)
      * @return {@code true} if a valid row was found with the given value, {@code false} if no row was found
      */
-    boolean findNextRow(Column columnPattern, Object valuePattern)
-        throws IOException;
+    boolean findNextRow(Column columnPattern, Object valuePattern) throws IOException;
 
     /**
      * Moves to the first row (as defined by the cursor) where the given columns have the given values. This may be more
@@ -291,8 +285,7 @@ public interface Cursor extends Iterable<Row> {
      *            instance of {@link java.util.function.Predicate}, it will be applied to the potential row value
      *            instead (overriding any configured ColumnMatcher)
      */
-    boolean currentRowMatches(Column columnPattern, Object valuePattern)
-        throws IOException;
+    boolean currentRowMatches(Column columnPattern, Object valuePattern) throws IOException;
 
     /**
      * Returns {@code true} if the current row matches the given pattern.
@@ -327,8 +320,7 @@ public interface Cursor extends Iterable<Row> {
      *
      * @param columnNames Only column names in this collection will be returned
      */
-    Row getCurrentRow(Collection<String> columnNames)
-        throws IOException;
+    Row getCurrentRow(Collection<String> columnNames) throws IOException;
 
     /**
      * Returns the given column from the current row.
@@ -340,8 +332,7 @@ public interface Cursor extends Iterable<Row> {
      *
      * @throws IllegalStateException if the current row is not valid (at beginning or end of table), or deleted.
      */
-    void setCurrentRowValue(Column column, Object value)
-        throws IOException;
+    void setCurrentRowValue(Column column, Object value) throws IOException;
 
     /**
      * Identifier for a cursor. Will be equal to any other cursor of the same type for the same table. Primarily used to

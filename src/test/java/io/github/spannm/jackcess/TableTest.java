@@ -110,13 +110,11 @@ class TableTest extends AbstractBaseTest {
 
     }
 
-    private ByteBuffer createRow(Object... row)
-        throws IOException {
+    private ByteBuffer createRow(Object... row) throws IOException {
         return _testTable.createRow(row);
     }
 
-    private ByteBuffer[] encodeColumns(Object... row)
-        throws IOException {
+    private ByteBuffer[] encodeColumns(Object... row) throws IOException {
         ByteBuffer[] result = new ByteBuffer[_columns.size()];
         for (int i = 0; i < _columns.size(); ++i) {
             ColumnImpl col = _columns.get(i);
@@ -125,8 +123,7 @@ class TableTest extends AbstractBaseTest {
         return result;
     }
 
-    private Object[] decodeColumns(ByteBuffer[] buffers)
-        throws IOException {
+    private Object[] decodeColumns(ByteBuffer[] buffers) throws IOException {
         Object[] result = new Object[_columns.size()];
         for (int i = 0; i < _columns.size(); ++i) {
             ColumnImpl col = _columns.get(i);

@@ -49,8 +49,7 @@ public class Joiner {
      * @param toTable the "to" side of the relationship
      * @throws IllegalArgumentException if there is no relationship between the given tables
      */
-    public static Joiner create(Table fromTable, Table toTable)
-        throws IOException {
+    public static Joiner create(Table fromTable, Table toTable) throws IOException {
         return create(fromTable.getForeignKeyIndex(toTable));
     }
 
@@ -60,8 +59,7 @@ public class Joiner {
      *
      * @param fromIndex the index backing one side of a foreign-key relationship
      */
-    public static Joiner create(Index fromIndex)
-        throws IOException {
+    public static Joiner create(Index fromIndex) throws IOException {
         Index toIndex = fromIndex.getReferencedIndex();
         IndexCursor toCursor = CursorBuilder.createCursor(toIndex);
         // text lookups are always case-insensitive
@@ -72,8 +70,7 @@ public class Joiner {
     /**
      * Creates a new Joiner that is the reverse of this Joiner (the "from" and "to" tables are swapped).
      */
-    public Joiner createReverse()
-        throws IOException {
+    public Joiner createReverse() throws IOException {
         return create(getToTable(), getFromTable());
     }
 
@@ -126,8 +123,7 @@ public class Joiner {
      *
      * @param fromRow row from the "from" table (which must include the relevant columns for this join relationship)
      */
-    public Row findFirstRow(Map<String, ?> fromRow)
-        throws IOException {
+    public Row findFirstRow(Map<String, ?> fromRow) throws IOException {
         return findFirstRow(fromRow, null);
     }
 
@@ -138,8 +134,7 @@ public class Joiner {
      * @param fromRow row from the "from" table (which must include the relevant columns for this join relationship)
      * @param columnNames desired columns in the from table row
      */
-    public Row findFirstRow(Map<String, ?> fromRow, Collection<String> columnNames)
-        throws IOException {
+    public Row findFirstRow(Map<String, ?> fromRow, Collection<String> columnNames) throws IOException {
         return hasRows(fromRow) ? _toCursor.getCurrentRow(columnNames) : null;
     }
 

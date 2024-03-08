@@ -45,8 +45,7 @@ public class ReplacementErrorHandler implements ErrorHandler {
 
     @Override
     public Object handleRowError(Column column, byte[] columnData,
-        Location location, Exception error)
-        throws IOException {
+        Location location, Exception error) throws IOException {
         return _replacement;
     }
 

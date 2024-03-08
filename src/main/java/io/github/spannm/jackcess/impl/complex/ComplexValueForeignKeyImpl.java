@@ -177,23 +177,20 @@ public class ComplexValueForeignKeyImpl extends ComplexValueForeignKey {
     @Override
     public Attachment addAttachment(
         String url, String name, String type, byte[] data,
-        Date timeStamp, Integer flags)
-        throws IOException {
+        Date timeStamp, Integer flags) throws IOException {
         return addAttachmentImpl(url, name, type, data, timeStamp, flags);
     }
 
     @Override
     public Attachment addAttachment(
         String url, String name, String type, byte[] data,
-        LocalDateTime timeStamp, Integer flags)
-        throws IOException {
+        LocalDateTime timeStamp, Integer flags) throws IOException {
         return addAttachmentImpl(url, name, type, data, timeStamp, flags);
     }
 
     private Attachment addAttachmentImpl(
         String url, String name, String type, byte[] data,
-        Object timeStamp, Integer flags)
-        throws IOException {
+        Object timeStamp, Integer flags) throws IOException {
         reset();
         Attachment a = AttachmentColumnInfoImpl.newAttachment(
             this, url, name, type, data, timeStamp, flags);
@@ -202,16 +199,14 @@ public class ComplexValueForeignKeyImpl extends ComplexValueForeignKey {
     }
 
     @Override
-    public Attachment addEncodedAttachment(byte[] encodedData)
-        throws IOException {
+    public Attachment addEncodedAttachment(byte[] encodedData) throws IOException {
         return addEncodedAttachmentImpl(null, null, null, encodedData, null, null);
     }
 
     @Override
     public Attachment addEncodedAttachment(
         String url, String name, String type, byte[] encodedData,
-        Date timeStamp, Integer flags)
-        throws IOException {
+        Date timeStamp, Integer flags) throws IOException {
         return addEncodedAttachmentImpl(url, name, type, encodedData, timeStamp,
             flags);
     }
@@ -219,16 +214,14 @@ public class ComplexValueForeignKeyImpl extends ComplexValueForeignKey {
     @Override
     public Attachment addEncodedAttachment(
         String url, String name, String type, byte[] encodedData,
-        LocalDateTime timeStamp, Integer flags)
-        throws IOException {
+        LocalDateTime timeStamp, Integer flags) throws IOException {
         return addEncodedAttachmentImpl(url, name, type, encodedData, timeStamp,
             flags);
     }
 
     private Attachment addEncodedAttachmentImpl(
         String url, String name, String type, byte[] encodedData,
-        Object timeStamp, Integer flags)
-        throws IOException {
+        Object timeStamp, Integer flags) throws IOException {
         reset();
         Attachment a = AttachmentColumnInfoImpl.newEncodedAttachment(
             this, url, name, type, encodedData, timeStamp, flags);
@@ -273,8 +266,7 @@ public class ComplexValueForeignKeyImpl extends ComplexValueForeignKey {
     }
 
     @Override
-    public UnsupportedValue addUnsupportedValue(Map<String, ?> values)
-        throws IOException {
+    public UnsupportedValue addUnsupportedValue(Map<String, ?> values) throws IOException {
         reset();
         UnsupportedValue v = UnsupportedColumnInfoImpl.newValue(this, values);
         getUnsupportedInfo().addValue(v);
@@ -282,16 +274,14 @@ public class ComplexValueForeignKeyImpl extends ComplexValueForeignKey {
     }
 
     @Override
-    public UnsupportedValue updateUnsupportedValue(UnsupportedValue value)
-        throws IOException {
+    public UnsupportedValue updateUnsupportedValue(UnsupportedValue value) throws IOException {
         reset();
         getUnsupportedInfo().updateValue(value);
         return value;
     }
 
     @Override
-    public UnsupportedValue deleteUnsupportedValue(UnsupportedValue value)
-        throws IOException {
+    public UnsupportedValue deleteUnsupportedValue(UnsupportedValue value) throws IOException {
         reset();
         getUnsupportedInfo().deleteValue(value);
         return value;

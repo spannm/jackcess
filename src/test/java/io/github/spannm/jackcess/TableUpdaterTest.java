@@ -66,8 +66,7 @@ class TableUpdaterTest extends AbstractBaseTest {
         }
     }
 
-    private void doTestUpdating(Database db, boolean oneToOne, boolean enforce, String relationshipName)
-        throws Exception {
+    private void doTestUpdating(Database db, boolean oneToOne, boolean enforce, String relationshipName) throws Exception {
         Table t1 = newTable("TestTable")
             .addColumn(newColumn("id", DataType.LONG))
             .toTable(db);

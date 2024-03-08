@@ -201,8 +201,7 @@ public interface Table extends Iterable<Row>, TableDefinition {
      *
      * @return the given row map, which will contain any autonumbers generated
      */
-    <M extends Map<String, Object>> M addRowFromMap(M row)
-        throws IOException;
+    <M extends Map<String, Object>> M addRowFromMap(M row) throws IOException;
 
     /**
      * Add multiple rows to this table, only writing to disk after all rows have been written, and every time a data
@@ -221,8 +220,7 @@ public interface Table extends Iterable<Row>, TableDefinition {
      * @return the given row values list (unless row values were to small), with appropriately sized row values (the
      *         ones passed in if long enough). the returned arrays will contain any autonumbers generated
      */
-    List<? extends Object[]> addRows(List<? extends Object[]> rows)
-        throws IOException;
+    List<? extends Object[]> addRows(List<? extends Object[]> rows) throws IOException;
 
     /**
      * Calls {@link #asRow} on the given row maps and passes the results to {@link #addRows}.
@@ -235,8 +233,7 @@ public interface Table extends Iterable<Row>, TableDefinition {
      *
      * @return the given row map list, where the row maps will contain any autonumbers generated
      */
-    <M extends Map<String, Object>> List<M> addRowsFromMaps(List<M> rows)
-        throws IOException;
+    <M extends Map<String, Object>> List<M> addRowsFromMaps(List<M> rows) throws IOException;
 
     /**
      * Update the given row. Provided Row must have previously been returned from this Table.

@@ -1673,8 +1673,7 @@ public class Expressionator {
         }
     }
 
-    private abstract static class EBaseBinaryOp extends Expr
-        implements LeftAssocExpr, RightAssocExpr {
+    private abstract static class EBaseBinaryOp extends Expr implements LeftAssocExpr, RightAssocExpr {
         protected final OpType _op;
         protected Expr         _left;
         protected Expr         _right;
@@ -1741,8 +1740,7 @@ public class Expressionator {
         }
     }
 
-    private static class EUnaryOp extends Expr
-        implements RightAssocExpr {
+    private static class EUnaryOp extends Expr implements RightAssocExpr {
         private final OpType _op;
         private Expr         _expr;
 
@@ -1846,8 +1844,7 @@ public class Expressionator {
         }
     }
 
-    private abstract static class ESpecOp extends Expr
-        implements LeftAssocExpr {
+    private abstract static class ESpecOp extends Expr implements LeftAssocExpr {
         protected final SpecOp _op;
         protected Expr         _expr;
 
@@ -1974,8 +1971,7 @@ public class Expressionator {
         }
     }
 
-    private static class EBetweenOp extends ESpecOp
-        implements RightAssocExpr {
+    private static class EBetweenOp extends ESpecOp implements RightAssocExpr {
         private final Expr _startRangeExpr;
         private Expr       _endRangeExpr;
 

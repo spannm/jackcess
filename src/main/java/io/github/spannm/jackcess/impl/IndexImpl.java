@@ -248,8 +248,7 @@ public class IndexImpl implements Index, Comparable<IndexImpl> {
      * <p>
      * Forces index initialization.
      */
-    public IndexData.EntryCursor cursor()
-        throws IOException {
+    public IndexData.EntryCursor cursor() throws IOException {
         return cursor(null, true, null, true);
     }
 
@@ -266,8 +265,7 @@ public class IndexImpl implements Index, Comparable<IndexImpl> {
     public IndexData.EntryCursor cursor(Object[] startRow,
         boolean startInclusive,
         Object[] endRow,
-        boolean endInclusive)
-        throws IOException {
+        boolean endInclusive) throws IOException {
         return getIndexData().cursor(startRow, startInclusive, endRow,
             endInclusive);
     }

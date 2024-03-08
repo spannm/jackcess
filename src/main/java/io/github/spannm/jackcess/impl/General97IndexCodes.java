@@ -89,8 +89,7 @@ public class General97IndexCodes extends GeneralLegacyIndexCodes {
      */
     @Override
     void writeNonNullIndexTextValue(
-        Object value, ByteStream bout, boolean isAscending)
-        throws IOException {
+        Object value, ByteStream bout, boolean isAscending) throws IOException {
         // convert to string
         String str = toIndexCharSequence(value);
 

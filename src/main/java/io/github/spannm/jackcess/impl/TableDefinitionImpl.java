@@ -32,8 +32,7 @@ import java.util.List;
  */
 public class TableDefinitionImpl extends TableImpl {
     protected TableDefinitionImpl(DatabaseImpl database, ByteBuffer tableBuffer,
-        int pageNumber, String name, int flags)
-        throws IOException {
+        int pageNumber, String name, int flags) throws IOException {
         super(database, tableBuffer, pageNumber, name, flags);
     }
 

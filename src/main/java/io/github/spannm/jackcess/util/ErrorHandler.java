@@ -57,8 +57,7 @@ public interface ErrorHandler {
     Object handleRowError(Column column,
         byte[] columnData,
         Location location,
-        Exception error)
-        throws IOException;
+        Exception error) throws IOException;
 
     /**
      * Provides location information for an error.

@@ -84,8 +84,7 @@ class CodecHandlerTest extends AbstractBaseTest {
         }
     }
 
-    private static void writeData(Table t1, Table t2, int start, int end)
-        throws Exception {
+    private static void writeData(Table t1, Table t2, int start, int end) throws Exception {
         Database db = t1.getDatabase();
         ((DatabaseImpl) db).getPageChannel().startWrite();
         try {

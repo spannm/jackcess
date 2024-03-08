@@ -43,6 +43,5 @@ public interface LinkResolver {
     /**
      * Returns the appropriate Database instance for the linkeeFileName from the given linkerDb.
      */
-    Database resolveLinkedDatabase(Database linkerDb, String linkeeFileName)
-        throws IOException;
+    Database resolveLinkedDatabase(Database linkerDb, String linkeeFileName) throws IOException;
 }

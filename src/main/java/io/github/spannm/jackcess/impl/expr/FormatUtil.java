@@ -1297,8 +1297,7 @@ public class FormatUtil {
         protected abstract TemporalField getField(WeekFields weekFields);
     }
 
-    private static final class AmPmDFB extends AbstractMap<Long, String>
-        implements DateFormatBuilder {
+    private static final class AmPmDFB extends AbstractMap<Long, String> implements DateFormatBuilder {
         private static final Long ZERO_KEY = 0L;
         private final String      _am;
         private final String      _pm;

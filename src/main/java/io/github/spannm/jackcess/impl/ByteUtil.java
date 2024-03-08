@@ -489,8 +489,7 @@ public final class ByteUtil {
     /**
      * Convert the given number of bytes from the given database page to a hexidecimal string for display.
      */
-    public static String toHexString(DatabaseImpl db, int pageNumber, int size)
-        throws IOException {
+    public static String toHexString(DatabaseImpl db, int pageNumber, int size) throws IOException {
         ByteBuffer buffer = db.getPageChannel().createPageBuffer();
         db.getPageChannel().readPage(buffer, pageNumber);
         return toHexString(buffer, size);
@@ -501,8 +500,7 @@ public final class ByteUtil {
      * value.
      */
     public static void writeHexString(ByteBuffer buffer,
-        String hexStr)
-        throws IOException {
+        String hexStr) throws IOException {
         char[] hexChars = hexStr.toCharArray();
         if (hexChars.length % 2 != 0) {
             throw new IOException("Hex string length must be even");
@@ -644,8 +642,7 @@ public final class ByteUtil {
     /**
      * Skips the given number of bytes in the given stream
      */
-    public static void skipFully(DataInputStream din, int len)
-        throws IOException {
+    public static void skipFully(DataInputStream din, int len) throws IOException {
         do {
             int skipped = din.skipBytes(len);
             len -= skipped;

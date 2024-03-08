@@ -43,8 +43,7 @@ public class VersionHistoryColumnInfoImpl extends ComplexColumnInfoImpl<Version>
     private final Column _modifiedCol;
 
     public VersionHistoryColumnInfoImpl(Column column, int complexId,
-        Table typeObjTable, Table flatTable)
-        throws IOException {
+        Table typeObjTable, Table flatTable) throws IOException {
         super(column, complexId, typeObjTable, flatTable);
 
         Column valueCol = null;
@@ -110,8 +109,7 @@ public class VersionHistoryColumnInfoImpl extends ComplexColumnInfoImpl<Version>
 
     @Override
     protected List<Version> toValues(ComplexValueForeignKey complexValueFk,
-        List<Row> rawValues)
-        throws IOException {
+        List<Row> rawValues) throws IOException {
         List<Version> versions = super.toValues(complexValueFk, rawValues);
 
         // order versions newest to oldest

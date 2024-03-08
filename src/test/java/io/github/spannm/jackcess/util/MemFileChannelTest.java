@@ -136,8 +136,7 @@ class MemFileChannelTest extends AbstractBaseTest {
         assertFalse(ch2.isOpen());
     }
 
-    private static void copy(FileChannel src, FileChannel dst, ByteBuffer bb)
-        throws IOException {
+    private static void copy(FileChannel src, FileChannel dst, ByteBuffer bb) throws IOException {
         src.position(0L);
         while (true) {
             bb.clear();

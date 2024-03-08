@@ -123,8 +123,7 @@ public abstract class CustomLinkResolver implements LinkResolver {
      * @see LinkResolver#DEFAULT
      */
     @Override
-    public Database resolveLinkedDatabase(Database linkerDb, String linkeeFileName)
-        throws IOException {
+    public Database resolveLinkedDatabase(Database linkerDb, String linkeeFileName) throws IOException {
         Object customFile = loadCustomFile(linkerDb, linkeeFileName);
         if (customFile != null) {
             // if linker is read-only, open linkee read-only
@@ -220,8 +219,7 @@ public abstract class CustomLinkResolver implements LinkResolver {
      * @return {@code true} if the table was available in the linked file, {@code false} otherwise
      */
     protected abstract boolean loadCustomTable(
-        Database tempDb, Object customFile, String tableName)
-        throws IOException;
+        Database tempDb, Object customFile, String tableName) throws IOException;
 
     /**
      * Subclass of DatabaseImpl which allows us to load tables "on demand" as well as delete the temporary db on close.

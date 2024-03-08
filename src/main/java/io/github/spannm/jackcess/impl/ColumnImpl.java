@@ -261,8 +261,7 @@ public class ColumnImpl implements Column, Comparable<ColumnImpl>, DateTimeConte
      * @param offset Offset in the buffer at which the column definition starts
      */
     public static ColumnImpl create(TableImpl table, ByteBuffer buffer,
-        int offset, String name, int displayIndex)
-        throws IOException {
+        int offset, String name, int displayIndex) throws IOException {
         InitArgs args = new InitArgs(table, buffer, offset, name, displayIndex);
 
         boolean calculated = (args.extFlags & CALCULATED_EXT_FLAG_MASK) != 0;
@@ -754,8 +753,7 @@ public class ColumnImpl implements Column, Comparable<ColumnImpl>, DateTimeConte
      * @return BigDecimal representing the monetary value
      * @throws IOException if the value cannot be parsed
      */
-    private BigDecimal readCurrencyValue(ByteBuffer buffer)
-        throws IOException {
+    private BigDecimal readCurrencyValue(ByteBuffer buffer) throws IOException {
         if (buffer.remaining() != 8) {
             throw new IOException(withErrorContext("Invalid money value"));
         }
@@ -766,8 +764,7 @@ public class ColumnImpl implements Column, Comparable<ColumnImpl>, DateTimeConte
     /**
      * Writes "Currency" values.
      */
-    private void writeCurrencyValue(ByteBuffer buffer, Object value)
-        throws IOException {
+    private void writeCurrencyValue(ByteBuffer buffer, Object value) throws IOException {
         Object inValue = value;
         try {
             BigDecimal decVal = toBigDecimal(value);
@@ -818,8 +815,7 @@ public class ColumnImpl implements Column, Comparable<ColumnImpl>, DateTimeConte
     /**
      * Writes a numeric value.
      */
-    private void writeNumericValue(ByteBuffer buffer, Object value)
-        throws IOException {
+    private void writeNumericValue(ByteBuffer buffer, Object value) throws IOException {
         Object inValue = value;
         try {
             BigDecimal decVal = toBigDecimal(value);
@@ -857,8 +853,7 @@ public class ColumnImpl implements Column, Comparable<ColumnImpl>, DateTimeConte
         }
     }
 
-    byte[] toUnscaledByteArray(BigDecimal decVal, int maxByteLen)
-        throws IOException {
+    byte[] toUnscaledByteArray(BigDecimal decVal, int maxByteLen) throws IOException {
         // convert to unscaled BigInteger, big-endian bytes
         byte[] intValBytes = decVal.unscaledValue().toByteArray();
         if (intValBytes.length > maxByteLen) {
@@ -968,8 +963,7 @@ public class ColumnImpl implements Column, Comparable<ColumnImpl>, DateTimeConte
     /**
      * Writes a date value.
      */
-    private void writeDateValue(ByteBuffer buffer, Object value)
-        throws InvalidValueException {
+    private void writeDateValue(ByteBuffer buffer, Object value) throws InvalidValueException {
         if (value == null) {
             buffer.putDouble(0d);
         } else if (value instanceof DateExt) {
@@ -1026,8 +1020,7 @@ public class ColumnImpl implements Column, Comparable<ColumnImpl>, DateTimeConte
     /**
      * Returns an access date double converted from a java Date/Calendar/Number time value.
      */
-    public double toDateDouble(Object value)
-        throws InvalidValueException {
+    public double toDateDouble(Object value) throws InvalidValueException {
         try {
             return toDateDouble(value, this);
         } catch (IllegalArgumentException iae) {
@@ -1240,8 +1233,7 @@ public class ColumnImpl implements Column, Comparable<ColumnImpl>, DateTimeConte
     /**
      * Writes a GUID value.
      */
-    private void writeGUIDValue(ByteBuffer buffer, Object value)
-        throws IOException {
+    private void writeGUIDValue(ByteBuffer buffer, Object value) throws IOException {
         Matcher m = GUID_PATTERN.matcher(toCharSequence(value));
         if (!m.matches()) {
             throw new InvalidValueException(
@@ -1311,8 +1303,7 @@ public class ColumnImpl implements Column, Comparable<ColumnImpl>, DateTimeConte
      * @param obj Object to serialize
      * @return A buffer containing the bytes
      */
-    public ByteBuffer write(Object obj, int remainingRowLength)
-        throws IOException {
+    public ByteBuffer write(Object obj, int remainingRowLength) throws IOException {
         return write(obj, remainingRowLength, PageChannel.DEFAULT_BYTE_ORDER);
     }
 
@@ -1323,8 +1314,7 @@ public class ColumnImpl implements Column, Comparable<ColumnImpl>, DateTimeConte
      * @param order Order in which to serialize
      * @return A buffer containing the bytes
      */
-    public ByteBuffer write(Object obj, int remainingRowLength, ByteOrder order)
-        throws IOException {
+    public ByteBuffer write(Object obj, int remainingRowLength, ByteOrder order) throws IOException {
         if (isRawData(obj)) {
             // just slap it right in (not for the faint of heart!)
             return ByteBuffer.wrap(((RawData) obj).getBytes());
@@ -1334,8 +1324,7 @@ public class ColumnImpl implements Column, Comparable<ColumnImpl>, DateTimeConte
     }
 
     protected ByteBuffer writeRealData(Object obj, int remainingRowLength,
-        ByteOrder order)
-        throws IOException {
+        ByteOrder order) throws IOException {
         if (!isVariableLength() || !getType().isVariableLength()) {
             return writeFixedLengthField(obj, order);
         }
@@ -1374,8 +1363,7 @@ public class ColumnImpl implements Column, Comparable<ColumnImpl>, DateTimeConte
      * @param order Order in which to serialize
      * @return A buffer containing the bytes
      */
-    protected ByteBuffer writeFixedLengthField(Object obj, ByteOrder order)
-        throws IOException {
+    protected ByteBuffer writeFixedLengthField(Object obj, ByteOrder order) throws IOException {
         int size = getType().getFixedSize(_columnLength);
 
         ByteBuffer buffer = writeFixedLengthField(
@@ -1384,8 +1372,7 @@ public class ColumnImpl implements Column, Comparable<ColumnImpl>, DateTimeConte
         return buffer;
     }
 
-    protected ByteBuffer writeFixedLengthField(Object obj, ByteBuffer buffer)
-        throws IOException {
+    protected ByteBuffer writeFixedLengthField(Object obj, ByteBuffer buffer) throws IOException {
         // since booleans are not written by this method, it's safe to convert any
         // incoming boolean into an integer.
         obj = booleanToInteger(obj);
@@ -1542,8 +1529,7 @@ public class ColumnImpl implements Column, Comparable<ColumnImpl>, DateTimeConte
      * Encodes a text value, possibly compressing.
      */
     ByteBuffer encodeTextValue(Object obj, int minChars, int maxChars,
-        boolean forceUncompressed)
-        throws IOException {
+        boolean forceUncompressed) throws IOException {
         CharSequence text = toCharSequence(obj);
         if (text.length() > maxChars || text.length() < minChars) {
           throw new InvalidValueException(withErrorContext(
@@ -1762,8 +1748,7 @@ public class ColumnImpl implements Column, Comparable<ColumnImpl>, DateTimeConte
     /**
      * @return an appropriate CharSequence representation of the given object.
      */
-    public static CharSequence toCharSequence(Object value)
-        throws IOException {
+    public static CharSequence toCharSequence(Object value) throws IOException {
         if (value == null) {
             return null;
         } else if (value instanceof CharSequence) {
@@ -1787,8 +1772,7 @@ public class ColumnImpl implements Column, Comparable<ColumnImpl>, DateTimeConte
     /**
      * @return an appropriate byte[] representation of the given object.
      */
-    public static byte[] toByteArray(Object value)
-        throws IOException {
+    public static byte[] toByteArray(Object value) throws IOException {
         if (value == null) {
             return null;
         } else if (value instanceof byte[]) {
@@ -2055,15 +2039,13 @@ public class ColumnImpl implements Column, Comparable<ColumnImpl>, DateTimeConte
      * Converts the given value to the "internal" representation for the given data type.
      */
     public static Object toInternalValue(DataType dataType, Object value,
-        DatabaseImpl db)
-        throws IOException {
+        DatabaseImpl db) throws IOException {
         return toInternalValue(dataType, value, db, null);
     }
 
     static Object toInternalValue(DataType dataType, Object value,
         DatabaseImpl db,
-        ColumnImpl.DateTimeFactory factory)
-        throws IOException {
+        ColumnImpl.DateTimeFactory factory) throws IOException {
         if (value == null) {
             return null;
         }

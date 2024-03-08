@@ -100,8 +100,7 @@ public class OleUtil {
     /**
      * Creates a new OlBlob instance using the given information.
      */
-    public static OleBlob createBlob(Builder oleBuilder)
-        throws IOException {
+    public static OleBlob createBlob(Builder oleBuilder) throws IOException {
         try {
 
             if (!WRITEABLE_TYPES.contains(oleBuilder.getType())) {
@@ -275,8 +274,7 @@ public class OleUtil {
     /**
      * creates the appropriate ContentImpl for the given blob.
      */
-    private static ContentImpl parseContent(OleBlobImpl blob)
-        throws IOException {
+    private static ContentImpl parseContent(OleBlobImpl blob) throws IOException {
         ByteBuffer bb = PageChannel.wrap(blob.getBytes());
 
         if (bb.remaining() < 2 || bb.getShort() != PACKAGE_SIGNATURE) {
@@ -588,8 +586,7 @@ public class OleUtil {
         }
     }
 
-    abstract static class EmbeddedContentImpl extends ContentImpl
-        implements EmbeddedContent {
+    abstract static class EmbeddedContentImpl extends ContentImpl implements EmbeddedContent {
         private final int _position;
         private final int _length;
 
@@ -625,8 +622,7 @@ public class OleUtil {
     }
 
     abstract static class EmbeddedPackageContentImpl
-        extends EmbeddedContentImpl
-        implements PackageContent {
+        extends EmbeddedContentImpl implements PackageContent {
         private final String _prettyName;
         private final String _className;
         private final String _typeName;
@@ -716,8 +712,7 @@ public class OleUtil {
     }
 
     private static final class SimplePackageContentImpl
-        extends EmbeddedPackageContentImpl
-        implements SimplePackageContent {
+        extends EmbeddedPackageContentImpl implements SimplePackageContent {
         private final String _fileName;
         private final String _filePath;
         private final String _localFilePath;

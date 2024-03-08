@@ -36,8 +36,7 @@ public class UnsupportedColumnInfoImpl
     implements UnsupportedColumnInfo {
 
     public UnsupportedColumnInfoImpl(Column column, int complexId,
-        Table typeObjTable, Table flatTable)
-        throws IOException {
+        Table typeObjTable, Table flatTable) throws IOException {
         super(column, complexId, typeObjTable, flatTable);
     }
 
@@ -65,8 +64,7 @@ public class UnsupportedColumnInfoImpl
     }
 
     @Override
-    protected Object[] asRow(Object[] row, UnsupportedValue value)
-        throws IOException {
+    protected Object[] asRow(Object[] row, UnsupportedValue value) throws IOException {
         super.asRow(row, value);
 
         Map<String, Object> values = value.getValues();

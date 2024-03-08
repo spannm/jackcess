@@ -63,8 +63,7 @@ public class AttachmentColumnInfoImpl extends ComplexColumnInfoImpl<Attachment> 
     private final Column             _fileFlagsCol;
 
     public AttachmentColumnInfoImpl(Column column, int complexId,
-        Table typeObjTable, Table flatTable)
-        throws IOException {
+        Table typeObjTable, Table flatTable) throws IOException {
         super(column, complexId, typeObjTable, flatTable);
 
         Column fileUrlCol = null;
@@ -160,8 +159,7 @@ public class AttachmentColumnInfoImpl extends ComplexColumnInfoImpl<Attachment> 
     }
 
     @Override
-    protected Object[] asRow(Object[] row, Attachment attachment)
-        throws IOException {
+    protected Object[] asRow(Object[] row, Attachment attachment) throws IOException {
         super.asRow(row, attachment);
         getFileUrlColumn().setRowValue(row, attachment.getFileUrl());
         getFileNameColumn().setRowValue(row, attachment.getFileName());
@@ -220,8 +218,7 @@ public class AttachmentColumnInfoImpl extends ComplexColumnInfoImpl<Attachment> 
     }
 
     @SuppressWarnings("deprecation")
-    private static class AttachmentImpl extends ComplexValueImpl
-        implements Attachment {
+    private static class AttachmentImpl extends ComplexValueImpl implements Attachment {
         private String  _url;
         private String  _name;
         private String  _type;

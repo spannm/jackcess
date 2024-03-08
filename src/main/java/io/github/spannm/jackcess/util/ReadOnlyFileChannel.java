@@ -80,8 +80,7 @@ public class ReadOnlyFileChannel extends FileChannel {
     }
 
     @Override
-    public long transferTo(long position, long count, WritableByteChannel target)
-        throws IOException {
+    public long transferTo(long position, long count, WritableByteChannel target) throws IOException {
         return _delegate.transferTo(position, count, target);
     }
 

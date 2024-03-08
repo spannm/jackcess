@@ -75,6 +75,5 @@ abstract class InternalColumnValidator implements ColumnValidator {
 
     protected abstract void appendToString(StringBuilder sb);
 
-    protected abstract Object internalValidate(Column col, Object val)
-        throws IOException;
+    protected abstract Object internalValidate(Column col, Object val) throws IOException;
 }

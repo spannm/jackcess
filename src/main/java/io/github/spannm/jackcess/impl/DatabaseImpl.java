@@ -520,8 +520,9 @@ public class DatabaseImpl implements Database, DateTimeContext {
      * @param provider CodecProvider for handling page encoding/decoding, may be {@code null} if no special encoding is necessary
      */
     @SuppressWarnings("PMD.UseTryWithResources")
-    public static DatabaseImpl open(Path mdbFile, boolean readOnly, FileChannel channel, boolean autoSync, Charset charset, TimeZone timeZone, CodecProvider provider, boolean ignoreSystemCatalogIndex)
-        throws IOException {
+    public static DatabaseImpl open(Path mdbFile, boolean readOnly, FileChannel channel, boolean autoSync,
+        Charset charset, TimeZone timeZone, CodecProvider provider, boolean ignoreSystemCatalogIndex) throws IOException {
+
         boolean closeChannel = false;
         if (channel == null) {
             if (!Files.isReadable(mdbFile)) {

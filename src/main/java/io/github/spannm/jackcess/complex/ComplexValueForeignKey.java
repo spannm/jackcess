@@ -104,32 +104,25 @@ public abstract class ComplexValueForeignKey extends Number {
 
     public abstract List<Version> getVersions() throws IOException;
 
-    public abstract List<Attachment> getAttachments()
-        throws IOException;
+    public abstract List<Attachment> getAttachments() throws IOException;
 
-    public abstract List<SingleValue> getMultiValues()
-        throws IOException;
+    public abstract List<SingleValue> getMultiValues() throws IOException;
 
-    public abstract List<UnsupportedValue> getUnsupportedValues()
-        throws IOException;
+    public abstract List<UnsupportedValue> getUnsupportedValues() throws IOException;
 
     public abstract void reset();
 
-    public abstract Version addVersion(String value)
-        throws IOException;
+    public abstract Version addVersion(String value) throws IOException;
 
     /**
      * @deprecated see {@link DateTimeType} for details
      */
     @Deprecated
-    public abstract Version addVersion(String value, Date modifiedDate)
-        throws IOException;
+    public abstract Version addVersion(String value, Date modifiedDate) throws IOException;
 
-    public abstract Version addVersion(String value, LocalDateTime modifiedDate)
-        throws IOException;
+    public abstract Version addVersion(String value, LocalDateTime modifiedDate) throws IOException;
 
-    public abstract Attachment addAttachment(byte[] data)
-        throws IOException;
+    public abstract Attachment addAttachment(byte[] data) throws IOException;
 
     /**
      * @deprecated see {@link DateTimeType} for details
@@ -137,16 +130,13 @@ public abstract class ComplexValueForeignKey extends Number {
     @Deprecated
     public abstract Attachment addAttachment(
         String url, String name, String type, byte[] data,
-        Date timeStamp, Integer flags)
-        throws IOException;
+        Date timeStamp, Integer flags) throws IOException;
 
     public abstract Attachment addAttachment(
         String url, String name, String type, byte[] data,
-        LocalDateTime timeStamp, Integer flags)
-        throws IOException;
+        LocalDateTime timeStamp, Integer flags) throws IOException;
 
-    public abstract Attachment addEncodedAttachment(byte[] encodedData)
-        throws IOException;
+    public abstract Attachment addEncodedAttachment(byte[] encodedData) throws IOException;
 
     /**
      * @deprecated see {@link DateTimeType} for details
@@ -154,39 +144,28 @@ public abstract class ComplexValueForeignKey extends Number {
     @Deprecated
     public abstract Attachment addEncodedAttachment(
         String url, String name, String type, byte[] encodedData,
-        Date timeStamp, Integer flags)
-        throws IOException;
+        Date timeStamp, Integer flags) throws IOException;
 
     public abstract Attachment addEncodedAttachment(
         String url, String name, String type, byte[] encodedData,
-        LocalDateTime timeStamp, Integer flags)
-        throws IOException;
+        LocalDateTime timeStamp, Integer flags) throws IOException;
 
-    public abstract Attachment updateAttachment(Attachment attachment)
-        throws IOException;
+    public abstract Attachment updateAttachment(Attachment attachment) throws IOException;
 
-    public abstract Attachment deleteAttachment(Attachment attachment)
-        throws IOException;
+    public abstract Attachment deleteAttachment(Attachment attachment) throws IOException;
 
-    public abstract SingleValue addMultiValue(Object value)
-        throws IOException;
+    public abstract SingleValue addMultiValue(Object value) throws IOException;
 
-    public abstract SingleValue updateMultiValue(SingleValue value)
-        throws IOException;
+    public abstract SingleValue updateMultiValue(SingleValue value) throws IOException;
 
-    public abstract SingleValue deleteMultiValue(SingleValue value)
-        throws IOException;
+    public abstract SingleValue deleteMultiValue(SingleValue value) throws IOException;
 
-    public abstract UnsupportedValue addUnsupportedValue(Map<String, ?> values)
-        throws IOException;
+    public abstract UnsupportedValue addUnsupportedValue(Map<String, ?> values) throws IOException;
 
-    public abstract UnsupportedValue updateUnsupportedValue(UnsupportedValue value)
-        throws IOException;
+    public abstract UnsupportedValue updateUnsupportedValue(UnsupportedValue value) throws IOException;
 
-    public abstract UnsupportedValue deleteUnsupportedValue(UnsupportedValue value)
-        throws IOException;
+    public abstract UnsupportedValue deleteUnsupportedValue(UnsupportedValue value) throws IOException;
 
-    public abstract void deleteAllValues()
-        throws IOException;
+    public abstract void deleteAllValues() throws IOException;
 
 }

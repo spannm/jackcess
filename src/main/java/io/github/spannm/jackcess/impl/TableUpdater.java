@@ -143,8 +143,7 @@ public class TableUpdater extends TableMutator {
     }
 
     IndexImpl addIndex(IndexBuilder index, boolean isInternal, byte ignoreIdxFlags,
-        byte ignoreColFlags)
-        throws IOException {
+        byte ignoreColFlags) throws IOException {
         _index = index;
 
         if (!isInternal) {

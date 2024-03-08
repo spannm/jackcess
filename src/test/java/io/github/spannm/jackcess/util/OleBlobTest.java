@@ -227,8 +227,7 @@ class OleBlobTest extends AbstractBaseTest {
     }
 
     private static void checkCompoundStorage(OleBlob.CompoundContent cc,
-        Attachment attach)
-        throws Exception {
+        Attachment attach) throws Exception {
         File tmpData = File.createTempFile("attach_", ".dat");
 
         try {
