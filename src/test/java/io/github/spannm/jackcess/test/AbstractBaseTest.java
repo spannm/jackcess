@@ -6,6 +6,7 @@ import io.github.spannm.jackcess.impl.DatabaseImpl;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.TestInfo;
+import org.junit.jupiter.params.provider.Arguments;
 
 import java.io.File;
 import java.io.IOException;
@@ -65,9 +66,9 @@ public abstract class AbstractBaseTest extends Assertions {
     @BeforeEach
     public final void logTestBegin(TestInfo _testInfo) {
         if (_testInfo.getTestMethod().isEmpty() || _testInfo.getDisplayName().startsWith(_testInfo.getTestMethod().get().getName())) {
-            getLogger().log(Level.INFO, ">>>>>>>>>> TEST: {0} <<<<<<<<<<", _testInfo.getDisplayName());
+            getLogger().log(Level.INFO, ">>>> TEST: {0} <<<<<<<<<<", _testInfo.getDisplayName());
         } else {
-            getLogger().log(Level.INFO, ">>>>>>>>>> TEST: {0} ({1}) <<<<<<<<<<",
+            getLogger().log(Level.INFO, ">>>> TEST: {0} ({1}) <<<<<<<<<<",
                 _testInfo.getTestMethod().get().getName(), _testInfo.getDisplayName());
         }
     }
@@ -146,6 +147,13 @@ public abstract class AbstractBaseTest extends Assertions {
 
     public static List<TestDB> getSupportedReadOnlyTestDbs() {
         return SUPPORTED_DBS_TEST_FOR_READ;
+    }
+
+    /**
+     * Shortcut to create an {@link Arguments} instance.
+     */
+    public static Arguments args(Object... _arguments) {
+        return Arguments.of(_arguments);
     }
 
 }

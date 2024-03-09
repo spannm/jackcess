@@ -129,8 +129,8 @@ class ExpressionatorTest extends AbstractBaseTest {
     @IntRangeSource(start = -10, end = 10, endInclusive = true)
     void testSimpleMathExpressions1(int i) {
         assertAll("math1",
-            () -> assertEquals(-i, eval("=-(" + i + ")")),
-            () -> assertEquals(i, eval("=+(" + i + ")"))
+            () -> assertEquals(-i, eval("-(" + i + ")")),
+            () -> assertEquals(i, eval("+(" + i + ")"))
         );
     }
 
@@ -139,15 +139,15 @@ class ExpressionatorTest extends AbstractBaseTest {
     void testSimpleMathExpressions2(double d) {
         BigDecimal bd = toBD(d);
         assertAll("math2",
-            () -> assertEquals(bd.negate(), eval("=-(" + d + ")")),
-            () -> assertEquals(bd, eval("=+(" + d + ")"))
+            () -> assertEquals(bd.negate(), eval("-(" + d + ")")),
+            () -> assertEquals(bd, eval("+(" + d + ")"))
         );
     }
 
     @ParameterizedTest(name = "[{index}] {0}, {1}")
     @IntMatrixSource(start = -10, end = 10, endInclusive = true)
     void testSimpleMathExpressions3(int i, int j) {
-        assertEquals(i + j, eval("=" + i + " + " + j));
+        assertEquals(i + j, eval(i + " + " + j));
     }
 
     @ParameterizedTest(name = "[{index}] {0}")
@@ -156,23 +156,23 @@ class ExpressionatorTest extends AbstractBaseTest {
         BigDecimal bd1 = toBD(d1);
         for (double j : getDoublesTestData()) {
             BigDecimal bd2 = toBD(j);
-            assertEquals(toBD(bd1.add(bd2)), eval("=" + d1 + " + " + j));
-            assertEquals(toBD(bd1.subtract(bd2)), eval("=" + d1 + " - " + j));
-            assertEquals(toBD(bd1.multiply(bd2)), eval("=" + d1 + " * " + j));
+            assertEquals(toBD(bd1.add(bd2)), eval(d1 + " + " + j));
+            assertEquals(toBD(bd1.subtract(bd2)), eval(d1 + " - " + j));
+            assertEquals(toBD(bd1.multiply(bd2)), eval(d1 + " * " + j));
             if (roundToLongInt(j) == 0) {
-                evalFail("=" + d1 + " \\ " + j, ArithmeticException.class);
+                evalFail(d1 + " \\ " + j, ArithmeticException.class);
             } else {
-                assertEquals(roundToLongInt(d1) / roundToLongInt(j), eval("=" + d1 + " \\ " + j));
+                assertEquals(roundToLongInt(d1) / roundToLongInt(j), eval(d1 + " \\ " + j));
             }
             if (roundToLongInt(j) == 0) {
-                evalFail("=" + d1 + " Mod " + j, ArithmeticException.class);
+                evalFail(d1 + " Mod " + j, ArithmeticException.class);
             } else {
-                assertEquals(roundToLongInt(d1) % roundToLongInt(j), eval("=" + d1 + " Mod " + j));
+                assertEquals(roundToLongInt(d1) % roundToLongInt(j), eval(d1 + " Mod " + j));
             }
             if (j == 0.0d) {
-                evalFail("=" + d1 + " / " + j, ArithmeticException.class);
+                evalFail(d1 + " / " + j, ArithmeticException.class);
             } else {
-                assertEquals(toBD(BuiltinOperators.divide(bd1, bd2)), eval("=" + d1 + " / " + j));
+                assertEquals(toBD(BuiltinOperators.divide(bd1, bd2)), eval(d1 + " / " + j));
             }
         }
     }
@@ -180,36 +180,36 @@ class ExpressionatorTest extends AbstractBaseTest {
     @ParameterizedTest(name = "[{index}] {0}, {1}")
     @IntMatrixSource(start = -10, end = 10, endInclusive = true)
     void testSimpleMathExpressions5(int i, int j) {
-        assertEquals(i - j, eval("=" + i + " - " + j));
-        assertEquals(i * j, eval("=" + i + " * " + j));
+        assertEquals(i - j, eval(i + " - " + j));
+        assertEquals(i * j, eval(i + " * " + j));
         if (j == 0L) {
-            evalFail("=" + i + " \\ " + j, ArithmeticException.class);
+            evalFail(i + " \\ " + j, ArithmeticException.class);
         } else {
-            assertEquals(i / j, eval("=" + i + " \\ " + j));
+            assertEquals(i / j, eval(i + " \\ " + j));
         }
 
         if (j == 0) {
-            evalFail("=" + i + " Mod " + j, ArithmeticException.class);
+            evalFail(i + " Mod " + j, ArithmeticException.class);
         } else {
-            assertEquals(i % j, eval("=" + i + " Mod " + j));
+            assertEquals(i % j, eval(i + " Mod " + j));
         }
 
         if (j == 0) {
-            evalFail("=" + i + " / " + j, ArithmeticException.class);
+            evalFail(i + " / " + j, ArithmeticException.class);
         } else {
             double result = (double) i / (double) j;
             if ((int) result == result) {
-                assertEquals((int) result, eval("=" + i + " / " + j));
+                assertEquals((int) result, eval(i + " / " + j));
             } else {
-                assertEquals(result, eval("=" + i + " / " + j));
+                assertEquals(result, eval(i + " / " + j));
             }
         }
 
         double result = Math.pow(i, j);
         if ((int) result == result) {
-            assertEquals((int) result, eval("=" + i + " ^ " + j));
+            assertEquals((int) result, eval(i + " ^ " + j));
         } else {
-            assertEquals(result, eval("=" + i + " ^ " + j));
+            assertEquals(result, eval(i + " ^ " + j));
         }
     }
 
@@ -268,31 +268,31 @@ class ExpressionatorTest extends AbstractBaseTest {
 
     @ParameterizedTest(name = "[{index}] {0}")
     @CsvSource(delimiter = ';', value = {
-        "=37 + Null",
-        "=37 - Null",
-        "=37 / Null",
-        "=37 * Null",
-        "=37 ^ Null",
-        "=37 Mod Null",
-        "=37 \\ Null",
-        "=-(Null)",
-        "=+(Null)",
-        "=Not Null",
-        "=Null Or 37",
-        "=37 And Null",
-        "=Null And 37",
-        "=37 Xor Null",
-        "=37 Imp Null",
-        "=Null Imp Null",
-        "=37 Eqv Null",
-        "=37 < Null",
-        "=37 > Null",
-        "=37 = Null",
-        "=37 <> Null",
-        "=37 <= Null",
-        "=37 >= Null",
-        "=37 Between Null And 54",
-        "=Null In (23, Null, 45)"
+        "37 + Null",
+        "37 - Null",
+        "37 / Null",
+        "37 * Null",
+        "37 ^ Null",
+        "37 Mod Null",
+        "37 \\ Null",
+        "-(Null)",
+        "+(Null)",
+        "Not Null",
+        "Null Or 37",
+        "37 And Null",
+        "Null And 37",
+        "37 Xor Null",
+        "37 Imp Null",
+        "Null Imp Null",
+        "37 Eqv Null",
+        "37 < Null",
+        "37 > Null",
+        "37 = Null",
+        "37 <> Null",
+        "37 <= Null",
+        "37 >= Null",
+        "37 Between Null And 54",
+        "Null In (23, Null, 45)"
     })
     void testNull1(String exprStr) {
         assertNull(eval(exprStr));
@@ -346,29 +346,29 @@ class ExpressionatorTest extends AbstractBaseTest {
 
     @Test
     void testTypeCoercion() {
-        assertEquals("foobar", eval("=\"foo\" + \"bar\""));
+        assertEquals("foobar", eval("\"foo\" + \"bar\""));
 
-        assertEquals("12foo", eval("=12 + \"foo\""));
-        assertEquals("foo12", eval("=\"foo\" + 12"));
+        assertEquals("12foo", eval("12 + \"foo\""));
+        assertEquals("foo12", eval("\"foo\" + 12"));
 
-        assertEquals(37d, eval("=\"25\" + 12"));
-        assertEquals(37d, eval("=12 + \"25\""));
-        assertEquals(37d, eval("=\" 25 \" + 12"));
-        assertEquals(37d, eval("=\" &h1A \" + 11"));
-        assertEquals(37d, eval("=\" &h1a \" + 11"));
-        assertEquals(37d, eval("=\" &O32 \" + 11"));
-        assertEquals(1037d, eval("=\"1,025\" + 12"));
+        assertEquals(37d, eval("\"25\" + 12"));
+        assertEquals(37d, eval("12 + \"25\""));
+        assertEquals(37d, eval("\" 25 \" + 12"));
+        assertEquals(37d, eval("\" &h1A \" + 11"));
+        assertEquals(37d, eval("\" &h1a \" + 11"));
+        assertEquals(37d, eval("\" &O32 \" + 11"));
+        assertEquals(1037d, eval("\"1,025\" + 12"));
 
         evalFail("=12 - \"foo\"", RuntimeException.class);
         evalFail("=\"foo\" - 12", RuntimeException.class);
 
-        assertEquals("foo1225", eval("=\"foo\" + 12 + 25"));
-        assertEquals("37foo", eval("=12 + 25 + \"foo\""));
-        assertEquals("foo37", eval("=\"foo\" + (12 + 25)"));
-        assertEquals("25foo12", eval("=\"25foo\" + 12"));
+        assertEquals("foo1225", eval("\"foo\" + 12 + 25"));
+        assertEquals("37foo", eval("12 + 25 + \"foo\""));
+        assertEquals("foo37", eval("\"foo\" + (12 + 25)"));
+        assertEquals("25foo12", eval("\"25foo\" + 12"));
 
-        assertEquals(LocalDateTime.of(2017, 1, 28, 0, 0), eval("=#1/1/2017# + 27"));
-        assertEquals(128208, eval("=#1/1/2017# * 3"));
+        assertEquals(LocalDateTime.of(2017, 1, 28, 0, 0), eval("#1/1/2017# + 27"));
+        assertEquals(128208, eval("#1/1/2017# * 3"));
     }
 
     @Test
@@ -389,7 +389,7 @@ class ExpressionatorTest extends AbstractBaseTest {
         assertEquals("-28 blah ", eval("=CDbl(9)-37 & \" blah \"", Value.Type.STRING));
         assertEquals("CDbl(9)-37 & \" blah \"", eval("CDbl(9)-37 & \" blah \"", Value.Type.STRING));
 
-        assertEquals(-28d, eval("=CDbl(9)-37", Value.Type.DOUBLE));
+        assertEquals(-28d, eval("CDbl(9)-37", Value.Type.DOUBLE));
         assertEquals(-28d, eval("CDbl(9)-37", Value.Type.DOUBLE));
     }
 
@@ -459,15 +459,15 @@ class ExpressionatorTest extends AbstractBaseTest {
     }
 
     private static void validateExpr(String exprStr, String debugStr, String cleanStr) {
-        TestContext ctx = new TestContext();
-        Expression expr = Expressionator.parse(Expressionator.Type.FIELD_VALIDATOR, exprStr, null, ctx);
-        String foundDebugStr = expr.toDebugString(ctx);
+        TestContext tc = new TestContext();
+        Expression expr = Expressionator.parse(Expressionator.Type.FIELD_VALIDATOR, exprStr, null, tc);
+        String foundDebugStr = expr.toDebugString(tc);
         if (foundDebugStr.startsWith("<EImplicitCompOp>")) {
             assertEquals("<EImplicitCompOp>{<EThisValue>{<THIS_COL>} = " + debugStr + "}", foundDebugStr);
         } else {
             assertEquals(debugStr, foundDebugStr);
         }
-        assertEquals(cleanStr, expr.toCleanString(ctx));
+        assertEquals(cleanStr, expr.toCleanString(tc));
         assertEquals(exprStr, expr.toRawString());
     }
 
@@ -505,17 +505,17 @@ class ExpressionatorTest extends AbstractBaseTest {
         return ValueSupport.normalize(bd);
     }
 
-    private static class TestContext implements Expressionator.ParseContext, EvalContext {
-        private final Value         _thisVal;
-        private final RandomContext _rndCtx   = new RandomContext();
-        private final Bindings      _bindings = new SimpleBindings();
+    static class TestContext implements Expressionator.ParseContext, EvalContext {
+        private final Value         thisVal;
+        private final RandomContext rndCtx   = new RandomContext();
+        private final Bindings      bindings = new SimpleBindings();
 
-        private TestContext() {
+        TestContext() {
             this(null);
         }
 
-        private TestContext(Value thisVal) {
-            _thisVal = thisVal;
+        TestContext(Value _thisVal) {
+            thisVal = _thisVal;
         }
 
         @Override
@@ -529,9 +529,8 @@ class ExpressionatorTest extends AbstractBaseTest {
         }
 
         @Override
-        public DateTimeFormatter createDateFormatter(String formatStr) {
-            return DateTimeFormatter.ofPattern(
-                formatStr, TemporalConfig.US_TEMPORAL_CONFIG.getLocale());
+        public DateTimeFormatter createDateFormatter(String _formatStr) {
+            return DateTimeFormatter.ofPattern(_formatStr, TemporalConfig.US_TEMPORAL_CONFIG.getLocale());
         }
 
         @Override
@@ -545,9 +544,8 @@ class ExpressionatorTest extends AbstractBaseTest {
         }
 
         @Override
-        public DecimalFormat createDecimalFormat(String formatStr) {
-            return new DecimalFormat(
-                formatStr, NumericConfig.US_NUMERIC_CONFIG.getDecimalFormatSymbols());
+        public DecimalFormat createDecimalFormat(String _formatStr) {
+            return new DecimalFormat(_formatStr, NumericConfig.US_NUMERIC_CONFIG.getDecimalFormatSymbols());
         }
 
         @Override
@@ -557,35 +555,35 @@ class ExpressionatorTest extends AbstractBaseTest {
 
         @Override
         public Value getThisColumnValue() {
-            if (_thisVal == null) {
+            if (thisVal == null) {
                 throw new UnsupportedOperationException();
             }
-            return _thisVal;
+            return thisVal;
         }
 
         @Override
-        public Value getIdentifierValue(Identifier identifier) {
+        public Value getIdentifierValue(Identifier _identifier) {
             throw new UnsupportedOperationException();
         }
 
         @Override
-        public float getRandom(Integer seed) {
-            return _rndCtx.getRandom(seed);
+        public float getRandom(Integer _seed) {
+            return rndCtx.getRandom(_seed);
         }
 
         @Override
         public Bindings getBindings() {
-            return _bindings;
+            return bindings;
         }
 
         @Override
-        public Object get(String key) {
-            return _bindings.get(key);
+        public Object get(String _key) {
+            return bindings.get(_key);
         }
 
         @Override
-        public void put(String key, Object value) {
-            _bindings.put(key, value);
+        public void put(String _key, Object _value) {
+            bindings.put(_key, _value);
         }
     }
 

@@ -16,11 +16,9 @@ limitations under the License.
 
 package io.github.spannm.jackcess.impl.expr;
 
-import static io.github.spannm.jackcess.impl.expr.ExpressionatorTest.eval;
-import static io.github.spannm.jackcess.impl.expr.ExpressionatorTest.toBD;
-import static org.junit.jupiter.params.provider.Arguments.arguments;
-
 import io.github.spannm.jackcess.expr.EvalException;
+import io.github.spannm.jackcess.expr.Expression;
+import io.github.spannm.jackcess.impl.expr.ExpressionatorTest.TestContext;
 import io.github.spannm.jackcess.test.AbstractBaseTest;
 import io.github.spannm.jackcess.test.TestUtil;
 import io.github.spannm.jackcess.test.converter.CsvToLocalDateTime;
@@ -40,7 +38,6 @@ import java.time.format.DateTimeFormatterBuilder;
 import java.util.Calendar;
 import java.util.List;
 import java.util.Locale;
-import java.util.function.Supplier;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
@@ -160,13 +157,13 @@ class DefaultFunctionsTest extends AbstractBaseTest {
         "FormatDateTime(#1/1/1973 1:37:25 PM#,3); 1:37:25 PM",
         "FormatDateTime(#1/1/1973 1:37:25 PM#,4); 13:37"
     })
-    void testFuncsString(String exprStr, String expected) {
-        assertEquals(expected, eval('=' + exprStr));
+    void testFuncsString(String _exprStr, String _expected) {
+        assertEquals(_expected, eval(_exprStr));
     }
 
     @Test
     void testFuncsQuoting() {
-        assertEquals(" FOO \" BAR ", eval("=UCase(\" foo \"\" bar \")"));
+        assertEquals(" FOO \" BAR ", eval("UCase(\" foo \"\" bar \")"));
     }
 
     @ParameterizedTest(name = "[{index}] {0} --> {1}")
@@ -237,8 +234,8 @@ class DefaultFunctionsTest extends AbstractBaseTest {
         "StrComp('bar', 'FOO', 0); 1",
         "StrComp('FOO', 'foo', 0); -1"
     })
-    void testFuncsInt(String exprStr, int expected) {
-        assertEquals(expected, eval('=' + exprStr));
+    void testFuncsInt(String _exprStr, int _expected) {
+        assertEquals(_expected, eval(_exprStr));
     }
 
     @ParameterizedTest(name = "[{index}] {0}")
@@ -249,8 +246,8 @@ class DefaultFunctionsTest extends AbstractBaseTest {
         "Choose(-1,'foo','bar','blah')",
         "Switch(False,'foo', False, 'bar', False, 'blah')"
     })
-    void testFuncsNull(String exprStr) {
-        assertNull(eval('=' + exprStr));
+    void testFuncsNull(String _exprStr) {
+        assertNull(eval(_exprStr));
     }
 
     @ParameterizedTest(name = "[{index}] {0} --> {1}")
@@ -266,8 +263,8 @@ class DefaultFunctionsTest extends AbstractBaseTest {
         "Val('  whatever123 '); 0d",
         "Val(''); 0d"
     })
-    void testFuncsDouble(String exprStr, double expected) {
-        assertEquals(expected, eval('=' + exprStr));
+    void testFuncsDouble(String _exprStr, double _expected) {
+        assertEquals(_expected, eval(_exprStr));
     }
 
     @ParameterizedTest(name = "[{index}] {0} --> {1}")
@@ -275,16 +272,16 @@ class DefaultFunctionsTest extends AbstractBaseTest {
         "CCur(\"57.12346\"); 57.1235",
         "CDec(\"57.123456789\"); 57.123456789"
     })
-    void testFuncsBigDecimal(String exprStr, BigDecimal expected) {
-        assertEquals(expected, eval('=' + exprStr));
+    void testFuncsBigDecimal(String _exprStr, BigDecimal _expected) {
+        assertEquals(_expected, eval(_exprStr));
     }
 
     @ParameterizedTest(name = "[{index}] {0} --> {1}")
     @CsvSource(delimiter = ';', value = {
         "CSng(\"57.12345\"); 57.12345"
     })
-    void testFuncsFloat(String exprStr, String expected) {
-        assertEquals(Float.valueOf(expected).doubleValue(), eval('=' + exprStr));
+    void testFuncsFloat(String _exprStr, String _expected) {
+        assertEquals(Float.valueOf(_expected).doubleValue(), eval(_exprStr));
     }
 
     @ParameterizedTest(name = "[{index}] {0} --> {1}")
@@ -293,8 +290,8 @@ class DefaultFunctionsTest extends AbstractBaseTest {
         "2003, 1, 2, 7, 0; CDate('01/02/2003 7:00:00 AM')",
         "1908, 3, 31, 10, 48; CDate(3013.45)"
     })
-    void testFuncsLocalDateTime(@ConvertWith(CsvToLocalDateTime.class) LocalDateTime expected, String exprStr) {
-        assertEquals(expected, eval(exprStr));
+    void testFuncsLocalDateTime(@ConvertWith(CsvToLocalDateTime.class) LocalDateTime _expected, String _exprStr) {
+        assertEquals(_expected, eval(_exprStr));
     }
 
     @ParameterizedTest(name = "[{index}] {0} --> {1}")
@@ -303,9 +300,9 @@ class DefaultFunctionsTest extends AbstractBaseTest {
         "StrReverse('blah', 1); Invalid function call",
         "StrReverse(); Invalid function call"
     })
-    void testFuncsExceptions(String exprStr, String message) {
-        EvalException ex = assertThrows(EvalException.class, () -> eval('=' + exprStr));
-        assertTrue(ex.getMessage().contains(message));
+    void testFuncsException(String _exprStr, String _message) {
+        EvalException ex = assertThrows(EvalException.class, () -> eval(_exprStr));
+        assertTrue(ex.getMessage().contains(_message));
     }
 
     @ParameterizedTest(name = "[{index}] {0} --> {1}")
@@ -371,8 +368,8 @@ class DefaultFunctionsTest extends AbstractBaseTest {
         "Format(#01/02/2003 7:00:00 AM#, 'Short Time'); 07:00",
         "Format(#01/02/2003 7:00:00 PM#, 'Short Time'); 19:00"
     })
-    void testFormat(String exprStr, String expected) {
-        assertEquals(expected, eval('=' + exprStr));
+    void testFormat(String _exprStr, String _expected) {
+        assertEquals(_expected, eval(_exprStr));
     }
 
     @ParameterizedTest(name = "[{index}] {0} --> {1}")
@@ -392,8 +389,8 @@ class DefaultFunctionsTest extends AbstractBaseTest {
         "Format(3.9, 'ttttt')| 9:36:00 PM",
         "Format('foo', 'dddd, yy mmm mm d, hh:nn:ss AMPM')| foo"
     })
-    void testCustomFormat1(String exprStr, String expected) {
-        assertEquals(expected, eval('=' + exprStr));
+    void testCustomFormat1(String _exprStr, String _expected) {
+        assertEquals(_expected, eval(_exprStr));
     }
 
     @ParameterizedTest(name = "[{index}] Format({0}, {1}) --> {2}")
@@ -589,8 +586,8 @@ class DefaultFunctionsTest extends AbstractBaseTest {
         "xfooba y", "'fooba'",
         "xbarbazy", "'foobarbaz'"
     })
-    void testCustomFormat2(String value, String fmtStr, String expected) {
-        assertEquals(expected, eval("=Format(" + value + ", " + fmtStr + ")"));
+    void testCustomFormat2(String value, String fmtStr, String _expected) {
+        assertEquals(_expected, eval("Format(" + value + ", " + fmtStr + ")"));
     }
 
     @ParameterizedTest(name = "[{index}] {0} --> {1}")
@@ -599,22 +596,27 @@ class DefaultFunctionsTest extends AbstractBaseTest {
         "Abs(-1)  ; 1",
         "Abs(-1.1); 1.1"
     })
-    void testNumberFuncsInt(String exprStr, double expected) {
-        Number result = (Number) eval('=' + exprStr);
-        assertEquals(expected, result.doubleValue());
+    void testNumberFuncsInt(String _exprStr, double _expected) {
+        Number result = (Number) eval(_exprStr);
+        assertEquals(_expected, result.doubleValue());
     }
 
-    @Test
-    void testNumberFuncsMath() {
-        assertAll("trig",
-            () -> assertEquals(Math.atan(0.2), eval("=Atan(0.2)")),
-            () -> assertEquals(Math.sin(0.2), eval("=Sin(0.2)")),
-            () -> assertEquals(Math.tan(0.2), eval("=Tan(0.2)")),
-            () -> assertEquals(Math.cos(0.2), eval("=Cos(0.2)")),
-            () -> assertEquals(Math.exp(0.2), eval("=Exp(0.2)")),
-            () -> assertEquals(Math.log(0.2), eval("=Log(0.2)")),
-            () -> assertEquals(Math.sqrt(4.3), eval("=Sqr(4.3)"))
+    static Stream<Arguments> getMathTrigFuncsData() {
+        return Stream.of(
+            args("Atan(0.2)", Math.atan(0.2)),
+            args("Sin(0.2)", Math.sin(0.2)),
+            args("Tan(0.2)", Math.tan(0.2)),
+            args("Cos(0.2)", Math.cos(0.2)),
+            args("Exp(0.2)", Math.exp(0.2)),
+            args("Log(0.2)", Math.log(0.2)),
+            args("Sqr(4.3)", Math.sqrt(4.3))
         );
+    }
+
+    @ParameterizedTest(name = "[{index}] {0} --> {1}")
+    @MethodSource("getMathTrigFuncsData")
+    void testMathTrigFuncs(String _exprStr, Object _expected) {
+        assertEquals(_expected, eval(_exprStr));
     }
 
     @ParameterizedTest(name = "[{index}] {0} --> {1}")
@@ -634,8 +636,8 @@ class DefaultFunctionsTest extends AbstractBaseTest {
         "Int(-3.5); -4",
         "Int(-4)  ; -4 "
     })
-    void testNumberFuncsInt2(String exprStr, int expected) {
-        assertEquals(expected, eval('=' + exprStr));
+    void testNumberFuncsInt2(String _exprStr, int _expected) {
+        assertEquals(_expected, eval(_exprStr));
     }
 
     @ParameterizedTest(name = "[{index}] {0} --> {1}")
@@ -650,174 +652,170 @@ class DefaultFunctionsTest extends AbstractBaseTest {
         "Round(-3.7345, 2); -3.73; true",
         "Round(-4, 2)     ;    -4; false"
     })
-    void testNumberFuncsRound(String exprStr, Double expected, boolean bd) {
-        assertEquals(bd ? toBD(expected) : expected.intValue(), eval('=' + exprStr));
+    void testNumberFuncsRound(String _exprStr, BigDecimal _expected, boolean isBigDecimal) {
+        assertEquals(isBigDecimal ? _expected : _expected.intValue(), eval(_exprStr));
     }
 
-    static Stream<Arguments> getDateFuncsTestData() {
+    static Stream<Arguments> getDateFuncsData() {
         return Stream.of(
-            arguments("CStr(DateValue(#01/02/2003 7:00:00 AM#))", "1/2/2003"),
-            arguments("CStr(TimeValue(#01/02/2003 7:00:00 AM#))", "7:00:00 AM"),
+            args("CStr(DateValue(#01/02/2003 7:00:00 AM#))", "1/2/2003"),
+            args("CStr(TimeValue(#01/02/2003 7:00:00 AM#))", "7:00:00 AM"),
 
-            arguments("CStr(#13:10:00#)", "1:10:00 PM"),
+            args("CStr(#13:10:00#)", "1:10:00 PM"),
 
-            arguments("Year(#01/02/2003 7:00:00 AM#)", 2003),
-            arguments("Month(#01/02/2003 7:00:00 AM#)", 1),
-            arguments("Day(#01/02/2003 7:00:00 AM#)", 2),
+            args("Year(#01/02/2003 7:00:00 AM#)", 2003),
+            args("Month(#01/02/2003 7:00:00 AM#)", 1),
+            args("Day(#01/02/2003 7:00:00 AM#)", 2),
 
-            arguments("Year('01/02/2003 7:00:00 AM')", 2003),
-            arguments("Year(#7:00:00 AM#)", 1899),
-            arguments("Year('01/02 7:00:00 AM')", Calendar.getInstance().get(Calendar.YEAR)),
+            args("Year('01/02/2003 7:00:00 AM')", 2003),
+            args("Year(#7:00:00 AM#)", 1899),
+            args("Year('01/02 7:00:00 AM')", Calendar.getInstance().get(Calendar.YEAR)),
 
-            arguments("MonthName(1)", "January"),
-            arguments("MonthName(2,True)", "Feb"),
-            arguments("MonthName(3,False)", "March"),
+            args("MonthName(1)", "January"),
+            args("MonthName(2,True)", "Feb"),
+            args("MonthName(3,False)", "March"),
 
-            arguments("Hour(#01/02/2003 7:10:27 AM#)", 7),
-            arguments("Hour(#01/02/2003 7:10:27 PM#)", 19),
-            arguments("Minute(#01/02/2003 7:10:27 AM#)", 10),
-            arguments("Second(#01/02/2003 7:10:27 AM#)", 27),
+            args("Hour(#01/02/2003 7:10:27 AM#)", 7),
+            args("Hour(#01/02/2003 7:10:27 PM#)", 19),
+            args("Minute(#01/02/2003 7:10:27 AM#)", 10),
+            args("Second(#01/02/2003 7:10:27 AM#)", 27),
 
-            arguments("Weekday(#11/22/2003#)", 7),
-            arguments("Weekday(#11/22/2003#, 5)", 3),
-            arguments("Weekday(#11/22/2003#, 7)", 1),
+            args("Weekday(#11/22/2003#)", 7),
+            args("Weekday(#11/22/2003#, 5)", 3),
+            args("Weekday(#11/22/2003#, 7)", 1),
 
-            arguments("WeekdayName(1)", "Sunday"),
-            arguments("WeekdayName(1,True)", "Sun"),
-            arguments("WeekdayName(1,False,3)", "Tuesday"),
-            arguments("WeekdayName(3,True,3)", "Thu"),
+            args("WeekdayName(1)", "Sunday"),
+            args("WeekdayName(1,True)", "Sun"),
+            args("WeekdayName(1,False,3)", "Tuesday"),
+            args("WeekdayName(3,True,3)", "Thu"),
 
-            arguments("CStr(Date())", (Supplier<?>) () ->
+            args("CStr(Date())",
                 DateTimeFormatter.ofPattern("M/d/yyyy").format(LocalDate.now(TestUtil.TEST_TZ.toZoneId()))),
-            arguments("CStr(Time())", (Supplier<?>) () ->
+            args("CStr(Time())",
                 new DateTimeFormatterBuilder().appendPattern("h:mm:ss a").toFormatter(Locale.US).format(LocalDateTime.now(TestUtil.TEST_TZ.toZoneId()))),
 
-            arguments("CStr(TimeSerial(3,57,34))", "3:57:34 AM"),
-            arguments("CStr(TimeSerial(15,57,34))", "3:57:34 PM"),
-            arguments("CStr(TimeSerial(6,-15,0))", "5:45:00 AM"),
-            arguments("CStr(TimeSerial(0,0,0))", "12:00:00 AM"),
-            arguments("CStr(TimeSerial(-10,0,0))", "2:00:00 PM"),
-            arguments("CStr(TimeSerial(30,0,0))", "6:00:00 AM"),
+            args("CStr(TimeSerial(3,57,34))", "3:57:34 AM"),
+            args("CStr(TimeSerial(15,57,34))", "3:57:34 PM"),
+            args("CStr(TimeSerial(6,-15,0))", "5:45:00 AM"),
+            args("CStr(TimeSerial(0,0,0))", "12:00:00 AM"),
+            args("CStr(TimeSerial(-10,0,0))", "2:00:00 PM"),
+            args("CStr(TimeSerial(30,0,0))", "6:00:00 AM"),
 
-            arguments("CStr(DateSerial(69,2,12))", "2/12/1969"),
-            arguments("CStr(DateSerial(10,2,12))", "2/12/2010"),
-            arguments("CStr(DateSerial(2014,-5,12))", "7/12/2013"),
-            arguments("CStr(DateSerial(2014,-5,38))", "8/7/2013"),
+            args("CStr(DateSerial(69,2,12))", "2/12/1969"),
+            args("CStr(DateSerial(10,2,12))", "2/12/2010"),
+            args("CStr(DateSerial(2014,-5,12))", "7/12/2013"),
+            args("CStr(DateSerial(2014,-5,38))", "8/7/2013"),
 
-            arguments("DatePart('ww',#01/03/2018#)", 1),
-            arguments("DatePart('ww',#01/03/2018#,4)", 2),
-            arguments("DatePart('ww',#01/03/2018#,5)", 1),
-            arguments("DatePart('ww',#01/03/2018#,4,3)", 1),
-            arguments("DatePart('ww',#01/03/2018#,5,3)", 52),
-            arguments("DatePart('ww',#01/03/2018#,4,2)", 1),
-            arguments("DatePart('ww',#01/03/2018#,5,2)", 53),
-            arguments("DatePart('yyyy',#11/22/2003 5:45:13 AM#)", 2003),
-            arguments("DatePart('q',#11/22/2003 5:45:13 AM#)", 4),
-            arguments("DatePart('m',#11/22/2003 5:45:13 AM#)", 11),
-            arguments("DatePart('y',#11/22/2003 5:45:13 AM#)", 326),
-            arguments("DatePart('d',#11/22/2003 5:45:13 AM#)", 22),
-            arguments("DatePart('w',#11/22/2003 5:45:13 AM#)", 7),
-            arguments("DatePart('w',#11/22/2003 5:45:13 AM#, 5)", 3),
-            arguments("DatePart('h',#11/22/2003 5:45:13 AM#)", 5),
-            arguments("DatePart('n',#11/22/2003 5:45:13 AM#)", 45),
-            arguments("DatePart('s',#11/22/2003 5:45:13 AM#)", 13),
+            args("DatePart('ww',#01/03/2018#)", 1),
+            args("DatePart('ww',#01/03/2018#,4)", 2),
+            args("DatePart('ww',#01/03/2018#,5)", 1),
+            args("DatePart('ww',#01/03/2018#,4,3)", 1),
+            args("DatePart('ww',#01/03/2018#,5,3)", 52),
+            args("DatePart('ww',#01/03/2018#,4,2)", 1),
+            args("DatePart('ww',#01/03/2018#,5,2)", 53),
+            args("DatePart('yyyy',#11/22/2003 5:45:13 AM#)", 2003),
+            args("DatePart('q',#11/22/2003 5:45:13 AM#)", 4),
+            args("DatePart('m',#11/22/2003 5:45:13 AM#)", 11),
+            args("DatePart('y',#11/22/2003 5:45:13 AM#)", 326),
+            args("DatePart('d',#11/22/2003 5:45:13 AM#)", 22),
+            args("DatePart('w',#11/22/2003 5:45:13 AM#)", 7),
+            args("DatePart('w',#11/22/2003 5:45:13 AM#, 5)", 3),
+            args("DatePart('h',#11/22/2003 5:45:13 AM#)", 5),
+            args("DatePart('n',#11/22/2003 5:45:13 AM#)", 45),
+            args("DatePart('s',#11/22/2003 5:45:13 AM#)", 13),
 
-            arguments("CStr(DateAdd('yyyy',2,#11/22/2003 5:45:13 AM#))", "11/22/2005 5:45:13 AM"),
-            arguments("CStr(DateAdd('q',1,#11/22/2003 5:45:13 AM#))", "2/22/2004 5:45:13 AM"),
-            arguments("CStr(DateAdd('m',2,#11/22/2003 5:45:13 AM#))", "1/22/2004 5:45:13 AM"),
-            arguments("CStr(DateAdd('d',20,#11/22/2003 5:45:13 AM#))", "12/12/2003 5:45:13 AM"),
-            arguments("CStr(DateAdd('w',20,#11/22/2003 5:45:13 AM#))", "12/12/2003 5:45:13 AM"),
-            arguments("CStr(DateAdd('y',20,#11/22/2003 5:45:13 AM#))", "12/12/2003 5:45:13 AM"),
-            arguments("CStr(DateAdd('ww',5,#11/22/2003 5:45:13 AM#))", "12/27/2003 5:45:13 AM"),
-            arguments("CStr(DateAdd('h',10,#11/22/2003 5:45:13 AM#))", "11/22/2003 3:45:13 PM"),
-            arguments("CStr(DateAdd('n',34,#11/22/2003 5:45:13 AM#))", "11/22/2003 6:19:13 AM"),
-            arguments("CStr(DateAdd('s',74,#11/22/2003 5:45:13 AM#))", "11/22/2003 5:46:27 AM"),
+            args("CStr(DateAdd('yyyy',2,#11/22/2003 5:45:13 AM#))", "11/22/2005 5:45:13 AM"),
+            args("CStr(DateAdd('q',1,#11/22/2003 5:45:13 AM#))", "2/22/2004 5:45:13 AM"),
+            args("CStr(DateAdd('m',2,#11/22/2003 5:45:13 AM#))", "1/22/2004 5:45:13 AM"),
+            args("CStr(DateAdd('d',20,#11/22/2003 5:45:13 AM#))", "12/12/2003 5:45:13 AM"),
+            args("CStr(DateAdd('w',20,#11/22/2003 5:45:13 AM#))", "12/12/2003 5:45:13 AM"),
+            args("CStr(DateAdd('y',20,#11/22/2003 5:45:13 AM#))", "12/12/2003 5:45:13 AM"),
+            args("CStr(DateAdd('ww',5,#11/22/2003 5:45:13 AM#))", "12/27/2003 5:45:13 AM"),
+            args("CStr(DateAdd('h',10,#11/22/2003 5:45:13 AM#))", "11/22/2003 3:45:13 PM"),
+            args("CStr(DateAdd('n',34,#11/22/2003 5:45:13 AM#))", "11/22/2003 6:19:13 AM"),
+            args("CStr(DateAdd('s',74,#11/22/2003 5:45:13 AM#))", "11/22/2003 5:46:27 AM"),
 
-            arguments("CStr(DateAdd('d',20,#11/22/2003#))", "12/12/2003"),
-            arguments("CStr(DateAdd('h',10,#11/22/2003#))", "11/22/2003 10:00:00 AM"),
-            arguments("CStr(DateAdd('h',24,#11/22/2003#))", "11/23/2003"),
-            arguments("CStr(DateAdd('h',10,#5:45:13 AM#))", "3:45:13 PM"),
-            arguments("CStr(DateAdd('h',30,#5:45:13 AM#))", "12/31/1899 11:45:13 AM"),
+            args("CStr(DateAdd('d',20,#11/22/2003#))", "12/12/2003"),
+            args("CStr(DateAdd('h',10,#11/22/2003#))", "11/22/2003 10:00:00 AM"),
+            args("CStr(DateAdd('h',24,#11/22/2003#))", "11/23/2003"),
+            args("CStr(DateAdd('h',10,#5:45:13 AM#))", "3:45:13 PM"),
+            args("CStr(DateAdd('h',30,#5:45:13 AM#))", "12/31/1899 11:45:13 AM"),
 
-            arguments("DateDiff('yyyy',#10/22/2003#,#11/22/2003#)", 0),
-            arguments("DateDiff('yyyy',#10/22/2003#,#11/22/2007#)", 4),
-            arguments("DateDiff('yyyy',#11/22/2007#,#10/22/2003#)", -4),
+            args("DateDiff('yyyy',#10/22/2003#,#11/22/2003#)", 0),
+            args("DateDiff('yyyy',#10/22/2003#,#11/22/2007#)", 4),
+            args("DateDiff('yyyy',#11/22/2007#,#10/22/2003#)", -4),
 
-            arguments("DateDiff('q',#10/22/2003#,#11/22/2003#)", 0),
-            arguments("DateDiff('q',#03/01/2003#,#11/22/2003#)", 3),
-            arguments("DateDiff('q',#10/22/2003#,#11/22/2007#)", 16),
-            arguments("DateDiff('q',#03/22/2007#,#10/22/2003#)", -13),
+            args("DateDiff('q',#10/22/2003#,#11/22/2003#)", 0),
+            args("DateDiff('q',#03/01/2003#,#11/22/2003#)", 3),
+            args("DateDiff('q',#10/22/2003#,#11/22/2007#)", 16),
+            args("DateDiff('q',#03/22/2007#,#10/22/2003#)", -13),
 
-            arguments("DateDiff('m',#10/22/2003#,#11/01/2003#)", 1),
-            arguments("DateDiff('m',#03/22/2003#,#11/01/2003#)", 8),
-            arguments("DateDiff('m',#10/22/2003#,#11/22/2007#)", 49),
-            arguments("DateDiff('m',#03/22/2007#,#10/01/2003#)", -41),
+            args("DateDiff('m',#10/22/2003#,#11/01/2003#)", 1),
+            args("DateDiff('m',#03/22/2003#,#11/01/2003#)", 8),
+            args("DateDiff('m',#10/22/2003#,#11/22/2007#)", 49),
+            args("DateDiff('m',#03/22/2007#,#10/01/2003#)", -41),
 
-            arguments("DateDiff('d','10/22','11/01')", 10),
-            arguments("DateDiff('y',#1:37:00 AM#,#2:15:00 AM#)", 0),
-            arguments("DateDiff('d',#10/22/2003#,#11/01/2003#)", 10),
-            arguments("DateDiff('d',#10/22/2003 11:00:00 PM#,#10/23/2003 1:00:00 AM#)", 1),
-            arguments("DateDiff('d',#03/22/2003#,#11/01/2003#)", 224),
-            arguments("DateDiff('y',#10/22/2003#,#11/22/2007#)", 1492),
-            arguments("DateDiff('d',#03/22/2007#,#10/01/2003#)", -1268),
-            arguments("DateDiff('d',#1/1/2000#,#1/1/2001#)", 366),
-            arguments("DateDiff('d',#1/1/2001#,#1/1/2002#)", 365),
+            args("DateDiff('d','10/22','11/01')", 10),
+            args("DateDiff('y',#1:37:00 AM#,#2:15:00 AM#)", 0),
+            args("DateDiff('d',#10/22/2003#,#11/01/2003#)", 10),
+            args("DateDiff('d',#10/22/2003 11:00:00 PM#,#10/23/2003 1:00:00 AM#)", 1),
+            args("DateDiff('d',#03/22/2003#,#11/01/2003#)", 224),
+            args("DateDiff('y',#10/22/2003#,#11/22/2007#)", 1492),
+            args("DateDiff('d',#03/22/2007#,#10/01/2003#)", -1268),
+            args("DateDiff('d',#1/1/2000#,#1/1/2001#)", 366),
+            args("DateDiff('d',#1/1/2001#,#1/1/2002#)", 365),
 
-            arguments("DateDiff('w',#11/3/2018#,#11/04/2018#)", 0),
-            arguments("DateDiff('w',#11/3/2018#,#11/10/2018#)", 1),
-            arguments("DateDiff('w',#12/31/2017#,#1/1/2018#)", 0),
-            arguments("DateDiff('w',#03/22/2003#,#11/01/2003#)", 32),
-            arguments("DateDiff('w',#10/22/2003#,#11/22/2007#)", 213),
-            arguments("DateDiff('w',#03/22/2007#,#10/01/2003#)", -181),
+            args("DateDiff('w',#11/3/2018#,#11/04/2018#)", 0),
+            args("DateDiff('w',#11/3/2018#,#11/10/2018#)", 1),
+            args("DateDiff('w',#12/31/2017#,#1/1/2018#)", 0),
+            args("DateDiff('w',#03/22/2003#,#11/01/2003#)", 32),
+            args("DateDiff('w',#10/22/2003#,#11/22/2007#)", 213),
+            args("DateDiff('w',#03/22/2007#,#10/01/2003#)", -181),
 
-            arguments("DateDiff('ww',#11/3/2018#,#11/04/2018#)", 1),
-            arguments("DateDiff('ww',#11/3/2018#,#11/10/2018#)", 1),
-            arguments("DateDiff('ww',#12/31/2017#,#1/1/2018#)", 0),
-            arguments("DateDiff('ww',#12/31/2017#,#1/1/2018#,2)", 1),
-            arguments("DateDiff('ww',#12/31/2017#,#1/1/2018#,1,3)", 0),
-            arguments("DateDiff('ww',#1/1/2000#,#1/1/2001#)", 53),
-            arguments("DateDiff('ww',#03/22/2003#,#11/01/2003#)", 32),
-            arguments("DateDiff('ww',#10/22/2003#,#11/22/2007#)", 213),
-            arguments("DateDiff('ww',#03/22/2007#,#10/01/2003#)", -181),
+            args("DateDiff('ww',#11/3/2018#,#11/04/2018#)", 1),
+            args("DateDiff('ww',#11/3/2018#,#11/10/2018#)", 1),
+            args("DateDiff('ww',#12/31/2017#,#1/1/2018#)", 0),
+            args("DateDiff('ww',#12/31/2017#,#1/1/2018#,2)", 1),
+            args("DateDiff('ww',#12/31/2017#,#1/1/2018#,1,3)", 0),
+            args("DateDiff('ww',#1/1/2000#,#1/1/2001#)", 53),
+            args("DateDiff('ww',#03/22/2003#,#11/01/2003#)", 32),
+            args("DateDiff('ww',#10/22/2003#,#11/22/2007#)", 213),
+            args("DateDiff('ww',#03/22/2007#,#10/01/2003#)", -181),
 
-            arguments("DateDiff('h',#1:37:00 AM#,#2:15:00 AM#)", 1),
-            arguments("DateDiff('h',#1:37:00 AM#,#2:15:00 PM#)", 13),
-            arguments("DateDiff('h',#11/3/2018 1:37:00 AM#,#11/3/2018 2:15:00 AM#)", 1),
-            arguments("DateDiff('h',#11/3/2018 1:37:00 AM#,#11/3/2018 2:15:00 PM#)", 13),
-            arguments("DateDiff('h',#11/3/2018#,#11/4/2018#)", 24),
-            arguments("DateDiff('h',#3/13/2018 1:37:00 AM#,#11/3/2018 2:15:00 AM#)", 5641),
-            arguments("DateDiff('h',#3/13/2016 1:37:00 AM#,#11/3/2018 2:15:00 AM#)", 23161),
-            arguments("DateDiff('h',#11/3/2018 2:15:00 PM#,#3/13/2016 1:37:00 AM#)", -23173),
+            args("DateDiff('h',#1:37:00 AM#,#2:15:00 AM#)", 1),
+            args("DateDiff('h',#1:37:00 AM#,#2:15:00 PM#)", 13),
+            args("DateDiff('h',#11/3/2018 1:37:00 AM#,#11/3/2018 2:15:00 AM#)", 1),
+            args("DateDiff('h',#11/3/2018 1:37:00 AM#,#11/3/2018 2:15:00 PM#)", 13),
+            args("DateDiff('h',#11/3/2018#,#11/4/2018#)", 24),
+            args("DateDiff('h',#3/13/2018 1:37:00 AM#,#11/3/2018 2:15:00 AM#)", 5641),
+            args("DateDiff('h',#3/13/2016 1:37:00 AM#,#11/3/2018 2:15:00 AM#)", 23161),
+            args("DateDiff('h',#11/3/2018 2:15:00 PM#,#3/13/2016 1:37:00 AM#)", -23173),
 
-            arguments("DateDiff('n',#1:37:59 AM#,#1:38:00 AM#)", 1),
-            arguments("DateDiff('n',#1:37:30 AM#,#2:15:13 PM#)", 758),
-            arguments("DateDiff('n',#11/3/2018 1:37:59 AM#,#11/3/2018 1:38:00 AM#)", 1),
-            arguments("DateDiff('n',#11/3/2018 1:37:59 AM#,#11/3/2018 2:15:00 PM#)", 758),
-            arguments("DateDiff('n',#11/3/2018#,#11/4/2018#)", 1440),
-            arguments("DateDiff('n',#3/13/2018 1:37:59 AM#,#11/3/2018 2:15:00 AM#)", 338438),
-            arguments("DateDiff('n',#3/13/2016 1:37:30 AM#,#11/3/2018 2:15:13 AM#)", 1389638),
-            arguments("DateDiff('n',#11/3/2018 2:15:30 PM#,#3/13/2016 1:37:13 AM#)", -1390358),
+            args("DateDiff('n',#1:37:59 AM#,#1:38:00 AM#)", 1),
+            args("DateDiff('n',#1:37:30 AM#,#2:15:13 PM#)", 758),
+            args("DateDiff('n',#11/3/2018 1:37:59 AM#,#11/3/2018 1:38:00 AM#)", 1),
+            args("DateDiff('n',#11/3/2018 1:37:59 AM#,#11/3/2018 2:15:00 PM#)", 758),
+            args("DateDiff('n',#11/3/2018#,#11/4/2018#)", 1440),
+            args("DateDiff('n',#3/13/2018 1:37:59 AM#,#11/3/2018 2:15:00 AM#)", 338438),
+            args("DateDiff('n',#3/13/2016 1:37:30 AM#,#11/3/2018 2:15:13 AM#)", 1389638),
+            args("DateDiff('n',#11/3/2018 2:15:30 PM#,#3/13/2016 1:37:13 AM#)", -1390358),
 
-            arguments("DateDiff('s',#1:37:59 AM#,#1:38:00 AM#)", 1),
-            arguments("DateDiff('s',#1:37:10 AM#,#1:37:45 AM#)", 35),
-            arguments("DateDiff('s',#1:37:30 AM#,#2:15:13 PM#)", 45463),
-            arguments("DateDiff('s',#11/3/2018 1:37:59 AM#,#11/3/2018 1:38:00 AM#)", 1),
-            arguments("DateDiff('s',#11/3/2018 1:37:30 AM#,#11/3/2018 2:15:13 PM#)", 45463),
-            arguments("DateDiff('s',#11/3/2018#,#11/4/2018#)", 86400),
-            arguments("DateDiff('s',#3/13/2018 1:37:59 AM#,#11/3/2018 2:15:00 AM#)", 20306221),
-            arguments("DateDiff('s',#3/13/2016 1:37:30 AM#,#11/3/2018 2:15:13 AM#)", 83378263),
-            arguments("DateDiff('s',#11/3/2018 2:15:30 PM#,#3/13/2016 1:37:13 AM#)", -83421497)
+            args("DateDiff('s',#1:37:59 AM#,#1:38:00 AM#)", 1),
+            args("DateDiff('s',#1:37:10 AM#,#1:37:45 AM#)", 35),
+            args("DateDiff('s',#1:37:30 AM#,#2:15:13 PM#)", 45463),
+            args("DateDiff('s',#11/3/2018 1:37:59 AM#,#11/3/2018 1:38:00 AM#)", 1),
+            args("DateDiff('s',#11/3/2018 1:37:30 AM#,#11/3/2018 2:15:13 PM#)", 45463),
+            args("DateDiff('s',#11/3/2018#,#11/4/2018#)", 86400),
+            args("DateDiff('s',#3/13/2018 1:37:59 AM#,#11/3/2018 2:15:00 AM#)", 20306221),
+            args("DateDiff('s',#3/13/2016 1:37:30 AM#,#11/3/2018 2:15:13 AM#)", 83378263),
+            args("DateDiff('s',#11/3/2018 2:15:30 PM#,#3/13/2016 1:37:13 AM#)", -83421497)
             );
     }
 
-    @SuppressWarnings("unchecked")
     @ParameterizedTest(name = "[{index}] {0} --> {1}")
-    @MethodSource("getDateFuncsTestData")
-    void testDateFuncs(String exprStr, Object expected) {
-        if (expected instanceof Supplier) {
-            expected = ((Supplier<Object>) expected).get();
-        }
-        assertEquals(expected, eval('=' + exprStr));
+    @MethodSource("getDateFuncsData")
+    void testDateFuncs(String _exprStr, Object _expected) {
+        assertEquals(_expected, eval(_exprStr));
     }
 
     @ParameterizedTest(name = "[{index}] {0} --> {1}")
@@ -896,8 +894,14 @@ class DefaultFunctionsTest extends AbstractBaseTest {
         "Format(CStr(Rate(4*12,-200,8000)), '#.############E+00'); 7.701472488202E-03",
         "CStr(Rate(60,93.22,5000,0.1)); -1.09802980531205"
     })
-    void testFinancialFuncs(String exprStr, String expected) {
-        assertEquals(expected, eval('=' + exprStr));
+    void testFinancialFuncs(String _exprStr, String _expected) {
+        assertEquals(_expected, eval(_exprStr));
+    }
+
+    static Object eval(String _expr) {
+        TestContext tc = new TestContext();
+        Expression expr = Expressionator.parse(Expressionator.Type.DEFAULT_VALUE, _expr, null, tc);
+        return expr.eval(tc);
     }
 
     @Target(ElementType.METHOD)
