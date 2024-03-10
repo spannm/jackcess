@@ -23,10 +23,10 @@ import io.github.spannm.jackcess.Database.FileFormat;
 import io.github.spannm.jackcess.test.AbstractBaseTest;
 import io.github.spannm.jackcess.test.Basename;
 import io.github.spannm.jackcess.test.TestDb;
-import io.github.spannm.jackcess.test.TestDbs;
+import io.github.spannm.jackcess.test.source.FileFormatSource;
+import io.github.spannm.jackcess.test.source.TestDbSource;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.MethodSource;
 
 import java.io.File;
 import java.nio.ByteBuffer;
@@ -38,31 +38,29 @@ import java.util.*;
  */
 class LongValueTest extends AbstractBaseTest {
 
-    @Test
-    void testReadLongValue() throws Exception {
-
-        for (TestDb testDB : TestDbs.getReadOnlyDbs(Basename.TEST2)) {
-            try (Database db = testDB.openMem()) {
-                Table table = db.getTable("MSP_PROJECTS");
-                Row row = table.getNextRow();
-                assertEquals("Jon Iles this is a a vawesrasoih aksdkl fas dlkjflkasjd flkjaslkdjflkajlksj dfl lkasjdf lkjaskldfj "
-                    + "lkas dlk lkjsjdfkl; aslkdf lkasjkldjf lka skldf lka sdkjfl;kasjd falksjdfljaslkdjf laskjdfk jalskjd "
-                    + "flkj aslkdjflkjkjasljdflkjas jf;lkasjd fjkas dasdf asd fasdf asdf asdmhf lksaiyudfoi jasodfj902384jsdf9 "
-                    + "aw90se fisajldkfj lkasj dlkfslkd jflksjadf as",
-                    row.get("PROJ_PROP_AUTHOR"));
-                assertEquals("T", row.get("PROJ_PROP_COMPANY"));
-                assertEquals("Standard", row.get("PROJ_INFO_CAL_NAME"));
-                assertEquals("Project1", row.get("PROJ_PROP_TITLE"));
-                byte[] foundBinaryData = row.getBytes("RESERVED_BINARY_DATA");
-                byte[] expectedBinaryData =
-                    toByteArray(new File(DIR_TEST_DATA, "test2BinData.dat"));
-                assertArrayEquals(expectedBinaryData, foundBinaryData);
-            }
+    @ParameterizedTest(name = "[{index}] {0}")
+    @TestDbSource(basename = Basename.TEST2, readOnly = true)
+    void testReadLongValue(TestDb testDb) throws Exception {
+        try (Database db = testDb.openMem()) {
+            Table table = db.getTable("MSP_PROJECTS");
+            Row row = table.getNextRow();
+            assertEquals("Jon Iles this is a a vawesrasoih aksdkl fas dlkjflkasjd flkjaslkdjflkajlksj dfl lkasjdf lkjaskldfj "
+                + "lkas dlk lkjsjdfkl; aslkdf lkasjkldjf lka skldf lka sdkjfl;kasjd falksjdfljaslkdjf laskjdfk jalskjd "
+                + "flkj aslkdjflkjkjasljdflkjas jf;lkasjd fjkas dasdf asd fasdf asdf asdmhf lksaiyudfoi jasodfj902384jsdf9 "
+                + "aw90se fisajldkfj lkasj dlkfslkd jflksjadf as",
+                row.get("PROJ_PROP_AUTHOR"));
+            assertEquals("T", row.get("PROJ_PROP_COMPANY"));
+            assertEquals("Standard", row.get("PROJ_INFO_CAL_NAME"));
+            assertEquals("Project1", row.get("PROJ_PROP_TITLE"));
+            byte[] foundBinaryData = row.getBytes("RESERVED_BINARY_DATA");
+            byte[] expectedBinaryData =
+                toByteArray(new File(DIR_TEST_DATA, "test2BinData.dat"));
+            assertArrayEquals(expectedBinaryData, foundBinaryData);
         }
     }
 
     @ParameterizedTest(name = "[{index}] {0}")
-    @MethodSource("io.github.spannm.jackcess.test.TestDbs#getFileformats()")
+    @FileFormatSource()
     void testWriteLongValue(FileFormat fileFormat) throws Exception {
 
         try (Database db = createMem(fileFormat)) {
@@ -111,7 +109,7 @@ class LongValueTest extends AbstractBaseTest {
     }
 
     @ParameterizedTest(name = "[{index}] {0}")
-    @MethodSource("io.github.spannm.jackcess.test.TestDbs#getFileformats()")
+    @FileFormatSource()
     void testManyMemos(FileFormat fileFormat) throws Exception {
         try (Database db = createMem(fileFormat)) {
             final int numColumns = 126;
@@ -171,7 +169,7 @@ class LongValueTest extends AbstractBaseTest {
     }
 
     @ParameterizedTest(name = "[{index}] {0}")
-    @MethodSource("io.github.spannm.jackcess.test.TestDbs#getFileformats()")
+    @FileFormatSource()
     void testLongValueAsMiddleColumn(FileFormat fileFormat) throws Exception {
         try (Database db = createMem(fileFormat)) {
             Table newTable = new TableBuilder("NewTable")

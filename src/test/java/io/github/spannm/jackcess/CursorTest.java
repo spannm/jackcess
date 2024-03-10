@@ -25,7 +25,8 @@ import io.github.spannm.jackcess.impl.TableImpl;
 import io.github.spannm.jackcess.test.AbstractBaseTest;
 import io.github.spannm.jackcess.test.Basename;
 import io.github.spannm.jackcess.test.TestDb;
-import io.github.spannm.jackcess.test.TestDbs;
+import io.github.spannm.jackcess.test.source.FileFormatSource;
+import io.github.spannm.jackcess.test.source.TestDbSource;
 import io.github.spannm.jackcess.util.CaseInsensitiveColumnMatcher;
 import io.github.spannm.jackcess.util.ColumnMatcher;
 import io.github.spannm.jackcess.util.SimpleColumnMatcher;
@@ -33,7 +34,6 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.MethodSource;
 
 import java.io.UncheckedIOException;
 import java.util.*;
@@ -43,8 +43,6 @@ import java.util.stream.Collectors;
  * @author James Ahlborn
  */
 class CursorTest extends AbstractBaseTest {
-
-    static final List<TestDb> INDEX_CURSOR_DBS = TestDbs.getDbs(Basename.INDEX_CURSOR);
 
     @BeforeEach
     void setUp() {
@@ -57,8 +55,7 @@ class CursorTest extends AbstractBaseTest {
     }
 
     private static List<Map<String, Object>> createTestTableData() {
-        List<Map<String, Object>> expectedRows =
-            new ArrayList<>();
+        List<Map<String, Object>> expectedRows = new ArrayList<>();
         for (int i = 0; i < 10; i++) {
             expectedRows.add(createExpectedRow("id", i, "value", "data" + i));
         }
@@ -88,8 +85,7 @@ class CursorTest extends AbstractBaseTest {
     }
 
     private static List<Map<String, Object>> createUnorderedTestTableData() {
-        List<Map<String, Object>> expectedRows =
-            new ArrayList<>();
+        List<Map<String, Object>> expectedRows = new ArrayList<>();
         int[] ids = new int[] {3, 7, 6, 1, 2, 9, 0, 5, 4, 8};
         for (int i : ids) {
             expectedRows.add(createExpectedRow("id", i, "value", "data" + i));
@@ -97,8 +93,8 @@ class CursorTest extends AbstractBaseTest {
         return expectedRows;
     }
 
-    static Database createTestIndexTable(TestDb indexCursorDB) throws Exception {
-        Database db = indexCursorDB.openMem();
+    static Database createTestIndexTable(TestDb _testDb) throws Exception {
+        Database db = _testDb.openMem();
 
         Table table = db.getTable("test");
 
@@ -122,8 +118,8 @@ class CursorTest extends AbstractBaseTest {
         return expectedRows;
     }
 
-    private static Database createDupeTestTable(FileFormat fileFormat) throws Exception {
-        Database db = createMem(fileFormat);
+    private static Database createDupeTestTable(FileFormat _fileFormat) throws Exception {
+        Database db = createMem(_fileFormat);
 
         Table table = DatabaseBuilder.newTable("test")
             .addColumn(DatabaseBuilder.newColumn("id", DataType.LONG))
@@ -137,8 +133,8 @@ class CursorTest extends AbstractBaseTest {
         return db;
     }
 
-    static Database createDupeTestTable(TestDb indexCursorDB) throws Exception {
-        Database db = indexCursorDB.openMem();
+    static Database createDupeTestTable(TestDb _testDb) throws Exception {
+        Database db = _testDb.openMem();
 
         Table table = db.getTable("test");
 
@@ -170,16 +166,13 @@ class CursorTest extends AbstractBaseTest {
 
         List<RowIdImpl> sortedRowIds =
             new ArrayList<>(new TreeSet<>(
-                List.of(rowId1, rowId2, rowId3, RowIdImpl.FIRST_ROW_ID,
-                    RowIdImpl.LAST_ROW_ID)));
+                List.of(rowId1, rowId2, rowId3, RowIdImpl.FIRST_ROW_ID, RowIdImpl.LAST_ROW_ID)));
 
-        assertEquals(List.of(RowIdImpl.FIRST_ROW_ID, rowId1, rowId2, rowId3,
-            RowIdImpl.LAST_ROW_ID),
-            sortedRowIds);
+        assertEquals(List.of(RowIdImpl.FIRST_ROW_ID, rowId1, rowId2, rowId3, RowIdImpl.LAST_ROW_ID), sortedRowIds);
     }
 
     @ParameterizedTest(name = "[{index}] {0}")
-    @MethodSource("io.github.spannm.jackcess.test.TestDbs#getFileformats()")
+    @FileFormatSource()
     void testSimple(FileFormat fileFormat) throws Exception {
         try (Database db = createTestTable(fileFormat)) {
             Table table = db.getTable("test");
@@ -203,7 +196,7 @@ class CursorTest extends AbstractBaseTest {
     }
 
     @ParameterizedTest(name = "[{index}] {0}")
-    @MethodSource("io.github.spannm.jackcess.test.TestDbs#getFileformats()")
+    @FileFormatSource()
     void testMove(FileFormat fileFormat) throws Exception {
         try (Database db = createTestTable(fileFormat)) {
             Table table = db.getTable("test");
@@ -258,7 +251,7 @@ class CursorTest extends AbstractBaseTest {
     }
 
     @ParameterizedTest(name = "[{index}] {0}")
-    @MethodSource("io.github.spannm.jackcess.test.TestDbs#getFileformats()")
+    @FileFormatSource()
     void testMoveNoReset(FileFormat fileFormat) throws Exception {
         try (Database db = createTestTable(fileFormat)) {
             Table table = db.getTable("test");
@@ -297,7 +290,7 @@ class CursorTest extends AbstractBaseTest {
     }
 
     @ParameterizedTest(name = "[{index}] {0}")
-    @MethodSource("io.github.spannm.jackcess.test.TestDbs#getFileformats()")
+    @FileFormatSource()
     void testSearch(FileFormat fileFormat) throws Exception {
         try (Database db = createTestTable(fileFormat)) {
             Table table = db.getTable("test");
@@ -376,7 +369,7 @@ class CursorTest extends AbstractBaseTest {
     }
 
     @ParameterizedTest(name = "[{index}] {0}")
-    @MethodSource("io.github.spannm.jackcess.test.TestDbs#getFileformats()")
+    @FileFormatSource()
     void testReverse(FileFormat fileFormat) throws Exception {
         try (Database db = createTestTable(fileFormat)) {
             Table table = db.getTable("test");
@@ -399,7 +392,7 @@ class CursorTest extends AbstractBaseTest {
     }
 
     @ParameterizedTest(name = "[{index}] {0}")
-    @MethodSource("io.github.spannm.jackcess.test.TestDbs#getFileformats()")
+    @FileFormatSource()
     void testLiveAddition(FileFormat fileFormat) throws Exception {
         try (Database db = createTestTable(fileFormat)) {
             Table table = db.getTable("test");
@@ -436,7 +429,7 @@ class CursorTest extends AbstractBaseTest {
     }
 
     @ParameterizedTest(name = "[{index}] {0}")
-    @MethodSource("io.github.spannm.jackcess.test.TestDbs#getFileformats()")
+    @FileFormatSource()
     void testLiveDeletion(FileFormat fileFormat) throws Exception {
         try (Database db = createTestTable(fileFormat)) {
             Table table = db.getTable("test");
@@ -517,217 +510,204 @@ class CursorTest extends AbstractBaseTest {
         assertTrue(cursor4.isCurrentRowDeleted());
     }
 
-    @Test
-    void testSimpleIndex() throws Exception {
-        for (TestDb indexCursorDB : INDEX_CURSOR_DBS) {
-            try (Database db = createTestIndexTable(indexCursorDB)) {
+    @ParameterizedTest(name = "[{index}] {0}")
+    @TestDbSource(basename = Basename.INDEX_CURSOR)
+    void testSimpleIndex(TestDb testDb) throws Exception {
+        try (Database db = createTestIndexTable(testDb)) {
+            Table table = db.getTable("test");
+            Index idx = table.getIndexes().get(0);
+
+            assertTable(createUnorderedTestTableData(), table);
+
+            Cursor cursor = CursorBuilder.createCursor(idx);
+            doTestSimple(cursor, null);
+        }
+    }
+
+    @ParameterizedTest(name = "[{index}] {0}")
+    @TestDbSource(basename = Basename.INDEX_CURSOR)
+    void testMoveIndex(TestDb testDb) throws Exception {
+        try (Database db = createTestIndexTable(testDb)) {
+            Table table = db.getTable("test");
+            Index idx = table.getIndexes().get(0);
+            Cursor cursor = CursorBuilder.createCursor(idx);
+            doTestMove(cursor, null);
+        }
+    }
+
+    @ParameterizedTest(name = "[{index}] {0}")
+    @TestDbSource(basename = Basename.INDEX_CURSOR)
+    void testReverseIndex(TestDb testDb) throws Exception {
+        try (Database db = createTestIndexTable(testDb)) {
+            Table table = db.getTable("test");
+            Index idx = table.getIndexes().get(0);
+            Cursor cursor = CursorBuilder.createCursor(idx);
+            doTestReverse(cursor, null);
+        }
+    }
+
+    @ParameterizedTest(name = "[{index}] {0}")
+    @TestDbSource(basename = Basename.INDEX_CURSOR)
+    void testSearchIndex(TestDb testDb) throws Exception {
+        try (Database db = createTestIndexTable(testDb)) {
+            Table table = db.getTable("test");
+            Index idx = table.getIndexes().get(0);
+            Cursor cursor = CursorBuilder.createCursor(idx);
+            doTestSearch(table, cursor, idx, 42, -13);
+        }
+    }
+
+    @ParameterizedTest(name = "[{index}] {0}")
+    @TestDbSource(basename = Basename.INDEX_CURSOR)
+    void testLiveAdditionIndex(TestDb testDb) throws Exception {
+        try (Database db = createTestIndexTable(testDb)) {
+            Table table = db.getTable("test");
+            Index idx = table.getIndexes().get(0);
+
+            Cursor cursor1 = CursorBuilder.createCursor(idx);
+            Cursor cursor2 = CursorBuilder.createCursor(idx);
+            doTestLiveAddition(table, cursor1, cursor2, 11);
+        }
+    }
+
+    @ParameterizedTest(name = "[{index}] {0}")
+    @TestDbSource(basename = Basename.INDEX_CURSOR)
+    void testLiveDeletionIndex(TestDb testDb) throws Exception {
+        try (Database db = createTestIndexTable(testDb)) {
+            Table table = db.getTable("test");
+            Index idx = table.getIndexes().get(0);
+
+            Cursor cursor1 = CursorBuilder.createCursor(idx);
+            Cursor cursor2 = CursorBuilder.createCursor(idx);
+            Cursor cursor3 = CursorBuilder.createCursor(idx);
+            Cursor cursor4 = CursorBuilder.createCursor(idx);
+            doTestLiveDeletion(cursor1, cursor2, cursor3, cursor4, 1);
+        }
+    }
+
+    @ParameterizedTest(name = "[{index}] {0}")
+    @TestDbSource(basename = Basename.INDEX_CURSOR)
+    void testSimpleIndexSubRange(TestDb testDb) throws Exception {
+        for (int i = 0; i < 2; i++) {
+            try (Database db = createTestIndexTable(testDb)) {
                 Table table = db.getTable("test");
                 Index idx = table.getIndexes().get(0);
 
-                assertTable(createUnorderedTestTableData(), table);
+                Cursor cursor = createIndexSubRangeCursor(table, idx, i);
 
-                Cursor cursor = CursorBuilder.createCursor(idx);
-                doTestSimple(cursor, null);
-            }
-        }
-    }
+                List<Map<String, Object>> expectedRows =
+                    createTestTableData(3, 9);
 
-    @Test
-    void testMoveIndex() throws Exception {
-        for (TestDb indexCursorDB : INDEX_CURSOR_DBS) {
-            try (Database db = createTestIndexTable(indexCursorDB)) {
-                Table table = db.getTable("test");
-                Index idx = table.getIndexes().get(0);
-                Cursor cursor = CursorBuilder.createCursor(idx);
-                doTestMove(cursor, null);
-            }
-        }
-    }
-
-    @Test
-    void testReverseIndex() throws Exception {
-        for (TestDb indexCursorDB : INDEX_CURSOR_DBS) {
-            try (Database db = createTestIndexTable(indexCursorDB)) {
-                Table table = db.getTable("test");
-                Index idx = table.getIndexes().get(0);
-                Cursor cursor = CursorBuilder.createCursor(idx);
-                doTestReverse(cursor, null);
-            }
-        }
-    }
-
-    @Test
-    void testSearchIndex() throws Exception {
-        for (TestDb indexCursorDB : INDEX_CURSOR_DBS) {
-            try (Database db = createTestIndexTable(indexCursorDB)) {
-                Table table = db.getTable("test");
-                Index idx = table.getIndexes().get(0);
-                Cursor cursor = CursorBuilder.createCursor(idx);
-                doTestSearch(table, cursor, idx, 42, -13);
-            }
-        }
-    }
-
-    @Test
-    void testLiveAdditionIndex() throws Exception {
-        for (TestDb indexCursorDB : INDEX_CURSOR_DBS) {
-            try (Database db = createTestIndexTable(indexCursorDB)) {
-                Table table = db.getTable("test");
-                Index idx = table.getIndexes().get(0);
-
-                Cursor cursor1 = CursorBuilder.createCursor(idx);
-                Cursor cursor2 = CursorBuilder.createCursor(idx);
-                doTestLiveAddition(table, cursor1, cursor2, 11);
-            }
-        }
-    }
-
-    @Test
-    void testLiveDeletionIndex() throws Exception {
-        for (TestDb indexCursorDB : INDEX_CURSOR_DBS) {
-            try (Database db = createTestIndexTable(indexCursorDB)) {
-                Table table = db.getTable("test");
-                Index idx = table.getIndexes().get(0);
-
-                Cursor cursor1 = CursorBuilder.createCursor(idx);
-                Cursor cursor2 = CursorBuilder.createCursor(idx);
-                Cursor cursor3 = CursorBuilder.createCursor(idx);
-                Cursor cursor4 = CursorBuilder.createCursor(idx);
-                doTestLiveDeletion(cursor1, cursor2, cursor3, cursor4, 1);
-            }
-        }
-    }
-
-    @Test
-    void testSimpleIndexSubRange() throws Exception {
-        for (TestDb indexCursorDB : INDEX_CURSOR_DBS) {
-            for (int i = 0; i < 2; i++) {
-                try (Database db = createTestIndexTable(indexCursorDB)) {
-                    Table table = db.getTable("test");
-                    Index idx = table.getIndexes().get(0);
-
-                    Cursor cursor = createIndexSubRangeCursor(table, idx, i);
-
-                    List<Map<String, Object>> expectedRows =
-                        createTestTableData(3, 9);
-
-                    doTestSimple(cursor, expectedRows);
-                }
-            }
-        }
-    }
-
-    @Test
-    void testMoveIndexSubRange() throws Exception {
-        for (TestDb indexCursorDB : INDEX_CURSOR_DBS) {
-            for (int i = 0; i < 2; i++) {
-                try (Database db = createTestIndexTable(indexCursorDB)) {
-                    Table table = db.getTable("test");
-                    Index idx = table.getIndexes().get(0);
-
-                    Cursor cursor = createIndexSubRangeCursor(table, idx, i);
-
-                    List<Map<String, Object>> expectedRows =
-                        createTestTableData(3, 9);
-
-                    doTestMove(cursor, expectedRows);
-                }
-            }
-        }
-    }
-
-    @Test
-    void testSearchIndexSubRange() throws Exception {
-        for (TestDb indexCursorDB : INDEX_CURSOR_DBS) {
-            for (int i = 0; i < 2; i++) {
-                try (Database db = createTestIndexTable(indexCursorDB)) {
-                    Table table = db.getTable("test");
-                    Index idx = table.getIndexes().get(0);
-
-                    Cursor cursor = createIndexSubRangeCursor(table, idx, i);
-
-                    doTestSearch(table, cursor, idx, 2, 9);
-                }
-            }
-        }
-    }
-
-    @Test
-    void testReverseIndexSubRange() throws Exception {
-        for (TestDb indexCursorDB : INDEX_CURSOR_DBS) {
-            for (int i = 0; i < 2; i++) {
-                try (Database db = createTestIndexTable(indexCursorDB)) {
-                    Table table = db.getTable("test");
-                    Index idx = table.getIndexes().get(0);
-
-                    Cursor cursor = createIndexSubRangeCursor(table, idx, i);
-
-                    List<Map<String, Object>> expectedRows =
-                        createTestTableData(3, 9);
-
-                    doTestReverse(cursor, expectedRows);
-                }
-            }
-        }
-    }
-
-    @Test
-    void testLiveAdditionIndexSubRange() throws Exception {
-        for (TestDb indexCursorDB : INDEX_CURSOR_DBS) {
-            for (int i = 0; i < 2; i++) {
-                try (Database db = createTestIndexTable(indexCursorDB)) {
-                    Table table = db.getTable("test");
-                    Index idx = table.getIndexes().get(0);
-
-                    Cursor cursor1 = createIndexSubRangeCursor(table, idx, i);
-                    Cursor cursor2 = createIndexSubRangeCursor(table, idx, i);
-
-                    doTestLiveAddition(table, cursor1, cursor2, 8);
-                }
-            }
-        }
-    }
-
-    @Test
-    void testLiveDeletionIndexSubRange() throws Exception {
-        for (TestDb indexCursorDB : INDEX_CURSOR_DBS) {
-            for (int i = 0; i < 2; i++) {
-                try (Database db = createTestIndexTable(indexCursorDB)) {
-                    Table table = db.getTable("test");
-                    Index idx = table.getIndexes().get(0);
-
-                    Cursor cursor1 = createIndexSubRangeCursor(table, idx, i);
-                    Cursor cursor2 = createIndexSubRangeCursor(table, idx, i);
-                    Cursor cursor3 = createIndexSubRangeCursor(table, idx, i);
-                    Cursor cursor4 = createIndexSubRangeCursor(table, idx, i);
-
-                    doTestLiveDeletion(cursor1, cursor2, cursor3, cursor4, 4);
-                }
+                doTestSimple(cursor, expectedRows);
             }
         }
     }
 
     @ParameterizedTest(name = "[{index}] {0}")
-    @MethodSource("io.github.spannm.jackcess.test.TestDbs#getFileformats()")
+    @TestDbSource(basename = Basename.INDEX_CURSOR)
+    void testMoveIndexSubRange(TestDb testDb) throws Exception {
+        for (int i = 0; i < 2; i++) {
+            try (Database db = createTestIndexTable(testDb)) {
+                Table table = db.getTable("test");
+                Index idx = table.getIndexes().get(0);
+
+                Cursor cursor = createIndexSubRangeCursor(table, idx, i);
+
+                List<Map<String, Object>> expectedRows =
+                    createTestTableData(3, 9);
+
+                doTestMove(cursor, expectedRows);
+            }
+        }
+    }
+
+    @ParameterizedTest(name = "[{index}] {0}")
+    @TestDbSource(basename = Basename.INDEX_CURSOR)
+    void testSearchIndexSubRange(TestDb testDb) throws Exception {
+        for (int i = 0; i < 2; i++) {
+            try (Database db = createTestIndexTable(testDb)) {
+                Table table = db.getTable("test");
+                Index idx = table.getIndexes().get(0);
+
+                Cursor cursor = createIndexSubRangeCursor(table, idx, i);
+
+                doTestSearch(table, cursor, idx, 2, 9);
+            }
+        }
+    }
+
+    @ParameterizedTest(name = "[{index}] {0}")
+    @TestDbSource(basename = Basename.INDEX_CURSOR)
+    void testReverseIndexSubRange(TestDb testDb) throws Exception {
+        for (int i = 0; i < 2; i++) {
+            try (Database db = createTestIndexTable(testDb)) {
+                Table table = db.getTable("test");
+                Index idx = table.getIndexes().get(0);
+
+                Cursor cursor = createIndexSubRangeCursor(table, idx, i);
+
+                List<Map<String, Object>> expectedRows =
+                    createTestTableData(3, 9);
+
+                doTestReverse(cursor, expectedRows);
+            }
+        }
+    }
+
+    @ParameterizedTest(name = "[{index}] {0}")
+    @TestDbSource(basename = Basename.INDEX_CURSOR)
+    void testLiveAdditionIndexSubRange(TestDb testDb) throws Exception {
+        for (int i = 0; i < 2; i++) {
+            try (Database db = createTestIndexTable(testDb)) {
+                Table table = db.getTable("test");
+                Index idx = table.getIndexes().get(0);
+
+                Cursor cursor1 = createIndexSubRangeCursor(table, idx, i);
+                Cursor cursor2 = createIndexSubRangeCursor(table, idx, i);
+
+                doTestLiveAddition(table, cursor1, cursor2, 8);
+            }
+        }
+    }
+
+    @ParameterizedTest(name = "[{index}] {0}")
+    @TestDbSource(basename = Basename.INDEX_CURSOR)
+    void testLiveDeletionIndexSubRange(TestDb testDb) throws Exception {
+        for (int i = 0; i < 2; i++) {
+            try (Database db = createTestIndexTable(testDb)) {
+                Table table = db.getTable("test");
+                Index idx = table.getIndexes().get(0);
+
+                Cursor cursor1 = createIndexSubRangeCursor(table, idx, i);
+                Cursor cursor2 = createIndexSubRangeCursor(table, idx, i);
+                Cursor cursor3 = createIndexSubRangeCursor(table, idx, i);
+                Cursor cursor4 = createIndexSubRangeCursor(table, idx, i);
+
+                doTestLiveDeletion(cursor1, cursor2, cursor3, cursor4, 4);
+            }
+        }
+    }
+
+    @ParameterizedTest(name = "[{index}] {0}")
+    @FileFormatSource()
     void testFindAllIndex(FileFormat fileFormat) throws Exception {
-        try (Database db = createDupeTestTable(fileFormat)) {
-            Table table = db.getTable("test");
+        try (Database testDb = createDupeTestTable(fileFormat)) {
+            Table table = testDb.getTable("test");
             Cursor cursor = CursorBuilder.createCursor(table);
 
             doTestFindAll(table, cursor, null);
         }
     }
 
-    @Test
-    void testFindAll() throws Exception {
-        for (TestDb indexCursorDB : INDEX_CURSOR_DBS) {
-            try (Database db = createDupeTestTable(indexCursorDB)) {
-                Table table = db.getTable("test");
-                Index idx = table.getIndexes().get(0);
-                Cursor cursor = CursorBuilder.createCursor(idx);
+    @ParameterizedTest(name = "[{index}] {0}")
+    @TestDbSource(basename = Basename.INDEX_CURSOR)
+    void testFindAll(TestDb testDb) throws Exception {
+        try (Database db = createDupeTestTable(testDb)) {
+            Table table = db.getTable("test");
+            Index idx = table.getIndexes().get(0);
+            Cursor cursor = CursorBuilder.createCursor(idx);
 
-                doTestFindAll(table, cursor, idx);
-            }
+            doTestFindAll(table, cursor, idx);
         }
     }
 
@@ -826,11 +806,10 @@ class CursorTest extends AbstractBaseTest {
         assertTrue(rows.isEmpty());
     }
 
-    @Test
-    void testId() throws Exception {
-        for (TestDb indexCursorDB : INDEX_CURSOR_DBS) {
-            Database db = createTestIndexTable(indexCursorDB);
-
+    @ParameterizedTest(name = "[{index}] {0}")
+    @TestDbSource(basename = Basename.INDEX_CURSOR)
+    void testId(TestDb testDb) throws Exception {
+        try (Database db = createTestIndexTable(testDb)) {
             Table table = db.getTable("test");
             Index idx = table.getIndexes().get(0);
 
@@ -862,13 +841,11 @@ class CursorTest extends AbstractBaseTest {
 
             tCursor2.restoreSavepoint(tSave);
             iCursor2.restoreSavepoint(iSave);
-
-            db.close();
         }
     }
 
     @ParameterizedTest(name = "[{index}] {0}")
-    @MethodSource("io.github.spannm.jackcess.test.TestDbs#getFileformats()")
+    @FileFormatSource()
     void testColumnMatcher(FileFormat fileFormat) throws Exception {
         try (Database db = createTestTable(fileFormat)) {
             Table table = db.getTable("test");
@@ -975,37 +952,34 @@ class CursorTest extends AbstractBaseTest {
                     .withColumnMatcher(CaseInsensitiveColumnMatcher.INSTANCE)));
     }
 
-    @Test
-    void testIndexCursor() throws Exception {
-        for (TestDb testDB : TestDbs.getReadOnlyDbs(Basename.INDEX)) {
+    @ParameterizedTest(name = "[{index}] {0}")
+    @TestDbSource(basename = Basename.INDEX, readOnly = true)
+    void testIndexCursor(TestDb testDb) throws Exception {
+        try (Database db = testDb.openMem()) {
+            Table t1 = db.getTable("Table1");
+            Index idx = t1.getIndex(IndexBuilder.PRIMARY_KEY_NAME);
+            IndexCursor cursor = CursorBuilder.createCursor(idx);
 
-            try (Database db = testDB.openMem()) {
-                Table t1 = db.getTable("Table1");
-                Index idx = t1.getIndex(IndexBuilder.PRIMARY_KEY_NAME);
-                IndexCursor cursor = CursorBuilder.createCursor(idx);
+            assertFalse(cursor.findFirstRowByEntry(-1));
+            cursor.findClosestRowByEntry(-1);
+            assertEquals(0, cursor.getCurrentRow().get("id"));
 
-                assertFalse(cursor.findFirstRowByEntry(-1));
-                cursor.findClosestRowByEntry(-1);
-                assertEquals(0, cursor.getCurrentRow().get("id"));
+            assertTrue(cursor.findFirstRowByEntry(1));
+            assertEquals(1, cursor.getCurrentRow().get("id"));
 
-                assertTrue(cursor.findFirstRowByEntry(1));
-                assertEquals(1, cursor.getCurrentRow().get("id"));
+            cursor.findClosestRowByEntry(2);
+            assertEquals(2, cursor.getCurrentRow().get("id"));
 
-                cursor.findClosestRowByEntry(2);
-                assertEquals(2, cursor.getCurrentRow().get("id"));
-
-                assertFalse(cursor.findFirstRowByEntry(4));
-                cursor.findClosestRowByEntry(4);
-                assertTrue(cursor.isAfterLast());
-            }
+            assertFalse(cursor.findFirstRowByEntry(4));
+            cursor.findClosestRowByEntry(4);
+            assertTrue(cursor.isAfterLast());
         }
     }
 
-    @Test
-    void testIndexCursorDelete() throws Exception {
-        for (TestDb testDB : TestDbs.getDbs(Basename.INDEX)) {
-
-            Database db = testDB.openMem();
+    @ParameterizedTest(name = "[{index}] {0}")
+    @TestDbSource(basename = Basename.INDEX)
+    void testIndexCursorDelete(TestDb testDb) throws Exception {
+        try (Database db = testDb.openMem()) {
             Table t1 = db.getTable("Table1");
             Index idx = t1.getIndex("Table2Table1");
             IndexCursor cursor = CursorBuilder.createCursor(idx);
@@ -1048,68 +1022,64 @@ class CursorTest extends AbstractBaseTest {
             }
 
             assertTrue(expectedData.isEmpty());
-
-            db.close();
-        }
-    }
-
-    @Test
-    void testCursorDelete() throws Exception {
-        for (TestDb testDB : TestDbs.getDbs(Basename.INDEX)) {
-
-            try (Database db = testDB.openMem()) {
-                Table t1 = db.getTable("Table1");
-                Cursor cursor = CursorBuilder.createCursor(t1);
-
-                List<String> expectedData = cursor.newIterable().withColumnNames(
-                    List.of("otherfk1", "data")).stream()
-                    .filter(r -> r.get("otherfk1").equals(1))
-                    .map(r -> r.getString("data"))
-                    .collect(Collectors.toList());
-
-                assertEquals(List.of("baz11", "baz11-2"), expectedData);
-
-                expectedData = new ArrayList<>();
-                for (Iterator<? extends Row> iter = cursor.iterator(); iter.hasNext();) {
-                    Row row = iter.next();
-                    if (row.get("otherfk1").equals(1)) {
-                        expectedData.add(row.getString("data"));
-                        iter.remove();
-                        try {
-                            iter.remove();
-                            fail("IllegalArgumentException should have been thrown");
-                        } catch (IllegalStateException e) {
-                            // success
-                        }
-                    }
-
-                    if (!iter.hasNext()) {
-                        try {
-                            iter.next();
-                            fail("NoSuchElementException should have been thrown");
-                        } catch (NoSuchElementException e) {
-                            // success
-                        }
-                    }
-                }
-
-                assertEquals(List.of("baz11", "baz11-2"), expectedData);
-
-                expectedData = new ArrayList<>();
-                for (Row row : cursor.newIterable().withColumnNames(
-                    List.of("otherfk1", "data"))) {
-                    if (row.get("otherfk1").equals(1)) {
-                        expectedData.add(row.getString("data"));
-                    }
-                }
-
-                assertTrue(expectedData.isEmpty());
-            }
         }
     }
 
     @ParameterizedTest(name = "[{index}] {0}")
-    @MethodSource("io.github.spannm.jackcess.test.TestDbs#getFileformats()")
+    @TestDbSource(basename = Basename.INDEX)
+    void testCursorDelete(TestDb testDb) throws Exception {
+        try (Database db = testDb.openMem()) {
+            Table t1 = db.getTable("Table1");
+            Cursor cursor = CursorBuilder.createCursor(t1);
+
+            List<String> expectedData = cursor.newIterable().withColumnNames(
+                List.of("otherfk1", "data")).stream()
+                .filter(r -> r.get("otherfk1").equals(1))
+                .map(r -> r.getString("data"))
+                .collect(Collectors.toList());
+
+            assertEquals(List.of("baz11", "baz11-2"), expectedData);
+
+            expectedData = new ArrayList<>();
+            for (Iterator<? extends Row> iter = cursor.iterator(); iter.hasNext();) {
+                Row row = iter.next();
+                if (row.get("otherfk1").equals(1)) {
+                    expectedData.add(row.getString("data"));
+                    iter.remove();
+                    try {
+                        iter.remove();
+                        fail("IllegalArgumentException should have been thrown");
+                    } catch (IllegalStateException e) {
+                        // success
+                    }
+                }
+
+                if (!iter.hasNext()) {
+                    try {
+                        iter.next();
+                        fail("NoSuchElementException should have been thrown");
+                    } catch (NoSuchElementException e) {
+                        // success
+                    }
+                }
+            }
+
+            assertEquals(List.of("baz11", "baz11-2"), expectedData);
+
+            expectedData = new ArrayList<>();
+            for (Row row : cursor.newIterable().withColumnNames(
+                List.of("otherfk1", "data"))) {
+                if (row.get("otherfk1").equals(1)) {
+                    expectedData.add(row.getString("data"));
+                }
+            }
+
+            assertTrue(expectedData.isEmpty());
+        }
+    }
+
+    @ParameterizedTest(name = "[{index}] {0}")
+    @FileFormatSource()
     void testFindByRowId(FileFormat fileFormat) throws Exception {
         try (Database db = createTestTable(fileFormat)) {
             Table table = db.getTable("test");
@@ -1118,18 +1088,17 @@ class CursorTest extends AbstractBaseTest {
         }
     }
 
-    @Test
-    void testFindByRowIdIndex() throws Exception {
-        for (TestDb indexCursorDB : INDEX_CURSOR_DBS) {
-            try (Database db = createTestIndexTable(indexCursorDB)) {
-                Table table = db.getTable("test");
-                Index idx = table.getIndexes().get(0);
+    @ParameterizedTest(name = "[{index}] {0}")
+    @TestDbSource(basename = Basename.INDEX_CURSOR)
+    void testFindByRowIdIndex(TestDb testDb) throws Exception {
+        try (Database db = createTestIndexTable(testDb)) {
+            Table table = db.getTable("test");
+            Index idx = table.getIndexes().get(0);
 
-                assertTable(createUnorderedTestTableData(), table);
+            assertTable(createUnorderedTestTableData(), table);
 
-                Cursor cursor = CursorBuilder.createCursor(idx);
-                doTestFindByRowId(cursor);
-            }
+            Cursor cursor = CursorBuilder.createCursor(idx);
+            doTestFindByRowId(cursor);
         }
     }
 
@@ -1173,7 +1142,7 @@ class CursorTest extends AbstractBaseTest {
     }
 
     @ParameterizedTest(name = "[{index}] {0}")
-    @MethodSource("io.github.spannm.jackcess.test.TestDbs#getFileformats()")
+    @FileFormatSource()
     void testIterationEarlyExit(FileFormat fileFormat) throws Exception {
         try (Database db = createMem(fileFormat)) {
             Table table = DatabaseBuilder.newTable("test")
@@ -1226,7 +1195,7 @@ class CursorTest extends AbstractBaseTest {
     }
 
     @ParameterizedTest(name = "[{index}] {0}")
-    @MethodSource("io.github.spannm.jackcess.test.TestDbs#getFileformats()")
+    @FileFormatSource()
     void testPartialIndexFind(FileFormat fileFormat) throws Exception {
         try (Database db = createMem(fileFormat)) {
             TableImpl t = (TableImpl) DatabaseBuilder.newTable("Test").addColumn(DatabaseBuilder.newColumn("id", DataType.LONG)).addColumn(DatabaseBuilder.newColumn("data1", DataType.TEXT))
@@ -1278,7 +1247,7 @@ class CursorTest extends AbstractBaseTest {
     }
 
     @ParameterizedTest(name = "[{index}] {0}")
-    @MethodSource("io.github.spannm.jackcess.test.TestDbs#getFileformats()")
+    @FileFormatSource()
     void testPartialIndexLookup(FileFormat fileFormat) throws Exception {
         try (Database db = createMem(fileFormat)) {
             TableImpl t = (TableImpl) DatabaseBuilder.newTable("Test")

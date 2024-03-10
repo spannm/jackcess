@@ -26,8 +26,8 @@ import io.github.spannm.jackcess.impl.PageChannel;
 import io.github.spannm.jackcess.test.AbstractBaseTest;
 import io.github.spannm.jackcess.test.Basename;
 import io.github.spannm.jackcess.test.TestDb;
-import io.github.spannm.jackcess.test.TestDbs;
-import org.junit.jupiter.api.Test;
+import io.github.spannm.jackcess.test.source.TestDbSource;
+import org.junit.jupiter.params.ParameterizedTest;
 
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
@@ -58,10 +58,10 @@ class ComplexColumnTest extends AbstractBaseTest {
 
     private static final byte[] TEST2_BYTES     = getAsciiBytes("this is some more test data for attachment.");
 
-    @Test
-    void testVersions() throws Exception {
-        for (TestDb testDB : TestDbs.getDbs(Basename.COMPLEX)) {
-            Database db = testDB.openCopy();
+    @ParameterizedTest(name = "[{index}] {0}")
+    @TestDbSource(basename = Basename.COMPLEX)
+    void testVersions(TestDb testDb) throws Exception {
+        try (Database db = testDb.openCopy()) {
             db.setDateTimeType(DateTimeType.DATE);
             db.setTimeZone(TEST_TZ);
 
@@ -156,17 +156,13 @@ class ComplexColumnTest extends AbstractBaseTest {
                 "row3-memo-again", new Date(1315876965382L),
                 "row3-memo-revised", new Date(1315876953077L),
                 "row3-memo", new Date(1315876879126L));
-
-            db.close();
         }
     }
 
-    @Test
-    void testAttachments() throws Exception {
-        for (TestDb testDB : TestDbs.getDbs(Basename.COMPLEX)) {
-
-            Database db = testDB.openCopy();
-
+    @ParameterizedTest(name = "[{index}] {0}")
+    @TestDbSource(basename = Basename.COMPLEX)
+    void testAttachments(TestDb testDb) throws Exception {
+        try (Database db = testDb.openCopy()) {
             Table t1 = db.getTable("Table1");
             Column col = t1.getColumn("attach-data");
             assertEquals(ComplexDataType.ATTACHMENT,
@@ -238,16 +234,13 @@ class ComplexColumnTest extends AbstractBaseTest {
             row2ValFk.deleteAllValues();
             checkAttachments(2, row2ValFk);
 
-            db.close();
         }
     }
 
-    @Test
-    void testMultiValues() throws Exception {
-        for (TestDb testDB : TestDbs.getDbs(Basename.COMPLEX)) {
-
-            Database db = testDB.openCopy();
-
+    @ParameterizedTest(name = "[{index}] {0}")
+    @TestDbSource(basename = Basename.COMPLEX)
+    void testMultiValues(TestDb testDb) throws Exception {
+        try (Database db = testDb.openCopy()) {
             Table t1 = db.getTable("Table1");
             Column col = t1.getColumn("multi-value-data");
             assertEquals(ComplexDataType.MULTI_VALUE,
@@ -311,17 +304,13 @@ class ComplexColumnTest extends AbstractBaseTest {
             assertEquals("Value List", props.getValue(PropertyMap.ROW_SOURCE_TYPE_PROP));
             assertEquals("\"value1\";\"value2\";\"value3\";\"value4\"",
                 props.getValue(PropertyMap.ROW_SOURCE_PROP));
-
-            db.close();
         }
     }
 
-    @Test
-    void testUnsupported() throws Exception {
-        for (TestDb testDB : TestDbs.getDbs(Basename.UNSUPPORTED)) {
-
-            Database db = testDB.openCopy();
-
+    @ParameterizedTest(name = "[{index}] {0}")
+    @TestDbSource(basename = Basename.UNSUPPORTED)
+    void testUnsupported(TestDb testDb) throws Exception {
+        try (Database db = testDb.openCopy()) {
             Table t1 = db.getTable("Test");
             Column col = t1.getColumn("UnknownComplex");
             assertEquals(ComplexDataType.UNSUPPORTED,
@@ -343,8 +332,6 @@ class ComplexColumnTest extends AbstractBaseTest {
                     fail();
                 }
             }
-
-            db.close();
         }
     }
 

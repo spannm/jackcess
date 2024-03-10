@@ -26,10 +26,9 @@ import io.github.spannm.jackcess.Database.FileFormat;
 import io.github.spannm.jackcess.test.AbstractBaseTest;
 import io.github.spannm.jackcess.test.Basename;
 import io.github.spannm.jackcess.test.TestDb;
-import io.github.spannm.jackcess.test.TestDbs;
-import org.junit.jupiter.api.Test;
+import io.github.spannm.jackcess.test.source.FileFormatSource;
+import io.github.spannm.jackcess.test.source.TestDbSource;
 import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.MethodSource;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -38,49 +37,45 @@ import java.time.format.DateTimeFormatter;
 import java.util.*;
 
 /**
- *
  * @author James Ahlborn
  */
 class ExtendedDateTest extends AbstractBaseTest {
 
-    @Test
-    void testReadExtendedDate() throws Exception {
-
+    @ParameterizedTest(name = "[{index}] {0}")
+    @TestDbSource(basename = Basename.EXT_DATE)
+    void testReadExtendedDate(TestDb testDb) throws Exception {
         ZoneId zoneId = ZoneId.of("America/New_York");
         DateTimeFormatter dtfNoTime = DateTimeFormatter.ofPattern("M/d/yyy", Locale.US);
         DateTimeFormatter dtfFull = DateTimeFormatter.ofPattern("M/d/yyy h:mm:ss.SSSSSSS a", Locale.US);
 
-        for (TestDb testDB : TestDbs.getDbs(Basename.EXT_DATE)) {
+        try (Database db = testDb.openMem()) {
+            db.setZoneId(zoneId);
 
-            try (Database db = testDB.openMem()) {
-                db.setZoneId(zoneId);
+            Table t = db.getTable("Table1");
+            for (Row r : t) {
+                LocalDateTime ldt = r.getLocalDateTime("DateExt");
+                String str = r.getString("DateExtStr");
 
-                Table t = db.getTable("Table1");
-                for (Row r : t) {
-                    LocalDateTime ldt = r.getLocalDateTime("DateExt");
-                    String str = r.getString("DateExtStr");
+                if (ldt != null) {
+                    String str1 = dtfNoTime.format(ldt);
+                    String str2 = dtfFull.format(ldt);
 
-                    if (ldt != null) {
-                        String str1 = dtfNoTime.format(ldt);
-                        String str2 = dtfFull.format(ldt);
-
-                        assertTrue(str1.equals(str) || str2.equals(str));
-                    } else {
-                        assertNull(str);
-                    }
-
+                    assertTrue(str1.equals(str) || str2.equals(str));
+                } else {
+                    assertNull(str);
                 }
 
-                Index idx = t.getIndex("DateExtAsc");
-                IndexCodesTest.checkIndexEntries(testDB, t, idx);
-                idx = t.getIndex("DateExtDesc");
-                IndexCodesTest.checkIndexEntries(testDB, t, idx);
             }
+
+            Index idx = t.getIndex("DateExtAsc");
+            IndexCodesTest.checkIndexEntries(testDb, t, idx);
+            idx = t.getIndex("DateExtDesc");
+            IndexCodesTest.checkIndexEntries(testDb, t, idx);
         }
     }
 
     @ParameterizedTest(name = "[{index}] {0}")
-    @MethodSource("io.github.spannm.jackcess.test.TestDbs#getFileformats()")
+    @FileFormatSource()
     void testWriteExtendedDate(FileFormat fileFormat) throws Exception {
         JetFormat format = DatabaseImpl.getFileFormatDetails(fileFormat).getFormat();
 

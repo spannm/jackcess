@@ -22,8 +22,8 @@ import io.github.spannm.jackcess.*;
 import io.github.spannm.jackcess.test.AbstractBaseTest;
 import io.github.spannm.jackcess.test.Basename;
 import io.github.spannm.jackcess.test.TestDb;
-import io.github.spannm.jackcess.test.TestDbs;
-import org.junit.jupiter.api.Test;
+import io.github.spannm.jackcess.test.source.TestDbSource;
+import org.junit.jupiter.params.ParameterizedTest;
 
 import java.io.IOException;
 import java.util.Iterator;
@@ -36,85 +36,79 @@ import java.util.Map;
  */
 class FKEnforcerTest extends AbstractBaseTest {
 
-    @Test
-    void testNoEnforceForeignKeys() throws Exception {
-        for (TestDb testDB : TestDbs.getDbs(Basename.INDEX)) {
+    @ParameterizedTest(name = "[{index}] {0}")
+    @TestDbSource(basename = Basename.INDEX)
+    void testNoEnforceForeignKeys(TestDb testDb) throws Exception {
+        try (Database db = testDb.openCopy()) {
+            db.setEnforceForeignKeys(false);
+            Table t1 = db.getTable("Table1");
+            Table t2 = db.getTable("Table2");
+            Table t3 = db.getTable("Table3");
 
-            try (Database db = testDB.openCopy()) {
-                db.setEnforceForeignKeys(false);
-                Table t1 = db.getTable("Table1");
-                Table t2 = db.getTable("Table2");
-                Table t3 = db.getTable("Table3");
+            t1.addRow(20, 0, 20, "some data", 20);
 
-                t1.addRow(20, 0, 20, "some data", 20);
+            Cursor c = CursorBuilder.createCursor(t2);
+            c.moveToNextRow();
+            c.updateCurrentRow(30, "foo30");
 
+            c = CursorBuilder.createCursor(t3);
+            c.moveToNextRow();
+            c.deleteCurrentRow();
+        }
+    }
+
+    @ParameterizedTest(name = "[{index}] {0}")
+    @TestDbSource(basename = Basename.INDEX)
+    void testEnforceForeignKeys(TestDb testDb) throws Exception {
+        try (Database db = testDb.openCopy()) {
+            db.setEvaluateExpressions(false);
+            Table t1 = db.getTable("Table1");
+            Table t2 = db.getTable("Table2");
+            Table t3 = db.getTable("Table3");
+
+            assertTrue(assertThrows(IOException.class, () ->
+                t1.addRow(20, 0, 20, "some data", 20)).getMessage().contains("Table1[otherfk2]"));
+
+            assertTrue(assertThrows(IOException.class, () -> {
                 Cursor c = CursorBuilder.createCursor(t2);
                 c.moveToNextRow();
                 c.updateCurrentRow(30, "foo30");
+            }).getMessage().contains("Table2[id]"));
 
-                c = CursorBuilder.createCursor(t3);
+            assertTrue(assertThrows(IOException.class, () -> {
+                Cursor c = CursorBuilder.createCursor(t3);
                 c.moveToNextRow();
                 c.deleteCurrentRow();
+            }).getMessage().contains("Table3[id]"));
+
+            t1.addRow(21, null, null, "null fks", null);
+
+            Cursor c = CursorBuilder.createCursor(t3);
+            Column col = t3.getColumn("id");
+            for (Row row : c) {
+                int id = row.getInt("id");
+                id += 20;
+                c.setCurrentRowValue(col, id);
             }
-        }
 
-    }
+            List<? extends Map<String, Object>> expectedRows =
+                createExpectedTable(
+                    createT1Row(0, 0, 30, "baz0", 0),
+                    createT1Row(1, 1, 31, "baz11", 0),
+                    createT1Row(2, 1, 31, "baz11-2", 0),
+                    createT1Row(3, 2, 33, "baz13", 0),
+                    createT1Row(21, null, null, "null fks", null));
 
-    @Test
-    void testEnforceForeignKeys() throws Exception {
-        for (TestDb testDB : TestDbs.getDbs(Basename.INDEX)) {
+            assertTable(expectedRows, t1);
 
-            try (Database db = testDB.openCopy()) {
-                db.setEvaluateExpressions(false);
-                Table t1 = db.getTable("Table1");
-                Table t2 = db.getTable("Table2");
-                Table t3 = db.getTable("Table3");
-
-                assertTrue(assertThrows(IOException.class, () ->
-                    t1.addRow(20, 0, 20, "some data", 20)).getMessage().contains("Table1[otherfk2]"));
-
-                assertTrue(assertThrows(IOException.class, () -> {
-                    Cursor c = CursorBuilder.createCursor(t2);
-                    c.moveToNextRow();
-                    c.updateCurrentRow(30, "foo30");
-                }).getMessage().contains("Table2[id]"));
-
-                assertTrue(assertThrows(IOException.class, () -> {
-                    Cursor c = CursorBuilder.createCursor(t3);
-                    c.moveToNextRow();
-                    c.deleteCurrentRow();
-                }).getMessage().contains("Table3[id]"));
-
-                t1.addRow(21, null, null, "null fks", null);
-
-                Cursor c = CursorBuilder.createCursor(t3);
-                Column col = t3.getColumn("id");
-                for (Row row : c) {
-                    int id = row.getInt("id");
-                    id += 20;
-                    c.setCurrentRowValue(col, id);
-                }
-
-                List<? extends Map<String, Object>> expectedRows =
-                    createExpectedTable(
-                        createT1Row(0, 0, 30, "baz0", 0),
-                        createT1Row(1, 1, 31, "baz11", 0),
-                        createT1Row(2, 1, 31, "baz11-2", 0),
-                        createT1Row(3, 2, 33, "baz13", 0),
-                        createT1Row(21, null, null, "null fks", null));
-
-                assertTable(expectedRows, t1);
-
-                c = CursorBuilder.createCursor(t2);
-                for (Iterator<?> iter = c.iterator(); iter.hasNext();) {
-                    iter.next();
-                    iter.remove();
-                }
-
-                assertEquals(1, t1.getRowCount());
+            c = CursorBuilder.createCursor(t2);
+            for (Iterator<?> iter = c.iterator(); iter.hasNext();) {
+                iter.next();
+                iter.remove();
             }
-        }
 
+            assertEquals(1, t1.getRowCount());
+        }
     }
 
     private static Row createT1Row(int id1, Integer fk1, Integer fk2, String data, Integer fk3) {

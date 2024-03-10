@@ -21,8 +21,8 @@ import static io.github.spannm.jackcess.test.TestUtil.*;
 import io.github.spannm.jackcess.*;
 import io.github.spannm.jackcess.Database.FileFormat;
 import io.github.spannm.jackcess.test.AbstractBaseTest;
+import io.github.spannm.jackcess.test.source.FileFormatSource;
 import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.MethodSource;
 
 import java.io.BufferedWriter;
 import java.io.StringWriter;
@@ -37,7 +37,7 @@ class ExportTest extends AbstractBaseTest {
     private static final String NL = System.lineSeparator();
 
     @ParameterizedTest(name = "[{index}] {0}")
-    @MethodSource("io.github.spannm.jackcess.test.TestDbs#getFileformats()")
+    @FileFormatSource()
     void testExportToFile(FileFormat fileFormat) throws Exception {
         DateFormat df = new SimpleDateFormat("yyyyMMdd HH:mm:ss");
         df.setTimeZone(TEST_TZ);

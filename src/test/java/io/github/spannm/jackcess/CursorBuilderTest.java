@@ -18,31 +18,20 @@ package io.github.spannm.jackcess;
 
 import io.github.spannm.jackcess.impl.IndexImpl;
 import io.github.spannm.jackcess.test.AbstractBaseTest;
+import io.github.spannm.jackcess.test.Basename;
 import io.github.spannm.jackcess.test.TestDb;
-import org.junit.jupiter.api.Test;
+import io.github.spannm.jackcess.test.source.TestDbSource;
+import org.junit.jupiter.params.ParameterizedTest;
 
 /**
  * @author James Ahlborn
  */
 class CursorBuilderTest extends AbstractBaseTest {
 
-    private static void assertCursor(
-        Cursor expected, Cursor found) {
-        assertSame(expected.getTable(), found.getTable());
-        if (expected instanceof IndexCursor) {
-            assertSame(((IndexCursor) expected).getIndex(),
-                ((IndexCursor) found).getIndex());
-        }
-
-        assertEquals(expected.getSavepoint().getCurrentPosition(),
-            found.getSavepoint().getCurrentPosition());
-    }
-
-    @Test
-    void test() throws Exception {
-        for (TestDb indexCursorDB : CursorTest.INDEX_CURSOR_DBS) {
-            Database db = CursorTest.createTestIndexTable(indexCursorDB);
-
+    @ParameterizedTest(name = "[{index}] {0}")
+    @TestDbSource(basename = Basename.INDEX_CURSOR)
+    void test(TestDb testDb) throws Exception {
+        try (Database db = CursorTest.createTestIndexTable(testDb)) {
             Table table = db.getTable("test");
             IndexImpl idx = (IndexImpl) table.getIndexes().get(0);
 
@@ -143,9 +132,18 @@ class CursorBuilderTest extends AbstractBaseTest {
                 .withEndRowInclusive(false)
                 .toCursor();
             assertCursor(expected, found);
-
-            db.close();
         }
+    }
+
+    private static void assertCursor(Cursor expected, Cursor found) {
+        assertSame(expected.getTable(), found.getTable());
+        if (expected instanceof IndexCursor) {
+            assertSame(((IndexCursor) expected).getIndex(),
+                ((IndexCursor) found).getIndex());
+        }
+
+        assertEquals(expected.getSavepoint().getCurrentPosition(),
+            found.getSavepoint().getCurrentPosition());
     }
 
 }

@@ -26,9 +26,9 @@ import io.github.spannm.jackcess.impl.expr.DefaultFunctions;
 import io.github.spannm.jackcess.impl.expr.FunctionSupport;
 import io.github.spannm.jackcess.impl.expr.ValueSupport;
 import io.github.spannm.jackcess.test.AbstractBaseTest;
+import io.github.spannm.jackcess.test.source.FileFormatSource;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.MethodSource;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -44,7 +44,7 @@ import javax.script.SimpleBindings;
 class PropertyExpressionTest extends AbstractBaseTest {
 
     @ParameterizedTest(name = "[{index}] {0}")
-    @MethodSource("io.github.spannm.jackcess.test.TestDbs#getFileformats()")
+    @FileFormatSource()
     void testDefaultValue(FileFormat fileFormat) throws Exception {
         try (Database db = create(fileFormat)) {
             db.setEvaluateExpressions(true);
@@ -149,7 +149,7 @@ class PropertyExpressionTest extends AbstractBaseTest {
     }
 
     @ParameterizedTest(name = "[{index}] {0}")
-    @MethodSource("io.github.spannm.jackcess.test.TestDbs#getFileformats()")
+    @FileFormatSource()
     void testColumnValidator(FileFormat fileFormat) throws Exception {
         try (Database db = create(fileFormat)) {
             db.setEvaluateExpressions(true);
@@ -220,7 +220,7 @@ class PropertyExpressionTest extends AbstractBaseTest {
     }
 
     @ParameterizedTest(name = "[{index}] {0}")
-    @MethodSource("io.github.spannm.jackcess.test.TestDbs#getFileformats()")
+    @FileFormatSource()
     void testRowValidator(FileFormat fileFormat) throws Exception {
         try (Database db = create(fileFormat)) {
             db.setEvaluateExpressions(true);
@@ -280,7 +280,7 @@ class PropertyExpressionTest extends AbstractBaseTest {
     }
 
     @ParameterizedTest(name = "[{index}] {0}")
-    @MethodSource("io.github.spannm.jackcess.test.TestDbs#getFileformats()")
+    @FileFormatSource()
     void testCustomEvalConfig(FileFormat fileFormat) throws Exception {
         TemporalConfig tempConf = new TemporalConfig("[uuuu/]M/d",
             "uuuu-MMM-d",

@@ -23,19 +23,18 @@ import io.github.spannm.jackcess.Database.FileFormat;
 import io.github.spannm.jackcess.impl.DatabaseImpl;
 import io.github.spannm.jackcess.impl.TableImpl;
 import io.github.spannm.jackcess.test.AbstractBaseTest;
+import io.github.spannm.jackcess.test.source.FileFormatSource;
 import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.MethodSource;
 
 import java.util.*;
 
 /**
- *
  * @author James Ahlborn
  */
 class TableUpdaterTest extends AbstractBaseTest {
 
     @ParameterizedTest(name = "[{index}] {0}")
-    @MethodSource("io.github.spannm.jackcess.test.TestDbs#getFileformats()")
+    @FileFormatSource()
     void testTableUpdating(FileFormat fileFormat) throws Exception {
         try (Database db = create(fileFormat)) {
             doTestUpdating(db, false, true, null);
@@ -43,7 +42,7 @@ class TableUpdaterTest extends AbstractBaseTest {
     }
 
     @ParameterizedTest(name = "[{index}] {0}")
-    @MethodSource("io.github.spannm.jackcess.test.TestDbs#getFileformats()")
+    @FileFormatSource()
     void testTableUpdatingOneToOne(FileFormat fileFormat) throws Exception {
         try (Database db = create(fileFormat)) {
             doTestUpdating(db, true, true, null);
@@ -51,7 +50,7 @@ class TableUpdaterTest extends AbstractBaseTest {
     }
 
     @ParameterizedTest(name = "[{index}] {0}")
-    @MethodSource("io.github.spannm.jackcess.test.TestDbs#getFileformats()")
+    @FileFormatSource()
     void testTableUpdatingNoEnforce(FileFormat fileFormat) throws Exception {
         try (Database db = create(fileFormat)) {
             doTestUpdating(db, false, false, null);
@@ -59,7 +58,7 @@ class TableUpdaterTest extends AbstractBaseTest {
     }
 
     @ParameterizedTest(name = "[{index}] {0}")
-    @MethodSource("io.github.spannm.jackcess.test.TestDbs#getFileformats()")
+    @FileFormatSource()
     void testTableUpdatingNamedRelationship(FileFormat fileFormat) throws Exception {
         try (Database db = create(fileFormat)) {
             doTestUpdating(db, false, true, "FKnun3jvv47l9kyl74h85y8a0if");
@@ -76,32 +75,24 @@ class TableUpdaterTest extends AbstractBaseTest {
             .toTable(db);
 
         int t1idxs = 1;
-        newPrimaryKey("id")
-            .addToTable(t1);
-        newColumn("data", DataType.TEXT)
-            .addToTable(t1);
-        newColumn("bigdata", DataType.MEMO)
-            .addToTable(t1);
+        newPrimaryKey("id").addToTable(t1);
+        newColumn("data", DataType.TEXT).addToTable(t1);
+        newColumn("bigdata", DataType.MEMO).addToTable(t1);
 
-        newColumn("data2", DataType.TEXT)
-            .addToTable(t2);
-        newColumn("bigdata2", DataType.MEMO)
-            .addToTable(t2);
+        newColumn("data2", DataType.TEXT).addToTable(t2);
+        newColumn("bigdata2", DataType.MEMO).addToTable(t2);
 
         int t2idxs = 0;
         if (oneToOne) {
             t2idxs++;
-            newPrimaryKey("id2")
-                .addToTable(t2);
+            newPrimaryKey("id2").addToTable(t2);
         }
 
-        RelationshipBuilder rb = newRelationship("TestTable", "TestTable2")
-            .addColumns("id", "id2");
+        RelationshipBuilder rb = newRelationship("TestTable", "TestTable2").addColumns("id", "id2");
         if (enforce) {
             t1idxs++;
             t2idxs++;
-            rb.withReferentialIntegrity()
-                .withCascadeDeletes();
+            rb.withReferentialIntegrity().withCascadeDeletes();
         }
 
         if (relationshipName != null) {
@@ -177,7 +168,7 @@ class TableUpdaterTest extends AbstractBaseTest {
     }
 
     @ParameterizedTest(name = "[{index}] {0}")
-    @MethodSource("io.github.spannm.jackcess.test.TestDbs#getFileformats()")
+    @FileFormatSource()
     void testInvalidUpdate(FileFormat fileFormat) throws Exception {
         try (Database db = create(fileFormat)) {
             Table t1 = newTable("TestTable")
@@ -216,7 +207,7 @@ class TableUpdaterTest extends AbstractBaseTest {
     }
 
     @ParameterizedTest(name = "[{index}] {0}")
-    @MethodSource("io.github.spannm.jackcess.test.TestDbs#getFileformats()")
+    @FileFormatSource()
     void testUpdateLargeTableDef(FileFormat fileFormat) throws Exception {
         try (Database db = create(fileFormat)) {
             final int numColumns = 89;

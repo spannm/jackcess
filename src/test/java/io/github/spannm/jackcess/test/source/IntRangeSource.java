@@ -1,11 +1,19 @@
 package io.github.spannm.jackcess.test.source;
 
+import io.github.spannm.jackcess.test.source.IntRangeSource.IntRangeArgumentsProvider;
+import org.junit.jupiter.api.extension.ExtensionContext;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.ArgumentsProvider;
 import org.junit.jupiter.params.provider.ArgumentsSource;
+import org.junit.platform.commons.support.AnnotationSupport;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
+import java.util.Optional;
+import java.util.stream.IntStream;
+import java.util.stream.Stream;
 
 /**
  * {@code @IntRangeSource} is an {@link ArgumentsSource} that provides consecutive
@@ -17,6 +25,7 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 @ArgumentsSource(IntRangeArgumentsProvider.class)
 public @interface IntRangeSource {
+
     /**
      * The start value of the range.
      */
@@ -31,4 +40,15 @@ public @interface IntRangeSource {
      * Whether the end value is inclusive (to be included in the range), default {@code false}.
      */
     boolean endInclusive() default false;
+
+    static class IntRangeArgumentsProvider implements ArgumentsProvider {
+
+        @Override
+        public Stream<Arguments> provideArguments(ExtensionContext context) {
+            Optional<IntRangeSource> optSrc = context.getElement().map(elem -> AnnotationSupport.findAnnotation(elem, IntRangeSource.class).get());
+            return optSrc.map(cfg -> IntStream.range(cfg.start(), cfg.endInclusive() ? cfg.end() + 1 : cfg.end()).boxed().map(Arguments::of)).orElse(Stream.empty());
+        }
+
+    }
+
 }

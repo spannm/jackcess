@@ -6,10 +6,12 @@ import io.github.spannm.jackcess.Database.FileFormat;
 import io.github.spannm.jackcess.JackcessException;
 import io.github.spannm.jackcess.PropertyMap;
 import io.github.spannm.jackcess.test.AbstractBaseTest;
+import io.github.spannm.jackcess.test.Basename;
 import io.github.spannm.jackcess.test.TestDb;
-import io.github.spannm.jackcess.test.TestDbs;
 import io.github.spannm.jackcess.test.TestUtil;
+import io.github.spannm.jackcess.test.source.TestDbSource;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
 
 import java.io.File;
 import java.nio.channels.FileChannel;
@@ -22,62 +24,52 @@ import java.nio.channels.NonWritableChannelException;
 class JetFormatTest extends AbstractBaseTest {
 
     @Test
-    void testGetFormat() throws Exception {
-        try {
-            JetFormat.getFormat(null);
-            fail("npe");
-        } catch (NullPointerException e) {
-            // success
+    void testGetFormatNull() {
+        assertThrows(NullPointerException.class, () -> JetFormat.getFormat(null));
+    }
+
+    @ParameterizedTest(name = "[{index}] {0}")
+    @TestDbSource(basename = Basename.TEST, readOnly = true)
+    void testGetFormat(TestDb testDb) throws Exception {
+        try (FileChannel channel = DatabaseImpl.openChannel(testDb.getFile().toPath(), false, false)) {
+
+            JetFormat fmtActual = JetFormat.getFormat(channel);
+            assertEquals(testDb.getExpectedJetFormat(), fmtActual, "Unexpected JetFormat for dbFile: " + testDb.getFile().getAbsolutePath());
         }
+    }
 
-        for (TestDb testDB : TestDbs.getReadOnlyDbs()) {
-
-            try (FileChannel channel = DatabaseImpl.openChannel(
-                    testDB.getFile().toPath(), false, false)) {
-
-                JetFormat fmtActual = JetFormat.getFormat(channel);
-                assertEquals(testDB.getExpectedJetFormat(), fmtActual, "Unexpected JetFormat for dbFile: " + testDB.getFile().getAbsolutePath());
+    @ParameterizedTest(name = "[{index}] {0}")
+    @TestDbSource(basename = Basename.TEST, readOnly = true)
+    void testReadOnlyFormat(TestDb testDb) {
+        Exception failure = null;
+        try (Database db = testDb.openCopy()) {
+            if (testDb.getExpectedJetFormat().READ_ONLY) {
+                PropertyMap props = db.getUserDefinedProperties();
+                props.put("foo", "bar");
+                props.save();
             }
 
+        } catch (Exception e) {
+            failure = e;
+        }
+
+        if (!testDb.getExpectedJetFormat().READ_ONLY) {
+            assertNull(failure);
+        } else {
+            assertInstanceOf(NonWritableChannelException.class, failure);
+        }
+    }
+
+    @ParameterizedTest(name = "[{index}] {0}")
+    @TestDbSource(basename = Basename.TEST, readOnly = true)
+    void testFileFormat1(TestDb testDb) throws Exception {
+        try (Database db = testDb.open()) {
+            assertEquals(testDb.getExpectedFileFormat(), db.getFileFormat());
         }
     }
 
     @Test
-    void testReadOnlyFormat() {
-
-        for (TestDb testDB : TestDbs.getReadOnlyDbs()) {
-
-            Exception failure = null;
-            try (Database db = testDB.openCopy()) {
-                if (testDB.getExpectedJetFormat().READ_ONLY) {
-                    PropertyMap props = db.getUserDefinedProperties();
-                    props.put("foo", "bar");
-                    props.save();
-                }
-
-            } catch (Exception e) {
-                failure = e;
-            }
-
-            if (!testDB.getExpectedJetFormat().READ_ONLY) {
-                assertNull(failure);
-            } else {
-                assertInstanceOf(NonWritableChannelException.class, failure);
-            }
-
-        }
-    }
-
-    @Test
-    void testFileFormat() throws Exception {
-
-        for (TestDb testDB : TestDbs.getReadOnlyDbs()) {
-
-            try (Database db = testDB.open()) {
-                assertEquals(testDB.getExpectedFileFormat(), db.getFileFormat());
-            }
-        }
-
+    void testFileFormat2() throws Exception {
         try (Database db = TestUtil.open(FileFormat.GENERIC_JET4, new File(DIR_TEST_DATA, "adox_jet4.mdb"))) {
             assertEquals(FileFormat.GENERIC_JET4, db.getFileFormat());
         }

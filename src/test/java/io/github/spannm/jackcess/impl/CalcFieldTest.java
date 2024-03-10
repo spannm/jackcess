@@ -23,10 +23,10 @@ import io.github.spannm.jackcess.Database.FileFormat;
 import io.github.spannm.jackcess.test.AbstractBaseTest;
 import io.github.spannm.jackcess.test.Basename;
 import io.github.spannm.jackcess.test.TestDb;
-import io.github.spannm.jackcess.test.TestDbs;
+import io.github.spannm.jackcess.test.source.FileFormatSource;
+import io.github.spannm.jackcess.test.source.TestDbSource;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.MethodSource;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -34,7 +34,6 @@ import java.util.List;
 import java.util.Map;
 
 /**
- *
  * @author James Ahlborn
  */
 class CalcFieldTest extends AbstractBaseTest {
@@ -50,7 +49,7 @@ class CalcFieldTest extends AbstractBaseTest {
     }
 
     @ParameterizedTest(name = "[{index}] {0}")
-    @MethodSource("io.github.spannm.jackcess.test.TestDbs#getFileformats()")
+    @FileFormatSource()
     void testCreateCalcField(FileFormat fileFormat) throws Exception {
         JetFormat format = DatabaseImpl.getFileFormatDetails(fileFormat).getFormat();
         if (!format.isSupportedCalculatedDataType(DataType.TEXT)) {
@@ -62,19 +61,13 @@ class CalcFieldTest extends AbstractBaseTest {
 
             Table t = new TableBuilder("Test")
                 .putProperty("awesome_table", true)
-                .addColumn(new ColumnBuilder("id", DataType.LONG)
-                    .withAutoNumber(true))
+                .addColumn(new ColumnBuilder("id", DataType.LONG).withAutoNumber(true))
                 .addColumn(new ColumnBuilder("data", DataType.TEXT))
-                .addColumn(new ColumnBuilder("calc_text", DataType.TEXT)
-                    .withCalculatedInfo("[id] & \"_\" & [data]"))
-                .addColumn(new ColumnBuilder("calc_memo", DataType.MEMO)
-                    .withCalculatedInfo("[id] & \"_\" & [data]"))
-                .addColumn(new ColumnBuilder("calc_bool", DataType.BOOLEAN)
-                    .withCalculatedInfo("[id] > 0"))
-                .addColumn(new ColumnBuilder("calc_long", DataType.LONG)
-                    .withCalculatedInfo("[id] + 1"))
-                .addColumn(new ColumnBuilder("calc_numeric", DataType.NUMERIC)
-                    .withCalculatedInfo("[id] / 0.03"))
+                .addColumn(new ColumnBuilder("calc_text", DataType.TEXT).withCalculatedInfo("[id] & \"_\" & [data]"))
+                .addColumn(new ColumnBuilder("calc_memo", DataType.MEMO).withCalculatedInfo("[id] & \"_\" & [data]"))
+                .addColumn(new ColumnBuilder("calc_bool", DataType.BOOLEAN).withCalculatedInfo("[id] > 0"))
+                .addColumn(new ColumnBuilder("calc_long", DataType.LONG).withCalculatedInfo("[id] + 1"))
+                .addColumn(new ColumnBuilder("calc_numeric", DataType.NUMERIC).withCalculatedInfo("[id] / 0.03"))
                 .toTable(db);
 
             Column col = t.getColumn("calc_text");
@@ -134,26 +127,24 @@ class CalcFieldTest extends AbstractBaseTest {
     }
 
     @SuppressWarnings("checkstyle:LineLengthCheck")
-    @Test
-    void testReadCalcFields() throws Exception {
+    @ParameterizedTest(name = "[{index}] {0}")
+    @TestDbSource(basename = Basename.CALC_FIELD)
+    void testReadCalcFields(TestDb testDb) throws Exception {
+        try (Database db = testDb.open()) {
+            Table t = db.getTable("Table1");
 
-        for (TestDb testDB : TestDbs.getDbs(Basename.CALC_FIELD)) {
-            try (Database db = testDB.open()) {
-                Table t = db.getTable("Table1");
-
-                List<String> rows = new ArrayList<>();
-                for (Row r : t) {
-                    rows.add(r.entrySet().toString());
-                }
-
-                List<String> expectedRows = List.of(
-                    "[ID=1, FirstName=Bruce, LastName=Wayne, LastFirst=Wayne, Bruce, City=Gotham, LastFirstLen=12, Salary=1000000.0000, MonthlySalary=83333.3333, IsRich=true, AllNames=Wayne, Bruce=Wayne, Bruce, WeeklySalary=19230.7692307692, SalaryTest=1000000.0000, BoolTest=true, Popularity=50.325000, DecimalTest=50.325000, FloatTest=2583.2092, BigNumTest=56505085819.424791296572280180]",
-                    "[ID=2, FirstName=Bart, LastName=Simpson, LastFirst=Simpson, Bart, City=Springfield, LastFirstLen=13, Salary=-1.0000, MonthlySalary=-0.0833, IsRich=false, AllNames=Simpson, Bart=Simpson, Bart, WeeklySalary=-0.0192307692307692, SalaryTest=-1.0000, BoolTest=true, Popularity=-36.222200, DecimalTest=-36.222200, FloatTest=0.0035889593, BigNumTest=-0.0784734499180612994241100748]",
-                    "[ID=3, FirstName=John, LastName=Doe, LastFirst=Doe, John, City=Nowhere, LastFirstLen=9, Salary=0.0000, MonthlySalary=0.0000, IsRich=false, AllNames=Doe, John=Doe, John, WeeklySalary=0, SalaryTest=0.0000, BoolTest=true, Popularity=0.012300, DecimalTest=0.012300, FloatTest=0.0, BigNumTest=0E-8]",
-                    "[ID=4, FirstName=Test, LastName=User, LastFirst=User, Test, City=Hockessin, LastFirstLen=10, Salary=100.0000, MonthlySalary=8.3333, IsRich=false, AllNames=User, Test=User, Test, WeeklySalary=1.92307692307692, SalaryTest=100.0000, BoolTest=true, Popularity=102030405060.654321, DecimalTest=102030405060.654321, FloatTest=1.27413E-10, BigNumTest=2.787019289824216980830E-7]");
-
-                assertEquals(expectedRows, rows);
+            List<String> rows = new ArrayList<>();
+            for (Row r : t) {
+                rows.add(r.entrySet().toString());
             }
+
+            List<String> expectedRows = List.of(
+                "[ID=1, FirstName=Bruce, LastName=Wayne, LastFirst=Wayne, Bruce, City=Gotham, LastFirstLen=12, Salary=1000000.0000, MonthlySalary=83333.3333, IsRich=true, AllNames=Wayne, Bruce=Wayne, Bruce, WeeklySalary=19230.7692307692, SalaryTest=1000000.0000, BoolTest=true, Popularity=50.325000, DecimalTest=50.325000, FloatTest=2583.2092, BigNumTest=56505085819.424791296572280180]",
+                "[ID=2, FirstName=Bart, LastName=Simpson, LastFirst=Simpson, Bart, City=Springfield, LastFirstLen=13, Salary=-1.0000, MonthlySalary=-0.0833, IsRich=false, AllNames=Simpson, Bart=Simpson, Bart, WeeklySalary=-0.0192307692307692, SalaryTest=-1.0000, BoolTest=true, Popularity=-36.222200, DecimalTest=-36.222200, FloatTest=0.0035889593, BigNumTest=-0.0784734499180612994241100748]",
+                "[ID=3, FirstName=John, LastName=Doe, LastFirst=Doe, John, City=Nowhere, LastFirstLen=9, Salary=0.0000, MonthlySalary=0.0000, IsRich=false, AllNames=Doe, John=Doe, John, WeeklySalary=0, SalaryTest=0.0000, BoolTest=true, Popularity=0.012300, DecimalTest=0.012300, FloatTest=0.0, BigNumTest=0E-8]",
+                "[ID=4, FirstName=Test, LastName=User, LastFirst=User, Test, City=Hockessin, LastFirstLen=10, Salary=100.0000, MonthlySalary=8.3333, IsRich=false, AllNames=User, Test=User, Test, WeeklySalary=1.92307692307692, SalaryTest=100.0000, BoolTest=true, Popularity=102030405060.654321, DecimalTest=102030405060.654321, FloatTest=1.27413E-10, BigNumTest=2.787019289824216980830E-7]");
+
+            assertEquals(expectedRows, rows);
         }
     }
 

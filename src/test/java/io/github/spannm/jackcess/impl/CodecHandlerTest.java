@@ -20,8 +20,8 @@ import io.github.spannm.jackcess.*;
 import io.github.spannm.jackcess.Database.FileFormat;
 import io.github.spannm.jackcess.test.AbstractBaseTest;
 import io.github.spannm.jackcess.test.TestUtil;
+import io.github.spannm.jackcess.test.source.FileFormatSource;
 import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.MethodSource;
 
 import java.io.File;
 import java.io.RandomAccessFile;
@@ -38,13 +38,13 @@ class CodecHandlerTest extends AbstractBaseTest {
     private static final CodecProvider FULL_PROVIDER   = (channel, charset) -> new FullCodecHandler(channel);
 
     @ParameterizedTest(name = "[{index}] {0}")
-    @MethodSource("io.github.spannm.jackcess.test.TestDbs#getFileformats()")
+    @FileFormatSource()
     void testCodecHandlerSimple(FileFormat fileFormat) throws Exception {
         doTestCodecHandler(fileFormat, true);
     }
 
     @ParameterizedTest(name = "[{index}] {0}")
-    @MethodSource("io.github.spannm.jackcess.test.TestDbs#getFileformats()")
+    @FileFormatSource()
     void testCodecHandlerNotSimple(FileFormat fileFormat) throws Exception {
         doTestCodecHandler(fileFormat, false);
     }

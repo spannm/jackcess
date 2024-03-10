@@ -1,7 +1,8 @@
 package io.github.spannm.jackcess.test;
 
 /**
- * Defines known valid database test file base names.
+ * Defines known valid database test file base names
+ * i.e. the prefix of the file name.
  */
 public enum Basename {
 

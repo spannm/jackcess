@@ -14,12 +14,12 @@ import java.nio.charset.Charset;
 public final class TestDb {
 
     private final File       databaseFile;
-    private final FileFormat expectedFileFormat;
+    private final FileFormat fileFormat;
     private final Charset    charset;
 
-    public TestDb(File _databaseFile, FileFormat _expectedFileFormat, Charset _charset) {
+    public TestDb(File _databaseFile, FileFormat _fileFormat, Charset _charset) {
         databaseFile = _databaseFile;
-        expectedFileFormat = _expectedFileFormat;
+        fileFormat = _fileFormat;
         charset = _charset;
     }
 
@@ -28,11 +28,11 @@ public final class TestDb {
     }
 
     public FileFormat getExpectedFileFormat() {
-        return expectedFileFormat;
+        return fileFormat;
     }
 
     public JetFormat getExpectedJetFormat() {
-        return DatabaseImpl.getFileFormatDetails(expectedFileFormat).getFormat();
+        return DatabaseImpl.getFileFormatDetails(fileFormat).getFormat();
     }
 
     public Charset getExpectedCharset() {
@@ -51,10 +51,14 @@ public final class TestDb {
         return TestUtil.openCopy(getExpectedFileFormat(), getFile(), false);
     }
 
+
     @Override
     public String toString() {
-        return String.format("%s[dbFile=%s, fileFormat=%s, charset=%s]",
-            getClass().getSimpleName(), databaseFile, expectedFileFormat, charset);
+        return getClass().getSimpleName() + '['
+            + databaseFile
+            + ", fileFormat=" + fileFormat
+            + (charset == null ? "" : ", charset=" + charset)
+            + ']';
     }
 
 }

@@ -21,9 +21,9 @@ import static io.github.spannm.jackcess.test.TestUtil.*;
 import io.github.spannm.jackcess.*;
 import io.github.spannm.jackcess.Database.FileFormat;
 import io.github.spannm.jackcess.test.AbstractBaseTest;
+import io.github.spannm.jackcess.test.source.FileFormatSource;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.MethodSource;
 
 import java.time.Instant;
 import java.time.LocalDateTime;
@@ -39,7 +39,7 @@ import java.util.Map;
 class DatabaseReadWriteTest extends AbstractBaseTest {
 
     @ParameterizedTest(name = "[{index}] {0}")
-    @MethodSource("io.github.spannm.jackcess.test.TestDbs#getFileformats()")
+    @FileFormatSource()
     void testWriteAndRead(FileFormat fileFormat) throws Exception {
         try (Database db = create(fileFormat)) {
             doTestWriteAndRead(db);
@@ -47,7 +47,7 @@ class DatabaseReadWriteTest extends AbstractBaseTest {
     }
 
     @ParameterizedTest(name = "[{index}] {0}")
-    @MethodSource("io.github.spannm.jackcess.test.TestDbs#getFileformats()")
+    @FileFormatSource()
     void testWriteAndReadInMem(FileFormat fileFormat) throws Exception {
         try (Database db = createMem(fileFormat)) {
             doTestWriteAndRead(db);
@@ -82,7 +82,7 @@ class DatabaseReadWriteTest extends AbstractBaseTest {
     }
 
     @ParameterizedTest(name = "[{index}] {0}")
-    @MethodSource("io.github.spannm.jackcess.test.TestDbs#getFileformats()")
+    @FileFormatSource()
     void testWriteAndReadInBatch(FileFormat fileFormat) throws Exception {
         try (Database db = createMem(fileFormat)) {
             createTestTable(db);
@@ -109,7 +109,7 @@ class DatabaseReadWriteTest extends AbstractBaseTest {
     }
 
     @ParameterizedTest(name = "[{index}] {0}")
-    @MethodSource("io.github.spannm.jackcess.test.TestDbs#getFileformats()")
+    @FileFormatSource()
     void testUpdateRow(FileFormat fileFormat) throws Exception {
         try (Database db = createMem(fileFormat)) {
             Table t = new TableBuilder("test")

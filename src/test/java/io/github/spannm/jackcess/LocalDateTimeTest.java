@@ -27,10 +27,10 @@ import io.github.spannm.jackcess.impl.DatabaseImpl;
 import io.github.spannm.jackcess.test.AbstractBaseTest;
 import io.github.spannm.jackcess.test.Basename;
 import io.github.spannm.jackcess.test.TestDb;
-import io.github.spannm.jackcess.test.TestDbs;
+import io.github.spannm.jackcess.test.source.FileFormatSource;
+import io.github.spannm.jackcess.test.source.TestDbSource;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.MethodSource;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -45,7 +45,7 @@ import java.util.*;
 class LocalDateTimeTest extends AbstractBaseTest {
 
     @ParameterizedTest(name = "[{index}] {0}")
-    @MethodSource("io.github.spannm.jackcess.test.TestDbs#getFileformats()")
+    @FileFormatSource()
     void testWriteAndReadLocalDate(FileFormat fileFormat) throws Exception {
         try (Database db = createMem(fileFormat)) {
             db.setDateTimeType(DateTimeType.LOCAL_DATE_TIME);
@@ -105,7 +105,7 @@ class LocalDateTimeTest extends AbstractBaseTest {
     }
 
     @ParameterizedTest(name = "[{index}] {0}")
-    @MethodSource("io.github.spannm.jackcess.test.TestDbs#getFileformats()")
+    @FileFormatSource()
     void testAncientLocalDates1(FileFormat fileFormat) throws Exception {
         DateTimeFormatter sdf = DateTimeFormatter.ofPattern("uuuu-MM-dd");
         List<String> dates = List.of("1582-10-15", "1582-10-14", "1492-01-10", "1392-01-10");
@@ -133,25 +133,24 @@ class LocalDateTimeTest extends AbstractBaseTest {
         }
     }
 
-    void testAncientLocalDates2() throws Exception {
+    @ParameterizedTest(name = "[{index}] {0}")
+    @TestDbSource(basename = Basename.OLD_DATES)
+    void testAncientLocalDates2(TestDb testDb) throws Exception {
         DateTimeFormatter sdf = DateTimeFormatter.ofPattern("uuuu-MM-dd");
         List<String> dates = List.of("1582-10-15", "1582-10-14", "1492-01-10", "1392-01-10");
 
-        for (TestDb testDB : TestDbs.getDbs(Basename.OLD_DATES)) {
-            try (Database db = testDB.openCopy()) {
-                db.setDateTimeType(DateTimeType.LOCAL_DATE_TIME);
+        try (Database db = testDb.openCopy()) {
+            db.setDateTimeType(DateTimeType.LOCAL_DATE_TIME);
 
-                Table t = db.getTable("Table1");
+            Table t = db.getTable("Table1");
 
-                List<String> foundDates = new ArrayList<>();
-                for (Row row : t) {
-                    foundDates.add(sdf.format(row.getLocalDateTime("DateField")));
-                }
-
-                assertEquals(dates, foundDates);
+            List<String> foundDates = new ArrayList<>();
+            for (Row row : t) {
+                foundDates.add(sdf.format(row.getLocalDateTime("DateField")));
             }
-        }
 
+            assertEquals(dates, foundDates);
+        }
     }
 
     @Test
@@ -208,7 +207,7 @@ class LocalDateTimeTest extends AbstractBaseTest {
     }
 
     @ParameterizedTest(name = "[{index}] {0}")
-    @MethodSource("io.github.spannm.jackcess.test.TestDbs#getFileformats()")
+    @FileFormatSource()
     void testWriteAndReadTemporals(FileFormat fileFormat) throws Exception {
         ZoneId zoneId = ZoneId.of("America/New_York");
 

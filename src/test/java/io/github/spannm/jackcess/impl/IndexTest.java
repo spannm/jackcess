@@ -18,12 +18,16 @@ package io.github.spannm.jackcess.impl;
 
 import io.github.spannm.jackcess.*;
 import io.github.spannm.jackcess.Database.FileFormat;
-import io.github.spannm.jackcess.test.*;
+import io.github.spannm.jackcess.test.AbstractBaseTest;
+import io.github.spannm.jackcess.test.Basename;
+import io.github.spannm.jackcess.test.TestDb;
+import io.github.spannm.jackcess.test.TestUtil;
+import io.github.spannm.jackcess.test.source.FileFormatSource;
+import io.github.spannm.jackcess.test.source.TestDbSource;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.MethodSource;
 
 import java.io.IOException;
 import java.util.*;
@@ -76,115 +80,113 @@ class IndexTest extends AbstractBaseTest {
 
     }
 
-    @Test
-    void testPrimaryKey() throws Exception {
-        for (TestDb testDB : TestDbs.getReadOnlyDbs()) {
-            try (Database db = testDB.open()) {
-                Table table = db.getTable("Table1");
-                Map<String, Boolean> foundPKs = new HashMap<>();
-                Index pkIndex = null;
-                for (Index index : table.getIndexes()) {
-                    foundPKs.put(index.getColumns().iterator().next().getName(),
-                        index.isPrimaryKey());
-                    if (index.isPrimaryKey()) {
-                        pkIndex = index;
+    @ParameterizedTest(name = "[{index}] {0}")
+    @TestDbSource(basename = Basename.TEST, readOnly = true)
+    void testPrimaryKey(TestDb testDb) throws Exception {
+        try (Database db = testDb.open()) {
+            Table table = db.getTable("Table1");
+            Map<String, Boolean> foundPKs = new HashMap<>();
+            Index pkIndex = null;
+            for (Index index : table.getIndexes()) {
+                foundPKs.put(index.getColumns().iterator().next().getName(),
+                    index.isPrimaryKey());
+                if (index.isPrimaryKey()) {
+                    pkIndex = index;
 
-                    }
                 }
-                Map<String, Boolean> expectedPKs = new HashMap<>();
-                expectedPKs.put("A", Boolean.TRUE);
-                expectedPKs.put("B", Boolean.FALSE);
-                assertEquals(expectedPKs, foundPKs);
-                assertSame(pkIndex, table.getPrimaryKeyIndex());
             }
-        }
-    }
-
-    @Test
-    void testLogicalIndexes() throws Exception {
-        for (TestDb testDB : TestDbs.getReadOnlyDbs(Basename.INDEX)) {
-            try (Database db = testDB.open()) {
-                TableImpl table = (TableImpl) db.getTable("Table1");
-                for (IndexImpl idx : table.getIndexes()) {
-                    idx.initialize();
-                }
-                assertEquals(4, table.getIndexes().size());
-                assertEquals(4, table.getLogicalIndexCount());
-                checkIndexColumns(table,
-                    "id", "id",
-                    "PrimaryKey", "id",
-                    "Table2Table1", "otherfk1",
-                    "Table3Table1", "otherfk2");
-
-                table = (TableImpl) db.getTable("Table2");
-                for (IndexImpl idx : table.getIndexes()) {
-                    idx.initialize();
-                }
-                assertEquals(3, table.getIndexes().size());
-                assertEquals(2, table.getIndexDatas().size());
-                assertEquals(3, table.getLogicalIndexCount());
-                checkIndexColumns(table,
-                    "id", "id",
-                    "PrimaryKey", "id",
-                    ".rC", "id");
-
-                IndexImpl pkIdx = table.getIndex("PrimaryKey");
-                IndexImpl fkIdx = table.getIndex(".rC");
-                assertNotSame(pkIdx, fkIdx);
-                assertTrue(fkIdx.isForeignKey());
-                assertSame(pkIdx.getIndexData(), fkIdx.getIndexData());
-                IndexData indexData = pkIdx.getIndexData();
-                assertEquals(List.of(pkIdx, fkIdx), indexData.getIndexes());
-                assertSame(pkIdx, indexData.getPrimaryIndex());
-
-                table = (TableImpl) db.getTable("Table3");
-                for (IndexImpl idx : table.getIndexes()) {
-                    idx.initialize();
-                }
-                assertEquals(3, table.getIndexes().size());
-                assertEquals(2, table.getIndexDatas().size());
-                assertEquals(3, table.getLogicalIndexCount());
-                checkIndexColumns(table,
-                    "id", "id",
-                    "PrimaryKey", "id",
-                    ".rC", "id");
-
-                pkIdx = table.getIndex("PrimaryKey");
-                fkIdx = table.getIndex(".rC");
-                assertNotSame(pkIdx, fkIdx);
-                assertTrue(fkIdx.isForeignKey());
-                assertSame(pkIdx.getIndexData(), fkIdx.getIndexData());
-                indexData = pkIdx.getIndexData();
-                assertEquals(List.of(pkIdx, fkIdx), indexData.getIndexes());
-                assertSame(pkIdx, indexData.getPrimaryIndex());
-            }
-        }
-    }
-
-    @Test
-    void testComplexIndex() throws Exception {
-        for (TestDb testDB : TestDbs.getDbs(Basename.COMP_INDEX)) {
-            try (// this file has an index with "compressed" entries and node pages
-            Database db1 = testDB.open()) {
-                TableImpl t1 = (TableImpl) db1.getTable("Table1");
-                IndexImpl idx1 = t1.getIndexes().get(0);
-                assertFalse(idx1.isInitialized());
-                assertEquals(512, TestUtil.countRows(t1));
-                assertEquals(512, idx1.getIndexData().getEntryCount());
-            }
-
-            try (// copy to temp file and attempt to edit
-            Database db2 = testDB.openCopy()) {
-                TableImpl t2 = (TableImpl) db2.getTable("Table1");
-                t2.addRow(99, "abc", "def");
-            }
+            Map<String, Boolean> expectedPKs = new HashMap<>();
+            expectedPKs.put("A", Boolean.TRUE);
+            expectedPKs.put("B", Boolean.FALSE);
+            assertEquals(expectedPKs, foundPKs);
+            assertSame(pkIndex, table.getPrimaryKeyIndex());
         }
     }
 
     @ParameterizedTest(name = "[{index}] {0}")
-    @MethodSource("io.github.spannm.jackcess.test.TestDbs#getDbs()")
-    void testEntryDeletion(TestDb testDB) throws Exception {
-        try (Database db = testDB.openCopy()) {
+    @TestDbSource(basename = Basename.INDEX, readOnly = true)
+    void testLogicalIndexes(TestDb testDb) throws Exception {
+
+        try (Database db = testDb.open()) {
+            TableImpl table = (TableImpl) db.getTable("Table1");
+            for (IndexImpl idx : table.getIndexes()) {
+                idx.initialize();
+            }
+            assertEquals(4, table.getIndexes().size());
+            assertEquals(4, table.getLogicalIndexCount());
+            checkIndexColumns(table,
+                "id", "id",
+                "PrimaryKey", "id",
+                "Table2Table1", "otherfk1",
+                "Table3Table1", "otherfk2");
+
+            table = (TableImpl) db.getTable("Table2");
+            for (IndexImpl idx : table.getIndexes()) {
+                idx.initialize();
+            }
+            assertEquals(3, table.getIndexes().size());
+            assertEquals(2, table.getIndexDatas().size());
+            assertEquals(3, table.getLogicalIndexCount());
+            checkIndexColumns(table,
+                "id", "id",
+                "PrimaryKey", "id",
+                ".rC", "id");
+
+            IndexImpl pkIdx = table.getIndex("PrimaryKey");
+            IndexImpl fkIdx = table.getIndex(".rC");
+            assertNotSame(pkIdx, fkIdx);
+            assertTrue(fkIdx.isForeignKey());
+            assertSame(pkIdx.getIndexData(), fkIdx.getIndexData());
+            IndexData indexData = pkIdx.getIndexData();
+            assertEquals(List.of(pkIdx, fkIdx), indexData.getIndexes());
+            assertSame(pkIdx, indexData.getPrimaryIndex());
+
+            table = (TableImpl) db.getTable("Table3");
+            for (IndexImpl idx : table.getIndexes()) {
+                idx.initialize();
+            }
+            assertEquals(3, table.getIndexes().size());
+            assertEquals(2, table.getIndexDatas().size());
+            assertEquals(3, table.getLogicalIndexCount());
+            checkIndexColumns(table,
+                "id", "id",
+                "PrimaryKey", "id",
+                ".rC", "id");
+
+            pkIdx = table.getIndex("PrimaryKey");
+            fkIdx = table.getIndex(".rC");
+            assertNotSame(pkIdx, fkIdx);
+            assertTrue(fkIdx.isForeignKey());
+            assertSame(pkIdx.getIndexData(), fkIdx.getIndexData());
+            indexData = pkIdx.getIndexData();
+            assertEquals(List.of(pkIdx, fkIdx), indexData.getIndexes());
+            assertSame(pkIdx, indexData.getPrimaryIndex());
+        }
+    }
+
+    @ParameterizedTest(name = "[{index}] {0}")
+    @TestDbSource(basename = Basename.COMP_INDEX)
+    void testComplexIndex(TestDb testDb) throws Exception {
+        try (// this file has an index with "compressed" entries and node pages
+        Database db1 = testDb.open()) {
+            TableImpl t1 = (TableImpl) db1.getTable("Table1");
+            IndexImpl idx1 = t1.getIndexes().get(0);
+            assertFalse(idx1.isInitialized());
+            assertEquals(512, TestUtil.countRows(t1));
+            assertEquals(512, idx1.getIndexData().getEntryCount());
+        }
+
+        try (// copy to temp file and attempt to edit
+        Database db2 = testDb.openCopy()) {
+            TableImpl t2 = (TableImpl) db2.getTable("Table1");
+            t2.addRow(99, "abc", "def");
+        }
+    }
+
+    @ParameterizedTest(name = "[{index}] {0}")
+    @TestDbSource(basename = Basename.TEST)
+    void testEntryDeletion(TestDb testDb) throws Exception {
+        try (Database db = testDb.openCopy()) {
             Table table = db.getTable("Table1");
 
             for (int i = 0; i < 10; i++) {
@@ -221,15 +223,14 @@ class IndexTest extends AbstractBaseTest {
         }
     }
 
-    @Test
-    void testIgnoreNulls() throws Exception {
-        for (TestDb testDB : TestDbs.getDbs(Basename.INDEX_PROPERTIES)) {
-            try (Database db = testDB.openCopy()) {
-                db.setEvaluateExpressions(false);
+    @ParameterizedTest(name = "[{index}] {0}")
+    @TestDbSource(basename = Basename.INDEX_PROPERTIES)
+    void testIgnoreNulls(TestDb testDb) throws Exception {
+        try (Database db = testDb.openCopy()) {
+            db.setEvaluateExpressions(false);
 
-                doTestIgnoreNulls(db, "TableIgnoreNulls1");
-                doTestIgnoreNulls(db, "TableIgnoreNulls2");
-            }
+            doTestIgnoreNulls(db, "TableIgnoreNulls1");
+            doTestIgnoreNulls(db, "TableIgnoreNulls2");
         }
     }
 
@@ -268,11 +269,10 @@ class IndexTest extends AbstractBaseTest {
         }
     }
 
-    @Test
-    void testUnique() throws Exception {
-        for (TestDb testDB : TestDbs.getDbs(Basename.INDEX_PROPERTIES)) {
-            Database db = testDB.openCopy();
-
+    @ParameterizedTest(name = "[{index}] {0}")
+    @TestDbSource(basename = Basename.INDEX_PROPERTIES)
+    void testUnique(TestDb testDb) throws Exception {
+        try (Database db = testDb.openCopy()) {
             Table t = db.getTable("TableUnique1_temp");
             Index index = t.getIndex("DataIndex");
 
@@ -301,8 +301,6 @@ class IndexTest extends AbstractBaseTest {
                 "unique data", 42, false,
                 "unique data", null, false,
                 null, -4242, false);
-
-            db.close();
         }
     }
 
@@ -332,9 +330,9 @@ class IndexTest extends AbstractBaseTest {
     }
 
     @ParameterizedTest(name = "[{index}] {0}")
-    @MethodSource("io.github.spannm.jackcess.test.TestDbs#getDbs()")
-    void testUniqueEntryCount(TestDb testDB) throws Exception {
-        try (Database db = testDB.openCopy()) {
+    @TestDbSource(basename = Basename.TEST)
+    void testUniqueEntryCount(TestDb testDb) throws Exception {
+        try (Database db = testDb.openCopy()) {
             db.setDateTimeType(DateTimeType.DATE);
             Table table = db.getTable("Table1");
             IndexImpl indA = (IndexImpl) table.getIndex("PrimaryKey");
@@ -374,10 +372,10 @@ class IndexTest extends AbstractBaseTest {
 
             final Row row = c.getCurrentRow();
             // Row order is arbitrary, so v2007 row order difference is valid
-            if (testDB.getExpectedFileFormat().ordinal() >= FileFormat.V2007.ordinal()) {
-                TestUtil.checkTestDBTable1RowA(testDB, table, row);
+            if (testDb.getExpectedFileFormat().ordinal() >= FileFormat.V2007.ordinal()) {
+                TestUtil.checkTestDBTable1RowA(testDb, table, row);
             } else {
-                TestUtil.checkTestDBTable1RowABCDEFG(testDB, table, row);
+                TestUtil.checkTestDBTable1RowABCDEFG(testDb, table, row);
             }
             c.deleteCurrentRow();
 
@@ -390,9 +388,9 @@ class IndexTest extends AbstractBaseTest {
     }
 
     @ParameterizedTest(name = "[{index}] {0}")
-    @MethodSource("io.github.spannm.jackcess.test.TestDbs#getDbs()")
-    void testReplId(TestDb testDB) throws Exception {
-        try (Database db = testDB.openCopy()) {
+    @TestDbSource(basename = Basename.TEST)
+    void testReplId(TestDb testDb) throws Exception {
+        try (Database db = testDb.openCopy()) {
             Table table = db.getTable("Table4");
 
             for (int i = 0; i < 20; i++) {
@@ -404,7 +402,7 @@ class IndexTest extends AbstractBaseTest {
     }
 
     @ParameterizedTest(name = "[{index}] {0}")
-    @MethodSource("io.github.spannm.jackcess.test.TestDbs#getFileformats()")
+    @FileFormatSource()
     void testIndexCreation(FileFormat fileFormat) throws Exception {
         try (Database db = TestUtil.create(fileFormat)) {
             Table t = DatabaseBuilder.newTable("TestTable")
@@ -442,7 +440,7 @@ class IndexTest extends AbstractBaseTest {
     }
 
     @ParameterizedTest(name = "[{index}] {0}")
-    @MethodSource("io.github.spannm.jackcess.test.TestDbs#getFileformats()")
+    @FileFormatSource()
     void testIndexCreationSharedData(FileFormat fileFormat) throws Exception {
         try (Database db = TestUtil.create(fileFormat)) {
             Table t = DatabaseBuilder.newTable("TestTable")
@@ -490,41 +488,41 @@ class IndexTest extends AbstractBaseTest {
         }
     }
 
-    @Test
-    void testGetForeignKeyIndex() throws Exception {
-        for (TestDb testDB : TestDbs.getReadOnlyDbs(Basename.INDEX)) {
-            try (Database db = testDB.open()) {
-                Table t1 = db.getTable("Table1");
-                Table t2 = db.getTable("Table2");
-                Table t3 = db.getTable("Table3");
+    @ParameterizedTest(name = "[{index}] {0}")
+    @TestDbSource(basename = Basename.INDEX, readOnly = true)
+    void testGetForeignKeyIndex(TestDb testDb) throws Exception {
 
-                IndexImpl t2t1 = (IndexImpl) t1.getIndex("Table2Table1");
-                IndexImpl t3t1 = (IndexImpl) t1.getIndex("Table3Table1");
+        try (Database db = testDb.open()) {
+            Table t1 = db.getTable("Table1");
+            Table t2 = db.getTable("Table2");
+            Table t3 = db.getTable("Table3");
 
-                assertTrue(t2t1.isForeignKey());
-                assertNotNull(t2t1.getReference());
-                assertFalse(t2t1.getReference().isPrimaryTable());
-                assertFalse(t2t1.getReference().isCascadeUpdates());
-                assertTrue(t2t1.getReference().isCascadeDeletes());
-                doCheckForeignKeyIndex(t2t1, t2);
+            IndexImpl t2t1 = (IndexImpl) t1.getIndex("Table2Table1");
+            IndexImpl t3t1 = (IndexImpl) t1.getIndex("Table3Table1");
 
-                assertTrue(t3t1.isForeignKey());
-                assertNotNull(t3t1.getReference());
-                assertFalse(t3t1.getReference().isPrimaryTable());
-                assertTrue(t3t1.getReference().isCascadeUpdates());
-                assertFalse(t3t1.getReference().isCascadeDeletes());
-                doCheckForeignKeyIndex(t3t1, t3);
+            assertTrue(t2t1.isForeignKey());
+            assertNotNull(t2t1.getReference());
+            assertFalse(t2t1.getReference().isPrimaryTable());
+            assertFalse(t2t1.getReference().isCascadeUpdates());
+            assertTrue(t2t1.getReference().isCascadeDeletes());
+            doCheckForeignKeyIndex(t2t1, t2);
 
-                Index t1pk = t1.getIndex(IndexBuilder.PRIMARY_KEY_NAME);
-                assertNotNull(t1pk);
-                assertNull(((IndexImpl) t1pk).getReference());
-                assertNull(t1pk.getReferencedIndex());
-            }
+            assertTrue(t3t1.isForeignKey());
+            assertNotNull(t3t1.getReference());
+            assertFalse(t3t1.getReference().isPrimaryTable());
+            assertTrue(t3t1.getReference().isCascadeUpdates());
+            assertFalse(t3t1.getReference().isCascadeDeletes());
+            doCheckForeignKeyIndex(t3t1, t3);
+
+            Index t1pk = t1.getIndex(IndexBuilder.PRIMARY_KEY_NAME);
+            assertNotNull(t1pk);
+            assertNull(((IndexImpl) t1pk).getReference());
+            assertNull(t1pk.getReferencedIndex());
         }
     }
 
     @ParameterizedTest(name = "[{index}] {0}")
-    @MethodSource("io.github.spannm.jackcess.test.TestDbs#getFileformats()")
+    @FileFormatSource()
     void testConstraintViolation(FileFormat fileFormat) throws Exception {
 
         try (Database db = TestUtil.create(fileFormat)) {
@@ -593,7 +591,7 @@ class IndexTest extends AbstractBaseTest {
     }
 
     @ParameterizedTest(name = "[{index}] {0}")
-    @MethodSource("io.github.spannm.jackcess.test.TestDbs#getFileformats()")
+    @FileFormatSource()
     void testAutoNumberRecover(FileFormat fileFormat) throws Exception {
         try (Database db = TestUtil.create(fileFormat)) {
             Table t = DatabaseBuilder.newTable("TestTable")
@@ -648,11 +646,10 @@ class IndexTest extends AbstractBaseTest {
 
     }
 
-    @Test
-    void testBinaryIndex() throws Exception {
-        for (TestDb testDB : TestDbs.getDbs(Basename.BINARY_INDEX)) {
-            Database db = testDB.open();
-
+    @ParameterizedTest(name = "[{index}] {0}")
+    @TestDbSource(basename = Basename.BINARY_INDEX)
+    void testBinaryIndex(TestDb testDb) throws Exception {
+        try (Database db = testDb.open()) {
             Table table = db.getTable("Test");
 
             Index idx = table.getIndex("BinAscIdx");
@@ -660,8 +657,6 @@ class IndexTest extends AbstractBaseTest {
 
             idx = table.getIndex("BinDscIdx");
             doTestBinaryIndex(idx, "BinDsc", true);
-
-            db.close();
         }
     }
 

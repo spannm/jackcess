@@ -21,14 +21,12 @@ import io.github.spannm.jackcess.impl.DatabaseImpl;
 import io.github.spannm.jackcess.impl.PropertyMapImpl;
 import io.github.spannm.jackcess.impl.PropertyMaps;
 import io.github.spannm.jackcess.impl.TableImpl;
-import io.github.spannm.jackcess.test.AbstractBaseTest;
-import io.github.spannm.jackcess.test.TestDb;
-import io.github.spannm.jackcess.test.TestDbs;
-import io.github.spannm.jackcess.test.TestUtil;
+import io.github.spannm.jackcess.test.*;
+import io.github.spannm.jackcess.test.source.FileFormatSource;
+import io.github.spannm.jackcess.test.source.TestDbSource;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
-import org.junit.jupiter.params.provider.MethodSource;
 
 import java.io.File;
 import java.util.*;
@@ -115,62 +113,54 @@ class PropertiesTest extends AbstractBaseTest {
             defMap.put("intprop", 37).getType());
     }
 
-    @Test
-    void testReadProperties() throws Exception {
-        byte[] nameMapBytes = null;
-
-        for (TestDb testDb : TestDbs.getReadOnlyDbs()) {
-            try (Database db = testDb.open()) {
-                TableImpl t = (TableImpl) db.getTable("Table1");
-                assertEquals(t.getTableDefPageNumber(), t.getPropertyMaps().getObjectId());
-                PropertyMap tProps = t.getProperties();
-                assertEquals(PropertyMaps.DEFAULT_NAME, tProps.getName());
-                int expectedNumProps = 3;
-                if (db.getFileFormat() != FileFormat.V1997) {
-                    assertEquals("{5A29A676-1145-4D1A-AE47-9F5415CDF2F1}", tProps.getValue(PropertyMap.GUID_PROP));
-                    if (nameMapBytes == null) {
-                        nameMapBytes = (byte[]) tProps.getValue("NameMap");
-                    } else {
-                        assertArrayEquals(nameMapBytes, (byte[]) tProps.getValue("NameMap"));
-                    }
-                    expectedNumProps += 2;
-                }
-                assertEquals(expectedNumProps, tProps.getSize());
-                assertEquals((byte) 0, tProps.getValue("Orientation"));
-                assertEquals(Boolean.FALSE, tProps.getValue("OrderByOn"));
-                assertEquals((byte) 2, tProps.getValue("DefaultView"));
-
-                PropertyMap colProps = t.getColumn("A").getProperties();
-                assertEquals("A", colProps.getName());
-                expectedNumProps = 9;
-                if (db.getFileFormat() != FileFormat.V1997) {
-                    assertEquals("{E9EDD90C-CE55-4151-ABE1-A1ACE1007515}", colProps.getValue(PropertyMap.GUID_PROP));
-                    expectedNumProps++;
-                }
-                assertEquals(expectedNumProps, colProps.getSize());
-                assertEquals((short) -1, colProps.getValue("ColumnWidth"));
-                assertEquals((short) 0, colProps.getValue("ColumnOrder"));
-                assertEquals(Boolean.FALSE, colProps.getValue("ColumnHidden"));
-                assertEquals(Boolean.FALSE, colProps.getValue(PropertyMap.REQUIRED_PROP));
-                assertEquals(Boolean.FALSE, colProps.getValue(PropertyMap.ALLOW_ZERO_LEN_PROP));
-                assertEquals((short) 109, colProps.getValue("DisplayControl"));
-                assertEquals(Boolean.TRUE, colProps.getValue("UnicodeCompression"));
-                assertEquals((byte) 0, colProps.getValue("IMEMode"));
-                assertEquals((byte) 3, colProps.getValue("IMESentenceMode"));
-
-                PropertyMap dbProps = db.getDatabaseProperties();
-                assertTrue(((String) dbProps.getValue(PropertyMap.ACCESS_VERSION_PROP)).matches("[0-9]{2}[.][0-9]{2}"));
-
-                PropertyMap sumProps = db.getSummaryProperties();
-                assertEquals(3, sumProps.getSize());
-                assertEquals("test", sumProps.getValue(PropertyMap.TITLE_PROP));
-                assertEquals("tmccune", sumProps.getValue(PropertyMap.AUTHOR_PROP));
-                assertEquals("Health Market Science", sumProps.getValue(PropertyMap.COMPANY_PROP));
-
-                PropertyMap userProps = db.getUserDefinedProperties();
-                assertEquals(1, userProps.getSize());
-                assertEquals(Boolean.TRUE, userProps.getValue("ReplicateProject"));
+    @ParameterizedTest(name = "[{index}] {0}")
+    @TestDbSource(basename = Basename.TEST, readOnly = true)
+    void testReadProperties(TestDb testDb) throws Exception {
+        try (Database db = testDb.open()) {
+            TableImpl t = (TableImpl) db.getTable("Table1");
+            assertEquals(t.getTableDefPageNumber(), t.getPropertyMaps().getObjectId());
+            PropertyMap tProps = t.getProperties();
+            assertEquals(PropertyMaps.DEFAULT_NAME, tProps.getName());
+            int expectedNumProps = 3;
+            if (db.getFileFormat() != FileFormat.V1997) {
+                assertEquals("{5A29A676-1145-4D1A-AE47-9F5415CDF2F1}", tProps.getValue(PropertyMap.GUID_PROP));
+                expectedNumProps += 2;
             }
+            assertEquals(expectedNumProps, tProps.getSize());
+            assertEquals((byte) 0, tProps.getValue("Orientation"));
+            assertEquals(Boolean.FALSE, tProps.getValue("OrderByOn"));
+            assertEquals((byte) 2, tProps.getValue("DefaultView"));
+
+            PropertyMap colProps = t.getColumn("A").getProperties();
+            assertEquals("A", colProps.getName());
+            expectedNumProps = 9;
+            if (db.getFileFormat() != FileFormat.V1997) {
+                assertEquals("{E9EDD90C-CE55-4151-ABE1-A1ACE1007515}", colProps.getValue(PropertyMap.GUID_PROP));
+                expectedNumProps++;
+            }
+            assertEquals(expectedNumProps, colProps.getSize());
+            assertEquals((short) -1, colProps.getValue("ColumnWidth"));
+            assertEquals((short) 0, colProps.getValue("ColumnOrder"));
+            assertEquals(Boolean.FALSE, colProps.getValue("ColumnHidden"));
+            assertEquals(Boolean.FALSE, colProps.getValue(PropertyMap.REQUIRED_PROP));
+            assertEquals(Boolean.FALSE, colProps.getValue(PropertyMap.ALLOW_ZERO_LEN_PROP));
+            assertEquals((short) 109, colProps.getValue("DisplayControl"));
+            assertEquals(Boolean.TRUE, colProps.getValue("UnicodeCompression"));
+            assertEquals((byte) 0, colProps.getValue("IMEMode"));
+            assertEquals((byte) 3, colProps.getValue("IMESentenceMode"));
+
+            PropertyMap dbProps = db.getDatabaseProperties();
+            assertTrue(((String) dbProps.getValue(PropertyMap.ACCESS_VERSION_PROP)).matches("[0-9]{2}[.][0-9]{2}"));
+
+            PropertyMap sumProps = db.getSummaryProperties();
+            assertEquals(3, sumProps.getSize());
+            assertEquals("test", sumProps.getValue(PropertyMap.TITLE_PROP));
+            assertEquals("tmccune", sumProps.getValue(PropertyMap.AUTHOR_PROP));
+            assertEquals("Health Market Science", sumProps.getValue(PropertyMap.COMPANY_PROP));
+
+            PropertyMap userProps = db.getUserDefinedProperties();
+            assertEquals(1, userProps.getSize());
+            assertEquals(Boolean.TRUE, userProps.getValue("ReplicateProject"));
         }
     }
 
@@ -207,7 +197,7 @@ class PropertiesTest extends AbstractBaseTest {
     }
 
     @ParameterizedTest(name = "[{index}] {0}")
-    @MethodSource("io.github.spannm.jackcess.test.TestDbs#getDbs()")
+    @TestDbSource(basename = Basename.TEST)
     void testWriteProperties(TestDb testDb) throws Exception {
         try (Database db = testDb.open()) {
             TableImpl t = (TableImpl) db.getTable("Table1");
@@ -237,7 +227,7 @@ class PropertiesTest extends AbstractBaseTest {
     }
 
     @ParameterizedTest(name = "[{index}] {0}")
-    @MethodSource("io.github.spannm.jackcess.test.TestDbs#getDbs()")
+    @TestDbSource(basename = Basename.TEST)
     void testModifyProperties(TestDb testDb) throws Exception {
         Database db = testDb.openCopy();
         File dbFile = db.getFile();
@@ -321,7 +311,7 @@ class PropertiesTest extends AbstractBaseTest {
     }
 
     @ParameterizedTest(name = "[{index}] {0}")
-    @MethodSource("io.github.spannm.jackcess.test.TestDbs#getFileformats()")
+    @FileFormatSource()
     void testCreateDbProperties(FileFormat fileFormat) throws Exception {
         if (fileFormat == FileFormat.GENERIC_JET4) {
             // weirdo format, no properties
@@ -370,7 +360,7 @@ class PropertiesTest extends AbstractBaseTest {
     }
 
     @ParameterizedTest(name = "[{index}] {0}")
-    @MethodSource("io.github.spannm.jackcess.test.TestDbs#getFileformats()")
+    @FileFormatSource()
     void testEnforceProperties(FileFormat fileFormat) throws Exception {
         try (Database db = TestUtil.create(fileFormat)) {
             Table t = DatabaseBuilder.newTable("testReq")

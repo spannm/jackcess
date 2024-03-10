@@ -36,36 +36,37 @@ class MemFileChannelTest extends AbstractBaseTest {
     @Test
     void testReadOnlyChannel() throws Exception {
         File testFile = new File(DIR_TEST_DATA, "V1997/compIndexTestV1997.mdb");
-        MemFileChannel ch = MemFileChannel.newChannel(testFile, "r");
-        assertEquals(testFile.length(), ch.size());
-        assertEquals(0L, ch.position());
+        try (MemFileChannel ch = MemFileChannel.newChannel(testFile, "r")) {
+            assertEquals(testFile.length(), ch.size());
+            assertEquals(0L, ch.position());
 
-        try {
-            ByteBuffer bb = ByteBuffer.allocate(1024);
-            ch.write(bb);
-            fail("NonWritableChannelException should have been thrown");
-        } catch (NonWritableChannelException ignored) {
-            // success
+            try {
+                ByteBuffer bb = ByteBuffer.allocate(1024);
+                ch.write(bb);
+                fail("NonWritableChannelException should have been thrown");
+            } catch (NonWritableChannelException ignored) {
+                // success
+            }
+
+            try {
+                ch.truncate(0L);
+                fail("NonWritableChannelException should have been thrown");
+            } catch (NonWritableChannelException ignored) {
+                // success
+            }
+
+            try {
+                ch.transferFrom(null, 0L, 10L);
+                fail("NonWritableChannelException should have been thrown");
+            } catch (NonWritableChannelException ignored) {
+                // success
+            }
+
+            assertEquals(testFile.length(), ch.size());
+            assertEquals(0L, ch.position());
+
+            ch.close();
         }
-
-        try {
-            ch.truncate(0L);
-            fail("NonWritableChannelException should have been thrown");
-        } catch (NonWritableChannelException ignored) {
-            // success
-        }
-
-        try {
-            ch.transferFrom(null, 0L, 10L);
-            fail("NonWritableChannelException should have been thrown");
-        } catch (NonWritableChannelException ignored) {
-            // success
-        }
-
-        assertEquals(testFile.length(), ch.size());
-        assertEquals(0L, ch.position());
-
-        ch.close();
     }
 
     @Test

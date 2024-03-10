@@ -26,10 +26,9 @@ import io.github.spannm.jackcess.complex.ComplexValueForeignKey;
 import io.github.spannm.jackcess.test.AbstractBaseTest;
 import io.github.spannm.jackcess.test.Basename;
 import io.github.spannm.jackcess.test.TestDb;
-import io.github.spannm.jackcess.test.TestDbs;
-import org.junit.jupiter.api.Test;
+import io.github.spannm.jackcess.test.source.FileFormatSource;
+import io.github.spannm.jackcess.test.source.TestDbSource;
 import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.MethodSource;
 
 import java.io.IOException;
 import java.util.Collections;
@@ -38,13 +37,12 @@ import java.util.Map;
 import java.util.UUID;
 
 /**
- *
  * @author James Ahlborn
  */
 class AutoNumberTest extends AbstractBaseTest {
 
     @ParameterizedTest(name = "[{index}] {0}")
-    @MethodSource("io.github.spannm.jackcess.test.TestDbs#getFileformats()")
+    @FileFormatSource()
     void testAutoNumber(FileFormat fileFormat) throws Exception {
         try (Database db = createMem(fileFormat)) {
             Table table = newTable("test")
@@ -58,7 +56,7 @@ class AutoNumberTest extends AbstractBaseTest {
     }
 
     @ParameterizedTest(name = "[{index}] {0}")
-    @MethodSource("io.github.spannm.jackcess.test.TestDbs#getDbs()")
+    @TestDbSource(basename = Basename.TEST)
     void testAutoNumberPK(TestDb testDB) throws Exception {
         try (Database db = testDB.openMem()) {
             Table table = db.getTable("Table3");
@@ -115,7 +113,7 @@ class AutoNumberTest extends AbstractBaseTest {
     }
 
     @ParameterizedTest(name = "[{index}] {0}")
-    @MethodSource("io.github.spannm.jackcess.test.TestDbs#getFileformats()")
+    @FileFormatSource()
     void testAutoNumberGuid(FileFormat fileFormat) throws Exception {
         try (Database db = createMem(fileFormat)) {
             Table table = newTable("test")
@@ -140,7 +138,7 @@ class AutoNumberTest extends AbstractBaseTest {
     }
 
     @ParameterizedTest(name = "[{index}] {0}")
-    @MethodSource("io.github.spannm.jackcess.test.TestDbs#getFileformats()")
+    @FileFormatSource()
     void testInsertLongAutoNumber(FileFormat fileFormat) throws Exception {
         try (Database db = createMem(fileFormat)) {
             Table table = newTable("test")
@@ -154,7 +152,7 @@ class AutoNumberTest extends AbstractBaseTest {
     }
 
     @ParameterizedTest(name = "[{index}] {0}")
-    @MethodSource("io.github.spannm.jackcess.test.TestDbs#getFileformats()")
+    @FileFormatSource()
     void testInsertLongAutoNumberPK(FileFormat fileFormat) throws Exception {
         try (Database db = createMem(fileFormat)) {
             Table table = newTable("test")
@@ -247,94 +245,94 @@ class AutoNumberTest extends AbstractBaseTest {
 
     }
 
-    @Test
-    void testInsertComplexAutoNumber() throws Exception {
-        for (TestDb testDB : TestDbs.getDbs(Basename.COMPLEX)) {
+    @ParameterizedTest(name = "[{index}] {0}")
+    @TestDbSource(basename = Basename.COMPLEX)
+    void testInsertComplexAutoNumber(TestDb testDb) throws Exception {
 
-            try (Database db = testDB.openMem()) {
-                Table t1 = db.getTable("Table1");
 
-                assertFalse(t1.isAllowAutoNumberInsert());
+        try (Database db = testDb.openMem()) {
+            Table t1 = db.getTable("Table1");
 
-                int lastAutoNum = ((TableImpl) t1).getLastComplexTypeAutoNumber();
+            assertFalse(t1.isAllowAutoNumberInsert());
 
-                Object[] row = t1.addRow("arow");
-                lastAutoNum++;
-                checkAllComplexAutoNums(lastAutoNum, row);
+            int lastAutoNum = ((TableImpl) t1).getLastComplexTypeAutoNumber();
 
-                assertEquals(lastAutoNum, ((TableImpl) t1).getLastComplexTypeAutoNumber());
+            Object[] row = t1.addRow("arow");
+            lastAutoNum++;
+            checkAllComplexAutoNums(lastAutoNum, row);
 
-                db.setAllowAutoNumberInsert(true);
-                assertTrue(db.isAllowAutoNumberInsert());
-                assertTrue(t1.isAllowAutoNumberInsert());
+            assertEquals(lastAutoNum, ((TableImpl) t1).getLastComplexTypeAutoNumber());
 
-                row = t1.addRow("anotherrow");
-                lastAutoNum++;
-                checkAllComplexAutoNums(lastAutoNum, row);
+            db.setAllowAutoNumberInsert(true);
+            assertTrue(db.isAllowAutoNumberInsert());
+            assertTrue(t1.isAllowAutoNumberInsert());
 
-                assertEquals(lastAutoNum, ((TableImpl) t1).getLastComplexTypeAutoNumber());
+            row = t1.addRow("anotherrow");
+            lastAutoNum++;
+            checkAllComplexAutoNums(lastAutoNum, row);
 
-                row = t1.addRow("row5", 5, null, null, 5, 5);
-                checkAllComplexAutoNums(5, row);
+            assertEquals(lastAutoNum, ((TableImpl) t1).getLastComplexTypeAutoNumber());
 
-                assertEquals(lastAutoNum, ((TableImpl) t1).getLastComplexTypeAutoNumber());
+            row = t1.addRow("row5", 5, null, null, 5, 5);
+            checkAllComplexAutoNums(5, row);
 
-                row = t1.addRow("row13", 13, null, null, 13, 13);
-                checkAllComplexAutoNums(13, row);
+            assertEquals(lastAutoNum, ((TableImpl) t1).getLastComplexTypeAutoNumber());
 
-                assertEquals(13, ((TableImpl) t1).getLastComplexTypeAutoNumber());
+            row = t1.addRow("row13", 13, null, null, 13, 13);
+            checkAllComplexAutoNums(13, row);
 
-                assertThrows(NumberFormatException.class, () ->
-                    t1.addRow("nope", "not a number"));
+            assertEquals(13, ((TableImpl) t1).getLastComplexTypeAutoNumber());
 
-                assertEquals(13, ((TableImpl) t1).getLastComplexTypeAutoNumber());
+            assertThrows(NumberFormatException.class, () ->
+                t1.addRow("nope", "not a number"));
 
-                assertThrows(IOException.class, () ->
-                    t1.addRow("uh-uh", -10));
+            assertEquals(13, ((TableImpl) t1).getLastComplexTypeAutoNumber());
 
-                assertEquals(13, ((TableImpl) t1).getLastComplexTypeAutoNumber());
+            assertThrows(IOException.class, () ->
+                t1.addRow("uh-uh", -10));
 
-                assertThrows(IOException.class, () ->
-                    t1.addRow("wut", 6, null, null, 40, 42));
+            assertEquals(13, ((TableImpl) t1).getLastComplexTypeAutoNumber());
 
-                row = t1.addRow("morerows");
-                checkAllComplexAutoNums(14, row);
+            assertThrows(IOException.class, () ->
+                t1.addRow("wut", 6, null, null, 40, 42));
 
-                assertEquals(14, ((TableImpl) t1).getLastComplexTypeAutoNumber());
+            row = t1.addRow("morerows");
+            checkAllComplexAutoNums(14, row);
 
-                Row row13 = CursorBuilder.findRow(t1, Collections.singletonMap("id", "row13"));
+            assertEquals(14, ((TableImpl) t1).getLastComplexTypeAutoNumber());
 
-                row13.put("VersionHistory_F5F8918F-0A3F-4DA9-AE71-184EE5012880", "45");
-                row13.put("multi-value-data", "45");
-                row13.put("attach-data", "45");
+            Row row13 = CursorBuilder.findRow(t1, Collections.singletonMap("id", "row13"));
 
-                final Row row13b = t1.updateRow(row13);
-                checkAllComplexAutoNums(45, row13b);
+            row13.put("VersionHistory_F5F8918F-0A3F-4DA9-AE71-184EE5012880", "45");
+            row13.put("multi-value-data", "45");
+            row13.put("attach-data", "45");
 
-                assertEquals(45, ((TableImpl) t1).getLastComplexTypeAutoNumber());
+            final Row row13b = t1.updateRow(row13);
+            checkAllComplexAutoNums(45, row13b);
 
-                row13b.put("attach-data", -1);
+            assertEquals(45, ((TableImpl) t1).getLastComplexTypeAutoNumber());
 
-                assertThrows(IOException.class, () -> t1.updateRow(row13b));
+            row13b.put("attach-data", -1);
 
-                assertEquals(45, ((TableImpl) t1).getLastComplexTypeAutoNumber());
+            assertThrows(IOException.class, () -> t1.updateRow(row13b));
 
-                row13b.put("attach-data", 55);
+            assertEquals(45, ((TableImpl) t1).getLastComplexTypeAutoNumber());
 
-                assertThrows(IOException.class, () -> t1.updateRow(row13b));
+            row13b.put("attach-data", 55);
 
-                assertEquals(45, ((TableImpl) t1).getLastComplexTypeAutoNumber());
+            assertThrows(IOException.class, () -> t1.updateRow(row13b));
 
-                row13b.put("VersionHistory_F5F8918F-0A3F-4DA9-AE71-184EE5012880", 55);
-                row13b.put("multi-value-data", 55);
+            assertEquals(45, ((TableImpl) t1).getLastComplexTypeAutoNumber());
 
-                db.setAllowAutoNumberInsert(null);
+            row13b.put("VersionHistory_F5F8918F-0A3F-4DA9-AE71-184EE5012880", 55);
+            row13b.put("multi-value-data", 55);
 
-                Row row13c = t1.updateRow(row13b);
-                checkAllComplexAutoNums(45, row13c);
+            db.setAllowAutoNumberInsert(null);
 
-                assertEquals(45, ((TableImpl) t1).getLastComplexTypeAutoNumber());
-            }
+            Row row13c = t1.updateRow(row13b);
+            checkAllComplexAutoNums(45, row13c);
+
+            assertEquals(45, ((TableImpl) t1).getLastComplexTypeAutoNumber());
         }
     }
 
@@ -351,7 +349,7 @@ class AutoNumberTest extends AbstractBaseTest {
     }
 
     @ParameterizedTest(name = "[{index}] {0}")
-    @MethodSource("io.github.spannm.jackcess.test.TestDbs#getFileformats()")
+    @FileFormatSource()
     void testInsertGuidAutoNumber(FileFormat fileFormat) throws Exception {
         try (Database db = createMem(fileFormat)) {
             Table table = newTable("test").addColumn(newColumn("a", DataType.GUID).withAutoNumber(true)).addColumn(newColumn("b", DataType.TEXT)).toTable(db);

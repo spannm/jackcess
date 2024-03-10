@@ -20,8 +20,8 @@ import io.github.spannm.jackcess.impl.RelationshipImpl;
 import io.github.spannm.jackcess.test.AbstractBaseTest;
 import io.github.spannm.jackcess.test.Basename;
 import io.github.spannm.jackcess.test.TestDb;
-import io.github.spannm.jackcess.test.TestDbs;
-import org.junit.jupiter.api.Test;
+import io.github.spannm.jackcess.test.source.TestDbSource;
+import org.junit.jupiter.params.ParameterizedTest;
 
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -34,90 +34,88 @@ class RelationshipTest extends AbstractBaseTest {
 
     private static final Comparator<Relationship> REL_COMP = (r1, r2) -> String.CASE_INSENSITIVE_ORDER.compare(r1.getName(), r2.getName());
 
-    @Test
-    void testTwoTables() throws Exception {
-        for (TestDb testDB : TestDbs.getReadOnlyDbs(Basename.INDEX)) {
-            try (Database db = testDB.open()) {
-                Table t1 = db.getTable("Table1");
-                Table t2 = db.getTable("Table2");
-                Table t3 = db.getTable("Table3");
+    @ParameterizedTest(name = "[{index}] {0}")
+    @TestDbSource(basename = Basename.INDEX, readOnly = true)
+    void testTwoTables(TestDb testDb) throws Exception {
 
-                List<Relationship> rels = db.getRelationships(t1, t2);
-                assertEquals(1, rels.size());
-                Relationship rel = rels.get(0);
-                assertEquals("Table2Table1", rel.getName());
-                assertEquals(t2, rel.getFromTable());
-                assertEquals(List.of(t2.getColumn("id")),
-                    rel.getFromColumns());
-                assertEquals(t1, rel.getToTable());
-                assertEquals(List.of(t1.getColumn("otherfk1")),
-                    rel.getToColumns());
-                assertTrue(rel.hasReferentialIntegrity());
-                assertEquals(4096, ((RelationshipImpl) rel).getFlags());
-                assertTrue(rel.cascadeDeletes());
-                assertSameRelationships(rels, db.getRelationships(t2, t1), true);
+        try (Database db = testDb.open()) {
+            Table t1 = db.getTable("Table1");
+            Table t2 = db.getTable("Table2");
+            Table t3 = db.getTable("Table3");
 
-                rels = db.getRelationships(t2, t3);
-                assertTrue(db.getRelationships(t2, t3).isEmpty());
-                assertSameRelationships(rels, db.getRelationships(t3, t2), true);
+            List<Relationship> rels = db.getRelationships(t1, t2);
+            assertEquals(1, rels.size());
+            Relationship rel = rels.get(0);
+            assertEquals("Table2Table1", rel.getName());
+            assertEquals(t2, rel.getFromTable());
+            assertEquals(List.of(t2.getColumn("id")),
+                rel.getFromColumns());
+            assertEquals(t1, rel.getToTable());
+            assertEquals(List.of(t1.getColumn("otherfk1")),
+                rel.getToColumns());
+            assertTrue(rel.hasReferentialIntegrity());
+            assertEquals(4096, ((RelationshipImpl) rel).getFlags());
+            assertTrue(rel.cascadeDeletes());
+            assertSameRelationships(rels, db.getRelationships(t2, t1), true);
 
-                rels = db.getRelationships(t1, t3);
-                assertEquals(1, rels.size());
-                rel = rels.get(0);
-                assertEquals("Table3Table1", rel.getName());
-                assertEquals(t3, rel.getFromTable());
-                assertEquals(List.of(t3.getColumn("id")),
-                    rel.getFromColumns());
-                assertEquals(t1, rel.getToTable());
-                assertEquals(List.of(t1.getColumn("otherfk2")),
-                    rel.getToColumns());
-                assertTrue(rel.hasReferentialIntegrity());
-                assertEquals(256, ((RelationshipImpl) rel).getFlags());
-                assertTrue(rel.cascadeUpdates());
-                assertSameRelationships(rels, db.getRelationships(t3, t1), true);
+            rels = db.getRelationships(t2, t3);
+            assertTrue(db.getRelationships(t2, t3).isEmpty());
+            assertSameRelationships(rels, db.getRelationships(t3, t2), true);
 
-                try {
-                    db.getRelationships(t1, t1);
-                    fail("IllegalArgumentException should have been thrown");
-                } catch (IllegalArgumentException ignored) {
-                    // success
-                }
+            rels = db.getRelationships(t1, t3);
+            assertEquals(1, rels.size());
+            rel = rels.get(0);
+            assertEquals("Table3Table1", rel.getName());
+            assertEquals(t3, rel.getFromTable());
+            assertEquals(List.of(t3.getColumn("id")),
+                rel.getFromColumns());
+            assertEquals(t1, rel.getToTable());
+            assertEquals(List.of(t1.getColumn("otherfk2")),
+                rel.getToColumns());
+            assertTrue(rel.hasReferentialIntegrity());
+            assertEquals(256, ((RelationshipImpl) rel).getFlags());
+            assertTrue(rel.cascadeUpdates());
+            assertSameRelationships(rels, db.getRelationships(t3, t1), true);
+
+            try {
+                db.getRelationships(t1, t1);
+                fail("IllegalArgumentException should have been thrown");
+            } catch (IllegalArgumentException ignored) {
+                // success
             }
         }
     }
 
-    @Test
-    void testOneTable() throws Exception {
-        for (TestDb testDB : TestDbs.getReadOnlyDbs(Basename.INDEX)) {
-            try (Database db = testDB.open()) {
-                Table t1 = db.getTable("Table1");
-                Table t2 = db.getTable("Table2");
-                Table t3 = db.getTable("Table3");
+    @ParameterizedTest(name = "[{index}] {0}")
+    @TestDbSource(basename = Basename.INDEX, readOnly = true)
+    void testOneTable(TestDb testDb) throws Exception {
+        try (Database db = testDb.open()) {
+            Table t1 = db.getTable("Table1");
+            Table t2 = db.getTable("Table2");
+            Table t3 = db.getTable("Table3");
 
-                List<Relationship> expected = new ArrayList<>();
-                expected.addAll(db.getRelationships(t1, t2));
-                expected.addAll(db.getRelationships(t2, t3));
+            List<Relationship> expected = new ArrayList<>();
+            expected.addAll(db.getRelationships(t1, t2));
+            expected.addAll(db.getRelationships(t2, t3));
 
-                assertSameRelationships(expected, db.getRelationships(t2), false);
-            }
+            assertSameRelationships(expected, db.getRelationships(t2), false);
         }
     }
 
-    @Test
-    void testNoTables() throws Exception {
-        for (TestDb testDB : TestDbs.getReadOnlyDbs(Basename.INDEX)) {
-            try (Database db = testDB.open()) {
-                Table t1 = db.getTable("Table1");
-                Table t2 = db.getTable("Table2");
-                Table t3 = db.getTable("Table3");
+    @ParameterizedTest(name = "[{index}] {0}")
+    @TestDbSource(basename = Basename.INDEX, readOnly = true)
+    void testNoTables(TestDb testDb) throws Exception {
+        try (Database db = testDb.open()) {
+            Table t1 = db.getTable("Table1");
+            Table t2 = db.getTable("Table2");
+            Table t3 = db.getTable("Table3");
 
-                List<Relationship> expected = new ArrayList<>();
-                expected.addAll(db.getRelationships(t1, t2));
-                expected.addAll(db.getRelationships(t2, t3));
-                expected.addAll(db.getRelationships(t1, t3));
+            List<Relationship> expected = new ArrayList<>();
+            expected.addAll(db.getRelationships(t1, t2));
+            expected.addAll(db.getRelationships(t2, t3));
+            expected.addAll(db.getRelationships(t1, t3));
 
-                assertSameRelationships(expected, db.getRelationships(), false);
-            }
+            assertSameRelationships(expected, db.getRelationships(), false);
         }
     }
 
