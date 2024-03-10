@@ -6,29 +6,29 @@ package io.github.spannm.jackcess.test;
 public enum Basename {
 
     BIG_INDEX("bigIndexTest"),
+    BINARY_INDEX("binIdxTest"),
+    BLOB("testOle"),
+    CALC_FIELD("calcFieldTest"),
+    COMPLEX("complexDataTest"),
     COMP_INDEX("compIndexTest"),
-    DEL_COL("delColTest"),
     DEL("delTest"),
+    DEL_COL("delColTest"),
+    EXT_DATE("extDateTest"),
     FIXED_NUMERIC("fixedNumericTest"),
     FIXED_TEXT("fixedTextTest"),
-    INDEX_CURSOR("indexCursorTest"),
     INDEX("indexTest"),
+    INDEX_CODES("testIndexCodes"),
+    INDEX_CURSOR("indexCursorTest"),
+    INDEX_PROPERTIES("testIndexProperties"),
+    LINKED("linkerTest"),
+    LINKED_ODBC("odbcLinkerTest"),
+    OLD_DATES("oldDates"),
     OVERFLOW("overflowTest"),
+    PROMOTION("testPromotion"),
     QUERY("queryTest"),
     TEST("test"),
     TEST2("test2"),
-    INDEX_CODES("testIndexCodes"),
-    INDEX_PROPERTIES("testIndexProperties"),
-    PROMOTION("testPromotion"),
-    COMPLEX("complexDataTest"),
-    UNSUPPORTED("unsupportedFieldsTest"),
-    LINKED("linkerTest"),
-    LINKED_ODBC("odbcLinkerTest"),
-    BLOB("testOle"),
-    CALC_FIELD("calcFieldTest"),
-    BINARY_INDEX("binIdxTest"),
-    OLD_DATES("oldDates"),
-    EXT_DATE("extDateTest");
+    UNSUPPORTED("unsupportedFieldsTest");
 
     private final String basename;
 
