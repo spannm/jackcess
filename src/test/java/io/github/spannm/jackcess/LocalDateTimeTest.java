@@ -44,7 +44,7 @@ import java.util.*;
 class LocalDateTimeTest extends AbstractBaseTest {
 
     @ParameterizedTest(name = "[{index}] {0}")
-    @MethodSource("getSupportedFileformats")
+    @MethodSource("io.github.spannm.jackcess.test.TestDB#getSupportedFileformats()")
     void testWriteAndReadLocalDate(FileFormat fileFormat) throws Exception {
         try (Database db = createMem(fileFormat)) {
             db.setDateTimeType(DateTimeType.LOCAL_DATE_TIME);
@@ -104,7 +104,7 @@ class LocalDateTimeTest extends AbstractBaseTest {
     }
 
     @ParameterizedTest(name = "[{index}] {0}")
-    @MethodSource("getSupportedFileformats")
+    @MethodSource("io.github.spannm.jackcess.test.TestDB#getSupportedFileformats()")
     void testAncientLocalDates1(FileFormat fileFormat) throws Exception {
         DateTimeFormatter sdf = DateTimeFormatter.ofPattern("uuuu-MM-dd");
         List<String> dates = List.of("1582-10-15", "1582-10-14", "1492-01-10", "1392-01-10");
@@ -207,7 +207,7 @@ class LocalDateTimeTest extends AbstractBaseTest {
     }
 
     @ParameterizedTest(name = "[{index}] {0}")
-    @MethodSource("getSupportedFileformats")
+    @MethodSource("io.github.spannm.jackcess.test.TestDB#getSupportedFileformats()")
     void testWriteAndReadTemporals(FileFormat fileFormat) throws Exception {
         ZoneId zoneId = ZoneId.of("America/New_York");
 

@@ -40,7 +40,7 @@ class LongValueTest extends AbstractBaseTest {
     @Test
     void testReadLongValue() throws Exception {
 
-        for (TestDB testDB : TestDB.getSupportedTestDbsForRead(Basename.TEST2)) {
+        for (TestDB testDB : TestDB.getSupportedTestDbsReadOnly(Basename.TEST2)) {
             try (Database db = testDB.openMem()) {
                 Table table = db.getTable("MSP_PROJECTS");
                 Row row = table.getNextRow();
@@ -61,7 +61,7 @@ class LongValueTest extends AbstractBaseTest {
     }
 
     @ParameterizedTest(name = "[{index}] {0}")
-    @MethodSource("getSupportedFileformats")
+    @MethodSource("io.github.spannm.jackcess.test.TestDB#getSupportedFileformats()")
     void testWriteLongValue(FileFormat fileFormat) throws Exception {
 
         try (Database db = createMem(fileFormat)) {
@@ -110,7 +110,7 @@ class LongValueTest extends AbstractBaseTest {
     }
 
     @ParameterizedTest(name = "[{index}] {0}")
-    @MethodSource("getSupportedFileformats")
+    @MethodSource("io.github.spannm.jackcess.test.TestDB#getSupportedFileformats()")
     void testManyMemos(FileFormat fileFormat) throws Exception {
         try (Database db = createMem(fileFormat)) {
             final int numColumns = 126;
@@ -170,7 +170,7 @@ class LongValueTest extends AbstractBaseTest {
     }
 
     @ParameterizedTest(name = "[{index}] {0}")
-    @MethodSource("getSupportedFileformats")
+    @MethodSource("io.github.spannm.jackcess.test.TestDB#getSupportedFileformats()")
     void testLongValueAsMiddleColumn(FileFormat fileFormat) throws Exception {
         try (Database db = createMem(fileFormat)) {
             Table newTable = new TableBuilder("NewTable")

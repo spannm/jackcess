@@ -39,7 +39,7 @@ import java.util.Map;
 class DatabaseReadWriteTest extends AbstractBaseTest {
 
     @ParameterizedTest(name = "[{index}] {0}")
-    @MethodSource("getSupportedFileformats")
+    @MethodSource("io.github.spannm.jackcess.test.TestDB#getSupportedFileformats()")
     void testWriteAndRead(FileFormat fileFormat) throws Exception {
         try (Database db = create(fileFormat)) {
             doTestWriteAndRead(db);
@@ -47,7 +47,7 @@ class DatabaseReadWriteTest extends AbstractBaseTest {
     }
 
     @ParameterizedTest(name = "[{index}] {0}")
-    @MethodSource("getSupportedFileformats")
+    @MethodSource("io.github.spannm.jackcess.test.TestDB#getSupportedFileformats()")
     void testWriteAndReadInMem(FileFormat fileFormat) throws Exception {
         try (Database db = createMem(fileFormat)) {
             doTestWriteAndRead(db);
@@ -82,7 +82,7 @@ class DatabaseReadWriteTest extends AbstractBaseTest {
     }
 
     @ParameterizedTest(name = "[{index}] {0}")
-    @MethodSource("getSupportedFileformats")
+    @MethodSource("io.github.spannm.jackcess.test.TestDB#getSupportedFileformats()")
     void testWriteAndReadInBatch(FileFormat fileFormat) throws Exception {
         try (Database db = createMem(fileFormat)) {
             createTestTable(db);
@@ -109,7 +109,7 @@ class DatabaseReadWriteTest extends AbstractBaseTest {
     }
 
     @ParameterizedTest(name = "[{index}] {0}")
-    @MethodSource("getSupportedFileformats")
+    @MethodSource("io.github.spannm.jackcess.test.TestDB#getSupportedFileformats()")
     void testUpdateRow(FileFormat fileFormat) throws Exception {
         try (Database db = createMem(fileFormat)) {
             Table t = new TableBuilder("test")

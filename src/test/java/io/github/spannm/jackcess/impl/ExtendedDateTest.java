@@ -79,7 +79,7 @@ class ExtendedDateTest extends AbstractBaseTest {
     }
 
     @ParameterizedTest(name = "[{index}] {0}")
-    @MethodSource("getSupportedFileformats")
+    @MethodSource("io.github.spannm.jackcess.test.TestDB#getSupportedFileformats()")
     void testWriteExtendedDate(FileFormat fileFormat) throws Exception {
         JetFormat format = DatabaseImpl.getFileFormatDetails(fileFormat).getFormat();
 

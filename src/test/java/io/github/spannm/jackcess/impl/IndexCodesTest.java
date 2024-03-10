@@ -55,7 +55,7 @@ public class IndexCodesTest extends AbstractBaseTest {
 
     @Test
     void testIndexCodes() throws Exception {
-        for (TestDB testDB : TestDB.getSupportedTestDbsForRead(Basename.INDEX_CODES)) {
+        for (TestDB testDB : TestDB.getSupportedTestDbsReadOnly(Basename.INDEX_CODES)) {
             try (Database db = testDB.openMem()) {
                 db.setDateTimeType(DateTimeType.DATE);
 

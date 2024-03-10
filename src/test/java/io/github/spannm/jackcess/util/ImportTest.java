@@ -41,7 +41,7 @@ import java.util.Map;
 class ImportTest extends AbstractBaseTest {
 
     @ParameterizedTest(name = "[{index}] {0}")
-    @MethodSource("getSupportedFileformats")
+    @MethodSource("io.github.spannm.jackcess.test.TestDB#getSupportedFileformats()")
     void testImportFromFile(FileFormat fileFormat) throws Exception {
         try (Database db = create(fileFormat)) {
             String tableName = new ImportUtil.Builder(db, "test")
@@ -164,7 +164,7 @@ class ImportTest extends AbstractBaseTest {
     }
 
     @ParameterizedTest(name = "[{index}] {0}")
-    @MethodSource("getSupportedFileformats")
+    @MethodSource("io.github.spannm.jackcess.test.TestDB#getSupportedFileformats()")
     void testImportFromFileWithOnlyHeaders(FileFormat fileFormat) throws Exception {
         try (Database db = create(fileFormat)) {
             String tableName = new ImportUtil.Builder(db, "test")
@@ -186,7 +186,7 @@ class ImportTest extends AbstractBaseTest {
     }
 
     @ParameterizedTest(name = "[{index}] {0}")
-    @MethodSource("getSupportedFileformats")
+    @MethodSource("io.github.spannm.jackcess.test.TestDB#getSupportedFileformats()")
     void testCopySqlHeaders(FileFormat fileFormat) throws Exception {
         TestResultSet rs = new TestResultSet();
 

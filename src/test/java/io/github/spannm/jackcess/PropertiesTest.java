@@ -118,7 +118,7 @@ class PropertiesTest extends AbstractBaseTest {
     void testReadProperties() throws Exception {
         byte[] nameMapBytes = null;
 
-        for (TestDB testDb : getSupportedReadOnlyTestDbs()) {
+        for (TestDB testDb : TestDB.getSupportedTestDbsReadOnly()) {
             try (Database db = testDb.open()) {
                 TableImpl t = (TableImpl) db.getTable("Table1");
                 assertEquals(t.getTableDefPageNumber(), t.getPropertyMaps().getObjectId());
@@ -206,7 +206,7 @@ class PropertiesTest extends AbstractBaseTest {
     }
 
     @ParameterizedTest(name = "[{index}] {0}")
-    @MethodSource("getSupportedTestDbs")
+    @MethodSource("io.github.spannm.jackcess.test.TestDB#getSupportedTestDbs()")
     void testWriteProperties(TestDB testDb) throws Exception {
         try (Database db = testDb.open()) {
             TableImpl t = (TableImpl) db.getTable("Table1");
@@ -236,7 +236,7 @@ class PropertiesTest extends AbstractBaseTest {
     }
 
     @ParameterizedTest(name = "[{index}] {0}")
-    @MethodSource("getSupportedTestDbs")
+    @MethodSource("io.github.spannm.jackcess.test.TestDB#getSupportedTestDbs()")
     void testModifyProperties(TestDB testDb) throws Exception {
         Database db = testDb.openCopy();
         File dbFile = db.getFile();
@@ -320,7 +320,7 @@ class PropertiesTest extends AbstractBaseTest {
     }
 
     @ParameterizedTest(name = "[{index}] {0}")
-    @MethodSource("getSupportedFileformats")
+    @MethodSource("io.github.spannm.jackcess.test.TestDB#getSupportedFileformats()")
     void testCreateDbProperties(FileFormat fileFormat) throws Exception {
         if (fileFormat == FileFormat.GENERIC_JET4) {
             // weirdo format, no properties
@@ -369,7 +369,7 @@ class PropertiesTest extends AbstractBaseTest {
     }
 
     @ParameterizedTest(name = "[{index}] {0}")
-    @MethodSource("getSupportedFileformats")
+    @MethodSource("io.github.spannm.jackcess.test.TestDB#getSupportedFileformats()")
     void testEnforceProperties(FileFormat fileFormat) throws Exception {
         try (Database db = TestUtil.create(fileFormat)) {
             Table t = DatabaseBuilder.newTable("testReq")

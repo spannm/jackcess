@@ -181,7 +181,7 @@ class QueryTest extends AbstractBaseTest {
 
     @Test
     void testReadQueries() throws Exception {
-        for (TestDB testDB : TestDB.getSupportedTestDbsForRead(Basename.QUERY)) {
+        for (TestDB testDB : TestDB.getSupportedTestDbsReadOnly(Basename.QUERY)) {
             Map<String, String> expectedQueries = new HashMap<>();
             expectedQueries.put(
                 "SelectQuery", multiline(

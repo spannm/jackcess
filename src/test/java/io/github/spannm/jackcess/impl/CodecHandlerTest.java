@@ -38,13 +38,13 @@ class CodecHandlerTest extends AbstractBaseTest {
     private static final CodecProvider FULL_PROVIDER   = (channel, charset) -> new FullCodecHandler(channel);
 
     @ParameterizedTest(name = "[{index}] {0}")
-    @MethodSource("getSupportedFileformats")
+    @MethodSource("io.github.spannm.jackcess.test.TestDB#getSupportedFileformats()")
     void testCodecHandlerSimple(FileFormat fileFormat) throws Exception {
         doTestCodecHandler(fileFormat, true);
     }
 
     @ParameterizedTest(name = "[{index}] {0}")
-    @MethodSource("getSupportedFileformats")
+    @MethodSource("io.github.spannm.jackcess.test.TestDB#getSupportedFileformats()")
     void testCodecHandlerNotSimple(FileFormat fileFormat) throws Exception {
         doTestCodecHandler(fileFormat, false);
     }

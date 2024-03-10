@@ -36,7 +36,7 @@ class BigIndexTest extends AbstractBaseTest {
 
     @Test
     void testComplexIndex() throws Exception {
-        for (TestDB testDB : TestDB.getSupportedTestDbsForRead(Basename.COMP_INDEX)) {
+        for (TestDB testDB : TestDB.getSupportedTestDbsReadOnly(Basename.COMP_INDEX)) {
             try (// this file has an index with "compressed" entries and node pages
             Database db = testDB.openMem()) {
                 TableImpl t = (TableImpl) db.getTable("Table1");

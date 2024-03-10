@@ -1,8 +1,6 @@
 package io.github.spannm.jackcess.test;
 
 import io.github.spannm.jackcess.Database;
-import io.github.spannm.jackcess.Database.FileFormat;
-import io.github.spannm.jackcess.impl.DatabaseImpl;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.TestInfo;
@@ -14,8 +12,6 @@ import java.io.UncheckedIOException;
 import java.lang.System.Logger;
 import java.lang.System.Logger.Level;
 import java.lang.reflect.Method;
-import java.nio.charset.Charset;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -31,7 +27,9 @@ import java.util.stream.StreamSupport;
  */
 public abstract class AbstractBaseTest extends Assertions {
 
-    private static final ThreadLocal<Boolean> AUTO_SYNC = new ThreadLocal<>();
+    public static final File                  DIR_TEST_DATA = new File("src/test/resources", "data");
+
+    private static final ThreadLocal<Boolean> AUTO_SYNC     = new ThreadLocal<>();
 
     /** The java platform/system logger. */
     private Logger                            logger;
@@ -66,9 +64,9 @@ public abstract class AbstractBaseTest extends Assertions {
     @BeforeEach
     public final void logTestBegin(TestInfo _testInfo) {
         if (_testInfo.getTestMethod().isEmpty() || _testInfo.getDisplayName().startsWith(_testInfo.getTestMethod().get().getName())) {
-            getLogger().log(Level.INFO, ">>>> TEST: {0} <<<<<<<<<<", _testInfo.getDisplayName());
+            getLogger().log(Level.INFO, ">>>> TEST: {0} <<<<", _testInfo.getDisplayName());
         } else {
-            getLogger().log(Level.INFO, ">>>> TEST: {0} ({1}) <<<<<<<<<<",
+            getLogger().log(Level.INFO, ">>>> TEST: {0} ({1}) <<<<",
                 _testInfo.getTestMethod().get().getName(), _testInfo.getDisplayName());
         }
     }
@@ -119,34 +117,6 @@ public abstract class AbstractBaseTest extends Assertions {
             tmpDir += File.separatorChar;
         }
         return tmpDir;
-    }
-
-    public static final File          DIR_TEST_DATA         = new File("src/test/resources", "data");
-
-    /** Charset for access 97 databases. */
-    static final Charset              A97_CHARSET           = Charset.forName("windows-1252");
-
-    /**
-     * Defines currently supported database file formats that are neither read-only nor {@value FileFormat#MSISAM} (MS Money).
-     */
-    private static final FileFormat[] SUPPORTED_FILEFORMATS = Arrays.stream(FileFormat.values())
-        .filter(ff -> !DatabaseImpl.getFileFormatDetails(ff).getFormat().READ_ONLY && ff != FileFormat.MSISAM)
-        .toArray(FileFormat[]::new);
-
-    static final FileFormat[] getSupportedFileformats() {
-        return SUPPORTED_FILEFORMATS;
-    }
-
-    static final List<TestDB> SUPPORTED_DBS_TEST          = TestDB.getSupportedTestDbs(Basename.TEST);
-
-    public static List<TestDB> getSupportedTestDbs() {
-        return SUPPORTED_DBS_TEST;
-    }
-
-    static final List<TestDB> SUPPORTED_DBS_TEST_FOR_READ = TestDB.getSupportedTestDbsForRead(Basename.TEST);
-
-    public static List<TestDB> getSupportedReadOnlyTestDbs() {
-        return SUPPORTED_DBS_TEST_FOR_READ;
     }
 
     /**

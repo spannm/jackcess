@@ -81,7 +81,7 @@ class IndexTest extends AbstractBaseTest {
 
     @Test
     void testPrimaryKey() throws Exception {
-        for (TestDB testDB : getSupportedReadOnlyTestDbs()) {
+        for (TestDB testDB : TestDB.getSupportedTestDbsReadOnly()) {
             try (Database db = testDB.open()) {
                 Table table = db.getTable("Table1");
                 Map<String, Boolean> foundPKs = new HashMap<>();
@@ -105,7 +105,7 @@ class IndexTest extends AbstractBaseTest {
 
     @Test
     void testLogicalIndexes() throws Exception {
-        for (TestDB testDB : TestDB.getSupportedTestDbsForRead(Basename.INDEX)) {
+        for (TestDB testDB : TestDB.getSupportedTestDbsReadOnly(Basename.INDEX)) {
             try (Database db = testDB.open()) {
                 TableImpl table = (TableImpl) db.getTable("Table1");
                 for (IndexImpl idx : table.getIndexes()) {
@@ -185,7 +185,7 @@ class IndexTest extends AbstractBaseTest {
     }
 
     @ParameterizedTest(name = "[{index}] {0}")
-    @MethodSource("getSupportedTestDbs")
+    @MethodSource("io.github.spannm.jackcess.test.TestDB#getSupportedTestDbs()")
     void testEntryDeletion(TestDB testDB) throws Exception {
         try (Database db = testDB.openCopy()) {
             Table table = db.getTable("Table1");
@@ -335,7 +335,7 @@ class IndexTest extends AbstractBaseTest {
     }
 
     @ParameterizedTest(name = "[{index}] {0}")
-    @MethodSource("getSupportedTestDbs")
+    @MethodSource("io.github.spannm.jackcess.test.TestDB#getSupportedTestDbs()")
     void testUniqueEntryCount(TestDB testDB) throws Exception {
         try (Database db = testDB.openCopy()) {
             db.setDateTimeType(DateTimeType.DATE);
@@ -393,7 +393,7 @@ class IndexTest extends AbstractBaseTest {
     }
 
     @ParameterizedTest(name = "[{index}] {0}")
-    @MethodSource("getSupportedTestDbs")
+    @MethodSource("io.github.spannm.jackcess.test.TestDB#getSupportedTestDbs()")
     void testReplId(TestDB testDB) throws Exception {
         try (Database db = testDB.openCopy()) {
             Table table = db.getTable("Table4");
@@ -407,7 +407,7 @@ class IndexTest extends AbstractBaseTest {
     }
 
     @ParameterizedTest(name = "[{index}] {0}")
-    @MethodSource("getSupportedFileformats")
+    @MethodSource("io.github.spannm.jackcess.test.TestDB#getSupportedFileformats()")
     void testIndexCreation(FileFormat fileFormat) throws Exception {
         try (Database db = TestUtil.create(fileFormat)) {
             Table t = DatabaseBuilder.newTable("TestTable")
@@ -445,7 +445,7 @@ class IndexTest extends AbstractBaseTest {
     }
 
     @ParameterizedTest(name = "[{index}] {0}")
-    @MethodSource("getSupportedFileformats")
+    @MethodSource("io.github.spannm.jackcess.test.TestDB#getSupportedFileformats()")
     void testIndexCreationSharedData(FileFormat fileFormat) throws Exception {
         try (Database db = TestUtil.create(fileFormat)) {
             Table t = DatabaseBuilder.newTable("TestTable")
@@ -495,7 +495,7 @@ class IndexTest extends AbstractBaseTest {
 
     @Test
     void testGetForeignKeyIndex() throws Exception {
-        for (TestDB testDB : TestDB.getSupportedTestDbsForRead(Basename.INDEX)) {
+        for (TestDB testDB : TestDB.getSupportedTestDbsReadOnly(Basename.INDEX)) {
             try (Database db = testDB.open()) {
                 Table t1 = db.getTable("Table1");
                 Table t2 = db.getTable("Table2");
@@ -527,7 +527,7 @@ class IndexTest extends AbstractBaseTest {
     }
 
     @ParameterizedTest(name = "[{index}] {0}")
-    @MethodSource("getSupportedFileformats")
+    @MethodSource("io.github.spannm.jackcess.test.TestDB#getSupportedFileformats()")
     void testConstraintViolation(FileFormat fileFormat) throws Exception {
 
         try (Database db = TestUtil.create(fileFormat)) {
@@ -596,7 +596,7 @@ class IndexTest extends AbstractBaseTest {
     }
 
     @ParameterizedTest(name = "[{index}] {0}")
-    @MethodSource("getSupportedFileformats")
+    @MethodSource("io.github.spannm.jackcess.test.TestDB#getSupportedFileformats()")
     void testAutoNumberRecover(FileFormat fileFormat) throws Exception {
         try (Database db = TestUtil.create(fileFormat)) {
             Table t = DatabaseBuilder.newTable("TestTable")

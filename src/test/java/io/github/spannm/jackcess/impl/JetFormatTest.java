@@ -29,7 +29,7 @@ class JetFormatTest extends AbstractBaseTest {
             // success
         }
 
-        for (TestDB testDB : getSupportedReadOnlyTestDbs()) {
+        for (TestDB testDB : TestDB.getSupportedTestDbsReadOnly()) {
 
             try (FileChannel channel = DatabaseImpl.openChannel(
                     testDB.getFile().toPath(), false, false)) {
@@ -44,7 +44,7 @@ class JetFormatTest extends AbstractBaseTest {
     @Test
     void testReadOnlyFormat() {
 
-        for (TestDB testDB : getSupportedReadOnlyTestDbs()) {
+        for (TestDB testDB : TestDB.getSupportedTestDbsReadOnly()) {
 
             Exception failure = null;
             try (Database db = testDB.openCopy()) {
@@ -70,7 +70,7 @@ class JetFormatTest extends AbstractBaseTest {
     @Test
     void testFileFormat() throws Exception {
 
-        for (TestDB testDB : getSupportedReadOnlyTestDbs()) {
+        for (TestDB testDB : TestDB.getSupportedTestDbsReadOnly()) {
 
             try (Database db = testDB.open()) {
                 assertEquals(testDB.getExpectedFileFormat(), db.getFileFormat());

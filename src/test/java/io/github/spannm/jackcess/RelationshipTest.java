@@ -35,7 +35,7 @@ class RelationshipTest extends AbstractBaseTest {
 
     @Test
     void testTwoTables() throws Exception {
-        for (TestDB testDB : TestDB.getSupportedTestDbsForRead(Basename.INDEX)) {
+        for (TestDB testDB : TestDB.getSupportedTestDbsReadOnly(Basename.INDEX)) {
             try (Database db = testDB.open()) {
                 Table t1 = db.getTable("Table1");
                 Table t2 = db.getTable("Table2");
@@ -87,7 +87,7 @@ class RelationshipTest extends AbstractBaseTest {
 
     @Test
     void testOneTable() throws Exception {
-        for (TestDB testDB : TestDB.getSupportedTestDbsForRead(Basename.INDEX)) {
+        for (TestDB testDB : TestDB.getSupportedTestDbsReadOnly(Basename.INDEX)) {
             try (Database db = testDB.open()) {
                 Table t1 = db.getTable("Table1");
                 Table t2 = db.getTable("Table2");
@@ -104,7 +104,7 @@ class RelationshipTest extends AbstractBaseTest {
 
     @Test
     void testNoTables() throws Exception {
-        for (TestDB testDB : TestDB.getSupportedTestDbsForRead(Basename.INDEX)) {
+        for (TestDB testDB : TestDB.getSupportedTestDbsReadOnly(Basename.INDEX)) {
             try (Database db = testDB.open()) {
                 Table t1 = db.getTable("Table1");
                 Table t2 = db.getTable("Table2");

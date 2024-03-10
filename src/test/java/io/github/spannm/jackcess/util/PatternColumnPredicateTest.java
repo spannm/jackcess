@@ -35,7 +35,7 @@ import java.util.stream.Collectors;
 class PatternColumnPredicateTest extends AbstractBaseTest {
 
     @ParameterizedTest(name = "[{index}] {0}")
-    @MethodSource("getSupportedFileformats")
+    @MethodSource("io.github.spannm.jackcess.test.TestDB#getSupportedFileformats()")
     void testRegexPredicate(FileFormat fileFormat) throws Exception {
         try (Database db = createTestDb(fileFormat)) {
             Table t = db.getTable("Test");

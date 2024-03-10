@@ -178,7 +178,7 @@ class CursorTest extends AbstractBaseTest {
     }
 
     @ParameterizedTest(name = "[{index}] {0}")
-    @MethodSource("getSupportedFileformats")
+    @MethodSource("io.github.spannm.jackcess.test.TestDB#getSupportedFileformats()")
     void testSimple(FileFormat fileFormat) throws Exception {
         try (Database db = createTestTable(fileFormat)) {
             Table table = db.getTable("test");
@@ -202,7 +202,7 @@ class CursorTest extends AbstractBaseTest {
     }
 
     @ParameterizedTest(name = "[{index}] {0}")
-    @MethodSource("getSupportedFileformats")
+    @MethodSource("io.github.spannm.jackcess.test.TestDB#getSupportedFileformats()")
     void testMove(FileFormat fileFormat) throws Exception {
         try (Database db = createTestTable(fileFormat)) {
             Table table = db.getTable("test");
@@ -257,7 +257,7 @@ class CursorTest extends AbstractBaseTest {
     }
 
     @ParameterizedTest(name = "[{index}] {0}")
-    @MethodSource("getSupportedFileformats")
+    @MethodSource("io.github.spannm.jackcess.test.TestDB#getSupportedFileformats()")
     void testMoveNoReset(FileFormat fileFormat) throws Exception {
         try (Database db = createTestTable(fileFormat)) {
             Table table = db.getTable("test");
@@ -296,7 +296,7 @@ class CursorTest extends AbstractBaseTest {
     }
 
     @ParameterizedTest(name = "[{index}] {0}")
-    @MethodSource("getSupportedFileformats")
+    @MethodSource("io.github.spannm.jackcess.test.TestDB#getSupportedFileformats()")
     void testSearch(FileFormat fileFormat) throws Exception {
         try (Database db = createTestTable(fileFormat)) {
             Table table = db.getTable("test");
@@ -375,7 +375,7 @@ class CursorTest extends AbstractBaseTest {
     }
 
     @ParameterizedTest(name = "[{index}] {0}")
-    @MethodSource("getSupportedFileformats")
+    @MethodSource("io.github.spannm.jackcess.test.TestDB#getSupportedFileformats()")
     void testReverse(FileFormat fileFormat) throws Exception {
         try (Database db = createTestTable(fileFormat)) {
             Table table = db.getTable("test");
@@ -398,7 +398,7 @@ class CursorTest extends AbstractBaseTest {
     }
 
     @ParameterizedTest(name = "[{index}] {0}")
-    @MethodSource("getSupportedFileformats")
+    @MethodSource("io.github.spannm.jackcess.test.TestDB#getSupportedFileformats()")
     void testLiveAddition(FileFormat fileFormat) throws Exception {
         try (Database db = createTestTable(fileFormat)) {
             Table table = db.getTable("test");
@@ -435,7 +435,7 @@ class CursorTest extends AbstractBaseTest {
     }
 
     @ParameterizedTest(name = "[{index}] {0}")
-    @MethodSource("getSupportedFileformats")
+    @MethodSource("io.github.spannm.jackcess.test.TestDB#getSupportedFileformats()")
     void testLiveDeletion(FileFormat fileFormat) throws Exception {
         try (Database db = createTestTable(fileFormat)) {
             Table table = db.getTable("test");
@@ -707,7 +707,7 @@ class CursorTest extends AbstractBaseTest {
     }
 
     @ParameterizedTest(name = "[{index}] {0}")
-    @MethodSource("getSupportedFileformats")
+    @MethodSource("io.github.spannm.jackcess.test.TestDB#getSupportedFileformats()")
     void testFindAllIndex(FileFormat fileFormat) throws Exception {
         try (Database db = createDupeTestTable(fileFormat)) {
             Table table = db.getTable("test");
@@ -867,7 +867,7 @@ class CursorTest extends AbstractBaseTest {
     }
 
     @ParameterizedTest(name = "[{index}] {0}")
-    @MethodSource("getSupportedFileformats")
+    @MethodSource("io.github.spannm.jackcess.test.TestDB#getSupportedFileformats()")
     void testColumnMatcher(FileFormat fileFormat) throws Exception {
         try (Database db = createTestTable(fileFormat)) {
             Table table = db.getTable("test");
@@ -976,7 +976,7 @@ class CursorTest extends AbstractBaseTest {
 
     @Test
     void testIndexCursor() throws Exception {
-        for (TestDB testDB : TestDB.getSupportedTestDbsForRead(Basename.INDEX)) {
+        for (TestDB testDB : TestDB.getSupportedTestDbsReadOnly(Basename.INDEX)) {
 
             try (Database db = testDB.openMem()) {
                 Table t1 = db.getTable("Table1");
@@ -1108,7 +1108,7 @@ class CursorTest extends AbstractBaseTest {
     }
 
     @ParameterizedTest(name = "[{index}] {0}")
-    @MethodSource("getSupportedFileformats")
+    @MethodSource("io.github.spannm.jackcess.test.TestDB#getSupportedFileformats()")
     void testFindByRowId(FileFormat fileFormat) throws Exception {
         try (Database db = createTestTable(fileFormat)) {
             Table table = db.getTable("test");
@@ -1172,7 +1172,7 @@ class CursorTest extends AbstractBaseTest {
     }
 
     @ParameterizedTest(name = "[{index}] {0}")
-    @MethodSource("getSupportedFileformats")
+    @MethodSource("io.github.spannm.jackcess.test.TestDB#getSupportedFileformats()")
     void testIterationEarlyExit(FileFormat fileFormat) throws Exception {
         try (Database db = createMem(fileFormat)) {
             Table table = DatabaseBuilder.newTable("test")
@@ -1225,7 +1225,7 @@ class CursorTest extends AbstractBaseTest {
     }
 
     @ParameterizedTest(name = "[{index}] {0}")
-    @MethodSource("getSupportedFileformats")
+    @MethodSource("io.github.spannm.jackcess.test.TestDB#getSupportedFileformats()")
     void testPartialIndexFind(FileFormat fileFormat) throws Exception {
         try (Database db = createMem(fileFormat)) {
             TableImpl t = (TableImpl) DatabaseBuilder.newTable("Test").addColumn(DatabaseBuilder.newColumn("id", DataType.LONG)).addColumn(DatabaseBuilder.newColumn("data1", DataType.TEXT))
@@ -1277,7 +1277,7 @@ class CursorTest extends AbstractBaseTest {
     }
 
     @ParameterizedTest(name = "[{index}] {0}")
-    @MethodSource("getSupportedFileformats")
+    @MethodSource("io.github.spannm.jackcess.test.TestDB#getSupportedFileformats()")
     void testPartialIndexLookup(FileFormat fileFormat) throws Exception {
         try (Database db = createMem(fileFormat)) {
             TableImpl t = (TableImpl) DatabaseBuilder.newTable("Test")

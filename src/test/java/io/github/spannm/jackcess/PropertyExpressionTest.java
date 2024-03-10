@@ -44,7 +44,7 @@ import javax.script.SimpleBindings;
 class PropertyExpressionTest extends AbstractBaseTest {
 
     @ParameterizedTest(name = "[{index}] {0}")
-    @MethodSource("getSupportedFileformats")
+    @MethodSource("io.github.spannm.jackcess.test.TestDB#getSupportedFileformats()")
     void testDefaultValue(FileFormat fileFormat) throws Exception {
         try (Database db = create(fileFormat)) {
             db.setEvaluateExpressions(true);
@@ -149,7 +149,7 @@ class PropertyExpressionTest extends AbstractBaseTest {
     }
 
     @ParameterizedTest(name = "[{index}] {0}")
-    @MethodSource("getSupportedFileformats")
+    @MethodSource("io.github.spannm.jackcess.test.TestDB#getSupportedFileformats()")
     void testColumnValidator(FileFormat fileFormat) throws Exception {
         try (Database db = create(fileFormat)) {
             db.setEvaluateExpressions(true);
@@ -220,7 +220,7 @@ class PropertyExpressionTest extends AbstractBaseTest {
     }
 
     @ParameterizedTest(name = "[{index}] {0}")
-    @MethodSource("getSupportedFileformats")
+    @MethodSource("io.github.spannm.jackcess.test.TestDB#getSupportedFileformats()")
     void testRowValidator(FileFormat fileFormat) throws Exception {
         try (Database db = create(fileFormat)) {
             db.setEvaluateExpressions(true);
@@ -280,7 +280,7 @@ class PropertyExpressionTest extends AbstractBaseTest {
     }
 
     @ParameterizedTest(name = "[{index}] {0}")
-    @MethodSource("getSupportedFileformats")
+    @MethodSource("io.github.spannm.jackcess.test.TestDB#getSupportedFileformats()")
     void testCustomEvalConfig(FileFormat fileFormat) throws Exception {
         TemporalConfig tempConf = new TemporalConfig("[uuuu/]M/d",
             "uuuu-MMM-d",

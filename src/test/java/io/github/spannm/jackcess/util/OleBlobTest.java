@@ -45,7 +45,7 @@ import java.io.FileOutputStream;
 class OleBlobTest extends AbstractBaseTest {
 
     @ParameterizedTest(name = "[{index}] {0}")
-    @MethodSource("getSupportedFileformats")
+    @MethodSource("io.github.spannm.jackcess.test.TestDB#getSupportedFileformats()")
     void testCreateBlob(FileFormat fileFormat) throws Exception {
         File sampleFile = new File(DIR_TEST_DATA, "sample-input.tab");
         String sampleFilePath = sampleFile.getAbsolutePath();
@@ -129,7 +129,7 @@ class OleBlobTest extends AbstractBaseTest {
 
     @Test
     void testReadBlob() throws Exception {
-        for (TestDB testDb : TestDB.getSupportedTestDbsForRead(Basename.BLOB)) {
+        for (TestDB testDb : TestDB.getSupportedTestDbsReadOnly(Basename.BLOB)) {
             try (Database db = testDb.open()) {
                 Table t = db.getTable("Table1");
 

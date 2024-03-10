@@ -21,7 +21,7 @@ import java.util.List;
 public class UsageMapTest extends AbstractBaseTest {
 
     @ParameterizedTest(name = "[{index}] {0}")
-    @MethodSource("getSupportedTestDbs")
+    @MethodSource("io.github.spannm.jackcess.test.TestDB#getSupportedTestDbs()")
     void testRead(TestDB testDB) throws Exception {
         int expectedFirstPage;
         int expectedLastPage;

@@ -43,7 +43,7 @@ import java.util.UUID;
 class AutoNumberTest extends AbstractBaseTest {
 
     @ParameterizedTest(name = "[{index}] {0}")
-    @MethodSource("getSupportedFileformats")
+    @MethodSource("io.github.spannm.jackcess.test.TestDB#getSupportedFileformats()")
     void testAutoNumber(FileFormat fileFormat) throws Exception {
         try (Database db = createMem(fileFormat)) {
             Table table = newTable("test")
@@ -57,7 +57,7 @@ class AutoNumberTest extends AbstractBaseTest {
     }
 
     @ParameterizedTest(name = "[{index}] {0}")
-    @MethodSource("getSupportedTestDbs")
+    @MethodSource("io.github.spannm.jackcess.test.TestDB#getSupportedTestDbs()")
     void testAutoNumberPK(TestDB testDB) throws Exception {
         try (Database db = testDB.openMem()) {
             Table table = db.getTable("Table3");
@@ -114,7 +114,7 @@ class AutoNumberTest extends AbstractBaseTest {
     }
 
     @ParameterizedTest(name = "[{index}] {0}")
-    @MethodSource("getSupportedFileformats")
+    @MethodSource("io.github.spannm.jackcess.test.TestDB#getSupportedFileformats()")
     void testAutoNumberGuid(FileFormat fileFormat) throws Exception {
         try (Database db = createMem(fileFormat)) {
             Table table = newTable("test")
@@ -139,7 +139,7 @@ class AutoNumberTest extends AbstractBaseTest {
     }
 
     @ParameterizedTest(name = "[{index}] {0}")
-    @MethodSource("getSupportedFileformats")
+    @MethodSource("io.github.spannm.jackcess.test.TestDB#getSupportedFileformats()")
     void testInsertLongAutoNumber(FileFormat fileFormat) throws Exception {
         try (Database db = createMem(fileFormat)) {
             Table table = newTable("test")
@@ -153,7 +153,7 @@ class AutoNumberTest extends AbstractBaseTest {
     }
 
     @ParameterizedTest(name = "[{index}] {0}")
-    @MethodSource("getSupportedFileformats")
+    @MethodSource("io.github.spannm.jackcess.test.TestDB#getSupportedFileformats()")
     void testInsertLongAutoNumberPK(FileFormat fileFormat) throws Exception {
         try (Database db = createMem(fileFormat)) {
             Table table = newTable("test")
@@ -350,7 +350,7 @@ class AutoNumberTest extends AbstractBaseTest {
     }
 
     @ParameterizedTest(name = "[{index}] {0}")
-    @MethodSource("getSupportedFileformats")
+    @MethodSource("io.github.spannm.jackcess.test.TestDB#getSupportedFileformats()")
     void testInsertGuidAutoNumber(FileFormat fileFormat) throws Exception {
         try (Database db = createMem(fileFormat)) {
             Table table = newTable("test").addColumn(newColumn("a", DataType.GUID).withAutoNumber(true)).addColumn(newColumn("b", DataType.TEXT)).toTable(db);

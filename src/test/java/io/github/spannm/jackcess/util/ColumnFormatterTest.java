@@ -34,7 +34,7 @@ import java.util.List;
 class ColumnFormatterTest extends AbstractBaseTest {
 
     @ParameterizedTest(name = "[{index}] {0}")
-    @MethodSource("getSupportedFileformats")
+    @MethodSource("io.github.spannm.jackcess.test.TestDB#getSupportedFileformats()")
     void testFormat(FileFormat fileFormat) throws Exception {
         try (Database db = create(fileFormat)) {
             db.setEvaluateExpressions(true);
