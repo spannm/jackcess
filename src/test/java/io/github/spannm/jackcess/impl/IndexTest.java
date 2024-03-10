@@ -18,10 +18,7 @@ package io.github.spannm.jackcess.impl;
 
 import io.github.spannm.jackcess.*;
 import io.github.spannm.jackcess.Database.FileFormat;
-import io.github.spannm.jackcess.test.AbstractBaseTest;
-import io.github.spannm.jackcess.test.Basename;
-import io.github.spannm.jackcess.test.TestDB;
-import io.github.spannm.jackcess.test.TestUtil;
+import io.github.spannm.jackcess.test.*;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -81,7 +78,7 @@ class IndexTest extends AbstractBaseTest {
 
     @Test
     void testPrimaryKey() throws Exception {
-        for (TestDB testDB : TestDB.getSupportedTestDbsReadOnly()) {
+        for (TestDb testDB : TestDbs.getReadOnlyDbs()) {
             try (Database db = testDB.open()) {
                 Table table = db.getTable("Table1");
                 Map<String, Boolean> foundPKs = new HashMap<>();
@@ -105,7 +102,7 @@ class IndexTest extends AbstractBaseTest {
 
     @Test
     void testLogicalIndexes() throws Exception {
-        for (TestDB testDB : TestDB.getSupportedTestDbsReadOnly(Basename.INDEX)) {
+        for (TestDb testDB : TestDbs.getReadOnlyDbs(Basename.INDEX)) {
             try (Database db = testDB.open()) {
                 TableImpl table = (TableImpl) db.getTable("Table1");
                 for (IndexImpl idx : table.getIndexes()) {
@@ -166,7 +163,7 @@ class IndexTest extends AbstractBaseTest {
 
     @Test
     void testComplexIndex() throws Exception {
-        for (TestDB testDB : TestDB.getSupportedTestDbs(Basename.COMP_INDEX)) {
+        for (TestDb testDB : TestDbs.getDbs(Basename.COMP_INDEX)) {
             try (// this file has an index with "compressed" entries and node pages
             Database db1 = testDB.open()) {
                 TableImpl t1 = (TableImpl) db1.getTable("Table1");
@@ -185,8 +182,8 @@ class IndexTest extends AbstractBaseTest {
     }
 
     @ParameterizedTest(name = "[{index}] {0}")
-    @MethodSource("io.github.spannm.jackcess.test.TestDB#getSupportedTestDbs()")
-    void testEntryDeletion(TestDB testDB) throws Exception {
+    @MethodSource("io.github.spannm.jackcess.test.TestDbs#getDbs()")
+    void testEntryDeletion(TestDb testDB) throws Exception {
         try (Database db = testDB.openCopy()) {
             Table table = db.getTable("Table1");
 
@@ -226,7 +223,7 @@ class IndexTest extends AbstractBaseTest {
 
     @Test
     void testIgnoreNulls() throws Exception {
-        for (TestDB testDB : TestDB.getSupportedTestDbs(Basename.INDEX_PROPERTIES)) {
+        for (TestDb testDB : TestDbs.getDbs(Basename.INDEX_PROPERTIES)) {
             try (Database db = testDB.openCopy()) {
                 db.setEvaluateExpressions(false);
 
@@ -273,7 +270,7 @@ class IndexTest extends AbstractBaseTest {
 
     @Test
     void testUnique() throws Exception {
-        for (TestDB testDB : TestDB.getSupportedTestDbs(Basename.INDEX_PROPERTIES)) {
+        for (TestDb testDB : TestDbs.getDbs(Basename.INDEX_PROPERTIES)) {
             Database db = testDB.openCopy();
 
             Table t = db.getTable("TableUnique1_temp");
@@ -335,8 +332,8 @@ class IndexTest extends AbstractBaseTest {
     }
 
     @ParameterizedTest(name = "[{index}] {0}")
-    @MethodSource("io.github.spannm.jackcess.test.TestDB#getSupportedTestDbs()")
-    void testUniqueEntryCount(TestDB testDB) throws Exception {
+    @MethodSource("io.github.spannm.jackcess.test.TestDbs#getDbs()")
+    void testUniqueEntryCount(TestDb testDB) throws Exception {
         try (Database db = testDB.openCopy()) {
             db.setDateTimeType(DateTimeType.DATE);
             Table table = db.getTable("Table1");
@@ -393,8 +390,8 @@ class IndexTest extends AbstractBaseTest {
     }
 
     @ParameterizedTest(name = "[{index}] {0}")
-    @MethodSource("io.github.spannm.jackcess.test.TestDB#getSupportedTestDbs()")
-    void testReplId(TestDB testDB) throws Exception {
+    @MethodSource("io.github.spannm.jackcess.test.TestDbs#getDbs()")
+    void testReplId(TestDb testDB) throws Exception {
         try (Database db = testDB.openCopy()) {
             Table table = db.getTable("Table4");
 
@@ -407,7 +404,7 @@ class IndexTest extends AbstractBaseTest {
     }
 
     @ParameterizedTest(name = "[{index}] {0}")
-    @MethodSource("io.github.spannm.jackcess.test.TestDB#getSupportedFileformats()")
+    @MethodSource("io.github.spannm.jackcess.test.TestDbs#getFileformats()")
     void testIndexCreation(FileFormat fileFormat) throws Exception {
         try (Database db = TestUtil.create(fileFormat)) {
             Table t = DatabaseBuilder.newTable("TestTable")
@@ -445,7 +442,7 @@ class IndexTest extends AbstractBaseTest {
     }
 
     @ParameterizedTest(name = "[{index}] {0}")
-    @MethodSource("io.github.spannm.jackcess.test.TestDB#getSupportedFileformats()")
+    @MethodSource("io.github.spannm.jackcess.test.TestDbs#getFileformats()")
     void testIndexCreationSharedData(FileFormat fileFormat) throws Exception {
         try (Database db = TestUtil.create(fileFormat)) {
             Table t = DatabaseBuilder.newTable("TestTable")
@@ -495,7 +492,7 @@ class IndexTest extends AbstractBaseTest {
 
     @Test
     void testGetForeignKeyIndex() throws Exception {
-        for (TestDB testDB : TestDB.getSupportedTestDbsReadOnly(Basename.INDEX)) {
+        for (TestDb testDB : TestDbs.getReadOnlyDbs(Basename.INDEX)) {
             try (Database db = testDB.open()) {
                 Table t1 = db.getTable("Table1");
                 Table t2 = db.getTable("Table2");
@@ -527,7 +524,7 @@ class IndexTest extends AbstractBaseTest {
     }
 
     @ParameterizedTest(name = "[{index}] {0}")
-    @MethodSource("io.github.spannm.jackcess.test.TestDB#getSupportedFileformats()")
+    @MethodSource("io.github.spannm.jackcess.test.TestDbs#getFileformats()")
     void testConstraintViolation(FileFormat fileFormat) throws Exception {
 
         try (Database db = TestUtil.create(fileFormat)) {
@@ -596,7 +593,7 @@ class IndexTest extends AbstractBaseTest {
     }
 
     @ParameterizedTest(name = "[{index}] {0}")
-    @MethodSource("io.github.spannm.jackcess.test.TestDB#getSupportedFileformats()")
+    @MethodSource("io.github.spannm.jackcess.test.TestDbs#getFileformats()")
     void testAutoNumberRecover(FileFormat fileFormat) throws Exception {
         try (Database db = TestUtil.create(fileFormat)) {
             Table t = DatabaseBuilder.newTable("TestTable")
@@ -653,7 +650,7 @@ class IndexTest extends AbstractBaseTest {
 
     @Test
     void testBinaryIndex() throws Exception {
-        for (TestDB testDB : TestDB.getSupportedTestDbs(Basename.BINARY_INDEX)) {
+        for (TestDb testDB : TestDbs.getDbs(Basename.BINARY_INDEX)) {
             Database db = testDB.open();
 
             Table table = db.getTable("Test");

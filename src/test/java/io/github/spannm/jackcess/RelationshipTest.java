@@ -19,7 +19,8 @@ package io.github.spannm.jackcess;
 import io.github.spannm.jackcess.impl.RelationshipImpl;
 import io.github.spannm.jackcess.test.AbstractBaseTest;
 import io.github.spannm.jackcess.test.Basename;
-import io.github.spannm.jackcess.test.TestDB;
+import io.github.spannm.jackcess.test.TestDb;
+import io.github.spannm.jackcess.test.TestDbs;
 import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
@@ -35,7 +36,7 @@ class RelationshipTest extends AbstractBaseTest {
 
     @Test
     void testTwoTables() throws Exception {
-        for (TestDB testDB : TestDB.getSupportedTestDbsReadOnly(Basename.INDEX)) {
+        for (TestDb testDB : TestDbs.getReadOnlyDbs(Basename.INDEX)) {
             try (Database db = testDB.open()) {
                 Table t1 = db.getTable("Table1");
                 Table t2 = db.getTable("Table2");
@@ -87,7 +88,7 @@ class RelationshipTest extends AbstractBaseTest {
 
     @Test
     void testOneTable() throws Exception {
-        for (TestDB testDB : TestDB.getSupportedTestDbsReadOnly(Basename.INDEX)) {
+        for (TestDb testDB : TestDbs.getReadOnlyDbs(Basename.INDEX)) {
             try (Database db = testDB.open()) {
                 Table t1 = db.getTable("Table1");
                 Table t2 = db.getTable("Table2");
@@ -104,7 +105,7 @@ class RelationshipTest extends AbstractBaseTest {
 
     @Test
     void testNoTables() throws Exception {
-        for (TestDB testDB : TestDB.getSupportedTestDbsReadOnly(Basename.INDEX)) {
+        for (TestDb testDB : TestDbs.getReadOnlyDbs(Basename.INDEX)) {
             try (Database db = testDB.open()) {
                 Table t1 = db.getTable("Table1");
                 Table t2 = db.getTable("Table2");

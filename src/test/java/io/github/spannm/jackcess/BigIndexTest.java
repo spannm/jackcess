@@ -22,7 +22,8 @@ import io.github.spannm.jackcess.impl.IndexImpl;
 import io.github.spannm.jackcess.impl.TableImpl;
 import io.github.spannm.jackcess.test.AbstractBaseTest;
 import io.github.spannm.jackcess.test.Basename;
-import io.github.spannm.jackcess.test.TestDB;
+import io.github.spannm.jackcess.test.TestDb;
+import io.github.spannm.jackcess.test.TestDbs;
 import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
@@ -36,7 +37,7 @@ class BigIndexTest extends AbstractBaseTest {
 
     @Test
     void testComplexIndex() throws Exception {
-        for (TestDB testDB : TestDB.getSupportedTestDbsReadOnly(Basename.COMP_INDEX)) {
+        for (TestDb testDB : TestDbs.getReadOnlyDbs(Basename.COMP_INDEX)) {
             try (// this file has an index with "compressed" entries and node pages
             Database db = testDB.openMem()) {
                 TableImpl t = (TableImpl) db.getTable("Table1");
@@ -50,7 +51,7 @@ class BigIndexTest extends AbstractBaseTest {
 
     @Test
     void testBigIndex() throws Exception {
-        for (TestDB testDB : TestDB.getSupportedTestDbs(Basename.BIG_INDEX)) {
+        for (TestDb testDB : TestDbs.getDbs(Basename.BIG_INDEX)) {
             // this file has an index with "compressed" entries and node pages
             Database db = testDB.openMem();
             TableImpl t = (TableImpl) db.getTable("Table1");

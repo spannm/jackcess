@@ -22,7 +22,8 @@ import io.github.spannm.jackcess.*;
 import io.github.spannm.jackcess.Database.FileFormat;
 import io.github.spannm.jackcess.test.AbstractBaseTest;
 import io.github.spannm.jackcess.test.Basename;
-import io.github.spannm.jackcess.test.TestDB;
+import io.github.spannm.jackcess.test.TestDb;
+import io.github.spannm.jackcess.test.TestDbs;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
@@ -40,7 +41,7 @@ class LongValueTest extends AbstractBaseTest {
     @Test
     void testReadLongValue() throws Exception {
 
-        for (TestDB testDB : TestDB.getSupportedTestDbsReadOnly(Basename.TEST2)) {
+        for (TestDb testDB : TestDbs.getReadOnlyDbs(Basename.TEST2)) {
             try (Database db = testDB.openMem()) {
                 Table table = db.getTable("MSP_PROJECTS");
                 Row row = table.getNextRow();
@@ -61,7 +62,7 @@ class LongValueTest extends AbstractBaseTest {
     }
 
     @ParameterizedTest(name = "[{index}] {0}")
-    @MethodSource("io.github.spannm.jackcess.test.TestDB#getSupportedFileformats()")
+    @MethodSource("io.github.spannm.jackcess.test.TestDbs#getFileformats()")
     void testWriteLongValue(FileFormat fileFormat) throws Exception {
 
         try (Database db = createMem(fileFormat)) {
@@ -110,7 +111,7 @@ class LongValueTest extends AbstractBaseTest {
     }
 
     @ParameterizedTest(name = "[{index}] {0}")
-    @MethodSource("io.github.spannm.jackcess.test.TestDB#getSupportedFileformats()")
+    @MethodSource("io.github.spannm.jackcess.test.TestDbs#getFileformats()")
     void testManyMemos(FileFormat fileFormat) throws Exception {
         try (Database db = createMem(fileFormat)) {
             final int numColumns = 126;
@@ -170,7 +171,7 @@ class LongValueTest extends AbstractBaseTest {
     }
 
     @ParameterizedTest(name = "[{index}] {0}")
-    @MethodSource("io.github.spannm.jackcess.test.TestDB#getSupportedFileformats()")
+    @MethodSource("io.github.spannm.jackcess.test.TestDbs#getFileformats()")
     void testLongValueAsMiddleColumn(FileFormat fileFormat) throws Exception {
         try (Database db = createMem(fileFormat)) {
             Table newTable = new TableBuilder("NewTable")

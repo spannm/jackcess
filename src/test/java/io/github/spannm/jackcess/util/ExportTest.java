@@ -37,7 +37,7 @@ class ExportTest extends AbstractBaseTest {
     private static final String NL = System.lineSeparator();
 
     @ParameterizedTest(name = "[{index}] {0}")
-    @MethodSource("io.github.spannm.jackcess.test.TestDB#getSupportedFileformats()")
+    @MethodSource("io.github.spannm.jackcess.test.TestDbs#getFileformats()")
     void testExportToFile(FileFormat fileFormat) throws Exception {
         DateFormat df = new SimpleDateFormat("yyyyMMdd HH:mm:ss");
         df.setTimeZone(TEST_TZ);

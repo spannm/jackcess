@@ -35,7 +35,7 @@ import java.nio.file.Path;
 class CustomLinkResolverTest extends AbstractBaseTest {
 
     @ParameterizedTest(name = "[{index}] {0}")
-    @MethodSource("io.github.spannm.jackcess.test.TestDB#getSupportedFileformats()")
+    @MethodSource("io.github.spannm.jackcess.test.TestDbs#getFileformats()")
     void testCustomLinkResolver(FileFormat fileFormat) throws Exception {
         try (Database db = create(fileFormat)) {
             db.setLinkResolver(new TestLinkResolver());

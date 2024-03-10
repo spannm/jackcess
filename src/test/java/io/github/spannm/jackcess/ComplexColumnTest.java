@@ -25,7 +25,8 @@ import io.github.spannm.jackcess.impl.ColumnImpl;
 import io.github.spannm.jackcess.impl.PageChannel;
 import io.github.spannm.jackcess.test.AbstractBaseTest;
 import io.github.spannm.jackcess.test.Basename;
-import io.github.spannm.jackcess.test.TestDB;
+import io.github.spannm.jackcess.test.TestDb;
+import io.github.spannm.jackcess.test.TestDbs;
 import org.junit.jupiter.api.Test;
 
 import java.nio.ByteBuffer;
@@ -59,7 +60,7 @@ class ComplexColumnTest extends AbstractBaseTest {
 
     @Test
     void testVersions() throws Exception {
-        for (TestDB testDB : TestDB.getSupportedTestDbs(Basename.COMPLEX)) {
+        for (TestDb testDB : TestDbs.getDbs(Basename.COMPLEX)) {
             Database db = testDB.openCopy();
             db.setDateTimeType(DateTimeType.DATE);
             db.setTimeZone(TEST_TZ);
@@ -162,7 +163,7 @@ class ComplexColumnTest extends AbstractBaseTest {
 
     @Test
     void testAttachments() throws Exception {
-        for (TestDB testDB : TestDB.getSupportedTestDbs(Basename.COMPLEX)) {
+        for (TestDb testDB : TestDbs.getDbs(Basename.COMPLEX)) {
 
             Database db = testDB.openCopy();
 
@@ -243,7 +244,7 @@ class ComplexColumnTest extends AbstractBaseTest {
 
     @Test
     void testMultiValues() throws Exception {
-        for (TestDB testDB : TestDB.getSupportedTestDbs(Basename.COMPLEX)) {
+        for (TestDb testDB : TestDbs.getDbs(Basename.COMPLEX)) {
 
             Database db = testDB.openCopy();
 
@@ -317,7 +318,7 @@ class ComplexColumnTest extends AbstractBaseTest {
 
     @Test
     void testUnsupported() throws Exception {
-        for (TestDB testDB : TestDB.getSupportedTestDbs(Basename.UNSUPPORTED)) {
+        for (TestDb testDB : TestDbs.getDbs(Basename.UNSUPPORTED)) {
 
             Database db = testDB.openCopy();
 

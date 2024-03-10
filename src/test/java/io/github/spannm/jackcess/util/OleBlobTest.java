@@ -26,7 +26,8 @@ import io.github.spannm.jackcess.impl.ByteUtil;
 import io.github.spannm.jackcess.impl.CompoundOleUtil;
 import io.github.spannm.jackcess.test.AbstractBaseTest;
 import io.github.spannm.jackcess.test.Basename;
-import io.github.spannm.jackcess.test.TestDB;
+import io.github.spannm.jackcess.test.TestDb;
+import io.github.spannm.jackcess.test.TestDbs;
 import org.apache.poi.poifs.filesystem.DocumentEntry;
 import org.apache.poi.poifs.filesystem.DocumentInputStream;
 import org.apache.poi.poifs.filesystem.POIFSFileSystem;
@@ -45,7 +46,7 @@ import java.io.FileOutputStream;
 class OleBlobTest extends AbstractBaseTest {
 
     @ParameterizedTest(name = "[{index}] {0}")
-    @MethodSource("io.github.spannm.jackcess.test.TestDB#getSupportedFileformats()")
+    @MethodSource("io.github.spannm.jackcess.test.TestDbs#getFileformats()")
     void testCreateBlob(FileFormat fileFormat) throws Exception {
         File sampleFile = new File(DIR_TEST_DATA, "sample-input.tab");
         String sampleFilePath = sampleFile.getAbsolutePath();
@@ -129,7 +130,7 @@ class OleBlobTest extends AbstractBaseTest {
 
     @Test
     void testReadBlob() throws Exception {
-        for (TestDB testDb : TestDB.getSupportedTestDbsReadOnly(Basename.BLOB)) {
+        for (TestDb testDb : TestDbs.getReadOnlyDbs(Basename.BLOB)) {
             try (Database db = testDb.open()) {
                 Table t = db.getTable("Table1");
 

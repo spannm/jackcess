@@ -21,7 +21,8 @@ import static io.github.spannm.jackcess.test.TestUtil.*;
 import io.github.spannm.jackcess.*;
 import io.github.spannm.jackcess.test.AbstractBaseTest;
 import io.github.spannm.jackcess.test.Basename;
-import io.github.spannm.jackcess.test.TestDB;
+import io.github.spannm.jackcess.test.TestDb;
+import io.github.spannm.jackcess.test.TestDbs;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
@@ -37,7 +38,7 @@ class FKEnforcerTest extends AbstractBaseTest {
 
     @Test
     void testNoEnforceForeignKeys() throws Exception {
-        for (TestDB testDB : TestDB.getSupportedTestDbs(Basename.INDEX)) {
+        for (TestDb testDB : TestDbs.getDbs(Basename.INDEX)) {
 
             try (Database db = testDB.openCopy()) {
                 db.setEnforceForeignKeys(false);
@@ -61,7 +62,7 @@ class FKEnforcerTest extends AbstractBaseTest {
 
     @Test
     void testEnforceForeignKeys() throws Exception {
-        for (TestDB testDB : TestDB.getSupportedTestDbs(Basename.INDEX)) {
+        for (TestDb testDB : TestDbs.getDbs(Basename.INDEX)) {
 
             try (Database db = testDB.openCopy()) {
                 db.setEvaluateExpressions(false);

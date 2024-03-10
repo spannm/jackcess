@@ -22,7 +22,8 @@ import io.github.spannm.jackcess.*;
 import io.github.spannm.jackcess.Database.FileFormat;
 import io.github.spannm.jackcess.test.AbstractBaseTest;
 import io.github.spannm.jackcess.test.Basename;
-import io.github.spannm.jackcess.test.TestDB;
+import io.github.spannm.jackcess.test.TestDb;
+import io.github.spannm.jackcess.test.TestDbs;
 import org.junit.jupiter.api.Test;
 
 import java.io.File;
@@ -55,7 +56,7 @@ public class IndexCodesTest extends AbstractBaseTest {
 
     @Test
     void testIndexCodes() throws Exception {
-        for (TestDB testDB : TestDB.getSupportedTestDbsReadOnly(Basename.INDEX_CODES)) {
+        for (TestDb testDB : TestDbs.getReadOnlyDbs(Basename.INDEX_CODES)) {
             try (Database db = testDB.openMem()) {
                 db.setDateTimeType(DateTimeType.DATE);
 
@@ -69,7 +70,7 @@ public class IndexCodesTest extends AbstractBaseTest {
         }
     }
 
-    public static void checkIndexEntries(final TestDB testDB, Table t, Index index) throws Exception {
+    public static void checkIndexEntries(final TestDb testDB, Table t, Index index) throws Exception {
         // index.initialize();
         // System.out.println("Ind " + index);
 
@@ -99,7 +100,7 @@ public class IndexCodesTest extends AbstractBaseTest {
 
     }
 
-    private static void findRow(final TestDB testDB, Table t, Index index, Row expectedRow, Cursor.Position expectedPos) throws Exception {
+    private static void findRow(final TestDb testDB, Table t, Index index, Row expectedRow, Cursor.Position expectedPos) throws Exception {
         Object[] idxRow = ((IndexImpl) index).constructIndexRow(expectedRow);
         Cursor cursor = CursorBuilder.createCursor(index, idxRow, idxRow);
 

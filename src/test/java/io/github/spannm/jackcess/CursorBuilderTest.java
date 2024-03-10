@@ -18,7 +18,7 @@ package io.github.spannm.jackcess;
 
 import io.github.spannm.jackcess.impl.IndexImpl;
 import io.github.spannm.jackcess.test.AbstractBaseTest;
-import io.github.spannm.jackcess.test.TestDB;
+import io.github.spannm.jackcess.test.TestDb;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -40,7 +40,7 @@ class CursorBuilderTest extends AbstractBaseTest {
 
     @Test
     void test() throws Exception {
-        for (TestDB indexCursorDB : CursorTest.INDEX_CURSOR_DBS) {
+        for (TestDb indexCursorDB : CursorTest.INDEX_CURSOR_DBS) {
             Database db = CursorTest.createTestIndexTable(indexCursorDB);
 
             Table table = db.getTable("test");

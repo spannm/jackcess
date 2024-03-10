@@ -21,7 +21,8 @@ import static io.github.spannm.jackcess.test.TestUtil.*;
 import io.github.spannm.jackcess.impl.DatabaseImpl;
 import io.github.spannm.jackcess.test.AbstractBaseTest;
 import io.github.spannm.jackcess.test.Basename;
-import io.github.spannm.jackcess.test.TestDB;
+import io.github.spannm.jackcess.test.TestDb;
+import io.github.spannm.jackcess.test.TestDbs;
 import org.junit.jupiter.api.Test;
 
 import java.io.File;
@@ -37,7 +38,7 @@ class LinkedTableTest extends AbstractBaseTest {
 
     @Test
     void testLinkedTables() throws Exception {
-        for (TestDB testDB : TestDB.getSupportedTestDbs(Basename.LINKED)) {
+        for (TestDb testDB : TestDbs.getDbs(Basename.LINKED)) {
             try (Database db = testDB.openCopy()) {
                 try {
                     db.getTable("Table2");
@@ -152,7 +153,7 @@ class LinkedTableTest extends AbstractBaseTest {
 
     @Test
     void testOdbcLinkedTables() throws Exception {
-        for (TestDB testDB : TestDB.getSupportedTestDbs(Basename.LINKED_ODBC)) {
+        for (TestDb testDB : TestDbs.getDbs(Basename.LINKED_ODBC)) {
             try (Database db = testDB.openCopy()) {
                 TableMetaData tmd = db.getTableMetaData("Ordrar");
                 assertEquals(TableMetaData.Type.LINKED_ODBC, tmd.getType());

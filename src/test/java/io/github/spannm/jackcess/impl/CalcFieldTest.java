@@ -22,7 +22,8 @@ import io.github.spannm.jackcess.*;
 import io.github.spannm.jackcess.Database.FileFormat;
 import io.github.spannm.jackcess.test.AbstractBaseTest;
 import io.github.spannm.jackcess.test.Basename;
-import io.github.spannm.jackcess.test.TestDB;
+import io.github.spannm.jackcess.test.TestDb;
+import io.github.spannm.jackcess.test.TestDbs;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
@@ -49,7 +50,7 @@ class CalcFieldTest extends AbstractBaseTest {
     }
 
     @ParameterizedTest(name = "[{index}] {0}")
-    @MethodSource("io.github.spannm.jackcess.test.TestDB#getSupportedFileformats()")
+    @MethodSource("io.github.spannm.jackcess.test.TestDbs#getFileformats()")
     void testCreateCalcField(FileFormat fileFormat) throws Exception {
         JetFormat format = DatabaseImpl.getFileFormatDetails(fileFormat).getFormat();
         if (!format.isSupportedCalculatedDataType(DataType.TEXT)) {
@@ -136,7 +137,7 @@ class CalcFieldTest extends AbstractBaseTest {
     @Test
     void testReadCalcFields() throws Exception {
 
-        for (TestDB testDB : TestDB.getSupportedTestDbs(Basename.CALC_FIELD)) {
+        for (TestDb testDB : TestDbs.getDbs(Basename.CALC_FIELD)) {
             try (Database db = testDB.open()) {
                 Table t = db.getTable("Table1");
 

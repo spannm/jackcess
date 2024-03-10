@@ -38,7 +38,7 @@ import java.util.List;
 class ErrorHandlerTest extends AbstractBaseTest {
 
     @ParameterizedTest(name = "[{index}] {0}")
-    @MethodSource("io.github.spannm.jackcess.test.TestDB#getSupportedFileformats()")
+    @MethodSource("io.github.spannm.jackcess.test.TestDbs#getFileformats()")
     void testErrorHandler(FileFormat fileFormat) throws Exception {
         try (Database db = create(fileFormat)) {
             Table table =

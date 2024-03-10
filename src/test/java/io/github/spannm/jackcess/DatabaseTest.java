@@ -22,7 +22,8 @@ import io.github.spannm.jackcess.Database.FileFormat;
 import io.github.spannm.jackcess.impl.*;
 import io.github.spannm.jackcess.test.AbstractBaseTest;
 import io.github.spannm.jackcess.test.Basename;
-import io.github.spannm.jackcess.test.TestDB;
+import io.github.spannm.jackcess.test.TestDb;
+import io.github.spannm.jackcess.test.TestDbs;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
@@ -44,7 +45,7 @@ import java.util.stream.Collectors;
 class DatabaseTest extends AbstractBaseTest {
 
     @ParameterizedTest(name = "[{index}] {0}")
-    @MethodSource("io.github.spannm.jackcess.test.TestDB#getSupportedFileformats()")
+    @MethodSource("io.github.spannm.jackcess.test.TestDbs#getFileformats()")
     void testInvalidTableDefs(FileFormat fileFormat) throws Exception {
         try (Database db = create(fileFormat)) {
             try {
@@ -100,7 +101,7 @@ class DatabaseTest extends AbstractBaseTest {
 
     @Test
     void testReadDeletedRows() throws Exception {
-        for (TestDB testDB : TestDB.getSupportedTestDbsReadOnly(Basename.DEL)) {
+        for (TestDb testDB : TestDbs.getReadOnlyDbs(Basename.DEL)) {
             try (Database db = testDB.open()) {
                 Table table = db.getTable("Table");
                 int rows = 0;
@@ -114,7 +115,7 @@ class DatabaseTest extends AbstractBaseTest {
 
     @Test
     void testGetColumns() throws Exception {
-        for (TestDB testDB : TestDB.getSupportedTestDbsReadOnly()) {
+        for (TestDb testDB : TestDbs.getReadOnlyDbs()) {
             try (Database db = testDB.open()) {
                 List<? extends Column> columns = db.getTable("Table1").getColumns();
                 assertEquals(9, columns.size());
@@ -139,7 +140,7 @@ class DatabaseTest extends AbstractBaseTest {
 
     @Test
     void testGetNextRow() throws Exception {
-        for (TestDB testDB : TestDB.getSupportedTestDbsReadOnly()) {
+        for (TestDb testDB : TestDbs.getReadOnlyDbs()) {
             try (Database db = testDB.open()) {
                 db.setDateTimeType(DateTimeType.DATE);
 
@@ -162,7 +163,7 @@ class DatabaseTest extends AbstractBaseTest {
     }
 
     @ParameterizedTest(name = "[{index}] {0}")
-    @MethodSource("io.github.spannm.jackcess.test.TestDB#getSupportedFileformats()")
+    @MethodSource("io.github.spannm.jackcess.test.TestDbs#getFileformats()")
     void testCreate(FileFormat fileFormat) throws Exception {
         try (Database db = create(fileFormat)) {
             assertEquals(0, db.getTableNames().size());
@@ -170,7 +171,7 @@ class DatabaseTest extends AbstractBaseTest {
     }
 
     @ParameterizedTest(name = "[{index}] {0}")
-    @MethodSource("io.github.spannm.jackcess.test.TestDB#getSupportedFileformats()")
+    @MethodSource("io.github.spannm.jackcess.test.TestDbs#getFileformats()")
     void testDeleteCurrentRow(FileFormat fileFormat) throws Exception {
         // make sure correct row is deleted
         Database db = createMem(fileFormat);
@@ -238,7 +239,7 @@ class DatabaseTest extends AbstractBaseTest {
     }
 
     @ParameterizedTest(name = "[{index}] {0}")
-    @MethodSource("io.github.spannm.jackcess.test.TestDB#getSupportedFileformats()")
+    @MethodSource("io.github.spannm.jackcess.test.TestDbs#getFileformats()")
     void testDeleteRow(FileFormat fileFormat) throws Exception {
         // make sure correct row is deleted
         try (
@@ -285,7 +286,7 @@ class DatabaseTest extends AbstractBaseTest {
 
     @Test
     void testReadWithDeletedCols() throws Exception {
-        for (TestDB testDB : TestDB.getSupportedTestDbsReadOnly(Basename.DEL_COL)) {
+        for (TestDb testDB : TestDbs.getReadOnlyDbs(Basename.DEL_COL)) {
             try (Database db = testDB.open()) {
                 Table table = db.getTable("Table1");
 
@@ -318,7 +319,7 @@ class DatabaseTest extends AbstractBaseTest {
     }
 
     @ParameterizedTest(name = "[{index}] {0}")
-    @MethodSource("io.github.spannm.jackcess.test.TestDB#getSupportedFileformats()")
+    @MethodSource("io.github.spannm.jackcess.test.TestDbs#getFileformats()")
     void testCurrency(FileFormat fileFormat) throws Exception {
         try (Database db = create(fileFormat)) {
             Table table = DatabaseBuilder.newTable("test")
@@ -353,7 +354,7 @@ class DatabaseTest extends AbstractBaseTest {
     }
 
     @ParameterizedTest(name = "[{index}] {0}")
-    @MethodSource("io.github.spannm.jackcess.test.TestDB#getSupportedFileformats()")
+    @MethodSource("io.github.spannm.jackcess.test.TestDbs#getFileformats()")
     void testGUID(FileFormat fileFormat) throws Exception {
         Database db = create(fileFormat);
 
@@ -392,7 +393,7 @@ class DatabaseTest extends AbstractBaseTest {
     }
 
     @ParameterizedTest(name = "[{index}] {0}")
-    @MethodSource("io.github.spannm.jackcess.test.TestDB#getSupportedFileformats()")
+    @MethodSource("io.github.spannm.jackcess.test.TestDbs#getFileformats()")
     void testNumeric(FileFormat fileFormat) throws Exception {
         Database db = create(fileFormat);
 
@@ -443,7 +444,7 @@ class DatabaseTest extends AbstractBaseTest {
 
     @Test
     void testFixedNumeric() throws Exception {
-        for (TestDB testDB : TestDB.getSupportedTestDbs(Basename.FIXED_NUMERIC)) {
+        for (TestDb testDB : TestDbs.getDbs(Basename.FIXED_NUMERIC)) {
             try (Database db = testDB.openCopy()) {
                 Table t = db.getTable("test");
 
@@ -487,7 +488,7 @@ class DatabaseTest extends AbstractBaseTest {
 
     @Test
     void testMultiPageTableDef() throws Exception {
-        for (TestDB testDB : TestDB.getSupportedTestDbsReadOnly()) {
+        for (TestDb testDB : TestDbs.getReadOnlyDbs()) {
             try (Database db = testDB.open()) {
                 List<? extends Column> columns = db.getTable("Table2").getColumns();
                 assertEquals(89, columns.size());
@@ -497,7 +498,7 @@ class DatabaseTest extends AbstractBaseTest {
 
     @Test
     void testOverflow() throws Exception {
-        for (TestDB testDB : TestDB.getSupportedTestDbsReadOnly(Basename.OVERFLOW)) {
+        for (TestDb testDB : TestDbs.getReadOnlyDbs(Basename.OVERFLOW)) {
             try (Database db = testDB.open()) {
                 Table table = db.getTable("Table1");
 
@@ -523,7 +524,7 @@ class DatabaseTest extends AbstractBaseTest {
 
     @Test
     void testUsageMapPromotion() throws Exception {
-        for (TestDB testDB : TestDB.getSupportedTestDbs(Basename.PROMOTION)) {
+        for (TestDb testDB : TestDbs.getDbs(Basename.PROMOTION)) {
             try (Database db = testDB.openMem()) {
                 Table t = db.getTable("jobDB1");
 
@@ -553,7 +554,7 @@ class DatabaseTest extends AbstractBaseTest {
     }
 
     @ParameterizedTest(name = "[{index}] {0}")
-    @MethodSource("io.github.spannm.jackcess.test.TestDB#getSupportedFileformats()")
+    @MethodSource("io.github.spannm.jackcess.test.TestDbs#getFileformats()")
     void testLargeTableDef(FileFormat fileFormat) throws Exception {
         Database db = create(fileFormat);
 
@@ -586,7 +587,7 @@ class DatabaseTest extends AbstractBaseTest {
     }
 
     @ParameterizedTest(name = "[{index}] {0}")
-    @MethodSource("io.github.spannm.jackcess.test.TestDB#getSupportedFileformats()")
+    @MethodSource("io.github.spannm.jackcess.test.TestDbs#getFileformats()")
     void testWriteAndReadDate(FileFormat fileFormat) throws Exception {
         try (Database db = createMem(fileFormat)) {
             db.setDateTimeType(DateTimeType.DATE);
@@ -645,7 +646,7 @@ class DatabaseTest extends AbstractBaseTest {
     }
 
     @ParameterizedTest(name = "[{index}] {0}")
-    @MethodSource("io.github.spannm.jackcess.test.TestDB#getSupportedFileformats()")
+    @MethodSource("io.github.spannm.jackcess.test.TestDbs#getFileformats()")
     void testAncientDatesWrite(FileFormat fileFormat) throws Exception {
         SimpleDateFormat sdf = DatabaseBuilder.createDateFormat("yyyy-MM-dd");
 
@@ -683,7 +684,7 @@ class DatabaseTest extends AbstractBaseTest {
         List<String> dates = List.of("1582-10-15", "1582-10-14",
             "1492-01-10", "1392-01-10");
 
-        for (TestDB testDB : TestDB.getSupportedTestDbs(Basename.OLD_DATES)) {
+        for (TestDb testDB : TestDbs.getDbs(Basename.OLD_DATES)) {
             try (Database db = testDB.openCopy()) {
                 db.setTimeZone(tz); // explicitly set database time zone
                 db.setDateTimeType(DateTimeType.DATE);
@@ -702,7 +703,7 @@ class DatabaseTest extends AbstractBaseTest {
     }
 
     @ParameterizedTest(name = "[{index}] {0}")
-    @MethodSource("io.github.spannm.jackcess.test.TestDB#getSupportedFileformats()")
+    @MethodSource("io.github.spannm.jackcess.test.TestDbs#getFileformats()")
     void testSystemTable(FileFormat fileFormat) throws Exception {
         Database db = create(fileFormat);
 
@@ -752,7 +753,7 @@ class DatabaseTest extends AbstractBaseTest {
 
     @Test
     void testFixedText() throws Exception {
-        for (TestDB testDB : TestDB.getSupportedTestDbs(Basename.FIXED_TEXT)) {
+        for (TestDb testDB : TestDbs.getDbs(Basename.FIXED_TEXT)) {
             try (Database db = testDB.openCopy()) {
                 Table t = db.getTable("users");
                 Column c = t.getColumn("c_flag_");
@@ -777,7 +778,7 @@ class DatabaseTest extends AbstractBaseTest {
     @Test
     void testDbSortOrder() throws Exception {
 
-        for (TestDB testDB : TestDB.getSupportedTestDbsReadOnly()) {
+        for (TestDb testDB : TestDbs.getReadOnlyDbs()) {
 
             try (Database db = testDB.open()) {
                 assertEquals(((DatabaseImpl) db).getFormat().DEFAULT_SORT_ORDER,
@@ -788,7 +789,7 @@ class DatabaseTest extends AbstractBaseTest {
 
     @Test
     void testUnsupportedColumns() throws Exception {
-        for (TestDB testDB : TestDB.getSupportedTestDbs(Basename.UNSUPPORTED)) {
+        for (TestDb testDB : TestDbs.getDbs(Basename.UNSUPPORTED)) {
 
             try (Database db = testDB.open()) {
                 Table t = db.getTable("Test");
@@ -882,7 +883,7 @@ class DatabaseTest extends AbstractBaseTest {
 
     @Test
     void testIterateTableNames() throws Exception {
-        for (TestDB testDB : TestDB.getSupportedTestDbsReadOnly()) {
+        for (TestDb testDB : TestDbs.getReadOnlyDbs()) {
             try (Database db = testDB.open()) {
                 Set<String> names = new HashSet<>();
                 int sysCount = 0;
@@ -902,7 +903,7 @@ class DatabaseTest extends AbstractBaseTest {
             }
         }
 
-        for (TestDB testDB : TestDB.getSupportedTestDbs(Basename.LINKED)) {
+        for (TestDb testDB : TestDbs.getDbs(Basename.LINKED)) {
             try (Database db = testDB.open()) {
                 Set<String> names = new HashSet<>();
                 for (TableMetaData tmd : db.newTableMetaDataIterable()) {
@@ -928,7 +929,7 @@ class DatabaseTest extends AbstractBaseTest {
 
     @Test
     void testTableDates() throws Exception {
-        for (TestDB testDB : TestDB.getSupportedTestDbsReadOnly()) {
+        for (TestDb testDB : TestDbs.getReadOnlyDbs()) {
             try (Database db = testDB.open()) {
                 Table table = db.getTable("Table1");
                 String expectedCreateDate = null;
@@ -948,7 +949,7 @@ class DatabaseTest extends AbstractBaseTest {
 
     @Test
     void testBrokenIndex() throws Exception {
-        TestDB testDb = TestDB.getSupportedTestDbs(Basename.TEST).get(0);
+        TestDb testDb = TestDbs.getDbs(Basename.TEST).get(0);
         try (Database db = new DatabaseBuilder(testDb.getFile())
             .withReadOnly(true).withIgnoreBrokenSystemCatalogIndex(true).open()) {
             Table test = db.getTable("Table1");

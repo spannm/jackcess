@@ -24,7 +24,8 @@ import io.github.spannm.jackcess.impl.query.QueryImpl;
 import io.github.spannm.jackcess.impl.query.QueryImpl.Row;
 import io.github.spannm.jackcess.test.AbstractBaseTest;
 import io.github.spannm.jackcess.test.Basename;
-import io.github.spannm.jackcess.test.TestDB;
+import io.github.spannm.jackcess.test.TestDb;
+import io.github.spannm.jackcess.test.TestDbs;
 import org.junit.jupiter.api.Test;
 
 import java.util.*;
@@ -181,7 +182,7 @@ class QueryTest extends AbstractBaseTest {
 
     @Test
     void testReadQueries() throws Exception {
-        for (TestDB testDB : TestDB.getSupportedTestDbsReadOnly(Basename.QUERY)) {
+        for (TestDb testDB : TestDbs.getReadOnlyDbs(Basename.QUERY)) {
             Map<String, String> expectedQueries = new HashMap<>();
             expectedQueries.put(
                 "SelectQuery", multiline(

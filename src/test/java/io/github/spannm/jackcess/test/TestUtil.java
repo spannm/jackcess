@@ -370,7 +370,7 @@ public final class TestUtil extends Assertions {
         }
     }
 
-    public static void checkTestDBTable1RowABCDEFG(TestDB testDB, Table table, Row row) {
+    public static void checkTestDBTable1RowABCDEFG(TestDb testDB, Table table, Row row) {
         assertEquals("abcdefg", row.get("A"), "testDB: " + testDB + "; table: " + table);
         assertEquals("hijklmnop", row.get("B"));
         assertEquals((byte) 2, row.get("C"));
@@ -389,7 +389,7 @@ public final class TestUtil extends Assertions {
         assertEquals(Boolean.TRUE, row.get("I"));
     }
 
-    public static void checkTestDBTable1RowA(TestDB testDB, Table table, Row row) {
+    public static void checkTestDBTable1RowA(TestDb testDB, Table table, Row row) {
         assertEquals("a", row.get("A"), "testDB: " + testDB + "; table: " + table);
         assertEquals("b", row.get("B"));
         assertEquals((byte) 0, row.get("C"));

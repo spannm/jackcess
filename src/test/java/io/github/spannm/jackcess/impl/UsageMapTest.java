@@ -6,7 +6,7 @@ import static io.github.spannm.jackcess.test.TestUtil.openCopy;
 import io.github.spannm.jackcess.*;
 import io.github.spannm.jackcess.Database.FileFormat;
 import io.github.spannm.jackcess.test.AbstractBaseTest;
-import io.github.spannm.jackcess.test.TestDB;
+import io.github.spannm.jackcess.test.TestDb;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
@@ -21,8 +21,8 @@ import java.util.List;
 public class UsageMapTest extends AbstractBaseTest {
 
     @ParameterizedTest(name = "[{index}] {0}")
-    @MethodSource("io.github.spannm.jackcess.test.TestDB#getSupportedTestDbs()")
-    void testRead(TestDB testDB) throws Exception {
+    @MethodSource("io.github.spannm.jackcess.test.TestDbs#getDbs()")
+    void testRead(TestDb testDB) throws Exception {
         int expectedFirstPage;
         int expectedLastPage;
         FileFormat expectedFileFormat = testDB.getExpectedFileFormat();

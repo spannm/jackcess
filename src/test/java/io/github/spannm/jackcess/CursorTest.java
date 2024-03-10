@@ -24,7 +24,8 @@ import io.github.spannm.jackcess.impl.RowIdImpl;
 import io.github.spannm.jackcess.impl.TableImpl;
 import io.github.spannm.jackcess.test.AbstractBaseTest;
 import io.github.spannm.jackcess.test.Basename;
-import io.github.spannm.jackcess.test.TestDB;
+import io.github.spannm.jackcess.test.TestDb;
+import io.github.spannm.jackcess.test.TestDbs;
 import io.github.spannm.jackcess.util.CaseInsensitiveColumnMatcher;
 import io.github.spannm.jackcess.util.ColumnMatcher;
 import io.github.spannm.jackcess.util.SimpleColumnMatcher;
@@ -43,7 +44,7 @@ import java.util.stream.Collectors;
  */
 class CursorTest extends AbstractBaseTest {
 
-    static final List<TestDB> INDEX_CURSOR_DBS = TestDB.getSupportedTestDbs(Basename.INDEX_CURSOR);
+    static final List<TestDb> INDEX_CURSOR_DBS = TestDbs.getDbs(Basename.INDEX_CURSOR);
 
     @BeforeEach
     void setUp() {
@@ -96,7 +97,7 @@ class CursorTest extends AbstractBaseTest {
         return expectedRows;
     }
 
-    static Database createTestIndexTable(TestDB indexCursorDB) throws Exception {
+    static Database createTestIndexTable(TestDb indexCursorDB) throws Exception {
         Database db = indexCursorDB.openMem();
 
         Table table = db.getTable("test");
@@ -136,7 +137,7 @@ class CursorTest extends AbstractBaseTest {
         return db;
     }
 
-    static Database createDupeTestTable(TestDB indexCursorDB) throws Exception {
+    static Database createDupeTestTable(TestDb indexCursorDB) throws Exception {
         Database db = indexCursorDB.openMem();
 
         Table table = db.getTable("test");
@@ -178,7 +179,7 @@ class CursorTest extends AbstractBaseTest {
     }
 
     @ParameterizedTest(name = "[{index}] {0}")
-    @MethodSource("io.github.spannm.jackcess.test.TestDB#getSupportedFileformats()")
+    @MethodSource("io.github.spannm.jackcess.test.TestDbs#getFileformats()")
     void testSimple(FileFormat fileFormat) throws Exception {
         try (Database db = createTestTable(fileFormat)) {
             Table table = db.getTable("test");
@@ -202,7 +203,7 @@ class CursorTest extends AbstractBaseTest {
     }
 
     @ParameterizedTest(name = "[{index}] {0}")
-    @MethodSource("io.github.spannm.jackcess.test.TestDB#getSupportedFileformats()")
+    @MethodSource("io.github.spannm.jackcess.test.TestDbs#getFileformats()")
     void testMove(FileFormat fileFormat) throws Exception {
         try (Database db = createTestTable(fileFormat)) {
             Table table = db.getTable("test");
@@ -257,7 +258,7 @@ class CursorTest extends AbstractBaseTest {
     }
 
     @ParameterizedTest(name = "[{index}] {0}")
-    @MethodSource("io.github.spannm.jackcess.test.TestDB#getSupportedFileformats()")
+    @MethodSource("io.github.spannm.jackcess.test.TestDbs#getFileformats()")
     void testMoveNoReset(FileFormat fileFormat) throws Exception {
         try (Database db = createTestTable(fileFormat)) {
             Table table = db.getTable("test");
@@ -296,7 +297,7 @@ class CursorTest extends AbstractBaseTest {
     }
 
     @ParameterizedTest(name = "[{index}] {0}")
-    @MethodSource("io.github.spannm.jackcess.test.TestDB#getSupportedFileformats()")
+    @MethodSource("io.github.spannm.jackcess.test.TestDbs#getFileformats()")
     void testSearch(FileFormat fileFormat) throws Exception {
         try (Database db = createTestTable(fileFormat)) {
             Table table = db.getTable("test");
@@ -375,7 +376,7 @@ class CursorTest extends AbstractBaseTest {
     }
 
     @ParameterizedTest(name = "[{index}] {0}")
-    @MethodSource("io.github.spannm.jackcess.test.TestDB#getSupportedFileformats()")
+    @MethodSource("io.github.spannm.jackcess.test.TestDbs#getFileformats()")
     void testReverse(FileFormat fileFormat) throws Exception {
         try (Database db = createTestTable(fileFormat)) {
             Table table = db.getTable("test");
@@ -398,7 +399,7 @@ class CursorTest extends AbstractBaseTest {
     }
 
     @ParameterizedTest(name = "[{index}] {0}")
-    @MethodSource("io.github.spannm.jackcess.test.TestDB#getSupportedFileformats()")
+    @MethodSource("io.github.spannm.jackcess.test.TestDbs#getFileformats()")
     void testLiveAddition(FileFormat fileFormat) throws Exception {
         try (Database db = createTestTable(fileFormat)) {
             Table table = db.getTable("test");
@@ -435,7 +436,7 @@ class CursorTest extends AbstractBaseTest {
     }
 
     @ParameterizedTest(name = "[{index}] {0}")
-    @MethodSource("io.github.spannm.jackcess.test.TestDB#getSupportedFileformats()")
+    @MethodSource("io.github.spannm.jackcess.test.TestDbs#getFileformats()")
     void testLiveDeletion(FileFormat fileFormat) throws Exception {
         try (Database db = createTestTable(fileFormat)) {
             Table table = db.getTable("test");
@@ -518,7 +519,7 @@ class CursorTest extends AbstractBaseTest {
 
     @Test
     void testSimpleIndex() throws Exception {
-        for (TestDB indexCursorDB : INDEX_CURSOR_DBS) {
+        for (TestDb indexCursorDB : INDEX_CURSOR_DBS) {
             try (Database db = createTestIndexTable(indexCursorDB)) {
                 Table table = db.getTable("test");
                 Index idx = table.getIndexes().get(0);
@@ -533,7 +534,7 @@ class CursorTest extends AbstractBaseTest {
 
     @Test
     void testMoveIndex() throws Exception {
-        for (TestDB indexCursorDB : INDEX_CURSOR_DBS) {
+        for (TestDb indexCursorDB : INDEX_CURSOR_DBS) {
             try (Database db = createTestIndexTable(indexCursorDB)) {
                 Table table = db.getTable("test");
                 Index idx = table.getIndexes().get(0);
@@ -545,7 +546,7 @@ class CursorTest extends AbstractBaseTest {
 
     @Test
     void testReverseIndex() throws Exception {
-        for (TestDB indexCursorDB : INDEX_CURSOR_DBS) {
+        for (TestDb indexCursorDB : INDEX_CURSOR_DBS) {
             try (Database db = createTestIndexTable(indexCursorDB)) {
                 Table table = db.getTable("test");
                 Index idx = table.getIndexes().get(0);
@@ -557,7 +558,7 @@ class CursorTest extends AbstractBaseTest {
 
     @Test
     void testSearchIndex() throws Exception {
-        for (TestDB indexCursorDB : INDEX_CURSOR_DBS) {
+        for (TestDb indexCursorDB : INDEX_CURSOR_DBS) {
             try (Database db = createTestIndexTable(indexCursorDB)) {
                 Table table = db.getTable("test");
                 Index idx = table.getIndexes().get(0);
@@ -569,7 +570,7 @@ class CursorTest extends AbstractBaseTest {
 
     @Test
     void testLiveAdditionIndex() throws Exception {
-        for (TestDB indexCursorDB : INDEX_CURSOR_DBS) {
+        for (TestDb indexCursorDB : INDEX_CURSOR_DBS) {
             try (Database db = createTestIndexTable(indexCursorDB)) {
                 Table table = db.getTable("test");
                 Index idx = table.getIndexes().get(0);
@@ -583,7 +584,7 @@ class CursorTest extends AbstractBaseTest {
 
     @Test
     void testLiveDeletionIndex() throws Exception {
-        for (TestDB indexCursorDB : INDEX_CURSOR_DBS) {
+        for (TestDb indexCursorDB : INDEX_CURSOR_DBS) {
             try (Database db = createTestIndexTable(indexCursorDB)) {
                 Table table = db.getTable("test");
                 Index idx = table.getIndexes().get(0);
@@ -599,7 +600,7 @@ class CursorTest extends AbstractBaseTest {
 
     @Test
     void testSimpleIndexSubRange() throws Exception {
-        for (TestDB indexCursorDB : INDEX_CURSOR_DBS) {
+        for (TestDb indexCursorDB : INDEX_CURSOR_DBS) {
             for (int i = 0; i < 2; i++) {
                 try (Database db = createTestIndexTable(indexCursorDB)) {
                     Table table = db.getTable("test");
@@ -618,7 +619,7 @@ class CursorTest extends AbstractBaseTest {
 
     @Test
     void testMoveIndexSubRange() throws Exception {
-        for (TestDB indexCursorDB : INDEX_CURSOR_DBS) {
+        for (TestDb indexCursorDB : INDEX_CURSOR_DBS) {
             for (int i = 0; i < 2; i++) {
                 try (Database db = createTestIndexTable(indexCursorDB)) {
                     Table table = db.getTable("test");
@@ -637,7 +638,7 @@ class CursorTest extends AbstractBaseTest {
 
     @Test
     void testSearchIndexSubRange() throws Exception {
-        for (TestDB indexCursorDB : INDEX_CURSOR_DBS) {
+        for (TestDb indexCursorDB : INDEX_CURSOR_DBS) {
             for (int i = 0; i < 2; i++) {
                 try (Database db = createTestIndexTable(indexCursorDB)) {
                     Table table = db.getTable("test");
@@ -653,7 +654,7 @@ class CursorTest extends AbstractBaseTest {
 
     @Test
     void testReverseIndexSubRange() throws Exception {
-        for (TestDB indexCursorDB : INDEX_CURSOR_DBS) {
+        for (TestDb indexCursorDB : INDEX_CURSOR_DBS) {
             for (int i = 0; i < 2; i++) {
                 try (Database db = createTestIndexTable(indexCursorDB)) {
                     Table table = db.getTable("test");
@@ -672,7 +673,7 @@ class CursorTest extends AbstractBaseTest {
 
     @Test
     void testLiveAdditionIndexSubRange() throws Exception {
-        for (TestDB indexCursorDB : INDEX_CURSOR_DBS) {
+        for (TestDb indexCursorDB : INDEX_CURSOR_DBS) {
             for (int i = 0; i < 2; i++) {
                 try (Database db = createTestIndexTable(indexCursorDB)) {
                     Table table = db.getTable("test");
@@ -689,7 +690,7 @@ class CursorTest extends AbstractBaseTest {
 
     @Test
     void testLiveDeletionIndexSubRange() throws Exception {
-        for (TestDB indexCursorDB : INDEX_CURSOR_DBS) {
+        for (TestDb indexCursorDB : INDEX_CURSOR_DBS) {
             for (int i = 0; i < 2; i++) {
                 try (Database db = createTestIndexTable(indexCursorDB)) {
                     Table table = db.getTable("test");
@@ -707,7 +708,7 @@ class CursorTest extends AbstractBaseTest {
     }
 
     @ParameterizedTest(name = "[{index}] {0}")
-    @MethodSource("io.github.spannm.jackcess.test.TestDB#getSupportedFileformats()")
+    @MethodSource("io.github.spannm.jackcess.test.TestDbs#getFileformats()")
     void testFindAllIndex(FileFormat fileFormat) throws Exception {
         try (Database db = createDupeTestTable(fileFormat)) {
             Table table = db.getTable("test");
@@ -719,7 +720,7 @@ class CursorTest extends AbstractBaseTest {
 
     @Test
     void testFindAll() throws Exception {
-        for (TestDB indexCursorDB : INDEX_CURSOR_DBS) {
+        for (TestDb indexCursorDB : INDEX_CURSOR_DBS) {
             try (Database db = createDupeTestTable(indexCursorDB)) {
                 Table table = db.getTable("test");
                 Index idx = table.getIndexes().get(0);
@@ -827,7 +828,7 @@ class CursorTest extends AbstractBaseTest {
 
     @Test
     void testId() throws Exception {
-        for (TestDB indexCursorDB : INDEX_CURSOR_DBS) {
+        for (TestDb indexCursorDB : INDEX_CURSOR_DBS) {
             Database db = createTestIndexTable(indexCursorDB);
 
             Table table = db.getTable("test");
@@ -867,7 +868,7 @@ class CursorTest extends AbstractBaseTest {
     }
 
     @ParameterizedTest(name = "[{index}] {0}")
-    @MethodSource("io.github.spannm.jackcess.test.TestDB#getSupportedFileformats()")
+    @MethodSource("io.github.spannm.jackcess.test.TestDbs#getFileformats()")
     void testColumnMatcher(FileFormat fileFormat) throws Exception {
         try (Database db = createTestTable(fileFormat)) {
             Table table = db.getTable("test");
@@ -976,7 +977,7 @@ class CursorTest extends AbstractBaseTest {
 
     @Test
     void testIndexCursor() throws Exception {
-        for (TestDB testDB : TestDB.getSupportedTestDbsReadOnly(Basename.INDEX)) {
+        for (TestDb testDB : TestDbs.getReadOnlyDbs(Basename.INDEX)) {
 
             try (Database db = testDB.openMem()) {
                 Table t1 = db.getTable("Table1");
@@ -1002,7 +1003,7 @@ class CursorTest extends AbstractBaseTest {
 
     @Test
     void testIndexCursorDelete() throws Exception {
-        for (TestDB testDB : TestDB.getSupportedTestDbs(Basename.INDEX)) {
+        for (TestDb testDB : TestDbs.getDbs(Basename.INDEX)) {
 
             Database db = testDB.openMem();
             Table t1 = db.getTable("Table1");
@@ -1054,7 +1055,7 @@ class CursorTest extends AbstractBaseTest {
 
     @Test
     void testCursorDelete() throws Exception {
-        for (TestDB testDB : TestDB.getSupportedTestDbs(Basename.INDEX)) {
+        for (TestDb testDB : TestDbs.getDbs(Basename.INDEX)) {
 
             try (Database db = testDB.openMem()) {
                 Table t1 = db.getTable("Table1");
@@ -1108,7 +1109,7 @@ class CursorTest extends AbstractBaseTest {
     }
 
     @ParameterizedTest(name = "[{index}] {0}")
-    @MethodSource("io.github.spannm.jackcess.test.TestDB#getSupportedFileformats()")
+    @MethodSource("io.github.spannm.jackcess.test.TestDbs#getFileformats()")
     void testFindByRowId(FileFormat fileFormat) throws Exception {
         try (Database db = createTestTable(fileFormat)) {
             Table table = db.getTable("test");
@@ -1119,7 +1120,7 @@ class CursorTest extends AbstractBaseTest {
 
     @Test
     void testFindByRowIdIndex() throws Exception {
-        for (TestDB indexCursorDB : INDEX_CURSOR_DBS) {
+        for (TestDb indexCursorDB : INDEX_CURSOR_DBS) {
             try (Database db = createTestIndexTable(indexCursorDB)) {
                 Table table = db.getTable("test");
                 Index idx = table.getIndexes().get(0);
@@ -1172,7 +1173,7 @@ class CursorTest extends AbstractBaseTest {
     }
 
     @ParameterizedTest(name = "[{index}] {0}")
-    @MethodSource("io.github.spannm.jackcess.test.TestDB#getSupportedFileformats()")
+    @MethodSource("io.github.spannm.jackcess.test.TestDbs#getFileformats()")
     void testIterationEarlyExit(FileFormat fileFormat) throws Exception {
         try (Database db = createMem(fileFormat)) {
             Table table = DatabaseBuilder.newTable("test")
@@ -1225,7 +1226,7 @@ class CursorTest extends AbstractBaseTest {
     }
 
     @ParameterizedTest(name = "[{index}] {0}")
-    @MethodSource("io.github.spannm.jackcess.test.TestDB#getSupportedFileformats()")
+    @MethodSource("io.github.spannm.jackcess.test.TestDbs#getFileformats()")
     void testPartialIndexFind(FileFormat fileFormat) throws Exception {
         try (Database db = createMem(fileFormat)) {
             TableImpl t = (TableImpl) DatabaseBuilder.newTable("Test").addColumn(DatabaseBuilder.newColumn("id", DataType.LONG)).addColumn(DatabaseBuilder.newColumn("data1", DataType.TEXT))
@@ -1277,7 +1278,7 @@ class CursorTest extends AbstractBaseTest {
     }
 
     @ParameterizedTest(name = "[{index}] {0}")
-    @MethodSource("io.github.spannm.jackcess.test.TestDB#getSupportedFileformats()")
+    @MethodSource("io.github.spannm.jackcess.test.TestDbs#getFileformats()")
     void testPartialIndexLookup(FileFormat fileFormat) throws Exception {
         try (Database db = createMem(fileFormat)) {
             TableImpl t = (TableImpl) DatabaseBuilder.newTable("Test")

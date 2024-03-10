@@ -25,7 +25,8 @@ import io.github.spannm.jackcess.Table;
 import io.github.spannm.jackcess.impl.RowImpl;
 import io.github.spannm.jackcess.test.AbstractBaseTest;
 import io.github.spannm.jackcess.test.Basename;
-import io.github.spannm.jackcess.test.TestDB;
+import io.github.spannm.jackcess.test.TestDb;
+import io.github.spannm.jackcess.test.TestDbs;
 import org.junit.jupiter.api.Test;
 
 import java.util.*;
@@ -39,7 +40,7 @@ class JoinerTest extends AbstractBaseTest {
 
     @Test
     void testJoiner() throws Exception {
-        for (TestDB testDB : TestDB.getSupportedTestDbs(Basename.INDEX)) {
+        for (TestDb testDB : TestDbs.getDbs(Basename.INDEX)) {
 
             try (Database db = testDB.openCopy()) {
                 Table t1 = db.getTable("Table1");

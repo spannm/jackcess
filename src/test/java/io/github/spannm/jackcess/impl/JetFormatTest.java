@@ -6,7 +6,8 @@ import io.github.spannm.jackcess.Database.FileFormat;
 import io.github.spannm.jackcess.JackcessException;
 import io.github.spannm.jackcess.PropertyMap;
 import io.github.spannm.jackcess.test.AbstractBaseTest;
-import io.github.spannm.jackcess.test.TestDB;
+import io.github.spannm.jackcess.test.TestDb;
+import io.github.spannm.jackcess.test.TestDbs;
 import io.github.spannm.jackcess.test.TestUtil;
 import org.junit.jupiter.api.Test;
 
@@ -29,7 +30,7 @@ class JetFormatTest extends AbstractBaseTest {
             // success
         }
 
-        for (TestDB testDB : TestDB.getSupportedTestDbsReadOnly()) {
+        for (TestDb testDB : TestDbs.getReadOnlyDbs()) {
 
             try (FileChannel channel = DatabaseImpl.openChannel(
                     testDB.getFile().toPath(), false, false)) {
@@ -44,7 +45,7 @@ class JetFormatTest extends AbstractBaseTest {
     @Test
     void testReadOnlyFormat() {
 
-        for (TestDB testDB : TestDB.getSupportedTestDbsReadOnly()) {
+        for (TestDb testDB : TestDbs.getReadOnlyDbs()) {
 
             Exception failure = null;
             try (Database db = testDB.openCopy()) {
@@ -70,7 +71,7 @@ class JetFormatTest extends AbstractBaseTest {
     @Test
     void testFileFormat() throws Exception {
 
-        for (TestDB testDB : TestDB.getSupportedTestDbsReadOnly()) {
+        for (TestDb testDB : TestDbs.getReadOnlyDbs()) {
 
             try (Database db = testDB.open()) {
                 assertEquals(testDB.getExpectedFileFormat(), db.getFileFormat());

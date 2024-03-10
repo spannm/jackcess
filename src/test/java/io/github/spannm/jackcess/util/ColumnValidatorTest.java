@@ -34,7 +34,7 @@ import java.util.Map;
 class ColumnValidatorTest extends AbstractBaseTest {
 
     @ParameterizedTest(name = "[{index}] {0}")
-    @MethodSource("io.github.spannm.jackcess.test.TestDB#getSupportedFileformats()")
+    @MethodSource("io.github.spannm.jackcess.test.TestDbs#getFileformats()")
     void testValidate(FileFormat fileFormat) throws Exception {
         try (Database db = create(fileFormat)) {
             ColumnValidatorFactory initFact = db.getColumnValidatorFactory();
