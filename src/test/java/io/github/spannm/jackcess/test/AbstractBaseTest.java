@@ -121,7 +121,7 @@ public abstract class AbstractBaseTest extends Assertions {
         return tmpDir;
     }
 
-    public static final File          DIR_TEST_DATA         = new File("src/test/data");
+    public static final File          DIR_TEST_DATA         = new File("src/test/resources", "data");
 
     /** Charset for access 97 databases. */
     static final Charset              A97_CHARSET           = Charset.forName("windows-1252");
