@@ -108,9 +108,9 @@ public @interface TestDbSource {
             if (optSrc.isEmpty()) {
                 return Stream.empty();
             }
-            TestDbSource testDbSource = optSrc.get();
-            Basename basename = Objects.requireNonNull(testDbSource.basename());
-            List<TestDb> dbs = testDbSource.readOnly() ? getReadOnlyDbs(basename) : getDbs(basename);
+            TestDbSource src = optSrc.get();
+            Basename basename = Objects.requireNonNull(src.basename());
+            List<TestDb> dbs = src.readOnly() ? getReadOnlyDbs(basename) : getDbs(basename);
             return dbs.stream().map(Arguments::of);
         }
 

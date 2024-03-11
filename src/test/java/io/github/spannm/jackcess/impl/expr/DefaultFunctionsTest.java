@@ -18,6 +18,7 @@ package io.github.spannm.jackcess.impl.expr;
 
 import io.github.spannm.jackcess.expr.EvalException;
 import io.github.spannm.jackcess.expr.Expression;
+import io.github.spannm.jackcess.impl.expr.DefaultFunctionsTest.CustomFormatSource.CustomFormatArgumentsProvider;
 import io.github.spannm.jackcess.impl.expr.ExpressionatorTest.TestContext;
 import io.github.spannm.jackcess.test.AbstractBaseTest;
 import io.github.spannm.jackcess.test.TestUtil;
@@ -912,24 +913,25 @@ class DefaultFunctionsTest extends AbstractBaseTest {
         String format();
 
         String[] testValues() default {};
+
+        static class CustomFormatArgumentsProvider implements ArgumentsProvider {
+            @Override
+            public Stream<Arguments> provideArguments(ExtensionContext context) {
+                return context.getElement().map(elem -> AnnotationSupport.findRepeatableAnnotations(elem, CustomFormatSource.class)).orElse(List.of()).stream()
+                    .flatMap(src -> IntStream.range(0, src.testValues().length).filter(i -> i % 2 == 0).mapToObj(i -> {
+                        String expected = src.testValues()[i];
+                        String val = src.testValues()[i + 1];
+                        return Arguments.of(val, src.format(), expected);
+                    }));
+            }
+        }
+
     }
 
     @Target(ElementType.METHOD)
     @Retention(RetentionPolicy.RUNTIME)
     @interface CustomFormatSources {
         CustomFormatSource[] value();
-    }
-
-    static class CustomFormatArgumentsProvider implements ArgumentsProvider {
-        @Override
-        public Stream<Arguments> provideArguments(ExtensionContext context) {
-            return context.getElement().map(elem -> AnnotationSupport.findRepeatableAnnotations(elem, CustomFormatSource.class)).orElse(List.of()).stream()
-                .flatMap(src -> IntStream.range(0, src.testValues().length).filter(i -> i % 2 == 0).mapToObj(i -> {
-                    String expected = src.testValues()[i];
-                    String val = src.testValues()[i + 1];
-                    return Arguments.of(val, src.format(), expected);
-                }));
-        }
     }
 
 }

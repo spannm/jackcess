@@ -22,7 +22,6 @@ import io.github.spannm.jackcess.impl.BaseEvalContext;
 import io.github.spannm.jackcess.test.AbstractBaseTest;
 import io.github.spannm.jackcess.test.TestUtil;
 import io.github.spannm.jackcess.test.converter.CsvToLocalDateTime;
-import io.github.spannm.jackcess.test.converter.CsvToStringArray;
 import io.github.spannm.jackcess.test.source.IntMatrixSource;
 import io.github.spannm.jackcess.test.source.IntRangeSource;
 import org.junit.jupiter.api.Test;
@@ -56,6 +55,39 @@ class ExpressionatorTest extends AbstractBaseTest {
             9.20456200d, 10.325d};
     }
 
+    @ParameterizedTest(name = "[{index}] {0}")
+    @ValueSource(strings = {
+        "+", "-", "*", "/", "\\", "^", "&", "Mod"
+    })
+    void testParseEBinaryOp(String op) {
+        String opName = "EBinaryOp";
+        validateExpr("\"A\" " + op + " \"B\"", "<" + opName + ">{<ELiteralValue>{\"A\"} " + op + " <ELiteralValue>{\"B\"}}");
+    }
+
+    @ParameterizedTest(name = "[{index}] {0}")
+    @ValueSource(strings = {
+        "<", "<=", ">", ">=", "=", "<>"
+    })
+    void testParseECompOp(String op) {
+        String opName = "ECompOp";
+        validateExpr("\"A\" " + op + " \"B\"", "<" + opName + ">{<ELiteralValue>{\"A\"} " + op + " <ELiteralValue>{\"B\"}}");
+    }
+
+    @ParameterizedTest(name = "[{index}] {0}")
+    @ValueSource(strings = {
+        "And", "Or", "Eqv", "Xor", "Imp"
+    })
+    void testParseELogicalOp(String op) {
+        String opName = "ELogicalOp";
+        validateExpr("\"A\" " + op + " \"B\"", "<" + opName + ">{<ELiteralValue>{\"A\"} " + op + " <ELiteralValue>{\"B\"}}");
+    }
+
+    @ParameterizedTest(name = "[{index}] {0}")
+    @ValueSource(strings = {"True", "False", "Null"})
+    void testParseEConstValue(String constStr) {
+        validateExpr(constStr, "<EConstValue>{" + constStr + "}");
+    }
+
     @ParameterizedTest(name = "[{index}] {0} --> {1}")
     @CsvSource(delimiter = ';', value = {
         "\"A\"; <ELiteralValue>{\"A\"}",
@@ -65,24 +97,6 @@ class ExpressionatorTest extends AbstractBaseTest {
     })
     void testParseSimpleExpr1(String exprStr, String debugStr) {
         validateExpr(exprStr, debugStr);
-    }
-
-    @ParameterizedTest(name = "[{index}] {0} --> {1}")
-    @CsvSource(delimiter = ';', value = {
-        "EBinaryOp; +, -, *, /, \\, ^, &, Mod",
-        "ECompOp; <, <=, >, >=, =, <>",
-        "ELogicalOp; And, Or, Eqv, Xor, Imp",
-    })
-    void testParseSimpleExpr2(String opName, @ConvertWith(CsvToStringArray.class) String... ops) {
-        for (String op : ops) {
-            validateExpr("\"A\" " + op + " \"B\"", "<" + opName + ">{<ELiteralValue>{\"A\"} " + op + " <ELiteralValue>{\"B\"}}");
-        }
-    }
-
-    @ParameterizedTest(name = "[{index}] {0}")
-    @ValueSource(strings = {"True", "False", "Null"})
-    void testParseSimpleExpr3(String constStr) {
-        validateExpr(constStr, "<EConstValue>{" + constStr + "}");
     }
 
     @ParameterizedTest(name = "[{index}] {0} --> {1}")
@@ -102,7 +116,7 @@ class ExpressionatorTest extends AbstractBaseTest {
         "' \"A\" '; <ELiteralValue>{\" \"\"A\"\" \"}; \" \"\"A\"\" \"",
         "<=1 And >=0; <ELogicalOp>{<ECompOp>{<EThisValue>{<THIS_COL>} <= <ELiteralValue>{1}} And <ECompOp>{<EThisValue>{<THIS_COL>} >= <ELiteralValue>{0}}}; <= 1 And >= 0",
     })
-    void testParseSimpleExpr4(String exprStr, String debugStr, String cleanStr) {
+    void testParseSimpleExpr2(String exprStr, String debugStr, String cleanStr) {
         validateExpr(exprStr, debugStr, Objects.requireNonNullElse(cleanStr, exprStr));
     }
 
@@ -154,25 +168,25 @@ class ExpressionatorTest extends AbstractBaseTest {
     @MethodSource("getDoublesTestData")
     void testSimpleMathExpressions4(double d1) {
         BigDecimal bd1 = toBD(d1);
-        for (double j : getDoublesTestData()) {
-            BigDecimal bd2 = toBD(j);
-            assertEquals(toBD(bd1.add(bd2)), eval(d1 + " + " + j));
-            assertEquals(toBD(bd1.subtract(bd2)), eval(d1 + " - " + j));
-            assertEquals(toBD(bd1.multiply(bd2)), eval(d1 + " * " + j));
-            if (roundToLongInt(j) == 0) {
-                evalFail(d1 + " \\ " + j, ArithmeticException.class);
+        for (double d : getDoublesTestData()) {
+            BigDecimal bd2 = toBD(d);
+            assertEquals(toBD(bd1.add(bd2)), eval(d1 + " + " + d));
+            assertEquals(toBD(bd1.subtract(bd2)), eval(d1 + " - " + d));
+            assertEquals(toBD(bd1.multiply(bd2)), eval(d1 + " * " + d));
+            if (roundToLongInt(d) == 0) {
+                evalFail(d1 + " \\ " + d, ArithmeticException.class);
             } else {
-                assertEquals(roundToLongInt(d1) / roundToLongInt(j), eval(d1 + " \\ " + j));
+                assertEquals(roundToLongInt(d1) / roundToLongInt(d), eval(d1 + " \\ " + d));
             }
-            if (roundToLongInt(j) == 0) {
-                evalFail(d1 + " Mod " + j, ArithmeticException.class);
+            if (roundToLongInt(d) == 0) {
+                evalFail(d1 + " Mod " + d, ArithmeticException.class);
             } else {
-                assertEquals(roundToLongInt(d1) % roundToLongInt(j), eval(d1 + " Mod " + j));
+                assertEquals(roundToLongInt(d1) % roundToLongInt(d), eval(d1 + " Mod " + d));
             }
-            if (j == 0.0d) {
-                evalFail(d1 + " / " + j, ArithmeticException.class);
+            if (d == 0.0d) {
+                evalFail(d1 + " / " + d, ArithmeticException.class);
             } else {
-                assertEquals(toBD(BuiltinOperators.divide(bd1, bd2)), eval(d1 + " / " + j));
+                assertEquals(toBD(BuiltinOperators.divide(bd1, bd2)), eval(d1 + " / " + d));
             }
         }
     }
