@@ -31,14 +31,13 @@ import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.junit.jupiter.params.provider.ValueSource;
 
-import java.io.BufferedReader;
-import java.io.FileReader;
 import java.math.BigDecimal;
 import java.text.DecimalFormat;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.Objects;
+import java.util.Optional;
 
 import javax.script.Bindings;
 import javax.script.SimpleBindings;
@@ -407,10 +406,101 @@ class ExpressionatorTest extends AbstractBaseTest {
         assertEquals(-28d, eval("CDbl(9)-37", Value.Type.DOUBLE));
     }
 
-    @Test
-    void testParseSomeExprs() throws Exception {
-        BufferedReader br = new BufferedReader(new FileReader("src/test/resources/test_exprs.txt"));
-
+    @ParameterizedTest(name = "[{index}] {0}, {1}, \"{2}\"")
+    @CsvSource(delimiter = ';', nullValues = {"null"}, quoteCharacter = '§', value = {
+        "DEFAULT_VALUE; SHORT_DATE_TIME; Now()",
+        "DEFAULT_VALUE; NUMERIC; 0",
+        "FIELD_VALIDATOR; DOUBLE; <=1 And >=0",
+        "FIELD_VALIDATOR; SHORT_DATE_TIME; >=#1/1/1900#",
+        "DEFAULT_VALUE; BOOLEAN; No",
+        "DEFAULT_VALUE; SHORT_DATE_TIME; Null",
+        "DEFAULT_VALUE; TEXT; NEW",
+        "DEFAULT_VALUE; LONG; 0.0",
+        "DEFAULT_VALUE; LONG; 1",
+        "DEFAULT_VALUE; DOUBLE; 1.0",
+        "DEFAULT_VALUE; LONG; 3",
+        "DEFAULT_VALUE; LONG; -1",
+        "DEFAULT_VALUE; GUID; GenGUID()",
+        "FIELD_VALIDATOR; TEXT; Like \"http://*\"",
+        "DEFAULT_VALUE; BOOLEAN; True",
+        "DEFAULT_VALUE; SHORT_DATE_TIME; Date()",
+        "DEFAULT_VALUE; TEXT; \"\"",
+        "DEFAULT_VALUE; BOOLEAN; False",
+        "DEFAULT_VALUE; LONG; 524287",
+        "DEFAULT_VALUE; LONG; 5",
+        "DEFAULT_VALUE; LONG; 10",
+        "DEFAULT_VALUE; TEXT; '        '",
+        "EXPRESSION; MONEY; [UnitPrice]*[Quantity]",
+        "DEFAULT_VALUE; TEXT; \"UTC\"",
+        "EXPRESSION; BIG_INT; [BigNum]+10",
+        "EXPRESSION; TEXT; IIf(IsNull([LastName]),IIf(IsNull([FirstName]),[Company],[FirstName]),IIf(IsNull([FirstName]),[LastName],[FirstName] & \" \" & [LastName]))",
+        "EXPRESSION; TEXT; IIf(IsNull([LastName]),IIf(IsNull([FirstName]),[Company],[FirstName]),IIf(IsNull([FirstName]),[LastName],[LastName] & \", \" & [FirstName]))",
+        "RECORD_VALIDATOR; null; Not IsNull([Email] & [FullName] & [Login])",
+        "DEFAULT_VALUE; DOUBLE; =0",
+        "EXPRESSION; DOUBLE; [InitialLevel]+[Received]-[Shipped]-[Waste]",
+        "EXPRESSION; DOUBLE; [OnHand]-[Allocated]",
+        "EXPRESSION; DOUBLE; [Available]+[OnOrder]-[BackOrdered]",
+        "EXPRESSION; DOUBLE; IIf([TargetLevel]-[CurrentLevel]>0,[TargetLevel]-[CurrentLevel],0)",
+        "EXPRESSION; DOUBLE; IIf([BelowTargetLevel]>0,IIf([BelowTargetLevel]<[MinimumReorderQuantity],[MinimumReorderQuantity],[BelowTargetLevel]),0)",
+        "EXPRESSION; MONEY; [SubTotal]+[Tax]+[Shipping]",
+        "EXPRESSION; MONEY; [UnitPrice]*[Quantity]*(1-[Discount])",
+        "DEFAULT_VALUE; TEXT; =\"None\"",
+        "EXPRESSION; BOOLEAN; ([StatusID]=10)",
+        "EXPRESSION; BOOLEAN; ([StatusID]>=30)",
+        "EXPRESSION; BOOLEAN; [StatusID]>=40",
+        "EXPRESSION; BOOLEAN; [StatusID]>50",
+        "EXPRESSION; BOOLEAN; ([StatusID]=20)",
+        "DEFAULT_VALUE; SHORT_DATE_TIME; =Date()",
+        "EXPRESSION; DOUBLE; Month([OrderDate])",
+        "EXPRESSION; DOUBLE; Year([OrderDate])",
+        "EXPRESSION; MONEY; [OrderSubTotal]+[Tax]+[ShippingFee]",
+        "EXPRESSION; DOUBLE; IIf([OrderMonth]<=3,1,IIf([OrderMonth]<=6,2,IIf([OrderMonth]<=9,3,4)))",
+        "EXPRESSION; BOOLEAN; ([StatusID]=0)",
+        "EXPRESSION; BOOLEAN; ([StatusID]=30) And (Not IsNull([ClosedDate]))",
+        "EXPRESSION; BOOLEAN; ([StatusID]>=20) And (Not IsNull([ShippedDate]))",
+        "EXPRESSION; BOOLEAN; ([StatusID]>=10)",
+        "EXPRESSION; BOOLEAN; Not [IsCompleted]",
+        "EXPRESSION; DOUBLE; [Quantity]*[UnitCost]",
+        "DEFAULT_VALUE; BOOLEAN; =False",
+        "EXPRESSION; MONEY; [OrderSubTotal]+[ShippingFee]+[Taxes]",
+        "EXPRESSION; BOOLEAN; Not IsNull([ClosedDate])",
+        "EXPRESSION; BOOLEAN; Not IsNull([SubmittedDate])",
+        "EXPRESSION; BOOLEAN; Not [IsSubmitted]",
+        "DEFAULT_VALUE; SHORT_DATE_TIME; =Now()",
+        "DEFAULT_VALUE; LONG; =Int(13)",
+        "FIELD_VALIDATOR; SHORT_DATE_TIME; <Date()",
+        "FIELD_VALIDATOR; MONEY; >=0",
+        "FIELD_VALIDATOR; INT; >0",
+        "FIELD_VALIDATOR; FLOAT; Between 0 And 1",
+        "DEFAULT_VALUE; BOOLEAN; =No",
+        "EXPRESSION; TEXT; [LastName] & \", \" & [FirstName]",
+        "EXPRESSION; LONG; Len([LastFirst])",
+        "EXPRESSION; MONEY; [Salary]/12",
+        "EXPRESSION; BOOLEAN; [Salary]>100000",
+        "EXPRESSION; MEMO; [LastName] & \", \" & [FirstName] & \"=\" & [LastFirst]",
+        "EXPRESSION; NUMERIC; [Salary]/52",
+        "EXPRESSION; MONEY; [Salary]",
+        "EXPRESSION; BOOLEAN; True",
+        "EXPRESSION; NUMERIC; [Popularity]",
+        "EXPRESSION; FLOAT; [Salary]*0.13/[DecimalTest]",
+        "EXPRESSION; NUMERIC; ([Salary] * [MonthlySalary] / [DecimalTest]) * 34.12342134",
+        "DEFAULT_VALUE; COMPLEX_TYPE; \"data4\"",
+        "EXPRESSION; DOUBLE; NPer(1,2,3,4,5)",
+        "EXPRESSION; DOUBLE; [Time Field]",
+        "DEFAULT_VALUE; TEXT; =Rnd(25)",
+        "DEFAULT_VALUE; TEXT; =Rnd(13)",
+        "DEFAULT_VALUE; TEXT; =Rnd(-1)",
+        "DEFAULT_VALUE; TEXT; =Rnd(-2)",
+        "DEFAULT_VALUE; TEXT; =Rnd()",
+        "RECORD_VALIDATOR; null; [Field4]>10",
+        "EXPRESSION; DOUBLE; [Field6]+3",
+        "EXPRESSION; DOUBLE; [Table4].[Field1]+4",
+        "EXPRESSION; LONG; [Field5]+5",
+        "DEFAULT_VALUE; LONG; 134217727",
+        "DEFAULT_VALUE; TEXT; '+P-E'",
+        "FIELD_VALIDATOR; TEXT; Is Not Null"
+    })
+    void testParseSomeExprs(Expressionator.Type _type, DataType _dType, String _exprStr) throws Exception {
         TestContext tc = new TestContext() {
             @Override
             public Value getThisColumnValue() {
@@ -423,28 +513,11 @@ class ExpressionatorTest extends AbstractBaseTest {
             }
         };
 
-        String line = null;
-        while ((line = br.readLine()) != null) {
-            line = line.trim();
-            if (line.isEmpty()) {
-                continue;
-            }
+        Value.Type resultType = Optional.ofNullable(_dType).map(BaseEvalContext::toValueType).orElse(null);
 
-            String[] parts = line.split(";", 3);
-            Expressionator.Type type = Expressionator.Type.valueOf(parts[0]);
-            DataType dType =
-                "null".equals(parts[1]) ? null : DataType.valueOf(parts[1]);
-            String exprStr = parts[2];
+        Expression expr = Expressionator.parse(_type, _exprStr, resultType, tc);
 
-            Value.Type resultType = dType != null ? BaseEvalContext.toValueType(dType) : null;
-
-            Expression expr = Expressionator.parse(
-                type, exprStr, resultType, tc);
-
-            expr.eval(tc);
-        }
-
-        br.close();
+        expr.eval(tc);
     }
 
     @ParameterizedTest(name = "[{index}] {0} --> {1}")
