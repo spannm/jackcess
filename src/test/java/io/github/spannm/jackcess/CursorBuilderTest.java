@@ -51,13 +51,7 @@ class CursorBuilderTest extends AbstractBaseTest {
                 .toCursor();
             assertCursor(expected, found);
 
-            try {
-                table.newCursor()
-                    .withIndexByName("foo");
-                fail("IllegalArgumentException should have been thrown");
-            } catch (IllegalArgumentException ignored) {
-                // success
-            }
+            assertThrows(IllegalArgumentException.class, () -> table.newCursor().withIndexByName("foo"));
 
             expected = CursorBuilder.createCursor(idx);
             found = table.newCursor()
@@ -65,21 +59,11 @@ class CursorBuilderTest extends AbstractBaseTest {
                 .toCursor();
             assertCursor(expected, found);
 
-            try {
-                table.newCursor()
-                    .withIndexByColumns(table.getColumn("value"));
-                fail("IllegalArgumentException should have been thrown");
-            } catch (IllegalArgumentException ignored) {
-                // success
-            }
+            assertThrows(IllegalArgumentException.class, () -> table.newCursor()
+                .withIndexByColumns(table.getColumn("value")));
 
-            try {
-                table.newCursor()
-                    .withIndexByColumns(table.getColumn("id"), table.getColumn("value"));
-                fail("IllegalArgumentException should have been thrown");
-            } catch (IllegalArgumentException ignored) {
-                // success
-            }
+            assertThrows(IllegalArgumentException.class, () -> table.newCursor()
+                .withIndexByColumns(table.getColumn("id"), table.getColumn("value")));
 
             expected = CursorBuilder.createCursor(table);
             expected.beforeFirst();

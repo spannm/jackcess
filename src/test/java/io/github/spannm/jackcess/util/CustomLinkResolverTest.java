@@ -71,12 +71,7 @@ class CustomLinkResolverTest extends AbstractBaseTest {
 
             assertNull(db.getTable("Table4"));
 
-            try {
-                db.getTable("Table3");
-                fail("FileNotFoundException should have been thrown");
-            } catch (FileNotFoundException e) {
-                // success
-            }
+            assertThrows(FileNotFoundException.class, () -> db.getTable("Table3"));
         }
     }
 

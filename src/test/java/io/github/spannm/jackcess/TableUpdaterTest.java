@@ -120,7 +120,6 @@ class TableUpdaterTest extends AbstractBaseTest {
 
         ((DatabaseImpl) db).getPageChannel().startWrite();
         try {
-
             for (int i = 0; i < 10; i++) {
                 t1.addRow(i, "row" + i, "row-data" + i);
             }
@@ -133,16 +132,10 @@ class TableUpdaterTest extends AbstractBaseTest {
             ((DatabaseImpl) db).getPageChannel().finishWrite();
         }
 
-        try {
-            t2.addRow(10, "row10", "row-data10");
-            if (enforce) {
-                fail("ConstraintViolationException should have been thrown");
-            }
-        } catch (ConstraintViolationException cv) {
-            // success
-            if (!enforce) {
-                throw cv;
-            }
+        if (enforce) {
+            assertThrows(ConstraintViolationException.class, () -> t2.addRow(10, "row10", "row-data10"));
+        } else {
+            assertDoesNotThrow(() -> t2.addRow(10, "row10", "row-data10"));
         }
 
         Row r1 = CursorBuilder.findRowByPrimaryKey(t1, 5);

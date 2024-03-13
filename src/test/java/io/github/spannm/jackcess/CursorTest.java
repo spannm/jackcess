@@ -824,19 +824,9 @@ class CursorTest extends AbstractBaseTest {
             tCursor.restoreSavepoint(tSave);
             iCursor.restoreSavepoint(iSave);
 
-            try {
-                tCursor.restoreSavepoint(iSave);
-                fail("IllegalArgumentException should have been thrown");
-            } catch (IllegalArgumentException e) {
-                // success
-            }
+            assertThrows(IllegalArgumentException.class, () -> tCursor.restoreSavepoint(iSave));
 
-            try {
-                iCursor.restoreSavepoint(tSave);
-                fail("IllegalArgumentException should have been thrown");
-            } catch (IllegalArgumentException e) {
-                // success
-            }
+            assertThrows(IllegalArgumentException.class, () -> iCursor.restoreSavepoint(tSave));
 
             Cursor tCursor2 = CursorBuilder.createCursor(table);
             Cursor iCursor2 = CursorBuilder.createCursor(idx);
@@ -998,28 +988,17 @@ class CursorTest extends AbstractBaseTest {
                 cursor.newEntryIterable(1).iterator(); iter.hasNext();) {
                 expectedData.add(iter.next().getString("data"));
                 iter.remove();
-                try {
-                    iter.remove();
-                    fail("IllegalArgumentException should have been thrown");
-                } catch (IllegalStateException e) {
-                    // success
-                }
+                assertThrows(IllegalStateException.class, iter::remove);
 
                 if (!iter.hasNext()) {
-                    try {
-                        iter.next();
-                        fail("NoSuchElementException should have been thrown");
-                    } catch (NoSuchElementException e) {
-                        // success
-                    }
+                    assertThrows(NoSuchElementException.class, iter::next);
                 }
             }
 
             assertEquals(List.of("baz11", "baz11-2"), expectedData);
 
             expectedData = new ArrayList<>();
-            for (Row row : cursor.newEntryIterable(1)
-                .addColumnNames("data")) {
+            for (Row row : cursor.newEntryIterable(1).addColumnNames("data")) {
                 expectedData.add(row.getString("data"));
             }
 
@@ -1048,21 +1027,11 @@ class CursorTest extends AbstractBaseTest {
                 if (row.get("otherfk1").equals(1)) {
                     expectedData.add(row.getString("data"));
                     iter.remove();
-                    try {
-                        iter.remove();
-                        fail("IllegalArgumentException should have been thrown");
-                    } catch (IllegalStateException e) {
-                        // success
-                    }
+                    assertThrows(IllegalStateException.class, iter::remove);
                 }
 
                 if (!iter.hasNext()) {
-                    try {
-                        iter.next();
-                        fail("NoSuchElementException should have been thrown");
-                    } catch (NoSuchElementException e) {
-                        // success
-                    }
+                    assertThrows(NoSuchElementException.class, iter::next);
                 }
             }
 
@@ -1167,15 +1136,10 @@ class CursorTest extends AbstractBaseTest {
 
             IndexCursor cursor = CursorBuilder.createCursor(table.getIndex("value_idx"));
 
-            try {
-                cursor.newIterable()
-                    .addMatchPattern("value", "val-9")
-                    .addMatchPattern("memo", "anything")
-                    .iterator().hasNext();
-                fail("UncheckedIOException should have been thrown");
-            } catch (UncheckedIOException ignored) {
-                // success
-            }
+            assertThrows(UncheckedIOException.class, () -> cursor.newIterable()
+                .addMatchPattern("value", "val-9")
+                .addMatchPattern("memo", "anything")
+                .iterator().hasNext());
 
             List<Row> rows = new ArrayList<>();
             for (Row row : cursor.newIterable()
@@ -1308,7 +1272,7 @@ class CursorTest extends AbstractBaseTest {
             doFindFirstByEntry(c, null, "C", 4, "K3");
         }
 
-        try {
+        assertThrows(IllegalArgumentException.class, () -> {
             if (colCount > 2) {
                 c.findFirstRowByEntry("C", 4, "K1", 14);
             } else if (colCount > 1) {
@@ -1316,10 +1280,7 @@ class CursorTest extends AbstractBaseTest {
             } else {
                 c.findFirstRowByEntry("C", 4);
             }
-            fail("IllegalArgumentException should have been thrown");
-        } catch (IllegalArgumentException expected) {
-            // scucess
-        }
+        });
 
         doFindByEntryRange(c, 11, 20, "B");
         doFindByEntry(c, new int[] {}, "Z");

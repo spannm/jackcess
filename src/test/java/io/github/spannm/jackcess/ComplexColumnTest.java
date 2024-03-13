@@ -119,12 +119,7 @@ class ComplexColumnTest extends AbstractBaseTest {
                 "row3-memo-revised", new Date(1315876953077L),
                 "row3-memo", new Date(1315876879126L));
 
-            try {
-                v.update();
-                fail("UnsupportedOperationException should have been thrown");
-            } catch (UnsupportedOperationException expected) {
-                // success
-            }
+            assertThrows(UnsupportedOperationException.class, v::update);
 
             checkVersions(3, row3ValFk, "new-value",
                 "new-value", upTime,
@@ -132,12 +127,7 @@ class ComplexColumnTest extends AbstractBaseTest {
                 "row3-memo-revised", new Date(1315876953077L),
                 "row3-memo", new Date(1315876879126L));
 
-            try {
-                v.delete();
-                fail("UnsupportedOperationException should have been thrown");
-            } catch (UnsupportedOperationException expected) {
-                // success
-            }
+            assertThrows(UnsupportedOperationException.class, v::delete);
 
             checkVersions(3, row3ValFk, "new-value",
                 "new-value", upTime,
@@ -145,12 +135,7 @@ class ComplexColumnTest extends AbstractBaseTest {
                 "row3-memo-revised", new Date(1315876953077L),
                 "row3-memo", new Date(1315876879126L));
 
-            try {
-                v.getComplexValueForeignKey().deleteAllValues();
-                fail("UnsupportedOperationException should have been thrown");
-            } catch (UnsupportedOperationException expected) {
-                // success
-            }
+            assertThrows(UnsupportedOperationException.class, v.getComplexValueForeignKey()::deleteAllValues);
 
             checkVersions(3, row3ValFk, "new-value",
                 "new-value", upTime,

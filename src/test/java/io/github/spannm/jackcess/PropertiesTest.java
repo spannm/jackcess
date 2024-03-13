@@ -378,12 +378,7 @@ class PropertiesTest extends AbstractBaseTest {
 
             t.addRow(Column.AUTO_NUMBER, "v1");
 
-            try {
-                t.addRow(Column.AUTO_NUMBER, null);
-                fail("InvalidValueException should have been thrown");
-            } catch (InvalidValueException expected) {
-                // success
-            }
+            assertThrows(InvalidValueException.class, () -> t.addRow(Column.AUTO_NUMBER, null));
 
             t.addRow(Column.AUTO_NUMBER, "");
 
@@ -392,63 +387,48 @@ class PropertiesTest extends AbstractBaseTest {
                             TestUtil.createExpectedRow("id", 2, "value", ""));
             TestUtil.assertTable(expectedRows, t);
 
-            t = DatabaseBuilder.newTable("testNz")
+            Table t2 = DatabaseBuilder.newTable("testNz")
                     .addColumn(DatabaseBuilder.newColumn("id", DataType.LONG).withAutoNumber(true)
                             .withProperty(PropertyMap.REQUIRED_PROP, true))
                     .addColumn(DatabaseBuilder.newColumn("value", DataType.TEXT)
                             .withProperty(PropertyMap.ALLOW_ZERO_LEN_PROP, false))
                     .toTable(db);
 
-            t.addRow(Column.AUTO_NUMBER, "v1");
+            t2.addRow(Column.AUTO_NUMBER, "v1");
 
-            try {
-                t.addRow(Column.AUTO_NUMBER, "");
-                fail("InvalidValueException should have been thrown");
-            } catch (InvalidValueException expected) {
-                // success
-            }
+            assertThrows(InvalidValueException.class, () -> t2.addRow(Column.AUTO_NUMBER, ""));
 
-            t.addRow(Column.AUTO_NUMBER, null);
+            t2.addRow(Column.AUTO_NUMBER, null);
 
             expectedRows = TestUtil.createExpectedTable(TestUtil.createExpectedRow("id", 1, "value", "v1"),
                     TestUtil.createExpectedRow("id", 2, "value", null));
-            TestUtil.assertTable(expectedRows, t);
+            TestUtil.assertTable(expectedRows, t2);
 
-            t = DatabaseBuilder.newTable("testReqNz")
+            Table t3 = DatabaseBuilder.newTable("testReqNz")
                 .addColumn(DatabaseBuilder.newColumn("id", DataType.LONG)
                     .withAutoNumber(true)
                     .withProperty(PropertyMap.REQUIRED_PROP, true))
                 .addColumn(DatabaseBuilder.newColumn("value", DataType.TEXT))
                 .toTable(db);
 
-            Column col = t.getColumn("value");
+            Column col = t3.getColumn("value");
             PropertyMap props = col.getProperties();
             props.put(PropertyMap.REQUIRED_PROP, true);
             props.put(PropertyMap.ALLOW_ZERO_LEN_PROP, false);
             props.save();
 
-            t.addRow(Column.AUTO_NUMBER, "v1");
+            t3.addRow(Column.AUTO_NUMBER, "v1");
 
-            try {
-                t.addRow(Column.AUTO_NUMBER, "");
-                fail("InvalidValueException should have been thrown");
-            } catch (InvalidValueException expected) {
-                // success
-            }
+            assertThrows(InvalidValueException.class, () -> t3.addRow(Column.AUTO_NUMBER, ""));
 
-            try {
-                t.addRow(Column.AUTO_NUMBER, null);
-                fail("InvalidValueException should have been thrown");
-            } catch (InvalidValueException expected) {
-                // success
-            }
+            assertThrows(InvalidValueException.class, () -> t3.addRow(Column.AUTO_NUMBER, null));
 
-            t.addRow(Column.AUTO_NUMBER, "v2");
+            t3.addRow(Column.AUTO_NUMBER, "v2");
 
             expectedRows = TestUtil.createExpectedTable(
-                    TestUtil.createExpectedRow("id", 1, "value", "v1"),
-                    TestUtil.createExpectedRow("id", 2, "value", "v2"));
-            TestUtil.assertTable(expectedRows, t);
+                TestUtil.createExpectedRow("id", 1, "value", "v1"),
+                TestUtil.createExpectedRow("id", 2, "value", "v2"));
+            TestUtil.assertTable(expectedRows, t3);
         }
     }
 

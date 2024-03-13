@@ -78,12 +78,7 @@ class RelationshipTest extends AbstractBaseTest {
             assertTrue(rel.cascadeUpdates());
             assertSameRelationships(rels, db.getRelationships(t3, t1), true);
 
-            try {
-                db.getRelationships(t1, t1);
-                fail("IllegalArgumentException should have been thrown");
-            } catch (IllegalArgumentException ignored) {
-                // success
-            }
+            assertThrows(IllegalArgumentException.class, () -> db.getRelationships(t1, t1));
         }
     }
 

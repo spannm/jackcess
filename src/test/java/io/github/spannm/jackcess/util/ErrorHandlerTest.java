@@ -26,6 +26,7 @@ import io.github.spannm.jackcess.test.AbstractBaseTest;
 import io.github.spannm.jackcess.test.source.FileFormatSource;
 import org.junit.jupiter.params.ParameterizedTest;
 
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
@@ -63,23 +64,16 @@ class ErrorHandlerTest extends AbstractBaseTest {
             replaceColumn(table, "val");
 
             table.reset();
-            try {
-                table.getNextRow();
-                fail("IOException should have been thrown");
-            } catch (IOException e) {
-                // success
-            }
+
+            assertThrows(IOException.class, table::getNextRow);
 
             table.reset();
             table.setErrorHandler(new ReplacementErrorHandler());
 
             assertTable(createExpectedTable(
-                createExpectedRow("col", "row1",
-                    "val", null),
-                createExpectedRow("col", "row2",
-                    "val", null),
-                createExpectedRow("col", "row3",
-                    "val", null)),
+                createExpectedRow("col", "row1", "val", null),
+                createExpectedRow("col", "row2", "val", null),
+                createExpectedRow("col", "row3", "val", null)),
                 table);
 
             Cursor c1 = CursorBuilder.createCursor(table);
@@ -107,22 +101,13 @@ class ErrorHandlerTest extends AbstractBaseTest {
                     "val", "#error")),
                 c2);
 
-            try {
-                c3.getNextRow();
-                fail("IOException should have been thrown");
-            } catch (IOException e) {
-                // success
-            }
+            assertThrows(IOException.class, c3::getNextRow);
 
             table.setErrorHandler(null);
             c1.setErrorHandler(null);
             c1.reset();
-            try {
-                c1.getNextRow();
-                fail("IOException should have been thrown");
-            } catch (IOException e) {
-                // success
-            }
+
+            assertThrows(IOException.class, c1::getNextRow);
         }
     }
 

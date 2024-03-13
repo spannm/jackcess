@@ -271,12 +271,10 @@ class DatabaseTest extends AbstractBaseTest {
     void testMissingFile() throws Exception {
         File bogusFile = new File("fooby-dooby.mdb");
         assertFalse(bogusFile.exists());
-        try {
-            DatabaseBuilder dbb = DatabaseBuilder.newDatabase(bogusFile).withReadOnly(true).withAutoSync(getTestAutoSync());
-            try (Database db = dbb.open()) {
-                fail("FileNotFoundException should have been thrown");
-            }
-        } catch (FileNotFoundException e) {}
+        DatabaseBuilder dbb = DatabaseBuilder.newDatabase(bogusFile).withReadOnly(true).withAutoSync(getTestAutoSync());
+        assertThrows(FileNotFoundException.class, () -> {
+            try (Database db = dbb.open()) {}
+        });
         assertFalse(bogusFile.exists());
     }
 
@@ -339,12 +337,7 @@ class DatabaseTest extends AbstractBaseTest {
                 new BigDecimal("10000.4500")),
                 foundValues);
 
-            try {
-                table.addRow(new BigDecimal("342523234145343543.3453"));
-                fail("IOException should have been thrown");
-            } catch (IOException e) {
-                // ignored
-            }
+            assertThrows(IOException.class, () -> table.addRow(new BigDecimal("342523234145343543.3453")));
         }
     }
 
@@ -379,12 +372,7 @@ class DatabaseTest extends AbstractBaseTest {
             "{32A59F01-1234-3E29-4AAF-4523453CD2E6}"),
             foundValues);
 
-        try {
-            table.addRow("3245234");
-            fail("IOException should have been thrown");
-        } catch (IOException e) {
-            // ignored
-        }
+        assertThrows(IOException.class, () -> table.addRow("3245234"));
     }
 
     @ParameterizedTest(name = "[{index}] {0}")
@@ -428,13 +416,8 @@ class DatabaseTest extends AbstractBaseTest {
             new BigDecimal("-3452345321000.00000000")),
             foundBigValues);
 
-        try {
-            table.addRow(new BigDecimal("3245234.234"),
-                new BigDecimal("3245234.234"));
-            fail("IOException should have been thrown");
-        } catch (IOException e) {
-            // ignored
-        }
+        assertThrows(IOException.class, () -> table.addRow(new BigDecimal("3245234.234"),
+            new BigDecimal("3245234.234")));
     }
 
     @ParameterizedTest(name = "[{index}] {0}")

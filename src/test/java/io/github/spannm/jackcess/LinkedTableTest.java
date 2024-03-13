@@ -41,12 +41,7 @@ class LinkedTableTest extends AbstractBaseTest {
     void testLinkedTables(TestDb testDb) throws Exception {
 
         try (Database db = testDb.openCopy()) {
-            try {
-                db.getTable("Table2");
-                fail("FileNotFoundException should have been thrown");
-            } catch (FileNotFoundException e) {
-                // success
-            }
+            assertThrows(FileNotFoundException.class, () -> db.getTable("Table2"));
 
             TableMetaData tmd = db.getTableMetaData("Table2");
             assertEquals("Table2", tmd.getName());
@@ -173,19 +168,9 @@ class LinkedTableTest extends AbstractBaseTest {
 
             Table tbl = db.getTable("Ordrar");
 
-            try {
-                tbl.iterator();
-                fail("UnsupportedOperationException should have been thrown");
-            } catch (UnsupportedOperationException expected) {
-                // expected
-            }
+            assertThrows(UnsupportedOperationException.class, tbl::iterator);
 
-            try {
-                tbl.addRow(1L, "bar");
-                fail("UnsupportedOperationException should have been thrown");
-            } catch (UnsupportedOperationException expected) {
-                // expected
-            }
+            assertThrows(UnsupportedOperationException.class, () -> tbl.addRow(1L, "bar"));
         }
     }
 

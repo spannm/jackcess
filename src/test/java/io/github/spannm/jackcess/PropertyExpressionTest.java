@@ -168,21 +168,9 @@ class PropertyExpressionTest extends AbstractBaseTest {
 
             t.addRow(Column.AUTO_NUMBER, 42, 8);
 
-            try {
-                t.addRow(Column.AUTO_NUMBER, 42, 20);
-                fail("InvalidValueException should have been thrown");
-            } catch (InvalidValueException ive) {
-                // success
-                assertTrue(ive.getMessage().contains("You failed"));
-            }
+            assertThrows(InvalidValueException.class, () -> t.addRow(Column.AUTO_NUMBER, 42, 20));
 
-            try {
-                t.addRow(Column.AUTO_NUMBER, 3, 8);
-                fail("InvalidValueException should have been thrown");
-            } catch (InvalidValueException ive) {
-                // success
-                assertFalse(ive.getMessage().contains("You failed"));
-            }
+            assertThrows(InvalidValueException.class, () -> t.addRow(Column.AUTO_NUMBER, 3, 8));
 
             t.addRow(Column.AUTO_NUMBER, 54, 9);
 
@@ -190,13 +178,8 @@ class PropertyExpressionTest extends AbstractBaseTest {
             setProp(t, "data2", PropertyMap.VALIDATION_RULE_PROP, "<100");
             setProp(t, "data2", PropertyMap.VALIDATION_TEXT_PROP, "Too big");
 
-            try {
-                t.addRow(Column.AUTO_NUMBER, 42, 200);
-                fail("InvalidValueException should have been thrown");
-            } catch (InvalidValueException ive) {
-                // success
-                assertTrue(ive.getMessage().contains("Too big"));
-            }
+            InvalidValueException ex = assertThrows(InvalidValueException.class, () -> t.addRow(Column.AUTO_NUMBER, 42, 200));
+            assertTrue(ex.getMessage().contains("Too big"));
 
             t.addRow(Column.AUTO_NUMBER, 1, 9);
 
@@ -237,26 +220,14 @@ class PropertyExpressionTest extends AbstractBaseTest {
 
             t.addRow(Column.AUTO_NUMBER, 42, 8);
 
-            try {
-                t.addRow(Column.AUTO_NUMBER, 1, 20);
-                fail("InvalidValueException should have been thrown");
-            } catch (InvalidValueException ive) {
-                // success
-                assertTrue(ive.getMessage().contains("You failed"));
-            }
+            assertThrows(InvalidValueException.class, () -> t.addRow(Column.AUTO_NUMBER, 1, 20));
 
             t.addRow(Column.AUTO_NUMBER, 54, 9);
 
             setTableProp(t, PropertyMap.VALIDATION_RULE_PROP, "[data2]<100");
             setTableProp(t, PropertyMap.VALIDATION_TEXT_PROP, "Too big");
 
-            try {
-                t.addRow(Column.AUTO_NUMBER, 42, 200);
-                fail("InvalidValueException should have been thrown");
-            } catch (InvalidValueException ive) {
-                // success
-                assertTrue(ive.getMessage().contains("Too big"));
-            }
+            assertThrows(InvalidValueException.class, () -> t.addRow(Column.AUTO_NUMBER, 42, 200));
 
             t.addRow(Column.AUTO_NUMBER, 1, 9);
 

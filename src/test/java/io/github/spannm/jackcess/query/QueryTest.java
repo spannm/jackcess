@@ -68,13 +68,7 @@ class QueryTest extends AbstractBaseTest {
 
         removeRows(query, TABLE_ATTRIBUTE);
 
-        try {
-            query.toSQLString();
-            fail("IllegalStateException should have been thrown");
-        } catch (IllegalStateException e) {
-            // success
-        }
-
+        assertThrows(IllegalStateException.class, () -> query.toSQLString());
     }
 
     @Test
@@ -150,35 +144,19 @@ class QueryTest extends AbstractBaseTest {
         List<Row> rowList = new ArrayList<>();
         rowList.add(newRow(TYPE_ATTRIBUTE, null, -1, null, null));
         QueryImpl query = QueryImpl.create(-1, "TestQuery", rowList, 13);
-        try {
-            query.toSQLString();
-            fail("UnsupportedOperationException should have been thrown");
-        } catch (UnsupportedOperationException e) {
-            // success
-        }
+        assertThrows(UnsupportedOperationException.class, query::toSQLString);
 
         addRows(query, newRow(TYPE_ATTRIBUTE, null, -1, null, null));
 
-        try {
-            query.getTypeRow();
-            fail("IllegalStateException should have been thrown");
-        } catch (IllegalStateException e) {
-            // success
-        }
+        assertThrows(IllegalStateException.class, query::getTypeRow);
 
-        try {
-            new QueryImpl("TestQuery", rowList, 13, Query.Type.UNION.getObjectFlag(),
-                Query.Type.UNION) {
-                @Override
-                protected void toSQLString(StringBuilder builder) {
-                    throw new UnsupportedOperationException();
-                }
-            };
-            fail("IllegalStateException should have been thrown");
-        } catch (IllegalStateException e) {
-            // success
-        }
-
+        assertThrows(IllegalStateException.class, () -> new QueryImpl("TestQuery", rowList, 13, Query.Type.UNION.getObjectFlag(),
+            Query.Type.UNION) {
+            @Override
+            protected void toSQLString(StringBuilder builder) {
+                throw new UnsupportedOperationException();
+            }
+        });
     }
 
     @ParameterizedTest(name = "[{index}] {0}")
@@ -311,25 +289,19 @@ class QueryTest extends AbstractBaseTest {
         addRows(query, newRow(PARAMETER_ATTRIBUTE, null, DataType.INT.getValue(), "INT_VAL", null));
 
         assertEquals(multiline("PARAMETERS INT_VAL Short;",
-            "SELECT Table1.id, Table1.col AS [Some.Alias]",
-            "FROM Table1;"),
+            "SELECT Table1.id, Table1.col AS [Some.Alias]", "FROM Table1;"),
             query.toSQLString());
 
         addRows(query, newRow(PARAMETER_ATTRIBUTE, null, DataType.TEXT.getValue(), 50, "TextVal", null),
             newRow(PARAMETER_ATTRIBUTE, null, 0, 50, "[Some Value]", null));
 
         assertEquals(multiline("PARAMETERS INT_VAL Short, TextVal Text(50), [Some Value] Value;",
-            "SELECT Table1.id, Table1.col AS [Some.Alias]",
-            "FROM Table1;"),
+            "SELECT Table1.id, Table1.col AS [Some.Alias]", "FROM Table1;"),
             query.toSQLString());
 
         addRows(query, newRow(PARAMETER_ATTRIBUTE, null, -1, "BadVal", null));
-        try {
-            query.toSQLString();
-            fail("IllegalStateException should have been thrown");
-        } catch (IllegalStateException e) {
-            // success
-        }
+
+        assertThrows(IllegalStateException.class, query::toSQLString);
 
         removeRows(query, PARAMETER_ATTRIBUTE);
     }
@@ -380,12 +352,7 @@ class QueryTest extends AbstractBaseTest {
 
         addRows(query, newRow(JOIN_ATTRIBUTE, "(Table1.id = Table3Val.id)", 5, "Table1", "Table3Val"));
 
-        try {
-            query.toSQLString();
-            fail("IllegalStateException should have been thrown");
-        } catch (IllegalStateException e) {
-            // success
-        }
+        assertThrows(IllegalStateException.class, query::toSQLString);
 
         removeLastRows(query, 1);
         query.toSQLString();
@@ -454,30 +421,21 @@ class QueryTest extends AbstractBaseTest {
             addRows(query, newRow(TABLE_ATTRIBUTE, null, "Table" + i, null));
         }
 
-        addJoinRows(query, 1, 2, 1,
-            2, 3, 1,
-            3, 4, 1);
+        addJoinRows(query, 1, 2, 1, 2, 3, 1, 3, 4, 1);
 
         assertEquals(multiline("SELECT *",
             "FROM Table5, Table6, Table7, Table8, Table9, Table10, ((Table1 INNER JOIN Table2 ON Table1.f0 = Table2.f0) INNER JOIN Table3 ON Table2.f3 = Table3.f3) INNER JOIN Table4 ON Table3.f6 = Table4.f6;"),
             query.toSQLString());
 
-        addJoinRows(query, 1, 2, 1,
-            2, 1, 1);
+        addJoinRows(query, 1, 2, 1, 2, 1, 1);
 
         assertEquals(multiline("SELECT *",
             "FROM Table3, Table4, Table5, Table6, Table7, Table8, Table9, Table10, Table1 INNER JOIN Table2 ON (Table2.f3 = Table1.f3) AND (Table1.f0 = Table2.f0);"),
             query.toSQLString());
 
-        addJoinRows(query, 1, 2, 1,
-            2, 1, 2);
+        addJoinRows(query, 1, 2, 1, 2, 1, 2);
 
-        try {
-            query.toSQLString();
-            fail("IllegalStateException should have been thrown");
-        } catch (IllegalStateException e) {
-            // success
-        }
+        assertThrows(IllegalStateException.class, query::toSQLString);
 
         addJoinRows(query, 1, 2, 1,
             3, 4, 1,

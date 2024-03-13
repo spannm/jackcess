@@ -28,7 +28,6 @@ import java.nio.channels.FileChannel;
 import java.nio.channels.NonWritableChannelException;
 
 /**
- *
  * @author James Ahlborn
  */
 class MemFileChannelTest extends AbstractBaseTest {
@@ -40,32 +39,17 @@ class MemFileChannelTest extends AbstractBaseTest {
             assertEquals(testFile.length(), ch.size());
             assertEquals(0L, ch.position());
 
-            try {
+            assertThrows(NonWritableChannelException.class, () -> {
                 ByteBuffer bb = ByteBuffer.allocate(1024);
                 ch.write(bb);
-                fail("NonWritableChannelException should have been thrown");
-            } catch (NonWritableChannelException ignored) {
-                // success
-            }
+            });
 
-            try {
-                ch.truncate(0L);
-                fail("NonWritableChannelException should have been thrown");
-            } catch (NonWritableChannelException ignored) {
-                // success
-            }
+            assertThrows(NonWritableChannelException.class, () -> ch.truncate(0L));
 
-            try {
-                ch.transferFrom(null, 0L, 10L);
-                fail("NonWritableChannelException should have been thrown");
-            } catch (NonWritableChannelException ignored) {
-                // success
-            }
+            assertThrows(NonWritableChannelException.class, () -> ch.transferFrom(null, 0L, 10L));
 
             assertEquals(testFile.length(), ch.size());
             assertEquals(0L, ch.position());
-
-            ch.close();
         }
     }
 
@@ -73,68 +57,54 @@ class MemFileChannelTest extends AbstractBaseTest {
     void testChannel() throws Exception {
         ByteBuffer bb = ByteBuffer.allocate(1024);
 
-        MemFileChannel ch = MemFileChannel.newChannel();
-        assertTrue(ch.isOpen());
-        assertEquals(0L, ch.size());
-        assertEquals(0L, ch.position());
-        assertEquals(-1, ch.read(bb));
-
-        ch.close();
-
-        assertFalse(ch.isOpen());
+        try (MemFileChannel ch1 = MemFileChannel.newChannel()) {
+            assertTrue(ch1.isOpen());
+            assertEquals(0L, ch1.size());
+            assertEquals(0L, ch1.position());
+            assertEquals(-1, ch1.read(bb));
+        }
 
         File testFile = new File(DIR_TEST_DATA, "V1997/compIndexTestV1997.mdb");
-        ch = MemFileChannel.newChannel(testFile, "r");
-        assertEquals(testFile.length(), ch.size());
-        assertEquals(0L, ch.position());
-
-        try {
-            ch.position(-1);
-            fail("IllegalArgumentException should have been thrown");
-        } catch (IllegalArgumentException ignored) {
-            // success
-        }
-
-        MemFileChannel ch2 = MemFileChannel.newChannel();
-        ch.transferTo(ch2);
-        ch2.force(true);
+        MemFileChannel ch2 = MemFileChannel.newChannel(testFile, "r");
         assertEquals(testFile.length(), ch2.size());
-        assertEquals(testFile.length(), ch2.position());
+        assertEquals(0L, ch2.position());
 
-        try {
-            ch2.truncate(-1L);
-            fail("IllegalArgumentException should have been thrown");
-        } catch (IllegalArgumentException ignored) {
-            // success
-        }
+        assertThrows(IllegalArgumentException.class, () -> ch2.position(-1));
 
-        long trucSize = ch2.size() / 3;
-        ch2.truncate(trucSize);
-        assertEquals(trucSize, ch2.size());
-        assertEquals(trucSize, ch2.position());
-        ch2.position(0L);
-        copy(ch, ch2, bb);
+        MemFileChannel ch3 = MemFileChannel.newChannel();
+        ch2.transferTo(ch3);
+        ch3.force(true);
+        assertEquals(testFile.length(), ch3.size());
+        assertEquals(testFile.length(), ch3.position());
+
+        assertThrows(IllegalArgumentException.class, () -> ch3.truncate(-1L));
+
+        long trucSize = ch3.size() / 3;
+        ch3.truncate(trucSize);
+        assertEquals(trucSize, ch3.size());
+        assertEquals(trucSize, ch3.position());
+        ch3.position(0L);
+        copy(ch2, ch3, bb);
 
         File tmpFile = File.createTempFile("chtest_", ".dat");
         tmpFile.deleteOnExit();
-        FileOutputStream fc = new FileOutputStream(tmpFile);
 
-        ch2.transferTo(fc);
-
-        fc.close();
+        try (FileOutputStream fc = new FileOutputStream(tmpFile)) {
+            ch3.transferTo(fc);
+        }
 
         assertEquals(testFile.length(), tmpFile.length());
 
         assertArrayEquals(TestUtil.toByteArray(testFile), TestUtil.toByteArray(tmpFile));
 
-        ch2.truncate(0L);
-        assertTrue(ch2.isOpen());
-        assertEquals(0L, ch2.size());
-        assertEquals(0L, ch2.position());
-        assertEquals(-1, ch2.read(bb));
+        ch3.truncate(0L);
+        assertTrue(ch3.isOpen());
+        assertEquals(0L, ch3.size());
+        assertEquals(0L, ch3.position());
+        assertEquals(-1, ch3.read(bb));
 
-        ch2.close();
-        assertFalse(ch2.isOpen());
+        ch3.close();
+        assertFalse(ch3.isOpen());
     }
 
     private static void copy(FileChannel src, FileChannel dst, ByteBuffer bb) throws IOException {
