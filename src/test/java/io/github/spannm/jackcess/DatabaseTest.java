@@ -16,14 +16,15 @@ limitations under the License.
 
 package io.github.spannm.jackcess;
 
+import static io.github.spannm.jackcess.test.Basename.*;
 import static io.github.spannm.jackcess.test.TestUtil.*;
 
 import io.github.spannm.jackcess.Database.FileFormat;
 import io.github.spannm.jackcess.impl.*;
 import io.github.spannm.jackcess.test.AbstractBaseTest;
-import io.github.spannm.jackcess.test.Basename;
 import io.github.spannm.jackcess.test.TestDb;
 import io.github.spannm.jackcess.test.source.FileFormatSource;
+import io.github.spannm.jackcess.test.source.TestDbReadOnlySource;
 import io.github.spannm.jackcess.test.source.TestDbSource;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -45,7 +46,7 @@ import java.util.stream.Collectors;
 class DatabaseTest extends AbstractBaseTest {
 
     @ParameterizedTest(name = "[{index}] {0}")
-    @FileFormatSource()
+    @FileFormatSource
     void testInvalidTableDefs(FileFormat fileFormat) throws Exception {
         try (Database db = create(fileFormat)) {
             try {
@@ -100,7 +101,7 @@ class DatabaseTest extends AbstractBaseTest {
     }
 
     @ParameterizedTest(name = "[{index}] {0}")
-    @TestDbSource(basename = Basename.DEL, readOnly = true)
+    @TestDbReadOnlySource(DEL)
     void testReadDeletedRows(TestDb testDb) throws Exception {
         try (Database db = testDb.open()) {
             Table table = db.getTable("Table");
@@ -113,7 +114,7 @@ class DatabaseTest extends AbstractBaseTest {
     }
 
     @ParameterizedTest(name = "[{index}] {0}")
-    @TestDbSource(basename = Basename.TEST, readOnly = true)
+    @TestDbReadOnlySource(TEST)
     void testGetColumns(TestDb testDb) throws Exception {
         try (Database db = testDb.open()) {
             List<? extends Column> columns = db.getTable("Table1").getColumns();
@@ -137,7 +138,7 @@ class DatabaseTest extends AbstractBaseTest {
     }
 
     @ParameterizedTest(name = "[{index}] {0}")
-    @TestDbSource(basename = Basename.TEST, readOnly = true)
+    @TestDbReadOnlySource(TEST)
     void testGetNextRow(TestDb testDb) throws Exception {
         try (Database db = testDb.open()) {
             db.setDateTimeType(DateTimeType.DATE);
@@ -160,7 +161,7 @@ class DatabaseTest extends AbstractBaseTest {
     }
 
     @ParameterizedTest(name = "[{index}] {0}")
-    @FileFormatSource()
+    @FileFormatSource
     void testCreate(FileFormat fileFormat) throws Exception {
         try (Database db = create(fileFormat)) {
             assertEquals(0, db.getTableNames().size());
@@ -168,7 +169,7 @@ class DatabaseTest extends AbstractBaseTest {
     }
 
     @ParameterizedTest(name = "[{index}] {0}")
-    @FileFormatSource()
+    @FileFormatSource
     void testDeleteCurrentRow(FileFormat fileFormat) throws Exception {
         // make sure correct row is deleted
         Database db1 = createMem(fileFormat);
@@ -234,7 +235,7 @@ class DatabaseTest extends AbstractBaseTest {
     }
 
     @ParameterizedTest(name = "[{index}] {0}")
-    @FileFormatSource()
+    @FileFormatSource
     void testDeleteRow(FileFormat fileFormat) throws Exception {
         // make sure correct row is deleted
         try (
@@ -280,7 +281,7 @@ class DatabaseTest extends AbstractBaseTest {
     }
 
     @ParameterizedTest(name = "[{index}] {0}")
-    @TestDbSource(basename = Basename.DEL_COL, readOnly = true)
+    @TestDbReadOnlySource(DEL_COL)
     void testReadWithDeletedCols(TestDb testDb) throws Exception {
         try (Database db = testDb.open()) {
             Table table = db.getTable("Table1");
@@ -313,7 +314,7 @@ class DatabaseTest extends AbstractBaseTest {
     }
 
     @ParameterizedTest(name = "[{index}] {0}")
-    @FileFormatSource()
+    @FileFormatSource
     void testCurrency(FileFormat fileFormat) throws Exception {
         try (Database db = create(fileFormat)) {
             Table table = DatabaseBuilder.newTable("test")
@@ -348,7 +349,7 @@ class DatabaseTest extends AbstractBaseTest {
     }
 
     @ParameterizedTest(name = "[{index}] {0}")
-    @FileFormatSource()
+    @FileFormatSource
     void testGUID(FileFormat fileFormat) throws Exception {
         Database db = create(fileFormat);
 
@@ -387,7 +388,7 @@ class DatabaseTest extends AbstractBaseTest {
     }
 
     @ParameterizedTest(name = "[{index}] {0}")
-    @FileFormatSource()
+    @FileFormatSource
     void testNumeric(FileFormat fileFormat) throws Exception {
         Database db = create(fileFormat);
 
@@ -437,7 +438,7 @@ class DatabaseTest extends AbstractBaseTest {
     }
 
     @ParameterizedTest(name = "[{index}] {0}")
-    @TestDbSource(basename = Basename.FIXED_NUMERIC)
+    @TestDbSource(FIXED_NUMERIC)
     void testFixedNumeric(TestDb testDb) throws Exception {
 
         try (Database db = testDb.openCopy()) {
@@ -481,7 +482,7 @@ class DatabaseTest extends AbstractBaseTest {
     }
 
     @ParameterizedTest(name = "[{index}] {0}")
-    @TestDbSource(basename = Basename.TEST, readOnly = true)
+    @TestDbReadOnlySource(TEST)
     void testMultiPageTableDef(TestDb testDb) throws Exception {
         try (Database db = testDb.open()) {
             List<? extends Column> columns = db.getTable("Table2").getColumns();
@@ -490,7 +491,7 @@ class DatabaseTest extends AbstractBaseTest {
     }
 
     @ParameterizedTest(name = "[{index}] {0}")
-    @TestDbSource(basename = Basename.OVERFLOW, readOnly = true)
+    @TestDbReadOnlySource(OVERFLOW)
     void testOverflow(TestDb testDb) throws Exception {
         try (Database db = testDb.open()) {
             Table table = db.getTable("Table1");
@@ -515,7 +516,7 @@ class DatabaseTest extends AbstractBaseTest {
     }
 
     @ParameterizedTest(name = "[{index}] {0}")
-    @TestDbSource(basename = Basename.PROMOTION)
+    @TestDbSource(PROMOTION)
     void testUsageMapPromotion(TestDb testDb) throws Exception {
 
         try (Database db = testDb.openMem()) {
@@ -546,7 +547,7 @@ class DatabaseTest extends AbstractBaseTest {
     }
 
     @ParameterizedTest(name = "[{index}] {0}")
-    @FileFormatSource()
+    @FileFormatSource
     void testLargeTableDef(FileFormat fileFormat) throws Exception {
         Database db = create(fileFormat);
 
@@ -579,7 +580,7 @@ class DatabaseTest extends AbstractBaseTest {
     }
 
     @ParameterizedTest(name = "[{index}] {0}")
-    @FileFormatSource()
+    @FileFormatSource
     void testWriteAndReadDate(FileFormat fileFormat) throws Exception {
         try (Database db = createMem(fileFormat)) {
             db.setDateTimeType(DateTimeType.DATE);
@@ -638,7 +639,7 @@ class DatabaseTest extends AbstractBaseTest {
     }
 
     @ParameterizedTest(name = "[{index}] {0}")
-    @FileFormatSource()
+    @FileFormatSource
     void testAncientDatesWrite(FileFormat fileFormat) throws Exception {
         SimpleDateFormat sdf = DatabaseBuilder.createDateFormat("yyyy-MM-dd");
 
@@ -668,7 +669,7 @@ class DatabaseTest extends AbstractBaseTest {
      * Test ancient date handling against test database {@code oldDates*.accdb}.
      */
     @ParameterizedTest(name = "[{index}] {0}")
-    @TestDbSource(basename = Basename.OLD_DATES)
+    @TestDbSource(OLD_DATES)
     void testAncientDatesRead(TestDb testDb) throws Exception {
         TimeZone tz = TimeZone.getTimeZone("America/New_York");
         SimpleDateFormat sdf = DatabaseBuilder.createDateFormat("yyyy-MM-dd");
@@ -693,7 +694,7 @@ class DatabaseTest extends AbstractBaseTest {
     }
 
     @ParameterizedTest(name = "[{index}] {0}")
-    @FileFormatSource()
+    @FileFormatSource
     void testSystemTable(FileFormat fileFormat) throws Exception {
         Database db = create(fileFormat);
 
@@ -742,7 +743,7 @@ class DatabaseTest extends AbstractBaseTest {
     }
 
     @ParameterizedTest(name = "[{index}] {0}")
-    @TestDbSource(basename = Basename.FIXED_TEXT)
+    @TestDbSource(FIXED_TEXT)
     void testFixedText(TestDb testDb) throws Exception {
 
         try (Database db = testDb.openCopy()) {
@@ -766,7 +767,7 @@ class DatabaseTest extends AbstractBaseTest {
     }
 
     @ParameterizedTest(name = "[{index}] {0}")
-    @TestDbSource(basename = Basename.TEST, readOnly = true)
+    @TestDbReadOnlySource(TEST)
     void testDbSortOrder(TestDb testDb) throws Exception {
         try (Database db = testDb.open()) {
             assertEquals(((DatabaseImpl) db).getFormat().DEFAULT_SORT_ORDER,
@@ -775,7 +776,7 @@ class DatabaseTest extends AbstractBaseTest {
     }
 
     @ParameterizedTest(name = "[{index}] {0}")
-    @TestDbSource(basename = Basename.UNSUPPORTED)
+    @TestDbSource(UNSUPPORTED)
     void testUnsupportedColumns(TestDb testDb) throws Exception {
         try (Database db = testDb.open()) {
             Table t = db.getTable("Test");
@@ -867,7 +868,7 @@ class DatabaseTest extends AbstractBaseTest {
     }
 
     @ParameterizedTest(name = "[{index}] {0}")
-    @TestDbSource(basename = Basename.TEST, readOnly = true)
+    @TestDbReadOnlySource(TEST)
     void testIterateTableNames1(TestDb testDb) throws Exception {
         try (Database db = testDb.open()) {
             Set<String> names = new HashSet<>();
@@ -889,7 +890,7 @@ class DatabaseTest extends AbstractBaseTest {
     }
 
     @ParameterizedTest(name = "[{index}] {0}")
-    @TestDbSource(basename = Basename.LINKED)
+    @TestDbSource(LINKED)
     void testIterateTableNames2(TestDb testDb) throws Exception {
         try (Database db = testDb.open()) {
             Set<String> names = new HashSet<>();
@@ -914,7 +915,7 @@ class DatabaseTest extends AbstractBaseTest {
     }
 
     @ParameterizedTest(name = "[{index}] {0}")
-    @TestDbSource(basename = Basename.TEST, readOnly = true)
+    @TestDbReadOnlySource(TEST)
     void testTableDates(TestDb testDb) throws Exception {
         try (Database db = testDb.open()) {
             Table table = db.getTable("Table1");
@@ -933,7 +934,7 @@ class DatabaseTest extends AbstractBaseTest {
     }
 
     @ParameterizedTest(name = "[{index}] {0}")
-    @TestDbSource(basename = Basename.TEST)
+    @TestDbSource(TEST)
     void testBrokenIndex(TestDb testDb) throws Exception {
         try (Database db = new DatabaseBuilder(testDb.getFile())
             .withReadOnly(true).withIgnoreBrokenSystemCatalogIndex(true).open()) {

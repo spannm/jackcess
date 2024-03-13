@@ -35,14 +35,10 @@ import java.util.stream.Stream;
 public @interface TestDbSource {
 
     /**
-     * Optional base name of test databases.
+     * Base name of test databases.<br>
+     * The annotation is deliberately named {@code value}, so the parameter name can be left out.
      */
-    Basename basename();
-
-    /**
-     * Read-only test databases if {@code true}.
-     */
-    boolean readOnly() default false;
+    Basename value();
 
     static class TestDbArgumentsProvider implements ArgumentsProvider {
 
@@ -69,7 +65,7 @@ public @interface TestDbSource {
                         continue;
                     }
 
-                    // verify that the db has the expected file format
+                    // verify that the database has the expected file format
                     try (Database db = new DatabaseBuilder(testFile).withReadOnly(true).open()) {
                         FileFormat dbFileFormat = db.getFileFormat();
                         if (dbFileFormat != fileFormat) {
@@ -88,30 +84,17 @@ public @interface TestDbSource {
             return map;
         }
 
-        private static List<TestDb> getDbs(Basename _basename) {
-            return Arrays.stream(FILE_FORMATS_WRITE)
-                .map(ff -> TESTDBS_MAP.get(_basename).get(ff))
-                .filter(Objects::nonNull)
-                .collect(Collectors.toList());
-        }
-
-        private static List<TestDb> getReadOnlyDbs(Basename _basename) {
-            return Arrays.stream(FileFormat.values())
+        static List<TestDb> getDbs(Basename _basename, FileFormat[] _fileFormats) {
+            return Arrays.stream(_fileFormats)
                 .map(ff -> TESTDBS_MAP.get(_basename).get(ff))
                 .filter(Objects::nonNull)
                 .collect(Collectors.toList());
         }
 
         @Override
-        public Stream<Arguments> provideArguments(ExtensionContext context) {
-            Optional<TestDbSource> optSrc = context.getElement().map(elem -> AnnotationSupport.findAnnotation(elem, TestDbSource.class).get());
-            if (optSrc.isEmpty()) {
-                return Stream.empty();
-            }
-            TestDbSource src = optSrc.get();
-            Basename basename = Objects.requireNonNull(src.basename());
-            List<TestDb> dbs = src.readOnly() ? getReadOnlyDbs(basename) : getDbs(basename);
-            return dbs.stream().map(Arguments::of);
+        public Stream<Arguments> provideArguments(ExtensionContext _context) throws Exception {
+            TestDbSource src = _context.getElement().map(elem -> AnnotationSupport.findAnnotation(elem, TestDbSource.class).get()).orElse(null);
+            return src == null ? Stream.empty() : getDbs(src.value(), FILE_FORMATS_WRITE).stream().map(Arguments::of);
         }
 
     }

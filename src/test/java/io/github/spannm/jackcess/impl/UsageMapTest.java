@@ -1,12 +1,12 @@
 package io.github.spannm.jackcess.impl;
 
+import static io.github.spannm.jackcess.test.Basename.TEST;
 import static io.github.spannm.jackcess.test.TestUtil.createString;
 import static io.github.spannm.jackcess.test.TestUtil.openCopy;
 
 import io.github.spannm.jackcess.*;
 import io.github.spannm.jackcess.Database.FileFormat;
 import io.github.spannm.jackcess.test.AbstractBaseTest;
-import io.github.spannm.jackcess.test.Basename;
 import io.github.spannm.jackcess.test.TestDb;
 import io.github.spannm.jackcess.test.source.TestDbSource;
 import org.junit.jupiter.api.Test;
@@ -22,7 +22,7 @@ import java.util.List;
 public class UsageMapTest extends AbstractBaseTest {
 
     @ParameterizedTest(name = "[{index}] {0}")
-    @TestDbSource(basename = Basename.TEST)
+    @TestDbSource(TEST)
     void testRead(TestDb testDB) throws Exception {
         int expectedFirstPage;
         int expectedLastPage;

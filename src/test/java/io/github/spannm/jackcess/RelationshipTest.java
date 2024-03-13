@@ -16,11 +16,12 @@ limitations under the License.
 
 package io.github.spannm.jackcess;
 
+import static io.github.spannm.jackcess.test.Basename.INDEX;
+
 import io.github.spannm.jackcess.impl.RelationshipImpl;
 import io.github.spannm.jackcess.test.AbstractBaseTest;
-import io.github.spannm.jackcess.test.Basename;
 import io.github.spannm.jackcess.test.TestDb;
-import io.github.spannm.jackcess.test.source.TestDbSource;
+import io.github.spannm.jackcess.test.source.TestDbReadOnlySource;
 import org.junit.jupiter.params.ParameterizedTest;
 
 import java.util.ArrayList;
@@ -35,7 +36,7 @@ class RelationshipTest extends AbstractBaseTest {
     private static final Comparator<Relationship> REL_COMP = (r1, r2) -> String.CASE_INSENSITIVE_ORDER.compare(r1.getName(), r2.getName());
 
     @ParameterizedTest(name = "[{index}] {0}")
-    @TestDbSource(basename = Basename.INDEX, readOnly = true)
+    @TestDbReadOnlySource(INDEX)
     void testTwoTables(TestDb testDb) throws Exception {
 
         try (Database db = testDb.open()) {
@@ -87,7 +88,7 @@ class RelationshipTest extends AbstractBaseTest {
     }
 
     @ParameterizedTest(name = "[{index}] {0}")
-    @TestDbSource(basename = Basename.INDEX, readOnly = true)
+    @TestDbReadOnlySource(INDEX)
     void testOneTable(TestDb testDb) throws Exception {
         try (Database db = testDb.open()) {
             Table t1 = db.getTable("Table1");
@@ -103,7 +104,7 @@ class RelationshipTest extends AbstractBaseTest {
     }
 
     @ParameterizedTest(name = "[{index}] {0}")
-    @TestDbSource(basename = Basename.INDEX, readOnly = true)
+    @TestDbReadOnlySource(INDEX)
     void testNoTables(TestDb testDb) throws Exception {
         try (Database db = testDb.open()) {
             Table t1 = db.getTable("Table1");

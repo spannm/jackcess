@@ -38,7 +38,7 @@ import java.util.List;
 class ErrorHandlerTest extends AbstractBaseTest {
 
     @ParameterizedTest(name = "[{index}] {0}")
-    @FileFormatSource()
+    @FileFormatSource
     void testErrorHandler(FileFormat fileFormat) throws Exception {
         try (Database db = create(fileFormat)) {
             Table table =

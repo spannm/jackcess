@@ -16,6 +16,7 @@ limitations under the License.
 
 package io.github.spannm.jackcess.util;
 
+import static io.github.spannm.jackcess.test.Basename.BLOB;
 import static io.github.spannm.jackcess.test.TestUtil.create;
 import static io.github.spannm.jackcess.test.TestUtil.toByteArray;
 
@@ -25,10 +26,9 @@ import io.github.spannm.jackcess.complex.Attachment;
 import io.github.spannm.jackcess.impl.ByteUtil;
 import io.github.spannm.jackcess.impl.CompoundOleUtil;
 import io.github.spannm.jackcess.test.AbstractBaseTest;
-import io.github.spannm.jackcess.test.Basename;
 import io.github.spannm.jackcess.test.TestDb;
 import io.github.spannm.jackcess.test.source.FileFormatSource;
-import io.github.spannm.jackcess.test.source.TestDbSource;
+import io.github.spannm.jackcess.test.source.TestDbReadOnlySource;
 import org.apache.poi.poifs.filesystem.DocumentEntry;
 import org.apache.poi.poifs.filesystem.DocumentInputStream;
 import org.apache.poi.poifs.filesystem.POIFSFileSystem;
@@ -45,7 +45,7 @@ import java.io.FileOutputStream;
 class OleBlobTest extends AbstractBaseTest {
 
     @ParameterizedTest(name = "[{index}] {0}")
-    @FileFormatSource()
+    @FileFormatSource
     void testCreateBlob(FileFormat fileFormat) throws Exception {
         File sampleFile = new File(DIR_TEST_DATA, "sample-input.tab");
         String sampleFilePath = sampleFile.getAbsolutePath();
@@ -128,7 +128,7 @@ class OleBlobTest extends AbstractBaseTest {
     }
 
     @ParameterizedTest(name = "[{index}] {0}")
-    @TestDbSource(basename = Basename.BLOB, readOnly = true)
+    @TestDbReadOnlySource(BLOB)
     void testReadBlob(TestDb testDb) throws Exception {
         try (Database db = testDb.open()) {
             Table t = db.getTable("Table1");

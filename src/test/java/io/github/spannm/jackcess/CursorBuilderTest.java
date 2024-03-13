@@ -16,9 +16,10 @@ limitations under the License.
 
 package io.github.spannm.jackcess;
 
+import static io.github.spannm.jackcess.test.Basename.INDEX_CURSOR;
+
 import io.github.spannm.jackcess.impl.IndexImpl;
 import io.github.spannm.jackcess.test.AbstractBaseTest;
-import io.github.spannm.jackcess.test.Basename;
 import io.github.spannm.jackcess.test.TestDb;
 import io.github.spannm.jackcess.test.source.TestDbSource;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -29,7 +30,7 @@ import org.junit.jupiter.params.ParameterizedTest;
 class CursorBuilderTest extends AbstractBaseTest {
 
     @ParameterizedTest(name = "[{index}] {0}")
-    @TestDbSource(basename = Basename.INDEX_CURSOR)
+    @TestDbSource(INDEX_CURSOR)
     void test(TestDb testDb) throws Exception {
         try (Database db = CursorTest.createTestIndexTable(testDb)) {
             Table table = db.getTable("test");

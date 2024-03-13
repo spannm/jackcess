@@ -16,12 +16,12 @@ limitations under the License.
 
 package io.github.spannm.jackcess.impl;
 
+import static io.github.spannm.jackcess.test.Basename.CALC_FIELD;
 import static io.github.spannm.jackcess.test.TestUtil.*;
 
 import io.github.spannm.jackcess.*;
 import io.github.spannm.jackcess.Database.FileFormat;
 import io.github.spannm.jackcess.test.AbstractBaseTest;
-import io.github.spannm.jackcess.test.Basename;
 import io.github.spannm.jackcess.test.TestDb;
 import io.github.spannm.jackcess.test.source.FileFormatSource;
 import io.github.spannm.jackcess.test.source.TestDbSource;
@@ -49,7 +49,7 @@ class CalcFieldTest extends AbstractBaseTest {
     }
 
     @ParameterizedTest(name = "[{index}] {0}")
-    @FileFormatSource()
+    @FileFormatSource
     void testCreateCalcField(FileFormat fileFormat) throws Exception {
         JetFormat format = DatabaseImpl.getFileFormatDetails(fileFormat).getFormat();
         if (!format.isSupportedCalculatedDataType(DataType.TEXT)) {
@@ -128,7 +128,7 @@ class CalcFieldTest extends AbstractBaseTest {
 
     @SuppressWarnings("checkstyle:LineLengthCheck")
     @ParameterizedTest(name = "[{index}] {0}")
-    @TestDbSource(basename = Basename.CALC_FIELD)
+    @TestDbSource(CALC_FIELD)
     void testReadCalcFields(TestDb testDb) throws Exception {
         try (Database db = testDb.open()) {
             Table t = db.getTable("Table1");

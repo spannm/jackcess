@@ -17,6 +17,7 @@ limitations under the License.
 package io.github.spannm.jackcess.impl;
 
 import static io.github.spannm.jackcess.DatabaseBuilder.*;
+import static io.github.spannm.jackcess.test.Basename.EXT_DATE;
 import static io.github.spannm.jackcess.test.TestUtil.assertCursor;
 import static io.github.spannm.jackcess.test.TestUtil.create;
 import static io.github.spannm.jackcess.test.TestUtil.createExpectedRow;
@@ -24,7 +25,6 @@ import static io.github.spannm.jackcess.test.TestUtil.createExpectedRow;
 import io.github.spannm.jackcess.*;
 import io.github.spannm.jackcess.Database.FileFormat;
 import io.github.spannm.jackcess.test.AbstractBaseTest;
-import io.github.spannm.jackcess.test.Basename;
 import io.github.spannm.jackcess.test.TestDb;
 import io.github.spannm.jackcess.test.source.FileFormatSource;
 import io.github.spannm.jackcess.test.source.TestDbSource;
@@ -42,7 +42,7 @@ import java.util.*;
 class ExtendedDateTest extends AbstractBaseTest {
 
     @ParameterizedTest(name = "[{index}] {0}")
-    @TestDbSource(basename = Basename.EXT_DATE)
+    @TestDbSource(EXT_DATE)
     void testReadExtendedDate(TestDb testDb) throws Exception {
         ZoneId zoneId = ZoneId.of("America/New_York");
         DateTimeFormatter dtfNoTime = DateTimeFormatter.ofPattern("M/d/yyy", Locale.US);
@@ -75,7 +75,7 @@ class ExtendedDateTest extends AbstractBaseTest {
     }
 
     @ParameterizedTest(name = "[{index}] {0}")
-    @FileFormatSource()
+    @FileFormatSource
     void testWriteExtendedDate(FileFormat fileFormat) throws Exception {
         JetFormat format = DatabaseImpl.getFileFormatDetails(fileFormat).getFormat();
 

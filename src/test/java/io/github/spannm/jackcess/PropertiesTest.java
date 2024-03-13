@@ -16,13 +16,18 @@ limitations under the License.
 
 package io.github.spannm.jackcess;
 
+import static io.github.spannm.jackcess.test.Basename.TEST;
+
 import io.github.spannm.jackcess.Database.FileFormat;
 import io.github.spannm.jackcess.impl.DatabaseImpl;
 import io.github.spannm.jackcess.impl.PropertyMapImpl;
 import io.github.spannm.jackcess.impl.PropertyMaps;
 import io.github.spannm.jackcess.impl.TableImpl;
-import io.github.spannm.jackcess.test.*;
+import io.github.spannm.jackcess.test.AbstractBaseTest;
+import io.github.spannm.jackcess.test.TestDb;
+import io.github.spannm.jackcess.test.TestUtil;
 import io.github.spannm.jackcess.test.source.FileFormatSource;
+import io.github.spannm.jackcess.test.source.TestDbReadOnlySource;
 import io.github.spannm.jackcess.test.source.TestDbSource;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -114,7 +119,7 @@ class PropertiesTest extends AbstractBaseTest {
     }
 
     @ParameterizedTest(name = "[{index}] {0}")
-    @TestDbSource(basename = Basename.TEST, readOnly = true)
+    @TestDbReadOnlySource(TEST)
     void testReadProperties(TestDb testDb) throws Exception {
         try (Database db = testDb.open()) {
             TableImpl t = (TableImpl) db.getTable("Table1");
@@ -197,7 +202,7 @@ class PropertiesTest extends AbstractBaseTest {
     }
 
     @ParameterizedTest(name = "[{index}] {0}")
-    @TestDbSource(basename = Basename.TEST)
+    @TestDbSource(TEST)
     void testWriteProperties(TestDb testDb) throws Exception {
         try (Database db = testDb.open()) {
             TableImpl t = (TableImpl) db.getTable("Table1");
@@ -227,7 +232,7 @@ class PropertiesTest extends AbstractBaseTest {
     }
 
     @ParameterizedTest(name = "[{index}] {0}")
-    @TestDbSource(basename = Basename.TEST)
+    @TestDbSource(TEST)
     void testModifyProperties(TestDb testDb) throws Exception {
         Database db = testDb.openCopy();
         File dbFile = db.getFile();
@@ -311,7 +316,7 @@ class PropertiesTest extends AbstractBaseTest {
     }
 
     @ParameterizedTest(name = "[{index}] {0}")
-    @FileFormatSource()
+    @FileFormatSource
     void testCreateDbProperties(FileFormat fileFormat) throws Exception {
         if (fileFormat == FileFormat.GENERIC_JET4) {
             // weirdo format, no properties
@@ -360,7 +365,7 @@ class PropertiesTest extends AbstractBaseTest {
     }
 
     @ParameterizedTest(name = "[{index}] {0}")
-    @FileFormatSource()
+    @FileFormatSource
     void testEnforceProperties(FileFormat fileFormat) throws Exception {
         try (Database db = TestUtil.create(fileFormat)) {
             Table t = DatabaseBuilder.newTable("testReq")

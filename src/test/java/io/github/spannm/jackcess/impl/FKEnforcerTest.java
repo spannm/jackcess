@@ -16,11 +16,11 @@ limitations under the License.
 
 package io.github.spannm.jackcess.impl;
 
+import static io.github.spannm.jackcess.test.Basename.INDEX;
 import static io.github.spannm.jackcess.test.TestUtil.*;
 
 import io.github.spannm.jackcess.*;
 import io.github.spannm.jackcess.test.AbstractBaseTest;
-import io.github.spannm.jackcess.test.Basename;
 import io.github.spannm.jackcess.test.TestDb;
 import io.github.spannm.jackcess.test.source.TestDbSource;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -31,13 +31,12 @@ import java.util.List;
 import java.util.Map;
 
 /**
- *
  * @author James Ahlborn
  */
 class FKEnforcerTest extends AbstractBaseTest {
 
     @ParameterizedTest(name = "[{index}] {0}")
-    @TestDbSource(basename = Basename.INDEX)
+    @TestDbSource(INDEX)
     void testNoEnforceForeignKeys(TestDb testDb) throws Exception {
         try (Database db = testDb.openCopy()) {
             db.setEnforceForeignKeys(false);
@@ -58,7 +57,7 @@ class FKEnforcerTest extends AbstractBaseTest {
     }
 
     @ParameterizedTest(name = "[{index}] {0}")
-    @TestDbSource(basename = Basename.INDEX)
+    @TestDbSource(INDEX)
     void testEnforceForeignKeys(TestDb testDb) throws Exception {
         try (Database db = testDb.openCopy()) {
             db.setEvaluateExpressions(false);

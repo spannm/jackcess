@@ -34,7 +34,7 @@ import java.util.List;
 class ColumnFormatterTest extends AbstractBaseTest {
 
     @ParameterizedTest(name = "[{index}] {0}")
-    @FileFormatSource()
+    @FileFormatSource
     void testFormat(FileFormat fileFormat) throws Exception {
         try (Database db = create(fileFormat)) {
             db.setEvaluateExpressions(true);

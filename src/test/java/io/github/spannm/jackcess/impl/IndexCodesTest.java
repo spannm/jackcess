@@ -16,14 +16,14 @@ limitations under the License.
 
 package io.github.spannm.jackcess.impl;
 
+import static io.github.spannm.jackcess.test.Basename.INDEX_CODES;
 import static io.github.spannm.jackcess.test.TestUtil.*;
 
 import io.github.spannm.jackcess.*;
 import io.github.spannm.jackcess.Database.FileFormat;
 import io.github.spannm.jackcess.test.AbstractBaseTest;
-import io.github.spannm.jackcess.test.Basename;
 import io.github.spannm.jackcess.test.TestDb;
-import io.github.spannm.jackcess.test.source.TestDbSource;
+import io.github.spannm.jackcess.test.source.TestDbReadOnlySource;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 
@@ -56,7 +56,7 @@ public class IndexCodesTest extends AbstractBaseTest {
     }};
 
     @ParameterizedTest(name = "[{index}] {0}")
-    @TestDbSource(basename = Basename.INDEX_CODES, readOnly = true)
+    @TestDbReadOnlySource(INDEX_CODES)
     void testIndexCodes(TestDb testDb) throws Exception {
         try (Database db = testDb.openMem()) {
             db.setDateTimeType(DateTimeType.DATE);

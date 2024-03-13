@@ -1,15 +1,16 @@
 package io.github.spannm.jackcess.impl;
 
+import static io.github.spannm.jackcess.test.Basename.TEST;
+
 import io.github.spannm.jackcess.DataType;
 import io.github.spannm.jackcess.Database;
 import io.github.spannm.jackcess.Database.FileFormat;
 import io.github.spannm.jackcess.JackcessException;
 import io.github.spannm.jackcess.PropertyMap;
 import io.github.spannm.jackcess.test.AbstractBaseTest;
-import io.github.spannm.jackcess.test.Basename;
 import io.github.spannm.jackcess.test.TestDb;
 import io.github.spannm.jackcess.test.TestUtil;
-import io.github.spannm.jackcess.test.source.TestDbSource;
+import io.github.spannm.jackcess.test.source.TestDbReadOnlySource;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 
@@ -29,7 +30,7 @@ class JetFormatTest extends AbstractBaseTest {
     }
 
     @ParameterizedTest(name = "[{index}] {0}")
-    @TestDbSource(basename = Basename.TEST, readOnly = true)
+    @TestDbReadOnlySource(TEST)
     void testGetFormat(TestDb testDb) throws Exception {
         try (FileChannel channel = DatabaseImpl.openChannel(testDb.getFile().toPath(), false, false)) {
 
@@ -39,7 +40,7 @@ class JetFormatTest extends AbstractBaseTest {
     }
 
     @ParameterizedTest(name = "[{index}] {0}")
-    @TestDbSource(basename = Basename.TEST, readOnly = true)
+    @TestDbReadOnlySource(TEST)
     void testReadOnlyFormat(TestDb testDb) {
         Exception failure = null;
         try (Database db = testDb.openCopy()) {
@@ -61,7 +62,7 @@ class JetFormatTest extends AbstractBaseTest {
     }
 
     @ParameterizedTest(name = "[{index}] {0}")
-    @TestDbSource(basename = Basename.TEST, readOnly = true)
+    @TestDbReadOnlySource(TEST)
     void testFileFormat1(TestDb testDb) throws Exception {
         try (Database db = testDb.open()) {
             assertEquals(testDb.getExpectedFileFormat(), db.getFileFormat());

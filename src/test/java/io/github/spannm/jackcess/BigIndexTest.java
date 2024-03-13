@@ -16,13 +16,15 @@ limitations under the License.
 
 package io.github.spannm.jackcess;
 
+import static io.github.spannm.jackcess.test.Basename.BIG_INDEX;
+import static io.github.spannm.jackcess.test.Basename.COMP_INDEX;
 import static io.github.spannm.jackcess.test.TestUtil.countRows;
 
 import io.github.spannm.jackcess.impl.IndexImpl;
 import io.github.spannm.jackcess.impl.TableImpl;
 import io.github.spannm.jackcess.test.AbstractBaseTest;
-import io.github.spannm.jackcess.test.Basename;
 import io.github.spannm.jackcess.test.TestDb;
+import io.github.spannm.jackcess.test.source.TestDbReadOnlySource;
 import io.github.spannm.jackcess.test.source.TestDbSource;
 import org.junit.jupiter.params.ParameterizedTest;
 
@@ -36,7 +38,7 @@ import java.util.Random;
 class BigIndexTest extends AbstractBaseTest {
 
     @ParameterizedTest(name = "[{index}] {0}")
-    @TestDbSource(basename = Basename.COMP_INDEX, readOnly = true)
+    @TestDbReadOnlySource(COMP_INDEX)
     void testComplexIndex(TestDb testDb) throws Exception {
         try (// this file has an index with "compressed" entries and node pages
         Database db = testDb.openMem()) {
@@ -49,7 +51,7 @@ class BigIndexTest extends AbstractBaseTest {
     }
 
     @ParameterizedTest(name = "[{index}] {0}")
-    @TestDbSource(basename = Basename.BIG_INDEX)
+    @TestDbSource(BIG_INDEX)
     void testBigIndex(TestDb testDb) throws Exception {
         // this file has an index with "compressed" entries and node pages
         Database db = testDb.openMem();

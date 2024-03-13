@@ -17,15 +17,15 @@ limitations under the License.
 package io.github.spannm.jackcess.query;
 
 import static io.github.spannm.jackcess.impl.query.QueryFormat.*;
+import static io.github.spannm.jackcess.test.Basename.QUERY;
 
 import io.github.spannm.jackcess.DataType;
 import io.github.spannm.jackcess.Database;
 import io.github.spannm.jackcess.impl.query.QueryImpl;
 import io.github.spannm.jackcess.impl.query.QueryImpl.Row;
 import io.github.spannm.jackcess.test.AbstractBaseTest;
-import io.github.spannm.jackcess.test.Basename;
 import io.github.spannm.jackcess.test.TestDb;
-import io.github.spannm.jackcess.test.source.TestDbSource;
+import io.github.spannm.jackcess.test.source.TestDbReadOnlySource;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 
@@ -182,7 +182,7 @@ class QueryTest extends AbstractBaseTest {
     }
 
     @ParameterizedTest(name = "[{index}] {0}")
-    @TestDbSource(basename = Basename.QUERY, readOnly = true)
+    @TestDbReadOnlySource(QUERY)
     void testReadQueries(TestDb testDb) throws Exception {
 
         Map<String, String> expectedQueries = new HashMap<>();

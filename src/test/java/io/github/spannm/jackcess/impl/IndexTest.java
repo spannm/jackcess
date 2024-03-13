@@ -16,13 +16,15 @@ limitations under the License.
 
 package io.github.spannm.jackcess.impl;
 
+import static io.github.spannm.jackcess.test.Basename.*;
+
 import io.github.spannm.jackcess.*;
 import io.github.spannm.jackcess.Database.FileFormat;
 import io.github.spannm.jackcess.test.AbstractBaseTest;
-import io.github.spannm.jackcess.test.Basename;
 import io.github.spannm.jackcess.test.TestDb;
 import io.github.spannm.jackcess.test.TestUtil;
 import io.github.spannm.jackcess.test.source.FileFormatSource;
+import io.github.spannm.jackcess.test.source.TestDbReadOnlySource;
 import io.github.spannm.jackcess.test.source.TestDbSource;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -81,7 +83,7 @@ class IndexTest extends AbstractBaseTest {
     }
 
     @ParameterizedTest(name = "[{index}] {0}")
-    @TestDbSource(basename = Basename.TEST, readOnly = true)
+    @TestDbReadOnlySource(TEST)
     void testPrimaryKey(TestDb testDb) throws Exception {
         try (Database db = testDb.open()) {
             Table table = db.getTable("Table1");
@@ -104,7 +106,7 @@ class IndexTest extends AbstractBaseTest {
     }
 
     @ParameterizedTest(name = "[{index}] {0}")
-    @TestDbSource(basename = Basename.INDEX, readOnly = true)
+    @TestDbReadOnlySource(INDEX)
     void testLogicalIndexes(TestDb testDb) throws Exception {
 
         try (Database db = testDb.open()) {
@@ -165,7 +167,7 @@ class IndexTest extends AbstractBaseTest {
     }
 
     @ParameterizedTest(name = "[{index}] {0}")
-    @TestDbSource(basename = Basename.COMP_INDEX)
+    @TestDbSource(COMP_INDEX)
     void testComplexIndex(TestDb testDb) throws Exception {
         try (// this file has an index with "compressed" entries and node pages
         Database db1 = testDb.open()) {
@@ -184,7 +186,7 @@ class IndexTest extends AbstractBaseTest {
     }
 
     @ParameterizedTest(name = "[{index}] {0}")
-    @TestDbSource(basename = Basename.TEST)
+    @TestDbSource(TEST)
     void testEntryDeletion(TestDb testDb) throws Exception {
         try (Database db = testDb.openCopy()) {
             Table table = db.getTable("Table1");
@@ -224,7 +226,7 @@ class IndexTest extends AbstractBaseTest {
     }
 
     @ParameterizedTest(name = "[{index}] {0}")
-    @TestDbSource(basename = Basename.INDEX_PROPERTIES)
+    @TestDbSource(INDEX_PROPERTIES)
     void testIgnoreNulls(TestDb testDb) throws Exception {
         try (Database db = testDb.openCopy()) {
             db.setEvaluateExpressions(false);
@@ -270,7 +272,7 @@ class IndexTest extends AbstractBaseTest {
     }
 
     @ParameterizedTest(name = "[{index}] {0}")
-    @TestDbSource(basename = Basename.INDEX_PROPERTIES)
+    @TestDbSource(INDEX_PROPERTIES)
     void testUnique(TestDb testDb) throws Exception {
         try (Database db = testDb.openCopy()) {
             Table t = db.getTable("TableUnique1_temp");
@@ -330,7 +332,7 @@ class IndexTest extends AbstractBaseTest {
     }
 
     @ParameterizedTest(name = "[{index}] {0}")
-    @TestDbSource(basename = Basename.TEST)
+    @TestDbSource(TEST)
     void testUniqueEntryCount(TestDb testDb) throws Exception {
         try (Database db = testDb.openCopy()) {
             db.setDateTimeType(DateTimeType.DATE);
@@ -388,7 +390,7 @@ class IndexTest extends AbstractBaseTest {
     }
 
     @ParameterizedTest(name = "[{index}] {0}")
-    @TestDbSource(basename = Basename.TEST)
+    @TestDbSource(TEST)
     void testReplId(TestDb testDb) throws Exception {
         try (Database db = testDb.openCopy()) {
             Table table = db.getTable("Table4");
@@ -402,7 +404,7 @@ class IndexTest extends AbstractBaseTest {
     }
 
     @ParameterizedTest(name = "[{index}] {0}")
-    @FileFormatSource()
+    @FileFormatSource
     void testIndexCreation(FileFormat fileFormat) throws Exception {
         try (Database db = TestUtil.create(fileFormat)) {
             Table t = DatabaseBuilder.newTable("TestTable")
@@ -440,7 +442,7 @@ class IndexTest extends AbstractBaseTest {
     }
 
     @ParameterizedTest(name = "[{index}] {0}")
-    @FileFormatSource()
+    @FileFormatSource
     void testIndexCreationSharedData(FileFormat fileFormat) throws Exception {
         try (Database db = TestUtil.create(fileFormat)) {
             Table t = DatabaseBuilder.newTable("TestTable")
@@ -489,7 +491,7 @@ class IndexTest extends AbstractBaseTest {
     }
 
     @ParameterizedTest(name = "[{index}] {0}")
-    @TestDbSource(basename = Basename.INDEX, readOnly = true)
+    @TestDbReadOnlySource(INDEX)
     void testGetForeignKeyIndex(TestDb testDb) throws Exception {
 
         try (Database db = testDb.open()) {
@@ -522,7 +524,7 @@ class IndexTest extends AbstractBaseTest {
     }
 
     @ParameterizedTest(name = "[{index}] {0}")
-    @FileFormatSource()
+    @FileFormatSource
     void testConstraintViolation(FileFormat fileFormat) throws Exception {
 
         try (Database db = TestUtil.create(fileFormat)) {
@@ -591,7 +593,7 @@ class IndexTest extends AbstractBaseTest {
     }
 
     @ParameterizedTest(name = "[{index}] {0}")
-    @FileFormatSource()
+    @FileFormatSource
     void testAutoNumberRecover(FileFormat fileFormat) throws Exception {
         try (Database db = TestUtil.create(fileFormat)) {
             Table t = DatabaseBuilder.newTable("TestTable")
@@ -647,7 +649,7 @@ class IndexTest extends AbstractBaseTest {
     }
 
     @ParameterizedTest(name = "[{index}] {0}")
-    @TestDbSource(basename = Basename.BINARY_INDEX)
+    @TestDbSource(BINARY_INDEX)
     void testBinaryIndex(TestDb testDb) throws Exception {
         try (Database db = testDb.open()) {
             Table table = db.getTable("Test");

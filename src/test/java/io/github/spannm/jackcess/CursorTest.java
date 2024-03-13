@@ -16,6 +16,8 @@ limitations under the License.
 
 package io.github.spannm.jackcess;
 
+import static io.github.spannm.jackcess.test.Basename.INDEX;
+import static io.github.spannm.jackcess.test.Basename.INDEX_CURSOR;
 import static io.github.spannm.jackcess.test.TestUtil.*;
 
 import io.github.spannm.jackcess.Database.FileFormat;
@@ -23,9 +25,9 @@ import io.github.spannm.jackcess.impl.ColumnImpl;
 import io.github.spannm.jackcess.impl.RowIdImpl;
 import io.github.spannm.jackcess.impl.TableImpl;
 import io.github.spannm.jackcess.test.AbstractBaseTest;
-import io.github.spannm.jackcess.test.Basename;
 import io.github.spannm.jackcess.test.TestDb;
 import io.github.spannm.jackcess.test.source.FileFormatSource;
+import io.github.spannm.jackcess.test.source.TestDbReadOnlySource;
 import io.github.spannm.jackcess.test.source.TestDbSource;
 import io.github.spannm.jackcess.util.CaseInsensitiveColumnMatcher;
 import io.github.spannm.jackcess.util.ColumnMatcher;
@@ -172,7 +174,7 @@ class CursorTest extends AbstractBaseTest {
     }
 
     @ParameterizedTest(name = "[{index}] {0}")
-    @FileFormatSource()
+    @FileFormatSource
     void testSimple(FileFormat fileFormat) throws Exception {
         try (Database db = createTestTable(fileFormat)) {
             Table table = db.getTable("test");
@@ -196,7 +198,7 @@ class CursorTest extends AbstractBaseTest {
     }
 
     @ParameterizedTest(name = "[{index}] {0}")
-    @FileFormatSource()
+    @FileFormatSource
     void testMove(FileFormat fileFormat) throws Exception {
         try (Database db = createTestTable(fileFormat)) {
             Table table = db.getTable("test");
@@ -251,7 +253,7 @@ class CursorTest extends AbstractBaseTest {
     }
 
     @ParameterizedTest(name = "[{index}] {0}")
-    @FileFormatSource()
+    @FileFormatSource
     void testMoveNoReset(FileFormat fileFormat) throws Exception {
         try (Database db = createTestTable(fileFormat)) {
             Table table = db.getTable("test");
@@ -290,7 +292,7 @@ class CursorTest extends AbstractBaseTest {
     }
 
     @ParameterizedTest(name = "[{index}] {0}")
-    @FileFormatSource()
+    @FileFormatSource
     void testSearch(FileFormat fileFormat) throws Exception {
         try (Database db = createTestTable(fileFormat)) {
             Table table = db.getTable("test");
@@ -369,7 +371,7 @@ class CursorTest extends AbstractBaseTest {
     }
 
     @ParameterizedTest(name = "[{index}] {0}")
-    @FileFormatSource()
+    @FileFormatSource
     void testReverse(FileFormat fileFormat) throws Exception {
         try (Database db = createTestTable(fileFormat)) {
             Table table = db.getTable("test");
@@ -392,7 +394,7 @@ class CursorTest extends AbstractBaseTest {
     }
 
     @ParameterizedTest(name = "[{index}] {0}")
-    @FileFormatSource()
+    @FileFormatSource
     void testLiveAddition(FileFormat fileFormat) throws Exception {
         try (Database db = createTestTable(fileFormat)) {
             Table table = db.getTable("test");
@@ -429,7 +431,7 @@ class CursorTest extends AbstractBaseTest {
     }
 
     @ParameterizedTest(name = "[{index}] {0}")
-    @FileFormatSource()
+    @FileFormatSource
     void testLiveDeletion(FileFormat fileFormat) throws Exception {
         try (Database db = createTestTable(fileFormat)) {
             Table table = db.getTable("test");
@@ -511,7 +513,7 @@ class CursorTest extends AbstractBaseTest {
     }
 
     @ParameterizedTest(name = "[{index}] {0}")
-    @TestDbSource(basename = Basename.INDEX_CURSOR)
+    @TestDbSource(INDEX_CURSOR)
     void testSimpleIndex(TestDb testDb) throws Exception {
         try (Database db = createTestIndexTable(testDb)) {
             Table table = db.getTable("test");
@@ -525,7 +527,7 @@ class CursorTest extends AbstractBaseTest {
     }
 
     @ParameterizedTest(name = "[{index}] {0}")
-    @TestDbSource(basename = Basename.INDEX_CURSOR)
+    @TestDbSource(INDEX_CURSOR)
     void testMoveIndex(TestDb testDb) throws Exception {
         try (Database db = createTestIndexTable(testDb)) {
             Table table = db.getTable("test");
@@ -536,7 +538,7 @@ class CursorTest extends AbstractBaseTest {
     }
 
     @ParameterizedTest(name = "[{index}] {0}")
-    @TestDbSource(basename = Basename.INDEX_CURSOR)
+    @TestDbSource(INDEX_CURSOR)
     void testReverseIndex(TestDb testDb) throws Exception {
         try (Database db = createTestIndexTable(testDb)) {
             Table table = db.getTable("test");
@@ -547,7 +549,7 @@ class CursorTest extends AbstractBaseTest {
     }
 
     @ParameterizedTest(name = "[{index}] {0}")
-    @TestDbSource(basename = Basename.INDEX_CURSOR)
+    @TestDbSource(INDEX_CURSOR)
     void testSearchIndex(TestDb testDb) throws Exception {
         try (Database db = createTestIndexTable(testDb)) {
             Table table = db.getTable("test");
@@ -558,7 +560,7 @@ class CursorTest extends AbstractBaseTest {
     }
 
     @ParameterizedTest(name = "[{index}] {0}")
-    @TestDbSource(basename = Basename.INDEX_CURSOR)
+    @TestDbSource(INDEX_CURSOR)
     void testLiveAdditionIndex(TestDb testDb) throws Exception {
         try (Database db = createTestIndexTable(testDb)) {
             Table table = db.getTable("test");
@@ -571,7 +573,7 @@ class CursorTest extends AbstractBaseTest {
     }
 
     @ParameterizedTest(name = "[{index}] {0}")
-    @TestDbSource(basename = Basename.INDEX_CURSOR)
+    @TestDbSource(INDEX_CURSOR)
     void testLiveDeletionIndex(TestDb testDb) throws Exception {
         try (Database db = createTestIndexTable(testDb)) {
             Table table = db.getTable("test");
@@ -586,7 +588,7 @@ class CursorTest extends AbstractBaseTest {
     }
 
     @ParameterizedTest(name = "[{index}] {0}")
-    @TestDbSource(basename = Basename.INDEX_CURSOR)
+    @TestDbSource(INDEX_CURSOR)
     void testSimpleIndexSubRange(TestDb testDb) throws Exception {
         for (int i = 0; i < 2; i++) {
             try (Database db = createTestIndexTable(testDb)) {
@@ -604,7 +606,7 @@ class CursorTest extends AbstractBaseTest {
     }
 
     @ParameterizedTest(name = "[{index}] {0}")
-    @TestDbSource(basename = Basename.INDEX_CURSOR)
+    @TestDbSource(INDEX_CURSOR)
     void testMoveIndexSubRange(TestDb testDb) throws Exception {
         for (int i = 0; i < 2; i++) {
             try (Database db = createTestIndexTable(testDb)) {
@@ -622,7 +624,7 @@ class CursorTest extends AbstractBaseTest {
     }
 
     @ParameterizedTest(name = "[{index}] {0}")
-    @TestDbSource(basename = Basename.INDEX_CURSOR)
+    @TestDbSource(INDEX_CURSOR)
     void testSearchIndexSubRange(TestDb testDb) throws Exception {
         for (int i = 0; i < 2; i++) {
             try (Database db = createTestIndexTable(testDb)) {
@@ -637,7 +639,7 @@ class CursorTest extends AbstractBaseTest {
     }
 
     @ParameterizedTest(name = "[{index}] {0}")
-    @TestDbSource(basename = Basename.INDEX_CURSOR)
+    @TestDbSource(INDEX_CURSOR)
     void testReverseIndexSubRange(TestDb testDb) throws Exception {
         for (int i = 0; i < 2; i++) {
             try (Database db = createTestIndexTable(testDb)) {
@@ -655,7 +657,7 @@ class CursorTest extends AbstractBaseTest {
     }
 
     @ParameterizedTest(name = "[{index}] {0}")
-    @TestDbSource(basename = Basename.INDEX_CURSOR)
+    @TestDbSource(INDEX_CURSOR)
     void testLiveAdditionIndexSubRange(TestDb testDb) throws Exception {
         for (int i = 0; i < 2; i++) {
             try (Database db = createTestIndexTable(testDb)) {
@@ -671,7 +673,7 @@ class CursorTest extends AbstractBaseTest {
     }
 
     @ParameterizedTest(name = "[{index}] {0}")
-    @TestDbSource(basename = Basename.INDEX_CURSOR)
+    @TestDbSource(INDEX_CURSOR)
     void testLiveDeletionIndexSubRange(TestDb testDb) throws Exception {
         for (int i = 0; i < 2; i++) {
             try (Database db = createTestIndexTable(testDb)) {
@@ -689,7 +691,7 @@ class CursorTest extends AbstractBaseTest {
     }
 
     @ParameterizedTest(name = "[{index}] {0}")
-    @FileFormatSource()
+    @FileFormatSource
     void testFindAllIndex(FileFormat fileFormat) throws Exception {
         try (Database testDb = createDupeTestTable(fileFormat)) {
             Table table = testDb.getTable("test");
@@ -700,7 +702,7 @@ class CursorTest extends AbstractBaseTest {
     }
 
     @ParameterizedTest(name = "[{index}] {0}")
-    @TestDbSource(basename = Basename.INDEX_CURSOR)
+    @TestDbSource(INDEX_CURSOR)
     void testFindAll(TestDb testDb) throws Exception {
         try (Database db = createDupeTestTable(testDb)) {
             Table table = db.getTable("test");
@@ -807,7 +809,7 @@ class CursorTest extends AbstractBaseTest {
     }
 
     @ParameterizedTest(name = "[{index}] {0}")
-    @TestDbSource(basename = Basename.INDEX_CURSOR)
+    @TestDbSource(INDEX_CURSOR)
     void testId(TestDb testDb) throws Exception {
         try (Database db = createTestIndexTable(testDb)) {
             Table table = db.getTable("test");
@@ -845,7 +847,7 @@ class CursorTest extends AbstractBaseTest {
     }
 
     @ParameterizedTest(name = "[{index}] {0}")
-    @FileFormatSource()
+    @FileFormatSource
     void testColumnMatcher(FileFormat fileFormat) throws Exception {
         try (Database db = createTestTable(fileFormat)) {
             Table table = db.getTable("test");
@@ -953,7 +955,7 @@ class CursorTest extends AbstractBaseTest {
     }
 
     @ParameterizedTest(name = "[{index}] {0}")
-    @TestDbSource(basename = Basename.INDEX, readOnly = true)
+    @TestDbReadOnlySource(INDEX)
     void testIndexCursor(TestDb testDb) throws Exception {
         try (Database db = testDb.openMem()) {
             Table t1 = db.getTable("Table1");
@@ -977,7 +979,7 @@ class CursorTest extends AbstractBaseTest {
     }
 
     @ParameterizedTest(name = "[{index}] {0}")
-    @TestDbSource(basename = Basename.INDEX)
+    @TestDbSource(INDEX)
     void testIndexCursorDelete(TestDb testDb) throws Exception {
         try (Database db = testDb.openMem()) {
             Table t1 = db.getTable("Table1");
@@ -1026,7 +1028,7 @@ class CursorTest extends AbstractBaseTest {
     }
 
     @ParameterizedTest(name = "[{index}] {0}")
-    @TestDbSource(basename = Basename.INDEX)
+    @TestDbSource(INDEX)
     void testCursorDelete(TestDb testDb) throws Exception {
         try (Database db = testDb.openMem()) {
             Table t1 = db.getTable("Table1");
@@ -1079,7 +1081,7 @@ class CursorTest extends AbstractBaseTest {
     }
 
     @ParameterizedTest(name = "[{index}] {0}")
-    @FileFormatSource()
+    @FileFormatSource
     void testFindByRowId(FileFormat fileFormat) throws Exception {
         try (Database db = createTestTable(fileFormat)) {
             Table table = db.getTable("test");
@@ -1089,7 +1091,7 @@ class CursorTest extends AbstractBaseTest {
     }
 
     @ParameterizedTest(name = "[{index}] {0}")
-    @TestDbSource(basename = Basename.INDEX_CURSOR)
+    @TestDbSource(INDEX_CURSOR)
     void testFindByRowIdIndex(TestDb testDb) throws Exception {
         try (Database db = createTestIndexTable(testDb)) {
             Table table = db.getTable("test");
@@ -1142,7 +1144,7 @@ class CursorTest extends AbstractBaseTest {
     }
 
     @ParameterizedTest(name = "[{index}] {0}")
-    @FileFormatSource()
+    @FileFormatSource
     void testIterationEarlyExit(FileFormat fileFormat) throws Exception {
         try (Database db = createMem(fileFormat)) {
             Table table = DatabaseBuilder.newTable("test")
@@ -1195,7 +1197,7 @@ class CursorTest extends AbstractBaseTest {
     }
 
     @ParameterizedTest(name = "[{index}] {0}")
-    @FileFormatSource()
+    @FileFormatSource
     void testPartialIndexFind(FileFormat fileFormat) throws Exception {
         try (Database db = createMem(fileFormat)) {
             TableImpl t = (TableImpl) DatabaseBuilder.newTable("Test").addColumn(DatabaseBuilder.newColumn("id", DataType.LONG)).addColumn(DatabaseBuilder.newColumn("data1", DataType.TEXT))
@@ -1247,7 +1249,7 @@ class CursorTest extends AbstractBaseTest {
     }
 
     @ParameterizedTest(name = "[{index}] {0}")
-    @FileFormatSource()
+    @FileFormatSource
     void testPartialIndexLookup(FileFormat fileFormat) throws Exception {
         try (Database db = createMem(fileFormat)) {
             TableImpl t = (TableImpl) DatabaseBuilder.newTable("Test")

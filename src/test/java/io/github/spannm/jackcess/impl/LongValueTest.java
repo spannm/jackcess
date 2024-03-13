@@ -16,15 +16,15 @@ limitations under the License.
 
 package io.github.spannm.jackcess.impl;
 
+import static io.github.spannm.jackcess.test.Basename.TEST2;
 import static io.github.spannm.jackcess.test.TestUtil.*;
 
 import io.github.spannm.jackcess.*;
 import io.github.spannm.jackcess.Database.FileFormat;
 import io.github.spannm.jackcess.test.AbstractBaseTest;
-import io.github.spannm.jackcess.test.Basename;
 import io.github.spannm.jackcess.test.TestDb;
 import io.github.spannm.jackcess.test.source.FileFormatSource;
-import io.github.spannm.jackcess.test.source.TestDbSource;
+import io.github.spannm.jackcess.test.source.TestDbReadOnlySource;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 
@@ -39,7 +39,7 @@ import java.util.*;
 class LongValueTest extends AbstractBaseTest {
 
     @ParameterizedTest(name = "[{index}] {0}")
-    @TestDbSource(basename = Basename.TEST2, readOnly = true)
+    @TestDbReadOnlySource(TEST2)
     void testReadLongValue(TestDb testDb) throws Exception {
         try (Database db = testDb.openMem()) {
             Table table = db.getTable("MSP_PROJECTS");
@@ -60,7 +60,7 @@ class LongValueTest extends AbstractBaseTest {
     }
 
     @ParameterizedTest(name = "[{index}] {0}")
-    @FileFormatSource()
+    @FileFormatSource
     void testWriteLongValue(FileFormat fileFormat) throws Exception {
 
         try (Database db = createMem(fileFormat)) {
@@ -109,7 +109,7 @@ class LongValueTest extends AbstractBaseTest {
     }
 
     @ParameterizedTest(name = "[{index}] {0}")
-    @FileFormatSource()
+    @FileFormatSource
     void testManyMemos(FileFormat fileFormat) throws Exception {
         try (Database db = createMem(fileFormat)) {
             final int numColumns = 126;
@@ -169,7 +169,7 @@ class LongValueTest extends AbstractBaseTest {
     }
 
     @ParameterizedTest(name = "[{index}] {0}")
-    @FileFormatSource()
+    @FileFormatSource
     void testLongValueAsMiddleColumn(FileFormat fileFormat) throws Exception {
         try (Database db = createMem(fileFormat)) {
             Table newTable = new TableBuilder("NewTable")

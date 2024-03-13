@@ -16,11 +16,12 @@ limitations under the License.
 
 package io.github.spannm.jackcess;
 
+import static io.github.spannm.jackcess.test.Basename.LINKED;
+import static io.github.spannm.jackcess.test.Basename.LINKED_ODBC;
 import static io.github.spannm.jackcess.test.TestUtil.*;
 
 import io.github.spannm.jackcess.impl.DatabaseImpl;
 import io.github.spannm.jackcess.test.AbstractBaseTest;
-import io.github.spannm.jackcess.test.Basename;
 import io.github.spannm.jackcess.test.TestDb;
 import io.github.spannm.jackcess.test.source.TestDbSource;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -36,7 +37,7 @@ import java.util.Map;
 class LinkedTableTest extends AbstractBaseTest {
 
     @ParameterizedTest(name = "[{index}] {0}")
-    @TestDbSource(basename = Basename.LINKED)
+    @TestDbSource(LINKED)
     void testLinkedTables(TestDb testDb) throws Exception {
 
         try (Database db = testDb.openCopy()) {
@@ -151,7 +152,7 @@ class LinkedTableTest extends AbstractBaseTest {
     }
 
     @ParameterizedTest(name = "[{index}] {0}")
-    @TestDbSource(basename = Basename.LINKED_ODBC)
+    @TestDbSource(LINKED_ODBC)
     void testOdbcLinkedTables(TestDb testDb) throws Exception {
 
         try (Database db = testDb.openCopy()) {

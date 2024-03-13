@@ -16,6 +16,7 @@ limitations under the License.
 
 package io.github.spannm.jackcess.util;
 
+import static io.github.spannm.jackcess.test.Basename.INDEX;
 import static io.github.spannm.jackcess.test.TestUtil.*;
 
 import io.github.spannm.jackcess.Database;
@@ -24,7 +25,6 @@ import io.github.spannm.jackcess.Row;
 import io.github.spannm.jackcess.Table;
 import io.github.spannm.jackcess.impl.RowImpl;
 import io.github.spannm.jackcess.test.AbstractBaseTest;
-import io.github.spannm.jackcess.test.Basename;
 import io.github.spannm.jackcess.test.TestDb;
 import io.github.spannm.jackcess.test.source.TestDbSource;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -38,7 +38,7 @@ import java.util.stream.Collectors;
 class JoinerTest extends AbstractBaseTest {
 
     @ParameterizedTest(name = "[{index}] {0}")
-    @TestDbSource(basename = Basename.INDEX)
+    @TestDbSource(INDEX)
     void testJoiner(TestDb testDb) throws Exception {
         try (Database db = testDb.openCopy()) {
             Table t1 = db.getTable("Table1");

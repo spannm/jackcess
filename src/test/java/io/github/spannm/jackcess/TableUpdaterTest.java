@@ -34,7 +34,7 @@ import java.util.*;
 class TableUpdaterTest extends AbstractBaseTest {
 
     @ParameterizedTest(name = "[{index}] {0}")
-    @FileFormatSource()
+    @FileFormatSource
     void testTableUpdating(FileFormat fileFormat) throws Exception {
         try (Database db = create(fileFormat)) {
             doTestUpdating(db, false, true, null);
@@ -42,7 +42,7 @@ class TableUpdaterTest extends AbstractBaseTest {
     }
 
     @ParameterizedTest(name = "[{index}] {0}")
-    @FileFormatSource()
+    @FileFormatSource
     void testTableUpdatingOneToOne(FileFormat fileFormat) throws Exception {
         try (Database db = create(fileFormat)) {
             doTestUpdating(db, true, true, null);
@@ -50,7 +50,7 @@ class TableUpdaterTest extends AbstractBaseTest {
     }
 
     @ParameterizedTest(name = "[{index}] {0}")
-    @FileFormatSource()
+    @FileFormatSource
     void testTableUpdatingNoEnforce(FileFormat fileFormat) throws Exception {
         try (Database db = create(fileFormat)) {
             doTestUpdating(db, false, false, null);
@@ -58,7 +58,7 @@ class TableUpdaterTest extends AbstractBaseTest {
     }
 
     @ParameterizedTest(name = "[{index}] {0}")
-    @FileFormatSource()
+    @FileFormatSource
     void testTableUpdatingNamedRelationship(FileFormat fileFormat) throws Exception {
         try (Database db = create(fileFormat)) {
             doTestUpdating(db, false, true, "FKnun3jvv47l9kyl74h85y8a0if");
@@ -168,7 +168,7 @@ class TableUpdaterTest extends AbstractBaseTest {
     }
 
     @ParameterizedTest(name = "[{index}] {0}")
-    @FileFormatSource()
+    @FileFormatSource
     void testInvalidUpdate(FileFormat fileFormat) throws Exception {
         try (Database db = create(fileFormat)) {
             Table t1 = newTable("TestTable")
@@ -207,7 +207,7 @@ class TableUpdaterTest extends AbstractBaseTest {
     }
 
     @ParameterizedTest(name = "[{index}] {0}")
-    @FileFormatSource()
+    @FileFormatSource
     void testUpdateLargeTableDef(FileFormat fileFormat) throws Exception {
         try (Database db = create(fileFormat)) {
             final int numColumns = 89;

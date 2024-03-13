@@ -34,7 +34,7 @@ import java.util.Map;
 class ColumnValidatorTest extends AbstractBaseTest {
 
     @ParameterizedTest(name = "[{index}] {0}")
-    @FileFormatSource()
+    @FileFormatSource
     void testValidate(FileFormat fileFormat) throws Exception {
         try (Database db = create(fileFormat)) {
             ColumnValidatorFactory initFact = db.getColumnValidatorFactory();

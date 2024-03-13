@@ -35,7 +35,7 @@ import java.util.stream.Collectors;
 class PatternColumnPredicateTest extends AbstractBaseTest {
 
     @ParameterizedTest(name = "[{index}] {0}")
-    @FileFormatSource()
+    @FileFormatSource
     void testRegexPredicate(FileFormat fileFormat) throws Exception {
         try (Database db = createTestDb(fileFormat)) {
             Table t = db.getTable("Test");
