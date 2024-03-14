@@ -114,7 +114,7 @@ class DatabaseTest extends AbstractBaseTest {
     }
 
     @ParameterizedTest(name = "[{index}] {0}")
-    @TestDbReadOnlySource(TEST)
+    @TestDbReadOnlySource(COMMON1)
     void testGetColumns(TestDb testDb) throws Exception {
         try (Database db = testDb.open()) {
             List<? extends Column> columns = db.getTable("Table1").getColumns();
@@ -138,7 +138,7 @@ class DatabaseTest extends AbstractBaseTest {
     }
 
     @ParameterizedTest(name = "[{index}] {0}")
-    @TestDbReadOnlySource(TEST)
+    @TestDbReadOnlySource(COMMON1)
     void testGetNextRow(TestDb testDb) throws Exception {
         try (Database db = testDb.open()) {
             db.setDateTimeType(DateTimeType.DATE);
@@ -465,7 +465,7 @@ class DatabaseTest extends AbstractBaseTest {
     }
 
     @ParameterizedTest(name = "[{index}] {0}")
-    @TestDbReadOnlySource(TEST)
+    @TestDbReadOnlySource(COMMON1)
     void testMultiPageTableDef(TestDb testDb) throws Exception {
         try (Database db = testDb.open()) {
             List<? extends Column> columns = db.getTable("Table2").getColumns();
@@ -750,7 +750,7 @@ class DatabaseTest extends AbstractBaseTest {
     }
 
     @ParameterizedTest(name = "[{index}] {0}")
-    @TestDbReadOnlySource(TEST)
+    @TestDbReadOnlySource(COMMON1)
     void testDbSortOrder(TestDb testDb) throws Exception {
         try (Database db = testDb.open()) {
             assertEquals(((DatabaseImpl) db).getFormat().DEFAULT_SORT_ORDER,
@@ -759,7 +759,7 @@ class DatabaseTest extends AbstractBaseTest {
     }
 
     @ParameterizedTest(name = "[{index}] {0}")
-    @TestDbSource(UNSUPPORTED)
+    @TestDbSource(UNSUPPORTED_FIELDS)
     void testUnsupportedColumns(TestDb testDb) throws Exception {
         try (Database db = testDb.open()) {
             Table t = db.getTable("Test");
@@ -851,7 +851,7 @@ class DatabaseTest extends AbstractBaseTest {
     }
 
     @ParameterizedTest(name = "[{index}] {0}")
-    @TestDbReadOnlySource(TEST)
+    @TestDbReadOnlySource(COMMON1)
     void testIterateTableNames1(TestDb testDb) throws Exception {
         try (Database db = testDb.open()) {
             Set<String> names = new HashSet<>();
@@ -898,7 +898,7 @@ class DatabaseTest extends AbstractBaseTest {
     }
 
     @ParameterizedTest(name = "[{index}] {0}")
-    @TestDbReadOnlySource(TEST)
+    @TestDbReadOnlySource(COMMON1)
     void testTableDates(TestDb testDb) throws Exception {
         try (Database db = testDb.open()) {
             Table table = db.getTable("Table1");
@@ -917,7 +917,7 @@ class DatabaseTest extends AbstractBaseTest {
     }
 
     @ParameterizedTest(name = "[{index}] {0}")
-    @TestDbSource(TEST)
+    @TestDbSource(COMMON1)
     void testBrokenIndex(TestDb testDb) throws Exception {
         try (Database db = new DatabaseBuilder(testDb.getFile())
             .withReadOnly(true).withIgnoreBrokenSystemCatalogIndex(true).open()) {

@@ -16,7 +16,7 @@ limitations under the License.
 
 package io.github.spannm.jackcess;
 
-import static io.github.spannm.jackcess.test.Basename.TEST;
+import static io.github.spannm.jackcess.test.Basename.COMMON1;
 
 import io.github.spannm.jackcess.Database.FileFormat;
 import io.github.spannm.jackcess.impl.DatabaseImpl;
@@ -119,7 +119,7 @@ class PropertiesTest extends AbstractBaseTest {
     }
 
     @ParameterizedTest(name = "[{index}] {0}")
-    @TestDbReadOnlySource(TEST)
+    @TestDbReadOnlySource(COMMON1)
     void testReadProperties(TestDb testDb) throws Exception {
         try (Database db = testDb.open()) {
             TableImpl t = (TableImpl) db.getTable("Table1");
@@ -202,7 +202,7 @@ class PropertiesTest extends AbstractBaseTest {
     }
 
     @ParameterizedTest(name = "[{index}] {0}")
-    @TestDbSource(TEST)
+    @TestDbSource(COMMON1)
     void testWriteProperties(TestDb testDb) throws Exception {
         try (Database db = testDb.open()) {
             TableImpl t = (TableImpl) db.getTable("Table1");
@@ -232,7 +232,7 @@ class PropertiesTest extends AbstractBaseTest {
     }
 
     @ParameterizedTest(name = "[{index}] {0}")
-    @TestDbSource(TEST)
+    @TestDbSource(COMMON1)
     void testModifyProperties(TestDb testDb) throws Exception {
         Database db = testDb.openCopy();
         File dbFile = db.getFile();

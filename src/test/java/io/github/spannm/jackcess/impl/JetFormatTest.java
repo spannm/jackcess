@@ -1,6 +1,6 @@
 package io.github.spannm.jackcess.impl;
 
-import static io.github.spannm.jackcess.test.Basename.TEST;
+import static io.github.spannm.jackcess.test.Basename.COMMON1;
 
 import io.github.spannm.jackcess.DataType;
 import io.github.spannm.jackcess.Database;
@@ -30,7 +30,7 @@ class JetFormatTest extends AbstractBaseTest {
     }
 
     @ParameterizedTest(name = "[{index}] {0}")
-    @TestDbReadOnlySource(TEST)
+    @TestDbReadOnlySource(COMMON1)
     void testGetFormat(TestDb testDb) throws Exception {
         try (FileChannel channel = DatabaseImpl.openChannel(testDb.getFile().toPath(), false, false)) {
 
@@ -40,7 +40,7 @@ class JetFormatTest extends AbstractBaseTest {
     }
 
     @ParameterizedTest(name = "[{index}] {0}")
-    @TestDbReadOnlySource(TEST)
+    @TestDbReadOnlySource(COMMON1)
     void testReadOnlyFormat(TestDb testDb) {
         Exception failure = null;
         try (Database db = testDb.openCopy()) {
@@ -62,7 +62,7 @@ class JetFormatTest extends AbstractBaseTest {
     }
 
     @ParameterizedTest(name = "[{index}] {0}")
-    @TestDbReadOnlySource(TEST)
+    @TestDbReadOnlySource(COMMON1)
     void testFileFormat1(TestDb testDb) throws Exception {
         try (Database db = testDb.open()) {
             assertEquals(testDb.getExpectedFileFormat(), db.getFileFormat());

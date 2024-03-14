@@ -16,8 +16,8 @@ limitations under the License.
 
 package io.github.spannm.jackcess;
 
-import static io.github.spannm.jackcess.test.Basename.COMPLEX;
-import static io.github.spannm.jackcess.test.Basename.UNSUPPORTED;
+import static io.github.spannm.jackcess.test.Basename.COMPLEX_DATA;
+import static io.github.spannm.jackcess.test.Basename.UNSUPPORTED_FIELDS;
 import static io.github.spannm.jackcess.test.TestUtil.TEST_TZ;
 import static io.github.spannm.jackcess.test.TestUtil.assertSameDate;
 
@@ -60,7 +60,7 @@ class ComplexColumnTest extends AbstractBaseTest {
     private static final byte[] TEST2_BYTES     = getAsciiBytes("this is some more test data for attachment.");
 
     @ParameterizedTest(name = "[{index}] {0}")
-    @TestDbSource(COMPLEX)
+    @TestDbSource(COMPLEX_DATA)
     void testVersions(TestDb testDb) throws Exception {
         try (Database db = testDb.openCopy()) {
             db.setDateTimeType(DateTimeType.DATE);
@@ -146,7 +146,7 @@ class ComplexColumnTest extends AbstractBaseTest {
     }
 
     @ParameterizedTest(name = "[{index}] {0}")
-    @TestDbSource(COMPLEX)
+    @TestDbSource(COMPLEX_DATA)
     void testAttachments(TestDb testDb) throws Exception {
         try (Database db = testDb.openCopy()) {
             Table t1 = db.getTable("Table1");
@@ -224,7 +224,7 @@ class ComplexColumnTest extends AbstractBaseTest {
     }
 
     @ParameterizedTest(name = "[{index}] {0}")
-    @TestDbSource(COMPLEX)
+    @TestDbSource(COMPLEX_DATA)
     void testMultiValues(TestDb testDb) throws Exception {
         try (Database db = testDb.openCopy()) {
             Table t1 = db.getTable("Table1");
@@ -294,7 +294,7 @@ class ComplexColumnTest extends AbstractBaseTest {
     }
 
     @ParameterizedTest(name = "[{index}] {0}")
-    @TestDbSource(UNSUPPORTED)
+    @TestDbSource(UNSUPPORTED_FIELDS)
     void testUnsupported(TestDb testDb) throws Exception {
         try (Database db = testDb.openCopy()) {
             Table t1 = db.getTable("Test");

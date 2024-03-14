@@ -1,6 +1,7 @@
 package io.github.spannm.jackcess.impl;
 
-import static io.github.spannm.jackcess.test.Basename.TEST;
+import static io.github.spannm.jackcess.test.Basename.COMMON1;
+import static io.github.spannm.jackcess.test.Basename.REF_GLOBAL;
 import static io.github.spannm.jackcess.test.TestUtil.createString;
 import static io.github.spannm.jackcess.test.TestUtil.openCopy;
 
@@ -9,10 +10,8 @@ import io.github.spannm.jackcess.Database.FileFormat;
 import io.github.spannm.jackcess.test.AbstractBaseTest;
 import io.github.spannm.jackcess.test.TestDb;
 import io.github.spannm.jackcess.test.source.TestDbSource;
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -22,7 +21,7 @@ import java.util.List;
 public class UsageMapTest extends AbstractBaseTest {
 
     @ParameterizedTest(name = "[{index}] {0}")
-    @TestDbSource(TEST)
+    @TestDbSource(COMMON1)
     void testRead(TestDb testDB) throws Exception {
         int expectedFirstPage;
         int expectedLastPage;
@@ -52,11 +51,10 @@ public class UsageMapTest extends AbstractBaseTest {
         }
     }
 
-    @Test
-    void testGobalReferenceUsageMap() throws Exception {
-        try (Database db = openCopy(
-            FileFormat.V2000,
-            new File(DIR_TEST_DATA, "V2000/testRefGlobalV2000.mdb"))) {
+    @ParameterizedTest(name = "[{index}] {0}")
+    @TestDbSource(REF_GLOBAL)
+    void testGobalReferenceUsageMap(TestDb testDb) throws Exception {
+        try (Database db = openCopy(FileFormat.V2000, testDb.getFile())) {
             Table t = new TableBuilder("Test2")
                 .addColumn(new ColumnBuilder("id", DataType.LONG))
                 .addColumn(new ColumnBuilder("data1", DataType.TEXT))

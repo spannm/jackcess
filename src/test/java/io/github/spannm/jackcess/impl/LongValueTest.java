@@ -16,7 +16,8 @@ limitations under the License.
 
 package io.github.spannm.jackcess.impl;
 
-import static io.github.spannm.jackcess.test.Basename.TEST2;
+import static io.github.spannm.jackcess.test.Basename.COMMON2;
+import static io.github.spannm.jackcess.test.Basename.UNICODE_COMP;
 import static io.github.spannm.jackcess.test.TestUtil.*;
 
 import io.github.spannm.jackcess.*;
@@ -25,7 +26,6 @@ import io.github.spannm.jackcess.test.AbstractBaseTest;
 import io.github.spannm.jackcess.test.TestDb;
 import io.github.spannm.jackcess.test.source.FileFormatSource;
 import io.github.spannm.jackcess.test.source.TestDbReadOnlySource;
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 
 import java.io.File;
@@ -39,7 +39,7 @@ import java.util.*;
 class LongValueTest extends AbstractBaseTest {
 
     @ParameterizedTest(name = "[{index}] {0}")
-    @TestDbReadOnlySource(TEST2)
+    @TestDbReadOnlySource(COMMON2)
     void testReadLongValue(TestDb testDb) throws Exception {
         try (Database db = testDb.openMem()) {
             Table table = db.getTable("MSP_PROJECTS");
@@ -190,10 +190,10 @@ class LongValueTest extends AbstractBaseTest {
         }
     }
 
-    @Test
-    void testUnicodeCompression() throws Exception {
-        File dbFile = new File(DIR_TEST_DATA, "V2003/testUnicodeCompV2003.mdb");
-        try (Database db = open(FileFormat.V2003, dbFile, true)) {
+    @ParameterizedTest(name = "[{index}] {0}")
+    @TestDbReadOnlySource(UNICODE_COMP)
+    void testUnicodeCompression(TestDb testDb) throws Exception {
+        try (Database db = open(FileFormat.V2003, testDb.getFile(), true)) {
             StringBuilder sb = new StringBuilder(127);
             for (int i = 1; i <= 0xFF; i++) {
                 sb.append((char) i);

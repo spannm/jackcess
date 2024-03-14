@@ -65,6 +65,35 @@ public final class StringUtil {
         return cp == newCp ? str : (char) newCp + str.substring(1);
     }
 
+    /**
+     * Converts a string to "title case", a type of capitalization in which the first letter of a word (following an underscore) except in position 0 is capitalized,
+     * underscores are removed, and the rest of the letters are lower-case.
+     */
+    public static String toTitleCase(String str) {
+        if (str == null || str.isBlank()) {
+            return str;
+        }
+        StringBuilder sb = new StringBuilder();
+        boolean nextUpper = false;
+        for (int i = 0; i < str.length(); i++) {
+            char c = str.charAt(i);
+            if ('_' == c) {
+                nextUpper = true; // skip underscore, next char upper
+            } else if (i == 0) {
+                sb.append(Character.toLowerCase(c));
+            } else if (nextUpper) {
+                if ('_' != c) {
+                    sb.append(Character.toTitleCase(c));
+                    nextUpper = false;
+                } // else skip underscore, next char upper
+            } else {
+                sb.append(Character.toLowerCase(c));
+            }
+        }
+
+        return sb.toString();
+    }
+
     public static String replace(String text, CharSequence searchString, CharSequence replacement) {
         return isEmpty(text) || isEmpty(searchString) ? text : text.replace(searchString, replacement);
     }

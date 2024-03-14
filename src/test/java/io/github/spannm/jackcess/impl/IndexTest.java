@@ -83,7 +83,7 @@ class IndexTest extends AbstractBaseTest {
     }
 
     @ParameterizedTest(name = "[{index}] {0}")
-    @TestDbReadOnlySource(TEST)
+    @TestDbReadOnlySource(COMMON1)
     void testPrimaryKey(TestDb testDb) throws Exception {
         try (Database db = testDb.open()) {
             Table table = db.getTable("Table1");
@@ -186,7 +186,7 @@ class IndexTest extends AbstractBaseTest {
     }
 
     @ParameterizedTest(name = "[{index}] {0}")
-    @TestDbSource(TEST)
+    @TestDbSource(COMMON1)
     void testEntryDeletion(TestDb testDb) throws Exception {
         try (Database db = testDb.openCopy()) {
             Table table = db.getTable("Table1");
@@ -332,7 +332,7 @@ class IndexTest extends AbstractBaseTest {
     }
 
     @ParameterizedTest(name = "[{index}] {0}")
-    @TestDbSource(TEST)
+    @TestDbSource(COMMON1)
     void testUniqueEntryCount(TestDb testDb) throws Exception {
         try (Database db = testDb.openCopy()) {
             db.setDateTimeType(DateTimeType.DATE);
@@ -390,7 +390,7 @@ class IndexTest extends AbstractBaseTest {
     }
 
     @ParameterizedTest(name = "[{index}] {0}")
-    @TestDbSource(TEST)
+    @TestDbSource(COMMON1)
     void testReplId(TestDb testDb) throws Exception {
         try (Database db = testDb.openCopy()) {
             Table table = db.getTable("Table4");

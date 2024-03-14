@@ -16,9 +16,13 @@ limitations under the License.
 
 package io.github.spannm.jackcess.util;
 
+import static io.github.spannm.jackcess.test.Basename.COMP_INDEX;
+
 import io.github.spannm.jackcess.test.AbstractBaseTest;
+import io.github.spannm.jackcess.test.TestDb;
 import io.github.spannm.jackcess.test.TestUtil;
-import org.junit.jupiter.api.Test;
+import io.github.spannm.jackcess.test.source.TestDbReadOnlySource;
+import org.junit.jupiter.params.ParameterizedTest;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -32,11 +36,11 @@ import java.nio.channels.NonWritableChannelException;
  */
 class MemFileChannelTest extends AbstractBaseTest {
 
-    @Test
-    void testReadOnlyChannel() throws Exception {
-        File testFile = new File(DIR_TEST_DATA, "V1997/compIndexTestV1997.mdb");
-        try (MemFileChannel ch = MemFileChannel.newChannel(testFile, "r")) {
-            assertEquals(testFile.length(), ch.size());
+    @ParameterizedTest(name = "[{index}] {0}")
+    @TestDbReadOnlySource(COMP_INDEX)
+    void testReadOnlyChannel(TestDb testDb) throws Exception {
+        try (MemFileChannel ch = MemFileChannel.newChannel(testDb.getFile(), "r")) {
+            assertEquals(testDb.getFile().length(), ch.size());
             assertEquals(0L, ch.position());
 
             assertThrows(NonWritableChannelException.class, () -> {
@@ -48,13 +52,14 @@ class MemFileChannelTest extends AbstractBaseTest {
 
             assertThrows(NonWritableChannelException.class, () -> ch.transferFrom(null, 0L, 10L));
 
-            assertEquals(testFile.length(), ch.size());
+            assertEquals(testDb.getFile().length(), ch.size());
             assertEquals(0L, ch.position());
         }
     }
 
-    @Test
-    void testChannel() throws Exception {
+    @ParameterizedTest(name = "[{index}] {0}")
+    @TestDbReadOnlySource(COMP_INDEX)
+    void testChannel(TestDb testDb) throws Exception {
         ByteBuffer bb = ByteBuffer.allocate(1024);
 
         try (MemFileChannel ch1 = MemFileChannel.newChannel()) {
@@ -64,9 +69,8 @@ class MemFileChannelTest extends AbstractBaseTest {
             assertEquals(-1, ch1.read(bb));
         }
 
-        File testFile = new File(DIR_TEST_DATA, "V1997/compIndexTestV1997.mdb");
-        MemFileChannel ch2 = MemFileChannel.newChannel(testFile, "r");
-        assertEquals(testFile.length(), ch2.size());
+        MemFileChannel ch2 = MemFileChannel.newChannel(testDb.getFile(), "r");
+        assertEquals(testDb.getFile().length(), ch2.size());
         assertEquals(0L, ch2.position());
 
         assertThrows(IllegalArgumentException.class, () -> ch2.position(-1));
@@ -74,8 +78,8 @@ class MemFileChannelTest extends AbstractBaseTest {
         MemFileChannel ch3 = MemFileChannel.newChannel();
         ch2.transferTo(ch3);
         ch3.force(true);
-        assertEquals(testFile.length(), ch3.size());
-        assertEquals(testFile.length(), ch3.position());
+        assertEquals(testDb.getFile().length(), ch3.size());
+        assertEquals(testDb.getFile().length(), ch3.position());
 
         assertThrows(IllegalArgumentException.class, () -> ch3.truncate(-1L));
 
@@ -86,6 +90,9 @@ class MemFileChannelTest extends AbstractBaseTest {
         ch3.position(0L);
         copy(ch2, ch3, bb);
 
+        ch2.close();
+        assertFalse(ch2.isOpen());
+
         File tmpFile = File.createTempFile("chtest_", ".dat");
         tmpFile.deleteOnExit();
 
@@ -93,9 +100,9 @@ class MemFileChannelTest extends AbstractBaseTest {
             ch3.transferTo(fc);
         }
 
-        assertEquals(testFile.length(), tmpFile.length());
+        assertEquals(testDb.getFile().length(), tmpFile.length());
 
-        assertArrayEquals(TestUtil.toByteArray(testFile), TestUtil.toByteArray(tmpFile));
+        assertArrayEquals(TestUtil.toByteArray(testDb.getFile()), TestUtil.toByteArray(tmpFile));
 
         ch3.truncate(0L);
         assertTrue(ch3.isOpen());

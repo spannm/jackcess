@@ -1,40 +1,44 @@
 package io.github.spannm.jackcess.test;
 
+import io.github.spannm.jackcess.util.StringUtil;
+
 /**
  * Defines known valid database test file base names
  * i.e. the prefix of the file name.
  */
 public enum Basename {
 
-    BIG_INDEX("bigIndexTest"),
-    BINARY_INDEX("binIdxTest"),
-    BLOB("testOle"),
-    CALC_FIELD("calcFieldTest"),
-    COMPLEX("complexDataTest"),
-    COMP_INDEX("compIndexTest"),
-    DEL("delTest"),
-    DEL_COL("delColTest"),
-    EXT_DATE("extDateTest"),
-    FIXED_NUMERIC("fixedNumericTest"),
-    FIXED_TEXT("fixedTextTest"),
-    INDEX("indexTest"),
-    INDEX_CODES("testIndexCodes"),
-    INDEX_CURSOR("indexCursorTest"),
-    INDEX_PROPERTIES("testIndexProperties"),
-    LINKED("linkerTest"),
-    LINKED_ODBC("odbcLinkerTest"),
-    OLD_DATES("oldDates"),
-    OVERFLOW("overflowTest"),
-    PROMOTION("testPromotion"),
-    QUERY("queryTest"),
-    TEST("test"),
-    TEST2("test2"),
-    UNSUPPORTED("unsupportedFieldsTest");
+    BIG_INDEX,
+    BINARY_INDEX,
+    BLOB,
+    CALC_FIELD,
+    COMMON1,
+    COMMON2,
+    COMPLEX_DATA,
+    COMP_INDEX,
+    DEL,
+    DEL_COL,
+    EXT_DATE,
+    FIXED_NUMERIC,
+    FIXED_TEXT,
+    INDEX,
+    INDEX_CODES,
+    INDEX_CURSOR,
+    INDEX_PROPERTIES,
+    LINKED,
+    LINKED_ODBC,
+    OLD_DATES,
+    OVERFLOW,
+    PROMOTION,
+    QUERY,
+    REF_GLOBAL,
+    UNICODE_COMP,
+    UNSUPPORTED_FIELDS;
 
     private final String basename;
 
-    Basename(String _basename) {
-        basename = _basename;
+    Basename() {
+        basename = StringUtil.toTitleCase(name());
     }
 
     @Override

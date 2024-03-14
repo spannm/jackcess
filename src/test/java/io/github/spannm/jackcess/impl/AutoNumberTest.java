@@ -18,8 +18,8 @@ package io.github.spannm.jackcess.impl;
 
 import static io.github.spannm.jackcess.DatabaseBuilder.newColumn;
 import static io.github.spannm.jackcess.DatabaseBuilder.newTable;
-import static io.github.spannm.jackcess.test.Basename.COMPLEX;
-import static io.github.spannm.jackcess.test.Basename.TEST;
+import static io.github.spannm.jackcess.test.Basename.COMPLEX_DATA;
+import static io.github.spannm.jackcess.test.Basename.COMMON1;
 import static io.github.spannm.jackcess.test.TestUtil.*;
 
 import io.github.spannm.jackcess.*;
@@ -57,7 +57,7 @@ class AutoNumberTest extends AbstractBaseTest {
     }
 
     @ParameterizedTest(name = "[{index}] {0}")
-    @TestDbSource(TEST)
+    @TestDbSource(COMMON1)
     void testAutoNumberPK(TestDb testDB) throws Exception {
         try (Database db = testDB.openMem()) {
             Table table = db.getTable("Table3");
@@ -247,7 +247,7 @@ class AutoNumberTest extends AbstractBaseTest {
     }
 
     @ParameterizedTest(name = "[{index}] {0}")
-    @TestDbSource(COMPLEX)
+    @TestDbSource(COMPLEX_DATA)
     void testInsertComplexAutoNumber(TestDb testDb) throws Exception {
 
 
