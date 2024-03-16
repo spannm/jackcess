@@ -198,7 +198,6 @@ class LocalDateTimeTest extends AbstractBaseTest {
             LocalDateTime newLdt = ColumnImpl.ldtFromLocalDateDouble(
                 col.toDateDouble(curDate));
             if (!curLdt.equals(newLdt)) {
-                System.out.println("FOO " + curLdt + " " + newLdt);
                 assertEquals(sdf.format(curLdt), sdf.format(newLdt));
             }
             curCal.add(Calendar.MINUTE, 30);

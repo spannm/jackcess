@@ -44,6 +44,10 @@ public abstract class AbstractBaseTest extends Assertions {
         return logger;
     }
 
+    protected static final Logger getStaticLogger() {
+        return System.getLogger(AbstractBaseTest.class.getName());
+    }
+
     @BeforeEach
     public final void setTestMethodName(TestInfo _testInfo) {
         lastTestInfo = _testInfo;

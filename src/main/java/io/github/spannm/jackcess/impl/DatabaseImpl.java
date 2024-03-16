@@ -462,7 +462,7 @@ public class DatabaseImpl implements Database, DateTimeContext {
      */
     private final TableCache                _tableCache                         = new TableCache();
     /**
-     * handler for reading/writing properteies
+     * handler for reading/writing properties
      */
     private PropertyMaps.Handler            _propsHandler;
     /**

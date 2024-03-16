@@ -24,6 +24,8 @@ import io.github.spannm.jackcess.util.MemFileChannel;
 import org.junit.jupiter.api.Assertions;
 
 import java.io.*;
+import java.lang.System.Logger;
+import java.lang.System.Logger.Level;
 import java.lang.reflect.Field;
 import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
@@ -46,35 +48,39 @@ public final class TestUtil extends Assertions {
     private TestUtil() {
     }
 
-    public static Database open(FileFormat fileFormat, File file) throws Exception {
+    private static Logger getLogger() {
+        return System.getLogger(TestUtil.class.getName());
+    }
+
+    public static Database open(FileFormat fileFormat, File file) throws IOException {
         return open(fileFormat, file, false);
     }
 
-    public static Database open(FileFormat fileFormat, File file, boolean inMem) throws Exception {
+    public static Database open(FileFormat fileFormat, File file, boolean inMem) throws IOException {
         return open(fileFormat, file, inMem, null);
     }
 
-    public static Database open(FileFormat fileFormat, File file, boolean inMem, Charset charset) throws Exception {
+    public static Database open(FileFormat fileFormat, File file, boolean inMem, Charset charset) throws IOException {
         return openDB(fileFormat, file, inMem, charset, true);
     }
 
-    public static Database create(FileFormat fileFormat) throws Exception {
+    public static Database create(FileFormat fileFormat) throws IOException {
         return create(fileFormat, false);
     }
 
-    public static Database create(FileFormat fileFormat, boolean keep) throws Exception {
+    public static Database create(FileFormat fileFormat, boolean keep) throws IOException {
         return create(fileFormat, keep, true);
     }
 
-    public static Database createMem(FileFormat fileFormat) throws Exception {
+    public static Database createMem(FileFormat fileFormat) throws IOException {
         return create(fileFormat);
     }
 
-    public static Database createFile(FileFormat fileFormat) throws Exception {
+    public static Database createFile(FileFormat fileFormat) throws IOException {
         return create(fileFormat, false, false);
     }
 
-    private static Database create(FileFormat fileFormat, boolean keep, boolean inMem) throws Exception {
+    private static Database create(FileFormat fileFormat, boolean keep, boolean inMem) throws IOException {
 
         FileChannel channel = inMem && !keep ? MemFileChannel.newChannel() : null;
 
@@ -103,17 +109,17 @@ public final class TestUtil extends Assertions {
             .withChannel(channel).create();
     }
 
-    public static Database openCopy(FileFormat fileFormat, File file) throws Exception {
+    public static Database openCopy(FileFormat fileFormat, File file) throws IOException {
         return openCopy(fileFormat, file, false);
     }
 
-    public static Database openCopy(FileFormat fileFormat, File file, boolean keep) throws Exception {
+    public static Database openCopy(FileFormat fileFormat, File file, boolean keep) throws IOException {
         File tmp = createTempFile(keep);
         copyFile(file, tmp);
         return openDB(fileFormat, tmp, false, null, false);
     }
 
-    static Database openDB(FileFormat fileFormat, File file, boolean inMem, Charset charset, boolean readOnly) throws Exception {
+    static Database openDB(FileFormat fileFormat, File file, boolean inMem, Charset charset, boolean readOnly) throws IOException {
         FileChannel channel = inMem ? MemFileChannel.newChannel(file, MemFileChannel.RW_CHANNEL_MODE) : null;
         Database db = new DatabaseBuilder(file).withReadOnly(readOnly)
             .withAutoSync(AbstractBaseTest.getTestAutoSync())
@@ -141,7 +147,7 @@ public final class TestUtil extends Assertions {
             "G", 777.88f, "H", (short) 999, "I", new Date());
     }
 
-    public static void createTestTable(Database db) throws Exception {
+    public static void createTestTable(Database db) throws IOException {
         new TableBuilder("test")
             .addColumn(new ColumnBuilder("A", DataType.TEXT))
             .addColumn(new ColumnBuilder("B", DataType.TEXT))
@@ -164,19 +170,19 @@ public final class TestUtil extends Assertions {
     }
 
     private static String createString(int len, char firstChar) {
-        StringBuilder builder = new StringBuilder(len);
+        StringBuilder sb = new StringBuilder(len);
         for (int i = 0; i < len; i++) {
-            builder.append((char) (firstChar + i % 26));
+            sb.append((char) (firstChar + i % 26));
         }
-        return builder.toString();
+        return sb.toString();
     }
 
-    public static void assertRowCount(int expectedRowCount, Table table) throws Exception {
+    public static void assertRowCount(int expectedRowCount, Table table) throws IOException {
         assertEquals(expectedRowCount, countRows(table));
         assertEquals(expectedRowCount, table.getRowCount());
     }
 
-    public static int countRows(Table table) throws Exception {
+    public static int countRows(Table table) throws IOException {
         Cursor cursor = CursorBuilder.createCursor(table);
         return (int) StreamSupport.stream(cursor.spliterator(), false).count();
     }
@@ -208,27 +214,26 @@ public final class TestUtil extends Assertions {
         return List.of(rows);
     }
 
-    public static void dumpDatabase(Database mdb) throws Exception {
+    public static void dumpDatabase(Database mdb) throws IOException {
         dumpDatabase(mdb, false);
     }
 
-    public static void dumpDatabase(Database mdb, boolean systemTables) throws Exception {
+    public static void dumpDatabase(Database mdb, boolean systemTables) throws IOException {
         dumpDatabase(mdb, systemTables, new PrintWriter(System.out, true));
     }
 
-    public static void dumpTable(Table table) throws Exception {
+    public static void dumpTable(Table table) throws IOException {
         dumpTable(table, new PrintWriter(System.out, true));
     }
 
-    public static void dumpProperties(Table table) throws Exception {
-        System.out.println("TABLE_PROPS: " + table.getName() + ": " + table.getProperties());
+    public static void dumpProperties(Table table) throws IOException {
+        getLogger().log(Level.DEBUG, "TABLE_PROPS: {0}: {1}", table.getName(), table.getProperties());
         for (Column c : table.getColumns()) {
-            System.out.println("COL_PROPS: " + c.getName() + ": " + c.getProperties());
+            getLogger().log(Level.DEBUG, "COL_PROPS: {0}: {1}", c.getName(), c.getProperties());
         }
     }
 
-    static void dumpDatabase(Database mdb, boolean systemTables,
-        PrintWriter writer) throws Exception {
+    static void dumpDatabase(Database mdb, boolean systemTables, PrintWriter writer) throws IOException {
         writer.println("DATABASE:");
         for (Table table : mdb) {
             dumpTable(table, writer);
@@ -240,7 +245,7 @@ public final class TestUtil extends Assertions {
         }
     }
 
-    static void dumpTable(Table table, PrintWriter writer) throws Exception {
+    static void dumpTable(Table table, PrintWriter writer) throws IOException {
         // make sure all indexes are read
         for (Index index : table.getIndexes()) {
             ((IndexImpl) index).initialize();
@@ -274,11 +279,11 @@ public final class TestUtil extends Assertions {
         return row;
     }
 
-    static void dumpIndex(Index index) throws Exception {
+    static void dumpIndex(Index index) throws IOException {
         dumpIndex(index, new PrintWriter(System.out, true));
     }
 
-    static void dumpIndex(Index index, PrintWriter writer) throws Exception {
+    static void dumpIndex(Index index, PrintWriter writer) throws IOException {
         writer.println("INDEX: " + index);
         IndexData.EntryCursor ec = ((IndexImpl) index).cursor();
         IndexData.Entry lastE = ec.getLastEntry();
@@ -335,10 +340,10 @@ public final class TestUtil extends Assertions {
         }
     }
 
-    public static File createTempFile(boolean keep) throws Exception {
+    public static File createTempFile(boolean keep) throws IOException {
         File tmp = File.createTempFile("databaseTest", ".mdb");
         if (keep) {
-            System.out.println("Created " + tmp);
+            getLogger().log(Level.INFO, "Created {0}", tmp);
         } else {
             tmp.deleteOnExit();
         }
@@ -360,8 +365,6 @@ public final class TestUtil extends Assertions {
     }
 
     public static byte[] toByteArray(InputStream in, long length) throws IOException {
-        // FIXME should really be using commons io IOUtils here, but don't want
-        // to add dep for one simple test method
         try (in) {
             DataInputStream din = new DataInputStream(in);
             byte[] bytes = new byte[(int) length];
@@ -377,7 +380,7 @@ public final class TestUtil extends Assertions {
         assertEquals((short) 222, row.get("D"));
         assertEquals(333333333, row.get("E"));
         assertEquals(444.555d, row.get("F"));
-        final Calendar cal = Calendar.getInstance();
+        Calendar cal = Calendar.getInstance();
         cal.setTime(row.getDate("G"));
         assertEquals(Calendar.SEPTEMBER, cal.get(Calendar.MONTH));
         assertEquals(21, cal.get(Calendar.DAY_OF_MONTH));
