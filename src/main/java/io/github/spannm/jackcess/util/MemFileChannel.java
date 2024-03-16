@@ -154,6 +154,7 @@ public class MemFileChannel extends FileChannel {
      * Creates a new MemFileChannel containing the contents of the given ReadableByteChannel with the given mode (for
      * mode details see {@link RandomAccessFile#RandomAccessFile(File,String)}).
      */
+    @SuppressWarnings("resource")
     public static MemFileChannel newChannel(ReadableByteChannel in, String mode) throws IOException {
         MemFileChannel channel = new MemFileChannel();
         channel.transferFrom(in, 0L, Long.MAX_VALUE);
