@@ -149,12 +149,14 @@ class ExpressionatorTest extends AbstractBaseTest {
 
     @ParameterizedTest(name = "[{index}] {0}")
     @MethodSource("getDoublesTestData")
-    void testSimpleMathExpressions2(double d) {
-        BigDecimal bd = toBD(d);
-        assertAll("math2",
-            () -> assertEquals(bd.negate(), eval("-(" + d + ")")),
-            () -> assertEquals(bd, eval("+(" + d + ")"))
-        );
+    void testPositiveDouble(double d) {
+        assertEquals(toBD(d), eval("+(" + d + ")"));
+    }
+
+    @ParameterizedTest(name = "[{index}] {0}")
+    @MethodSource("getDoublesTestData")
+    void testNegativeDouble(double d) {
+        assertEquals(toBD(d).negate(), eval("-(" + d + ")"));
     }
 
     @ParameterizedTest(name = "[{index}] {0}, {1}")
