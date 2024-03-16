@@ -172,35 +172,34 @@ class DatabaseTest extends AbstractBaseTest {
     @FileFormatSource
     void testDeleteCurrentRow(FileFormat fileFormat) throws Exception {
         // make sure correct row is deleted
-        Database db1 = createMem(fileFormat);
-        createTestTable(db1);
-        Map<String, Object> row1 = createTestRowMap("Tim1");
-        Map<String, Object> row2 = createTestRowMap("Tim2");
-        Map<String, Object> row3 = createTestRowMap("Tim3");
-        Table table = db1.getTable("Test");
-        List<Map<String, Object>> rows = List.of(row1, row2, row3);
-        table.addRowsFromMaps(rows);
-        assertRowCount(3, table);
+        try (Database db = createMem(fileFormat)) {
+            createTestTable(db);
+            Map<String, Object> row1 = createTestRowMap("Tim1");
+            Map<String, Object> row2 = createTestRowMap("Tim2");
+            Map<String, Object> row3 = createTestRowMap("Tim3");
+            Table table = db.getTable("Test");
+            List<Map<String, Object>> rows = List.of(row1, row2, row3);
+            table.addRowsFromMaps(rows);
+            assertRowCount(3, table);
 
-        table.reset();
-        table.getNextRow();
-        table.getNextRow();
-        table.getDefaultCursor().deleteCurrentRow();
+            table.reset();
+            table.getNextRow();
+            table.getNextRow();
+            table.getDefaultCursor().deleteCurrentRow();
 
-        table.reset();
+            table.reset();
 
-        Map<String, Object> outRow = table.getNextRow();
-        assertEquals("Tim1", outRow.get("A"));
-        outRow = table.getNextRow();
-        assertEquals("Tim3", outRow.get("A"));
-        assertRowCount(2, table);
+            Map<String, Object> outRow = table.getNextRow();
+            assertEquals("Tim1", outRow.get("A"));
+            outRow = table.getNextRow();
+            assertEquals("Tim3", outRow.get("A"));
+            assertRowCount(2, table);
+        }
 
-        db1.close();
-
-        try (Database db2 = createMem(fileFormat)) { // test multi row delete/add
-            createTestTable(db2);
+        try (Database db = createMem(fileFormat)) { // test multi row delete/add
+            createTestTable(db);
             Object[] row = createTestRow();
-            table = db2.getTable("Test");
+            Table table = db.getTable("Test");
             for (int i = 0; i < 10; i++) {
                 row[3] = i;
                 table.addRow(row);

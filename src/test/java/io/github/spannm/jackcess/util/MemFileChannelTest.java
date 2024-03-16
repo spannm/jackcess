@@ -62,56 +62,52 @@ class MemFileChannelTest extends AbstractBaseTest {
     void testChannel(TestDb testDb) throws Exception {
         ByteBuffer bb = ByteBuffer.allocate(1024);
 
-        try (MemFileChannel ch1 = MemFileChannel.newChannel()) {
-            assertTrue(ch1.isOpen());
-            assertEquals(0L, ch1.size());
-            assertEquals(0L, ch1.position());
-            assertEquals(-1, ch1.read(bb));
+        try (MemFileChannel ch = MemFileChannel.newChannel()) {
+            assertTrue(ch.isOpen());
+            assertEquals(0L, ch.size());
+            assertEquals(0L, ch.position());
+            assertEquals(-1, ch.read(bb));
         }
 
-        MemFileChannel ch2 = MemFileChannel.newChannel(testDb.getFile(), "r");
-        assertEquals(testDb.getFile().length(), ch2.size());
-        assertEquals(0L, ch2.position());
+        try (MemFileChannel ch2 = MemFileChannel.newChannel(testDb.getFile(), "r");
+            MemFileChannel ch3 = MemFileChannel.newChannel()) {
 
-        assertThrows(IllegalArgumentException.class, () -> ch2.position(-1));
+            assertEquals(testDb.getFile().length(), ch2.size());
+            assertEquals(0L, ch2.position());
 
-        MemFileChannel ch3 = MemFileChannel.newChannel();
-        ch2.transferTo(ch3);
-        ch3.force(true);
-        assertEquals(testDb.getFile().length(), ch3.size());
-        assertEquals(testDb.getFile().length(), ch3.position());
+            assertThrows(IllegalArgumentException.class, () -> ch2.position(-1));
 
-        assertThrows(IllegalArgumentException.class, () -> ch3.truncate(-1L));
+            ch2.transferTo(ch3);
+            ch3.force(true);
+            assertEquals(testDb.getFile().length(), ch3.size());
+            assertEquals(testDb.getFile().length(), ch3.position());
 
-        long trucSize = ch3.size() / 3;
-        ch3.truncate(trucSize);
-        assertEquals(trucSize, ch3.size());
-        assertEquals(trucSize, ch3.position());
-        ch3.position(0L);
-        copy(ch2, ch3, bb);
+            assertThrows(IllegalArgumentException.class, () -> ch3.truncate(-1L));
 
-        ch2.close();
-        assertFalse(ch2.isOpen());
+            long trucSize = ch3.size() / 3;
+            ch3.truncate(trucSize);
+            assertEquals(trucSize, ch3.size());
+            assertEquals(trucSize, ch3.position());
+            ch3.position(0L);
+            copy(ch2, ch3, bb);
 
-        File tmpFile = File.createTempFile("chtest_", ".dat");
-        tmpFile.deleteOnExit();
+            File tmpFile = File.createTempFile("chtest_", ".dat");
+            tmpFile.deleteOnExit();
 
-        try (FileOutputStream fc = new FileOutputStream(tmpFile)) {
-            ch3.transferTo(fc);
+            try (FileOutputStream fc = new FileOutputStream(tmpFile)) {
+                ch3.transferTo(fc);
+            }
+
+            assertEquals(testDb.getFile().length(), tmpFile.length());
+
+            assertArrayEquals(TestUtil.toByteArray(testDb.getFile()), TestUtil.toByteArray(tmpFile));
+
+            ch3.truncate(0L);
+            assertTrue(ch3.isOpen());
+            assertEquals(0L, ch3.size());
+            assertEquals(0L, ch3.position());
+            assertEquals(-1, ch3.read(bb));
         }
-
-        assertEquals(testDb.getFile().length(), tmpFile.length());
-
-        assertArrayEquals(TestUtil.toByteArray(testDb.getFile()), TestUtil.toByteArray(tmpFile));
-
-        ch3.truncate(0L);
-        assertTrue(ch3.isOpen());
-        assertEquals(0L, ch3.size());
-        assertEquals(0L, ch3.position());
-        assertEquals(-1, ch3.read(bb));
-
-        ch3.close();
-        assertFalse(ch3.isOpen());
     }
 
     private static void copy(FileChannel src, FileChannel dst, ByteBuffer bb) throws IOException {

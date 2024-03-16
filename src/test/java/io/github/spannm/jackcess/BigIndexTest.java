@@ -54,25 +54,24 @@ class BigIndexTest extends AbstractBaseTest {
     @TestDbSource(BIG_INDEX)
     void testBigIndex(TestDb testDb) throws Exception {
         // this file has an index with "compressed" entries and node pages
-        Database db = testDb.openMem();
-        TableImpl t = (TableImpl) db.getTable("Table1");
-        IndexImpl index = t.getIndex("col1");
-        assertFalse(index.isInitialized());
-        assertEquals(0, countRows(t));
-        assertEquals(0, index.getIndexData().getEntryCount());
-        db.close();
+        try (Database db = testDb.openMem()) {
+            TableImpl t = (TableImpl) db.getTable("Table1");
+            IndexImpl i = t.getIndex("col1");
+            assertFalse(i.isInitialized());
+            assertEquals(0, countRows(t));
+            assertEquals(0, i.getIndexData().getEntryCount());
+        }
 
         setTestAutoSync(false);
-        try {
 
-            String extraText
-                = " some random text to fill out the index and make it fill up pages with lots of extra bytes "
-                + "so i will keep typing until i think that i probably have enough text in the index entry so that i do not need to add as many entries in order";
+        String extraText = " some random text to fill out the index and make it fill up pages with lots of extra bytes "
+            + "so i will keep typing until i think that i probably have enough text in the index entry so that i do not need to add as many entries in order";
 
-            // copy to temp file and attempt to edit
-            db = testDb.openMem();
-            t = (TableImpl) db.getTable("Table1");
-            index = t.getIndex("col1");
+        // copy to temp file and attempt to edit
+        try (Database db = testDb.openMem()) {
+
+            TableImpl t1 = (TableImpl) db.getTable("Table1");
+            IndexImpl idx1 = t1.getIndex("col1");
 
             // add 2,000 (pseudo) random entries to the table
             Random rand = new Random(13L);
@@ -88,7 +87,7 @@ class BigIndexTest extends AbstractBaseTest {
                         }
                         rows.add(new Object[] {nextVal, "this is some row data " + nextInt});
                     }
-                    t.addRows(rows);
+                    t1.addRows(rows);
                     i--;
                 } else {
                     int nextInt = rand.nextInt(Integer.MAX_VALUE);
@@ -96,25 +95,25 @@ class BigIndexTest extends AbstractBaseTest {
                     if ((i + 1) % 333 == 0) {
                         nextVal = null;
                     }
-                    t.addRow(nextVal, "this is some row data " + nextInt);
+                    t1.addRow(nextVal, "this is some row data " + nextInt);
                 }
             }
 
-            index.getIndexData().validate(false);
+            idx1.getIndexData().validate(false);
 
             db.flush();
-            t = null;
+            t1 = null;
             System.gc();
 
-            t = (TableImpl) db.getTable("Table1");
-            index = t.getIndex("col1");
+            TableImpl t2 = (TableImpl) db.getTable("Table1");
+            IndexImpl idx2 = t2.getIndex("col1");
 
             // make sure all entries are there and correctly ordered
             String firstValue = "      ";
             String prevValue = firstValue;
             int rowCount = 0;
             List<String> firstTwo = new ArrayList<>();
-            for (Row row : CursorBuilder.createCursor(index)) {
+            for (Row row : CursorBuilder.createCursor(idx2)) {
                 String origVal = row.getString("col1");
                 String val = origVal;
                 if (val == null) {
@@ -130,10 +129,10 @@ class BigIndexTest extends AbstractBaseTest {
 
             assertEquals(2000, rowCount);
 
-            index.getIndexData().validate(false);
+            idx2.getIndexData().validate(false);
 
             // delete an entry in the middle
-            Cursor cursor = CursorBuilder.createCursor(index);
+            Cursor cursor = CursorBuilder.createCursor(idx2);
             for (int i = 0; i < rowCount / 2; i++) {
                 assertTrue(cursor.moveToNextRow());
             }
@@ -147,17 +146,17 @@ class BigIndexTest extends AbstractBaseTest {
                 cursor.deleteCurrentRow();
             }
 
-            index.getIndexData().validate(false);
+            idx2.getIndexData().validate(false);
 
             List<String> found = new ArrayList<>();
-            for (Row row : CursorBuilder.createCursor(index)) {
+            for (Row row : CursorBuilder.createCursor(idx2)) {
                 found.add(row.getString("col1"));
             }
 
             assertEquals(firstTwo, found);
 
             // remove remaining entries
-            cursor = CursorBuilder.createCursor(t);
+            cursor = CursorBuilder.createCursor(t2);
             for (int i = 0; i < 2; i++) {
                 assertTrue(cursor.moveToNextRow());
                 cursor.deleteCurrentRow();
@@ -166,7 +165,7 @@ class BigIndexTest extends AbstractBaseTest {
             assertFalse(cursor.moveToNextRow());
             assertFalse(cursor.moveToPreviousRow());
 
-            index.getIndexData().validate(false);
+            idx2.getIndexData().validate(false);
 
             // add 50 (pseudo) random entries to the table
             rand = new Random(42L);
@@ -176,19 +175,17 @@ class BigIndexTest extends AbstractBaseTest {
                 if ((i + 1) % 3333 == 0) {
                     nextVal = null;
                 }
-                t.addRow(nextVal, "this is some row data " + nextInt);
+                t2.addRow(nextVal, "this is some row data " + nextInt);
             }
 
-            index.getIndexData().validate(false);
+            idx2.getIndexData().validate(false);
 
-            cursor = CursorBuilder.createCursor(index);
+            cursor = CursorBuilder.createCursor(idx2);
             while (cursor.moveToNextRow()) {
                 cursor.deleteCurrentRow();
             }
 
-            index.getIndexData().validate(false);
-
-            db.close();
+            idx2.getIndexData().validate(false);
 
         } finally {
             clearTestAutoSync();

@@ -234,85 +234,82 @@ class PropertiesTest extends AbstractBaseTest {
     @ParameterizedTest(name = "[{index}] {0}")
     @TestDbSource(COMMON1)
     void testModifyProperties(TestDb testDb) throws Exception {
-        Database db = testDb.openCopy();
-        File dbFile = db.getFile();
+        File dbFile;
+        PropertyMap origCProps;
+        PropertyMap origFProps;
+        PropertyMap origDProps;
 
-        Table t = db.getTable("Table1");
+        try (Database db = testDb.openCopy()) {
+            dbFile = db.getFile();
+            Table t = db.getTable("Table1");
 
-        // grab originals
-        PropertyMap origCProps = t.getColumn("C").getProperties();
-        PropertyMap origFProps = t.getColumn("F").getProperties();
-        PropertyMap origDProps = t.getColumn("D").getProperties();
-
-        db.close();
+            // grab originals
+            origCProps = t.getColumn("C").getProperties();
+            origFProps = t.getColumn("F").getProperties();
+            origDProps = t.getColumn("D").getProperties();
+        }
 
         // modify but do not save
-        db = DatabaseBuilder.open(dbFile);
+        try (Database db = DatabaseBuilder.open(dbFile)) {
+            Table t = db.getTable("Table1");
 
-        t = db.getTable("Table1");
+            PropertyMap cProps = t.getColumn("C").getProperties();
+            PropertyMap fProps = t.getColumn("F").getProperties();
+            PropertyMap dProps = t.getColumn("D").getProperties();
 
-        PropertyMap cProps = t.getColumn("C").getProperties();
-        PropertyMap fProps = t.getColumn("F").getProperties();
-        PropertyMap dProps = t.getColumn("D").getProperties();
+            assertFalse((Boolean) cProps.getValue(PropertyMap.REQUIRED_PROP));
+            assertEquals("0", fProps.getValue(PropertyMap.DEFAULT_VALUE_PROP));
+            assertEquals((short) 109, dProps.getValue("DisplayControl"));
 
-        assertFalse((Boolean) cProps.getValue(PropertyMap.REQUIRED_PROP));
-        assertEquals("0", fProps.getValue(PropertyMap.DEFAULT_VALUE_PROP));
-        assertEquals((short) 109, dProps.getValue("DisplayControl"));
-
-        cProps.put(PropertyMap.REQUIRED_PROP, DataType.BOOLEAN, true);
-        fProps.get(PropertyMap.DEFAULT_VALUE_PROP).setValue("42");
-        dProps.remove("DisplayControl");
-
-        db.close();
+            cProps.put(PropertyMap.REQUIRED_PROP, DataType.BOOLEAN, true);
+            fProps.get(PropertyMap.DEFAULT_VALUE_PROP).setValue("42");
+            dProps.remove("DisplayControl");
+        }
 
         // modify and save
-        db = DatabaseBuilder.open(dbFile);
+        try (Database db = DatabaseBuilder.open(dbFile)) {
+            Table t = db.getTable("Table1");
 
-        t = db.getTable("Table1");
+            PropertyMap cProps = t.getColumn("C").getProperties();
+            PropertyMap fProps = t.getColumn("F").getProperties();
+            PropertyMap dProps = t.getColumn("D").getProperties();
 
-        cProps = t.getColumn("C").getProperties();
-        fProps = t.getColumn("F").getProperties();
-        dProps = t.getColumn("D").getProperties();
+            assertFalse((Boolean) cProps.getValue(PropertyMap.REQUIRED_PROP));
+            assertEquals("0", fProps.getValue(PropertyMap.DEFAULT_VALUE_PROP));
+            assertEquals((short) 109, dProps.getValue("DisplayControl"));
 
-        assertFalse((Boolean) cProps.getValue(PropertyMap.REQUIRED_PROP));
-        assertEquals("0", fProps.getValue(PropertyMap.DEFAULT_VALUE_PROP));
-        assertEquals((short) 109, dProps.getValue("DisplayControl"));
+            checkProperties(origCProps, cProps);
+            checkProperties(origFProps, fProps);
+            checkProperties(origDProps, dProps);
 
-        checkProperties(origCProps, cProps);
-        checkProperties(origFProps, fProps);
-        checkProperties(origDProps, dProps);
-
-        cProps.put(PropertyMap.REQUIRED_PROP, DataType.BOOLEAN, true);
-        cProps.save();
-        fProps.get(PropertyMap.DEFAULT_VALUE_PROP).setValue("42");
-        fProps.save();
-        dProps.remove("DisplayControl");
-        dProps.save();
-
-        db.close();
+            cProps.put(PropertyMap.REQUIRED_PROP, DataType.BOOLEAN, true);
+            cProps.save();
+            fProps.get(PropertyMap.DEFAULT_VALUE_PROP).setValue("42");
+            fProps.save();
+            dProps.remove("DisplayControl");
+            dProps.save();
+        }
 
         // reload saved props
-        db = DatabaseBuilder.open(dbFile);
+        try (Database db = DatabaseBuilder.open(dbFile)) {
+            Table t = db.getTable("Table1");
 
-        t = db.getTable("Table1");
+            PropertyMap cProps = t.getColumn("C").getProperties();
+            PropertyMap fProps = t.getColumn("F").getProperties();
+            PropertyMap dProps = t.getColumn("D").getProperties();
 
-        cProps = t.getColumn("C").getProperties();
-        fProps = t.getColumn("F").getProperties();
-        dProps = t.getColumn("D").getProperties();
+            assertTrue((Boolean) cProps.getValue(PropertyMap.REQUIRED_PROP));
+            assertEquals("42", fProps.getValue(PropertyMap.DEFAULT_VALUE_PROP));
+            assertNull(dProps.getValue("DisplayControl"));
 
-        assertTrue((Boolean) cProps.getValue(PropertyMap.REQUIRED_PROP));
-        assertEquals("42", fProps.getValue(PropertyMap.DEFAULT_VALUE_PROP));
-        assertNull(dProps.getValue("DisplayControl"));
+            cProps.put(PropertyMap.REQUIRED_PROP, DataType.BOOLEAN, false);
+            fProps.get(PropertyMap.DEFAULT_VALUE_PROP).setValue("0");
+            dProps.put("DisplayControl", DataType.INT, (short) 109);
 
-        cProps.put(PropertyMap.REQUIRED_PROP, DataType.BOOLEAN, false);
-        fProps.get(PropertyMap.DEFAULT_VALUE_PROP).setValue("0");
-        dProps.put("DisplayControl", DataType.INT, (short) 109);
-
-        checkProperties(origCProps, cProps);
-        checkProperties(origFProps, fProps);
-        checkProperties(origDProps, dProps);
-
-        db.close();
+            checkProperties(origCProps, cProps);
+            checkProperties(origFProps, fProps);
+            checkProperties(origDProps, dProps);
+        }
     }
 
     @ParameterizedTest(name = "[{index}] {0}")
@@ -323,45 +320,44 @@ class PropertiesTest extends AbstractBaseTest {
             return;
         }
 
-        File file = TestUtil.createTempFile(false);
-        Database db = DatabaseBuilder.newDatabase(file)
-            .withFileFormat(fileFormat)
-            .putUserDefinedProperty("testing", "123")
-            .create();
-
         UUID u1 = UUID.randomUUID();
         UUID u2 = UUID.randomUUID();
-        Table t = DatabaseBuilder.newTable("Test")
-            .putProperty("awesome_table", true)
-            .addColumn(DatabaseBuilder.newColumn("id", DataType.LONG)
-                .withAutoNumber(true)
-                .withProperty(PropertyMap.REQUIRED_PROP, true)
-                .withProperty(PropertyMap.GUID_PROP, u1))
-            .addColumn(DatabaseBuilder.newColumn("data", DataType.TEXT)
-                .withProperty(PropertyMap.ALLOW_ZERO_LEN_PROP, false)
-                .withProperty(PropertyMap.GUID_PROP, u2))
-            .toTable(db);
 
-        t.addRow(Column.AUTO_NUMBER, "value");
+        File file = TestUtil.createTempFile(false);
 
-        db.close();
+        try (Database db1 = DatabaseBuilder.newDatabase(file)
+            .withFileFormat(fileFormat)
+            .putUserDefinedProperty("testing", "123")
+            .create()) {
+            Table t1 = DatabaseBuilder.newTable("Test")
+                .putProperty("awesome_table", true)
+                .addColumn(DatabaseBuilder.newColumn("id", DataType.LONG)
+                    .withAutoNumber(true)
+                    .withProperty(PropertyMap.REQUIRED_PROP, true)
+                    .withProperty(PropertyMap.GUID_PROP, u1))
+                .addColumn(DatabaseBuilder.newColumn("data", DataType.TEXT)
+                    .withProperty(PropertyMap.ALLOW_ZERO_LEN_PROP, false)
+                    .withProperty(PropertyMap.GUID_PROP, u2))
+                .toTable(db1);
 
-        db = DatabaseBuilder.open(file);
+            t1.addRow(Column.AUTO_NUMBER, "value");
+        }
 
-        assertEquals("123", db.getUserDefinedProperties().getValue("testing"));
+        try (Database db = DatabaseBuilder.open(file)) {
+            assertEquals("123", db.getUserDefinedProperties().getValue("testing"));
 
-        t = db.getTable("Test");
+            Table t = db.getTable("Test");
 
-        assertEquals(Boolean.TRUE,
-            t.getProperties().getValue("awesome_table"));
+            assertEquals(Boolean.TRUE, t.getProperties().getValue("awesome_table"));
 
-        Column c = t.getColumn("id");
-        assertEquals(Boolean.TRUE, c.getProperties().getValue(PropertyMap.REQUIRED_PROP));
-        assertEquals("{" + u1.toString().toUpperCase() + "}", c.getProperties().getValue(PropertyMap.GUID_PROP));
+            Column c = t.getColumn("id");
+            assertEquals(Boolean.TRUE, c.getProperties().getValue(PropertyMap.REQUIRED_PROP));
+            assertEquals("{" + u1.toString().toUpperCase() + "}", c.getProperties().getValue(PropertyMap.GUID_PROP));
 
-        c = t.getColumn("data");
-        assertEquals(Boolean.FALSE, c.getProperties().getValue(PropertyMap.ALLOW_ZERO_LEN_PROP));
-        assertEquals("{" + u2.toString().toUpperCase() + "}", c.getProperties().getValue(PropertyMap.GUID_PROP));
+            c = t.getColumn("data");
+            assertEquals(Boolean.FALSE, c.getProperties().getValue(PropertyMap.ALLOW_ZERO_LEN_PROP));
+            assertEquals("{" + u2.toString().toUpperCase() + "}", c.getProperties().getValue(PropertyMap.GUID_PROP));
+        }
     }
 
     @ParameterizedTest(name = "[{index}] {0}")

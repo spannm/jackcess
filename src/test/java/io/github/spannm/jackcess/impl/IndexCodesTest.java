@@ -459,8 +459,6 @@ public class IndexCodesTest extends AbstractBaseTest {
                 throw new RuntimeException("Unhandled char " + toUnicodeStr(c));
             }
             getLogger().log(Level.DEBUG, "\n*** END CODES");
-
-            db.close();
         }
     }
 
@@ -626,8 +624,6 @@ public class IndexCodesTest extends AbstractBaseTest {
                 throw new RuntimeException("Unhandled char " + toUnicodeStr(c));
             }
             getLogger().log(Level.DEBUG, "\n*** END CODES");
-
-            db.close();
         }
     }
 

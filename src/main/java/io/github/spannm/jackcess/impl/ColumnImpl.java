@@ -1789,9 +1789,9 @@ public class ColumnImpl implements Column, Comparable<ColumnImpl>, DateTimeConte
             ByteUtil.copy((InputStream) value, bout);
         } else {
             // if all else fails, serialize it
-            ObjectOutputStream oos = new ObjectOutputStream(bout);
-            oos.writeObject(value);
-            oos.close();
+            try (ObjectOutputStream oos = new ObjectOutputStream(bout)) {
+                oos.writeObject(value);
+            }
         }
 
         return bout.toByteArray();
