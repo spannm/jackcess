@@ -1795,6 +1795,11 @@ public class DatabaseImpl implements Database, DateTimeContext {
         return CursorImpl.createCursor(table);
     }
 
+    // intended for test use only
+    public void clearTableCache() {
+        _tableCache._tables.clear();
+    }
+
     @Override
     public void flush() throws IOException {
         if (_linkedDbs != null) {

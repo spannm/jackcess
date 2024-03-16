@@ -20,6 +20,7 @@ import static io.github.spannm.jackcess.test.TestUtil.*;
 
 import io.github.spannm.jackcess.*;
 import io.github.spannm.jackcess.Database.FileFormat;
+import io.github.spannm.jackcess.impl.DatabaseImpl;
 import io.github.spannm.jackcess.test.AbstractBaseTest;
 import io.github.spannm.jackcess.test.source.FileFormatSource;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -57,7 +58,7 @@ class ColumnValidatorTest extends AbstractBaseTest {
             }
 
             // force table to be reloaded
-            clearTableCache(db);
+            ((DatabaseImpl) db).clearTableCache();
 
             final ColumnValidator cv = (col, v1) -> {
                 Number num = (Number) v1;

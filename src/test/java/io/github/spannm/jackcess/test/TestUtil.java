@@ -26,7 +26,6 @@ import org.junit.jupiter.api.Assertions;
 import java.io.*;
 import java.lang.System.Logger;
 import java.lang.System.Logger.Level;
-import java.lang.reflect.Field;
 import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
 import java.nio.charset.Charset;
@@ -348,16 +347,6 @@ public final class TestUtil extends Assertions {
             tmp.deleteOnExit();
         }
         return tmp;
-    }
-
-    public static void clearTableCache(Database db) throws Exception {
-        Field f = db.getClass().getDeclaredField("_tableCache");
-        f.setAccessible(true);
-        Object val = f.get(db);
-        f = val.getClass().getDeclaredField("_tables");
-        f.setAccessible(true);
-        val = f.get(val);
-        ((Map<?, ?>) val).clear();
     }
 
     public static byte[] toByteArray(File file) throws IOException {
