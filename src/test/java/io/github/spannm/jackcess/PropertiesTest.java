@@ -313,13 +313,8 @@ class PropertiesTest extends AbstractBaseTest {
     }
 
     @ParameterizedTest(name = "[{index}] {0}")
-    @FileFormatSource
+    @FileFormatSource(exclude = "GENERIC_JET4")
     void testCreateDbProperties(FileFormat fileFormat) throws Exception {
-        if (fileFormat == FileFormat.GENERIC_JET4) {
-            // weirdo format, no properties
-            return;
-        }
-
         UUID u1 = UUID.randomUUID();
         UUID u2 = UUID.randomUUID();
 

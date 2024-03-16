@@ -7,12 +7,15 @@ import org.junit.jupiter.api.extension.ExtensionContext;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.ArgumentsProvider;
 import org.junit.jupiter.params.provider.ArgumentsSource;
+import org.junit.platform.commons.support.AnnotationSupport;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 /**
@@ -23,18 +26,40 @@ import java.util.stream.Stream;
 @ArgumentsSource(FileFormatArgumentsProvider.class)
 public @interface FileFormatSource {
 
+    /**
+     * Optional names of enum constants to include.<br>
+     * If specified, the names must match existing enum constants otherwise an {@link IllegalArgumentException} is thrown.<br>
+     * If not specified, all enum constants are taken into consideration.
+     */
+    String[] include() default {};
+
+    /**
+     * Optional names of enum constants to exclude.<br>
+     * If used, the names must match existing enum constants otherwise an {@link IllegalArgumentException} is thrown.
+     */
+    String[] exclude() default {};
+
     static class FileFormatArgumentsProvider implements ArgumentsProvider {
 
         /**
          * Defines currently supported database file formats that are neither read-only nor {@value FileFormat#MSISAM} (MS Money).
          */
-        private static final FileFormat[] FILE_FORMATS_WRITE = Arrays.stream(FileFormat.values())
+        private static final List<FileFormat> FILE_FORMATS_WRITE = Arrays.stream(FileFormat.values())
             .filter(ff -> !DatabaseImpl.getFileFormatDetails(ff).getFormat().READ_ONLY && ff != FileFormat.MSISAM)
-            .toArray(FileFormat[]::new);
+            .collect(Collectors.toList());
 
         @Override
-        public Stream<Arguments> provideArguments(ExtensionContext context) {
-            return Arrays.stream(FILE_FORMATS_WRITE).map(Arguments::of);
+        public Stream<Arguments> provideArguments(ExtensionContext _context) {
+            FileFormatSource src = _context.getElement().map(elem -> AnnotationSupport.findAnnotation(elem, FileFormatSource.class).get()).orElse(null);
+            List<FileFormat> include = Arrays.stream(src.include()).map(FileFormat::valueOf).collect(Collectors.toList());
+            if (include.isEmpty()) {
+                include.addAll(FILE_FORMATS_WRITE);
+            }
+            List<FileFormat> exclude = Arrays.stream(src.exclude()).map(FileFormat::valueOf).collect(Collectors.toList());
+
+            return include.stream()
+                .filter(ff -> !exclude.contains(ff))
+                .map(Arguments::of);
         }
 
     }

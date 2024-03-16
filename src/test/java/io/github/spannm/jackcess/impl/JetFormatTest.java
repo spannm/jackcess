@@ -10,6 +10,7 @@ import io.github.spannm.jackcess.PropertyMap;
 import io.github.spannm.jackcess.test.AbstractBaseTest;
 import io.github.spannm.jackcess.test.TestDb;
 import io.github.spannm.jackcess.test.TestUtil;
+import io.github.spannm.jackcess.test.source.FileFormatSource;
 import io.github.spannm.jackcess.test.source.TestDbReadOnlySource;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -69,10 +70,11 @@ class JetFormatTest extends AbstractBaseTest {
         }
     }
 
-    @Test
-    void testFileFormat2() throws Exception {
-        try (Database db = TestUtil.open(FileFormat.GENERIC_JET4, new File(DIR_TEST_DATA, "adox_jet4.mdb"))) {
-            assertEquals(FileFormat.GENERIC_JET4, db.getFileFormat());
+    @ParameterizedTest(name = "[{index}] {0}")
+    @FileFormatSource(include = "GENERIC_JET4")
+    void testFileFormat2(FileFormat ff) throws Exception {
+        try (Database db = TestUtil.open(ff, new File(DIR_TEST_DATA, "adox_jet4.mdb"))) {
+            assertEquals(ff, db.getFileFormat());
         }
     }
 
