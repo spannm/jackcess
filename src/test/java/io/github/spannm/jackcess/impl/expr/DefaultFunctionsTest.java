@@ -39,6 +39,7 @@ import java.time.format.DateTimeFormatterBuilder;
 import java.util.Calendar;
 import java.util.List;
 import java.util.Locale;
+import java.util.function.Supplier;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
@@ -670,7 +671,7 @@ class DefaultFunctionsTest extends AbstractBaseTest {
 
             args("Year('01/02/2003 7:00:00 AM')", 2003),
             args("Year(#7:00:00 AM#)", 1899),
-            args("Year('01/02 7:00:00 AM')", Calendar.getInstance().get(Calendar.YEAR)),
+            args("Year('01/02 7:00:00 AM')", () -> Calendar.getInstance().get(Calendar.YEAR)),
 
             args("MonthName(1)", "January"),
             args("MonthName(2,True)", "Feb"),
@@ -690,10 +691,12 @@ class DefaultFunctionsTest extends AbstractBaseTest {
             args("WeekdayName(1,False,3)", "Tuesday"),
             args("WeekdayName(3,True,3)", "Thu"),
 
-            args("CStr(Date())",
+            args("CStr(Date())", () ->
                 DateTimeFormatter.ofPattern("M/d/yyyy").format(LocalDate.now(TestUtil.TEST_TZ.toZoneId()))),
-            args("CStr(Time())",
-                new DateTimeFormatterBuilder().appendPattern("h:mm:ss a").toFormatter(Locale.US).format(LocalDateTime.now(TestUtil.TEST_TZ.toZoneId()))),
+            args("CStr(Time())", () -> {
+                    DateTimeFormatter formatter = new DateTimeFormatterBuilder().appendPattern("h:mm:ss a").toFormatter(Locale.US);
+                    return formatter.format(LocalDateTime.now(TestUtil.TEST_TZ.toZoneId()));
+                }),
 
             args("CStr(TimeSerial(3,57,34))", "3:57:34 AM"),
             args("CStr(TimeSerial(15,57,34))", "3:57:34 PM"),
@@ -810,13 +813,23 @@ class DefaultFunctionsTest extends AbstractBaseTest {
             args("DateDiff('s',#3/13/2018 1:37:59 AM#,#11/3/2018 2:15:00 AM#)", 20306221),
             args("DateDiff('s',#3/13/2016 1:37:30 AM#,#11/3/2018 2:15:13 AM#)", 83378263),
             args("DateDiff('s',#11/3/2018 2:15:30 PM#,#3/13/2016 1:37:13 AM#)", -83421497)
-            );
+        );
     }
+
+    /**
+     * Shortcut to create an {@link Arguments} instance consisting of a String and a {@link Supplier}.
+     */
+    private static Arguments args(String _str, Supplier<?> _supplier) {
+        return Arguments.of(_str, _supplier);
+    }
+
 
     @ParameterizedTest(name = "[{index}] {0} --> {1}")
     @MethodSource("getDateFuncsData")
     void testDateFuncs(String _exprStr, Object _expected) {
-        assertEquals(_expected, eval(_exprStr));
+        Object actual = eval(_exprStr);
+        Object expected = _expected instanceof Supplier ? ((Supplier<?>) _expected).get() : _expected;
+        assertEquals(expected, actual);
     }
 
     @ParameterizedTest(name = "[{index}] {0} --> {1}")
