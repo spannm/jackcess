@@ -14,6 +14,7 @@ import io.github.spannm.jackcess.test.source.FileFormatSource;
 import io.github.spannm.jackcess.test.source.TestDbReadOnlySource;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.EnumSource;
 
 import java.io.File;
 import java.nio.channels.FileChannel;
@@ -78,29 +79,27 @@ class JetFormatTest extends AbstractBaseTest {
         }
     }
 
-    @Test
-    void testSqlTypes() throws Exception {
+    @ParameterizedTest(name = "[{index}] {0}")
+    @EnumSource(DataType.class)
+    void testJet4SqlTypes(DataType dt) throws Exception {
+        if (JetFormat.VERSION_4.isSupportedDataType(dt)) {
+            Integer sqlType = null;
+            try {
+                sqlType = dt.getSQLType();
+            } catch (JackcessException ignored) {}
 
-        JetFormat v2000 = JetFormat.VERSION_4;
-        for (DataType dt : DataType.values()) {
-            if (v2000.isSupportedDataType(dt)) {
-                Integer sqlType = null;
-                try {
-                    sqlType = dt.getSQLType();
-                } catch (JackcessException ignored) {}
-
-                if (sqlType != null) {
-                    assertEquals(dt, DataType.fromSQLType(sqlType));
-                }
+            if (sqlType != null) {
+                assertEquals(dt, DataType.fromSQLType(sqlType));
             }
         }
+    }
 
+    @Test
+    void testSqlTypes() throws Exception {
         assertEquals(DataType.LONG, DataType.fromSQLType(java.sql.Types.BIGINT));
-        assertEquals(DataType.BIG_INT, DataType.fromSQLType(
-            java.sql.Types.BIGINT, 0, FileFormat.V2016));
+        assertEquals(DataType.BIG_INT, DataType.fromSQLType(java.sql.Types.BIGINT, 0, FileFormat.V2016));
         assertEquals(java.sql.Types.BIGINT, DataType.BIG_INT.getSQLType());
-        assertEquals(DataType.MEMO, DataType.fromSQLType(
-            java.sql.Types.VARCHAR, 1000));
+        assertEquals(DataType.MEMO, DataType.fromSQLType(java.sql.Types.VARCHAR, 1000));
     }
 
 }
