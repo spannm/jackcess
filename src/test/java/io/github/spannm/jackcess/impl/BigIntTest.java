@@ -28,6 +28,7 @@ import io.github.spannm.jackcess.test.source.FileFormatSource;
 import org.junit.jupiter.params.ParameterizedTest;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 
@@ -58,8 +59,7 @@ class BigIntTest extends AbstractBaseTest {
 
             long[] vals = new long[] {0L, -10L, 3844L, -45309590834L, 50392084913L, 65000L, -6489273L};
 
-            List<Map<String, Object>> expectedTable =
-                new ArrayList<>();
+            List<Map<String, Object>> expectedTable = new ArrayList<>();
 
             int idx = 1;
             for (long lng : vals) {
@@ -71,11 +71,7 @@ class BigIntTest extends AbstractBaseTest {
                     "num1", lng));
             }
 
-            expectedTable.sort((r1, r2) -> {
-                Long l1 = (Long) r1.get("num1");
-                Long l2 = (Long) r2.get("num1");
-                return l1.compareTo(l2);
-            });
+            expectedTable.sort(Comparator.comparingLong(r -> (Long) r.get("num1")));
 
             Cursor c = t.newCursor().withIndexByName("idx").toIndexCursor();
 
