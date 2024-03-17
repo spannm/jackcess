@@ -66,11 +66,6 @@ public class DatabaseImpl implements Database, DateTimeContext {
     static final String                                              RESOURCE_PATH         = System.getProperty(RESOURCE_PATH_PROPERTY, DEFAULT_RESOURCE_PATH);
 
     /**
-     * whether or not this jvm has "broken" nio support
-     */
-    static final boolean                                             BROKEN_NIO            = Boolean.TRUE.toString().equalsIgnoreCase(System.getProperty(BROKEN_NIO_PROPERTY));
-
-    /**
      * additional internal details about each FileFormat
      */
     private static final Map<FileFormat, FileFormatDetails> FILE_FORMAT_DETAILS   = new EnumMap<>(FileFormat.class);
@@ -2031,22 +2026,11 @@ public class DatabaseImpl implements Database, DateTimeContext {
     }
 
     /**
-     * Copies the given database input stream {@code from} to the given channel {@code to}
-     * using the most efficient means possible.
+     * Copies the given database input stream {@code from} to the given channel {@code to}.
      */
     public static void transferDatabase(InputStream from, FileChannel to) throws IOException {
-        ReadableByteChannel readChannel = Channels.newChannel(from);
-        if (!BROKEN_NIO) {
-            // sane implementation
-            to.transferFrom(readChannel, 0, MAX_SIZE_EMPTY_DB);
-        } else {
-            // do things the hard way for broken vms
-            ByteBuffer bb = ByteBuffer.allocate(8096);
-            while (readChannel.read(bb) >= 0) {
-                bb.flip();
-                to.write(bb);
-                bb.clear();
-            }
+        try (ReadableByteChannel ch = Channels.newChannel(from)) {
+            to.transferFrom(ch, 0, MAX_SIZE_EMPTY_DB);
         }
     }
 

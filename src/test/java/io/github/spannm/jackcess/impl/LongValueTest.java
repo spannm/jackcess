@@ -30,6 +30,7 @@ import org.junit.jupiter.params.ParameterizedTest;
 
 import java.io.File;
 import java.nio.ByteBuffer;
+import java.nio.file.Files;
 import java.sql.Types;
 import java.util.*;
 
@@ -53,8 +54,7 @@ class LongValueTest extends AbstractBaseTest {
             assertEquals("Standard", row.get("PROJ_INFO_CAL_NAME"));
             assertEquals("Project1", row.get("PROJ_PROP_TITLE"));
             byte[] foundBinaryData = row.getBytes("RESERVED_BINARY_DATA");
-            byte[] expectedBinaryData =
-                toByteArray(new File(DIR_TEST_DATA, "test2BinData.dat"));
+            byte[] expectedBinaryData = Files.readAllBytes(new File(DIR_TEST_DATA, "test2BinData.dat").toPath());
             assertArrayEquals(expectedBinaryData, foundBinaryData);
         }
     }
@@ -73,7 +73,7 @@ class LongValueTest extends AbstractBaseTest {
 
             String testStr = "This is a test";
             String longMemo = createString(2030);
-            byte[] oleValue = toByteArray(new File(DIR_TEST_DATA, "test2BinData.dat"));
+            byte[] oleValue = Files.readAllBytes(new File(DIR_TEST_DATA, "test2BinData.dat").toPath());
 
             table.addRow(testStr, testStr, null);
             table.addRow(testStr, longMemo, oleValue);

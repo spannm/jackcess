@@ -30,6 +30,8 @@ import java.lang.System.Logger.Level;
 import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
 import java.nio.charset.Charset;
+import java.nio.file.Files;
+import java.nio.file.StandardCopyOption;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
@@ -77,7 +79,7 @@ public final class TestUtil {
         int fnLastDot = file.getName().lastIndexOf('.');
         File tempFile = TestUtil.createTempFile(file.getName().substring(0, fnLastDot), file.getName().substring(fnLastDot), keep);
 
-        copyFile(file, tempFile);
+        Files.copy(file.toPath(), tempFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
 
         return openDb(fileFormat, tempFile, false, null, false);
     }
@@ -284,38 +286,6 @@ public final class TestUtil {
             ZoneId.systemDefault());
 
         assertEquals(expectedLdt, found);
-    }
-
-    public static void copyFile(File srcFile, File dstFile) throws IOException {
-        // FIXME should really be using commons io FileUtils here, but don't want
-        // to add dep for one simple test method
-        try (OutputStream ostream = new FileOutputStream(dstFile)) {
-            InputStream istream = new FileInputStream(srcFile);
-            copyStream(istream, ostream);
-        }
-    }
-
-    public static void copyStream(InputStream istream, OutputStream ostream) throws IOException {
-        // FIXME should really be using commons io FileUtils here, but don't want
-        // to add dep for one simple test method
-        byte[] buf = new byte[1024];
-        int numBytes = 0;
-        while ((numBytes = istream.read(buf)) >= 0) {
-            ostream.write(buf, 0, numBytes);
-        }
-    }
-
-    public static byte[] toByteArray(File file) throws IOException {
-        return toByteArray(new FileInputStream(file), file.length());
-    }
-
-    public static byte[] toByteArray(InputStream in, long length) throws IOException {
-        try (in) {
-            DataInputStream din = new DataInputStream(in);
-            byte[] bytes = new byte[(int) length];
-            din.readFully(bytes);
-            return bytes;
-        }
     }
 
     public static void checkTestDBTable1RowABCDEFG(TestDb testDB, Table table, Row row) {

@@ -33,10 +33,8 @@ import org.apache.poi.poifs.filesystem.DocumentInputStream;
 import org.apache.poi.poifs.filesystem.POIFSFileSystem;
 import org.junit.jupiter.params.ParameterizedTest;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
+import java.io.*;
+import java.nio.file.Files;
 
 /**
  *
@@ -50,7 +48,7 @@ class OleBlobTest extends AbstractBaseTest {
         File sampleFile = new File(DIR_TEST_DATA, "sample-input.tab");
         String sampleFilePath = sampleFile.getAbsolutePath();
         String sampleFileName = sampleFile.getName();
-        byte[] sampleFileBytes =  TestUtil.toByteArray(sampleFile);
+        byte[] sampleFileBytes =  Files.readAllBytes(sampleFile.toPath());
 
         try (Database db = createDbMem(fileFormat)) {
             Table t = new TableBuilder("TestOle")
@@ -89,14 +87,11 @@ class OleBlobTest extends AbstractBaseTest {
                             assertEquals(sampleFilePath, spc.getFilePath());
                             assertEquals(sampleFilePath, spc.getLocalFilePath());
                             assertEquals(sampleFileName, spc.getFileName());
-                            assertEquals(OleBlob.Builder.PACKAGE_PRETTY_NAME,
-                                spc.getPrettyName());
-                            assertEquals(OleBlob.Builder.PACKAGE_TYPE_NAME,
-                                spc.getTypeName());
-                            assertEquals(OleBlob.Builder.PACKAGE_TYPE_NAME,
-                                spc.getClassName());
+                            assertEquals(OleBlob.Builder.PACKAGE_PRETTY_NAME, spc.getPrettyName());
+                            assertEquals(OleBlob.Builder.PACKAGE_TYPE_NAME, spc.getTypeName());
+                            assertEquals(OleBlob.Builder.PACKAGE_TYPE_NAME, spc.getClassName());
                             assertEquals(sampleFileBytes.length, spc.length());
-                            assertArrayEquals(sampleFileBytes, TestUtil.toByteArray(spc.getStream(), spc.length()));
+                            assertArrayEquals(sampleFileBytes, OleBlobTest.readToByteArray(spc.getStream(), spc.length()));
                             break;
 
                         case 2:
@@ -117,7 +112,7 @@ class OleBlobTest extends AbstractBaseTest {
                             assertEquals("Text.File", oc.getClassName());
                             assertEquals("TextFile", oc.getTypeName());
                             assertEquals(sampleFileBytes.length, oc.length());
-                            assertArrayEquals(sampleFileBytes, TestUtil.toByteArray(oc.getStream(), oc.length()));
+                            assertArrayEquals(sampleFileBytes, OleBlobTest.readToByteArray(oc.getStream(), oc.length()));
                             break;
                         default:
                             throw new RuntimeException("unexpected id " + row);
@@ -155,7 +150,7 @@ class OleBlobTest extends AbstractBaseTest {
 
                         case SIMPLE_PACKAGE:
                             OleBlob.SimplePackageContent spc = (OleBlob.SimplePackageContent) content;
-                            byte[] packageBytes = TestUtil.toByteArray(spc.getStream(), spc.length());
+                            byte[] packageBytes = OleBlobTest.readToByteArray(spc.getStream(), spc.length());
                             assertArrayEquals(attach.getFileData(), packageBytes);
                             break;
 
@@ -163,7 +158,7 @@ class OleBlobTest extends AbstractBaseTest {
                             OleBlob.CompoundContent cc = (OleBlob.CompoundContent) content;
                             if (cc.hasContentsEntry()) {
                                 OleBlob.CompoundContent.Entry entry = cc.getContentsEntry();
-                                byte[] entryBytes = TestUtil.toByteArray(entry.getStream(), entry.length());
+                                byte[] entryBytes = OleBlobTest.readToByteArray(entry.getStream(), entry.length());
                                 assertArrayEquals(attach.getFileData(), entryBytes);
                             } else {
 
@@ -199,7 +194,7 @@ class OleBlobTest extends AbstractBaseTest {
 
                         case OTHER:
                             OleBlob.OtherContent oc = (OleBlob.OtherContent) content;
-                            byte[] otherBytes = TestUtil.toByteArray(oc.getStream(), oc.length());
+                            byte[] otherBytes = OleBlobTest.readToByteArray(oc.getStream(), oc.length());
                             assertArrayEquals(attach.getFileData(), otherBytes);
                             break;
 
@@ -209,6 +204,15 @@ class OleBlobTest extends AbstractBaseTest {
 
                 }
             }
+        }
+    }
+
+    private static byte[] readToByteArray(InputStream in, long length) throws IOException {
+        try (in) {
+            DataInputStream din = new DataInputStream(in);
+            byte[] bytes = new byte[(int) length];
+            din.readFully(bytes);
+            return bytes;
         }
     }
 
@@ -242,8 +246,8 @@ class OleBlobTest extends AbstractBaseTest {
                     continue;
                 }
 
-                byte[] attachEBytes = TestUtil.toByteArray(new DocumentInputStream(attachE), attachE.getSize());
-                byte[] entryBytes = TestUtil.toByteArray(e.getStream(), e.length());
+                byte[] attachEBytes = OleBlobTest.readToByteArray(new DocumentInputStream(attachE), attachE.getSize());
+                byte[] entryBytes = OleBlobTest.readToByteArray(e.getStream(), e.length());
 
                 assertArrayEquals(attachEBytes, entryBytes);
             }

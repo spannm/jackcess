@@ -420,13 +420,11 @@ public class AttachmentColumnInfoImpl extends ComplexColumnInfoImpl<Attachment> 
 
             // encode extension, which ends w/ a null byte
             type += '\0';
-            ByteBuffer typeBytes = ColumnImpl.encodeUncompressedText(
-                type, JetFormat.VERSION_12.CHARSET);
+            ByteBuffer typeBytes = ColumnImpl.encodeUncompressedText(type, JetFormat.VERSION_12.CHARSET);
             int headerLen = typeBytes.remaining() + CONTENT_HEADER_SIZE;
 
             int dataLen = _data.length;
-            ByteUtil.ByteStream dataStream = new ByteUtil.ByteStream(
-                WRAPPER_HEADER_SIZE + headerLen + dataLen);
+            ByteUtil.ByteStream dataStream = new ByteUtil.ByteStream(WRAPPER_HEADER_SIZE + headerLen + dataLen);
 
             // write the wrapper header info
             ByteBuffer bb = PageChannel.wrap(dataStream.getBytes());

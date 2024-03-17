@@ -30,6 +30,7 @@ import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
 import java.nio.channels.NonWritableChannelException;
+import java.nio.file.Files;
 
 /**
  * @author James Ahlborn
@@ -99,7 +100,7 @@ class MemFileChannelTest extends AbstractBaseTest {
 
             assertEquals(testDb.getFile().length(), tempFile.length());
 
-            assertArrayEquals(TestUtil.toByteArray(testDb.getFile()), TestUtil.toByteArray(tempFile));
+            assertArrayEquals(Files.readAllBytes(testDb.getFile().toPath()), Files.readAllBytes(tempFile.toPath()));
 
             ch3.truncate(0L);
             assertTrue(ch3.isOpen());

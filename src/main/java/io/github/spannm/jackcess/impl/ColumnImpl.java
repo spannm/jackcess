@@ -1783,18 +1783,18 @@ public class ColumnImpl implements Column, Comparable<ColumnImpl>, DateTimeConte
             return SqlHelper.INSTANCE.getBlobBytes(value);
         }
 
-        ByteArrayOutputStream bout = new ByteArrayOutputStream();
-
-        if (value instanceof InputStream) {
-            ByteUtil.copy((InputStream) value, bout);
-        } else {
-            // if all else fails, serialize it
-            try (ObjectOutputStream oos = new ObjectOutputStream(bout)) {
-                oos.writeObject(value);
+        try (ByteArrayOutputStream bout = new ByteArrayOutputStream()) {
+            if (value instanceof InputStream) {
+                ByteUtil.copy((InputStream) value, bout);
+            } else {
+                // if all else fails, serialize it
+                try (ObjectOutputStream oos = new ObjectOutputStream(bout)) {
+                    oos.writeObject(value);
+                }
             }
-        }
 
-        return bout.toByteArray();
+            return bout.toByteArray();
+        }
     }
 
     /**
