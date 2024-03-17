@@ -205,7 +205,7 @@ public class DatabaseImpl implements Database, DateTimeContext {
     /**
      * the maximum size of any of the included "empty db" resources
      */
-    private static final long               MAX_EMPTYDB_SIZE                    = 440000L;
+    private static final long               MAX_SIZE_EMPTY_DB                    = 440000L;
 
     /**
      * this object is a "system" object
@@ -606,7 +606,7 @@ public class DatabaseImpl implements Database, DateTimeContext {
         boolean success = false;
         try {
             channel.truncate(0);
-            transferDbFrom(channel, getResourceAsStream(details.getEmptyFilePath()));
+            transferDatabase(getResourceAsStream(details.getEmptyFilePath()), channel);
             channel.force(true);
             DatabaseImpl db = new DatabaseImpl(mdbFile, channel, closeChannel, autoSync, fileFormat, charset, timeZone, null, false, false);
             success = true;
@@ -2031,19 +2031,20 @@ public class DatabaseImpl implements Database, DateTimeContext {
     }
 
     /**
-     * Copies the given db InputStream to the given channel using the most efficient means possible.
+     * Copies the given database input stream {@code from} to the given channel {@code to}
+     * using the most efficient means possible.
      */
-    public static void transferDbFrom(FileChannel channel, InputStream in) throws IOException {
-        ReadableByteChannel readChannel = Channels.newChannel(in);
+    public static void transferDatabase(InputStream from, FileChannel to) throws IOException {
+        ReadableByteChannel readChannel = Channels.newChannel(from);
         if (!BROKEN_NIO) {
             // sane implementation
-            channel.transferFrom(readChannel, 0, MAX_EMPTYDB_SIZE);
+            to.transferFrom(readChannel, 0, MAX_SIZE_EMPTY_DB);
         } else {
             // do things the hard way for broken vms
             ByteBuffer bb = ByteBuffer.allocate(8096);
             while (readChannel.read(bb) >= 0) {
                 bb.flip();
-                channel.write(bb);
+                to.write(bb);
                 bb.clear();
             }
         }

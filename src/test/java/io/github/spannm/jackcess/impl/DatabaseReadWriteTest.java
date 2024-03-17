@@ -41,7 +41,7 @@ class DatabaseReadWriteTest extends AbstractBaseTest {
     @ParameterizedTest(name = "[{index}] {0}")
     @FileFormatSource
     void testWriteAndRead(FileFormat fileFormat) throws Exception {
-        try (Database db = create(fileFormat)) {
+        try (Database db = createDbMem(fileFormat)) {
             doTestWriteAndRead(db);
         }
     }
@@ -49,7 +49,7 @@ class DatabaseReadWriteTest extends AbstractBaseTest {
     @ParameterizedTest(name = "[{index}] {0}")
     @FileFormatSource
     void testWriteAndReadInMem(FileFormat fileFormat) throws Exception {
-        try (Database db = createMem(fileFormat)) {
+        try (Database db = createDbMem(fileFormat)) {
             doTestWriteAndRead(db);
         }
     }
@@ -84,7 +84,7 @@ class DatabaseReadWriteTest extends AbstractBaseTest {
     @ParameterizedTest(name = "[{index}] {0}")
     @FileFormatSource
     void testWriteAndReadInBatch(FileFormat fileFormat) throws Exception {
-        try (Database db = createMem(fileFormat)) {
+        try (Database db = createDbMem(fileFormat)) {
             createTestTable(db);
             int count = 1000;
             List<Object[]> rows = new ArrayList<>(count);
@@ -111,7 +111,7 @@ class DatabaseReadWriteTest extends AbstractBaseTest {
     @ParameterizedTest(name = "[{index}] {0}")
     @FileFormatSource
     void testUpdateRow(FileFormat fileFormat) throws Exception {
-        try (Database db = createMem(fileFormat)) {
+        try (Database db = createDbMem(fileFormat)) {
             Table t = new TableBuilder("test")
                 .addColumn(new ColumnBuilder("name", DataType.TEXT))
                 .addColumn(new ColumnBuilder("id", DataType.LONG)

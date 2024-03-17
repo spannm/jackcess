@@ -16,8 +16,6 @@ limitations under the License.
 
 package io.github.spannm.jackcess.util;
 
-import static io.github.spannm.jackcess.test.TestUtil.create;
-
 import io.github.spannm.jackcess.*;
 import io.github.spannm.jackcess.Database.FileFormat;
 import io.github.spannm.jackcess.test.AbstractBaseTest;
@@ -70,8 +68,8 @@ class PatternColumnPredicateTest extends AbstractBaseTest {
             .collect(Collectors.toList());
     }
 
-    private static Database createTestDb(FileFormat fileFormat) throws Exception {
-        Database db = create(fileFormat);
+    private Database createTestDb(FileFormat fileFormat) throws Exception {
+        Database db = createDbMem(fileFormat);
 
         Table table = new TableBuilder("Test")
             .addColumn(new ColumnBuilder("id", DataType.LONG).withAutoNumber(true))

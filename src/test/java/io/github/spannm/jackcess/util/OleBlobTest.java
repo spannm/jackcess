@@ -17,8 +17,6 @@ limitations under the License.
 package io.github.spannm.jackcess.util;
 
 import static io.github.spannm.jackcess.test.Basename.BLOB;
-import static io.github.spannm.jackcess.test.TestUtil.create;
-import static io.github.spannm.jackcess.test.TestUtil.toByteArray;
 
 import io.github.spannm.jackcess.*;
 import io.github.spannm.jackcess.Database.FileFormat;
@@ -27,6 +25,7 @@ import io.github.spannm.jackcess.impl.ByteUtil;
 import io.github.spannm.jackcess.impl.CompoundOleUtil;
 import io.github.spannm.jackcess.test.AbstractBaseTest;
 import io.github.spannm.jackcess.test.TestDb;
+import io.github.spannm.jackcess.test.TestUtil;
 import io.github.spannm.jackcess.test.source.FileFormatSource;
 import io.github.spannm.jackcess.test.source.TestDbReadOnlySource;
 import org.apache.poi.poifs.filesystem.DocumentEntry;
@@ -37,6 +36,7 @@ import org.junit.jupiter.params.ParameterizedTest;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.IOException;
 
 /**
  *
@@ -50,9 +50,9 @@ class OleBlobTest extends AbstractBaseTest {
         File sampleFile = new File(DIR_TEST_DATA, "sample-input.tab");
         String sampleFilePath = sampleFile.getAbsolutePath();
         String sampleFileName = sampleFile.getName();
-        byte[] sampleFileBytes = toByteArray(sampleFile);
+        byte[] sampleFileBytes =  TestUtil.toByteArray(sampleFile);
 
-        try (Database db = create(fileFormat)) {
+        try (Database db = createDbMem(fileFormat)) {
             Table t = new TableBuilder("TestOle")
                 .addColumn(new ColumnBuilder("id", DataType.LONG))
                 .addColumn(new ColumnBuilder("ole", DataType.OLE))
@@ -96,7 +96,7 @@ class OleBlobTest extends AbstractBaseTest {
                             assertEquals(OleBlob.Builder.PACKAGE_TYPE_NAME,
                                 spc.getClassName());
                             assertEquals(sampleFileBytes.length, spc.length());
-                            assertArrayEquals(sampleFileBytes, toByteArray(spc.getStream(), spc.length()));
+                            assertArrayEquals(sampleFileBytes, TestUtil.toByteArray(spc.getStream(), spc.length()));
                             break;
 
                         case 2:
@@ -117,7 +117,7 @@ class OleBlobTest extends AbstractBaseTest {
                             assertEquals("Text.File", oc.getClassName());
                             assertEquals("TextFile", oc.getTypeName());
                             assertEquals(sampleFileBytes.length, oc.length());
-                            assertArrayEquals(sampleFileBytes, toByteArray(oc.getStream(), oc.length()));
+                            assertArrayEquals(sampleFileBytes, TestUtil.toByteArray(oc.getStream(), oc.length()));
                             break;
                         default:
                             throw new RuntimeException("unexpected id " + row);
@@ -155,7 +155,7 @@ class OleBlobTest extends AbstractBaseTest {
 
                         case SIMPLE_PACKAGE:
                             OleBlob.SimplePackageContent spc = (OleBlob.SimplePackageContent) content;
-                            byte[] packageBytes = toByteArray(spc.getStream(), spc.length());
+                            byte[] packageBytes = TestUtil.toByteArray(spc.getStream(), spc.length());
                             assertArrayEquals(attach.getFileData(), packageBytes);
                             break;
 
@@ -163,7 +163,7 @@ class OleBlobTest extends AbstractBaseTest {
                             OleBlob.CompoundContent cc = (OleBlob.CompoundContent) content;
                             if (cc.hasContentsEntry()) {
                                 OleBlob.CompoundContent.Entry entry = cc.getContentsEntry();
-                                byte[] entryBytes = toByteArray(entry.getStream(), entry.length());
+                                byte[] entryBytes = TestUtil.toByteArray(entry.getStream(), entry.length());
                                 assertArrayEquals(attach.getFileData(), entryBytes);
                             } else {
 
@@ -199,7 +199,7 @@ class OleBlobTest extends AbstractBaseTest {
 
                         case OTHER:
                             OleBlob.OtherContent oc = (OleBlob.OtherContent) content;
-                            byte[] otherBytes = toByteArray(oc.getStream(), oc.length());
+                            byte[] otherBytes = TestUtil.toByteArray(oc.getStream(), oc.length());
                             assertArrayEquals(attach.getFileData(), otherBytes);
                             break;
 
@@ -225,14 +225,13 @@ class OleBlobTest extends AbstractBaseTest {
         }
     }
 
-    private static void checkCompoundStorage(OleBlob.CompoundContent cc,
-        Attachment attach) throws Exception {
-        File tmpData = File.createTempFile("attach_", ".dat");
+    private static void checkCompoundStorage(OleBlob.CompoundContent cc, Attachment attach) throws IOException {
+        File tempFile = TestUtil.createTempFile("attach", ".dat", false);
 
-        try (FileOutputStream fout = new FileOutputStream(tmpData)) {
+        try (FileOutputStream fout = new FileOutputStream(tempFile)) {
             fout.write(attach.getFileData());
 
-            POIFSFileSystem attachFs = new POIFSFileSystem(tmpData, true);
+            POIFSFileSystem attachFs = new POIFSFileSystem(tempFile, true);
 
             for (OleBlob.CompoundContent.Entry e : cc) {
                 DocumentEntry attachE = null;
@@ -243,17 +242,13 @@ class OleBlobTest extends AbstractBaseTest {
                     continue;
                 }
 
-                byte[] attachEBytes = toByteArray(new DocumentInputStream(attachE),
-                    attachE.getSize());
-                byte[] entryBytes = toByteArray(e.getStream(), e.length());
+                byte[] attachEBytes = TestUtil.toByteArray(new DocumentInputStream(attachE), attachE.getSize());
+                byte[] entryBytes = TestUtil.toByteArray(e.getStream(), e.length());
 
                 assertArrayEquals(attachEBytes, entryBytes);
             }
 
             ByteUtil.closeQuietly(attachFs);
-
-        } finally {
-            tmpData.delete();
         }
     }
 }

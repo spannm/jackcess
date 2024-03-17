@@ -48,7 +48,7 @@ class DatabaseTest extends AbstractBaseTest {
     @ParameterizedTest(name = "[{index}] {0}")
     @FileFormatSource
     void testInvalidTableDefs(FileFormat fileFormat) throws Exception {
-        try (Database db = create(fileFormat)) {
+        try (Database db = createDbMem(fileFormat)) {
             try {
                 DatabaseBuilder.newTable("test").toTable(db);
                 fail("created table with no columns?");
@@ -163,7 +163,7 @@ class DatabaseTest extends AbstractBaseTest {
     @ParameterizedTest(name = "[{index}] {0}")
     @FileFormatSource
     void testCreate(FileFormat fileFormat) throws Exception {
-        try (Database db = create(fileFormat)) {
+        try (Database db = createDbMem(fileFormat)) {
             assertEquals(0, db.getTableNames().size());
         }
     }
@@ -172,7 +172,7 @@ class DatabaseTest extends AbstractBaseTest {
     @FileFormatSource
     void testDeleteCurrentRow(FileFormat fileFormat) throws Exception {
         // make sure correct row is deleted
-        try (Database db = createMem(fileFormat)) {
+        try (Database db = createDbMem(fileFormat)) {
             createTestTable(db);
             Map<String, Object> row1 = createTestRowMap("Tim1");
             Map<String, Object> row2 = createTestRowMap("Tim2");
@@ -196,7 +196,7 @@ class DatabaseTest extends AbstractBaseTest {
             assertRowCount(2, table);
         }
 
-        try (Database db = createMem(fileFormat)) { // test multi row delete/add
+        try (Database db = createDbMem(fileFormat)) { // test multi row delete/add
             createTestTable(db);
             Object[] row = createTestRow();
             Table table = db.getTable("Test");
@@ -238,7 +238,7 @@ class DatabaseTest extends AbstractBaseTest {
     void testDeleteRow(FileFormat fileFormat) throws Exception {
         // make sure correct row is deleted
         try (
-        Database db = createMem(fileFormat)) {
+        Database db = createDbMem(fileFormat)) {
             createTestTable(db);
             Table table = db.getTable("Test");
             for (int i = 0; i < 10; i++) {
@@ -313,7 +313,7 @@ class DatabaseTest extends AbstractBaseTest {
     @ParameterizedTest(name = "[{index}] {0}")
     @FileFormatSource
     void testCurrency(FileFormat fileFormat) throws Exception {
-        try (Database db = create(fileFormat)) {
+        try (Database db = createDbMem(fileFormat)) {
             Table table = DatabaseBuilder.newTable("test")
                 .addColumn(DatabaseBuilder.newColumn("A", DataType.MONEY))
                 .toTable(db);
@@ -343,7 +343,7 @@ class DatabaseTest extends AbstractBaseTest {
     @ParameterizedTest(name = "[{index}] {0}")
     @FileFormatSource
     void testGUID(FileFormat fileFormat) throws Exception {
-        Database db = create(fileFormat);
+        Database db = createDbMem(fileFormat);
 
         Table table = DatabaseBuilder.newTable("test")
             .addColumn(DatabaseBuilder.newColumn("A", DataType.GUID))
@@ -377,7 +377,7 @@ class DatabaseTest extends AbstractBaseTest {
     @ParameterizedTest(name = "[{index}] {0}")
     @FileFormatSource
     void testNumeric(FileFormat fileFormat) throws Exception {
-        Database db = create(fileFormat);
+        Database db = createDbMem(fileFormat);
 
         ColumnBuilder col = DatabaseBuilder.newColumn("A", DataType.NUMERIC)
             .withScale(4).withPrecision(8).toColumn();
@@ -531,7 +531,7 @@ class DatabaseTest extends AbstractBaseTest {
     @ParameterizedTest(name = "[{index}] {0}")
     @FileFormatSource
     void testLargeTableDef(FileFormat fileFormat) throws Exception {
-        Database db = create(fileFormat);
+        Database db = createDbMem(fileFormat);
 
         final int numColumns = 90;
 
@@ -564,7 +564,7 @@ class DatabaseTest extends AbstractBaseTest {
     @ParameterizedTest(name = "[{index}] {0}")
     @FileFormatSource
     void testWriteAndReadDate(FileFormat fileFormat) throws Exception {
-        try (Database db = createMem(fileFormat)) {
+        try (Database db = createDbMem(fileFormat)) {
             db.setDateTimeType(DateTimeType.DATE);
 
             Table table = DatabaseBuilder.newTable("test")
@@ -627,7 +627,7 @@ class DatabaseTest extends AbstractBaseTest {
 
         List<String> dates = List.of("1582-10-15", "1582-10-14", "1492-01-10", "1392-01-10");
 
-        Database db = createMem(fileFormat);
+        Database db = createDbMem(fileFormat);
         db.setDateTimeType(DateTimeType.DATE);
 
         Table table = DatabaseBuilder.newTable("test")
@@ -678,7 +678,7 @@ class DatabaseTest extends AbstractBaseTest {
     @ParameterizedTest(name = "[{index}] {0}")
     @FileFormatSource
     void testSystemTable(FileFormat fileFormat) throws Exception {
-        Database db = create(fileFormat);
+        Database db = createDbMem(fileFormat);
 
         Set<String> sysTables = new TreeSet<>(String.CASE_INSENSITIVE_ORDER);
         sysTables.addAll(List.of("MSysObjects", "MSysQueries", "MSysACES", "MSysRelationships"));
@@ -918,7 +918,8 @@ class DatabaseTest extends AbstractBaseTest {
     @ParameterizedTest(name = "[{index}] {0}")
     @TestDbSource(COMMON1)
     void testBrokenIndex(TestDb testDb) throws Exception {
-        try (Database db = new DatabaseBuilder(testDb.getFile())
+        try (Database db = new DatabaseBuilder()
+            .withFile(testDb.getFile())
             .withReadOnly(true).withIgnoreBrokenSystemCatalogIndex(true).open()) {
             Table test = db.getTable("Table1");
             assertNotNull(test);

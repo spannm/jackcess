@@ -16,11 +16,10 @@ limitations under the License.
 
 package io.github.spannm.jackcess.util;
 
-import static io.github.spannm.jackcess.test.TestUtil.*;
-
 import io.github.spannm.jackcess.*;
 import io.github.spannm.jackcess.Database.FileFormat;
 import io.github.spannm.jackcess.test.AbstractBaseTest;
+import io.github.spannm.jackcess.test.TestUtil;
 import io.github.spannm.jackcess.test.source.FileFormatSource;
 import org.junit.jupiter.params.ParameterizedTest;
 
@@ -37,7 +36,7 @@ class CustomLinkResolverTest extends AbstractBaseTest {
     @ParameterizedTest(name = "[{index}] {0}")
     @FileFormatSource
     void testCustomLinkResolver(FileFormat fileFormat) throws Exception {
-        try (Database db = create(fileFormat)) {
+        try (Database db = createDbMem(fileFormat)) {
             db.setLinkResolver(new TestLinkResolver());
 
             db.createLinkedTable("Table1", "testFile1.txt", "Table1");
@@ -49,24 +48,20 @@ class CustomLinkResolverTest extends AbstractBaseTest {
             assertNotNull(t1);
             assertNotSame(db, t1.getDatabase());
 
-            assertTable(createExpectedTable(createExpectedRow("id", 0,
-                "data1", "row0"),
-                createExpectedRow("id", 1,
-                    "data1", "row1"),
-                createExpectedRow("id", 2,
-                    "data1", "row2")),
+            TestUtil.assertTable(TestUtil.createExpectedTable(
+                TestUtil.createExpectedRow("id", 0, "data1", "row0"),
+                TestUtil.createExpectedRow("id", 1, "data1", "row1"),
+                TestUtil.createExpectedRow("id", 2, "data1", "row2")),
                 t1);
 
             Table t2 = db.getTable("Table2");
             assertNotNull(t2);
             assertNotSame(db, t2.getDatabase());
 
-            assertTable(createExpectedTable(createExpectedRow("id", 3,
-                "data2", "row3"),
-                createExpectedRow("id", 4,
-                    "data2", "row4"),
-                createExpectedRow("id", 5,
-                    "data2", "row5")),
+            TestUtil.assertTable(TestUtil.createExpectedTable(
+                TestUtil.createExpectedRow("id", 3, "data2", "row3"),
+                TestUtil.createExpectedRow("id", 4, "data2", "row4"),
+                TestUtil.createExpectedRow("id", 5, "data2", "row5")),
                 t2);
 
             assertNull(db.getTable("Table4"));
@@ -130,12 +125,9 @@ class CustomLinkResolverTest extends AbstractBaseTest {
 
         @Override
         protected Database createTempDb(Object customFile, FileFormat format,
-            boolean inMemory, Path tempDir,
-            boolean readOnly)
-            throws IOException {
+            boolean inMemory, Path tempDir, boolean readOnly) throws IOException {
             inMemory = "testFile1.txt".equals(customFile);
-            return super.createTempDb(customFile, format, inMemory, tempDir,
-                readOnly);
+            return super.createTempDb(customFile, format, inMemory, tempDir, readOnly);
         }
     }
 }

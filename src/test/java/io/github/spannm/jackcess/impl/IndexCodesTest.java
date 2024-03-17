@@ -17,12 +17,12 @@ limitations under the License.
 package io.github.spannm.jackcess.impl;
 
 import static io.github.spannm.jackcess.test.Basename.INDEX_CODES;
-import static io.github.spannm.jackcess.test.TestUtil.*;
 
 import io.github.spannm.jackcess.*;
 import io.github.spannm.jackcess.Database.FileFormat;
 import io.github.spannm.jackcess.test.AbstractBaseTest;
 import io.github.spannm.jackcess.test.TestDb;
+import io.github.spannm.jackcess.test.TestUtil;
 import io.github.spannm.jackcess.test.source.TestDbReadOnlySource;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
@@ -141,7 +141,7 @@ public class IndexCodesTest extends AbstractBaseTest {
 
     @Test @Disabled
     void testCreateIsoFile() throws Exception {
-        try (Database db = create(FileFormat.V2000, true)) {
+        try (Database db = createDbMem(FileFormat.V2000, true)) {
             Table t = new TableBuilder("test").addColumn(new ColumnBuilder("row", DataType.TEXT)).addColumn(new ColumnBuilder("data", DataType.TEXT)).toTable(db);
 
             for (int i = 0; i < 256; i++) {
@@ -153,7 +153,7 @@ public class IndexCodesTest extends AbstractBaseTest {
 
     @Test @Disabled
     void testCreateAltIsoFile() throws Exception {
-        try (Database db = openCopy(FileFormat.V2000, new File("/tmp/test_ind.mdb"), true)) {
+        try (Database db = TestUtil.openCopy(FileFormat.V2000, new File("/tmp/test_ind.mdb"), true)) {
             Table t = db.getTable("Table1");
 
             for (int i = 0; i < 256; i++) {
@@ -166,7 +166,7 @@ public class IndexCodesTest extends AbstractBaseTest {
     @SuppressWarnings("unused")
     @Test @Disabled
     void testWriteAllCodesMdb() throws Exception {
-        try (Database db = create(FileFormat.V2000, true)) {
+        try (Database db = createDbMem(FileFormat.V2000, true)) {
             Table t = new TableBuilder("Table5").addColumn(new ColumnBuilder("name", DataType.TEXT)).addColumn(new ColumnBuilder("data", DataType.TEXT)).toTable(db);
 
             char c = (char) 0x3041; // crazy 7F 02 ... A0
@@ -232,7 +232,7 @@ public class IndexCodesTest extends AbstractBaseTest {
         try ( // Database db = openCopy(new File("/data2/jackcess_test/testAllIndexCodes.mdb"));
               // Database db = openCopy(new File("/data2/jackcess_test/testAllIndexCodes_orig.mdb"));
               // Database db = openCopy(new File("/data2/jackcess_test/testSomeMoreCodes.mdb"));
-        Database db = openCopy(FileFormat.V2000, new File("/data2/jackcess_test/testStillMoreCodes.mdb"))) {
+        Database db = TestUtil.openCopy(FileFormat.V2000, new File("/data2/jackcess_test/testStillMoreCodes.mdb"))) {
             Table t = db.getTable("Table5");
 
             Index ind = t.getIndexes().iterator().next();
@@ -279,7 +279,7 @@ public class IndexCodesTest extends AbstractBaseTest {
         try ( // Database db = open(new File("/tmp/test_ind.mdb"));
               // Database db = open(new File("/tmp/test_ind2.mdb"));
               // Database db = open(new File("/tmp/test_ind4.mdb"));
-        Database db = open(FileFormat.V2000, new File("/tmp/test_ind3.mdb"))) {
+        Database db = TestUtil.openDb(FileFormat.V2000, new File("/tmp/test_ind3.mdb"))) {
             Table t = db.getTable("Table1");
             Index index = t.getIndex("B");
             ((IndexImpl) index).initialize();
@@ -297,7 +297,7 @@ public class IndexCodesTest extends AbstractBaseTest {
 
     @Test @Disabled
     void testReverseIsoMdb2010() throws Exception {
-        try (Database db = open(FileFormat.V2010, new File("/data2/jackcess_test/testAllIndexCodes3_2010.accdb"))) {
+        try (Database db = TestUtil.openDb(FileFormat.V2010, new File("/data2/jackcess_test/testAllIndexCodes3_2010.accdb"))) {
             Table t = db.getTable("Table1");
             Index index = t.getIndexes().iterator().next();
             ((IndexImpl) index).initialize();
@@ -464,7 +464,7 @@ public class IndexCodesTest extends AbstractBaseTest {
 
     @Test @Disabled
     void testReverseIsoMdb() throws Exception {
-        try (Database db = open(FileFormat.V2000, new File("/data2/jackcess_test/testAllIndexCodes3.mdb"))) {
+        try (Database db = TestUtil.openDb(FileFormat.V2000, new File("/data2/jackcess_test/testAllIndexCodes3.mdb"))) {
             Table t = db.getTable("Table1");
             Index index = t.getIndexes().iterator().next();
             ((IndexImpl) index).initialize();

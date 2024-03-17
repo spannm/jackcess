@@ -20,7 +20,6 @@ import io.github.spannm.jackcess.DataType;
 import io.github.spannm.jackcess.expr.*;
 import io.github.spannm.jackcess.impl.BaseEvalContext;
 import io.github.spannm.jackcess.test.AbstractBaseTest;
-import io.github.spannm.jackcess.test.TestUtil;
 import io.github.spannm.jackcess.test.converter.CsvToLocalDateTime;
 import io.github.spannm.jackcess.test.source.IntMatrixSource;
 import io.github.spannm.jackcess.test.source.IntRangeSource;
@@ -624,7 +623,7 @@ class ExpressionatorTest extends AbstractBaseTest {
 
         @Override
         public ZoneId getZoneId() {
-            return TestUtil.TEST_TZ.toZoneId();
+            return TEST_TZ.toZoneId();
         }
 
         @Override

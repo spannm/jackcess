@@ -16,11 +16,10 @@ limitations under the License.
 
 package io.github.spannm.jackcess.util;
 
-import static io.github.spannm.jackcess.test.TestUtil.*;
-
 import io.github.spannm.jackcess.*;
 import io.github.spannm.jackcess.Database.FileFormat;
 import io.github.spannm.jackcess.test.AbstractBaseTest;
+import io.github.spannm.jackcess.test.TestUtil;
 import io.github.spannm.jackcess.test.source.FileFormatSource;
 import org.junit.jupiter.params.ParameterizedTest;
 
@@ -43,7 +42,7 @@ class ImportTest extends AbstractBaseTest {
     @ParameterizedTest(name = "[{index}] {0}")
     @FileFormatSource
     void testImportFromFile(FileFormat fileFormat) throws Exception {
-        try (Database db = create(fileFormat)) {
+        try (Database db = createDbMem(fileFormat)) {
             String tableName = new ImportUtil.Builder(db, "test")
                 .withDelimiter("\\t")
                 .importFile(new File(DIR_TEST_DATA, "sample-input.tab"));
@@ -56,29 +55,29 @@ class ImportTest extends AbstractBaseTest {
             assertEquals(List.of("Test1", "Test2", "Test3"), colNames);
 
             List<? extends Map<String, Object>> expectedRows =
-                createExpectedTable(
-                    createExpectedRow(
+                TestUtil.createExpectedTable(
+                    TestUtil.createExpectedRow(
                         "Test1", "Foo",
                         "Test2", "Bar",
                         "Test3", "Ralph"),
-                    createExpectedRow(
+                    TestUtil.createExpectedRow(
                         "Test1", "S",
                         "Test2", "Mouse",
                         "Test3", "Rocks"),
-                    createExpectedRow(
+                    TestUtil.createExpectedRow(
                         "Test1", "",
                         "Test2", "Partial line",
                         "Test3", null),
-                    createExpectedRow(
+                    TestUtil.createExpectedRow(
                         "Test1", " Quoted Value",
                         "Test2", " bazz ",
                         "Test3", " Really \"Crazy" + ImportUtil.LINE_SEPARATOR
                             + "value\""),
-                    createExpectedRow(
+                    TestUtil.createExpectedRow(
                         "Test1", "buzz",
                         "Test2", "embedded\tseparator",
                         "Test3", "long"));
-            assertTable(expectedRows, t);
+            TestUtil.assertTable(expectedRows, t);
 
             t = new TableBuilder("test2")
                 .addColumn(new ColumnBuilder("T1", DataType.TEXT))
@@ -93,33 +92,32 @@ class ImportTest extends AbstractBaseTest {
                 .importFile(new File(DIR_TEST_DATA, "sample-input.tab"));
 
             expectedRows =
-                createExpectedTable(
-                    createExpectedRow(
+                TestUtil.createExpectedTable(
+                    TestUtil.createExpectedRow(
                         "T1", "Test1",
                         "T2", "Test2",
                         "T3", "Test3"),
-                    createExpectedRow(
+                    TestUtil.createExpectedRow(
                         "T1", "Foo",
                         "T2", "Bar",
                         "T3", "Ralph"),
-                    createExpectedRow(
+                    TestUtil.createExpectedRow(
                         "T1", "S",
                         "T2", "Mouse",
                         "T3", "Rocks"),
-                    createExpectedRow(
+                    TestUtil.createExpectedRow(
                         "T1", "",
                         "T2", "Partial line",
                         "T3", null),
-                    createExpectedRow(
+                    TestUtil.createExpectedRow(
                         "T1", " Quoted Value",
                         "T2", " bazz ",
-                        "T3", " Really \"Crazy" + ImportUtil.LINE_SEPARATOR
-                            + "value\""),
-                    createExpectedRow(
+                        "T3", " Really \"Crazy" + ImportUtil.LINE_SEPARATOR + "value\""),
+                    TestUtil.createExpectedRow(
                         "T1", "buzz",
                         "T2", "embedded\tseparator",
                         "T3", "long"));
-            assertTable(expectedRows, t);
+            TestUtil.assertTable(expectedRows, t);
 
             ImportFilter oddFilter = new SimpleImportFilter() {
                 private int _num;
@@ -146,27 +144,27 @@ class ImportTest extends AbstractBaseTest {
             assertEquals(List.of("Test1", "Test2", "Test3"), colNames);
 
             expectedRows =
-                createExpectedTable(
-                    createExpectedRow(
+                TestUtil.createExpectedTable(
+                    TestUtil.createExpectedRow(
                         "Test1", "Foo",
                         "Test2", "Bar",
                         "Test3", "Ralph"),
-                    createExpectedRow(
+                    TestUtil.createExpectedRow(
                         "Test1", "",
                         "Test2", "Partial line",
                         "Test3", null),
-                    createExpectedRow(
+                    TestUtil.createExpectedRow(
                         "Test1", "buzz",
                         "Test2", "embedded\tseparator",
                         "Test3", "long"));
-            assertTable(expectedRows, t);
+            TestUtil.assertTable(expectedRows, t);
         }
     }
 
     @ParameterizedTest(name = "[{index}] {0}")
     @FileFormatSource
     void testImportFromFileWithOnlyHeaders(FileFormat fileFormat) throws Exception {
-        try (Database db = create(fileFormat)) {
+        try (Database db = createDbMem(fileFormat)) {
             String tableName = new ImportUtil.Builder(db, "test")
                 .withDelimiter("\\t")
                 .importFile(new File(DIR_TEST_DATA, "sample-input-only-headers.tab"));
@@ -198,7 +196,7 @@ class ImportTest extends AbstractBaseTest {
         rs.addColumn(Types.NUMERIC, "col6", 0, 7, 15);
         rs.addColumn(Types.VARCHAR, "col7", Integer.MAX_VALUE, 0, 0);
 
-        Database db = create(fileFormat);
+        Database db = createDbMem(fileFormat);
         ImportUtil.importResultSet((ResultSet) Proxy.newProxyInstance(
             Thread.currentThread().getContextClassLoader(),
             new Class<?>[] {ResultSet.class},

@@ -91,16 +91,15 @@ class MemFileChannelTest extends AbstractBaseTest {
             ch3.position(0L);
             copy(ch2, ch3, bb);
 
-            File tmpFile = File.createTempFile("chtest_", ".dat");
-            tmpFile.deleteOnExit();
+            File tempFile = TestUtil.createTempFile("chtest", ".dat", false);
 
-            try (FileOutputStream fc = new FileOutputStream(tmpFile)) {
+            try (FileOutputStream fc = new FileOutputStream(tempFile)) {
                 ch3.transferTo(fc);
             }
 
-            assertEquals(testDb.getFile().length(), tmpFile.length());
+            assertEquals(testDb.getFile().length(), tempFile.length());
 
-            assertArrayEquals(TestUtil.toByteArray(testDb.getFile()), TestUtil.toByteArray(tmpFile));
+            assertArrayEquals(TestUtil.toByteArray(testDb.getFile()), TestUtil.toByteArray(tempFile));
 
             ch3.truncate(0L);
             assertTrue(ch3.isOpen());

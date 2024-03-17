@@ -49,9 +49,9 @@ class CodecHandlerTest extends AbstractBaseTest {
         doTestCodecHandler(fileFormat, false);
     }
 
-    private static void doTestCodecHandler(FileFormat fileFormat, boolean simple) throws Exception {
+    private void doTestCodecHandler(FileFormat fileFormat, boolean simple) throws Exception {
         File dbFile;
-        try (Database db1 = TestUtil.createFile(fileFormat)) {
+        try (Database db1 = createDb(fileFormat, false, false)) {
             int pageSize = ((DatabaseImpl) db1).getFormat().PAGE_SIZE;
             dbFile = db1.getFile();
 
@@ -59,7 +59,8 @@ class CodecHandlerTest extends AbstractBaseTest {
             encodeFile(dbFile, pageSize, simple);
         }
 
-        try (Database db2 = new DatabaseBuilder(dbFile)
+        try (Database db2 = new DatabaseBuilder()
+            .withFile(dbFile)
             .withCodecProvider(simple ? SIMPLE_PROVIDER : FULL_PROVIDER)
             .open()) {
             Table t1 = new TableBuilder("test1")

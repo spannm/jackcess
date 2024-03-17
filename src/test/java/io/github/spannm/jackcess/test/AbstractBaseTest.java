@@ -1,26 +1,31 @@
 package io.github.spannm.jackcess.test;
 
 import io.github.spannm.jackcess.Database;
+import io.github.spannm.jackcess.Database.FileFormat;
+import io.github.spannm.jackcess.DatabaseBuilder;
+import io.github.spannm.jackcess.impl.ByteUtil;
+import io.github.spannm.jackcess.impl.DatabaseImpl;
+import io.github.spannm.jackcess.util.MemFileChannel;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.TestInfo;
 import org.junit.jupiter.params.provider.Arguments;
 
-import java.io.File;
-import java.io.IOException;
-import java.io.UncheckedIOException;
+import java.io.*;
 import java.lang.System.Logger;
 import java.lang.System.Logger.Level;
 import java.lang.reflect.Method;
+import java.nio.channels.FileChannel;
 import java.util.List;
 import java.util.Optional;
+import java.util.TimeZone;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
 /**
  * Base class for JUnit test cases.<p>
  *
- * Logs entry and exit to/from all test methods.<br>
+ * Logs entry to all test methods.<br>
  * This class extends JUnit assertions to avoid the need for static imports in subclasses.
  *
  * @author Markus Spann
@@ -28,6 +33,8 @@ import java.util.stream.StreamSupport;
 public abstract class AbstractBaseTest extends Assertions {
 
     public static final File                  DIR_TEST_DATA = new File("src/test/resources", "data");
+
+    public static final TimeZone              TEST_TZ       = TimeZone.getTimeZone("America/New_York");
 
     private static final ThreadLocal<Boolean> AUTO_SYNC     = new ThreadLocal<>();
 
@@ -75,6 +82,47 @@ public abstract class AbstractBaseTest extends Assertions {
         }
     }
 
+    public Database createDbMem(FileFormat fileFormat) throws IOException {
+        return createDb(fileFormat, false, true);
+    }
+
+    public Database createDbMem(FileFormat fileFormat, boolean keep) throws IOException {
+        return createDb(fileFormat, keep, true);
+    }
+
+    public Database createDb(FileFormat fileFormat, boolean keep, boolean inMem) throws IOException {
+
+        FileChannel channel = inMem && !keep ? MemFileChannel.newChannel() : null;
+
+        File tempFile = TestUtil.createTempFile(getShortTestMethodName(), ".mdb", keep);
+
+        if (fileFormat == FileFormat.GENERIC_JET4) {
+            // while we don't support creating GENERIC_JET4 as a jackcess feature,
+            // we do want to be able to test these types of dbs
+            try (InputStream inStream = TestUtil.class.getClassLoader().getResourceAsStream("emptyJet4.mdb")) {
+                if (channel != null) {
+                    DatabaseImpl.transferDatabase(inStream, channel);
+                } else {
+                    try (OutputStream outStream = new FileOutputStream(tempFile)) {
+                        ByteUtil.copy(inStream, outStream);
+                    }
+                }
+                return new DatabaseBuilder()
+                    .withFile(tempFile)
+                    .withAutoSync(AbstractBaseTest.getTestAutoSync())
+                    .withChannel(channel)
+                    .open();
+            }
+        } else {
+            return new DatabaseBuilder()
+                .withFile(tempFile)
+                .withFileFormat(fileFormat)
+                .withAutoSync(AbstractBaseTest.getTestAutoSync())
+                .withChannel(channel).create();
+        }
+
+    }
+
     public static boolean getTestAutoSync() {
         Boolean autoSync = AUTO_SYNC.get();
         return autoSync != null ? autoSync : Database.DEFAULT_AUTO_SYNC;
@@ -90,37 +138,6 @@ public abstract class AbstractBaseTest extends Assertions {
 
     public static <T> List<T> toList(Iterable<T> iterable) {
         return StreamSupport.stream(iterable.spliterator(), false).collect(Collectors.toList());
-    }
-
-    /**
-     * Creates a subdirectory of the system's temp file directory.
-     * @param _dir subdirectory name
-     * @return temp directory
-     * @throws UncheckedIOException If the subdirectory could not be created
-     */
-    protected static File createTempDir(String _dir) {
-        File tempDir = new File(getTempDir());
-        if (null != _dir) {
-            tempDir = new File(tempDir, _dir);
-        }
-        if (!tempDir.exists() && !tempDir.mkdirs()) {
-            throw new UncheckedIOException(new IOException("Could not create directory " + tempDir));
-        }
-        return tempDir;
-    }
-
-    /**
-     * Returns the system's temporary directory i.e. the content of the {@code java.io.tmpdir} system property.<br>
-     * Ensures the directory name ends in the system-dependent default name-separator character.
-     *
-     * @return system's temporary directory name
-     */
-    protected static String getTempDir() {
-        String tmpDir = System.getProperty("java.io.tmpdir");
-        if (!tmpDir.endsWith(File.separator)) {
-            tmpDir += File.separatorChar;
-        }
-        return tmpDir;
     }
 
     /**

@@ -36,7 +36,8 @@ public interface LinkResolver {
     LinkResolver DEFAULT = (linkerDb, linkeeFileName) -> {
         // if linker is read-only, open linkee read-only
         boolean readOnly = linkerDb instanceof DatabaseImpl && ((DatabaseImpl) linkerDb).isReadOnly();
-        return new DatabaseBuilder(new File(linkeeFileName))
+        return new DatabaseBuilder()
+            .withFile(new File(linkeeFileName))
             .withReadOnly(readOnly).open();
     };
 

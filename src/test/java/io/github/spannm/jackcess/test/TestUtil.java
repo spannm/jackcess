@@ -16,12 +16,13 @@ limitations under the License.
 
 package io.github.spannm.jackcess.test;
 
+import static org.junit.jupiter.api.Assertions.*;
+
 import io.github.spannm.jackcess.*;
 import io.github.spannm.jackcess.Database.FileFormat;
 import io.github.spannm.jackcess.complex.ComplexValueForeignKey;
 import io.github.spannm.jackcess.impl.*;
 import io.github.spannm.jackcess.util.MemFileChannel;
-import org.junit.jupiter.api.Assertions;
 
 import java.io.*;
 import java.lang.System.Logger;
@@ -32,7 +33,10 @@ import java.nio.charset.Charset;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
 /**
@@ -41,8 +45,9 @@ import java.util.stream.StreamSupport;
  * @author James Ahlborn
  */
 @SuppressWarnings("deprecation")
-public final class TestUtil extends Assertions {
-    public static final TimeZone TEST_TZ = TimeZone.getTimeZone("America/New_York");
+public final class TestUtil {
+
+    private static final File TEST_TEMP_DIR = createTempDir("test-jackcess-" + getCurrentUser());
 
     private TestUtil() {
     }
@@ -51,61 +56,16 @@ public final class TestUtil extends Assertions {
         return System.getLogger(TestUtil.class.getName());
     }
 
-    public static Database open(FileFormat fileFormat, File file) throws IOException {
-        return open(fileFormat, file, false);
+    public static Database openDb(FileFormat fileFormat, File file) throws IOException {
+        return openDb(fileFormat, file, false, null, true);
     }
 
-    public static Database open(FileFormat fileFormat, File file, boolean inMem) throws IOException {
-        return open(fileFormat, file, inMem, null);
+    public static Database openDb(FileFormat fileFormat, File file, boolean inMem) throws IOException {
+        return openDb(fileFormat, file, inMem, null, true);
     }
 
-    public static Database open(FileFormat fileFormat, File file, boolean inMem, Charset charset) throws IOException {
-        return openDB(fileFormat, file, inMem, charset, true);
-    }
-
-    public static Database create(FileFormat fileFormat) throws IOException {
-        return create(fileFormat, false);
-    }
-
-    public static Database create(FileFormat fileFormat, boolean keep) throws IOException {
-        return create(fileFormat, keep, true);
-    }
-
-    public static Database createMem(FileFormat fileFormat) throws IOException {
-        return create(fileFormat);
-    }
-
-    public static Database createFile(FileFormat fileFormat) throws IOException {
-        return create(fileFormat, false, false);
-    }
-
-    private static Database create(FileFormat fileFormat, boolean keep, boolean inMem) throws IOException {
-
-        FileChannel channel = inMem && !keep ? MemFileChannel.newChannel() : null;
-
-        if (fileFormat == FileFormat.GENERIC_JET4) {
-            // while we don't support creating GENERIC_JET4 as a jackcess feature,
-            // we do want to be able to test these types of dbs
-            try (InputStream inStream = TestUtil.class.getClassLoader().getResourceAsStream("emptyJet4.mdb")) {
-                File f = createTempFile(keep);
-                if (channel != null) {
-                    DatabaseImpl.transferDbFrom(channel, inStream);
-                } else {
-                    try (OutputStream outStream = new FileOutputStream(f)) {
-                        ByteUtil.copy(inStream, outStream);
-                    }
-                }
-                return new DatabaseBuilder(f)
-                    .withAutoSync(AbstractBaseTest.getTestAutoSync())
-                    .withChannel(channel)
-                    .open();
-            }
-        }
-
-        return new DatabaseBuilder(createTempFile(keep))
-            .withFileFormat(fileFormat)
-            .withAutoSync(AbstractBaseTest.getTestAutoSync())
-            .withChannel(channel).create();
+    public static Database openDb(FileFormat fileFormat, File file, boolean inMem, Charset charset) throws IOException {
+        return openDb(fileFormat, file, inMem, charset, true);
     }
 
     public static Database openCopy(FileFormat fileFormat, File file) throws IOException {
@@ -113,21 +73,27 @@ public final class TestUtil extends Assertions {
     }
 
     public static Database openCopy(FileFormat fileFormat, File file, boolean keep) throws IOException {
-        File tmp = createTempFile(keep);
-        copyFile(file, tmp);
-        return openDB(fileFormat, tmp, false, null, false);
+        // split file name into prefix and suffix
+        int fnLastDot = file.getName().lastIndexOf('.');
+        File tempFile = TestUtil.createTempFile(file.getName().substring(0, fnLastDot), file.getName().substring(fnLastDot), keep);
+
+        copyFile(file, tempFile);
+
+        return openDb(fileFormat, tempFile, false, null, false);
     }
 
-    static Database openDB(FileFormat fileFormat, File file, boolean inMem, Charset charset, boolean readOnly) throws IOException {
+    static Database openDb(FileFormat fileFormat, File file, boolean inMem, Charset charset, boolean readOnly) throws IOException {
         FileChannel channel = inMem ? MemFileChannel.newChannel(file, MemFileChannel.RW_CHANNEL_MODE) : null;
-        Database db = new DatabaseBuilder(file).withReadOnly(readOnly)
+        Database db = new DatabaseBuilder()
+            .withFile(file)
+            .withReadOnly(readOnly)
             .withAutoSync(AbstractBaseTest.getTestAutoSync())
             .withChannel(channel)
             .withCharset(charset)
             .open();
         if (fileFormat != null) {
             assertEquals(DatabaseImpl.getFileFormatDetails(fileFormat).getFormat(), ((DatabaseImpl) db).getFormat(), "Wrong JetFormat");
-            assertEquals(fileFormat, db.getFileFormat(), "Wrong FileFormat");
+            assertEquals(fileFormat, db.getFileFormat(), "Wrong file format");
         }
         return db;
     }
@@ -339,16 +305,6 @@ public final class TestUtil extends Assertions {
         }
     }
 
-    public static File createTempFile(boolean keep) throws IOException {
-        File tmp = File.createTempFile("databaseTest", ".mdb");
-        if (keep) {
-            getLogger().log(Level.INFO, "Created {0}", tmp);
-        } else {
-            tmp.deleteOnExit();
-        }
-        return tmp;
-    }
-
     public static byte[] toByteArray(File file) throws IOException {
         return toByteArray(new FileInputStream(file), file.length());
     }
@@ -398,6 +354,105 @@ public final class TestUtil extends Assertions {
         assertEquals(0, cal.get(Calendar.SECOND));
         assertEquals(0, cal.get(Calendar.MILLISECOND));
         assertEquals(Boolean.FALSE, row.get("I"));
+    }
+
+    /**
+     * Determines the current logged on user.
+     *
+     * @return logged on user
+     */
+    static String getCurrentUser() {
+        return Stream.of("user.name", "USER", "USERNAME")
+            .map(System::getProperty)
+            .filter(s -> !s.isBlank())
+            .findFirst().orElse(null);
+    }
+
+    public static final File getTestTempDir() {
+        return TEST_TEMP_DIR;
+    }
+
+    /**
+     * Creates a subdirectory of the system's temp file directory.
+     * @param _subdirs subdirectory names
+     * @return temp directory
+     * @throws UncheckedIOException If the subdirectory could not be created
+     */
+    public static File createTempDir(String... _subdirs) {
+        File tempDir = new File(System.getProperty("java.io.tmpdir"));
+        for (String dir : _subdirs) {
+            tempDir = new File(tempDir, dir);
+        }
+        if (!tempDir.exists() && !tempDir.mkdirs()) {
+            throw new UncheckedIOException(new IOException("Could not create directory " + tempDir));
+        }
+        return tempDir;
+    }
+
+    /**
+     * Creates a unique temporary file name using the given prefix and suffix and creates the file.
+     *
+     * @param _prefix file name prefix
+     * @param _suffix file name suffix
+     * @param _keep keep temporary file at jvm exit
+     * @return temporary file object
+     */
+    public static File createTempFile(String _prefix, String _suffix, boolean _keep) {
+        File tempFile = TestUtil.createTempFileName(_prefix, _suffix);
+        try {
+            tempFile.createNewFile();
+        } catch (IOException _ex) {
+            throw new UncheckedIOException(_ex);
+        }
+        getLogger().log(Level.INFO, "Created temp file {0}", tempFile);
+        if (!_keep) {
+            tempFile.deleteOnExit();
+        }
+        return tempFile;
+    }
+
+    /**
+     * Creates a unique temporary file name using the given prefix and suffix, but does not create the file.
+     *
+     * @param _prefix file name prefix
+     * @param _suffix file name suffix
+     * @return temporary file object
+     */
+    static File createTempFileName(String _prefix, String _suffix) {
+        String name = Optional.ofNullable(_prefix).map(p -> p.replace(File.separatorChar, '_')).orElse("");
+        if (!name.isBlank() && !name.endsWith("-")) {
+            name += "-";
+        }
+        String suffix = _suffix;
+        if (suffix == null || suffix.isBlank()) {
+            int idxLastDot = _prefix.lastIndexOf('.');
+            if (idxLastDot > -1) {
+                suffix = _prefix.substring(idxLastDot);
+            }
+            if (suffix.isEmpty() || suffix.length() > 6) {
+                suffix = ".tmp";
+            }
+        }
+        name += new TempFileNameString() + suffix;
+        return new File(getTestTempDir(), name);
+    }
+
+    /**
+     * Unique string based on current date/time to be used in names of temporary files.
+     */
+    private static final class TempFileNameString {
+        private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("yyyyMMdd-HHmmss");
+        private static final AtomicInteger     COUNTER   = new AtomicInteger(1);
+        private final String                   name;
+
+        private TempFileNameString() {
+            name = LocalDateTime.now().format(FORMATTER) + '_' + String.format("%03d", COUNTER.getAndIncrement());
+        }
+
+        @Override
+        public String toString() {
+            return name;
+        }
     }
 
 }

@@ -17,12 +17,12 @@ limitations under the License.
 package io.github.spannm.jackcess.impl;
 
 import static io.github.spannm.jackcess.test.Basename.CALC_FIELD;
-import static io.github.spannm.jackcess.test.TestUtil.*;
 
 import io.github.spannm.jackcess.*;
 import io.github.spannm.jackcess.Database.FileFormat;
 import io.github.spannm.jackcess.test.AbstractBaseTest;
 import io.github.spannm.jackcess.test.TestDb;
+import io.github.spannm.jackcess.test.TestUtil;
 import io.github.spannm.jackcess.test.source.FileFormatSource;
 import io.github.spannm.jackcess.test.source.TestDbSource;
 import org.junit.jupiter.api.Test;
@@ -56,7 +56,7 @@ class CalcFieldTest extends AbstractBaseTest {
             return;
         }
 
-        try (Database db = create(fileFormat)) {
+        try (Database db = createDbMem(fileFormat)) {
             db.setEvaluateExpressions(false);
 
             Table t = new TableBuilder("Test")
@@ -78,7 +78,7 @@ class CalcFieldTest extends AbstractBaseTest {
                 col.getProperties().getValue(
                     PropertyMap.RESULT_TYPE_PROP));
 
-            String longStr = createString(1000);
+            String longStr = TestUtil.createString(1000);
             BigDecimal bd1 = new BigDecimal("-1234.5678");
             BigDecimal bd2 = new BigDecimal("0.0234");
 
@@ -87,42 +87,41 @@ class CalcFieldTest extends AbstractBaseTest {
             t.addRow(Column.AUTO_NUMBER, "", "", "", false, 0, BigDecimal.ZERO);
             t.addRow(Column.AUTO_NUMBER, null, null, null, null, null, null);
 
-            List<? extends Map<String, Object>> expectedRows =
-                createExpectedTable(
-                    createExpectedRow(
-                        "id", 1,
-                        "data", "foo",
-                        "calc_text", "1_foo",
-                        "calc_memo", longStr,
-                        "calc_bool", true,
-                        "calc_long", 2,
-                        "calc_numeric", bd1),
-                    createExpectedRow(
-                        "id", 2,
-                        "data", "bar",
-                        "calc_text", "2_bar",
-                        "calc_memo", longStr,
-                        "calc_bool", false,
-                        "calc_long", -37,
-                        "calc_numeric", bd2),
-                    createExpectedRow(
-                        "id", 3,
-                        "data", "",
-                        "calc_text", "",
-                        "calc_memo", "",
-                        "calc_bool", false,
-                        "calc_long", 0,
-                        "calc_numeric", BigDecimal.ZERO),
-                    createExpectedRow(
-                        "id", 4,
-                        "data", null,
-                        "calc_text", null,
-                        "calc_memo", null,
-                        "calc_bool", null,
-                        "calc_long", null,
-                        "calc_numeric", null));
+            List<? extends Map<String, Object>> expectedRows = TestUtil.createExpectedTable(
+                TestUtil.createExpectedRow(
+                    "id", 1,
+                    "data", "foo",
+                    "calc_text", "1_foo",
+                    "calc_memo", longStr,
+                    "calc_bool", true,
+                    "calc_long", 2,
+                    "calc_numeric", bd1),
+                TestUtil.createExpectedRow(
+                    "id", 2,
+                    "data", "bar",
+                    "calc_text", "2_bar",
+                    "calc_memo", longStr,
+                    "calc_bool", false,
+                    "calc_long", -37,
+                    "calc_numeric", bd2),
+                TestUtil.createExpectedRow(
+                    "id", 3,
+                    "data", "",
+                    "calc_text", "",
+                    "calc_memo", "",
+                    "calc_bool", false,
+                    "calc_long", 0,
+                    "calc_numeric", BigDecimal.ZERO),
+                TestUtil.createExpectedRow(
+                    "id", 4,
+                    "data", null,
+                    "calc_text", null,
+                    "calc_memo", null,
+                    "calc_bool", null,
+                    "calc_long", null,
+                    "calc_numeric", null));
 
-            assertTable(expectedRows, t);
+            TestUtil.assertTable(expectedRows, t);
         }
     }
 

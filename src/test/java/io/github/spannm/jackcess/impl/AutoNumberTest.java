@@ -18,15 +18,15 @@ package io.github.spannm.jackcess.impl;
 
 import static io.github.spannm.jackcess.DatabaseBuilder.newColumn;
 import static io.github.spannm.jackcess.DatabaseBuilder.newTable;
-import static io.github.spannm.jackcess.test.Basename.COMPLEX_DATA;
 import static io.github.spannm.jackcess.test.Basename.COMMON1;
-import static io.github.spannm.jackcess.test.TestUtil.*;
+import static io.github.spannm.jackcess.test.Basename.COMPLEX_DATA;
 
 import io.github.spannm.jackcess.*;
 import io.github.spannm.jackcess.Database.FileFormat;
 import io.github.spannm.jackcess.complex.ComplexValueForeignKey;
 import io.github.spannm.jackcess.test.AbstractBaseTest;
 import io.github.spannm.jackcess.test.TestDb;
+import io.github.spannm.jackcess.test.TestUtil;
 import io.github.spannm.jackcess.test.source.FileFormatSource;
 import io.github.spannm.jackcess.test.source.TestDbSource;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -45,7 +45,7 @@ class AutoNumberTest extends AbstractBaseTest {
     @ParameterizedTest(name = "[{index}] {0}")
     @FileFormatSource
     void testAutoNumber(FileFormat fileFormat) throws Exception {
-        try (Database db = createMem(fileFormat)) {
+        try (Database db = createDbMem(fileFormat)) {
             Table table = newTable("test")
                 .addColumn(newColumn("a", DataType.LONG)
                     .withAutoNumber(true))
@@ -89,34 +89,33 @@ class AutoNumberTest extends AbstractBaseTest {
 
         table.reset();
 
-        List<? extends Map<String, Object>> expectedRows =
-            createExpectedTable(
-                createExpectedRow(
-                    "a", 1,
-                    "b", "row1"),
-                createExpectedRow(
-                    "a", 2,
-                    "b", "row2"),
-                createExpectedRow(
-                    "a", 3,
-                    "b", "row3"),
-                createExpectedRow(
-                    "a", 4,
-                    "b", "row4"),
-                createExpectedRow(
-                    "a", 5,
-                    "b", "row5"),
-                createExpectedRow(
-                    "a", 6,
-                    "b", null));
+        List<? extends Map<String, Object>> expectedRows = TestUtil.createExpectedTable(
+            TestUtil.createExpectedRow(
+                "a", 1,
+                "b", "row1"),
+            TestUtil.createExpectedRow(
+                "a", 2,
+                "b", "row2"),
+            TestUtil.createExpectedRow(
+                "a", 3,
+                "b", "row3"),
+            TestUtil.createExpectedRow(
+                "a", 4,
+                "b", "row4"),
+            TestUtil.createExpectedRow(
+                "a", 5,
+                "b", "row5"),
+            TestUtil.createExpectedRow(
+                "a", 6,
+                "b", null));
 
-        assertTable(expectedRows, table);
+        TestUtil.assertTable(expectedRows, table);
     }
 
     @ParameterizedTest(name = "[{index}] {0}")
     @FileFormatSource
     void testAutoNumberGuid(FileFormat fileFormat) throws Exception {
-        try (Database db = createMem(fileFormat)) {
+        try (Database db = createDbMem(fileFormat)) {
             Table table = newTable("test")
                 .addColumn(newColumn("a", DataType.GUID)
                     .withAutoNumber(true))
@@ -141,7 +140,7 @@ class AutoNumberTest extends AbstractBaseTest {
     @ParameterizedTest(name = "[{index}] {0}")
     @FileFormatSource
     void testInsertLongAutoNumber(FileFormat fileFormat) throws Exception {
-        try (Database db = createMem(fileFormat)) {
+        try (Database db = createDbMem(fileFormat)) {
             Table table = newTable("test")
                 .addColumn(newColumn("a", DataType.LONG)
                     .withAutoNumber(true))
@@ -155,7 +154,7 @@ class AutoNumberTest extends AbstractBaseTest {
     @ParameterizedTest(name = "[{index}] {0}")
     @FileFormatSource
     void testInsertLongAutoNumberPK(FileFormat fileFormat) throws Exception {
-        try (Database db = createMem(fileFormat)) {
+        try (Database db = createDbMem(fileFormat)) {
             Table table = newTable("test")
                 .addColumn(newColumn("a", DataType.LONG)
                     .withAutoNumber(true))
@@ -352,7 +351,7 @@ class AutoNumberTest extends AbstractBaseTest {
     @ParameterizedTest(name = "[{index}] {0}")
     @FileFormatSource
     void testInsertGuidAutoNumber(FileFormat fileFormat) throws Exception {
-        try (Database db = createMem(fileFormat)) {
+        try (Database db = createDbMem(fileFormat)) {
             Table table = newTable("test").addColumn(newColumn("a", DataType.GUID).withAutoNumber(true)).addColumn(newColumn("b", DataType.TEXT)).toTable(db);
 
             db.setAllowAutoNumberInsert(true);

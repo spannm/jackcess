@@ -66,7 +66,7 @@ public @interface TestDbSource {
                     }
 
                     // verify that the database has the expected file format
-                    try (Database db = new DatabaseBuilder(testFile).withReadOnly(true).open()) {
+                    try (Database db = new DatabaseBuilder().withFile(testFile).withReadOnly(true).open()) {
                         FileFormat dbFileFormat = db.getFileFormat();
                         if (dbFileFormat != fileFormat) {
                             throw new RuntimeException("Expected " + fileFormat + " was " + dbFileFormat);

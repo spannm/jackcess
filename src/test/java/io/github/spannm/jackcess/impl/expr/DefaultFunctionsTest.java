@@ -21,7 +21,6 @@ import io.github.spannm.jackcess.expr.Expression;
 import io.github.spannm.jackcess.impl.expr.DefaultFunctionsTest.CustomFormatSource.CustomFormatArgumentsProvider;
 import io.github.spannm.jackcess.impl.expr.ExpressionatorTest.TestContext;
 import io.github.spannm.jackcess.test.AbstractBaseTest;
-import io.github.spannm.jackcess.test.TestUtil;
 import io.github.spannm.jackcess.test.converter.CsvToLocalDateTime;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtensionContext;
@@ -692,10 +691,10 @@ class DefaultFunctionsTest extends AbstractBaseTest {
             args("WeekdayName(3,True,3)", "Thu"),
 
             args("CStr(Date())", () ->
-                DateTimeFormatter.ofPattern("M/d/yyyy").format(LocalDate.now(TestUtil.TEST_TZ.toZoneId()))),
+                DateTimeFormatter.ofPattern("M/d/yyyy").format(LocalDate.now(TEST_TZ.toZoneId()))),
             args("CStr(Time())", () -> {
                     DateTimeFormatter formatter = new DateTimeFormatterBuilder().appendPattern("h:mm:ss a").toFormatter(Locale.US);
-                    return formatter.format(LocalDateTime.now(TestUtil.TEST_TZ.toZoneId()));
+                    return formatter.format(LocalDateTime.now(TEST_TZ.toZoneId()));
                 }),
 
             args("CStr(TimeSerial(3,57,34))", "3:57:34 AM"),

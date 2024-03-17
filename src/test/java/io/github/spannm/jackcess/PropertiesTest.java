@@ -179,7 +179,7 @@ class PropertiesTest extends AbstractBaseTest {
                 continue;
             }
 
-            try (Database db = TestUtil.open(ff, f)) {
+            try (Database db = TestUtil.openDb(ff, f)) {
                 PropertyMap dbProps = db.getDatabaseProperties();
                 assertFalse(dbProps.isEmpty());
                 assertTrue(((String) dbProps.getValue(PropertyMap.ACCESS_VERSION_PROP)).matches("[0-9]{2}[.][0-9]{2}"));
@@ -318,7 +318,7 @@ class PropertiesTest extends AbstractBaseTest {
         UUID u1 = UUID.randomUUID();
         UUID u2 = UUID.randomUUID();
 
-        File file = TestUtil.createTempFile(false);
+        File file = TestUtil.createTempFile(getShortTestMethodName(), ".mdb", false);
 
         try (Database db1 = DatabaseBuilder.newDatabase(file)
             .withFileFormat(fileFormat)
@@ -358,7 +358,7 @@ class PropertiesTest extends AbstractBaseTest {
     @ParameterizedTest(name = "[{index}] {0}")
     @FileFormatSource
     void testEnforceProperties(FileFormat fileFormat) throws Exception {
-        try (Database db = TestUtil.create(fileFormat)) {
+        try (Database db = createDbMem(fileFormat)) {
             Table t = DatabaseBuilder.newTable("testReq")
                 .addColumn(DatabaseBuilder.newColumn("id", DataType.LONG)
                     .withAutoNumber(true)

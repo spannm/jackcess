@@ -37,7 +37,7 @@ class ColumnValidatorTest extends AbstractBaseTest {
     @ParameterizedTest(name = "[{index}] {0}")
     @FileFormatSource
     void testValidate(FileFormat fileFormat) throws Exception {
-        try (Database db = create(fileFormat)) {
+        try (Database db = createDbMem(fileFormat)) {
             ColumnValidatorFactory initFact = db.getColumnValidatorFactory();
             assertNotNull(initFact);
 

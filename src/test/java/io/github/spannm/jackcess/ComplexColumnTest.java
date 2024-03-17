@@ -18,8 +18,6 @@ package io.github.spannm.jackcess;
 
 import static io.github.spannm.jackcess.test.Basename.COMPLEX_DATA;
 import static io.github.spannm.jackcess.test.Basename.UNSUPPORTED_FIELDS;
-import static io.github.spannm.jackcess.test.TestUtil.TEST_TZ;
-import static io.github.spannm.jackcess.test.TestUtil.assertSameDate;
 
 import io.github.spannm.jackcess.complex.*;
 import io.github.spannm.jackcess.impl.ByteUtil;
@@ -27,6 +25,7 @@ import io.github.spannm.jackcess.impl.ColumnImpl;
 import io.github.spannm.jackcess.impl.PageChannel;
 import io.github.spannm.jackcess.test.AbstractBaseTest;
 import io.github.spannm.jackcess.test.TestDb;
+import io.github.spannm.jackcess.test.TestUtil;
 import io.github.spannm.jackcess.test.source.TestDbSource;
 import org.junit.jupiter.params.ParameterizedTest;
 
@@ -338,7 +337,7 @@ class ComplexColumnTest extends AbstractBaseTest {
                 Date modDate = (Date) versionInfos[i + 1];
                 Version v = versions.get(i / 2);
                 assertEquals(value, v.getValue());
-                assertSameDate(modDate, v.getModifiedDate());
+                TestUtil.assertSameDate(modDate, v.getModifiedDate());
             }
         }
     }

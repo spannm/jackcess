@@ -18,11 +18,11 @@ package io.github.spannm.jackcess;
 
 import static io.github.spannm.jackcess.test.Basename.LINKED;
 import static io.github.spannm.jackcess.test.Basename.LINKED_ODBC;
-import static io.github.spannm.jackcess.test.TestUtil.*;
 
 import io.github.spannm.jackcess.impl.DatabaseImpl;
 import io.github.spannm.jackcess.test.AbstractBaseTest;
 import io.github.spannm.jackcess.test.TestDb;
+import io.github.spannm.jackcess.test.TestUtil;
 import io.github.spannm.jackcess.test.source.TestDbSource;
 import org.junit.jupiter.params.ParameterizedTest;
 
@@ -74,12 +74,12 @@ class LinkedTableTest extends AbstractBaseTest {
             assertEquals("linkeeTest.accdb", ((DatabaseImpl) linkeeDb).getName());
 
             List<? extends Map<String, Object>> expectedRows =
-                createExpectedTable(
-                    createExpectedRow(
+                TestUtil.createExpectedTable(
+                    TestUtil.createExpectedRow(
                         "ID", 1,
                         "Field1", "bar"));
 
-            assertTable(expectedRows, t2);
+            TestUtil.assertTable(expectedRows, t2);
 
             db.createLinkedTable("FooTable", linkeeDbName, "Table2");
 
@@ -95,12 +95,12 @@ class LinkedTableTest extends AbstractBaseTest {
             assertEquals(1, db.getLinkedDatabases().size());
 
             expectedRows =
-                createExpectedTable(
-                    createExpectedRow(
+                TestUtil.createExpectedTable(
+                    TestUtil.createExpectedRow(
                         "ID", 1,
                         "Field1", "buzz"));
 
-            assertTable(expectedRows, t3);
+            TestUtil.assertTable(expectedRows, t3);
 
             tmd = db.getTableMetaData("Table1");
             assertEquals("Table1", tmd.getName());

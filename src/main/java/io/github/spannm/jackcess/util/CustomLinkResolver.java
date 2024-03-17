@@ -261,7 +261,7 @@ public abstract class CustomLinkResolver implements LinkResolver {
         static FileChannel initDbChannel(FileChannel channel, FileFormat format)
             throws IOException {
             FileFormatDetails details = getFileFormatDetails(format);
-            transferDbFrom(channel, getResourceAsStream(details.getEmptyFilePath()));
+            transferDatabase(getResourceAsStream(details.getEmptyFilePath()), channel);
             return channel;
         }
     }

@@ -16,13 +16,12 @@ limitations under the License.
 
 package io.github.spannm.jackcess.util;
 
-import static io.github.spannm.jackcess.test.TestUtil.*;
-
 import io.github.spannm.jackcess.*;
 import io.github.spannm.jackcess.Database.FileFormat;
 import io.github.spannm.jackcess.impl.ColumnImpl;
 import io.github.spannm.jackcess.impl.TableImpl;
 import io.github.spannm.jackcess.test.AbstractBaseTest;
+import io.github.spannm.jackcess.test.TestUtil;
 import io.github.spannm.jackcess.test.source.FileFormatSource;
 import org.junit.jupiter.params.ParameterizedTest;
 
@@ -40,7 +39,7 @@ class ErrorHandlerTest extends AbstractBaseTest {
     @ParameterizedTest(name = "[{index}] {0}")
     @FileFormatSource
     void testErrorHandler(FileFormat fileFormat) throws Exception {
-        try (Database db = create(fileFormat)) {
+        try (Database db = createDbMem(fileFormat)) {
             Table table =
                 new TableBuilder("test")
                     .addColumn(new ColumnBuilder("col", DataType.TEXT))
@@ -51,13 +50,10 @@ class ErrorHandlerTest extends AbstractBaseTest {
             table.addRow("row2", 2);
             table.addRow("row3", 3);
 
-            assertTable(createExpectedTable(
-                createExpectedRow("col", "row1",
-                    "val", 1),
-                createExpectedRow("col", "row2",
-                    "val", 2),
-                createExpectedRow("col", "row3",
-                    "val", 3)),
+            TestUtil.assertTable(TestUtil.createExpectedTable(
+                TestUtil.createExpectedRow("col", "row1", "val", 1),
+                TestUtil.createExpectedRow("col", "row2", "val", 2),
+                TestUtil.createExpectedRow("col", "row3", "val", 3)),
                 table);
 
             replaceColumn(table, "val");
@@ -69,10 +65,10 @@ class ErrorHandlerTest extends AbstractBaseTest {
             table.reset();
             table.setErrorHandler(new ReplacementErrorHandler());
 
-            assertTable(createExpectedTable(
-                createExpectedRow("col", "row1", "val", null),
-                createExpectedRow("col", "row2", "val", null),
-                createExpectedRow("col", "row3", "val", null)),
+            TestUtil.assertTable(TestUtil.createExpectedTable(
+                TestUtil.createExpectedRow("col", "row1", "val", null),
+                TestUtil.createExpectedRow("col", "row2", "val", null),
+                TestUtil.createExpectedRow("col", "row3", "val", null)),
                 table);
 
             Cursor c1 = CursorBuilder.createCursor(table);
@@ -82,22 +78,16 @@ class ErrorHandlerTest extends AbstractBaseTest {
             c2.setErrorHandler(new DebugErrorHandler("#error"));
             c3.setErrorHandler(ErrorHandler.DEFAULT);
 
-            assertCursor(createExpectedTable(
-                createExpectedRow("col", "row1",
-                    "val", null),
-                createExpectedRow("col", "row2",
-                    "val", null),
-                createExpectedRow("col", "row3",
-                    "val", null)),
+            TestUtil.assertCursor(TestUtil.createExpectedTable(
+                TestUtil.createExpectedRow("col", "row1", "val", null),
+                TestUtil.createExpectedRow("col", "row2", "val", null),
+                TestUtil.createExpectedRow("col", "row3", "val", null)),
                 c1);
 
-            assertCursor(createExpectedTable(
-                createExpectedRow("col", "row1",
-                    "val", "#error"),
-                createExpectedRow("col", "row2",
-                    "val", "#error"),
-                createExpectedRow("col", "row3",
-                    "val", "#error")),
+            TestUtil.assertCursor(TestUtil.createExpectedTable(
+                TestUtil.createExpectedRow("col", "row1", "val", "#error"),
+                TestUtil.createExpectedRow("col", "row2", "val", "#error"),
+                TestUtil.createExpectedRow("col", "row3", "val", "#error")),
                 c2);
 
             assertThrows(IOException.class, c3::getNextRow);

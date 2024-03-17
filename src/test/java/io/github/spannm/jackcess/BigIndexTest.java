@@ -18,12 +18,12 @@ package io.github.spannm.jackcess;
 
 import static io.github.spannm.jackcess.test.Basename.BIG_INDEX;
 import static io.github.spannm.jackcess.test.Basename.COMP_INDEX;
-import static io.github.spannm.jackcess.test.TestUtil.countRows;
 
 import io.github.spannm.jackcess.impl.IndexImpl;
 import io.github.spannm.jackcess.impl.TableImpl;
 import io.github.spannm.jackcess.test.AbstractBaseTest;
 import io.github.spannm.jackcess.test.TestDb;
+import io.github.spannm.jackcess.test.TestUtil;
 import io.github.spannm.jackcess.test.source.TestDbReadOnlySource;
 import io.github.spannm.jackcess.test.source.TestDbSource;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -45,7 +45,7 @@ class BigIndexTest extends AbstractBaseTest {
             TableImpl t = (TableImpl) db.getTable("Table1");
             IndexImpl index = t.getIndex("CD_AGENTE");
             assertFalse(index.isInitialized());
-            assertEquals(512, countRows(t));
+            assertEquals(512, TestUtil.countRows(t));
             assertEquals(512, index.getIndexData().getEntryCount());
         }
     }
@@ -58,7 +58,7 @@ class BigIndexTest extends AbstractBaseTest {
             TableImpl t = (TableImpl) db.getTable("Table1");
             IndexImpl i = t.getIndex("col1");
             assertFalse(i.isInitialized());
-            assertEquals(0, countRows(t));
+            assertEquals(0, TestUtil.countRows(t));
             assertEquals(0, i.getIndexData().getEntryCount());
         }
 

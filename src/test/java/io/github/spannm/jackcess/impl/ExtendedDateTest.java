@@ -18,14 +18,12 @@ package io.github.spannm.jackcess.impl;
 
 import static io.github.spannm.jackcess.DatabaseBuilder.*;
 import static io.github.spannm.jackcess.test.Basename.EXT_DATE;
-import static io.github.spannm.jackcess.test.TestUtil.assertCursor;
-import static io.github.spannm.jackcess.test.TestUtil.create;
-import static io.github.spannm.jackcess.test.TestUtil.createExpectedRow;
 
 import io.github.spannm.jackcess.*;
 import io.github.spannm.jackcess.Database.FileFormat;
 import io.github.spannm.jackcess.test.AbstractBaseTest;
 import io.github.spannm.jackcess.test.TestDb;
+import io.github.spannm.jackcess.test.TestUtil;
 import io.github.spannm.jackcess.test.source.FileFormatSource;
 import io.github.spannm.jackcess.test.source.TestDbSource;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -83,7 +81,7 @@ class ExtendedDateTest extends AbstractBaseTest {
             return;
         }
 
-        try (Database db = create(fileFormat)) {
+        try (Database db = createDbMem(fileFormat)) {
             Table t = newTable("Test")
                 .addColumn(newColumn("id", DataType.LONG)
                     .withAutoNumber(true))
@@ -107,7 +105,7 @@ class ExtendedDateTest extends AbstractBaseTest {
                 LocalDateTime realLdt = (LocalDateTime) ColumnImpl.toInternalValue(
                     DataType.EXT_DATE_TIME, ldt, (DatabaseImpl) db);
 
-                expectedTable.add(createExpectedRow(
+                expectedTable.add(TestUtil.createExpectedRow(
                     "id", idx++,
                     "data1", "" + ldt,
                     "extDate", realLdt));
@@ -122,13 +120,13 @@ class ExtendedDateTest extends AbstractBaseTest {
 
             Cursor c = t.newCursor().withIndexByName("idxAsc").toIndexCursor();
 
-            assertCursor(expectedTable, c);
+            TestUtil.assertCursor(expectedTable, c);
 
             expectedTable.sort(comp.reversed());
 
             c = t.newCursor().withIndexByName("idxDesc").toIndexCursor();
 
-            assertCursor(expectedTable, c);
+            TestUtil.assertCursor(expectedTable, c);
         }
     }
 }

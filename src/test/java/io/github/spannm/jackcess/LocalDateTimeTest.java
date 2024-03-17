@@ -19,14 +19,13 @@ package io.github.spannm.jackcess;
 import static io.github.spannm.jackcess.DatabaseBuilder.newColumn;
 import static io.github.spannm.jackcess.DatabaseBuilder.newTable;
 import static io.github.spannm.jackcess.test.Basename.OLD_DATES;
-import static io.github.spannm.jackcess.test.TestUtil.assertSameDate;
-import static io.github.spannm.jackcess.test.TestUtil.createMem;
 
 import io.github.spannm.jackcess.Database.FileFormat;
 import io.github.spannm.jackcess.impl.ColumnImpl;
 import io.github.spannm.jackcess.impl.DatabaseImpl;
 import io.github.spannm.jackcess.test.AbstractBaseTest;
 import io.github.spannm.jackcess.test.TestDb;
+import io.github.spannm.jackcess.test.TestUtil;
 import io.github.spannm.jackcess.test.source.FileFormatSource;
 import io.github.spannm.jackcess.test.source.TestDbSource;
 import org.junit.jupiter.api.Test;
@@ -46,7 +45,7 @@ class LocalDateTimeTest extends AbstractBaseTest {
     @ParameterizedTest(name = "[{index}] {0}")
     @FileFormatSource
     void testWriteAndReadLocalDate(FileFormat fileFormat) throws Exception {
-        try (Database db = createMem(fileFormat)) {
+        try (Database db = createDbMem(fileFormat)) {
             db.setDateTimeType(DateTimeType.LOCAL_DATE_TIME);
 
             Table table = newTable("test")
@@ -98,7 +97,7 @@ class LocalDateTimeTest extends AbstractBaseTest {
             for (int i = 0; i < dates.size(); i++) {
                 Date expected = dates.get(i);
                 LocalDateTime found = foundDates.get(i);
-                assertSameDate(expected, found);
+                TestUtil.assertSameDate(expected, found);
             }
         }
     }
@@ -109,7 +108,7 @@ class LocalDateTimeTest extends AbstractBaseTest {
         DateTimeFormatter sdf = DateTimeFormatter.ofPattern("uuuu-MM-dd");
         List<String> dates = List.of("1582-10-15", "1582-10-14", "1492-01-10", "1392-01-10");
 
-        try (Database db = createMem(fileFormat)) {
+        try (Database db = createDbMem(fileFormat)) {
             db.setZoneId(ZoneId.of("America/New_York"));
             db.setDateTimeType(DateTimeType.LOCAL_DATE_TIME);
 
@@ -209,7 +208,7 @@ class LocalDateTimeTest extends AbstractBaseTest {
     void testWriteAndReadTemporals(FileFormat fileFormat) throws Exception {
         ZoneId zoneId = ZoneId.of("America/New_York");
 
-        try (Database db = createMem(fileFormat)) {
+        try (Database db = createDbMem(fileFormat)) {
             db.setZoneId(zoneId);
             db.setDateTimeType(DateTimeType.LOCAL_DATE_TIME);
 

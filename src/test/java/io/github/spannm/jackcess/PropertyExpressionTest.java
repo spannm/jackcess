@@ -46,7 +46,7 @@ class PropertyExpressionTest extends AbstractBaseTest {
     @ParameterizedTest(name = "[{index}] {0}")
     @FileFormatSource
     void testDefaultValue(FileFormat fileFormat) throws Exception {
-        try (Database db = create(fileFormat)) {
+        try (Database db = createDbMem(fileFormat)) {
             db.setEvaluateExpressions(true);
 
             Table t = newTable("test")
@@ -107,7 +107,7 @@ class PropertyExpressionTest extends AbstractBaseTest {
 
     @Test
     void testCalculatedValue() throws Exception {
-        try (Database db = create(FileFormat.V2016)) {
+        try (Database db = createDbMem(FileFormat.V2016)) {
             db.setEvaluateExpressions(true);
 
             Table t = newTable("test")
@@ -151,7 +151,7 @@ class PropertyExpressionTest extends AbstractBaseTest {
     @ParameterizedTest(name = "[{index}] {0}")
     @FileFormatSource
     void testColumnValidator(FileFormat fileFormat) throws Exception {
-        try (Database db = create(fileFormat)) {
+        try (Database db = createDbMem(fileFormat)) {
             db.setEvaluateExpressions(true);
 
             Table t = newTable("test")
@@ -205,7 +205,7 @@ class PropertyExpressionTest extends AbstractBaseTest {
     @ParameterizedTest(name = "[{index}] {0}")
     @FileFormatSource
     void testRowValidator(FileFormat fileFormat) throws Exception {
-        try (Database db = create(fileFormat)) {
+        try (Database db = createDbMem(fileFormat)) {
             db.setEvaluateExpressions(true);
 
             Table t = newTable("test")
@@ -269,7 +269,7 @@ class PropertyExpressionTest extends AbstractBaseTest {
         Bindings bindings = new SimpleBindings();
         bindings.put("someKey", "someVal");
 
-        try (Database db = create(fileFormat)) {
+        try (Database db = createDbMem(fileFormat)) {
             EvalConfig ec = db.getEvalConfig();
             ec.setTemporalConfig(tempConf);
             ec.setFunctionLookup(lookup);

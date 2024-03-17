@@ -16,8 +16,6 @@ limitations under the License.
 
 package io.github.spannm.jackcess.util;
 
-import static io.github.spannm.jackcess.test.TestUtil.create;
-
 import io.github.spannm.jackcess.*;
 import io.github.spannm.jackcess.Database.FileFormat;
 import io.github.spannm.jackcess.test.AbstractBaseTest;
@@ -36,7 +34,7 @@ class ColumnFormatterTest extends AbstractBaseTest {
     @ParameterizedTest(name = "[{index}] {0}")
     @FileFormatSource
     void testFormat(FileFormat fileFormat) throws Exception {
-        try (Database db = create(fileFormat)) {
+        try (Database db = createDbMem(fileFormat)) {
             db.setEvaluateExpressions(true);
 
             Table t = new TableBuilder("test")

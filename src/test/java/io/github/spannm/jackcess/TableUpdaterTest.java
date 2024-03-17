@@ -17,7 +17,6 @@ limitations under the License.
 package io.github.spannm.jackcess;
 
 import static io.github.spannm.jackcess.DatabaseBuilder.*;
-import static io.github.spannm.jackcess.test.TestUtil.create;
 
 import io.github.spannm.jackcess.Database.FileFormat;
 import io.github.spannm.jackcess.impl.DatabaseImpl;
@@ -36,7 +35,7 @@ class TableUpdaterTest extends AbstractBaseTest {
     @ParameterizedTest(name = "[{index}] {0}")
     @FileFormatSource
     void testTableUpdating(FileFormat fileFormat) throws Exception {
-        try (Database db = create(fileFormat)) {
+        try (Database db = createDbMem(fileFormat)) {
             doTestUpdating(db, false, true, null);
         }
     }
@@ -44,7 +43,7 @@ class TableUpdaterTest extends AbstractBaseTest {
     @ParameterizedTest(name = "[{index}] {0}")
     @FileFormatSource
     void testTableUpdatingOneToOne(FileFormat fileFormat) throws Exception {
-        try (Database db = create(fileFormat)) {
+        try (Database db = createDbMem(fileFormat)) {
             doTestUpdating(db, true, true, null);
         }
     }
@@ -52,7 +51,7 @@ class TableUpdaterTest extends AbstractBaseTest {
     @ParameterizedTest(name = "[{index}] {0}")
     @FileFormatSource
     void testTableUpdatingNoEnforce(FileFormat fileFormat) throws Exception {
-        try (Database db = create(fileFormat)) {
+        try (Database db = createDbMem(fileFormat)) {
             doTestUpdating(db, false, false, null);
         }
     }
@@ -60,7 +59,7 @@ class TableUpdaterTest extends AbstractBaseTest {
     @ParameterizedTest(name = "[{index}] {0}")
     @FileFormatSource
     void testTableUpdatingNamedRelationship(FileFormat fileFormat) throws Exception {
-        try (Database db = create(fileFormat)) {
+        try (Database db = createDbMem(fileFormat)) {
             doTestUpdating(db, false, true, "FKnun3jvv47l9kyl74h85y8a0if");
         }
     }
@@ -163,7 +162,7 @@ class TableUpdaterTest extends AbstractBaseTest {
     @ParameterizedTest(name = "[{index}] {0}")
     @FileFormatSource
     void testInvalidUpdate(FileFormat fileFormat) throws Exception {
-        try (Database db = create(fileFormat)) {
+        try (Database db = createDbMem(fileFormat)) {
             Table t1 = newTable("TestTable")
                 .addColumn(newColumn("id", DataType.LONG))
                 .toTable(db);
@@ -202,7 +201,7 @@ class TableUpdaterTest extends AbstractBaseTest {
     @ParameterizedTest(name = "[{index}] {0}")
     @FileFormatSource
     void testUpdateLargeTableDef(FileFormat fileFormat) throws Exception {
-        try (Database db = create(fileFormat)) {
+        try (Database db = createDbMem(fileFormat)) {
             final int numColumns = 89;
 
             Table t = newTable("test")

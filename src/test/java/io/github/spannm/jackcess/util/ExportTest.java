@@ -16,11 +16,10 @@ limitations under the License.
 
 package io.github.spannm.jackcess.util;
 
-import static io.github.spannm.jackcess.test.TestUtil.*;
-
 import io.github.spannm.jackcess.*;
 import io.github.spannm.jackcess.Database.FileFormat;
 import io.github.spannm.jackcess.test.AbstractBaseTest;
+import io.github.spannm.jackcess.test.TestUtil;
 import io.github.spannm.jackcess.test.source.FileFormatSource;
 import org.junit.jupiter.params.ParameterizedTest;
 
@@ -42,7 +41,7 @@ class ExportTest extends AbstractBaseTest {
         DateFormat df = new SimpleDateFormat("yyyyMMdd HH:mm:ss");
         df.setTimeZone(TEST_TZ);
 
-        Database db = create(fileFormat);
+        Database db = createDbMem(fileFormat);
         db.setDateTimeType(DateTimeType.DATE);
         db.setTimeZone(TEST_TZ);
 
@@ -56,10 +55,10 @@ class ExportTest extends AbstractBaseTest {
             .toTable(db);
 
         Date testDate = df.parse("19801231 00:00:00");
-        t.addRow("some text||some more", 13, 13.25, createString(30).getBytes(),
+        t.addRow("some text||some more", 13, 13.25, TestUtil.createString(30).getBytes(),
             true, testDate);
 
-        t.addRow("crazy'data\"here", -345, -0.000345, createString(7).getBytes(),
+        t.addRow("crazy'data\"here", -345, -0.000345, TestUtil.createString(7).getBytes(),
             true, null);
 
         t.addRow("C:\\temp\\some_file.txt", 25, 0.0, null, false, null);

@@ -40,11 +40,11 @@ public final class TestDb {
     }
 
     public Database open() throws Exception {
-        return TestUtil.open(getExpectedFileFormat(), getFile(), false, getExpectedCharset());
+        return TestUtil.openDb(getExpectedFileFormat(), getFile(), false, getExpectedCharset());
     }
 
     public Database openMem() throws Exception {
-        return TestUtil.openDB(getExpectedFileFormat(), getFile(), true, getExpectedCharset(), false);
+        return TestUtil.openDb(getExpectedFileFormat(), getFile(), true, getExpectedCharset(), false);
     }
 
     public Database openCopy() throws Exception {

@@ -17,13 +17,11 @@ limitations under the License.
 package io.github.spannm.jackcess.impl;
 
 import static io.github.spannm.jackcess.DatabaseBuilder.*;
-import static io.github.spannm.jackcess.test.TestUtil.assertCursor;
-import static io.github.spannm.jackcess.test.TestUtil.create;
-import static io.github.spannm.jackcess.test.TestUtil.createExpectedRow;
 
 import io.github.spannm.jackcess.*;
 import io.github.spannm.jackcess.Database.FileFormat;
 import io.github.spannm.jackcess.test.AbstractBaseTest;
+import io.github.spannm.jackcess.test.TestUtil;
 import io.github.spannm.jackcess.test.source.FileFormatSource;
 import org.junit.jupiter.params.ParameterizedTest;
 
@@ -48,7 +46,7 @@ class BigIntTest extends AbstractBaseTest {
             return;
         }
 
-        try (Database db = create(fileFormat)) {
+        try (Database db = createDbMem(fileFormat)) {
             Table t = newTable("Test")
                 .addColumn(newColumn("id", DataType.LONG)
                     .withAutoNumber(true))
@@ -65,7 +63,7 @@ class BigIntTest extends AbstractBaseTest {
             for (long lng : vals) {
                 t.addRow(Column.AUTO_NUMBER, "" + lng, lng);
 
-                expectedTable.add(createExpectedRow(
+                expectedTable.add(TestUtil.createExpectedRow(
                     "id", idx++,
                     "data1", "" + lng,
                     "num1", lng));
@@ -75,7 +73,7 @@ class BigIntTest extends AbstractBaseTest {
 
             Cursor c = t.newCursor().withIndexByName("idx").toIndexCursor();
 
-            assertCursor(expectedTable, c);
+            TestUtil.assertCursor(expectedTable, c);
         }
     }
 }

@@ -73,7 +73,7 @@ class JetFormatTest extends AbstractBaseTest {
     @ParameterizedTest(name = "[{index}] {0}")
     @FileFormatSource(include = "GENERIC_JET4")
     void testFileFormat2(FileFormat ff) throws Exception {
-        try (Database db = TestUtil.open(ff, new File(DIR_TEST_DATA, "adox_jet4.mdb"))) {
+        try (Database db = TestUtil.openDb(ff, new File(DIR_TEST_DATA, "adox_jet4.mdb"))) {
             assertEquals(ff, db.getFileFormat());
         }
     }

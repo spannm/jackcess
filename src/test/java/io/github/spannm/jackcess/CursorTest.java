@@ -71,8 +71,8 @@ class CursorTest extends AbstractBaseTest {
         return expectedRows;
     }
 
-    private static Database createTestTable(FileFormat fileFormat) throws Exception {
-        Database db = createMem(fileFormat);
+    private Database createTestTable(FileFormat fileFormat) throws Exception {
+        Database db = createDbMem(fileFormat);
 
         Table table = DatabaseBuilder.newTable("test")
             .addColumn(DatabaseBuilder.newColumn("id", DataType.LONG))
@@ -120,8 +120,8 @@ class CursorTest extends AbstractBaseTest {
         return expectedRows;
     }
 
-    private static Database createDupeTestTable(FileFormat _fileFormat) throws Exception {
-        Database db = createMem(_fileFormat);
+    private Database createDupTestTable(FileFormat _fileFormat) throws Exception {
+        Database db = createDbMem(_fileFormat);
 
         Table table = DatabaseBuilder.newTable("test")
             .addColumn(DatabaseBuilder.newColumn("id", DataType.LONG))
@@ -693,7 +693,7 @@ class CursorTest extends AbstractBaseTest {
     @ParameterizedTest(name = "[{index}] {0}")
     @FileFormatSource
     void testFindAllIndex(FileFormat fileFormat) throws Exception {
-        try (Database testDb = createDupeTestTable(fileFormat)) {
+        try (Database testDb = createDupTestTable(fileFormat)) {
             Table table = testDb.getTable("test");
             Cursor cursor = CursorBuilder.createCursor(table);
 
@@ -1115,7 +1115,7 @@ class CursorTest extends AbstractBaseTest {
     @ParameterizedTest(name = "[{index}] {0}")
     @FileFormatSource
     void testIterationEarlyExit(FileFormat fileFormat) throws Exception {
-        try (Database db = createMem(fileFormat)) {
+        try (Database db = createDbMem(fileFormat)) {
             Table table = DatabaseBuilder.newTable("test")
                 .addColumn(DatabaseBuilder.newColumn("id", DataType.LONG))
                 .addColumn(DatabaseBuilder.newColumn("value", DataType.TEXT))
@@ -1163,7 +1163,7 @@ class CursorTest extends AbstractBaseTest {
     @ParameterizedTest(name = "[{index}] {0}")
     @FileFormatSource
     void testPartialIndexFind(FileFormat fileFormat) throws Exception {
-        try (Database db = createMem(fileFormat)) {
+        try (Database db = createDbMem(fileFormat)) {
             TableImpl t = (TableImpl) DatabaseBuilder.newTable("Test").addColumn(DatabaseBuilder.newColumn("id", DataType.LONG)).addColumn(DatabaseBuilder.newColumn("data1", DataType.TEXT))
                 .addColumn(DatabaseBuilder.newColumn("num2", DataType.LONG)).addColumn(DatabaseBuilder.newColumn("key3", DataType.TEXT)).addColumn(DatabaseBuilder.newColumn("value", DataType.TEXT))
                 .addIndex(DatabaseBuilder.newIndex("idx3").withColumns("data1", "num2", "key3")).toTable(db);
@@ -1215,7 +1215,7 @@ class CursorTest extends AbstractBaseTest {
     @ParameterizedTest(name = "[{index}] {0}")
     @FileFormatSource
     void testPartialIndexLookup(FileFormat fileFormat) throws Exception {
-        try (Database db = createMem(fileFormat)) {
+        try (Database db = createDbMem(fileFormat)) {
             TableImpl t = (TableImpl) DatabaseBuilder.newTable("Test")
                 .addColumn(DatabaseBuilder.newColumn("id", DataType.LONG))
                 .addColumn(DatabaseBuilder.newColumn("data1", DataType.TEXT))

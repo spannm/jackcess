@@ -63,7 +63,7 @@ class LongValueTest extends AbstractBaseTest {
     @FileFormatSource
     void testWriteLongValue(FileFormat fileFormat) throws Exception {
 
-        try (Database db = createMem(fileFormat)) {
+        try (Database db = createDbMem(fileFormat)) {
             Table table =
                 new TableBuilder("test")
                     .addColumn(new ColumnBuilder("A", DataType.TEXT))
@@ -111,7 +111,7 @@ class LongValueTest extends AbstractBaseTest {
     @ParameterizedTest(name = "[{index}] {0}")
     @FileFormatSource
     void testManyMemos(FileFormat fileFormat) throws Exception {
-        try (Database db = createMem(fileFormat)) {
+        try (Database db = createDbMem(fileFormat)) {
             final int numColumns = 126;
             TableBuilder bigTableBuilder = new TableBuilder("test");
 
@@ -171,7 +171,7 @@ class LongValueTest extends AbstractBaseTest {
     @ParameterizedTest(name = "[{index}] {0}")
     @FileFormatSource
     void testLongValueAsMiddleColumn(FileFormat fileFormat) throws Exception {
-        try (Database db = createMem(fileFormat)) {
+        try (Database db = createDbMem(fileFormat)) {
             Table newTable = new TableBuilder("NewTable")
                 .addColumn(new ColumnBuilder("a").withSqlType(Types.INTEGER))
                 .addColumn(new ColumnBuilder("b").withSqlType(Types.LONGVARCHAR))
@@ -193,7 +193,7 @@ class LongValueTest extends AbstractBaseTest {
     @ParameterizedTest(name = "[{index}] {0}")
     @TestDbReadOnlySource(UNICODE_COMP)
     void testUnicodeCompression(TestDb testDb) throws Exception {
-        try (Database db = open(FileFormat.V2003, testDb.getFile(), true)) {
+        try (Database db = openDb(FileFormat.V2003, testDb.getFile(), true)) {
             StringBuilder sb = new StringBuilder(127);
             for (int i = 1; i <= 0xFF; i++) {
                 sb.append((char) i);

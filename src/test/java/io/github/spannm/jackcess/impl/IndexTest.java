@@ -406,7 +406,7 @@ class IndexTest extends AbstractBaseTest {
     @ParameterizedTest(name = "[{index}] {0}")
     @FileFormatSource
     void testIndexCreation(FileFormat fileFormat) throws Exception {
-        try (Database db = TestUtil.create(fileFormat)) {
+        try (Database db = createDbMem(fileFormat)) {
             Table t = DatabaseBuilder.newTable("TestTable")
                 .addColumn(DatabaseBuilder.newColumn("id", DataType.LONG))
                 .addColumn(DatabaseBuilder.newColumn("data", DataType.TEXT))
@@ -444,7 +444,7 @@ class IndexTest extends AbstractBaseTest {
     @ParameterizedTest(name = "[{index}] {0}")
     @FileFormatSource
     void testIndexCreationSharedData(FileFormat fileFormat) throws Exception {
-        try (Database db = TestUtil.create(fileFormat)) {
+        try (Database db = createDbMem(fileFormat)) {
             Table t = DatabaseBuilder.newTable("TestTable")
                 .addColumn(DatabaseBuilder.newColumn("id", DataType.LONG))
                 .addColumn(DatabaseBuilder.newColumn("data", DataType.TEXT))
@@ -527,7 +527,7 @@ class IndexTest extends AbstractBaseTest {
     @FileFormatSource
     void testConstraintViolation(FileFormat fileFormat) throws Exception {
 
-        try (Database db = TestUtil.create(fileFormat)) {
+        try (Database db = createDbMem(fileFormat)) {
             Table t = DatabaseBuilder.newTable("TestTable")
                 .addColumn(DatabaseBuilder.newColumn("id", DataType.LONG))
                 .addColumn(DatabaseBuilder.newColumn("data", DataType.TEXT))
@@ -595,7 +595,7 @@ class IndexTest extends AbstractBaseTest {
     @ParameterizedTest(name = "[{index}] {0}")
     @FileFormatSource
     void testAutoNumberRecover(FileFormat fileFormat) throws Exception {
-        try (Database db = TestUtil.create(fileFormat)) {
+        try (Database db = createDbMem(fileFormat)) {
             Table t = DatabaseBuilder.newTable("TestTable")
                 .addColumn(DatabaseBuilder.newColumn("id", DataType.LONG).withAutoNumber(true))
                 .addColumn(DatabaseBuilder.newColumn("data", DataType.TEXT))
