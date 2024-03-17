@@ -81,10 +81,12 @@ public class DatabaseBuilder {
         this((Path) null);
     }
 
+    @Deprecated
     public DatabaseBuilder(File mdbFile) {
         this(toPath(mdbFile));
     }
 
+    @Deprecated
     public DatabaseBuilder(Path mdbFile) {
         _mdbFile = mdbFile;
     }
@@ -282,7 +284,7 @@ public class DatabaseBuilder {
      * @see DatabaseBuilder for more flexible Database opening
      */
     public static Database open(File mdbFile) throws IOException {
-        return new DatabaseBuilder(mdbFile).open();
+        return new DatabaseBuilder().withFile(mdbFile).open();
     }
 
     /**
@@ -306,7 +308,7 @@ public class DatabaseBuilder {
      * @see DatabaseBuilder for more flexible Database creation
      */
     public static Database create(FileFormat fileFormat, File mdbFile) throws IOException {
-        return new DatabaseBuilder(mdbFile).withFileFormat(fileFormat).create();
+        return new DatabaseBuilder().withFile(mdbFile).withFileFormat(fileFormat).create();
     }
 
     /**
@@ -350,7 +352,7 @@ public class DatabaseBuilder {
      * Convenience method for constructing a DatabaseBuilder.
      */
     public static DatabaseBuilder newDatabase(File file) {
-        return new DatabaseBuilder(file);
+        return new DatabaseBuilder().withFile(file);
     }
 
     /**
