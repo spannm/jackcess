@@ -125,7 +125,7 @@ public class IndexCodesTest extends AbstractBaseTest {
             String rowId = expectedRow.getString("name");
             String tName = t.getName();
             if (("Table11".equals(tName) || "Table11_desc".equals(tName)) && ("row10".equals(rowId) || "row11".equals(rowId) || "row12".equals(rowId))) {
-                getStaticLogger().log(Level.WARNING, "TODO long rows not handled completely yet in V2010: " + tName + ", " + rowId);
+                getStaticLogger().log(Level.WARNING, "TODO long rows not handled completely yet in V2010: {0}, {1}", tName, rowId);
                 return;
             }
         }
@@ -245,7 +245,7 @@ public class IndexCodesTest extends AbstractBaseTest {
                 String entryStr = entryToString(cursor.getSavepoint().getCurrentPosition());
                 getLogger().log(Level.DEBUG, "=======");
                 getLogger().log(Level.DEBUG, "Entry Bytes: {0}", entryStr);
-                getLogger().log(Level.DEBUG, "Value: " + cursor.getCurrentRow() + "; " + toUnicodeStr(cursor.getCurrentRow().get("data")));
+                getLogger().log(Level.DEBUG, "Value: {0}; {1}", cursor.getCurrentRow(), toUnicodeStr(cursor.getCurrentRow().get("data")));
             }
         }
     }

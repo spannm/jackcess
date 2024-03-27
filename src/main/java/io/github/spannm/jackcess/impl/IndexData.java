@@ -326,7 +326,7 @@ public class IndexData {
 
     private void setUnsupportedReason(String reason, ColumnImpl col) {
         _unsupportedReason = withErrorContext(reason);
-        LOGGER.log(col.getTable().isSystem() ? Level.DEBUG : Level.WARNING, _unsupportedReason + ", making read-only");
+        LOGGER.log(col.getTable().isSystem() ? Level.DEBUG : Level.WARNING, "{0}, making read-only", _unsupportedReason);
     }
 
     String getUnsupportedReason() {

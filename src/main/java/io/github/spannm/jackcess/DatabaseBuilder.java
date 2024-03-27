@@ -255,8 +255,7 @@ public class DatabaseBuilder {
      * Creates a new Database using the configured information.
      */
     public Database create() throws IOException {
-        Database db = DatabaseImpl.create(_fileFormat, _mdbFile, _channel, _autoSync,
-            _charset, _timeZone);
+        Database db = DatabaseImpl.create(_fileFormat, _mdbFile, _channel, _autoSync, _charset, _timeZone);
         if (_dbProps != null) {
             PropertyMap props = db.getDatabaseProperties();
             props.putAll(_dbProps.values());
