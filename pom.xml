@@ -102,6 +102,7 @@
         <dep.junit.version>5.10.2</dep.junit.version>
 
         <dep.plugin.sortpom.version>3.4.1</dep.plugin.sortpom.version>
+        <dep.plugin.sonar.version>3.10.0.2594</dep.plugin.sonar.version>
 
         <basepom.check.skip-checkstyle>false</basepom.check.skip-checkstyle>
         <basepom.check.skip-pmd>false</basepom.check.skip-pmd>
@@ -272,6 +273,7 @@
             </plugin>
 
         </plugins>
+
     </build>
 
     <profiles>
@@ -302,6 +304,40 @@
                     <url>https://maven.pkg.github.com/${developerId}/${project.artifactId}</url>
                 </snapshotRepository>
             </distributionManagement>
+        </profile>
+
+        <profile>
+            <!-- mvn verify -P sonarcloud -->
+            <id>sonarcloud</id>
+            <activation>
+                <activeByDefault>false</activeByDefault>
+            </activation>
+            <properties>
+                <sonar.skip>false</sonar.skip>
+                <sonar.host.url>https://sonarcloud.io</sonar.host.url>
+                <sonar.organization>spannm</sonar.organization>
+                <!-- sonar.token>YOUR_TOKEN_HERE</sonar.token -->
+
+                <basepom.test.skip>true</basepom.test.skip>
+                <basepom.check.skip-all>true</basepom.check.skip-all>
+            </properties>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.sonarsource.scanner.maven</groupId>
+                        <artifactId>sonar-maven-plugin</artifactId>
+                        <version>${dep.plugin.sonar.version}</version>
+                        <executions>
+                            <execution>
+                                <goals>
+                                    <goal>sonar</goal>
+                                </goals>
+                                <phase>verify</phase>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
         </profile>
 
         <profile>
