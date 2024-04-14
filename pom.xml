@@ -101,7 +101,7 @@
 
         <dep.junit.version>5.10.2</dep.junit.version>
 
-        <dep.plugin.sortpom.version>3.4.0</dep.plugin.sortpom.version>
+        <dep.plugin.sortpom.version>3.4.1</dep.plugin.sortpom.version>
 
         <basepom.check.skip-checkstyle>false</basepom.check.skip-checkstyle>
         <basepom.check.skip-pmd>false</basepom.check.skip-pmd>
