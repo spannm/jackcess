@@ -113,6 +113,9 @@ public interface Database extends Iterable<Table>, Closeable, Flushable {
      */
     String            DATE_TIME_TYPE_PROPERTY               = "jackcess.dateTimeType";
 
+    String            FILE_EXT_MDB                          = ".mdb";
+    String            FILE_EXT_ACCDB                        = ".accdb";
+
     /**
      * Returns the File underlying this Database
      */
@@ -426,21 +429,21 @@ public interface Database extends Iterable<Table>, Closeable, Flushable {
     enum FileFormat {
 
         /** A database which was created by MS Access 97 */
-        V1997(".mdb"),
+        V1997(FILE_EXT_MDB),
         /** A database which was most likely created programmatically (e.g. using windows ADOX) */
-        GENERIC_JET4(".mdb"),
+        GENERIC_JET4(FILE_EXT_MDB),
         /** A database which was created by MS Access 2000 */
-        V2000(".mdb"),
+        V2000(FILE_EXT_MDB),
         /** A database which was created by MS Access 2002/2003 */
-        V2003(".mdb"),
+        V2003(FILE_EXT_MDB),
         /** A database which was created by MS Access 2007 */
-        V2007(".accdb"),
+        V2007(FILE_EXT_ACCDB),
         /** A database which was created by MS Access 2010+ */
-        V2010(".accdb"),
+        V2010(FILE_EXT_ACCDB),
         /** A database which was created by MS Access 2016+ */
-        V2016(".accdb"),
+        V2016(FILE_EXT_ACCDB),
         /** A database which was created by MS Access 2019+ (Office 365) */
-        V2019(".accdb"),
+        V2019(FILE_EXT_ACCDB),
         /** A database which was created by MS Money */
         MSISAM(".mny");
 

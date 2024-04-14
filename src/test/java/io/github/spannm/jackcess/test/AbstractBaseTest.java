@@ -94,7 +94,7 @@ public abstract class AbstractBaseTest extends Assertions {
 
         FileChannel channel = inMem && !keep ? MemFileChannel.newChannel() : null;
 
-        File tempFile = TestUtil.createTempFile(getShortTestMethodName(), ".mdb", keep);
+        File tempFile = TestUtil.createTempFile(getShortTestMethodName(), Database.FILE_EXT_MDB, keep);
 
         if (fileFormat == FileFormat.GENERIC_JET4) {
             // while we don't support creating GENERIC_JET4 as a jackcess feature,

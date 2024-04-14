@@ -318,7 +318,7 @@ class PropertiesTest extends AbstractBaseTest {
         UUID u1 = UUID.randomUUID();
         UUID u2 = UUID.randomUUID();
 
-        File file = TestUtil.createTempFile(getShortTestMethodName(), ".mdb", false);
+        File file = TestUtil.createTempFile(getShortTestMethodName(), Database.FILE_EXT_MDB, false);
 
         try (Database db1 = DatabaseBuilder.newDatabase(file)
             .withFileFormat(fileFormat)
