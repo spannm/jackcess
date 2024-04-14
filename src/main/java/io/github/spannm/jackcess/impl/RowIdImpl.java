@@ -99,16 +99,13 @@ public class RowIdImpl implements RowId, Serializable {
 
     @Override
     public int compareTo(RowId other) {
-        return compareTo((RowIdImpl) other);
-    }
-
-    public int compareTo(RowIdImpl other) {
-        int compare = getType().compareTo(other.getType());
+        RowIdImpl o = (RowIdImpl) other;
+        int compare = getType().compareTo(o.getType());
         if (compare == 0) {
-            compare = Integer.compare(getPageNumber(), other.getPageNumber());
-        }
-        if (compare == 0) {
-            compare = Integer.compare(getRowNumber(), other.getRowNumber());
+            compare = Integer.compare(getPageNumber(), o.getPageNumber());
+            if (compare == 0) {
+                compare = Integer.compare(getRowNumber(), o.getRowNumber());
+            }
         }
         return compare;
     }

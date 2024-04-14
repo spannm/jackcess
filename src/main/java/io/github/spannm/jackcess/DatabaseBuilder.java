@@ -254,6 +254,7 @@ public class DatabaseBuilder {
     /**
      * Creates a new Database using the configured information.
      */
+    @SuppressWarnings("java:S2095") // suppress sonarcloud warning regarding try-with-resources
     public Database create() throws IOException {
         Database db = DatabaseImpl.create(_fileFormat, _mdbFile, _channel, _autoSync, _charset, _timeZone);
         if (_dbProps != null) {

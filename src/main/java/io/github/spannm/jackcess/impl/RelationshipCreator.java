@@ -161,18 +161,15 @@ public class RelationshipCreator extends DBMutator {
         _secondaryCols = getColumns(_secondaryTable, _relationship.getToColumns());
 
         if (_primaryCols == null || _primaryCols.isEmpty() || _secondaryCols == null || _secondaryCols.isEmpty()) {
-            throw new IllegalArgumentException(withErrorContext(
-                "Missing columns in relationship"));
+            throw new IllegalArgumentException(withErrorContext("Missing columns in relationship"));
         }
 
         if (_primaryCols.size() != _secondaryCols.size()) {
-            throw new IllegalArgumentException(withErrorContext(
-                "Must have same number of columns on each side of relationship"));
+            throw new IllegalArgumentException(withErrorContext("Must have same number of columns on each side of relationship"));
         }
 
-        for (ColumnImpl pcol : _primaryCols) {
-
-            if (pcol.getType() != pcol.getType()) {
+        for (int i = 0; i < _primaryCols.size(); i++) {
+            if (_primaryCols.get(i).getType() != _secondaryCols.get(i).getType()) {
                 throw new IllegalArgumentException(withErrorContext(
                     "Matched columns must have the same data type"));
             }

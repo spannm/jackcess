@@ -95,8 +95,7 @@ public class DefaultDateFunctions {
             }
 
             // we have to construct incrementally to handle out of range values
-            LocalDate ld = LocalDate.of(year, 1, 1).plusMonths(month - 1)
-                .plusDays(day - 1);
+            LocalDate ld = LocalDate.of(year, 1, 1).plusMonths(month - 1).plusDays(day - 1);
 
             return ValueSupport.toValue(ld);
         }

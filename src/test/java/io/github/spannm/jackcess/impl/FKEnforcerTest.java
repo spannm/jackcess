@@ -23,6 +23,7 @@ import io.github.spannm.jackcess.*;
 import io.github.spannm.jackcess.test.AbstractBaseTest;
 import io.github.spannm.jackcess.test.TestDb;
 import io.github.spannm.jackcess.test.source.TestDbSource;
+import org.junit.jupiter.api.function.Executable;
 import org.junit.jupiter.params.ParameterizedTest;
 
 import java.io.IOException;
@@ -65,20 +66,23 @@ class FKEnforcerTest extends AbstractBaseTest {
             Table t2 = db.getTable("Table2");
             Table t3 = db.getTable("Table3");
 
-            assertTrue(assertThrows(IOException.class, () ->
-                t1.addRow(20, 0, 20, "some data", 20)).getMessage().contains("Table1[otherfk2]"));
+            Map<Executable, String> tests = Map.of(
+                () -> t1.addRow(20, 0, 20, "some data", 20), "Table1[otherfk2]",
+                () -> {
+                    Cursor c = CursorBuilder.createCursor(t2);
+                    c.moveToNextRow();
+                    c.updateCurrentRow(30, "foo30");
+                }, "Table2[id]",
+                () -> {
+                    Cursor c = CursorBuilder.createCursor(t3);
+                    c.moveToNextRow();
+                    c.deleteCurrentRow();
+                }, "Table3[id]");
+            tests.entrySet().forEach(e -> {
+                IOException ex = assertThrows(IOException.class, e.getKey());
+                assertTrue(ex.getMessage().contains(e.getValue()));
 
-            assertTrue(assertThrows(IOException.class, () -> {
-                Cursor c = CursorBuilder.createCursor(t2);
-                c.moveToNextRow();
-                c.updateCurrentRow(30, "foo30");
-            }).getMessage().contains("Table2[id]"));
-
-            assertTrue(assertThrows(IOException.class, () -> {
-                Cursor c = CursorBuilder.createCursor(t3);
-                c.moveToNextRow();
-                c.deleteCurrentRow();
-            }).getMessage().contains("Table3[id]"));
+            });
 
             t1.addRow(21, null, null, "null fks", null);
 

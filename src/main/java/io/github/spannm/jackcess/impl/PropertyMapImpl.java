@@ -29,36 +29,36 @@ import java.util.*;
  * @author James Ahlborn
  */
 public class PropertyMapImpl implements PropertyMap {
-    @SuppressWarnings("serial")
-    private static final Map<String, PropDef> DEFAULT_TYPES = new HashMap<>() {{
-        put(ACCESS_VERSION_PROP, new PropDef(DataType.TEXT, false));
-        put(TITLE_PROP, new PropDef(DataType.TEXT, false));
-        put(AUTHOR_PROP, new PropDef(DataType.TEXT, false));
-        put(COMPANY_PROP, new PropDef(DataType.TEXT, false));
-
-        put(DEFAULT_VALUE_PROP, new PropDef(DataType.MEMO, true));
-        put(REQUIRED_PROP, new PropDef(DataType.BOOLEAN, true));
-        put(ALLOW_ZERO_LEN_PROP, new PropDef(DataType.BOOLEAN, true));
-        put(DECIMAL_PLACES_PROP, new PropDef(DataType.BYTE, true));
-        put(FORMAT_PROP, new PropDef(DataType.TEXT, true));
-        put(INPUT_MASK_PROP, new PropDef(DataType.TEXT, true));
-        put(CAPTION_PROP, new PropDef(DataType.MEMO, false));
-        put(VALIDATION_RULE_PROP, new PropDef(DataType.TEXT, true));
-        put(VALIDATION_TEXT_PROP, new PropDef(DataType.TEXT, true));
-        put(GUID_PROP, new PropDef(DataType.BINARY, true));
-        put(DESCRIPTION_PROP, new PropDef(DataType.MEMO, false));
-        put(RESULT_TYPE_PROP, new PropDef(DataType.BYTE, true));
-        put(EXPRESSION_PROP, new PropDef(DataType.MEMO, true));
-        put(DISPLAY_CONTROL_PROP, new PropDef(DataType.INT, false));
-        put(TEXT_FORMAT_PROP, new PropDef(DataType.BYTE, false));
-        put(IME_MODE_PROP, new PropDef(DataType.BYTE, false));
-        put(IME_SENTENCE_MODE_PROP, new PropDef(DataType.BYTE, false));
-    }};
+    private static final Map<String, PropDef> DEFAULT_TYPES = new HashMap<>();
+    static {
+        DEFAULT_TYPES.putAll(Map.of(
+            ACCESS_VERSION_PROP, new PropDef(DataType.TEXT, false),
+            TITLE_PROP, new PropDef(DataType.TEXT, false),
+            AUTHOR_PROP, new PropDef(DataType.TEXT, false),
+            COMPANY_PROP, new PropDef(DataType.TEXT, false),
+            DEFAULT_VALUE_PROP, new PropDef(DataType.MEMO, true),
+            REQUIRED_PROP, new PropDef(DataType.BOOLEAN, true),
+            ALLOW_ZERO_LEN_PROP, new PropDef(DataType.BOOLEAN, true),
+            DECIMAL_PLACES_PROP, new PropDef(DataType.BYTE, true),
+            FORMAT_PROP, new PropDef(DataType.TEXT, true),
+            INPUT_MASK_PROP, new PropDef(DataType.TEXT, true)));
+        DEFAULT_TYPES.putAll(Map.of(
+            CAPTION_PROP, new PropDef(DataType.MEMO, false),
+            VALIDATION_RULE_PROP, new PropDef(DataType.TEXT, true),
+            VALIDATION_TEXT_PROP, new PropDef(DataType.TEXT, true),
+            GUID_PROP, new PropDef(DataType.BINARY, true),
+            DESCRIPTION_PROP, new PropDef(DataType.MEMO, false),
+            RESULT_TYPE_PROP, new PropDef(DataType.BYTE, true),
+            EXPRESSION_PROP, new PropDef(DataType.MEMO, true),
+            DISPLAY_CONTROL_PROP, new PropDef(DataType.INT, false),
+            TEXT_FORMAT_PROP, new PropDef(DataType.BYTE, false)));
+        DEFAULT_TYPES.put(IME_MODE_PROP, new PropDef(DataType.BYTE, false));
+        DEFAULT_TYPES.put(IME_SENTENCE_MODE_PROP, new PropDef(DataType.BYTE, false));
+    }
 
     private final String                _mapName;
     private final short                 _mapType;
-    private final Map<String, Property> _props =
-        new LinkedHashMap<>();
+    private final Map<String, Property> _props = new LinkedHashMap<>();
     private final PropertyMaps          _owner;
 
     public PropertyMapImpl(String name, short type, PropertyMaps owner) {
