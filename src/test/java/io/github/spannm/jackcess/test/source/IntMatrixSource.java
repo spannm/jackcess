@@ -42,7 +42,7 @@ public @interface IntMatrixSource {
      */
     boolean endInclusive() default false;
 
-    static class IntMatrixArgumentsProvider implements ArgumentsProvider {
+    class IntMatrixArgumentsProvider implements ArgumentsProvider {
 
         @Override
         public Stream<Arguments> provideArguments(ExtensionContext context) {

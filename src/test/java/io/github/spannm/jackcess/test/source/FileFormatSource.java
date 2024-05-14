@@ -39,7 +39,7 @@ public @interface FileFormatSource {
      */
     String[] exclude() default {};
 
-    static class FileFormatArgumentsProvider implements ArgumentsProvider {
+    class FileFormatArgumentsProvider implements ArgumentsProvider {
 
         /**
          * Defines currently supported database file formats that are neither read-only nor {@value FileFormat#MSISAM} (MS Money).

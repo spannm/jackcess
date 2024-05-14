@@ -30,9 +30,9 @@ public @interface TestDbReadOnlySource {
      */
     Basename value();
 
-    static class ReadOnlyTestDbArgumentsProvider implements ArgumentsProvider {
+    class ReadOnlyTestDbArgumentsProvider implements ArgumentsProvider {
         @Override
-        public Stream<Arguments> provideArguments(ExtensionContext _context) throws Exception {
+        public Stream<Arguments> provideArguments(ExtensionContext _context) {
             TestDbReadOnlySource src = _context.getElement().map(elem -> AnnotationSupport.findAnnotation(elem, TestDbReadOnlySource.class).get()).orElse(null);
             return src == null ? Stream.empty() : TestDbArgumentsProvider.getDbs(src.value(), FileFormat.values()).stream().map(Arguments::of);
         }

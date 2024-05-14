@@ -57,7 +57,7 @@ class CalculatedColumnUtil {
      *
      * @param args column construction info
      */
-    static ColumnImpl create(ColumnImpl.InitArgs args) throws IOException {
+    static ColumnImpl create(ColumnImpl.InitArgs args) {
         switch (args.type) {
             case BOOLEAN:
                 return new CalcBooleanColImpl(args);

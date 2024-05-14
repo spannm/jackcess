@@ -338,7 +338,7 @@ public final class TestUtil {
             .findFirst().orElse(null);
     }
 
-    public static final File getTestTempDir() {
+    public static File getTestTempDir() {
         return TEST_TEMP_DIR;
     }
 

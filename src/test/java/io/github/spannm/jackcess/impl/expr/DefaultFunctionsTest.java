@@ -926,7 +926,7 @@ class DefaultFunctionsTest extends AbstractBaseTest {
 
         String[] testValues() default {};
 
-        static class CustomFormatArgumentsProvider implements ArgumentsProvider {
+        class CustomFormatArgumentsProvider implements ArgumentsProvider {
             @Override
             public Stream<Arguments> provideArguments(ExtensionContext context) {
                 return context.getElement().map(elem -> AnnotationSupport.findRepeatableAnnotations(elem, CustomFormatSource.class)).orElse(List.of()).stream()

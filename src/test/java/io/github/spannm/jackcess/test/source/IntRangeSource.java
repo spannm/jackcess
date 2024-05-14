@@ -41,7 +41,7 @@ public @interface IntRangeSource {
      */
     boolean endInclusive() default false;
 
-    static class IntRangeArgumentsProvider implements ArgumentsProvider {
+    class IntRangeArgumentsProvider implements ArgumentsProvider {
 
         @Override
         public Stream<Arguments> provideArguments(ExtensionContext context) {

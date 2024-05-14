@@ -78,9 +78,9 @@ class FKEnforcerTest extends AbstractBaseTest {
                     c.moveToNextRow();
                     c.deleteCurrentRow();
                 }, "Table3[id]");
-            tests.entrySet().forEach(e -> {
-                IOException ex = assertThrows(IOException.class, e.getKey());
-                assertTrue(ex.getMessage().contains(e.getValue()));
+            tests.forEach((key, value) -> {
+                IOException ex = assertThrows(IOException.class, key);
+                assertTrue(ex.getMessage().contains(value));
 
             });
 

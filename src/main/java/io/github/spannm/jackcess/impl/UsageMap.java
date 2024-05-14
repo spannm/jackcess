@@ -678,11 +678,9 @@ public class UsageMap {
             // extra page reference on top of the number of page references that fit
             // in the table
             for (int i = 0; i < numUsagePages; i++) {
-                int mapPageNum = getTableBuffer().getInt(
-                    calculateMapPagePointerOffset(i));
+                int mapPageNum = getTableBuffer().getInt(calculateMapPagePointerOffset(i));
                 if (mapPageNum > 0) {
-                    ByteBuffer mapPageBuffer =
-                        _mapPageHolder.withPage(getPageChannel(), mapPageNum);
+                    ByteBuffer mapPageBuffer = _mapPageHolder.withPage(getPageChannel(), mapPageNum);
                     byte pageType = mapPageBuffer.get();
                     if (pageType != PageTypes.USAGE_MAP) {
                         throw new IOException("Looking for usage map at page " + mapPageNum + ", but page type is " + pageType);

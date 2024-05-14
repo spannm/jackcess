@@ -68,7 +68,7 @@ class QueryTest extends AbstractBaseTest {
 
         removeRows(query, TABLE_ATTRIBUTE);
 
-        assertThrows(IllegalStateException.class, () -> query.toSQLString());
+        assertThrows(IllegalStateException.class, query::toSQLString);
     }
 
     @Test

@@ -267,7 +267,7 @@ class DatabaseTest extends AbstractBaseTest {
     }
 
     @Test
-    void testMissingFile() throws Exception {
+    void testMissingFile() {
         File bogusFile = new File("fooby-dooby.mdb");
         assertFalse(bogusFile.exists());
         DatabaseBuilder dbb = DatabaseBuilder.newDatabase(bogusFile).withReadOnly(true).withAutoSync(getTestAutoSync());

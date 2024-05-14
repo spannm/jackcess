@@ -40,7 +40,7 @@ public @interface TestDbSource {
      */
     Basename value();
 
-    static class TestDbArgumentsProvider implements ArgumentsProvider {
+    class TestDbArgumentsProvider implements ArgumentsProvider {
 
         /** Charset for access 97 databases. */
         private static final Charset                                ACC97_CHARSET      = Charset.forName("windows-1252");
@@ -92,7 +92,7 @@ public @interface TestDbSource {
         }
 
         @Override
-        public Stream<Arguments> provideArguments(ExtensionContext _context) throws Exception {
+        public Stream<Arguments> provideArguments(ExtensionContext _context) {
             TestDbSource src = _context.getElement().map(elem -> AnnotationSupport.findAnnotation(elem, TestDbSource.class).get()).orElse(null);
             return src == null ? Stream.empty() : getDbs(src.value(), FILE_FORMATS_WRITE).stream().map(Arguments::of);
         }

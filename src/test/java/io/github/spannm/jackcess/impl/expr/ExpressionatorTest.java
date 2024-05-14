@@ -501,7 +501,7 @@ class ExpressionatorTest extends AbstractBaseTest {
         "DEFAULT_VALUE; TEXT; '+P-E'",
         "FIELD_VALIDATOR; TEXT; Is Not Null"
     })
-    void testParseSomeExprs(Expressionator.Type _type, DataType _dType, String _exprStr) throws Exception {
+    void testParseSomeExprs(Expressionator.Type _type, DataType _dType, String _exprStr) {
         TestContext tc = new TestContext() {
             @Override
             public Value getThisColumnValue() {
