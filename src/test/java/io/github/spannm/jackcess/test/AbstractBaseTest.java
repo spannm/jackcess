@@ -109,7 +109,7 @@ public abstract class AbstractBaseTest extends Assertions {
                 }
                 return new DatabaseBuilder()
                     .withFile(tempFile)
-                    .withAutoSync(AbstractBaseTest.getTestAutoSync())
+                    .withAutoSync(getTestAutoSync())
                     .withChannel(channel)
                     .open();
             }
@@ -117,7 +117,7 @@ public abstract class AbstractBaseTest extends Assertions {
             return new DatabaseBuilder()
                 .withFile(tempFile)
                 .withFileFormat(fileFormat)
-                .withAutoSync(AbstractBaseTest.getTestAutoSync())
+                .withAutoSync(getTestAutoSync())
                 .withChannel(channel).create();
         }
 

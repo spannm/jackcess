@@ -211,7 +211,7 @@ class ExpressionatorTest extends AbstractBaseTest {
         if (j == 0) {
             evalFail(i + " / " + j, ArithmeticException.class);
         } else {
-            double result = (double) i / (double) j;
+            double result = (double) i / j;
             if ((int) result == result) {
                 assertEquals((int) result, eval(i + " / " + j));
             } else {

@@ -38,6 +38,7 @@ import java.time.temporal.WeekFields;
  *
  * @author James Ahlborn
  */
+@SuppressWarnings("checkstyle.HideUtilityClassConstructor")
 public class DefaultDateFunctions {
     // min, valid, recognizable date: January 1, 100 A.D. 00:00:00
     private static final double     MIN_DATE         = -657434.0d;
@@ -57,14 +58,7 @@ public class DefaultDateFunctions {
 
     private static final WeekFields SUNDAY_FIRST     = WeekFields.of(DayOfWeek.SUNDAY, 1);
 
-    private DefaultDateFunctions() {
-    }
-
-    static void init() {
-        // dummy method to ensure this class is loaded
-    }
-
-    public static final Function DATE        = registerFunc(new Func0("Date") {
+    public static final Function    DATE             = registerFunc(new Func0("Date") {
         @Override
         protected Value eval0(EvalContext ctx) {
             return ValueSupport.toValue(LocalDate.now(ctx.getZoneId()));
@@ -418,6 +412,9 @@ public class DefaultDateFunctions {
             return ValueSupport.toValue(weekdayName);
         }
     });
+
+    DefaultDateFunctions() {
+    }
 
     static Value stringToDateValue(LocaleContext ctx, String valStr) {
         // see if we can coerce to date/time

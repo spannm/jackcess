@@ -629,6 +629,7 @@ public final class ByteUtil {
     /**
      * Closes the given {@link Closeable} if non-null swallowing any {@link IOException}.
      */
+    @SuppressWarnings("PMD.UnnecessaryReturn")
     public static void closeQuietly(Closeable c) {
         if (c != null) {
             try {
@@ -761,8 +762,8 @@ public final class ByteUtil {
         }
 
         public void trimTrailing(byte minTrimCode, byte maxTrimCode) {
-            int minTrim = ByteUtil.asUnsignedByte(minTrimCode);
-            int maxTrim = ByteUtil.asUnsignedByte(maxTrimCode);
+            int minTrim = asUnsignedByte(minTrimCode);
+            int maxTrim = asUnsignedByte(maxTrimCode);
 
             int idx = _length - 1;
             while (idx >= 0) {

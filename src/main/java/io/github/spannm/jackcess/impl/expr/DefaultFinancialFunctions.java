@@ -36,6 +36,7 @@ import io.github.spannm.jackcess.impl.expr.FunctionSupport.FuncVar;
  *
  * @author James Ahlborn
  */
+@SuppressWarnings("checkstyle.HideUtilityClassConstructor")
 public class DefaultFinancialFunctions {
     // Useful Sources:
     // https://brownmath.com/bsci/loan.htm
@@ -50,13 +51,6 @@ public class DefaultFinancialFunctions {
 
     private static final int    MAX_RATE_ITERATIONS = 20;
     private static final double RATE_PRECISION      = 0.0000001; // 1.0e-8
-
-    private DefaultFinancialFunctions() {
-    }
-
-    static void init() {
-        // dummy method to ensure this class is loaded
-    }
 
     public static final Function NPER = registerFunc(new FuncVar("NPer", 3, 5) {
         @Override
@@ -211,6 +205,9 @@ public class DefaultFinancialFunctions {
             return ValueSupport.toValue(result);
         }
     });
+
+    DefaultFinancialFunctions() {
+    }
 
     private static double calculateFutureValue(
         double rate, double nper, double pmt, double pv, int pmtType) {

@@ -108,7 +108,7 @@ public class MemFileChannel extends FileChannel {
      */
     public static MemFileChannel newChannel(Path file, OpenOption... opts) throws IOException {
 
-        try (FileChannel in = FileChannel.open(file, StandardOpenOption.READ)) {
+        try (FileChannel in = open(file, StandardOpenOption.READ)) {
             String mode = RO_CHANNEL_MODE;
             for (OpenOption opt : opts) {
                 if (opt == StandardOpenOption.WRITE) {

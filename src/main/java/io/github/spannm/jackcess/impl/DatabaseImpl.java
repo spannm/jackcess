@@ -1986,11 +1986,8 @@ public class DatabaseImpl implements Database, DateTimeContext {
      * {@value io.github.spannm.jackcess.Database#FK_ENFORCE_PROPERTY}.
      */
     public static boolean getDefaultEnforceForeignKeys() {
-        String prop = System.getProperty(FK_ENFORCE_PROPERTY);
-        if (prop != null) {
-            return Boolean.TRUE.toString().equalsIgnoreCase(prop);
-        }
-        return true;
+        return Optional.ofNullable(System.getProperty(FK_ENFORCE_PROPERTY))
+            .map(p -> Boolean.TRUE.toString().equalsIgnoreCase(p)).orElse(true);
     }
 
     /**
@@ -1998,11 +1995,7 @@ public class DatabaseImpl implements Database, DateTimeContext {
      * {@value io.github.spannm.jackcess.Database#ALLOW_AUTONUM_INSERT_PROPERTY}.
      */
     public static boolean getDefaultAllowAutoNumberInsert() {
-        String prop = System.getProperty(ALLOW_AUTONUM_INSERT_PROPERTY);
-        if (prop != null) {
-            return Boolean.TRUE.toString().equalsIgnoreCase(prop);
-        }
-        return false;
+        return Boolean.TRUE.toString().equalsIgnoreCase(System.getProperty(ALLOW_AUTONUM_INSERT_PROPERTY));
     }
 
     /**
@@ -2010,11 +2003,8 @@ public class DatabaseImpl implements Database, DateTimeContext {
      * {@value io.github.spannm.jackcess.Database#ENABLE_EXPRESSION_EVALUATION_PROPERTY}.
      */
     public static boolean getDefaultEvaluateExpressions() {
-        String prop = System.getProperty(ENABLE_EXPRESSION_EVALUATION_PROPERTY);
-        if (prop != null) {
-            return Boolean.TRUE.toString().equalsIgnoreCase(prop);
-        }
-        return true;
+        return Optional.ofNullable(System.getProperty(ENABLE_EXPRESSION_EVALUATION_PROPERTY))
+            .map(p -> Boolean.TRUE.toString().equalsIgnoreCase(p)).orElse(true);
     }
 
     /**

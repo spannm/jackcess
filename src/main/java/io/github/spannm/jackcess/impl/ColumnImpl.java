@@ -2530,7 +2530,7 @@ public class ColumnImpl implements Column, Comparable<ColumnImpl>, DateTimeConte
         @Override
         protected Object internalValidate(Column col, Object val)
             throws IOException {
-            CharSequence valStr = ColumnImpl.toCharSequence(val);
+            CharSequence valStr = toCharSequence(val);
             // oddly enough null is allowed for non-zero len strings
             if (valStr != null && valStr.length() == 0) {
                 throw new InvalidValueException(

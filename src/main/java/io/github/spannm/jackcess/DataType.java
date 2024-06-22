@@ -162,7 +162,7 @@ public enum DataType {
     private static final Map<Integer, DataType>   ALT_SQL_TYPES = new HashMap<>();
 
     static {
-        for (DataType type : DataType.values()) {
+        for (DataType type : values()) {
             if (type._sqlType != null) {
                 SQL_TYPES.put(type._sqlType, new DataType[] {type});
             }
@@ -192,7 +192,7 @@ public enum DataType {
     }
 
     private static final Map<Byte, DataType> DATA_TYPES_BY_VALUE =
-        Arrays.stream(DataType.values()).filter(DataType::isSupported).collect(Collectors.toMap(k -> k._value, v -> v));
+        Arrays.stream(values()).filter(DataType::isSupported).collect(Collectors.toMap(k -> k._value, v -> v));
 
     /** is this a variable length field */
     private final boolean                    _variableLength;

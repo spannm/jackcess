@@ -56,8 +56,8 @@ public interface Query {
             return _value;
         }
 
-        public static boolean isUnknown(Type type) {
-            return type == null || type == Type.UNKNOWN;
+        public static boolean isUnknown(Type _type) {
+            return _type == null || UNKNOWN == _type;
         }
     }
 

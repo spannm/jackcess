@@ -64,11 +64,7 @@ public class NullMask {
         int columnNumber = column.getColumnNumber();
         // if new columns were added to the table, old null masks may not include
         // them (meaning the field is null)
-        if (columnNumber >= _columnCount) {
-            // it's null
-            return true;
-        }
-        return (_mask[byteIndex(columnNumber)] & bitMask(columnNumber)) == 0;
+        return columnNumber >= _columnCount || (_mask[byteIndex(columnNumber)] & bitMask(columnNumber)) == 0;
     }
 
     /**

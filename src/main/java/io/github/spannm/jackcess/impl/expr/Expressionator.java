@@ -31,7 +31,7 @@ import java.util.stream.Stream;
 /**
  * @author James Ahlborn
  */
-@SuppressWarnings("PMD.FieldDeclarationsShouldBeAtStartOfClass")
+@SuppressWarnings({"PMD.UnnecessaryFullyQualifiedName", "PMD.FieldDeclarationsShouldBeAtStartOfClass"})
 public class Expressionator {
 
     // Useful links:
@@ -434,8 +434,7 @@ public class Expressionator {
 
     public static Expression parse(Type exprType, String exprStr, Value.Type resultType, ParseContext context) {
 
-        List<Token> tokens = trimSpaces(
-            ExpressionTokenizer.tokenize(exprType, exprStr, context));
+        List<Token> tokens = trimSpaces(ExpressionTokenizer.tokenize(exprType, exprStr, context));
 
         if (tokens == null) {
             throw new ParseException("null/empty expression");
@@ -447,8 +446,7 @@ public class Expressionator {
 
             // this is handled as a literal string value, not an expression. no
             // need to memo-ize cause it's a simple literal value
-            return new ExprWrapper(exprStr,
-                new ELiteralValue(Value.Type.STRING, exprStr), resultType);
+            return new ExprWrapper(exprStr, new ELiteralValue(Value.Type.STRING, exprStr), resultType);
         }
 
         // normal expression handling
@@ -687,8 +685,7 @@ public class Expressionator {
         buf.setPendingExpr(new EParen(subExpr));
     }
 
-    private static boolean maybeParseFuncCallExpression(
-        Token firstTok, TokBuf buf) {
+    private static boolean maybeParseFuncCallExpression(Token firstTok, TokBuf buf) {
 
         int startPos = buf.curPos();
         boolean foundFunc = false;

@@ -34,17 +34,11 @@ import java.util.stream.Collectors;
  *
  * @author James Ahlborn
  */
+@SuppressWarnings("checkstyle.HideUtilityClassConstructor")
 public class DefaultTextFunctions {
     // mask to separate the case conversion value (first two bits) from the char
     // conversion value for the StrConv() function
     private static final int STR_CONV_MASK = 0x03;
-
-    private DefaultTextFunctions() {
-    }
-
-    static void init() {
-        // dummy method to ensure this class is loaded
-    }
 
     public static final Function ASC        = registerFunc(new Func1("Asc") {
         @Override
@@ -443,6 +437,9 @@ public class DefaultTextFunctions {
             return FormatUtil.format(ctx, expr, fmtStr, firstDay, firstWeekType);
         }
     });
+
+    DefaultTextFunctions() {
+    }
 
     private static String trim(String str, boolean doLeft, boolean doRight) {
         int start = 0;

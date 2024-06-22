@@ -465,6 +465,7 @@ public interface Database extends Iterable<Table>, Closeable, Flushable {
             return name() + " [" + DatabaseImpl.getFileFormatDetails(this).getFormat() + "]";
         }
 
+        @SuppressWarnings("PMD.UnnecessaryFullyQualifiedName")
         public static FileFormat parse(String _str) {
             return Arrays.stream(FileFormat.values())
                     .filter(e -> _str != null)

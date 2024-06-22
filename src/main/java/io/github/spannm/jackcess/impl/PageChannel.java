@@ -178,7 +178,7 @@ public class PageChannel implements Channel, Flushable {
      * Returns the offset for a page within the file.
      */
     private long getPageOffset(int pageNumber) {
-        return (long) pageNumber * (long) getFormat().PAGE_SIZE;
+        return (long) pageNumber * getFormat().PAGE_SIZE;
     }
 
     /**
@@ -211,7 +211,7 @@ public class PageChannel implements Channel, Flushable {
         }
 
         inPage.clear();
-        int bytesRead = _channel.read(inPage, (long) pageNumber * (long) getFormat().PAGE_SIZE);
+        int bytesRead = _channel.read(inPage, (long) pageNumber * getFormat().PAGE_SIZE);
         inPage.flip();
         if (bytesRead != getFormat().PAGE_SIZE) {
             throw new IOException("Failed attempting to read " + getFormat().PAGE_SIZE + " bytes from page " + pageNumber + ", only read " + bytesRead);

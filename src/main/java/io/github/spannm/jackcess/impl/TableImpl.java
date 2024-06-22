@@ -2053,8 +2053,7 @@ public class TableImpl implements Table, PropertyMaps.Owner {
      *
      * @param rows List of Object[] row values
      */
-    protected List<? extends Object[]> addRows(List<? extends Object[]> rows,
-        final boolean isBatchWrite) throws IOException {
+    protected List<? extends Object[]> addRows(List<? extends Object[]> rows, final boolean isBatchWrite) throws IOException {
         if (rows.isEmpty()) {
             return rows;
         }
@@ -2066,8 +2065,7 @@ public class TableImpl implements Table, PropertyMaps.Owner {
             int pageNumber = PageChannel.INVALID_PAGE_NUMBER;
             int updateCount = 0;
             int autoNumAssignCount = 0;
-            WriteRowState writeRowState =
-                !_autoNumColumns.isEmpty() ? new WriteRowState() : null;
+            WriteRowState writeRowState = !_autoNumColumns.isEmpty() ? new WriteRowState() : null;
             try {
 
                 List<Object[]> dupeRows = null;

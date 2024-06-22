@@ -82,8 +82,7 @@ public class StringValue extends BaseValue {
             // see if string can be coerced to number and then to value date (note,
             // numberToDateValue may return null for out of range numbers)
             try {
-                dateValue = DefaultDateFunctions.numberToDateValue(
-                    getNumber(ctx).doubleValue());
+                dateValue = DefaultDateFunctions.numberToDateValue(getNumber(ctx).doubleValue());
             } catch (EvalException ignored) {
                 // not a number, not a date/time
             }

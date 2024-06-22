@@ -22,12 +22,15 @@ import io.github.spannm.jackcess.expr.*;
 import io.github.spannm.jackcess.impl.DatabaseImpl;
 import io.github.spannm.jackcess.impl.expr.FunctionSupport.*;
 
+import java.lang.System.Logger;
+import java.lang.System.Logger.Level;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.text.DecimalFormat;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
 
@@ -39,16 +42,17 @@ public class DefaultFunctions {
 
     static {
         // load all default functions
-        DefaultTextFunctions.init();
-        DefaultNumberFunctions.init();
-        DefaultDateFunctions.init();
-        DefaultFinancialFunctions.init();
+        Logger logger = System.getLogger(DefaultFunctions.class.getName());
+        for (Object obj : List.of(
+            new DefaultTextFunctions(),
+            new DefaultNumberFunctions(),
+            new DefaultDateFunctions(),
+            new DefaultFinancialFunctions())) {
+            logger.log(Level.DEBUG, "Loaded functions from " + obj.getClass().getName());
+        }
     }
 
     public static final FunctionLookup LOOKUP = name -> FUNCS.get(DatabaseImpl.toLookupName(name));
-
-    private DefaultFunctions() {
-    }
 
     public static final Function IIF    = registerFunc(new Func3("IIf") {
         @Override
@@ -456,6 +460,9 @@ public class DefaultFunctions {
         }
     });
 
+    private DefaultFunctions() {
+    }
+
     private static boolean stringIsNumeric(LocaleContext ctx, Value param) {
         return maybeGetAsBigDecimal(ctx, param) != null;
     }
@@ -534,21 +541,22 @@ public class DefaultFunctions {
     // https://www.techonthenet.com/access/functions/
     // https://support.office.com/en-us/article/Access-Functions-by-category-b8b136c3-2716-4d39-94a2-658ce330ed83
 
-    static Function registerFunc(Function func) {
-        registerFunc(func.getName(), func);
-        return func;
+    static Function registerFunc(Function _func) {
+        return registerFunc(_func.getName(), _func);
     }
 
-    static Function registerStringFunc(Function func) {
-        registerFunc(func.getName(), func);
-        registerFunc(new StringFuncWrapper(func));
-        return func;
+    static Function registerStringFunc(Function _func) {
+        registerFunc(_func.getName(), _func);
+        registerFunc(new StringFuncWrapper(_func));
+        return _func;
     }
 
-    private static void registerFunc(String fname, Function func) {
-        String lookupFname = DatabaseImpl.toLookupName(fname);
-        if (FUNCS.put(lookupFname, func) != null) {
-            throw new IllegalStateException("Duplicate function " + fname);
+    private static Function registerFunc(String _fname, Function _func) {
+        System.getLogger(DefaultFunctions.class.getName()).log(Level.TRACE, "Registering function {0}", _fname);
+        String lookupFname = DatabaseImpl.toLookupName(_fname);
+        if (FUNCS.put(lookupFname, _func) != null) {
+            throw new IllegalStateException("Duplicate function " + _fname);
         }
+        return _func;
     }
 }

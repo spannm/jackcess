@@ -24,7 +24,10 @@ import io.github.spannm.jackcess.complex.ComplexValueForeignKey;
 import io.github.spannm.jackcess.impl.*;
 import io.github.spannm.jackcess.util.MemFileChannel;
 
-import java.io.*;
+import java.io.File;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.io.UncheckedIOException;
 import java.lang.System.Logger;
 import java.lang.System.Logger.Level;
 import java.nio.ByteBuffer;
@@ -42,7 +45,7 @@ import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
 /**
- * Utilty code for the test cases.
+ * Utility code for the test cases.
  *
  * @author James Ahlborn
  */
@@ -77,7 +80,7 @@ public final class TestUtil {
     public static Database openCopy(FileFormat fileFormat, File file, boolean keep) throws IOException {
         // split file name into prefix and suffix
         int fnLastDot = file.getName().lastIndexOf('.');
-        File tempFile = TestUtil.createTempFile(file.getName().substring(0, fnLastDot), file.getName().substring(fnLastDot), keep);
+        File tempFile = createTempFile(file.getName().substring(0, fnLastDot), file.getName().substring(fnLastDot), keep);
 
         Files.copy(file.toPath(), tempFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
 
@@ -368,7 +371,7 @@ public final class TestUtil {
      * @return temporary file object
      */
     public static File createTempFile(String _prefix, String _suffix, boolean _keep) {
-        File tempFile = TestUtil.createTempFileName(_prefix, _suffix);
+        File tempFile = createTempFileName(_prefix, _suffix);
         try {
             tempFile.createNewFile();
         } catch (IOException _ex) {

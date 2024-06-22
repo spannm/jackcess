@@ -272,7 +272,7 @@ class DatabaseTest extends AbstractBaseTest {
         assertFalse(bogusFile.exists());
         DatabaseBuilder dbb = DatabaseBuilder.newDatabase(bogusFile).withReadOnly(true).withAutoSync(getTestAutoSync());
         assertThrows(FileNotFoundException.class, () -> {
-            try (Database db = dbb.open()) {}
+            try (Database ignored = dbb.open()) {}
         });
         assertFalse(bogusFile.exists());
     }

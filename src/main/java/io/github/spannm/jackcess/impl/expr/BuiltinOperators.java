@@ -201,7 +201,7 @@ public class BuiltinOperators {
                 if (lp1 % lp2 == 0) {
                     return toValue(lp1 / lp2);
                 }
-                return toValue((double) lp1 / (double) lp2);
+                return toValue((double) lp1 / lp2);
             case DOUBLE:
                 double d2 = param2.getAsDouble(ctx);
                 if (d2 == 0.0d) {

@@ -18,7 +18,8 @@ package io.github.spannm.jackcess.impl;
 
 import static io.github.spannm.jackcess.test.Basename.COMMON2;
 import static io.github.spannm.jackcess.test.Basename.UNICODE_COMP;
-import static io.github.spannm.jackcess.test.TestUtil.*;
+import static io.github.spannm.jackcess.test.TestUtil.createString;
+import static io.github.spannm.jackcess.test.TestUtil.openDb;
 
 import io.github.spannm.jackcess.*;
 import io.github.spannm.jackcess.Database.FileFormat;
