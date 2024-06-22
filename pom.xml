@@ -97,11 +97,11 @@
 
         <dep.poi.version>4.1.2</dep.poi.version>
 
-        <dep.slf4j.version>2.0.12</dep.slf4j.version>
+        <dep.slf4j.version>2.0.13</dep.slf4j.version>
 
         <dep.junit.version>5.10.2</dep.junit.version>
 
-        <dep.plugin.sortpom.version>3.4.1</dep.plugin.sortpom.version>
+        <dep.plugin.sortpom.version>4.0.0</dep.plugin.sortpom.version>
         <dep.plugin.sonar.version>3.10.0.2594</dep.plugin.sonar.version>
 
         <basepom.check.skip-checkstyle>false</basepom.check.skip-checkstyle>
@@ -201,9 +201,13 @@
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-surefire-plugin</artifactId>
                     <configuration>
+                        <systemPropertyVariables combine.children="append">
+                            <user.timezone/>
+                        </systemPropertyVariables>
                         <forkCount>1</forkCount>
                         <reuseForks>true</reuseForks>
                         <forkedProcessTimeoutInSeconds>600</forkedProcessTimeoutInSeconds>
+                        <argLine>@{basepom.coverage.test-args} -Xmx1024m -Dfile.encoding=UTF-8</argLine>
                     </configuration>
                 </plugin>
 
