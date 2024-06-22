@@ -32,10 +32,6 @@ import io.github.spannm.jackcess.expr.Function;
 import io.github.spannm.jackcess.expr.Value;
 import io.github.spannm.jackcess.impl.expr.FunctionSupport.FuncVar;
 
-/**
- *
- * @author James Ahlborn
- */
 @SuppressWarnings("checkstyle.HideUtilityClassConstructor")
 public class DefaultFinancialFunctions {
     // Useful Sources:

@@ -20,9 +20,6 @@ import java.io.File;
 import java.nio.channels.FileChannel;
 import java.nio.channels.NonWritableChannelException;
 
-/**
- * @author Dan Rollo Date: Mar 5, 2010 Time: 12:44:21 PM
- */
 @SuppressWarnings("PMD.FieldDeclarationsShouldBeAtStartOfClass")
 class JetFormatTest extends AbstractBaseTest {
 

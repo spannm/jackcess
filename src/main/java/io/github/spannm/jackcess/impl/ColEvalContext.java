@@ -18,10 +18,6 @@ package io.github.spannm.jackcess.impl;
 
 import io.github.spannm.jackcess.expr.Value;
 
-/**
- *
- * @author James Ahlborn
- */
 public abstract class ColEvalContext extends BaseEvalContext {
     private final ColumnImpl _col;
 

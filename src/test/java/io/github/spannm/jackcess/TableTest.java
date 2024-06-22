@@ -31,9 +31,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.TimeZone;
 
-/**
- * @author Tim McCune
- */
 class TableTest extends AbstractBaseTest {
 
     private final PageChannel      _pageChannel = new PageChannel(true) {

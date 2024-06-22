@@ -31,9 +31,6 @@ import java.lang.reflect.Modifier;
 import java.nio.ByteOrder;
 import java.util.List;
 
-/**
- * @author James Ahlborn
- */
 class ErrorHandlerTest extends AbstractBaseTest {
 
     @ParameterizedTest(name = "[{index}] {0}")

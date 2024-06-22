@@ -34,9 +34,6 @@ import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 
-/**
- * @author James Ahlborn
- */
 class ExtendedDateTest extends AbstractBaseTest {
 
     @ParameterizedTest(name = "[{index}] {0}")

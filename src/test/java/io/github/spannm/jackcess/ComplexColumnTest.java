@@ -34,9 +34,6 @@ import java.nio.charset.StandardCharsets;
 import java.util.Date;
 import java.util.List;
 
-/**
- * @author James Ahlborn
- */
 @SuppressWarnings("deprecation")
 class ComplexColumnTest extends AbstractBaseTest {
 

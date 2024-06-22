@@ -24,9 +24,6 @@ import io.github.spannm.jackcess.test.TestDb;
 import io.github.spannm.jackcess.test.source.TestDbSource;
 import org.junit.jupiter.params.ParameterizedTest;
 
-/**
- * @author James Ahlborn
- */
 class CursorBuilderTest extends AbstractBaseTest {
 
     @ParameterizedTest(name = "[{index}] {0}")

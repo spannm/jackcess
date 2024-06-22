@@ -25,9 +25,6 @@ import org.junit.jupiter.api.Test;
 
 import java.util.List;
 
-/**
- * @author James Ahlborn
- */
 class RowFilterTest extends AbstractBaseTest {
     private static final String ID_COL = "id";
     private static final String COL1   = "col1";

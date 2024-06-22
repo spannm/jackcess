@@ -34,10 +34,6 @@ import java.util.Map;
 
 import javax.script.Bindings;
 
-/**
- *
- * @author James Ahlborn
- */
 public abstract class BaseEvalContext implements EvalContext {
     /** map of all non-string data types */
     private static final Map<DataType, Value.Type> TYPE_MAP =

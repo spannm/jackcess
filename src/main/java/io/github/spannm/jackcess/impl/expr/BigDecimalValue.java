@@ -20,10 +20,6 @@ import io.github.spannm.jackcess.expr.LocaleContext;
 
 import java.math.BigDecimal;
 
-/**
- *
- * @author James Ahlborn
- */
 public class BigDecimalValue extends BaseNumericValue {
     private final BigDecimal _val;
 

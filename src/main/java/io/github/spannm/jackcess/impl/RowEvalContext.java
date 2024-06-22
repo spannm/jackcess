@@ -20,10 +20,6 @@ import io.github.spannm.jackcess.expr.EvalException;
 import io.github.spannm.jackcess.expr.Identifier;
 import io.github.spannm.jackcess.expr.Value;
 
-/**
- *
- * @author James Ahlborn
- */
 public abstract class RowEvalContext extends BaseEvalContext {
     private Object[] _row;
 

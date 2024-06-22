@@ -36,10 +36,6 @@ import org.junit.jupiter.params.ParameterizedTest;
 import java.io.*;
 import java.nio.file.Files;
 
-/**
- *
- * @author James Ahlborn
- */
 class OleBlobTest extends AbstractBaseTest {
 
     @ParameterizedTest(name = "[{index}] {0}")

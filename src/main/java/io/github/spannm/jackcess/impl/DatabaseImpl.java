@@ -42,9 +42,6 @@ import java.time.ZoneId;
 import java.util.*;
 import java.util.regex.Pattern;
 
-/**
- * @author Tim McCune
- */
 public class DatabaseImpl implements Database, DateTimeContext {
     private static final Logger                                      LOGGER                = System.getLogger(DatabaseImpl.class.getName());
 

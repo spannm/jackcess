@@ -19,10 +19,6 @@ package io.github.spannm.jackcess.impl.expr;
 import io.github.spannm.jackcess.expr.LocaleContext;
 import io.github.spannm.jackcess.expr.Value;
 
-/**
- *
- * @author James Ahlborn
- */
 public abstract class BaseNumericValue extends BaseValue {
 
     protected BaseNumericValue() {

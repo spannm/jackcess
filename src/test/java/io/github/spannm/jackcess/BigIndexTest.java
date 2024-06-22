@@ -32,9 +32,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
-/**
- * @author james
- */
 class BigIndexTest extends AbstractBaseTest {
 
     @ParameterizedTest(name = "[{index}] {0}")

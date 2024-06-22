@@ -28,10 +28,6 @@ import org.junit.jupiter.params.ParameterizedTest;
 import java.util.List;
 import java.util.Map;
 
-/**
- *
- * @author James Ahlborn
- */
 class ColumnValidatorTest extends AbstractBaseTest {
 
     @ParameterizedTest(name = "[{index}] {0}")

@@ -39,9 +39,6 @@ import java.time.ZoneId;
 import java.util.*;
 import java.util.stream.Collectors;
 
-/**
- * @author Tim McCune
- */
 @SuppressWarnings("deprecation")
 class DatabaseTest extends AbstractBaseTest {
 

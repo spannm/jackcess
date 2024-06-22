@@ -30,10 +30,6 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 
-/**
- *
- * @author James Ahlborn
- */
 class BigIntTest extends AbstractBaseTest {
 
     @ParameterizedTest(name = "[{index}] {0}")

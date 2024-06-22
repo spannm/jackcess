@@ -27,10 +27,6 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.file.Path;
 
-/**
- *
- * @author James Ahlborn
- */
 class CustomLinkResolverTest extends AbstractBaseTest {
 
     @ParameterizedTest(name = "[{index}] {0}")

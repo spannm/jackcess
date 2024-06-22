@@ -39,9 +39,6 @@ import java.util.TreeMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-/**
- * @author James Ahlborn
- */
 @SuppressWarnings("checkstyle:MethodNameCheck")
 public class IndexCodesTest extends AbstractBaseTest {
 

@@ -24,10 +24,6 @@ import io.github.spannm.jackcess.util.StringUtil;
 import java.math.BigDecimal;
 import java.text.DecimalFormatSymbols;
 
-/**
- *
- * @author James Ahlborn
- */
 public class StringValue extends BaseValue {
     private static final Object NOT_A_NUMBER = new Object();
 

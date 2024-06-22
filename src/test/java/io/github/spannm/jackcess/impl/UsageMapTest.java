@@ -14,9 +14,6 @@ import org.junit.jupiter.params.ParameterizedTest;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * @author Dan Rollo Date: Mar 5, 2010 Time: 2:21:22 PM
- */
 public class UsageMapTest extends AbstractBaseTest {
 
     @ParameterizedTest(name = "[{index}] {0}")

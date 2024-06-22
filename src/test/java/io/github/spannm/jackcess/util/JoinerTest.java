@@ -32,9 +32,6 @@ import org.junit.jupiter.params.ParameterizedTest;
 import java.util.*;
 import java.util.stream.Collectors;
 
-/**
- * @author James Ahlborn
- */
 class JoinerTest extends AbstractBaseTest {
 
     @ParameterizedTest(name = "[{index}] {0}")

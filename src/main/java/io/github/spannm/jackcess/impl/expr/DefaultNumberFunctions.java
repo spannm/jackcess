@@ -28,10 +28,6 @@ import io.github.spannm.jackcess.impl.expr.FunctionSupport.FuncVar;
 
 import java.math.BigDecimal;
 
-/**
- *
- * @author James Ahlborn
- */
 @SuppressWarnings("checkstyle.HideUtilityClassConstructor")
 public class DefaultNumberFunctions {
 

@@ -34,9 +34,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-/**
- * @author Rob Di Marco
- */
 class ImportTest extends AbstractBaseTest {
 
     @ParameterizedTest(name = "[{index}] {0}")

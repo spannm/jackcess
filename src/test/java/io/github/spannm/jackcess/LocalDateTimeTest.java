@@ -37,9 +37,6 @@ import java.time.*;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 
-/**
- * @author James Ahlborn
- */
 class LocalDateTimeTest extends AbstractBaseTest {
 
     @ParameterizedTest(name = "[{index}] {0}")

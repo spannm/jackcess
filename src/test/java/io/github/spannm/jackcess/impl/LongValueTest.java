@@ -35,9 +35,6 @@ import java.nio.file.Files;
 import java.sql.Types;
 import java.util.*;
 
-/**
- * @author James Ahlborn
- */
 class LongValueTest extends AbstractBaseTest {
 
     @ParameterizedTest(name = "[{index}] {0}")

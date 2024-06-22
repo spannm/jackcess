@@ -30,10 +30,6 @@ import java.math.BigDecimal;
 import java.util.Arrays;
 import java.util.stream.Collectors;
 
-/**
- *
- * @author James Ahlborn
- */
 @SuppressWarnings("checkstyle.HideUtilityClassConstructor")
 public class DefaultTextFunctions {
     // mask to separate the case conversion value (first two bits) from the char

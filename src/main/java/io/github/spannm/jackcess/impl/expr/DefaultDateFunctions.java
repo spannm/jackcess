@@ -34,10 +34,6 @@ import java.time.temporal.ChronoField;
 import java.time.temporal.TemporalAccessor;
 import java.time.temporal.WeekFields;
 
-/**
- *
- * @author James Ahlborn
- */
 @SuppressWarnings("checkstyle.HideUtilityClassConstructor")
 public class DefaultDateFunctions {
     // min, valid, recognizable date: January 1, 100 A.D. 00:00:00

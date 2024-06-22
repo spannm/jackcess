@@ -19,10 +19,6 @@ package io.github.spannm.jackcess.impl;
 import io.github.spannm.jackcess.expr.Value;
 import io.github.spannm.jackcess.impl.expr.Expressionator;
 
-/**
- *
- * @author James Ahlborn
- */
 public class ColDefaultValueEvalContext extends ColEvalContext {
     public ColDefaultValueEvalContext(ColumnImpl col) {
         super(col);

@@ -37,10 +37,6 @@ import java.util.Locale;
 import javax.script.Bindings;
 import javax.script.SimpleBindings;
 
-/**
- *
- * @author James Ahlborn
- */
 class PropertyExpressionTest extends AbstractBaseTest {
 
     @ParameterizedTest(name = "[{index}] {0}")

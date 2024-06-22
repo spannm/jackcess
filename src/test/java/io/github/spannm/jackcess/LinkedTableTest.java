@@ -31,9 +31,6 @@ import java.io.FileNotFoundException;
 import java.util.List;
 import java.util.Map;
 
-/**
- * @author James Ahlborn
- */
 class LinkedTableTest extends AbstractBaseTest {
 
     @ParameterizedTest(name = "[{index}] {0}")

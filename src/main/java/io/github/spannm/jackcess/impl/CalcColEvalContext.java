@@ -21,10 +21,6 @@ import io.github.spannm.jackcess.impl.expr.Expressionator;
 
 import java.io.IOException;
 
-/**
- *
- * @author James Ahlborn
- */
 public class CalcColEvalContext extends RowEvalContext {
     private final ColumnImpl _col;
 

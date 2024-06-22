@@ -42,9 +42,6 @@ import java.util.function.Supplier;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
-/**
- * @author James Ahlborn
- */
 class DefaultFunctionsTest extends AbstractBaseTest {
 
     @ParameterizedTest(name = "[{index}] {0} --> {1}")

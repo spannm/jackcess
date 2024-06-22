@@ -22,10 +22,6 @@ import io.github.spannm.jackcess.expr.Value;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
-/**
- *
- * @author James Ahlborn
- */
 public abstract class BaseDelayedValue implements Value {
     private Value _val;
 

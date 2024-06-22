@@ -23,10 +23,6 @@ import io.github.spannm.jackcess.impl.ColumnImpl;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
-/**
- *
- * @author James Ahlborn
- */
 public class DateTimeValue extends BaseValue {
     private final Type          _type;
     private final LocalDateTime _val;

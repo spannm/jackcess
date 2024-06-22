@@ -27,9 +27,6 @@ import org.junit.jupiter.params.ParameterizedTest;
 
 import java.util.*;
 
-/**
- * @author James Ahlborn
- */
 class TableUpdaterTest extends AbstractBaseTest {
 
     @ParameterizedTest(name = "[{index}] {0}")

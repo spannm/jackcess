@@ -29,9 +29,6 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
-/**
- * @author James Ahlborn
- */
 class ExportTest extends AbstractBaseTest {
     private static final String NL = System.lineSeparator();
 

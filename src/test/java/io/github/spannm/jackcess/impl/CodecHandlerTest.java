@@ -29,10 +29,6 @@ import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
 import java.util.Iterator;
 
-/**
- *
- * @author James Ahlborn
- */
 class CodecHandlerTest extends AbstractBaseTest {
     private static final CodecProvider SIMPLE_PROVIDER = (channel, charset) -> new SimpleCodecHandler(channel);
     private static final CodecProvider FULL_PROVIDER   = (channel, charset) -> new FullCodecHandler(channel);

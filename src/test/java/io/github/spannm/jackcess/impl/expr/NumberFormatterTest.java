@@ -25,9 +25,6 @@ import org.junit.jupiter.params.provider.MethodSource;
 import java.math.BigDecimal;
 import java.util.stream.Stream;
 
-/**
- * @author James Ahlborn
- */
 class NumberFormatterTest extends AbstractBaseTest {
     private final NumberFormatter numFmt = new NumberFormatter(NumericConfig.US_NUMERIC_CONFIG.getDecimalFormatSymbols());
 

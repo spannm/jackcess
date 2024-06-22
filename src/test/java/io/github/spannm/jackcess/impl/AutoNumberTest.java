@@ -37,9 +37,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
-/**
- * @author James Ahlborn
- */
 class AutoNumberTest extends AbstractBaseTest {
 
     @ParameterizedTest(name = "[{index}] {0}")

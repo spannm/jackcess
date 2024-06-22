@@ -25,10 +25,6 @@ import io.github.spannm.jackcess.expr.Value;
 import java.math.BigDecimal;
 import java.util.regex.Pattern;
 
-/**
- *
- * @author James Ahlborn
- */
 public class BuiltinOperators {
     private static final String DIV_BY_ZERO = "/ by zero";
 

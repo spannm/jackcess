@@ -33,10 +33,6 @@ import java.util.Map;
 import javax.script.Bindings;
 import javax.script.SimpleBindings;
 
-/**
- *
- * @author James Ahlborn
- */
 public class DBEvalContext implements Expressionator.ParseContext, EvalConfig {
     private static final int               MAX_CACHE_SIZE = 10;
 

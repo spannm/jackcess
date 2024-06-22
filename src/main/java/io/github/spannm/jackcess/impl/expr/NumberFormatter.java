@@ -21,10 +21,6 @@ import java.math.MathContext;
 import java.math.RoundingMode;
 import java.text.*;
 
-/**
- *
- * @author James Ahlborn
- */
 public class NumberFormatter {
     public static final RoundingMode ROUND_MODE = RoundingMode.HALF_EVEN;
 

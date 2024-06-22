@@ -34,10 +34,6 @@ import java.time.format.DateTimeFormatter;
 import java.time.temporal.TemporalAccessor;
 import java.util.*;
 
-/**
- *
- * @author James Ahlborn
- */
 class ExpressionTokenizer {
     private static final int  EOF                    = -1;
     static final char         QUOTED_STR_CHAR        = '"';

@@ -41,9 +41,6 @@ import java.io.UncheckedIOException;
 import java.util.*;
 import java.util.stream.Collectors;
 
-/**
- * @author James Ahlborn
- */
 class CursorTest extends AbstractBaseTest {
 
     @BeforeEach

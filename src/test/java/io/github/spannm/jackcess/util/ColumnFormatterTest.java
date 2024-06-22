@@ -25,10 +25,6 @@ import org.junit.jupiter.params.ParameterizedTest;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- *
- * @author James Ahlborn
- */
 class ColumnFormatterTest extends AbstractBaseTest {
 
     @ParameterizedTest(name = "[{index}] {0}")

@@ -21,10 +21,6 @@ import org.junit.jupiter.api.Test;
 
 import java.util.*;
 
-/**
- *
- * @author James Ahlborn
- */
 class TopoSorterTest extends AbstractBaseTest {
 
     @Test

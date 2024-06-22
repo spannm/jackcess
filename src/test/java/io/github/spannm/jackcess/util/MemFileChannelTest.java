@@ -32,9 +32,6 @@ import java.nio.channels.FileChannel;
 import java.nio.channels.NonWritableChannelException;
 import java.nio.file.Files;
 
-/**
- * @author James Ahlborn
- */
 class MemFileChannelTest extends AbstractBaseTest {
 
     @ParameterizedTest(name = "[{index}] {0}")

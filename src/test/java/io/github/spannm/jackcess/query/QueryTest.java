@@ -31,9 +31,6 @@ import org.junit.jupiter.params.ParameterizedTest;
 
 import java.util.*;
 
-/**
- * @author James Ahlborn
- */
 @SuppressWarnings("checkstyle:LineLengthCheck")
 class QueryTest extends AbstractBaseTest {
 

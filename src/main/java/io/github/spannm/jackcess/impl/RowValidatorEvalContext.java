@@ -21,10 +21,6 @@ import io.github.spannm.jackcess.impl.expr.Expressionator;
 
 import java.io.IOException;
 
-/**
- *
- * @author James Ahlborn
- */
 public class RowValidatorEvalContext extends RowEvalContext {
     private final TableImpl _table;
     private String          _helpStr;

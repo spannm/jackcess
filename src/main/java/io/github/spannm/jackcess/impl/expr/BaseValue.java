@@ -23,10 +23,6 @@ import io.github.spannm.jackcess.expr.Value;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
-/**
- *
- * @author James Ahlborn
- */
 public abstract class BaseValue implements Value {
     @Override
     public boolean isNull() {

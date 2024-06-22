@@ -26,10 +26,6 @@ import java.util.List;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
-/**
- *
- * @author James Ahlborn
- */
 class PatternColumnPredicateTest extends AbstractBaseTest {
 
     @ParameterizedTest(name = "[{index}] {0}")

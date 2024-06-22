@@ -34,9 +34,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
 
-/**
- * @author James Ahlborn
- */
 public class DefaultFunctions {
     private static final Map<String, Function> FUNCS = new HashMap<>();
 

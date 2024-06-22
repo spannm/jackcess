@@ -34,9 +34,6 @@ import org.junit.jupiter.params.ParameterizedTest;
 import java.io.IOException;
 import java.util.*;
 
-/**
- * @author James Ahlborn
- */
 class IndexTest extends AbstractBaseTest {
 
     @BeforeEach

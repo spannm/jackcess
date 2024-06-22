@@ -28,9 +28,6 @@ import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 import java.util.stream.Stream;
 
-/**
- * @author James Ahlborn
- */
 @SuppressWarnings({"PMD.UnnecessaryFullyQualifiedName", "PMD.FieldDeclarationsShouldBeAtStartOfClass"})
 public class Expressionator {
 

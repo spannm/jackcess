@@ -29,10 +29,6 @@ import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.regex.Pattern;
 
-/**
- *
- * @author James Ahlborn
- */
 public class ValueSupport {
     public static final Value NULL_VAL           = new BaseValue() {
                                                      @Override

@@ -19,10 +19,6 @@ package io.github.spannm.jackcess.impl;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- *
- * @author James Ahlborn
- */
 public abstract class TopoSorter<E> {
     public static final boolean REVERSE   = true;
 

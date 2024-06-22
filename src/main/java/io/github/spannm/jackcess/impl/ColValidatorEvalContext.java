@@ -26,10 +26,6 @@ import io.github.spannm.jackcess.util.ColumnValidator;
 
 import java.io.IOException;
 
-/**
- *
- * @author James Ahlborn
- */
 public class ColValidatorEvalContext extends ColEvalContext {
     private String _helpStr;
     private Object _val;

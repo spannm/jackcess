@@ -32,9 +32,6 @@ import java.time.temporal.WeekFields;
 import java.util.*;
 import java.util.function.BiConsumer;
 
-/**
- * @author James Ahlborn
- */
 @SuppressWarnings("PMD.FieldDeclarationsShouldBeAtStartOfClass")
 public class FormatUtil {
     public enum NumPatternType {

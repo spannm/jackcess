@@ -20,10 +20,6 @@ import io.github.spannm.jackcess.expr.*;
 
 import java.util.Arrays;
 
-/**
- *
- * @author James Ahlborn
- */
 public class FunctionSupport {
     private static final char NON_VAR_SUFFIX = '$';
 

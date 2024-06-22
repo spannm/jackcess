@@ -36,9 +36,6 @@ import org.junit.jupiter.params.provider.EnumSource;
 import java.io.File;
 import java.util.*;
 
-/**
- * @author James Ahlborn
- */
 class PropertiesTest extends AbstractBaseTest {
 
     @Test
