@@ -35,12 +35,12 @@ import java.util.stream.Stream;
 public @interface TestDbSource {
 
     /**
-     * Base name of test databases.<br>
+     * Base names of test databases. All base names if left empty.<br>
      * The annotation is deliberately named {@code value}, so the parameter name can be left out.
      */
-    Basename value();
+    Basename[] value() default {};
 
-    class TestDbArgumentsProvider implements ArgumentsProvider {
+    static class TestDbArgumentsProvider implements ArgumentsProvider {
 
         /** Charset for access 97 databases. */
         private static final Charset                                ACC97_CHARSET      = Charset.forName("windows-1252");
@@ -84,9 +84,10 @@ public @interface TestDbSource {
             return map;
         }
 
-        static List<TestDb> getDbs(Basename _basename, FileFormat[] _fileFormats) {
-            return Arrays.stream(_fileFormats)
-                .map(ff -> TESTDBS_MAP.get(_basename).get(ff))
+        static List<TestDb> getDbs(Basename[] _basenames, FileFormat[] _fileFormats) {
+            Basename[] basenames = _basenames.length == 0 ? Basename.values() : _basenames;
+            return Arrays.stream(basenames)
+                .flatMap(bn -> Arrays.stream(_fileFormats).map(ff -> TESTDBS_MAP.get(bn).get(ff)))
                 .filter(Objects::nonNull)
                 .collect(Collectors.toList());
         }
