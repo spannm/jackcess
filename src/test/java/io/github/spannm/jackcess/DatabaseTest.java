@@ -34,6 +34,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.text.DateFormat;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.ZoneId;
 import java.util.*;
@@ -44,7 +45,7 @@ class DatabaseTest extends AbstractBaseTest {
 
     @ParameterizedTest(name = "[{index}] {0}")
     @FileFormatSource
-    void testInvalidTableDefs(FileFormat fileFormat) throws Exception {
+    void testInvalidTableDefs(FileFormat fileFormat) throws IOException {
         try (Database db = createDbMem(fileFormat)) {
             try {
                 DatabaseBuilder.newTable("test").toTable(db);
@@ -99,7 +100,7 @@ class DatabaseTest extends AbstractBaseTest {
 
     @ParameterizedTest(name = "[{index}] {0}")
     @TestDbReadOnlySource(DEL)
-    void testReadDeletedRows(TestDb testDb) throws Exception {
+    void testReadDeletedRows(TestDb testDb) throws IOException {
         try (Database db = testDb.open()) {
             Table table = db.getTable("Table");
             int rows = 0;
@@ -112,7 +113,7 @@ class DatabaseTest extends AbstractBaseTest {
 
     @ParameterizedTest(name = "[{index}] {0}")
     @TestDbReadOnlySource(COMMON1)
-    void testGetColumns(TestDb testDb) throws Exception {
+    void testGetColumns(TestDb testDb) throws IOException {
         try (Database db = testDb.open()) {
             List<? extends Column> columns = db.getTable("Table1").getColumns();
             assertEquals(9, columns.size());
@@ -136,7 +137,7 @@ class DatabaseTest extends AbstractBaseTest {
 
     @ParameterizedTest(name = "[{index}] {0}")
     @TestDbReadOnlySource(COMMON1)
-    void testGetNextRow(TestDb testDb) throws Exception {
+    void testGetNextRow(TestDb testDb) throws IOException {
         try (Database db = testDb.open()) {
             db.setDateTimeType(DateTimeType.DATE);
 
@@ -159,7 +160,7 @@ class DatabaseTest extends AbstractBaseTest {
 
     @ParameterizedTest(name = "[{index}] {0}")
     @FileFormatSource
-    void testCreate(FileFormat fileFormat) throws Exception {
+    void testCreate(FileFormat fileFormat) throws IOException {
         try (Database db = createDbMem(fileFormat)) {
             assertEquals(0, db.getTableNames().size());
         }
@@ -167,7 +168,7 @@ class DatabaseTest extends AbstractBaseTest {
 
     @ParameterizedTest(name = "[{index}] {0}")
     @FileFormatSource
-    void testDeleteCurrentRow(FileFormat fileFormat) throws Exception {
+    void testDeleteCurrentRow(FileFormat fileFormat) throws IOException {
         // make sure correct row is deleted
         try (Database db = createDbMem(fileFormat)) {
             createTestTable(db);
@@ -232,7 +233,7 @@ class DatabaseTest extends AbstractBaseTest {
 
     @ParameterizedTest(name = "[{index}] {0}")
     @FileFormatSource
-    void testDeleteRow(FileFormat fileFormat) throws Exception {
+    void testDeleteRow(FileFormat fileFormat) throws IOException {
         // make sure correct row is deleted
         try (
         Database db = createDbMem(fileFormat)) {
@@ -276,7 +277,7 @@ class DatabaseTest extends AbstractBaseTest {
 
     @ParameterizedTest(name = "[{index}] {0}")
     @TestDbReadOnlySource(DEL_COL)
-    void testReadWithDeletedCols(TestDb testDb) throws Exception {
+    void testReadWithDeletedCols(TestDb testDb) throws IOException {
         try (Database db = testDb.open()) {
             Table table = db.getTable("Table1");
 
@@ -309,7 +310,7 @@ class DatabaseTest extends AbstractBaseTest {
 
     @ParameterizedTest(name = "[{index}] {0}")
     @FileFormatSource
-    void testCurrency(FileFormat fileFormat) throws Exception {
+    void testCurrency(FileFormat fileFormat) throws IOException {
         try (Database db = createDbMem(fileFormat)) {
             Table table = DatabaseBuilder.newTable("test")
                 .addColumn(DatabaseBuilder.newColumn("A", DataType.MONEY))
@@ -339,7 +340,7 @@ class DatabaseTest extends AbstractBaseTest {
 
     @ParameterizedTest(name = "[{index}] {0}")
     @FileFormatSource
-    void testGUID(FileFormat fileFormat) throws Exception {
+    void testGUID(FileFormat fileFormat) throws IOException {
         Database db = createDbMem(fileFormat);
 
         Table table = DatabaseBuilder.newTable("test")
@@ -373,7 +374,7 @@ class DatabaseTest extends AbstractBaseTest {
 
     @ParameterizedTest(name = "[{index}] {0}")
     @FileFormatSource
-    void testNumeric(FileFormat fileFormat) throws Exception {
+    void testNumeric(FileFormat fileFormat) throws IOException {
         Database db = createDbMem(fileFormat);
 
         ColumnBuilder col = DatabaseBuilder.newColumn("A", DataType.NUMERIC)
@@ -418,7 +419,7 @@ class DatabaseTest extends AbstractBaseTest {
 
     @ParameterizedTest(name = "[{index}] {0}")
     @TestDbSource(FIXED_NUMERIC)
-    void testFixedNumeric(TestDb testDb) throws Exception {
+    void testFixedNumeric(TestDb testDb) throws IOException {
 
         try (Database db = testDb.openCopy()) {
             Table t = db.getTable("test");
@@ -462,7 +463,7 @@ class DatabaseTest extends AbstractBaseTest {
 
     @ParameterizedTest(name = "[{index}] {0}")
     @TestDbReadOnlySource(COMMON1)
-    void testMultiPageTableDef(TestDb testDb) throws Exception {
+    void testMultiPageTableDef(TestDb testDb) throws IOException {
         try (Database db = testDb.open()) {
             List<? extends Column> columns = db.getTable("Table2").getColumns();
             assertEquals(89, columns.size());
@@ -471,7 +472,7 @@ class DatabaseTest extends AbstractBaseTest {
 
     @ParameterizedTest(name = "[{index}] {0}")
     @TestDbReadOnlySource(OVERFLOW)
-    void testOverflow(TestDb testDb) throws Exception {
+    void testOverflow(TestDb testDb) throws IOException {
         try (Database db = testDb.open()) {
             Table table = db.getTable("Table1");
 
@@ -496,7 +497,7 @@ class DatabaseTest extends AbstractBaseTest {
 
     @ParameterizedTest(name = "[{index}] {0}")
     @TestDbSource(PROMOTION)
-    void testUsageMapPromotion(TestDb testDb) throws Exception {
+    void testUsageMapPromotion(TestDb testDb) throws IOException {
 
         try (Database db = testDb.openMem()) {
             Table t = db.getTable("jobDB1");
@@ -527,7 +528,7 @@ class DatabaseTest extends AbstractBaseTest {
 
     @ParameterizedTest(name = "[{index}] {0}")
     @FileFormatSource
-    void testLargeTableDef(FileFormat fileFormat) throws Exception {
+    void testLargeTableDef(FileFormat fileFormat) throws IOException {
         Database db = createDbMem(fileFormat);
 
         final int numColumns = 90;
@@ -619,7 +620,7 @@ class DatabaseTest extends AbstractBaseTest {
 
     @ParameterizedTest(name = "[{index}] {0}")
     @FileFormatSource
-    void testAncientDatesWrite(FileFormat fileFormat) throws Exception {
+    void testAncientDatesWrite(FileFormat fileFormat) throws IOException, ParseException {
         SimpleDateFormat sdf = DatabaseBuilder.createDateFormat("yyyy-MM-dd");
 
         List<String> dates = List.of("1582-10-15", "1582-10-14", "1492-01-10", "1392-01-10");
@@ -649,7 +650,7 @@ class DatabaseTest extends AbstractBaseTest {
      */
     @ParameterizedTest(name = "[{index}] {0}")
     @TestDbSource(OLD_DATES)
-    void testAncientDatesRead(TestDb testDb) throws Exception {
+    void testAncientDatesRead(TestDb testDb) throws IOException {
         TimeZone tz = TimeZone.getTimeZone("America/New_York");
         SimpleDateFormat sdf = DatabaseBuilder.createDateFormat("yyyy-MM-dd");
         sdf.getCalendar().setTimeZone(tz);
@@ -674,7 +675,7 @@ class DatabaseTest extends AbstractBaseTest {
 
     @ParameterizedTest(name = "[{index}] {0}")
     @FileFormatSource
-    void testSystemTable(FileFormat fileFormat) throws Exception {
+    void testSystemTable(FileFormat fileFormat) throws IOException {
         Database db = createDbMem(fileFormat);
 
         Set<String> sysTables = new TreeSet<>(String.CASE_INSENSITIVE_ORDER);
@@ -723,7 +724,7 @@ class DatabaseTest extends AbstractBaseTest {
 
     @ParameterizedTest(name = "[{index}] {0}")
     @TestDbSource(FIXED_TEXT)
-    void testFixedText(TestDb testDb) throws Exception {
+    void testFixedText(TestDb testDb) throws IOException {
 
         try (Database db = testDb.openCopy()) {
             Table t = db.getTable("users");
@@ -747,7 +748,7 @@ class DatabaseTest extends AbstractBaseTest {
 
     @ParameterizedTest(name = "[{index}] {0}")
     @TestDbReadOnlySource(COMMON1)
-    void testDbSortOrder(TestDb testDb) throws Exception {
+    void testDbSortOrder(TestDb testDb) throws IOException {
         try (Database db = testDb.open()) {
             assertEquals(((DatabaseImpl) db).getFormat().DEFAULT_SORT_ORDER,
                 ((DatabaseImpl) db).getDefaultSortOrder());
@@ -756,7 +757,7 @@ class DatabaseTest extends AbstractBaseTest {
 
     @ParameterizedTest(name = "[{index}] {0}")
     @TestDbSource(UNSUPPORTED_FIELDS)
-    void testUnsupportedColumns(TestDb testDb) throws Exception {
+    void testUnsupportedColumns(TestDb testDb) throws IOException {
         try (Database db = testDb.open()) {
             Table t = db.getTable("Test");
             Column varCol = t.getColumn("UnknownVar");
@@ -790,7 +791,7 @@ class DatabaseTest extends AbstractBaseTest {
     }
 
     @Test
-    void testTimeZone() throws Exception {
+    void testTimeZone() throws IOException, ParseException {
         TimeZone tz = TimeZone.getTimeZone("America/New_York");
         doTestTimeZone(tz);
 
@@ -798,7 +799,7 @@ class DatabaseTest extends AbstractBaseTest {
         doTestTimeZone(tz);
     }
 
-    private static void doTestTimeZone(final TimeZone tz) throws Exception {
+    private static void doTestTimeZone(final TimeZone tz) throws IOException, ParseException {
         ColumnImpl col = new ColumnImpl(null, null, DataType.SHORT_DATE_TIME, 0, 0, 0) {
             @Override
             public TimeZone getTimeZone() {
@@ -848,7 +849,7 @@ class DatabaseTest extends AbstractBaseTest {
 
     @ParameterizedTest(name = "[{index}] {0}")
     @TestDbReadOnlySource(COMMON1)
-    void testIterateTableNames1(TestDb testDb) throws Exception {
+    void testIterateTableNames1(TestDb testDb) throws IOException {
         try (Database db = testDb.open()) {
             Set<String> names = new HashSet<>();
             int sysCount = 0;
@@ -870,7 +871,7 @@ class DatabaseTest extends AbstractBaseTest {
 
     @ParameterizedTest(name = "[{index}] {0}")
     @TestDbSource(LINKED)
-    void testIterateTableNames2(TestDb testDb) throws Exception {
+    void testIterateTableNames2(TestDb testDb) throws IOException {
         try (Database db = testDb.open()) {
             Set<String> names = new HashSet<>();
             for (TableMetaData tmd : db.newTableMetaDataIterable()) {
@@ -895,7 +896,7 @@ class DatabaseTest extends AbstractBaseTest {
 
     @ParameterizedTest(name = "[{index}] {0}")
     @TestDbReadOnlySource(COMMON1)
-    void testTableDates(TestDb testDb) throws Exception {
+    void testTableDates(TestDb testDb) throws IOException {
         try (Database db = testDb.open()) {
             Table table = db.getTable("Table1");
             String expectedCreateDate = null;

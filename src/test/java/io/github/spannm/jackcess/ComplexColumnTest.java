@@ -29,6 +29,7 @@ import io.github.spannm.jackcess.test.TestUtil;
 import io.github.spannm.jackcess.test.source.TestDbSource;
 import org.junit.jupiter.params.ParameterizedTest;
 
+import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
 import java.util.Date;
@@ -57,7 +58,7 @@ class ComplexColumnTest extends AbstractBaseTest {
 
     @ParameterizedTest(name = "[{index}] {0}")
     @TestDbSource(COMPLEX_DATA)
-    void testVersions(TestDb testDb) throws Exception {
+    void testVersions(TestDb testDb) throws IOException {
         try (Database db = testDb.openCopy()) {
             db.setDateTimeType(DateTimeType.DATE);
             db.setTimeZone(TEST_TZ);
@@ -143,7 +144,7 @@ class ComplexColumnTest extends AbstractBaseTest {
 
     @ParameterizedTest(name = "[{index}] {0}")
     @TestDbSource(COMPLEX_DATA)
-    void testAttachments(TestDb testDb) throws Exception {
+    void testAttachments(TestDb testDb) throws IOException {
         try (Database db = testDb.openCopy()) {
             Table t1 = db.getTable("Table1");
             Column col = t1.getColumn("attach-data");
@@ -221,7 +222,7 @@ class ComplexColumnTest extends AbstractBaseTest {
 
     @ParameterizedTest(name = "[{index}] {0}")
     @TestDbSource(COMPLEX_DATA)
-    void testMultiValues(TestDb testDb) throws Exception {
+    void testMultiValues(TestDb testDb) throws IOException {
         try (Database db = testDb.openCopy()) {
             Table t1 = db.getTable("Table1");
             Column col = t1.getColumn("multi-value-data");
@@ -291,7 +292,7 @@ class ComplexColumnTest extends AbstractBaseTest {
 
     @ParameterizedTest(name = "[{index}] {0}")
     @TestDbSource(UNSUPPORTED_FIELDS)
-    void testUnsupported(TestDb testDb) throws Exception {
+    void testUnsupported(TestDb testDb) throws IOException {
         try (Database db = testDb.openCopy()) {
             Table t1 = db.getTable("Test");
             Column col = t1.getColumn("UnknownComplex");
@@ -319,7 +320,7 @@ class ComplexColumnTest extends AbstractBaseTest {
 
     private static void checkVersions(
         int cValId, ComplexValueForeignKey complexValueFk,
-        String curValue, Object... versionInfos) throws Exception {
+        String curValue, Object... versionInfos) throws IOException {
         assertEquals(cValId, complexValueFk.get());
 
         List<Version> versions = complexValueFk.getVersions();
@@ -341,7 +342,7 @@ class ComplexColumnTest extends AbstractBaseTest {
 
     private static void checkAttachments(
         int cValId, ComplexValueForeignKey complexValueFk,
-        String... fileNames) throws Exception {
+        String... fileNames) throws IOException {
         assertEquals(cValId, complexValueFk.get());
 
         List<Attachment> attachments = complexValueFk.getAttachments();
@@ -362,7 +363,7 @@ class ComplexColumnTest extends AbstractBaseTest {
 
     private static void checkMultiValues(
         int cValId, ComplexValueForeignKey complexValueFk,
-        Object... expectedValues) throws Exception {
+        Object... expectedValues) throws IOException {
         assertEquals(cValId, complexValueFk.get());
 
         List<SingleValue> values = complexValueFk.getMultiValues();
@@ -380,7 +381,7 @@ class ComplexColumnTest extends AbstractBaseTest {
 
     private static void checkUnsupportedValues(
         int cValId, ComplexValueForeignKey complexValueFk,
-        String... expectedValues) throws Exception {
+        String... expectedValues) throws IOException {
         assertEquals(cValId, complexValueFk.get());
 
         List<UnsupportedValue> values = complexValueFk.getUnsupportedValues();

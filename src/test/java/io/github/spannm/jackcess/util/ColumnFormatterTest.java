@@ -22,6 +22,7 @@ import io.github.spannm.jackcess.test.AbstractBaseTest;
 import io.github.spannm.jackcess.test.source.FileFormatSource;
 import org.junit.jupiter.params.ParameterizedTest;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -29,7 +30,7 @@ class ColumnFormatterTest extends AbstractBaseTest {
 
     @ParameterizedTest(name = "[{index}] {0}")
     @FileFormatSource
-    void testFormat(FileFormat fileFormat) throws Exception {
+    void testFormat(FileFormat fileFormat) throws IOException {
         try (Database db = createDbMem(fileFormat)) {
             db.setEvaluateExpressions(true);
 

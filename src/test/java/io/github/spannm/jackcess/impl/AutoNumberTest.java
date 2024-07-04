@@ -41,7 +41,7 @@ class AutoNumberTest extends AbstractBaseTest {
 
     @ParameterizedTest(name = "[{index}] {0}")
     @FileFormatSource
-    void testAutoNumber(FileFormat fileFormat) throws Exception {
+    void testAutoNumber(FileFormat fileFormat) throws IOException {
         try (Database db = createDbMem(fileFormat)) {
             Table table = newTable("test")
                 .addColumn(newColumn("a", DataType.LONG)
@@ -55,7 +55,7 @@ class AutoNumberTest extends AbstractBaseTest {
 
     @ParameterizedTest(name = "[{index}] {0}")
     @TestDbSource(COMMON1)
-    void testAutoNumberPK(TestDb testDB) throws Exception {
+    void testAutoNumberPK(TestDb testDB) throws IOException {
         try (Database db = testDB.openMem()) {
             Table table = db.getTable("Table3");
 
@@ -63,7 +63,7 @@ class AutoNumberTest extends AbstractBaseTest {
         }
     }
 
-    private static void doTestAutoNumber(Table table) throws Exception {
+    private static void doTestAutoNumber(Table table) throws IOException {
         Object[] row = {null, "row1"};
         assertSame(row, table.addRow(row));
         assertEquals(1, ((Integer) row[0]).intValue());
@@ -111,7 +111,7 @@ class AutoNumberTest extends AbstractBaseTest {
 
     @ParameterizedTest(name = "[{index}] {0}")
     @FileFormatSource
-    void testAutoNumberGuid(FileFormat fileFormat) throws Exception {
+    void testAutoNumberGuid(FileFormat fileFormat) throws IOException {
         try (Database db = createDbMem(fileFormat)) {
             Table table = newTable("test")
                 .addColumn(newColumn("a", DataType.GUID)
@@ -136,7 +136,7 @@ class AutoNumberTest extends AbstractBaseTest {
 
     @ParameterizedTest(name = "[{index}] {0}")
     @FileFormatSource
-    void testInsertLongAutoNumber(FileFormat fileFormat) throws Exception {
+    void testInsertLongAutoNumber(FileFormat fileFormat) throws IOException {
         try (Database db = createDbMem(fileFormat)) {
             Table table = newTable("test")
                 .addColumn(newColumn("a", DataType.LONG)
@@ -150,7 +150,7 @@ class AutoNumberTest extends AbstractBaseTest {
 
     @ParameterizedTest(name = "[{index}] {0}")
     @FileFormatSource
-    void testInsertLongAutoNumberPK(FileFormat fileFormat) throws Exception {
+    void testInsertLongAutoNumberPK(FileFormat fileFormat) throws IOException {
         try (Database db = createDbMem(fileFormat)) {
             Table table = newTable("test")
                 .addColumn(newColumn("a", DataType.LONG)
@@ -163,7 +163,7 @@ class AutoNumberTest extends AbstractBaseTest {
         }
     }
 
-    private static void doTestInsertLongAutoNumber(Table table) throws Exception {
+    private static void doTestInsertLongAutoNumber(Table table) throws IOException {
         assertFalse(table.getDatabase().isAllowAutoNumberInsert());
         assertFalse(table.isAllowAutoNumberInsert());
 
@@ -244,8 +244,7 @@ class AutoNumberTest extends AbstractBaseTest {
 
     @ParameterizedTest(name = "[{index}] {0}")
     @TestDbSource(COMPLEX_DATA)
-    void testInsertComplexAutoNumber(TestDb testDb) throws Exception {
-
+    void testInsertComplexAutoNumber(TestDb testDb) throws IOException {
 
         try (Database db = testDb.openMem()) {
             Table t1 = db.getTable("Table1");
@@ -347,7 +346,7 @@ class AutoNumberTest extends AbstractBaseTest {
 
     @ParameterizedTest(name = "[{index}] {0}")
     @FileFormatSource
-    void testInsertGuidAutoNumber(FileFormat fileFormat) throws Exception {
+    void testInsertGuidAutoNumber(FileFormat fileFormat) throws IOException {
         try (Database db = createDbMem(fileFormat)) {
             Table table = newTable("test").addColumn(newColumn("a", DataType.GUID).withAutoNumber(true)).addColumn(newColumn("b", DataType.TEXT)).toTable(db);
 

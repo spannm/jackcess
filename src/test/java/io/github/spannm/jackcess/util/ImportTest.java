@@ -24,11 +24,13 @@ import io.github.spannm.jackcess.test.source.FileFormatSource;
 import org.junit.jupiter.params.ParameterizedTest;
 
 import java.io.File;
+import java.io.IOException;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
+import java.sql.SQLException;
 import java.sql.Types;
 import java.util.ArrayList;
 import java.util.List;
@@ -38,7 +40,7 @@ class ImportTest extends AbstractBaseTest {
 
     @ParameterizedTest(name = "[{index}] {0}")
     @FileFormatSource
-    void testImportFromFile(FileFormat fileFormat) throws Exception {
+    void testImportFromFile(FileFormat fileFormat) throws IOException {
         try (Database db = createDbMem(fileFormat)) {
             String tableName = new ImportUtil.Builder(db, "test")
                 .withDelimiter("\\t")
@@ -160,7 +162,7 @@ class ImportTest extends AbstractBaseTest {
 
     @ParameterizedTest(name = "[{index}] {0}")
     @FileFormatSource
-    void testImportFromFileWithOnlyHeaders(FileFormat fileFormat) throws Exception {
+    void testImportFromFileWithOnlyHeaders(FileFormat fileFormat) throws IOException {
         try (Database db = createDbMem(fileFormat)) {
             String tableName = new ImportUtil.Builder(db, "test")
                 .withDelimiter("\\t")
@@ -182,7 +184,7 @@ class ImportTest extends AbstractBaseTest {
 
     @ParameterizedTest(name = "[{index}] {0}")
     @FileFormatSource
-    void testCopySqlHeaders(FileFormat fileFormat) throws Exception {
+    void testCopySqlHeaders(FileFormat fileFormat) throws IOException, SQLException {
         TestResultSet rs = new TestResultSet();
 
         rs.addColumn(Types.INTEGER, "col1");

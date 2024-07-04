@@ -24,8 +24,10 @@ import io.github.spannm.jackcess.test.source.FileFormatSource;
 import org.junit.jupiter.params.ParameterizedTest;
 
 import java.io.BufferedWriter;
+import java.io.IOException;
 import java.io.StringWriter;
 import java.text.DateFormat;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
@@ -34,7 +36,7 @@ class ExportTest extends AbstractBaseTest {
 
     @ParameterizedTest(name = "[{index}] {0}")
     @FileFormatSource
-    void testExportToFile(FileFormat fileFormat) throws Exception {
+    void testExportToFile(FileFormat fileFormat) throws IOException, ParseException {
         DateFormat df = new SimpleDateFormat("yyyyMMdd HH:mm:ss");
         df.setTimeZone(TEST_TZ);
 

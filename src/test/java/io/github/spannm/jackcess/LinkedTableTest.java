@@ -28,6 +28,7 @@ import org.junit.jupiter.params.ParameterizedTest;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 
@@ -35,7 +36,7 @@ class LinkedTableTest extends AbstractBaseTest {
 
     @ParameterizedTest(name = "[{index}] {0}")
     @TestDbSource(LINKED)
-    void testLinkedTables(TestDb testDb) throws Exception {
+    void testLinkedTables(TestDb testDb) throws IOException {
 
         try (Database db = testDb.openCopy()) {
             assertThrows(FileNotFoundException.class, () -> db.getTable("Table2"));
@@ -145,7 +146,7 @@ class LinkedTableTest extends AbstractBaseTest {
 
     @ParameterizedTest(name = "[{index}] {0}")
     @TestDbSource(LINKED_ODBC)
-    void testOdbcLinkedTables(TestDb testDb) throws Exception {
+    void testOdbcLinkedTables(TestDb testDb) throws IOException {
 
         try (Database db = testDb.openCopy()) {
             TableMetaData tmd = db.getTableMetaData("Ordrar");

@@ -11,6 +11,7 @@ import io.github.spannm.jackcess.test.TestUtil;
 import io.github.spannm.jackcess.test.source.TestDbSource;
 import org.junit.jupiter.params.ParameterizedTest;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -49,7 +50,7 @@ public class UsageMapTest extends AbstractBaseTest {
 
     @ParameterizedTest(name = "[{index}] {0}")
     @TestDbSource(REF_GLOBAL)
-    void testGobalReferenceUsageMap(TestDb testDb) throws Exception {
+    void testGobalReferenceUsageMap(TestDb testDb) throws IOException {
         try (Database db = TestUtil.openCopy(FileFormat.V2000, testDb.getFile())) {
             Table t = new TableBuilder("Test2")
                 .addColumn(new ColumnBuilder("id", DataType.LONG))

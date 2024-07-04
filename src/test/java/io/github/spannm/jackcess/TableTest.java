@@ -48,7 +48,7 @@ class TableTest extends AbstractBaseTest {
     }
 
     @Test
-    void testCreateRow() throws Exception {
+    void testCreateRow() throws IOException {
         reset();
         newTestColumn(DataType.INT, false);
         newTestColumn(DataType.TEXT, false);
@@ -69,7 +69,7 @@ class TableTest extends AbstractBaseTest {
     }
 
     @Test
-    void testUnicodeCompression() throws Exception {
+    void testUnicodeCompression() throws IOException {
         reset();
         newTestColumn(DataType.TEXT, false);
         newTestColumn(DataType.TEXT, false);

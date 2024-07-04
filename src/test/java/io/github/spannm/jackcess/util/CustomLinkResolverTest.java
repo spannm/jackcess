@@ -31,7 +31,7 @@ class CustomLinkResolverTest extends AbstractBaseTest {
 
     @ParameterizedTest(name = "[{index}] {0}")
     @FileFormatSource
-    void testCustomLinkResolver(FileFormat fileFormat) throws Exception {
+    void testCustomLinkResolver(FileFormat fileFormat) throws IOException {
         try (Database db = createDbMem(fileFormat)) {
             db.setLinkResolver(new TestLinkResolver());
 

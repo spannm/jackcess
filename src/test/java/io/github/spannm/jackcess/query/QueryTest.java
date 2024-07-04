@@ -29,6 +29,7 @@ import io.github.spannm.jackcess.test.source.TestDbReadOnlySource;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 
+import java.io.IOException;
 import java.util.*;
 
 @SuppressWarnings("checkstyle:LineLengthCheck")
@@ -158,38 +159,32 @@ class QueryTest extends AbstractBaseTest {
 
     @ParameterizedTest(name = "[{index}] {0}")
     @TestDbReadOnlySource(QUERY)
-    void testReadQueries(TestDb testDb) throws Exception {
+    void testReadQueries(TestDb testDb) throws IOException {
 
-        Map<String, String> expectedQueries = new HashMap<>();
-        expectedQueries.put(
+        Map<String, String> expectedQueries = new HashMap<>(Map.of(
             "SelectQuery", multiline(
                 "SELECT DISTINCT Table1.*, Table2.col1, Table2.col2, Table3.col3",
                 "FROM (Table1 LEFT JOIN Table3 ON Table1.col1 = Table3.col1) INNER JOIN Table2 ON (Table3.col1 = Table2.col2) AND (Table3.col1 = Table2.col1)",
                 "WHERE (((Table2.col2)=\"foo\" Or (Table2.col2) In (\"buzz\",\"bazz\")))",
-                "ORDER BY Table2.col1;"));
-        expectedQueries.put(
+                "ORDER BY Table2.col1;"),
             "DeleteQuery", multiline(
                 "DELETE Table1.col1, Table1.col2, Table1.col3",
                 "FROM Table1",
-                "WHERE (((Table1.col1)>\"blah\"));"));
-        expectedQueries.put(
+                "WHERE (((Table1.col1)>\"blah\"));"),
             "AppendQuery", multiline(
                 "INSERT INTO Table3 (col2, col2, col3)",
                 "SELECT [Table1].[col2], [Table2].[col2], [Table2].[col3]",
-                "FROM Table3, Table1 INNER JOIN Table2 ON [Table1].[col1]=[Table2].[col1];"));
-        expectedQueries.put(
+                "FROM Table3, Table1 INNER JOIN Table2 ON [Table1].[col1]=[Table2].[col1];"),
             "UpdateQuery", multiline(
                 "PARAMETERS User Name Text;",
                 "UPDATE Table1",
                 "SET Table1.col1 = \"foo\", Table1.col2 = [Table2].[col3], [Table2].[col1] = [User Name]",
-                "WHERE ((([Table2].[col1]) Is Not Null));"));
-        expectedQueries.put(
+                "WHERE ((([Table2].[col1]) Is Not Null));"),
             "MakeTableQuery", multiline(
                 "SELECT Max(Table2.col1) AS MaxOfcol1, Table2.col2, Table3.col2 INTO Table4",
                 "FROM (Table2 INNER JOIN Table1 ON Table2.col1 = Table1.col2) RIGHT JOIN Table3 ON Table1.col2 = Table3.col3",
                 "GROUP BY Table2.col2, Table3.col2",
-                "HAVING (((Max(Table2.col1))=\"buzz\") AND ((Table2.col2)<>\"blah\"));"));
-        expectedQueries.put(
+                "HAVING (((Max(Table2.col1))=\"buzz\") AND ((Table2.col2)<>\"blah\"));"),
             "CrosstabQuery", multiline(
                 "TRANSFORM Count([Table2].[col2]) AS CountOfcol2",
                 "SELECT Table2_1.col1, [Table2].[col3], Avg(Table2_1.col2) AS AvgOfcol2",
@@ -197,21 +192,16 @@ class QueryTest extends AbstractBaseTest {
                 "WHERE ((([Table1].[col1])>\"10\") And ((Table2_1.col1) Is Not Null) And ((Avg(Table2_1.col2))>\"10\"))",
                 "GROUP BY Table2_1.col1, [Table2].[col3]",
                 "ORDER BY [Table2].[col3]",
-                "PIVOT [Table1].[col1];"));
-        expectedQueries.put(
+                "PIVOT [Table1].[col1];"),
             "UnionQuery", multiline(
                 "Select Table1.col1, Table1.col2",
                 "where Table1.col1 = \"foo\"",
                 "UNION",
                 "Select Table2.col1, Table2.col2",
                 "UNION ALL Select Table3.col1, Table3.col2",
-                "where Table3.col3 > \"blah\";"));
-        expectedQueries.put(
-            "PassthroughQuery", multiline(
-                "ALTER TABLE Table4 DROP COLUMN col5;\0"));
-        expectedQueries.put(
-            "DataDefinitionQuery", multiline(
-                "CREATE TABLE Table5 (col1 CHAR, col2 CHAR);\0"));
+                "where Table3.col3 > \"blah\";"),
+            "PassthroughQuery", "ALTER TABLE Table4 DROP COLUMN col5;\0",
+            "DataDefinitionQuery", "CREATE TABLE Table5 (col1 CHAR, col2 CHAR);\0"));
 
         try (Database db = testDb.open()) {
             for (Query q : db.getQueries()) {

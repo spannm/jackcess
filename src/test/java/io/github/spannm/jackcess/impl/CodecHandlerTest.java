@@ -24,6 +24,7 @@ import io.github.spannm.jackcess.test.source.FileFormatSource;
 import org.junit.jupiter.params.ParameterizedTest;
 
 import java.io.File;
+import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
@@ -35,17 +36,17 @@ class CodecHandlerTest extends AbstractBaseTest {
 
     @ParameterizedTest(name = "[{index}] {0}")
     @FileFormatSource
-    void testCodecHandlerSimple(FileFormat fileFormat) throws Exception {
+    void testCodecHandlerSimple(FileFormat fileFormat) throws IOException {
         doTestCodecHandler(fileFormat, true);
     }
 
     @ParameterizedTest(name = "[{index}] {0}")
     @FileFormatSource
-    void testCodecHandlerNotSimple(FileFormat fileFormat) throws Exception {
+    void testCodecHandlerNotSimple(FileFormat fileFormat) throws IOException {
         doTestCodecHandler(fileFormat, false);
     }
 
-    private void doTestCodecHandler(FileFormat fileFormat, boolean simple) throws Exception {
+    private void doTestCodecHandler(FileFormat fileFormat, boolean simple) throws IOException {
         File dbFile;
         try (Database db1 = createDb(fileFormat, false, false)) {
             int pageSize = ((DatabaseImpl) db1).getFormat().PAGE_SIZE;
@@ -81,7 +82,7 @@ class CodecHandlerTest extends AbstractBaseTest {
         }
     }
 
-    private static void writeData(Table t1, Table t2, int start, int end) throws Exception {
+    private static void writeData(Table t1, Table t2, int start, int end) throws IOException {
         Database db = t1.getDatabase();
         ((DatabaseImpl) db).getPageChannel().startWrite();
         try {
@@ -133,7 +134,7 @@ class CodecHandlerTest extends AbstractBaseTest {
         assertEquals(valuePrefix.length() + 100, value.length());
     }
 
-    private static void encodeFile(File dbFile, int pageSize, boolean simple) throws Exception {
+    private static void encodeFile(File dbFile, int pageSize, boolean simple) throws IOException {
         long dbLen = dbFile.length();
         try (RandomAccessFile randomAccessFile = new RandomAccessFile(dbFile, "rw");
             FileChannel fileChannel = randomAccessFile.getChannel()) {

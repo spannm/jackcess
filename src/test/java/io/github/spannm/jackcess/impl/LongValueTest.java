@@ -30,6 +30,7 @@ import io.github.spannm.jackcess.test.source.TestDbReadOnlySource;
 import org.junit.jupiter.params.ParameterizedTest;
 
 import java.io.File;
+import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.file.Files;
 import java.sql.Types;
@@ -39,7 +40,7 @@ class LongValueTest extends AbstractBaseTest {
 
     @ParameterizedTest(name = "[{index}] {0}")
     @TestDbReadOnlySource(COMMON2)
-    void testReadLongValue(TestDb testDb) throws Exception {
+    void testReadLongValue(TestDb testDb) throws IOException {
         try (Database db = testDb.openMem()) {
             Table table = db.getTable("MSP_PROJECTS");
             Row row = table.getNextRow();
@@ -59,7 +60,7 @@ class LongValueTest extends AbstractBaseTest {
 
     @ParameterizedTest(name = "[{index}] {0}")
     @FileFormatSource
-    void testWriteLongValue(FileFormat fileFormat) throws Exception {
+    void testWriteLongValue(FileFormat fileFormat) throws IOException {
 
         try (Database db = createDbMem(fileFormat)) {
             Table table =
@@ -108,7 +109,7 @@ class LongValueTest extends AbstractBaseTest {
 
     @ParameterizedTest(name = "[{index}] {0}")
     @FileFormatSource
-    void testManyMemos(FileFormat fileFormat) throws Exception {
+    void testManyMemos(FileFormat fileFormat) throws IOException {
         try (Database db = createDbMem(fileFormat)) {
             final int numColumns = 126;
             TableBuilder bigTableBuilder = new TableBuilder("test");
@@ -168,7 +169,7 @@ class LongValueTest extends AbstractBaseTest {
 
     @ParameterizedTest(name = "[{index}] {0}")
     @FileFormatSource
-    void testLongValueAsMiddleColumn(FileFormat fileFormat) throws Exception {
+    void testLongValueAsMiddleColumn(FileFormat fileFormat) throws IOException {
         try (Database db = createDbMem(fileFormat)) {
             Table newTable = new TableBuilder("NewTable")
                 .addColumn(new ColumnBuilder("a").withSqlType(Types.INTEGER))
@@ -190,7 +191,7 @@ class LongValueTest extends AbstractBaseTest {
 
     @ParameterizedTest(name = "[{index}] {0}")
     @TestDbReadOnlySource(UNICODE_COMP)
-    void testUnicodeCompression(TestDb testDb) throws Exception {
+    void testUnicodeCompression(TestDb testDb) throws IOException {
         try (Database db = openDb(FileFormat.V2003, testDb.getFile(), true)) {
             StringBuilder sb = new StringBuilder(127);
             for (int i = 1; i <= 0xFF; i++) {

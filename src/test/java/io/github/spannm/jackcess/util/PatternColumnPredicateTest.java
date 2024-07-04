@@ -22,6 +22,7 @@ import io.github.spannm.jackcess.test.AbstractBaseTest;
 import io.github.spannm.jackcess.test.source.FileFormatSource;
 import org.junit.jupiter.params.ParameterizedTest;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
@@ -30,7 +31,7 @@ class PatternColumnPredicateTest extends AbstractBaseTest {
 
     @ParameterizedTest(name = "[{index}] {0}")
     @FileFormatSource
-    void testRegexPredicate(FileFormat fileFormat) throws Exception {
+    void testRegexPredicate(FileFormat fileFormat) throws IOException {
         try (Database db = createTestDb(fileFormat)) {
             Table t = db.getTable("Test");
 
@@ -64,7 +65,7 @@ class PatternColumnPredicateTest extends AbstractBaseTest {
             .collect(Collectors.toList());
     }
 
-    private Database createTestDb(FileFormat fileFormat) throws Exception {
+    private Database createTestDb(FileFormat fileFormat) throws IOException {
         Database db = createDbMem(fileFormat);
 
         Table table = new TableBuilder("Test")

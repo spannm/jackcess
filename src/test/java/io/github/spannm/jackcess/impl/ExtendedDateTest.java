@@ -28,6 +28,7 @@ import io.github.spannm.jackcess.test.source.FileFormatSource;
 import io.github.spannm.jackcess.test.source.TestDbSource;
 import org.junit.jupiter.params.ParameterizedTest;
 
+import java.io.IOException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
@@ -71,7 +72,7 @@ class ExtendedDateTest extends AbstractBaseTest {
 
     @ParameterizedTest(name = "[{index}] {0}")
     @FileFormatSource
-    void testWriteExtendedDate(FileFormat fileFormat) throws Exception {
+    void testWriteExtendedDate(FileFormat fileFormat) throws IOException {
         JetFormat format = DatabaseImpl.getFileFormatDetails(fileFormat).getFormat();
 
         if (!format.isSupportedDataType(DataType.EXT_DATE_TIME)) {

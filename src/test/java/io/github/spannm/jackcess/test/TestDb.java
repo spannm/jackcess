@@ -6,6 +6,7 @@ import io.github.spannm.jackcess.impl.DatabaseImpl;
 import io.github.spannm.jackcess.impl.JetFormat;
 
 import java.io.File;
+import java.io.IOException;
 import java.nio.charset.Charset;
 
 /**
@@ -39,18 +40,17 @@ public final class TestDb {
         return charset;
     }
 
-    public Database open() throws Exception {
+    public Database open() throws IOException {
         return TestUtil.openDb(getExpectedFileFormat(), getFile(), false, getExpectedCharset());
     }
 
-    public Database openMem() throws Exception {
+    public Database openMem() throws IOException {
         return TestUtil.openDb(getExpectedFileFormat(), getFile(), true, getExpectedCharset(), false);
     }
 
-    public Database openCopy() throws Exception {
+    public Database openCopy() throws IOException {
         return TestUtil.openCopy(getExpectedFileFormat(), getFile(), false);
     }
-
 
     @Override
     public String toString() {

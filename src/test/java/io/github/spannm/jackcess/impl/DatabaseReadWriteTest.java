@@ -25,6 +25,7 @@ import io.github.spannm.jackcess.test.source.FileFormatSource;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 
+import java.io.IOException;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
@@ -36,7 +37,7 @@ class DatabaseReadWriteTest extends AbstractBaseTest {
 
     @ParameterizedTest(name = "[{index}] {0}")
     @FileFormatSource
-    void testWriteAndRead(FileFormat fileFormat) throws Exception {
+    void testWriteAndRead(FileFormat fileFormat) throws IOException {
         try (Database db = createDbMem(fileFormat)) {
             doTestWriteAndRead(db);
         }
@@ -44,13 +45,13 @@ class DatabaseReadWriteTest extends AbstractBaseTest {
 
     @ParameterizedTest(name = "[{index}] {0}")
     @FileFormatSource
-    void testWriteAndReadInMem(FileFormat fileFormat) throws Exception {
+    void testWriteAndReadInMem(FileFormat fileFormat) throws IOException {
         try (Database db = createDbMem(fileFormat)) {
             doTestWriteAndRead(db);
         }
     }
 
-    private static void doTestWriteAndRead(Database db) throws Exception {
+    private static void doTestWriteAndRead(Database db) throws IOException {
         createTestTable(db);
         Object[] row = createTestRow();
         row[3] = null;
@@ -79,7 +80,7 @@ class DatabaseReadWriteTest extends AbstractBaseTest {
 
     @ParameterizedTest(name = "[{index}] {0}")
     @FileFormatSource
-    void testWriteAndReadInBatch(FileFormat fileFormat) throws Exception {
+    void testWriteAndReadInBatch(FileFormat fileFormat) throws IOException {
         try (Database db = createDbMem(fileFormat)) {
             createTestTable(db);
             int count = 1000;
@@ -106,7 +107,7 @@ class DatabaseReadWriteTest extends AbstractBaseTest {
 
     @ParameterizedTest(name = "[{index}] {0}")
     @FileFormatSource
-    void testUpdateRow(FileFormat fileFormat) throws Exception {
+    void testUpdateRow(FileFormat fileFormat) throws IOException {
         try (Database db = createDbMem(fileFormat)) {
             Table t = new TableBuilder("test")
                 .addColumn(new ColumnBuilder("name", DataType.TEXT))

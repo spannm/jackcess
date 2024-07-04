@@ -25,6 +25,7 @@ import io.github.spannm.jackcess.test.AbstractBaseTest;
 import io.github.spannm.jackcess.test.source.FileFormatSource;
 import org.junit.jupiter.params.ParameterizedTest;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 
@@ -32,7 +33,7 @@ class ColumnValidatorTest extends AbstractBaseTest {
 
     @ParameterizedTest(name = "[{index}] {0}")
     @FileFormatSource
-    void testValidate(FileFormat fileFormat) throws Exception {
+    void testValidate(FileFormat fileFormat) throws IOException {
         try (Database db = createDbMem(fileFormat)) {
             ColumnValidatorFactory initFact = db.getColumnValidatorFactory();
             assertNotNull(initFact);

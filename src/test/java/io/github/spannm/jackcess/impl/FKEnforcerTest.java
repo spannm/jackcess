@@ -35,7 +35,7 @@ class FKEnforcerTest extends AbstractBaseTest {
 
     @ParameterizedTest(name = "[{index}] {0}")
     @TestDbSource(INDEX)
-    void testNoEnforceForeignKeys(TestDb testDb) throws Exception {
+    void testNoEnforceForeignKeys(TestDb testDb) throws IOException {
         try (Database db = testDb.openCopy()) {
             db.setEnforceForeignKeys(false);
             Table t1 = db.getTable("Table1");
@@ -56,7 +56,7 @@ class FKEnforcerTest extends AbstractBaseTest {
 
     @ParameterizedTest(name = "[{index}] {0}")
     @TestDbSource(INDEX)
-    void testEnforceForeignKeys(TestDb testDb) throws Exception {
+    void testEnforceForeignKeys(TestDb testDb) throws IOException {
         try (Database db = testDb.openCopy()) {
             db.setEvaluateExpressions(false);
             Table t1 = db.getTable("Table1");

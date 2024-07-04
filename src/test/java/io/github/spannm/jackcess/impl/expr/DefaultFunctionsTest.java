@@ -819,7 +819,6 @@ class DefaultFunctionsTest extends AbstractBaseTest {
         return Arguments.of(_str, _supplier);
     }
 
-
     @ParameterizedTest(name = "[{index}] {0} --> {1}")
     @MethodSource("getDateFuncsData")
     void testDateFuncs(String _exprStr, Object _expected) {

@@ -40,7 +40,7 @@ class OleBlobTest extends AbstractBaseTest {
 
     @ParameterizedTest(name = "[{index}] {0}")
     @FileFormatSource
-    void testCreateBlob(FileFormat fileFormat) throws Exception {
+    void testCreateBlob(FileFormat fileFormat) throws IOException {
         File sampleFile = new File(DIR_TEST_DATA, "sample-input.tab");
         String sampleFilePath = sampleFile.getAbsolutePath();
         String sampleFileName = sampleFile.getName();
@@ -120,7 +120,7 @@ class OleBlobTest extends AbstractBaseTest {
 
     @ParameterizedTest(name = "[{index}] {0}")
     @TestDbReadOnlySource(BLOB)
-    void testReadBlob(TestDb testDb) throws Exception {
+    void testReadBlob(TestDb testDb) throws IOException {
         try (Database db = testDb.open()) {
             Table t = db.getTable("Table1");
 

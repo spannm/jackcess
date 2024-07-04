@@ -36,7 +36,7 @@ class MemFileChannelTest extends AbstractBaseTest {
 
     @ParameterizedTest(name = "[{index}] {0}")
     @TestDbReadOnlySource(COMP_INDEX)
-    void testReadOnlyChannel(TestDb testDb) throws Exception {
+    void testReadOnlyChannel(TestDb testDb) throws IOException {
         try (MemFileChannel ch = MemFileChannel.newChannel(testDb.getFile(), "r")) {
             assertEquals(testDb.getFile().length(), ch.size());
             assertEquals(0L, ch.position());
@@ -57,7 +57,7 @@ class MemFileChannelTest extends AbstractBaseTest {
 
     @ParameterizedTest(name = "[{index}] {0}")
     @TestDbReadOnlySource(COMP_INDEX)
-    void testChannel(TestDb testDb) throws Exception {
+    void testChannel(TestDb testDb) throws IOException {
         ByteBuffer bb = ByteBuffer.allocate(1024);
 
         try (MemFileChannel ch = MemFileChannel.newChannel()) {

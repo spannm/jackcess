@@ -29,6 +29,7 @@ import io.github.spannm.jackcess.test.TestDb;
 import io.github.spannm.jackcess.test.source.TestDbSource;
 import org.junit.jupiter.params.ParameterizedTest;
 
+import java.io.IOException;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -36,7 +37,7 @@ class JoinerTest extends AbstractBaseTest {
 
     @ParameterizedTest(name = "[{index}] {0}")
     @TestDbSource(INDEX)
-    void testJoiner(TestDb testDb) throws Exception {
+    void testJoiner(TestDb testDb) throws IOException {
         try (Database db = testDb.openCopy()) {
             Table t1 = db.getTable("Table1");
             Table t2 = db.getTable("Table2");
@@ -72,7 +73,7 @@ class JoinerTest extends AbstractBaseTest {
     }
 
     private static void doTestJoiner(
-        Joiner join, Map<Integer, List<Row>> expectedData) throws Exception {
+        Joiner join, Map<Integer, List<Row>> expectedData) throws IOException {
         final Set<String> colNames = Set.of("id", "data");
 
         Joiner revJoin = join.createReverse();
@@ -115,7 +116,7 @@ class JoinerTest extends AbstractBaseTest {
         }
     }
 
-    private static void doTestJoinerDelete(Joiner t2t1Join) throws Exception {
+    private static void doTestJoinerDelete(Joiner t2t1Join) throws IOException {
         assertEquals(4, countRows(t2t1Join.getToTable()));
 
         Row row = createExpectedRow("id", 1);

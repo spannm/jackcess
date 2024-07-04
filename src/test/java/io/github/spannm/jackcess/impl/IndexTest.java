@@ -81,7 +81,7 @@ class IndexTest extends AbstractBaseTest {
 
     @ParameterizedTest(name = "[{index}] {0}")
     @TestDbReadOnlySource(COMMON1)
-    void testPrimaryKey(TestDb testDb) throws Exception {
+    void testPrimaryKey(TestDb testDb) throws IOException {
         try (Database db = testDb.open()) {
             Table table = db.getTable("Table1");
             Map<String, Boolean> foundPKs = new HashMap<>();
@@ -104,7 +104,7 @@ class IndexTest extends AbstractBaseTest {
 
     @ParameterizedTest(name = "[{index}] {0}")
     @TestDbReadOnlySource(INDEX)
-    void testLogicalIndexes(TestDb testDb) throws Exception {
+    void testLogicalIndexes(TestDb testDb) throws IOException {
 
         try (Database db = testDb.open()) {
             TableImpl table = (TableImpl) db.getTable("Table1");
@@ -165,7 +165,7 @@ class IndexTest extends AbstractBaseTest {
 
     @ParameterizedTest(name = "[{index}] {0}")
     @TestDbSource(COMP_INDEX)
-    void testComplexIndex(TestDb testDb) throws Exception {
+    void testComplexIndex(TestDb testDb) throws IOException {
         try (// this file has an index with "compressed" entries and node pages
         Database db1 = testDb.open()) {
             TableImpl t1 = (TableImpl) db1.getTable("Table1");
@@ -184,7 +184,7 @@ class IndexTest extends AbstractBaseTest {
 
     @ParameterizedTest(name = "[{index}] {0}")
     @TestDbSource(COMMON1)
-    void testEntryDeletion(TestDb testDb) throws Exception {
+    void testEntryDeletion(TestDb testDb) throws IOException {
         try (Database db = testDb.openCopy()) {
             Table table = db.getTable("Table1");
 
@@ -270,7 +270,7 @@ class IndexTest extends AbstractBaseTest {
 
     @ParameterizedTest(name = "[{index}] {0}")
     @TestDbSource(INDEX_PROPERTIES)
-    void testUnique(TestDb testDb) throws Exception {
+    void testUnique(TestDb testDb) throws IOException {
         try (Database db = testDb.openCopy()) {
             Table t = db.getTable("TableUnique1_temp");
             Index index = t.getIndex("DataIndex");
@@ -330,7 +330,7 @@ class IndexTest extends AbstractBaseTest {
 
     @ParameterizedTest(name = "[{index}] {0}")
     @TestDbSource(COMMON1)
-    void testUniqueEntryCount(TestDb testDb) throws Exception {
+    void testUniqueEntryCount(TestDb testDb) throws IOException {
         try (Database db = testDb.openCopy()) {
             db.setDateTimeType(DateTimeType.DATE);
             Table table = db.getTable("Table1");
@@ -388,7 +388,7 @@ class IndexTest extends AbstractBaseTest {
 
     @ParameterizedTest(name = "[{index}] {0}")
     @TestDbSource(COMMON1)
-    void testReplId(TestDb testDb) throws Exception {
+    void testReplId(TestDb testDb) throws IOException {
         try (Database db = testDb.openCopy()) {
             Table table = db.getTable("Table4");
 
@@ -402,7 +402,7 @@ class IndexTest extends AbstractBaseTest {
 
     @ParameterizedTest(name = "[{index}] {0}")
     @FileFormatSource
-    void testIndexCreation(FileFormat fileFormat) throws Exception {
+    void testIndexCreation(FileFormat fileFormat) throws IOException {
         try (Database db = createDbMem(fileFormat)) {
             Table t = DatabaseBuilder.newTable("TestTable")
                 .addColumn(DatabaseBuilder.newColumn("id", DataType.LONG))
@@ -440,7 +440,7 @@ class IndexTest extends AbstractBaseTest {
 
     @ParameterizedTest(name = "[{index}] {0}")
     @FileFormatSource
-    void testIndexCreationSharedData(FileFormat fileFormat) throws Exception {
+    void testIndexCreationSharedData(FileFormat fileFormat) throws IOException {
         try (Database db = createDbMem(fileFormat)) {
             Table t = DatabaseBuilder.newTable("TestTable")
                 .addColumn(DatabaseBuilder.newColumn("id", DataType.LONG))
@@ -489,7 +489,7 @@ class IndexTest extends AbstractBaseTest {
 
     @ParameterizedTest(name = "[{index}] {0}")
     @TestDbReadOnlySource(INDEX)
-    void testGetForeignKeyIndex(TestDb testDb) throws Exception {
+    void testGetForeignKeyIndex(TestDb testDb) throws IOException {
 
         try (Database db = testDb.open()) {
             Table t1 = db.getTable("Table1");
@@ -522,7 +522,7 @@ class IndexTest extends AbstractBaseTest {
 
     @ParameterizedTest(name = "[{index}] {0}")
     @FileFormatSource
-    void testConstraintViolation(FileFormat fileFormat) throws Exception {
+    void testConstraintViolation(FileFormat fileFormat) throws IOException {
 
         try (Database db = createDbMem(fileFormat)) {
             Table t = DatabaseBuilder.newTable("TestTable")
@@ -591,7 +591,7 @@ class IndexTest extends AbstractBaseTest {
 
     @ParameterizedTest(name = "[{index}] {0}")
     @FileFormatSource
-    void testAutoNumberRecover(FileFormat fileFormat) throws Exception {
+    void testAutoNumberRecover(FileFormat fileFormat) throws IOException {
         try (Database db = createDbMem(fileFormat)) {
             Table t = DatabaseBuilder.newTable("TestTable")
                 .addColumn(DatabaseBuilder.newColumn("id", DataType.LONG).withAutoNumber(true))
@@ -647,7 +647,7 @@ class IndexTest extends AbstractBaseTest {
 
     @ParameterizedTest(name = "[{index}] {0}")
     @TestDbSource(BINARY_INDEX)
-    void testBinaryIndex(TestDb testDb) throws Exception {
+    void testBinaryIndex(TestDb testDb) throws IOException {
         try (Database db = testDb.open()) {
             Table table = db.getTable("Test");
 
@@ -659,7 +659,7 @@ class IndexTest extends AbstractBaseTest {
         }
     }
 
-    private static void doTestBinaryIndex(Index idx, String colName, boolean forward) throws Exception {
+    private static void doTestBinaryIndex(Index idx, String colName, boolean forward) throws IOException {
         IndexCursor ic = CursorBuilder.createCursor(idx);
 
         for (Row row : idx.getTable().getDefaultCursor().newIterable().withForward(forward)) {
@@ -679,7 +679,7 @@ class IndexTest extends AbstractBaseTest {
         }
     }
 
-    private void doCheckForeignKeyIndex(Index ia, Table tb) throws Exception {
+    private void doCheckForeignKeyIndex(Index ia, Table tb) throws IOException {
         IndexImpl ib = (IndexImpl) ia.getReferencedIndex();
         assertNotNull(ib);
         assertSame(tb, ib.getTable());

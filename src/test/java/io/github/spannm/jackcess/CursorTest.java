@@ -37,6 +37,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 
+import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -68,7 +69,7 @@ class CursorTest extends AbstractBaseTest {
         return expectedRows;
     }
 
-    private Database createTestTable(FileFormat fileFormat) throws Exception {
+    private Database createTestTable(FileFormat fileFormat) throws IOException {
         Database db = createDbMem(fileFormat);
 
         Table table = DatabaseBuilder.newTable("test")
@@ -92,7 +93,7 @@ class CursorTest extends AbstractBaseTest {
         return expectedRows;
     }
 
-    static Database createTestIndexTable(TestDb _testDb) throws Exception {
+    static Database createTestIndexTable(TestDb _testDb) throws IOException {
         Database db = _testDb.openMem();
 
         Table table = db.getTable("test");
@@ -117,7 +118,7 @@ class CursorTest extends AbstractBaseTest {
         return expectedRows;
     }
 
-    private Database createDupTestTable(FileFormat _fileFormat) throws Exception {
+    private Database createDupTestTable(FileFormat _fileFormat) throws IOException {
         Database db = createDbMem(_fileFormat);
 
         Table table = DatabaseBuilder.newTable("test")
@@ -132,7 +133,7 @@ class CursorTest extends AbstractBaseTest {
         return db;
     }
 
-    static Database createDupeTestTable(TestDb _testDb) throws Exception {
+    static Database createDupeTestTable(TestDb _testDb) throws IOException {
         Database db = _testDb.openMem();
 
         Table table = db.getTable("test");
@@ -146,7 +147,7 @@ class CursorTest extends AbstractBaseTest {
 
     private static Cursor createIndexSubRangeCursor(Table table,
         Index idx,
-        int type) throws Exception {
+        int type) throws IOException {
         return table.newCursor()
             .withIndex(idx)
             .withStartEntry(3 - type)
@@ -172,7 +173,7 @@ class CursorTest extends AbstractBaseTest {
 
     @ParameterizedTest(name = "[{index}] {0}")
     @FileFormatSource
-    void testSimple(FileFormat fileFormat) throws Exception {
+    void testSimple(FileFormat fileFormat) throws IOException {
         try (Database db = createTestTable(fileFormat)) {
             Table table = db.getTable("test");
             Cursor cursor = CursorBuilder.createCursor(table);
@@ -196,7 +197,7 @@ class CursorTest extends AbstractBaseTest {
 
     @ParameterizedTest(name = "[{index}] {0}")
     @FileFormatSource
-    void testMove(FileFormat fileFormat) throws Exception {
+    void testMove(FileFormat fileFormat) throws IOException {
         try (Database db = createTestTable(fileFormat)) {
             Table table = db.getTable("test");
             Cursor cursor = CursorBuilder.createCursor(table);
@@ -205,7 +206,7 @@ class CursorTest extends AbstractBaseTest {
     }
 
     private static void doTestMove(Cursor cursor,
-        List<Map<String, Object>> expectedRows) throws Exception {
+        List<Map<String, Object>> expectedRows) throws IOException {
         if (expectedRows == null) {
             expectedRows = createTestTableData();
         }
@@ -251,7 +252,7 @@ class CursorTest extends AbstractBaseTest {
 
     @ParameterizedTest(name = "[{index}] {0}")
     @FileFormatSource
-    void testMoveNoReset(FileFormat fileFormat) throws Exception {
+    void testMoveNoReset(FileFormat fileFormat) throws IOException {
         try (Database db = createTestTable(fileFormat)) {
             Table table = db.getTable("test");
             Cursor cursor = CursorBuilder.createCursor(table);
@@ -290,7 +291,7 @@ class CursorTest extends AbstractBaseTest {
 
     @ParameterizedTest(name = "[{index}] {0}")
     @FileFormatSource
-    void testSearch(FileFormat fileFormat) throws Exception {
+    void testSearch(FileFormat fileFormat) throws IOException {
         try (Database db = createTestTable(fileFormat)) {
             Table table = db.getTable("test");
             Cursor cursor = CursorBuilder.createCursor(table);
@@ -298,7 +299,7 @@ class CursorTest extends AbstractBaseTest {
         }
     }
 
-    private static void doTestSearch(Table table, Cursor cursor, Index index, Integer... outOfRangeValues) throws Exception {
+    private static void doTestSearch(Table table, Cursor cursor, Index index, Integer... outOfRangeValues) throws IOException {
         assertTrue(cursor.findFirstRow(table.getColumn("id"), 3));
         assertEquals(createExpectedRow("id", 3,
             "value", "data" + 3),
@@ -369,7 +370,7 @@ class CursorTest extends AbstractBaseTest {
 
     @ParameterizedTest(name = "[{index}] {0}")
     @FileFormatSource
-    void testReverse(FileFormat fileFormat) throws Exception {
+    void testReverse(FileFormat fileFormat) throws IOException {
         try (Database db = createTestTable(fileFormat)) {
             Table table = db.getTable("test");
             Cursor cursor = CursorBuilder.createCursor(table);
@@ -392,7 +393,7 @@ class CursorTest extends AbstractBaseTest {
 
     @ParameterizedTest(name = "[{index}] {0}")
     @FileFormatSource
-    void testLiveAddition(FileFormat fileFormat) throws Exception {
+    void testLiveAddition(FileFormat fileFormat) throws IOException {
         try (Database db = createTestTable(fileFormat)) {
             Table table = db.getTable("test");
 
@@ -405,7 +406,7 @@ class CursorTest extends AbstractBaseTest {
     private static void doTestLiveAddition(Table table,
         Cursor cursor1,
         Cursor cursor2,
-        Integer newRowNum) throws Exception {
+        Integer newRowNum) throws IOException {
         cursor1.moveNextRows(11);
         cursor2.moveNextRows(11);
 
@@ -429,7 +430,7 @@ class CursorTest extends AbstractBaseTest {
 
     @ParameterizedTest(name = "[{index}] {0}")
     @FileFormatSource
-    void testLiveDeletion(FileFormat fileFormat) throws Exception {
+    void testLiveDeletion(FileFormat fileFormat) throws IOException {
         try (Database db = createTestTable(fileFormat)) {
             Table table = db.getTable("test");
 
@@ -441,7 +442,7 @@ class CursorTest extends AbstractBaseTest {
         }
     }
 
-    private static void doTestLiveDeletion(Cursor cursor1, Cursor cursor2, Cursor cursor3, Cursor cursor4, int firstValue) throws Exception {
+    private static void doTestLiveDeletion(Cursor cursor1, Cursor cursor2, Cursor cursor3, Cursor cursor4, int firstValue) throws IOException {
         assertEquals(2, cursor1.moveNextRows(2));
         assertEquals(3, cursor2.moveNextRows(3));
         assertEquals(3, cursor3.moveNextRows(3));
@@ -511,7 +512,7 @@ class CursorTest extends AbstractBaseTest {
 
     @ParameterizedTest(name = "[{index}] {0}")
     @TestDbSource(INDEX_CURSOR)
-    void testSimpleIndex(TestDb testDb) throws Exception {
+    void testSimpleIndex(TestDb testDb) throws IOException {
         try (Database db = createTestIndexTable(testDb)) {
             Table table = db.getTable("test");
             Index idx = table.getIndexes().get(0);
@@ -525,7 +526,7 @@ class CursorTest extends AbstractBaseTest {
 
     @ParameterizedTest(name = "[{index}] {0}")
     @TestDbSource(INDEX_CURSOR)
-    void testMoveIndex(TestDb testDb) throws Exception {
+    void testMoveIndex(TestDb testDb) throws IOException {
         try (Database db = createTestIndexTable(testDb)) {
             Table table = db.getTable("test");
             Index idx = table.getIndexes().get(0);
@@ -536,7 +537,7 @@ class CursorTest extends AbstractBaseTest {
 
     @ParameterizedTest(name = "[{index}] {0}")
     @TestDbSource(INDEX_CURSOR)
-    void testReverseIndex(TestDb testDb) throws Exception {
+    void testReverseIndex(TestDb testDb) throws IOException {
         try (Database db = createTestIndexTable(testDb)) {
             Table table = db.getTable("test");
             Index idx = table.getIndexes().get(0);
@@ -547,7 +548,7 @@ class CursorTest extends AbstractBaseTest {
 
     @ParameterizedTest(name = "[{index}] {0}")
     @TestDbSource(INDEX_CURSOR)
-    void testSearchIndex(TestDb testDb) throws Exception {
+    void testSearchIndex(TestDb testDb) throws IOException {
         try (Database db = createTestIndexTable(testDb)) {
             Table table = db.getTable("test");
             Index idx = table.getIndexes().get(0);
@@ -558,7 +559,7 @@ class CursorTest extends AbstractBaseTest {
 
     @ParameterizedTest(name = "[{index}] {0}")
     @TestDbSource(INDEX_CURSOR)
-    void testLiveAdditionIndex(TestDb testDb) throws Exception {
+    void testLiveAdditionIndex(TestDb testDb) throws IOException {
         try (Database db = createTestIndexTable(testDb)) {
             Table table = db.getTable("test");
             Index idx = table.getIndexes().get(0);
@@ -571,7 +572,7 @@ class CursorTest extends AbstractBaseTest {
 
     @ParameterizedTest(name = "[{index}] {0}")
     @TestDbSource(INDEX_CURSOR)
-    void testLiveDeletionIndex(TestDb testDb) throws Exception {
+    void testLiveDeletionIndex(TestDb testDb) throws IOException {
         try (Database db = createTestIndexTable(testDb)) {
             Table table = db.getTable("test");
             Index idx = table.getIndexes().get(0);
@@ -586,7 +587,7 @@ class CursorTest extends AbstractBaseTest {
 
     @ParameterizedTest(name = "[{index}] {0}")
     @TestDbSource(INDEX_CURSOR)
-    void testSimpleIndexSubRange(TestDb testDb) throws Exception {
+    void testSimpleIndexSubRange(TestDb testDb) throws IOException {
         for (int i = 0; i < 2; i++) {
             try (Database db = createTestIndexTable(testDb)) {
                 Table table = db.getTable("test");
@@ -604,7 +605,7 @@ class CursorTest extends AbstractBaseTest {
 
     @ParameterizedTest(name = "[{index}] {0}")
     @TestDbSource(INDEX_CURSOR)
-    void testMoveIndexSubRange(TestDb testDb) throws Exception {
+    void testMoveIndexSubRange(TestDb testDb) throws IOException {
         for (int i = 0; i < 2; i++) {
             try (Database db = createTestIndexTable(testDb)) {
                 Table table = db.getTable("test");
@@ -622,7 +623,7 @@ class CursorTest extends AbstractBaseTest {
 
     @ParameterizedTest(name = "[{index}] {0}")
     @TestDbSource(INDEX_CURSOR)
-    void testSearchIndexSubRange(TestDb testDb) throws Exception {
+    void testSearchIndexSubRange(TestDb testDb) throws IOException {
         for (int i = 0; i < 2; i++) {
             try (Database db = createTestIndexTable(testDb)) {
                 Table table = db.getTable("test");
@@ -637,7 +638,7 @@ class CursorTest extends AbstractBaseTest {
 
     @ParameterizedTest(name = "[{index}] {0}")
     @TestDbSource(INDEX_CURSOR)
-    void testReverseIndexSubRange(TestDb testDb) throws Exception {
+    void testReverseIndexSubRange(TestDb testDb) throws IOException {
         for (int i = 0; i < 2; i++) {
             try (Database db = createTestIndexTable(testDb)) {
                 Table table = db.getTable("test");
@@ -655,7 +656,7 @@ class CursorTest extends AbstractBaseTest {
 
     @ParameterizedTest(name = "[{index}] {0}")
     @TestDbSource(INDEX_CURSOR)
-    void testLiveAdditionIndexSubRange(TestDb testDb) throws Exception {
+    void testLiveAdditionIndexSubRange(TestDb testDb) throws IOException {
         for (int i = 0; i < 2; i++) {
             try (Database db = createTestIndexTable(testDb)) {
                 Table table = db.getTable("test");
@@ -671,7 +672,7 @@ class CursorTest extends AbstractBaseTest {
 
     @ParameterizedTest(name = "[{index}] {0}")
     @TestDbSource(INDEX_CURSOR)
-    void testLiveDeletionIndexSubRange(TestDb testDb) throws Exception {
+    void testLiveDeletionIndexSubRange(TestDb testDb) throws IOException {
         for (int i = 0; i < 2; i++) {
             try (Database db = createTestIndexTable(testDb)) {
                 Table table = db.getTable("test");
@@ -689,7 +690,7 @@ class CursorTest extends AbstractBaseTest {
 
     @ParameterizedTest(name = "[{index}] {0}")
     @FileFormatSource
-    void testFindAllIndex(FileFormat fileFormat) throws Exception {
+    void testFindAllIndex(FileFormat fileFormat) throws IOException {
         try (Database testDb = createDupTestTable(fileFormat)) {
             Table table = testDb.getTable("test");
             Cursor cursor = CursorBuilder.createCursor(table);
@@ -700,7 +701,7 @@ class CursorTest extends AbstractBaseTest {
 
     @ParameterizedTest(name = "[{index}] {0}")
     @TestDbSource(INDEX_CURSOR)
-    void testFindAll(TestDb testDb) throws Exception {
+    void testFindAll(TestDb testDb) throws IOException {
         try (Database db = createDupeTestTable(testDb)) {
             Table table = db.getTable("test");
             Index idx = table.getIndexes().get(0);
@@ -807,7 +808,7 @@ class CursorTest extends AbstractBaseTest {
 
     @ParameterizedTest(name = "[{index}] {0}")
     @TestDbSource(INDEX_CURSOR)
-    void testId(TestDb testDb) throws Exception {
+    void testId(TestDb testDb) throws IOException {
         try (Database db = createTestIndexTable(testDb)) {
             Table table = db.getTable("test");
             Index idx = table.getIndexes().get(0);
@@ -835,7 +836,7 @@ class CursorTest extends AbstractBaseTest {
 
     @ParameterizedTest(name = "[{index}] {0}")
     @FileFormatSource
-    void testColumnMatcher(FileFormat fileFormat) throws Exception {
+    void testColumnMatcher(FileFormat fileFormat) throws IOException {
         try (Database db = createTestTable(fileFormat)) {
             Table table = db.getTable("test");
 
@@ -860,7 +861,7 @@ class CursorTest extends AbstractBaseTest {
         assertTrue(columnMatcher.matches(table, "value", 13, 13));
     }
 
-    private static void doTestMatcher(Table table, Cursor cursor, ColumnMatcher columnMatcher, boolean caseInsensitive) throws Exception {
+    private static void doTestMatcher(Table table, Cursor cursor, ColumnMatcher columnMatcher, boolean caseInsensitive) throws IOException {
         cursor.setColumnMatcher(columnMatcher);
 
         assertTrue(cursor.findFirstRow(table.getColumn("id"), 3));
@@ -943,7 +944,7 @@ class CursorTest extends AbstractBaseTest {
 
     @ParameterizedTest(name = "[{index}] {0}")
     @TestDbReadOnlySource(INDEX)
-    void testIndexCursor(TestDb testDb) throws Exception {
+    void testIndexCursor(TestDb testDb) throws IOException {
         try (Database db = testDb.openMem()) {
             Table t1 = db.getTable("Table1");
             Index idx = t1.getIndex(IndexBuilder.PRIMARY_KEY_NAME);
@@ -967,7 +968,7 @@ class CursorTest extends AbstractBaseTest {
 
     @ParameterizedTest(name = "[{index}] {0}")
     @TestDbSource(INDEX)
-    void testIndexCursorDelete(TestDb testDb) throws Exception {
+    void testIndexCursorDelete(TestDb testDb) throws IOException {
         try (Database db = testDb.openMem()) {
             Table t1 = db.getTable("Table1");
             Index idx = t1.getIndex("Table2Table1");
@@ -1005,7 +1006,7 @@ class CursorTest extends AbstractBaseTest {
 
     @ParameterizedTest(name = "[{index}] {0}")
     @TestDbSource(INDEX)
-    void testCursorDelete(TestDb testDb) throws Exception {
+    void testCursorDelete(TestDb testDb) throws IOException {
         try (Database db = testDb.openMem()) {
             Table t1 = db.getTable("Table1");
             Cursor cursor = CursorBuilder.createCursor(t1);
@@ -1048,7 +1049,7 @@ class CursorTest extends AbstractBaseTest {
 
     @ParameterizedTest(name = "[{index}] {0}")
     @FileFormatSource
-    void testFindByRowId(FileFormat fileFormat) throws Exception {
+    void testFindByRowId(FileFormat fileFormat) throws IOException {
         try (Database db = createTestTable(fileFormat)) {
             Table table = db.getTable("test");
             Cursor cursor = CursorBuilder.createCursor(table);
@@ -1058,7 +1059,7 @@ class CursorTest extends AbstractBaseTest {
 
     @ParameterizedTest(name = "[{index}] {0}")
     @TestDbSource(INDEX_CURSOR)
-    void testFindByRowIdIndex(TestDb testDb) throws Exception {
+    void testFindByRowIdIndex(TestDb testDb) throws IOException {
         try (Database db = createTestIndexTable(testDb)) {
             Table table = db.getTable("test");
             Index idx = table.getIndexes().get(0);
@@ -1070,7 +1071,7 @@ class CursorTest extends AbstractBaseTest {
         }
     }
 
-    private static void doTestFindByRowId(Cursor cursor) throws Exception {
+    private static void doTestFindByRowId(Cursor cursor) throws IOException {
         for (int i = 0; i < 3; i++) {
             cursor.moveToNextRow();
         }
@@ -1088,7 +1089,7 @@ class CursorTest extends AbstractBaseTest {
         doTestFindByRowId(cursor, r2, 5);
     }
 
-    private static void doTestFindByRowId(Cursor cursor, Row row, int id) throws Exception {
+    private static void doTestFindByRowId(Cursor cursor, Row row, int id) throws IOException {
         cursor.reset();
         assertTrue(cursor.findRow(row.getId()));
         Row rFound = cursor.getCurrentRow();
@@ -1111,7 +1112,7 @@ class CursorTest extends AbstractBaseTest {
 
     @ParameterizedTest(name = "[{index}] {0}")
     @FileFormatSource
-    void testIterationEarlyExit(FileFormat fileFormat) throws Exception {
+    void testIterationEarlyExit(FileFormat fileFormat) throws IOException {
         try (Database db = createDbMem(fileFormat)) {
             Table table = DatabaseBuilder.newTable("test")
                 .addColumn(DatabaseBuilder.newColumn("id", DataType.LONG))
@@ -1159,7 +1160,7 @@ class CursorTest extends AbstractBaseTest {
 
     @ParameterizedTest(name = "[{index}] {0}")
     @FileFormatSource
-    void testPartialIndexFind(FileFormat fileFormat) throws Exception {
+    void testPartialIndexFind(FileFormat fileFormat) throws IOException {
         try (Database db = createDbMem(fileFormat)) {
             TableImpl t = (TableImpl) DatabaseBuilder.newTable("Test").addColumn(DatabaseBuilder.newColumn("id", DataType.LONG)).addColumn(DatabaseBuilder.newColumn("data1", DataType.TEXT))
                 .addColumn(DatabaseBuilder.newColumn("num2", DataType.LONG)).addColumn(DatabaseBuilder.newColumn("key3", DataType.TEXT)).addColumn(DatabaseBuilder.newColumn("value", DataType.TEXT))
@@ -1211,7 +1212,7 @@ class CursorTest extends AbstractBaseTest {
 
     @ParameterizedTest(name = "[{index}] {0}")
     @FileFormatSource
-    void testPartialIndexLookup(FileFormat fileFormat) throws Exception {
+    void testPartialIndexLookup(FileFormat fileFormat) throws IOException {
         try (Database db = createDbMem(fileFormat)) {
             TableImpl t = (TableImpl) DatabaseBuilder.newTable("Test")
                 .addColumn(DatabaseBuilder.newColumn("id", DataType.LONG))
@@ -1252,7 +1253,7 @@ class CursorTest extends AbstractBaseTest {
         }
     }
 
-    private static void doPartialIndexLookup(Index idx) throws Exception {
+    private static void doPartialIndexLookup(Index idx) throws IOException {
         int colCount = idx.getColumnCount();
         IndexCursor c = idx.newCursor().toIndexCursor();
 
@@ -1316,7 +1317,7 @@ class CursorTest extends AbstractBaseTest {
     }
 
     private static void doFindFirstByEntry(IndexCursor c, Integer expectedId,
-        Object... entry) throws Exception {
+        Object... entry) throws IOException {
         if (expectedId != null) {
             assertTrue(c.findFirstRowByEntry(entry));
             assertEquals(expectedId, c.getCurrentRow().get("id"));
@@ -1352,7 +1353,7 @@ class CursorTest extends AbstractBaseTest {
         assertEquals(expectedIds, foundIds);
     }
 
-    private static void doFindByRow(Index idx, Integer id, Object... rowPairs) throws Exception {
+    private static void doFindByRow(Index idx, Integer id, Object... rowPairs) throws IOException {
         Map<String, Object> map = createExpectedRow(
             rowPairs);
         Row r = CursorBuilder.findRow(idx, map);
@@ -1364,7 +1365,7 @@ class CursorTest extends AbstractBaseTest {
     }
 
     private static void doFindValue(Index idx, Integer id,
-        Column columnPattern, Object valuePattern) throws Exception {
+        Column columnPattern, Object valuePattern) throws IOException {
         Object value = CursorBuilder.findValue(
             idx, idx.getTable().getColumn("id"), columnPattern, valuePattern);
         if (id != null) {

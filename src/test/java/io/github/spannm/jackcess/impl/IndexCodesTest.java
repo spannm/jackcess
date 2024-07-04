@@ -29,6 +29,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 
 import java.io.File;
+import java.io.IOException;
 import java.lang.System.Logger.Level;
 import java.lang.reflect.Field;
 import java.nio.ByteBuffer;
@@ -137,7 +138,7 @@ public class IndexCodesTest extends AbstractBaseTest {
     //////
 
     @Test @Disabled
-    void testCreateIsoFile() throws Exception {
+    void testCreateIsoFile() throws IOException {
         try (Database db = createDbMem(FileFormat.V2000, true)) {
             Table t = new TableBuilder("test").addColumn(new ColumnBuilder("row", DataType.TEXT)).addColumn(new ColumnBuilder("data", DataType.TEXT)).toTable(db);
 
@@ -149,7 +150,7 @@ public class IndexCodesTest extends AbstractBaseTest {
     }
 
     @Test @Disabled
-    void testCreateAltIsoFile() throws Exception {
+    void testCreateAltIsoFile() throws IOException {
         try (Database db = TestUtil.openCopy(FileFormat.V2000, new File("/tmp/test_ind.mdb"), true)) {
             Table t = db.getTable("Table1");
 
@@ -162,7 +163,7 @@ public class IndexCodesTest extends AbstractBaseTest {
 
     @SuppressWarnings("unused")
     @Test @Disabled
-    void testWriteAllCodesMdb() throws Exception {
+    void testWriteAllCodesMdb() throws IOException {
         try (Database db = createDbMem(FileFormat.V2000, true)) {
             Table t = new TableBuilder("Table5").addColumn(new ColumnBuilder("name", DataType.TEXT)).addColumn(new ColumnBuilder("data", DataType.TEXT)).toTable(db);
 
@@ -247,7 +248,7 @@ public class IndexCodesTest extends AbstractBaseTest {
         }
     }
 
-    private int addCombos(Table t, int rowNum, String s, char[] cs, int len) throws Exception {
+    private int addCombos(Table t, int rowNum, String s, char[] cs, int len) throws IOException {
         if (s.length() >= len) {
             return rowNum;
         }
@@ -262,7 +263,7 @@ public class IndexCodesTest extends AbstractBaseTest {
         return rowNum;
     }
 
-    void writeChars(int hibyte, Table t) throws Exception {
+    void writeChars(int hibyte, Table t) throws IOException {
         char other = (char) (hibyte | 0x41);
         for (int i = 0; i < 0xFF; i++) {
             char c = (char) (hibyte | i);
@@ -272,7 +273,7 @@ public class IndexCodesTest extends AbstractBaseTest {
     }
 
     @Test @Disabled
-    void testReadIsoMdb() throws Exception {
+    void testReadIsoMdb() throws IOException {
         try ( // Database db = open(new File("/tmp/test_ind.mdb"));
               // Database db = open(new File("/tmp/test_ind2.mdb"));
               // Database db = open(new File("/tmp/test_ind4.mdb"));
@@ -698,7 +699,7 @@ public class IndexCodesTest extends AbstractBaseTest {
         return builder.toString();
     }
 
-    public static String entryToString(Cursor.Position curPos) throws Exception {
+    public static String entryToString(Cursor.Position curPos) throws Exception, IllegalAccessException {
         Field eField = curPos.getClass().getDeclaredField("_entry");
         eField.setAccessible(true);
         IndexData.Entry entry = (IndexData.Entry) eField.get(curPos);

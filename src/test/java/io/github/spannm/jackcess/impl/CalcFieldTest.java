@@ -28,6 +28,7 @@ import io.github.spannm.jackcess.test.source.TestDbSource;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 
+import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
@@ -47,7 +48,7 @@ class CalcFieldTest extends AbstractBaseTest {
 
     @ParameterizedTest(name = "[{index}] {0}")
     @FileFormatSource
-    void testCreateCalcField(FileFormat fileFormat) throws Exception {
+    void testCreateCalcField(FileFormat fileFormat) throws IOException {
         JetFormat format = DatabaseImpl.getFileFormatDetails(fileFormat).getFormat();
         if (!format.isSupportedCalculatedDataType(DataType.TEXT)) {
             return;
@@ -125,7 +126,7 @@ class CalcFieldTest extends AbstractBaseTest {
     @SuppressWarnings("checkstyle:LineLengthCheck")
     @ParameterizedTest(name = "[{index}] {0}")
     @TestDbSource(CALC_FIELD)
-    void testReadCalcFields(TestDb testDb) throws Exception {
+    void testReadCalcFields(TestDb testDb) throws IOException {
         try (Database db = testDb.open()) {
             List<String> actual = db.getTable("Table1").stream().map(r -> r.entrySet().toString()).collect(Collectors.toList());
 

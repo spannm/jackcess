@@ -24,6 +24,7 @@ import io.github.spannm.jackcess.test.TestDb;
 import io.github.spannm.jackcess.test.source.TestDbReadOnlySource;
 import org.junit.jupiter.params.ParameterizedTest;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
@@ -34,7 +35,7 @@ class RelationshipTest extends AbstractBaseTest {
 
     @ParameterizedTest(name = "[{index}] {0}")
     @TestDbReadOnlySource(INDEX)
-    void testTwoTables(TestDb testDb) throws Exception {
+    void testTwoTables(TestDb testDb) throws IOException {
 
         try (Database db = testDb.open()) {
             Table t1 = db.getTable("Table1");
@@ -81,7 +82,7 @@ class RelationshipTest extends AbstractBaseTest {
 
     @ParameterizedTest(name = "[{index}] {0}")
     @TestDbReadOnlySource(INDEX)
-    void testOneTable(TestDb testDb) throws Exception {
+    void testOneTable(TestDb testDb) throws IOException {
         try (Database db = testDb.open()) {
             Table t1 = db.getTable("Table1");
             Table t2 = db.getTable("Table2");
@@ -97,7 +98,7 @@ class RelationshipTest extends AbstractBaseTest {
 
     @ParameterizedTest(name = "[{index}] {0}")
     @TestDbReadOnlySource(INDEX)
-    void testNoTables(TestDb testDb) throws Exception {
+    void testNoTables(TestDb testDb) throws IOException {
         try (Database db = testDb.open()) {
             Table t1 = db.getTable("Table1");
             Table t2 = db.getTable("Table2");

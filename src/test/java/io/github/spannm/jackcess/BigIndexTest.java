@@ -28,6 +28,7 @@ import io.github.spannm.jackcess.test.source.TestDbReadOnlySource;
 import io.github.spannm.jackcess.test.source.TestDbSource;
 import org.junit.jupiter.params.ParameterizedTest;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
@@ -36,7 +37,7 @@ class BigIndexTest extends AbstractBaseTest {
 
     @ParameterizedTest(name = "[{index}] {0}")
     @TestDbReadOnlySource(COMP_INDEX)
-    void testComplexIndex(TestDb testDb) throws Exception {
+    void testComplexIndex(TestDb testDb) throws IOException {
         try (// this file has an index with "compressed" entries and node pages
         Database db = testDb.openMem()) {
             TableImpl t = (TableImpl) db.getTable("Table1");
@@ -49,7 +50,7 @@ class BigIndexTest extends AbstractBaseTest {
 
     @ParameterizedTest(name = "[{index}] {0}")
     @TestDbSource(BIG_INDEX)
-    void testBigIndex(TestDb testDb) throws Exception {
+    void testBigIndex(TestDb testDb) throws IOException {
         // this file has an index with "compressed" entries and node pages
         try (Database db = testDb.openMem()) {
             TableImpl t = (TableImpl) db.getTable("Table1");

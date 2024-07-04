@@ -25,13 +25,14 @@ import io.github.spannm.jackcess.test.AbstractBaseTest;
 import io.github.spannm.jackcess.test.source.FileFormatSource;
 import org.junit.jupiter.params.ParameterizedTest;
 
+import java.io.IOException;
 import java.util.*;
 
 class TableUpdaterTest extends AbstractBaseTest {
 
     @ParameterizedTest(name = "[{index}] {0}")
     @FileFormatSource
-    void testTableUpdating(FileFormat fileFormat) throws Exception {
+    void testTableUpdating(FileFormat fileFormat) throws IOException {
         try (Database db = createDbMem(fileFormat)) {
             doTestUpdating(db, false, true, null);
         }
@@ -39,7 +40,7 @@ class TableUpdaterTest extends AbstractBaseTest {
 
     @ParameterizedTest(name = "[{index}] {0}")
     @FileFormatSource
-    void testTableUpdatingOneToOne(FileFormat fileFormat) throws Exception {
+    void testTableUpdatingOneToOne(FileFormat fileFormat) throws IOException {
         try (Database db = createDbMem(fileFormat)) {
             doTestUpdating(db, true, true, null);
         }
@@ -47,7 +48,7 @@ class TableUpdaterTest extends AbstractBaseTest {
 
     @ParameterizedTest(name = "[{index}] {0}")
     @FileFormatSource
-    void testTableUpdatingNoEnforce(FileFormat fileFormat) throws Exception {
+    void testTableUpdatingNoEnforce(FileFormat fileFormat) throws IOException {
         try (Database db = createDbMem(fileFormat)) {
             doTestUpdating(db, false, false, null);
         }
@@ -55,13 +56,13 @@ class TableUpdaterTest extends AbstractBaseTest {
 
     @ParameterizedTest(name = "[{index}] {0}")
     @FileFormatSource
-    void testTableUpdatingNamedRelationship(FileFormat fileFormat) throws Exception {
+    void testTableUpdatingNamedRelationship(FileFormat fileFormat) throws IOException {
         try (Database db = createDbMem(fileFormat)) {
             doTestUpdating(db, false, true, "FKnun3jvv47l9kyl74h85y8a0if");
         }
     }
 
-    private void doTestUpdating(Database db, boolean oneToOne, boolean enforce, String relationshipName) throws Exception {
+    private void doTestUpdating(Database db, boolean oneToOne, boolean enforce, String relationshipName) throws IOException {
         Table t1 = newTable("TestTable")
             .addColumn(newColumn("id", DataType.LONG))
             .toTable(db);
@@ -158,7 +159,7 @@ class TableUpdaterTest extends AbstractBaseTest {
 
     @ParameterizedTest(name = "[{index}] {0}")
     @FileFormatSource
-    void testInvalidUpdate(FileFormat fileFormat) throws Exception {
+    void testInvalidUpdate(FileFormat fileFormat) throws IOException {
         try (Database db = createDbMem(fileFormat)) {
             Table t1 = newTable("TestTable")
                 .addColumn(newColumn("id", DataType.LONG))
@@ -197,7 +198,7 @@ class TableUpdaterTest extends AbstractBaseTest {
 
     @ParameterizedTest(name = "[{index}] {0}")
     @FileFormatSource
-    void testUpdateLargeTableDef(FileFormat fileFormat) throws Exception {
+    void testUpdateLargeTableDef(FileFormat fileFormat) throws IOException {
         try (Database db = createDbMem(fileFormat)) {
             final int numColumns = 89;
 

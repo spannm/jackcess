@@ -24,11 +24,13 @@ import io.github.spannm.jackcess.test.TestDb;
 import io.github.spannm.jackcess.test.source.TestDbSource;
 import org.junit.jupiter.params.ParameterizedTest;
 
+import java.io.IOException;
+
 class CursorBuilderTest extends AbstractBaseTest {
 
     @ParameterizedTest(name = "[{index}] {0}")
     @TestDbSource(INDEX_CURSOR)
-    void test(TestDb testDb) throws Exception {
+    void test(TestDb testDb) throws IOException {
         try (Database db = CursorTest.createTestIndexTable(testDb)) {
             Table table = db.getTable("test");
             IndexImpl idx = (IndexImpl) table.getIndexes().get(0);

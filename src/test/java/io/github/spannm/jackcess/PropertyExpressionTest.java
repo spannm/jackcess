@@ -30,6 +30,7 @@ import io.github.spannm.jackcess.test.source.FileFormatSource;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
@@ -41,7 +42,7 @@ class PropertyExpressionTest extends AbstractBaseTest {
 
     @ParameterizedTest(name = "[{index}] {0}")
     @FileFormatSource
-    void testDefaultValue(FileFormat fileFormat) throws Exception {
+    void testDefaultValue(FileFormat fileFormat) throws IOException {
         try (Database db = createDbMem(fileFormat)) {
             db.setEvaluateExpressions(true);
 
@@ -102,7 +103,7 @@ class PropertyExpressionTest extends AbstractBaseTest {
     }
 
     @Test
-    void testCalculatedValue() throws Exception {
+    void testCalculatedValue() throws IOException {
         try (Database db = createDbMem(FileFormat.V2016)) {
             db.setEvaluateExpressions(true);
 
@@ -146,7 +147,7 @@ class PropertyExpressionTest extends AbstractBaseTest {
 
     @ParameterizedTest(name = "[{index}] {0}")
     @FileFormatSource
-    void testColumnValidator(FileFormat fileFormat) throws Exception {
+    void testColumnValidator(FileFormat fileFormat) throws IOException {
         try (Database db = createDbMem(fileFormat)) {
             db.setEvaluateExpressions(true);
 
@@ -200,7 +201,7 @@ class PropertyExpressionTest extends AbstractBaseTest {
 
     @ParameterizedTest(name = "[{index}] {0}")
     @FileFormatSource
-    void testRowValidator(FileFormat fileFormat) throws Exception {
+    void testRowValidator(FileFormat fileFormat) throws IOException {
         try (Database db = createDbMem(fileFormat)) {
             db.setEvaluateExpressions(true);
 
@@ -248,7 +249,7 @@ class PropertyExpressionTest extends AbstractBaseTest {
 
     @ParameterizedTest(name = "[{index}] {0}")
     @FileFormatSource
-    void testCustomEvalConfig(FileFormat fileFormat) throws Exception {
+    void testCustomEvalConfig(FileFormat fileFormat) throws IOException {
         TemporalConfig tempConf = new TemporalConfig("[uuuu/]M/d",
             "uuuu-MMM-d",
             "hh.mm.ss a",
@@ -300,7 +301,7 @@ class PropertyExpressionTest extends AbstractBaseTest {
     }
 
     private static void setProp(Table t, String colName, String propName,
-        Object propVal) throws Exception {
+        Object propVal) throws IOException {
         PropertyMap props = t.getColumn(colName).getProperties();
         if (propVal != null) {
             props.put(propName, propVal);
@@ -311,7 +312,7 @@ class PropertyExpressionTest extends AbstractBaseTest {
     }
 
     private static void setTableProp(Table t, String propName,
-        String propVal) throws Exception {
+        String propVal) throws IOException {
         PropertyMap props = t.getProperties();
         if (propVal != null) {
             props.put(propName, propVal);

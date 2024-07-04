@@ -34,6 +34,7 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.*;
 
 class PropertiesTest extends AbstractBaseTest {
@@ -117,7 +118,7 @@ class PropertiesTest extends AbstractBaseTest {
 
     @ParameterizedTest(name = "[{index}] {0}")
     @TestDbReadOnlySource(COMMON1)
-    void testReadProperties(TestDb testDb) throws Exception {
+    void testReadProperties(TestDb testDb) throws IOException {
         try (Database db = testDb.open()) {
             TableImpl t = (TableImpl) db.getTable("Table1");
             assertEquals(t.getTableDefPageNumber(), t.getPropertyMaps().getObjectId());
@@ -168,7 +169,7 @@ class PropertiesTest extends AbstractBaseTest {
 
     @ParameterizedTest
     @EnumSource(value = FileFormat.class)
-    void testParseProperties(FileFormat ff) throws Exception {
+    void testParseProperties(FileFormat ff) throws IOException {
         File[] dbFiles = Optional.ofNullable(new File(DIR_TEST_DATA, ff.name()).listFiles()).orElse(new File[0]);
         for (File f : dbFiles) {
 
@@ -200,7 +201,7 @@ class PropertiesTest extends AbstractBaseTest {
 
     @ParameterizedTest(name = "[{index}] {0}")
     @TestDbSource(COMMON1)
-    void testWriteProperties(TestDb testDb) throws Exception {
+    void testWriteProperties(TestDb testDb) throws IOException {
         try (Database db = testDb.open()) {
             TableImpl t = (TableImpl) db.getTable("Table1");
 
@@ -230,7 +231,7 @@ class PropertiesTest extends AbstractBaseTest {
 
     @ParameterizedTest(name = "[{index}] {0}")
     @TestDbSource(COMMON1)
-    void testModifyProperties(TestDb testDb) throws Exception {
+    void testModifyProperties(TestDb testDb) throws IOException {
         File dbFile;
         PropertyMap origCProps;
         PropertyMap origFProps;
@@ -311,7 +312,7 @@ class PropertiesTest extends AbstractBaseTest {
 
     @ParameterizedTest(name = "[{index}] {0}")
     @FileFormatSource(exclude = "GENERIC_JET4")
-    void testCreateDbProperties(FileFormat fileFormat) throws Exception {
+    void testCreateDbProperties(FileFormat fileFormat) throws IOException {
         UUID u1 = UUID.randomUUID();
         UUID u2 = UUID.randomUUID();
 
@@ -354,7 +355,7 @@ class PropertiesTest extends AbstractBaseTest {
 
     @ParameterizedTest(name = "[{index}] {0}")
     @FileFormatSource
-    void testEnforceProperties(FileFormat fileFormat) throws Exception {
+    void testEnforceProperties(FileFormat fileFormat) throws IOException {
         try (Database db = createDbMem(fileFormat)) {
             Table t = DatabaseBuilder.newTable("testReq")
                 .addColumn(DatabaseBuilder.newColumn("id", DataType.LONG)

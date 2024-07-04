@@ -31,7 +31,9 @@ import io.github.spannm.jackcess.test.source.TestDbSource;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 
+import java.io.IOException;
 import java.text.DateFormat;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.*;
 import java.time.format.DateTimeFormatter;
@@ -41,7 +43,7 @@ class LocalDateTimeTest extends AbstractBaseTest {
 
     @ParameterizedTest(name = "[{index}] {0}")
     @FileFormatSource
-    void testWriteAndReadLocalDate(FileFormat fileFormat) throws Exception {
+    void testWriteAndReadLocalDate(FileFormat fileFormat) throws IOException, ParseException {
         try (Database db = createDbMem(fileFormat)) {
             db.setDateTimeType(DateTimeType.LOCAL_DATE_TIME);
 
@@ -101,7 +103,7 @@ class LocalDateTimeTest extends AbstractBaseTest {
 
     @ParameterizedTest(name = "[{index}] {0}")
     @FileFormatSource
-    void testAncientLocalDates1(FileFormat fileFormat) throws Exception {
+    void testAncientLocalDates1(FileFormat fileFormat) throws IOException {
         DateTimeFormatter sdf = DateTimeFormatter.ofPattern("uuuu-MM-dd");
         List<String> dates = List.of("1582-10-15", "1582-10-14", "1492-01-10", "1392-01-10");
 
@@ -130,7 +132,7 @@ class LocalDateTimeTest extends AbstractBaseTest {
 
     @ParameterizedTest(name = "[{index}] {0}")
     @TestDbSource(OLD_DATES)
-    void testAncientLocalDates2(TestDb testDb) throws Exception {
+    void testAncientLocalDates2(TestDb testDb) throws IOException {
         DateTimeFormatter sdf = DateTimeFormatter.ofPattern("uuuu-MM-dd");
         List<String> dates = List.of("1582-10-15", "1582-10-14", "1492-01-10", "1392-01-10");
 
@@ -149,7 +151,7 @@ class LocalDateTimeTest extends AbstractBaseTest {
     }
 
     @Test
-    void testZoneId() throws Exception {
+    void testZoneId() throws IOException, ParseException {
         ZoneId zoneId = ZoneId.of("America/New_York");
         doTestZoneId(zoneId);
 
@@ -157,7 +159,7 @@ class LocalDateTimeTest extends AbstractBaseTest {
         doTestZoneId(zoneId);
     }
 
-    private static void doTestZoneId(final ZoneId zoneId) throws Exception {
+    private static void doTestZoneId(final ZoneId zoneId) throws IOException, ParseException {
         final TimeZone tz = TimeZone.getTimeZone(zoneId);
         ColumnImpl col = new ColumnImpl(null, null, DataType.SHORT_DATE_TIME, 0, 0, 0) {
             @Override
@@ -202,7 +204,7 @@ class LocalDateTimeTest extends AbstractBaseTest {
 
     @ParameterizedTest(name = "[{index}] {0}")
     @FileFormatSource
-    void testWriteAndReadTemporals(FileFormat fileFormat) throws Exception {
+    void testWriteAndReadTemporals(FileFormat fileFormat) throws IOException, ParseException {
         ZoneId zoneId = ZoneId.of("America/New_York");
 
         try (Database db = createDbMem(fileFormat)) {
