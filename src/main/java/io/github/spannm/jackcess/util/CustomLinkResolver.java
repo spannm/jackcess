@@ -32,7 +32,7 @@ import java.nio.file.Paths;
 import java.util.Random;
 
 /**
- * Utility base implementaton of LinkResolver which facilitates loading linked tables from files which are not access
+ * Utility base implementation of LinkResolver which facilitates loading linked tables from files which are not access
  * databases. The LinkResolver API ultimately presents linked table information to the primary database using the
  * jackcess {@link Database} and {@link Table} classes. In order to consume linked tables in non-mdb files, they need to
  * somehow be coerced into the appropriate form. The approach taken by this utility is to make it easy to copy the
