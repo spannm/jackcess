@@ -742,6 +742,7 @@ public class DatabaseImpl implements Database, DateTimeContext {
     }
 
     @Override
+    @SuppressWarnings("PMD.SimplifyBooleanReturns")
     public boolean isLinkedTable(Table table) throws IOException {
 
         if (table == null || this == table.getDatabase()) {

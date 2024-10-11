@@ -210,6 +210,7 @@ public class IndexCursorImpl extends CursorImpl implements IndexCursor {
         return new IndexPosition(_entryCursor.getNextEntry());
     }
 
+    @SuppressWarnings("PMD.SimplifyBooleanReturns")
     @Override
     protected boolean findAnotherRowImpl(
         ColumnImpl columnPattern, Object valuePattern, boolean moveForward,

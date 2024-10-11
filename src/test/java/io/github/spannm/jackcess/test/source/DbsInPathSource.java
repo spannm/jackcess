@@ -33,7 +33,7 @@ public @interface DbsInPathSource {
      */
     String value();
 
-    static class DbsInPathSourceArgumentsProvider implements ArgumentsProvider {
+    class DbsInPathSourceArgumentsProvider implements ArgumentsProvider {
 
         @Override
         public Stream<Arguments> provideArguments(ExtensionContext _context) throws IOException {

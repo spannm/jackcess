@@ -1323,7 +1323,7 @@ public class IndexPageCache {
                 Integer subPageNumber = e.getSubPageNumber();
                 DataPageMain childMain = getPageForValidate(subPageNumber);
                 if (childMain != null) {
-                    if (prevPageNumber != null && (int) childMain._prevPageNumber != prevPageNumber) {
+                    if (prevPageNumber != null && !childMain._prevPageNumber.equals(prevPageNumber)) {
                         throw new IllegalStateException(withErrorContext("Child's prevPageNumber is not the previous child for " + childMain + " " + dpExtra._entryView + " " + prevPageNumber));
                     }
                     if (nextPageNumber != null && childMain._pageNumber != nextPageNumber) {
@@ -1388,7 +1388,7 @@ public class IndexPageCache {
                 throw new IllegalStateException(withErrorContext("Mismatched peer status " + dpMain._leaf + " " + peerMain._leaf));
             }
             if (!dpMain._leaf) {
-                if (dpMain._parentPageNumber != null && peerMain._parentPageNumber != null && (int) dpMain._parentPageNumber != (int) peerMain._parentPageNumber) {
+                if (dpMain._parentPageNumber != null && peerMain._parentPageNumber != null && !dpMain._parentPageNumber.equals(peerMain._parentPageNumber)) {
                     throw new IllegalStateException(withErrorContext("Mismatched node parents " + dpMain._parentPageNumber + " " + peerMain._parentPageNumber));
                 }
             }

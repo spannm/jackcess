@@ -50,6 +50,7 @@ class BigIndexTest extends AbstractBaseTest {
 
     @ParameterizedTest(name = "[{index}] {0}")
     @TestDbSource(BIG_INDEX)
+    @SuppressWarnings("PMD.JumbledIncrementer")
     void testBigIndex(TestDb testDb) throws IOException {
         // this file has an index with "compressed" entries and node pages
         try (Database db = testDb.openMem()) {

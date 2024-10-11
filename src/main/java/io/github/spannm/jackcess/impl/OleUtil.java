@@ -18,7 +18,7 @@ package io.github.spannm.jackcess.impl;
 
 import io.github.spannm.jackcess.DataType;
 import io.github.spannm.jackcess.util.OleBlob;
-import io.github.spannm.jackcess.util.OleBlob.*;
+import io.github.spannm.jackcess.util.OleBlob.*; // NOPMD
 import io.github.spannm.jackcess.util.ToStringBuilder;
 
 import java.io.*;
@@ -100,6 +100,7 @@ public class OleUtil {
     /**
      * Creates a new OlBlob instance using the given information.
      */
+    @SuppressWarnings("PMD.UseTryWithResources")
     public static OleBlob createBlob(Builder oleBuilder) throws IOException {
         try {
 

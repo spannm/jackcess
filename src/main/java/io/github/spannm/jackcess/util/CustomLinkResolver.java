@@ -131,7 +131,7 @@ public abstract class CustomLinkResolver implements LinkResolver {
             return createTempDb(customFile, getDefaultFormat(), isDefaultInMemory(),
                 getDefaultTempDirectory(), readOnly);
         }
-        return LinkResolver.DEFAULT.resolveLinkedDatabase(linkerDb, linkeeFileName);
+        return DEFAULT.resolveLinkedDatabase(linkerDb, linkeeFileName);
     }
 
     /**

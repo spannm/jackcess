@@ -40,7 +40,7 @@ public @interface TestDbSource {
      */
     Basename[] value() default {};
 
-    static class TestDbArgumentsProvider implements ArgumentsProvider {
+    class TestDbArgumentsProvider implements ArgumentsProvider {
 
         /** Charset for access 97 databases. */
         private static final Charset                                ACC97_CHARSET      = Charset.forName("windows-1252");

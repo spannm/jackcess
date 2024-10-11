@@ -20,7 +20,7 @@ import static io.github.spannm.jackcess.impl.expr.FunctionSupport.getOptionalInt
 
 import io.github.spannm.jackcess.expr.*;
 import io.github.spannm.jackcess.impl.DatabaseImpl;
-import io.github.spannm.jackcess.impl.expr.FunctionSupport.*;
+import io.github.spannm.jackcess.impl.expr.FunctionSupport.*; // NOPMD
 
 import java.lang.System.Logger;
 import java.lang.System.Logger.Level;

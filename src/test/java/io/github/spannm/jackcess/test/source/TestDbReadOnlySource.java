@@ -30,7 +30,7 @@ public @interface TestDbReadOnlySource {
      */
     Basename[] value() default {};
 
-    static class TestDbReadOnlyArgumentsProvider implements ArgumentsProvider {
+    class TestDbReadOnlyArgumentsProvider implements ArgumentsProvider {
         @Override
         public Stream<Arguments> provideArguments(ExtensionContext _context) {
             TestDbReadOnlySource src = _context.getElement().map(elem -> AnnotationSupport.findAnnotation(elem, TestDbReadOnlySource.class).get()).orElse(null);
