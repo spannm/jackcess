@@ -16,6 +16,7 @@ limitations under the License.
 
 package io.github.spannm.jackcess.impl;
 
+import static io.github.spannm.jackcess.test.Basename.EMOTICONS;
 import static io.github.spannm.jackcess.test.Basename.INDEX_CODES;
 
 import io.github.spannm.jackcess.*;
@@ -56,7 +57,7 @@ public class IndexCodesTest extends AbstractBaseTest {
     }};
 
     @ParameterizedTest(name = "[{index}] {0}")
-    @TestDbReadOnlySource(INDEX_CODES)
+    @TestDbReadOnlySource({INDEX_CODES, EMOTICONS})
     void testIndexCodes(TestDb testDb) throws Exception {
         try (Database db = testDb.openMem()) {
             db.setDateTimeType(DateTimeType.DATE);

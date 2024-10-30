@@ -243,7 +243,7 @@ public class DatabaseBuilder {
     }
 
     /**
-     * Opens an existingnew Database using the configured information.
+     * Opens an existing new Database using the configured information.
      */
     public Database open() throws IOException {
         return DatabaseImpl.open(_mdbFile, _readOnly, _channel, _autoSync, _charset,

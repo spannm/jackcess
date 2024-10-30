@@ -18,6 +18,7 @@ public enum Basename {
     COMP_INDEX,
     DEL,
     DEL_COL,
+    EMOTICONS,
     EXT_DATE,
     FIXED_NUMERIC,
     FIXED_TEXT,
