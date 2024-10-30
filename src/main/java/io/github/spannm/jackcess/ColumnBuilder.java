@@ -283,7 +283,7 @@ public class ColumnBuilder {
     public ColumnBuilder withFromColumn(Column template) throws IOException {
         DataType type = template.getType();
         withType(type);
-        withLength(template.getLength());
+        withLengthInUnits(template.getLengthInUnits());
         withAutoNumber(template.isAutoNumber());
         if (type.getHasScalePrecision()) {
             withScale(template.getScale());
