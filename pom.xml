@@ -80,11 +80,6 @@
             <name>Nexus Release Repository</name>
             <url>https://s01.oss.sonatype.org/service/local/staging/deploy/maven2</url>
         </repository>
-        <site>
-            <id>local</id>
-            <name>Local Maven site</name>
-            <url>file://${java.io.tmpdir}/${project.artifactId}/site-prepared</url>
-        </site>
     </distributionManagement>
 
     <properties>
@@ -115,9 +110,6 @@
 
         <basepom.javadoc.skip>false</basepom.javadoc.skip>
         <basepom.javadoc.show>protected</basepom.javadoc.show>
-
-        <basepom.site.scm.branch>master</basepom.site.scm.branch>
-        <basepom.site.skip-deploy>false</basepom.site.skip-deploy>
     </properties>
 
     <dependencyManagement>
