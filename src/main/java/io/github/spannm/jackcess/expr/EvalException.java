@@ -2,8 +2,6 @@ package io.github.spannm.jackcess.expr;
 
 /**
  * Base class for exceptions thrown during expression evaluation.
- *
- * @author James Ahlborn
  */
 public class EvalException extends IllegalStateException {
     private static final long serialVersionUID = 20180330L;

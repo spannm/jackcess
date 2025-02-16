@@ -3,8 +3,6 @@ package io.github.spannm.jackcess.impl;
 /**
  * Exception thrown by a CodecHandler to indicate that the current encoding is not supported. This generally indicates
  * that a different CodecProvider needs to be chosen.
- *
- * @author James Ahlborn
  */
 public class UnsupportedCodecException extends UnsupportedOperationException {
     private static final long serialVersionUID = 20120313L;

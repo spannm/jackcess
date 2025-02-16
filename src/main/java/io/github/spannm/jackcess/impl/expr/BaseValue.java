@@ -49,13 +49,11 @@ public abstract class BaseValue implements Value {
     }
 
     protected EvalException invalidConversion(Type newType) {
-        return new EvalException(
-            this + " cannot be converted to " + newType);
+        return new EvalException(this + " cannot be converted to " + newType);
     }
 
     protected Integer roundToLongInt(LocaleContext ctx) {
-        return getAsBigDecimal(ctx).setScale(0, NumberFormatter.ROUND_MODE)
-            .intValueExact();
+        return getAsBigDecimal(ctx).setScale(0, NumberFormatter.ROUND_MODE).intValueExact();
     }
 
     @Override

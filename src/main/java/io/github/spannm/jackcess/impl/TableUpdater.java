@@ -10,8 +10,6 @@ import java.util.*;
 
 /**
  * Helper class used to maintain state during table mutation.
- *
- * @author James Ahlborn
  */
 public class TableUpdater extends TableMutator {
     private final TableImpl               _table;
@@ -126,8 +124,7 @@ public class TableUpdater extends TableMutator {
         return addIndex(index, false, (byte) 0, (byte) 0);
     }
 
-    IndexImpl addIndex(IndexBuilder index, boolean isInternal, byte ignoreIdxFlags,
-        byte ignoreColFlags) throws IOException {
+    IndexImpl addIndex(IndexBuilder index, boolean isInternal, byte ignoreIdxFlags, byte ignoreColFlags) throws IOException {
         _index = index;
 
         if (!isInternal) {
@@ -173,12 +170,10 @@ public class TableUpdater extends TableMutator {
     private void validateAddColumn() {
 
         if (_column == null) {
-            throw new IllegalArgumentException(withErrorContext(
-                "Cannot add column with no column"));
+            throw new IllegalArgumentException(withErrorContext("Cannot add column with no column"));
         }
         if (_table.getColumnCount() + 1 > getFormat().MAX_COLUMNS_PER_TABLE) {
-            throw new IllegalArgumentException(withErrorContext(
-                "Cannot add column to table with " + getFormat().MAX_COLUMNS_PER_TABLE + " columns"));
+            throw new IllegalArgumentException(withErrorContext("Cannot add column to table with " + getFormat().MAX_COLUMNS_PER_TABLE + " columns"));
         }
 
         Set<String> colNames = getColumnNames();
@@ -199,12 +194,10 @@ public class TableUpdater extends TableMutator {
     private void validateAddIndex() {
 
         if (_index == null) {
-            throw new IllegalArgumentException(withErrorContext(
-                "Cannot add index with no index"));
+            throw new IllegalArgumentException(withErrorContext("Cannot add index with no index"));
         }
         if (_table.getLogicalIndexCount() + 1 > getFormat().MAX_INDEXES_PER_TABLE) {
-            throw new IllegalArgumentException(withErrorContext(
-                "Cannot add index to table with " + getFormat().MAX_INDEXES_PER_TABLE + " indexes"));
+            throw new IllegalArgumentException(withErrorContext("Cannot add index to table with " + getFormat().MAX_INDEXES_PER_TABLE + " indexes"));
         }
 
         boolean[] foundPk = new boolean[1];
@@ -239,16 +232,14 @@ public class TableUpdater extends TableMutator {
 
         // search for an existing index which matches the given index (in terms of
         // the backing data)
-        IndexData idxData = findIndexData(
-            _index, _table, ignoreIdxFlags, ignoreColFlags);
+        IndexData idxData = findIndexData(_index, _table, ignoreIdxFlags, ignoreColFlags);
 
         int idxDataNumber = idxData != null ? idxData.getIndexDataNumber() : _table.getIndexCount();
 
         _idxDataState.setIndexDataNumber(idxDataNumber);
     }
 
-    static IndexData findIndexData(IndexBuilder idx, TableImpl table,
-        byte ignoreIdxFlags, byte ignoreColFlags) {
+    static IndexData findIndexData(IndexBuilder idx, TableImpl table, byte ignoreIdxFlags, byte ignoreColFlags) {
         for (IndexData idxData : table.getIndexDatas()) {
             if (sameIndexData(idx, idxData, ignoreIdxFlags, ignoreColFlags)) {
                 return idxData;
@@ -257,8 +248,7 @@ public class TableUpdater extends TableMutator {
         return null;
     }
 
-    private static boolean sameIndexData(IndexBuilder idx1, IndexData idx2,
-        byte ignoreIdxFlags, byte ignoreColFlags) {
+    private static boolean sameIndexData(IndexBuilder idx1, IndexData idx2, byte ignoreIdxFlags, byte ignoreColFlags) {
         // index data can be combined if flags match and columns (and col flags)
         // match
         if (((idx1.getFlags() | ignoreIdxFlags) != (idx2.getIndexFlags() | ignoreIdxFlags)) || (idx1.getColumns().size() != idx2.getColumnCount())) {
@@ -277,9 +267,7 @@ public class TableUpdater extends TableMutator {
         return true;
     }
 
-    private static boolean sameIndexData(
-        IndexBuilder.Column col1, IndexData.ColumnDescriptor col2,
-        int ignoreColFlags) {
+    private static boolean sameIndexData(IndexBuilder.Column col1, IndexData.ColumnDescriptor col2, int ignoreColFlags) {
         return col1.getName().equals(col2.getName()) && (col1.getFlags() | ignoreColFlags) == (col2.getFlags() | ignoreColFlags);
     }
 

@@ -23,8 +23,6 @@ import java.util.List;
 
 /**
  * Simple concrete implementation of ImportFilter which just returns the given values.
- *
- * @author James Ahlborn
  */
 public class SimpleImportFilter implements ImportFilter {
 

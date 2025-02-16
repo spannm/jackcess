@@ -12,9 +12,7 @@ import java.util.WeakHashMap;
 import java.util.stream.Collectors;
 
 /**
- * <p>Builder for {@link Object#toString()} methods.</p>
- *
- * @author Markus Spann
+ * Builder for {@link Object#toString()} methods.
  */
 public class ToStringBuilder {
     /** Object registry for avoidance of cycles. */

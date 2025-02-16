@@ -3,8 +3,6 @@ package io.github.spannm.jackcess;
 /**
  * Enum for selecting how a Database returns date/time types. Prefer using {@link DateTimeType#LOCAL_DATE_TIME} as using
  * Date is being phased out and will eventually be removed.
- *
- * @author James Ahlborn
  */
 public enum DateTimeType {
     /**

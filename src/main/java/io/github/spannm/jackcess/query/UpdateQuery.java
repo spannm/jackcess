@@ -5,8 +5,6 @@ import java.util.List;
 /**
  * Query interface which represents a row update query,
  * e.g.: {@code UPDATE table SET newValues}
- *
- * @author James Ahlborn
  */
 public interface UpdateQuery extends Query {
 

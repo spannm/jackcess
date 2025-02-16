@@ -2,8 +2,6 @@ package io.github.spannm.jackcess.impl;
 
 /**
  * ColumnImpl subclass which is used for Text data types.
- *
- * @author James Ahlborn
  */
 class TextColumnImpl extends ColumnImpl {
     /** whether or not they are compressed */
@@ -17,13 +15,10 @@ class TextColumnImpl extends ColumnImpl {
         super(args);
 
         // co-located w/ precision/scale
-        _sortOrder = readSortOrder(
-            args.buffer, args.offset + getFormat().OFFSET_COLUMN_SORT_ORDER,
-            getFormat());
+        _sortOrder = readSortOrder(args.buffer, args.offset + getFormat().OFFSET_COLUMN_SORT_ORDER, getFormat());
         _codePage = readCodePage(args.buffer, args.offset, getFormat());
 
-        _compressedUnicode =
-            (args.extFlags & COMPRESSED_UNICODE_EXT_FLAG_MASK) != 0;
+        _compressedUnicode = (args.extFlags & COMPRESSED_UNICODE_EXT_FLAG_MASK) != 0;
     }
 
     @Override

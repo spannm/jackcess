@@ -12,8 +12,6 @@ import java.io.IOException;
 
 /**
  * ColumnImpl subclass which is used for complex data types.
- *
- * @author James Ahlborn
  */
 class ComplexColumnImpl extends ColumnImpl {
     /** additional information specific to complex columns */
@@ -29,8 +27,7 @@ class ComplexColumnImpl extends ColumnImpl {
     @Override
     void postTableLoadInit() throws IOException {
         if (_complexInfo != null) {
-            ((ComplexColumnInfoImpl<? extends ComplexValue>) _complexInfo)
-                .postTableLoadInit();
+            ((ComplexColumnInfoImpl<? extends ComplexValue>) _complexInfo).postTableLoadInit();
         }
         super.postTableLoadInit();
     }
@@ -40,8 +37,7 @@ class ComplexColumnImpl extends ColumnImpl {
         if (_complexInfo.getType() == ComplexDataType.MULTI_VALUE) {
             if (_mvProps == null) {
                 PropertyMap primaryProps = super.getProperties();
-                PropertyMap complexProps = ((MultiValueColumnInfoImpl) _complexInfo)
-                    .getValueColumn().getProperties();
+                PropertyMap complexProps = ((MultiValueColumnInfoImpl) _complexInfo).getValueColumn().getProperties();
                 _mvProps = new MultiValueColumnPropertyMap(primaryProps, complexProps);
             }
             return _mvProps;

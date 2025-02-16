@@ -5,10 +5,10 @@ import io.github.spannm.jackcess.expr.LocaleContext;
 import java.math.BigDecimal;
 
 public class DoubleValue extends BaseNumericValue {
-    private final Double _val;
+    private final Double val;
 
-    public DoubleValue(Double val) {
-        _val = val;
+    public DoubleValue(Double _val) {
+        val = _val;
     }
 
     @Override
@@ -18,31 +18,31 @@ public class DoubleValue extends BaseNumericValue {
 
     @Override
     public Object get() {
-        return _val;
+        return val;
     }
 
     @Override
     protected Number getNumber() {
-        return _val;
+        return val;
     }
 
     @Override
     public boolean getAsBoolean(LocaleContext ctx) {
-        return _val != 0.0d;
+        return val != 0.0d;
     }
 
     @Override
     public Double getAsDouble(LocaleContext ctx) {
-        return _val;
+        return val;
     }
 
     @Override
     public BigDecimal getAsBigDecimal(LocaleContext ctx) {
-        return BigDecimal.valueOf(_val);
+        return BigDecimal.valueOf(val);
     }
 
     @Override
     public String getAsString(LocaleContext ctx) {
-        return ctx.getNumericConfig().format(_val);
+        return ctx.getNumericConfig().format(val);
     }
 }

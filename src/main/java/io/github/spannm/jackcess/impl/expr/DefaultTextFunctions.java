@@ -19,7 +19,7 @@ import java.util.stream.Collectors;
 public class DefaultTextFunctions {
     // mask to separate the case conversion value (first two bits) from the char
     // conversion value for the StrConv() function
-    private static final int STR_CONV_MASK = 0x03;
+    private static final int     STR_CONV_MASK = 0x03;
 
     public static final Function ASC        = registerFunc(new Func1("Asc") {
         @Override

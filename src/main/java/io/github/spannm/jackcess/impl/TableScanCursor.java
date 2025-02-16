@@ -6,29 +6,22 @@ import java.io.IOException;
 
 /**
  * Simple un-indexed cursor.
- *
- * @author James Ahlborn
  */
 public class TableScanCursor extends CursorImpl {
     /** first position for the TableScanCursor */
-    private static final ScanPosition FIRST_SCAN_POSITION =
-        new ScanPosition(RowIdImpl.FIRST_ROW_ID);
+    private static final ScanPosition FIRST_SCAN_POSITION = new ScanPosition(RowIdImpl.FIRST_ROW_ID);
     /** last position for the TableScanCursor */
-    private static final ScanPosition LAST_SCAN_POSITION  =
-        new ScanPosition(RowIdImpl.LAST_ROW_ID);
+    private static final ScanPosition LAST_SCAN_POSITION  = new ScanPosition(RowIdImpl.LAST_ROW_ID);
 
     /** ScanDirHandler for forward traversal */
-    private final ScanDirHandler      _forwardDirHandler  =
-        new ForwardScanDirHandler();
+    private final ScanDirHandler      _forwardDirHandler  = new ForwardScanDirHandler();
     /** ScanDirHandler for backward traversal */
-    private final ScanDirHandler      _reverseDirHandler  =
-        new ReverseScanDirHandler();
+    private final ScanDirHandler      _reverseDirHandler  = new ReverseScanDirHandler();
     /** Cursor over the pages that this table owns */
     private final UsageMap.PageCursor _ownedPagesCursor;
 
     public TableScanCursor(TableImpl table) {
-        super(new IdImpl(table, null), table,
-            FIRST_SCAN_POSITION, LAST_SCAN_POSITION);
+        super(new IdImpl(table, null), table, FIRST_SCAN_POSITION, LAST_SCAN_POSITION);
         _ownedPagesCursor = table.getOwnedPagesCursor();
     }
 
@@ -51,11 +44,9 @@ public class TableScanCursor extends CursorImpl {
     @Override
     protected void restorePositionImpl(PositionImpl curPos, PositionImpl prevPos) throws IOException {
         if (!(curPos instanceof ScanPosition) || !(prevPos instanceof ScanPosition)) {
-            throw new IllegalArgumentException(
-                "Restored positions must be scan positions");
+            throw new IllegalArgumentException("Restored positions must be scan positions");
         }
-        _ownedPagesCursor.restorePosition(curPos.getRowId().getPageNumber(),
-            prevPos.getRowId().getPageNumber());
+        _ownedPagesCursor.restorePosition(curPos.getRowId().getPageNumber(), prevPos.getRowId().getPageNumber());
         super.restorePositionImpl(curPos, prevPos);
     }
 
@@ -84,8 +75,7 @@ public class TableScanCursor extends CursorImpl {
             if (!rowState.isValid()) {
 
                 // load next page
-                curRowId = new RowIdImpl(handler.getAnotherPageNumber(),
-                    RowIdImpl.INVALID_ROW_NUMBER);
+                curRowId = new RowIdImpl(handler.getAnotherPageNumber(), RowIdImpl.INVALID_ROW_NUMBER);
                 TableImpl.positionAtRowHeader(rowState, curRowId);
 
                 if (!rowState.isHeaderPageNumberValid()) {
@@ -94,8 +84,7 @@ public class TableScanCursor extends CursorImpl {
                 }
 
                 // update row count and initial row number
-                currentRowNumber = handler.getInitialRowNumber(
-                    rowState.getRowsOnHeaderPage());
+                currentRowNumber = handler.getInitialRowNumber(rowState.getRowsOnHeaderPage());
 
             } else if (!rowState.isDeleted()) {
 

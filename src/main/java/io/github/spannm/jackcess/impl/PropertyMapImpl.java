@@ -9,8 +9,6 @@ import java.util.*;
 
 /**
  * Map of properties for a database object.
- *
- * @author James Ahlborn
  */
 public class PropertyMapImpl implements PropertyMap {
     private static final Map<String, PropDef> DEFAULT_TYPES = new HashMap<>();
@@ -123,8 +121,7 @@ public class PropertyMapImpl implements PropertyMap {
      * Puts a property into this map with the given information.
      */
     @Override
-    public PropertyImpl put(String name, DataType type, Object value,
-        boolean isDdl) {
+    public PropertyImpl put(String name, DataType type, Object value, boolean isDdl) {
         PropertyImpl prop = (PropertyImpl) createProperty(name, type, value, isDdl);
         _props.put(DatabaseImpl.toLookupName(name), prop);
         return prop;
@@ -151,24 +148,21 @@ public class PropertyMapImpl implements PropertyMap {
     }
 
     public static String toString(PropertyMap map) {
-        StringBuilder sb = new StringBuilder(PropertyMaps.DEFAULT_NAME.equals(map.getName()) ? "<DEFAULT>" : map.getName())
-            .append(" {");
+        StringBuilder sb = new StringBuilder(PropertyMaps.DEFAULT_NAME.equals(map.getName()) ? "<DEFAULT>" : map.getName()).append(" {");
         for (Iterator<Property> iter = map.iterator(); iter.hasNext();) {
             sb.append(iter.next());
             if (iter.hasNext()) {
                 sb.append(',');
             }
         }
-        return sb.append('}')
-            .toString();
+        return sb.append('}').toString();
     }
 
     public static Property createProperty(String name, DataType type, Object value) {
         return createProperty(name, type, value, false);
     }
 
-    public static Property createProperty(String name, DataType type,
-        Object value, boolean isDdl) {
+    public static Property createProperty(String name, DataType type, Object value, boolean isDdl) {
         // see if this is a builtin property that we already understand
         PropDef pd = DEFAULT_TYPES.get(name);
 
@@ -220,8 +214,7 @@ public class PropertyMapImpl implements PropertyMap {
         private final boolean  _ddl;
         private Object         _value;
 
-        private PropertyImpl(String name, DataType type, Object value,
-            boolean ddl) {
+        private PropertyImpl(String name, DataType type, Object value, boolean ddl) {
             _name = name;
             _type = type;
             _ddl = ddl;

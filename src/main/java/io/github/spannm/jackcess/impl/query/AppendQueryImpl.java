@@ -26,8 +26,6 @@ import java.util.List;
 /**
  * Concrete Query subclass which represents an append query,
  * e.g.: {@code INSERT INTO table VALUES (values)}
- *
- * @author James Ahlborn
  */
 public class AppendQueryImpl extends BaseSelectQueryImpl implements AppendQuery {
 

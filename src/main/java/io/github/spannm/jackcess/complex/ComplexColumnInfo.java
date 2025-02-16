@@ -9,8 +9,6 @@ import java.util.Map;
 
 /**
  * Base class for the additional information tracked for complex columns.
- *
- * @author James Ahlborn
  */
 public interface ComplexColumnInfo<V extends ComplexValue> {
     ComplexDataType getType();

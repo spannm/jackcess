@@ -29,8 +29,6 @@ import java.util.Random;
  * <li>Linked tables are loaded on-demand, see {@link #loadCustomTable}</li>
  * <li>Temp db files will be automatically deleted on close</li>
  * </ul>
- *
- * @author James Ahlborn
  */
 public abstract class CustomLinkResolver implements LinkResolver {
     private static final Random    DB_ID             = new Random();
@@ -165,7 +163,7 @@ public abstract class CustomLinkResolver implements LinkResolver {
         if (dbFile != null && dbFile.getFileName().toString().startsWith(FILE_DB_PREFIX)) {
             try {
                 Files.deleteIfExists(dbFile);
-            } catch (IOException ignores) {}
+            } catch (IOException _ignored) {}
         }
     }
 

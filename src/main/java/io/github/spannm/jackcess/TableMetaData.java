@@ -5,8 +5,6 @@ import java.io.IOException;
 /**
  * Basic metadata about a single database Table. This is the top-level information stored in a (local) database which
  * can be retrieved without attempting to load the Table itself.
- *
- * @author James Ahlborn
  */
 public interface TableMetaData {
     enum Type {

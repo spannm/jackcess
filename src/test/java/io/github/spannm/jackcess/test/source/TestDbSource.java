@@ -71,8 +71,8 @@ public @interface TestDbSource {
                         if (dbFileFormat != fileFormat) {
                             throw new RuntimeException("Expected " + fileFormat + " was " + dbFileFormat);
                         }
-                    } catch (IOException ex) {
-                        throw new UncheckedIOException(ex);
+                    } catch (IOException _ex) {
+                        throw new UncheckedIOException(_ex);
                     }
 
                     Charset charset = fileFormat == FileFormat.V1997 ? ACC97_CHARSET : null;

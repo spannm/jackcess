@@ -25,8 +25,6 @@ import java.util.stream.StreamSupport;
  * characteristics or easily search for specific values as well as friendly and flexible construction options.
  * <p>
  * A Cursor instance is not thread-safe (see {@link Database} for more thread-safety details).
- *
- * @author James Ahlborn
  */
 public interface Cursor extends Iterable<Row> {
 

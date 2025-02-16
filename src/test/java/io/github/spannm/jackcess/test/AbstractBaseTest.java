@@ -27,8 +27,6 @@ import java.util.stream.StreamSupport;
  *
  * Logs entry to all test methods.<br>
  * This class extends JUnit assertions to avoid the need for static imports in subclasses.
- *
- * @author Markus Spann
  */
 public abstract class AbstractBaseTest extends Assertions {
 

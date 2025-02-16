@@ -1,3 +1,25 @@
+- Simplify FILE_FORMAT_DETAILS
+
+- Do not use RuntimeException
+  - Introduce JackcessException
+
+- Row should not extend Map<String, Object>
+
+***************************************************
+
+Maven Release:
+
+mvn release:prepare
+git push --follow-tags
+mvn release:perform
+https://s01.oss.sonatype.org/
+  > Staging Repositories
+  Close, Release
+  
+Use JDK for copying of files and streams
+
+****************************************
+
 Missing pieces:
 
 - fix long text index entries (for new general sort order)

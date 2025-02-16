@@ -111,8 +111,7 @@ public class UsageMap {
      * @param isGlobal whether or not we are reading the "global" usage map
      * @return Either an InlineUsageMap or a ReferenceUsageMap, depending on which type of map is found
      */
-    static UsageMap read(DatabaseImpl database, int pageNum,
-        int rowNum, boolean isGlobal) throws IOException {
+    static UsageMap read(DatabaseImpl database, int pageNum, int rowNum, boolean isGlobal) throws IOException {
         if (pageNum <= 0) {
             // usage maps will never appear on page 0 (or less)
             throw new IllegalStateException("Invalid usage map page number " + pageNum);
@@ -195,14 +194,11 @@ public class UsageMap {
     }
 
     protected int getFirstPageNumber() {
-        return bitIndexToPageNumber(getNextBitIndex(-1),
-            RowIdImpl.LAST_PAGE_NUMBER);
+        return bitIndexToPageNumber(getNextBitIndex(-1), RowIdImpl.LAST_PAGE_NUMBER);
     }
 
     protected int getNextPageNumber(int curPage) {
-        return bitIndexToPageNumber(
-            getNextBitIndex(pageNumberToBitIndex(curPage)),
-            RowIdImpl.LAST_PAGE_NUMBER);
+        return bitIndexToPageNumber(getNextBitIndex(pageNumberToBitIndex(curPage)), RowIdImpl.LAST_PAGE_NUMBER);
     }
 
     protected int getNextBitIndex(int curIndex) {
@@ -210,14 +206,11 @@ public class UsageMap {
     }
 
     protected int getLastPageNumber() {
-        return bitIndexToPageNumber(getPrevBitIndex(_pageNumbers.length()),
-            RowIdImpl.FIRST_PAGE_NUMBER);
+        return bitIndexToPageNumber(getPrevBitIndex(_pageNumbers.length()), RowIdImpl.FIRST_PAGE_NUMBER);
     }
 
     protected int getPrevPageNumber(int curPage) {
-        return bitIndexToPageNumber(
-            getPrevBitIndex(pageNumberToBitIndex(curPage)),
-            RowIdImpl.FIRST_PAGE_NUMBER);
+        return bitIndexToPageNumber(getPrevBitIndex(pageNumberToBitIndex(curPage)), RowIdImpl.FIRST_PAGE_NUMBER);
     }
 
     protected int getPrevBitIndex(int curIndex) {
@@ -228,8 +221,7 @@ public class UsageMap {
         return curIndex;
     }
 
-    protected int bitIndexToPageNumber(int bitIndex,
-        int invalidPageNumber) {
+    protected int bitIndexToPageNumber(int bitIndex, int invalidPageNumber) {
         return bitIndex >= 0 ? _startPage + bitIndex : invalidPageNumber;
     }
 
@@ -266,12 +258,9 @@ public class UsageMap {
                 for (int i = 0; i < 8; i++) {
                     if ((b & 1 << i) != 0) {
                         int pageNumberOffset = byteCount * 8 + i + bufferStartPage;
-                        int pageNumber = bitIndexToPageNumber(
-                            pageNumberOffset,
-                            PageChannel.INVALID_PAGE_NUMBER);
+                        int pageNumber = bitIndexToPageNumber(pageNumberOffset, PageChannel.INVALID_PAGE_NUMBER);
                         if (!isPageWithinRange(pageNumber)) {
-                            throw new IllegalStateException(
-                                "found page number " + pageNumber + " in usage map outside of expected range " + _startPage + " to " + _endPage);
+                            throw new IllegalStateException("found page number " + pageNumber + " in usage map outside of expected range " + _startPage + " to " + _endPage);
                         }
                         _pageNumbers.set(pageNumberOffset);
                     }
@@ -308,9 +297,7 @@ public class UsageMap {
         _handler.addOrRemovePageNumber(pageNumber, false, force);
     }
 
-    protected void updateMap(int absolutePageNumber,
-        int bufferRelativePageNumber,
-        ByteBuffer buffer, boolean add, boolean force) throws IOException {
+    protected void updateMap(int absolutePageNumber, int bufferRelativePageNumber, ByteBuffer buffer, boolean add, boolean force) throws IOException {
         // Find the byte to which to apply the bitmask and create the bitmask
         int offset = bufferRelativePageNumber / 8;
         int bitmask = 1 << bufferRelativePageNumber % 8;
@@ -358,8 +345,7 @@ public class UsageMap {
         reAddPages(oldStartPage, oldPageNumbers, newPageNumber);
     }
 
-    private void reAddPages(int oldStartPage, BitSet oldPageNumbers,
-        int newPageNumber) throws IOException {
+    private void reAddPages(int oldStartPage, BitSet oldPageNumbers, int newPageNumber) throws IOException {
         // add all the old pages back in
         for (int i = oldPageNumbers.nextSetBit(0); i >= 0; i = oldPageNumbers.nextSetBit(i + 1)) {
             addPageNumber(oldStartPage + i);
@@ -396,14 +382,10 @@ public class UsageMap {
             rangeToString(ranges, curRangeStart, prevPage);
         }
 
-        return ToStringBuilder.valueBuilder(_handler.getClass().getSimpleName())
-            .append("range", "(" + _startPage + "-" + _endPage + ")")
-            .append("pageNumbers", ranges)
-            .toString();
+        return ToStringBuilder.valueBuilder(_handler.getClass().getSimpleName()).append("range", "(" + _startPage + "-" + _endPage + ")").append("pageNumbers", ranges).toString();
     }
 
-    private static void rangeToString(List<String> ranges, int rangeStart,
-        int rangeEnd) {
+    private static void rangeToString(List<String> ranges, int rangeStart, int rangeEnd) {
         if (rangeEnd > rangeStart) {
             ranges.add(rangeStart + "-" + rangeEnd);
         } else {
@@ -429,9 +411,7 @@ public class UsageMap {
          * @param add True to add it, false to remove it
          * @param force true to force add/remove and ignore certain inconsistencies
          */
-        public abstract void addOrRemovePageNumber(int pageNumber, boolean add,
-            boolean force)
-            throws IOException;
+        public abstract void addOrRemovePageNumber(int pageNumber, boolean add, boolean force) throws IOException;
     }
 
     /**
@@ -471,15 +451,12 @@ public class UsageMap {
         }
 
         @Override
-        public void addOrRemovePageNumber(int pageNumber, boolean add,
-            boolean force)
-            throws IOException {
+        public void addOrRemovePageNumber(int pageNumber, boolean add, boolean force) throws IOException {
             if (isPageWithinRange(pageNumber)) {
 
                 // easy enough, just update the inline data
                 int bufferRelativePageNumber = pageNumberToBitIndex(pageNumber);
-                updateMap(pageNumber, bufferRelativePageNumber, getTableBuffer(), add,
-                    force);
+                updateMap(pageNumber, bufferRelativePageNumber, getTableBuffer(), add, force);
                 // Write the updated map back to disk
                 writeTable();
 
@@ -490,9 +467,7 @@ public class UsageMap {
             }
         }
 
-        protected void addOrRemovePageNumberOutsideRange(
-            int pageNumber, boolean add, boolean force)
-            throws IOException {
+        protected void addOrRemovePageNumberOutsideRange(int pageNumber, boolean add, boolean force) throws IOException {
             // determine what our status is before taking action
 
             if (add) {
@@ -542,8 +517,7 @@ public class UsageMap {
          * @param newStartPage new page at which to start
          * @param newPageNumber optional page number to add once the map has been shifted to the new start page
          */
-        protected final void moveToNewStartPage(int newStartPage, int newPageNumber)
-            throws IOException {
+        protected final void moveToNewStartPage(int newStartPage, int newPageNumber) throws IOException {
             int oldStartPage = getStartPage();
             BitSet oldPageNumbers = (BitSet) getPageNumbers().clone();
 
@@ -585,9 +559,7 @@ public class UsageMap {
         }
 
         @Override
-        protected void addOrRemovePageNumberOutsideRange(
-            int pageNumber, boolean add, boolean force)
-            throws IOException {
+        protected void addOrRemovePageNumberOutsideRange(int pageNumber, boolean add, boolean force) throws IOException {
             // determine what our status is
 
             // for the global usage map, we can ignore out-of-range page addition
@@ -619,14 +591,11 @@ public class UsageMap {
          * @param firstPage current first used page
          * @param newPageNumber page number to remove once the map has been shifted to the new start page
          */
-        private void moveToNewStartPageForRemove(int firstPage, int newPageNumber)
-            throws IOException {
+        private void moveToNewStartPageForRemove(int firstPage, int newPageNumber) throws IOException {
             int oldEndPage = getEndPage();
-            int newStartPage =
-                toValidStartPage(
-                    firstPage <= PageChannel.INVALID_PAGE_NUMBER ? newPageNumber
-                    // just shift a little and discard any initial unused pages.
-                        : newPageNumber - getMaxInlinePages() / 2);
+            int newStartPage = toValidStartPage(firstPage <= PageChannel.INVALID_PAGE_NUMBER ? newPageNumber
+                // just shift a little and discard any initial unused pages.
+                : newPageNumber - getMaxInlinePages() / 2);
 
             // move the current data
             moveToNewStartPage(newStartPage, PageChannel.INVALID_PAGE_NUMBER);
@@ -634,8 +603,7 @@ public class UsageMap {
             if (firstPage <= PageChannel.INVALID_PAGE_NUMBER) {
 
                 // this is the common case where we left everything behind
-                ByteUtil.fillRange(_tableBuffer, getInlineDataStart(),
-                    getInlineDataEnd());
+                ByteUtil.fillRange(_tableBuffer, getInlineDataStart(), getInlineDataEnd());
 
                 // write out the updated table
                 writeTable();
@@ -696,9 +664,7 @@ public class UsageMap {
         }
 
         @Override
-        public void addOrRemovePageNumber(int pageNumber, boolean add,
-            boolean force)
-            throws IOException {
+        public void addOrRemovePageNumber(int pageNumber, boolean add, boolean force) throws IOException {
             if (!isPageWithinRange(pageNumber)) {
                 if (force) {
                     return;
@@ -706,8 +672,7 @@ public class UsageMap {
                 throw new IOException("Page number " + pageNumber + " is out of supported range");
             }
             int pageIndex = pageNumber / getMaxPagesPerUsagePage();
-            int mapPageNum = getTableBuffer().getInt(
-                calculateMapPagePointerOffset(pageIndex));
+            int mapPageNum = getTableBuffer().getInt(calculateMapPagePointerOffset(pageIndex));
             ByteBuffer mapPageBuffer = null;
             if (mapPageNum > 0) {
                 mapPageBuffer = _mapPageHolder.withPage(getPageChannel(), mapPageNum);
@@ -728,8 +693,7 @@ public class UsageMap {
         private ByteBuffer createNewUsageMapPage(int pageIndex) throws IOException {
             ByteBuffer mapPageBuffer = allocateNewUsageMapPage(pageIndex);
             int mapPageNum = _mapPageHolder.getPageNumber();
-            getTableBuffer().putInt(calculateMapPagePointerOffset(pageIndex),
-                mapPageNum);
+            getTableBuffer().putInt(calculateMapPagePointerOffset(pageIndex), mapPageNum);
             writeTable();
             return mapPageBuffer;
         }
@@ -738,8 +702,7 @@ public class UsageMap {
             return getRowStart() + getFormat().OFFSET_REFERENCE_MAP_PAGE_NUMBERS + pageIndex * 4;
         }
 
-        protected ByteBuffer allocateNewUsageMapPage(int pageIndex)
-            throws IOException {
+        protected ByteBuffer allocateNewUsageMapPage(int pageIndex) throws IOException {
             ByteBuffer mapPageBuffer = _mapPageHolder.withNewPage(getPageChannel());
             mapPageBuffer.put(PageTypes.USAGE_MAP);
             mapPageBuffer.put((byte) 0x01); // Unknown
@@ -772,9 +735,7 @@ public class UsageMap {
         }
 
         @Override
-        public void addOrRemovePageNumber(int pageNumber, boolean add,
-            boolean force)
-            throws IOException {
+        public void addOrRemovePageNumber(int pageNumber, boolean add, boolean force) throws IOException {
             if (_allocatingPage && !add) {
                 // we are in the midst of allocating a page for ourself, keep track of
                 // this new page so we can mark it later...
@@ -804,8 +765,7 @@ public class UsageMap {
         }
 
         @Override
-        protected ByteBuffer allocateNewUsageMapPage(int pageIndex)
-            throws IOException {
+        protected ByteBuffer allocateNewUsageMapPage(int pageIndex) throws IOException {
             try {
                 // keep track of the fact that we are actively allocating a page for our
                 // own use so that we can break the potential cycle.
@@ -819,8 +779,7 @@ public class UsageMap {
                 // load this map, which is fine because we should only add pages which
                 // represent the size of the database currently in use).
                 int dataStart = getFormat().OFFSET_USAGE_MAP_PAGE_DATA;
-                ByteUtil.fillRange(mapPageBuffer, dataStart,
-                    getFormat().PAGE_SIZE - dataStart);
+                ByteUtil.fillRange(mapPageBuffer, dataStart, getFormat().PAGE_SIZE - dataStart);
 
                 int maxPagesPerUmapPage = getMaxPagesPerUsagePage();
                 int firstNewPage = pageIndex * maxPagesPerUmapPage;
@@ -983,8 +942,7 @@ public class UsageMap {
 
         @Override
         public String toString() {
-            return String.format("%s[curPageNumber=%s, prevPageNumber=%s]",
-                getClass().getSimpleName(), _curPageNumber, _prevPageNumber);
+            return String.format("%s[curPageNumber=%s, prevPageNumber=%s]", getClass().getSimpleName(), _curPageNumber, _prevPageNumber);
         }
 
         /**

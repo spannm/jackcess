@@ -27,8 +27,6 @@ import java.util.List;
 
 /**
  * Information about a relationship between two tables in the database.
- *
- * @author James Ahlborn
  */
 public class RelationshipImpl implements Relationship {
 
@@ -66,16 +64,11 @@ public class RelationshipImpl implements Relationship {
     /** the various flags describing this relationship */
     private final int          _flags;
 
-    public RelationshipImpl(String name, Table fromTable, Table toTable, int flags,
-        int numCols) {
-        this(name, fromTable, toTable, flags,
-            Collections.nCopies(numCols, null),
-            Collections.nCopies(numCols, null));
+    public RelationshipImpl(String name, Table fromTable, Table toTable, int flags, int numCols) {
+        this(name, fromTable, toTable, flags, Collections.nCopies(numCols, null), Collections.nCopies(numCols, null));
     }
 
-    public RelationshipImpl(String name, Table fromTable, Table toTable, int flags,
-        List<? extends Column> fromCols,
-        List<? extends Column> toCols) {
+    public RelationshipImpl(String name, Table fromTable, Table toTable, int flags, List<? extends Column> fromCols, List<? extends Column> toCols) {
         _name = name;
         _fromTable = fromTable;
         _fromColumns = new ArrayList<>(fromCols);

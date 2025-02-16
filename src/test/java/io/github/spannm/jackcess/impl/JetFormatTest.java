@@ -50,8 +50,8 @@ class JetFormatTest extends AbstractBaseTest {
                 props.save();
             }
 
-        } catch (Exception e) {
-            failure = e;
+        } catch (Exception _ex) {
+            failure = _ex;
         }
 
         if (!testDb.getExpectedJetFormat().READ_ONLY) {

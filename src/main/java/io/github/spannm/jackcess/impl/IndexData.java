@@ -107,26 +107,24 @@ public class IndexData {
     }
 
     public static final Comparator<byte[]> BYTE_CODE_COMPARATOR = (left, right) -> {
-        if (left == right) {
-            return 0;
-        }
-        if (left == null) {
-            return -1;
-        }
-        if (right == null) {
-            return 1;
-        }
+                                                                    if (left == right) {
+                                                                        return 0;
+                                                                    } else if (left == null) {
+                                                                        return -1;
+                                                                    } else if (right == null) {
+                                                                        return 1;
+                                                                    }
 
-        int len = Math.min(left.length, right.length);
-        int pos = 0;
-        while (pos < len && left[pos] == right[pos]) {
-            pos++;
-        }
-        if (pos < len) {
-            return ByteUtil.asUnsignedByte(left[pos]) < ByteUtil.asUnsignedByte(right[pos]) ? -1 : 1;
-        }
-        return Integer.compare(left.length, right.length);
-    };
+                                                                    int len = Math.min(left.length, right.length);
+                                                                    int pos = 0;
+                                                                    while (pos < len && left[pos] == right[pos]) {
+                                                                        pos++;
+                                                                    }
+                                                                    if (pos < len) {
+                                                                        return ByteUtil.asUnsignedByte(left[pos]) < ByteUtil.asUnsignedByte(right[pos]) ? -1 : 1;
+                                                                    }
+                                                                    return Integer.compare(left.length, right.length);
+                                                                };
 
     /** name, generated on demand */
     private String                         _name;
@@ -624,10 +622,10 @@ public class IndexData {
         try {
             prepareAddRow(newRow, rowId, change);
             return change;
-        } catch (ConstraintViolationException e) {
+        } catch (ConstraintViolationException _ex) {
             // need to undo the deletion before bailing
             change.rollback();
-            throw e;
+            throw _ex;
         }
     }
 
@@ -945,23 +943,16 @@ public class IndexData {
 
     @Override
     public String toString() {
-        ToStringBuilder sb = ToStringBuilder.builder(this)
-            .append("dataNumber", _number)
-            .append("pageNumber", _rootPageNumber)
-            .append("isBackingPrimaryKey", isBackingPrimaryKey())
-            .append("isUnique", isUnique())
-            .append("ignoreNulls", shouldIgnoreNulls())
-            .append("isRequired", isRequired())
-            .append("columns", _columns).append("initialized", _initialized);
+        ToStringBuilder sb = ToStringBuilder.builder(this).append("dataNumber", _number).append("pageNumber", _rootPageNumber).append("isBackingPrimaryKey", isBackingPrimaryKey())
+            .append("isUnique", isUnique()).append("ignoreNulls", shouldIgnoreNulls()).append("isRequired", isRequired()).append("columns", _columns).append("initialized", _initialized);
         if (_initialized) {
             try {
                 sb.append("entryCount", getEntryCount());
-            } catch (IOException e) {
-                throw new UncheckedIOException(e);
+            } catch (IOException _ex) {
+                throw new UncheckedIOException(_ex);
             }
         }
-        return sb.append("pageCache", _pageCache)
-            .toString();
+        return sb.append("pageCache", _pageCache).toString();
     }
 
     /**
@@ -1450,10 +1441,7 @@ public class IndexData {
 
         @Override
         public String toString() {
-            return ToStringBuilder.builder(this)
-                .append("column", getColumn())
-                .append("flags", getFlags() + " " + (isAscending() ? "(ASC)" : "(DSC)"))
-                .toString();
+            return ToStringBuilder.builder(this).append("column", getColumn()).append("flags", getFlags() + " " + (isAscending() ? "(ASC)" : "(DSC)")).toString();
         }
     }
 
@@ -2207,10 +2195,7 @@ public class IndexData {
 
         @Override
         public String toString() {
-            return ToStringBuilder.valueBuilder(this)
-                .append("curPosition", _curPos)
-                .append("prevPosition", _prevPos)
-                .toString();
+            return ToStringBuilder.valueBuilder(this).append("curPosition", _curPos).append("prevPosition", _prevPos).toString();
         }
 
         /**
@@ -2358,12 +2343,7 @@ public class IndexData {
 
         @Override
         public String toString() {
-            return ToStringBuilder.valueBuilder(this)
-                .append("page", _dataPage.getPageNumber())
-                .append("idx", _idx)
-                .append("entry", _entry)
-                .append("between", _between)
-                .toString();
+            return ToStringBuilder.valueBuilder(this).append("page", _dataPage.getPageNumber()).append("idx", _idx).append("entry", _entry).append("between", _between).toString();
         }
     }
 
@@ -2563,37 +2543,37 @@ public class IndexData {
      * PendingChange for a row addition.
      */
     private class AddRowPendingChange extends PendingChange {
-        protected Entry    _addEntry;
-        protected DataPage _addDataPage;
-        protected int      _addIdx;
-        protected boolean  _isDupe;
-        protected Entry    _oldEntry;
+        protected Entry    maddEntry;
+        protected DataPage maddDataPage;
+        protected int      maddIdx;
+        protected boolean  misDupe;
+        protected Entry    moldEntry;
 
         private AddRowPendingChange(PendingChange next) {
             super(next);
         }
 
         public void setAddRow(Entry addEntry, DataPage dataPage, int idx, boolean isDupe) {
-            _addEntry = addEntry;
-            _addDataPage = dataPage;
-            _addIdx = idx;
-            _isDupe = isDupe;
+            maddEntry = addEntry;
+            maddDataPage = dataPage;
+            maddIdx = idx;
+            misDupe = isDupe;
         }
 
         public void setOldRow(Entry oldEntry) {
-            _oldEntry = oldEntry;
+            moldEntry = oldEntry;
         }
 
         @Override
         public void commit() throws IOException {
-            commitAddRow(_addEntry, _addDataPage, _addIdx, _isDupe, _oldEntry);
+            commitAddRow(maddEntry, maddDataPage, maddIdx, misDupe, moldEntry);
         }
 
         @Override
         public void rollback() throws IOException {
-            _addEntry = null;
-            _addDataPage = null;
-            _addIdx = -1;
+            maddEntry = null;
+            maddDataPage = null;
+            maddIdx = -1;
         }
     }
 
@@ -2608,7 +2588,7 @@ public class IndexData {
         @Override
         public void rollback() throws IOException {
             super.rollback();
-            rollbackDeletedRow(_oldEntry);
+            rollbackDeletedRow(moldEntry);
         }
     }
 

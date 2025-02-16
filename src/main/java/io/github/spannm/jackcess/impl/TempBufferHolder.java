@@ -23,13 +23,10 @@ import java.nio.ByteOrder;
 
 /**
  * Manages a reference to a ByteBuffer.
- *
- * @author James Ahlborn
  */
 public abstract class TempBufferHolder {
 
-    private static final Reference<ByteBuffer> EMPTY_BUFFER_REF =
-        new SoftReference<>(null);
+    private static final Reference<ByteBuffer> EMPTY_BUFFER_REF = new SoftReference<>(null);
 
     /**
      * The caching type for the buffer holder.
@@ -83,8 +80,7 @@ public abstract class TempBufferHolder {
      * @param autoRewind whether or not every get automatically rewinds the buffer
      * @param order byte order for all allocated buffers
      */
-    public static TempBufferHolder newHolder(Type type, boolean autoRewind,
-        ByteOrder order) {
+    public static TempBufferHolder newHolder(Type type, boolean autoRewind, ByteOrder order) {
         switch (type) {
             case HARD:
                 return new HardTempBufferHolder(autoRewind, order);

@@ -8,8 +8,6 @@ import java.util.*;
 /**
  * Builder style class for constructing an {@link Index}. See {@link TableBuilder} for example usage. Additionally, an
  * Index can be added to an existing Table using the {@link #addToTable(Table)} method.
- *
- * @author James Ahlborn
  * @see TableBuilder
  */
 public class IndexBuilder {

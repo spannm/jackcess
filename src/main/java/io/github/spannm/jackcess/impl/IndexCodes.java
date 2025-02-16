@@ -18,8 +18,6 @@ package io.github.spannm.jackcess.impl;
 
 /**
  * Various constants used for creating index entries.
- *
- * @author James Ahlborn
  */
 public class IndexCodes {
 
@@ -38,8 +36,7 @@ public class IndexCodes {
     }
 
     static boolean isNullEntry(byte startEntryFlag) {
-        return startEntryFlag == ASC_NULL_FLAG
-            || startEntryFlag == DESC_NULL_FLAG;
+        return startEntryFlag == ASC_NULL_FLAG || startEntryFlag == DESC_NULL_FLAG;
     }
 
     static byte getNullEntryFlag(boolean isAscending) {

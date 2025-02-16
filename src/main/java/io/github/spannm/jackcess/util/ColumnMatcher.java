@@ -21,8 +21,6 @@ import io.github.spannm.jackcess.Table;
 
 /**
  * Interface for handling comparisons between column values.
- *
- * @author James Ahlborn
  */
 @FunctionalInterface
 public interface ColumnMatcher {

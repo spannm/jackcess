@@ -10,8 +10,6 @@ import java.util.Map;
 
 /**
  * A row of data as column name-&gt;value pairs. Values are strongly typed, and column names are case sensitive.
- *
- * @author James Ahlborn
  */
 public interface Row extends Map<String, Object> {
     /**

@@ -4,8 +4,6 @@ import java.nio.ByteBuffer;
 
 /**
  * Interface for a handler which can encode/decode a specific access page encoding.
- *
- * @author James Ahlborn
  */
 public interface CodecHandler {
     /**

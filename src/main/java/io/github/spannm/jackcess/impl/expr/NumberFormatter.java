@@ -96,8 +96,7 @@ public class NumberFormatter {
         return _decFmt.format(bd.round(DEC_MATH_CONTEXT));
     }
 
-    private static ScientificFormat createScientificFormat(
-        int prec, DecimalFormatSymbols syms) {
+    private static ScientificFormat createScientificFormat(int prec, DecimalFormatSymbols syms) {
         DecimalFormat df = new DecimalFormat("0.#E00", syms);
         df.setMaximumIntegerDigits(1);
         df.setMaximumFractionDigits(prec);
@@ -157,16 +156,14 @@ public class NumberFormatter {
         }
 
         @Override
-        public StringBuffer format(Object number, StringBuffer toAppendTo,
-            FieldPosition pos) {
+        public StringBuffer format(Object number, StringBuffer toAppendTo, FieldPosition pos) {
             StringBuffer sb = _df.format(number, toAppendTo, pos);
             _type.format(sb, sb.lastIndexOf("E"));
             return sb;
         }
 
         @Override
-        public StringBuffer format(double number, StringBuffer toAppendTo,
-            FieldPosition pos) {
+        public StringBuffer format(double number, StringBuffer toAppendTo, FieldPosition pos) {
             throw new UnsupportedOperationException();
         }
 
@@ -176,8 +173,7 @@ public class NumberFormatter {
         }
 
         @Override
-        public StringBuffer format(long number, StringBuffer toAppendTo,
-            FieldPosition pos) {
+        public StringBuffer format(long number, StringBuffer toAppendTo, FieldPosition pos) {
             throw new UnsupportedOperationException();
         }
 

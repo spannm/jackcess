@@ -11,18 +11,14 @@ import java.util.List;
  * it was easier to do it this way and avoid a lot of unnecessary code shuffling.
  * <p>
  * Is not thread-safe.
- *
- * @author James Ahlborn
  */
 public class TableDefinitionImpl extends TableImpl {
-    protected TableDefinitionImpl(DatabaseImpl database, ByteBuffer tableBuffer,
-        int pageNumber, String name, int flags) throws IOException {
+    protected TableDefinitionImpl(DatabaseImpl database, ByteBuffer tableBuffer, int pageNumber, String name, int flags) throws IOException {
         super(database, tableBuffer, pageNumber, name, flags);
     }
 
     @Override
-    protected List<? extends Object[]> addRows(List<? extends Object[]> rows,
-        final boolean isBatchWrite) {
+    protected List<? extends Object[]> addRows(List<? extends Object[]> rows, final boolean isBatchWrite) {
         // all row additions eventually flow through this method
         throw new UnsupportedOperationException(withErrorContext("TableDefinition has no data access"));
     }

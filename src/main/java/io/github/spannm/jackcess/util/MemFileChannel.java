@@ -22,8 +22,6 @@ import java.nio.file.StandardOpenOption;
  * <p>
  * Implementation note: this class is optimized for use with {@link Database}. Therefore not all methods may be
  * implemented and individual read/write operations are only supported within page boundaries.
- *
- * @author James Ahlborn
  */
 public class MemFileChannel extends FileChannel {
     /** read-only channel access mode */

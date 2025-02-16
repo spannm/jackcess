@@ -226,12 +226,10 @@ public class IndexCodesTest extends AbstractBaseTest {
 
     }
 
-    @Test @Disabled
+    @Test
+    @Disabled
     void testReadAllCodesMdb() throws Exception {
-        try ( // Database db = openCopy(new File("/data2/jackcess_test/testAllIndexCodes.mdb"));
-              // Database db = openCopy(new File("/data2/jackcess_test/testAllIndexCodes_orig.mdb"));
-              // Database db = openCopy(new File("/data2/jackcess_test/testSomeMoreCodes.mdb"));
-        Database db = TestUtil.openCopy(FileFormat.V2000, new File("/data2/jackcess_test/testStillMoreCodes.mdb"))) {
+        try (Database db = TestUtil.openCopy(FileFormat.V2000, new File("/data2/jackcess_test/testStillMoreCodes.mdb"))) {
             Table t = db.getTable("Table5");
 
             Index ind = t.getIndexes().iterator().next();
@@ -273,12 +271,10 @@ public class IndexCodesTest extends AbstractBaseTest {
         }
     }
 
-    @Test @Disabled
+    @Test
+    @Disabled
     void testReadIsoMdb() throws IOException {
-        try ( // Database db = open(new File("/tmp/test_ind.mdb"));
-              // Database db = open(new File("/tmp/test_ind2.mdb"));
-              // Database db = open(new File("/tmp/test_ind4.mdb"));
-        Database db = TestUtil.openDb(FileFormat.V2000, new File("/tmp/test_ind3.mdb"))) {
+        try (Database db = TestUtil.openDb(FileFormat.V2000, new File("/tmp/test_ind3.mdb"))) {
             Table t = db.getTable("Table1");
             Index index = t.getIndex("B");
             ((IndexImpl) index).initialize();

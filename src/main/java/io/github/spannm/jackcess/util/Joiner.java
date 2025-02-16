@@ -9,8 +9,6 @@ import java.util.*;
 
 /**
  * Utility for finding rows based on pre-defined, foreign-key table relationships.
- *
- * @author James Ahlborn
  */
 public class Joiner {
     private final Index                        _fromIndex;

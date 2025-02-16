@@ -9,8 +9,6 @@ import java.io.IOException;
 /**
  * Base class for ColumnValidator instances handling "internal" validation functionality, which are wrappers around any
  * "external" behavior.
- *
- * @author James Ahlborn
  */
 abstract class InternalColumnValidator implements ColumnValidator {
     private ColumnValidator _delegate;
@@ -53,8 +51,7 @@ abstract class InternalColumnValidator implements ColumnValidator {
             sb.append(';');
         }
         appendToString(sb);
-        return sb.append('}')
-            .toString();
+        return sb.append('}').toString();
     }
 
     protected abstract void appendToString(StringBuilder sb);

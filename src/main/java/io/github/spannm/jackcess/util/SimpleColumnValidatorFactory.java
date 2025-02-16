@@ -22,8 +22,6 @@ import io.github.spannm.jackcess.Column;
 /**
  * Simple concrete implementation of ColumnValidatorFactory which returns {@link SimpleColumnValidator#INSTANCE} for all
  * columns.
- *
- * @author James Ahlborn
  */
 public class SimpleColumnValidatorFactory implements ColumnValidatorFactory {
     public static final SimpleColumnValidatorFactory INSTANCE =

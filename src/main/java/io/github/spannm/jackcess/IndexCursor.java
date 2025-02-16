@@ -7,8 +7,6 @@ import java.io.IOException;
 /**
  * Cursor backed by an {@link Index} with extended traversal options. Table traversal will be in the order defined by
  * the backing index. Lookups which utilize the columns of the index will be fast.
- *
- * @author James Ahlborn
  */
 public interface IndexCursor extends Cursor {
 

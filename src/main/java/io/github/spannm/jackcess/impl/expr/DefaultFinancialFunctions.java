@@ -1,27 +1,3 @@
-/*
-Copyright (c) 2017 James Ahlborn
-
-Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this file except in compliance with the License.
-You may obtain a copy of the License at
-
-    http://www.apache.org/licenses/LICENSE-2.0
-
-Unless required by applicable law or agreed to in writing, software
-distributed under the License is distributed on an "AS IS" BASIS,
-WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the specific language governing permissions and
-limitations under the License.
-
-NOTICE:
-Many of the financial functions have been originally copied from the Apache
-POI project (Apache Software Foundation) and the UCanAccess Project.  They
-have been then modified and adapted so that they are integrated with Jackcess,
-in a consistent manner.  The Apache POI and UCanAccess projects are licensed
-under Apache License, Version 2.0 http://www.apache.org/licenses/LICENSE-2.0.
-
-*/
-
 package io.github.spannm.jackcess.impl.expr;
 
 import static io.github.spannm.jackcess.impl.expr.DefaultFunctions.registerFunc;
@@ -41,12 +17,12 @@ public class DefaultFinancialFunctions {
     // http://www.tvmcalcs.com/index.php/calculators/apps/excel_loan_amortization
 
     /** 0 - payment end of month (default) */
-    private static final int    PMT_END_MNTH        = 0;
+    private static final int     PMT_END_MNTH        = 0;
     /** 1 - payment start of month */
-    private static final int    PMT_BEG_MNTH        = 1;
+    private static final int     PMT_BEG_MNTH        = 1;
 
-    private static final int    MAX_RATE_ITERATIONS = 20;
-    private static final double RATE_PRECISION      = 0.0000001; // 1.0e-8
+    private static final int     MAX_RATE_ITERATIONS = 20;
+    private static final double  RATE_PRECISION      = 0.0000001;                                                                                 // 1.0e-8
 
     public static final Function NPER = registerFunc(new FuncVar("NPer", 3, 5) {
         @Override
@@ -288,13 +264,11 @@ public class DefaultFinancialFunctions {
         return (cost - salvage) / life;
     }
 
-    private static double calculateSumOfYearsDepreciation(
-        double cost, double salvage, double life, double period) {
+    private static double calculateSumOfYearsDepreciation(double cost, double salvage, double life, double period) {
         return (cost - salvage) * (life - period + 1) * 2d / (life * (life + 1));
     }
 
-    private static double calculateLoanPaymentPeriods(
-        double rate, double pmt, double pv, double fv, int pmtType) {
+    private static double calculateLoanPaymentPeriods(double rate, double pmt, double pv, double fv, int pmtType) {
 
         if (rate == 0d) {
             return -1 * (fv + pv) / pmt;

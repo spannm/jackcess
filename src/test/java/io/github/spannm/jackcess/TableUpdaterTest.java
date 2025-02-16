@@ -153,7 +153,7 @@ class TableUpdaterTest extends AbstractBaseTest {
                 newColumn("ID", DataType.TEXT)
                     .addToTable(t1);
                 fail("created table with no columns?");
-            } catch (IllegalArgumentException e) {
+            } catch (IllegalArgumentException _ex) {
                 // success
             }
 
@@ -165,7 +165,7 @@ class TableUpdaterTest extends AbstractBaseTest {
                 newRelationship(t1, t2)
                     .toRelationship(db);
                 fail("created rel with no columns?");
-            } catch (IllegalArgumentException e) {
+            } catch (IllegalArgumentException _ex) {
                 // success
             }
 
@@ -174,7 +174,7 @@ class TableUpdaterTest extends AbstractBaseTest {
                     .addColumns("id", "id")
                     .toRelationship(db);
                 fail("created rel with wrong columns?");
-            } catch (IllegalArgumentException e) {
+            } catch (IllegalArgumentException _ex) {
                 // success
             }
         }

@@ -2,68 +2,63 @@ package io.github.spannm.jackcess.impl;
 
 /**
  * ColumnImpl subclass which is used for Memo data types.
- *
- * @author James Ahlborn
  */
 class MemoColumnImpl extends LongValueColumnImpl {
     /** whether or not they are compressed */
-    private final boolean   _compressedUnicode;
+    private final boolean   mcompressedUnicode;
     /** the collating sort order for a text field */
-    private final SortOrder _sortOrder;
+    private final SortOrder msortOrder;
     /** the code page for a text field (for certain db versions) */
-    private final short     _codePage;
+    private final short     mcodePage;
     /**
      * complex column which tracks the version history for this "append only" column
      */
-    private ColumnImpl      _versionHistoryCol;
+    private ColumnImpl      mversionHistoryCol;
     /**
      * whether or not this is a hyperlink column (only possible for columns of type MEMO)
      */
-    private final boolean   _hyperlink;
+    private final boolean   mhyperlink;
 
     MemoColumnImpl(InitArgs args) {
         super(args);
 
         // co-located w/ precision/scale
-        _sortOrder = readSortOrder(
-            args.buffer, args.offset + getFormat().OFFSET_COLUMN_SORT_ORDER,
-            getFormat());
-        _codePage = readCodePage(args.buffer, args.offset, getFormat());
+        msortOrder = readSortOrder(args.buffer, args.offset + getFormat().OFFSET_COLUMN_SORT_ORDER, getFormat());
+        mcodePage = readCodePage(args.buffer, args.offset, getFormat());
 
-        _compressedUnicode =
-            (args.extFlags & COMPRESSED_UNICODE_EXT_FLAG_MASK) != 0;
+        mcompressedUnicode = (args.extFlags & COMPRESSED_UNICODE_EXT_FLAG_MASK) != 0;
 
         // only memo fields can be hyperlinks
-        _hyperlink = (args.flags & HYPERLINK_FLAG_MASK) != 0;
+        mhyperlink = (args.flags & HYPERLINK_FLAG_MASK) != 0;
     }
 
     @Override
     public boolean isCompressedUnicode() {
-        return _compressedUnicode;
+        return mcompressedUnicode;
     }
 
     @Override
     public short getTextCodePage() {
-        return _codePage;
+        return mcodePage;
     }
 
     @Override
     public SortOrder getTextSortOrder() {
-        return _sortOrder;
+        return msortOrder;
     }
 
     @Override
     public ColumnImpl getVersionHistoryColumn() {
-        return _versionHistoryCol;
+        return mversionHistoryCol;
     }
 
     @Override
     public void setVersionHistoryColumn(ColumnImpl versionHistoryCol) {
-        _versionHistoryCol = versionHistoryCol;
+        mversionHistoryCol = versionHistoryCol;
     }
 
     @Override
     public boolean isHyperlink() {
-        return _hyperlink;
+        return mhyperlink;
     }
 }

@@ -8,8 +8,6 @@ import java.util.List;
  * Utility class for constructing {@code byte[]s} where the final size of the data is not known beforehand. The API is
  * similar to {@code ByteBuffer} but the data is not actually written to a {@code byte[]} until {@link #toBuffer} or
  * {@link #toArray} is called.
- *
- * @author James Ahlborn
  */
 public class ByteArrayBuilder {
     private int              _pos;

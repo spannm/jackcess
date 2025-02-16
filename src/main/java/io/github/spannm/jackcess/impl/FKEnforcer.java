@@ -10,8 +10,6 @@ import java.util.*;
 
 /**
  * Utility class used by Table to enforce foreign-key relationships (if enabled).
- *
- * @author James Ahlborn
  */
 final class FKEnforcer {
     // fk constraints always work with indexes, which are always case-insensitive
@@ -207,8 +205,7 @@ final class FKEnforcer {
         // ensure that the relevant rows exist in the primary tables for which
         // this table is a secondary table. however, null values are allowed
         if (!areNull(joiner, row) && !joiner.hasRows(row)) {
-            throw new ConstraintViolationException(
-                "Adding new row " + Arrays.toString(row) + " violates constraint " + joiner.toFKString());
+            throw new ConstraintViolationException("Adding new row " + Arrays.toString(row) + " violates constraint " + joiner.toFKString());
         }
     }
 
@@ -216,21 +213,17 @@ final class FKEnforcer {
         // ensure that no rows exist in the secondary table for which this table is
         // the primary table.
         if (joiner.hasRows(row)) {
-            throw new ConstraintViolationException(
-                "Removing old row " + Arrays.toString(row) + " violates constraint " + joiner.toFKString());
+            throw new ConstraintViolationException("Removing old row " + Arrays.toString(row) + " violates constraint " + joiner.toFKString());
         }
     }
 
-    private static void updateSecondaryValues(Joiner joiner, Object[] oldFromRow,
-        Object[] newFromRow) throws IOException {
+    private static void updateSecondaryValues(Joiner joiner, Object[] oldFromRow, Object[] newFromRow) throws IOException {
         IndexCursor toCursor = joiner.getToCursor();
         List<? extends Index.Column> fromCols = joiner.getColumns();
         List<? extends Index.Column> toCols = joiner.getToIndex().getColumns();
         Object[] toRow = new Object[joiner.getToTable().getColumnCount()];
 
-        for (Iterator<Row> iter = joiner.findRows(oldFromRow)
-            .withColumnNames(Set.of())
-            .iterator(); iter.hasNext();) {
+        for (Iterator<Row> iter = joiner.findRows(oldFromRow).withColumnNames(Set.of()).iterator(); iter.hasNext();) {
             iter.next();
 
             // create update row for "to" table
@@ -250,9 +243,7 @@ final class FKEnforcer {
         List<? extends Index.Column> toCols = joiner.getToIndex().getColumns();
         Object[] toRow = new Object[joiner.getToTable().getColumnCount()];
 
-        for (Iterator<Row> iter = joiner.findRows(oldFromRow)
-            .withColumnNames(Set.of())
-            .iterator(); iter.hasNext();) {
+        for (Iterator<Row> iter = joiner.findRows(oldFromRow).withColumnNames(Set.of()).iterator(); iter.hasNext();) {
             iter.next();
 
             // create update row for "to" table
@@ -267,21 +258,18 @@ final class FKEnforcer {
 
     private boolean anyUpdates(Object[] oldRow, Object[] newRow) {
         for (ColumnImpl col : _cols) {
-            if (!MATCHER.matches(_table, col.getName(),
-                col.getRowValue(oldRow), col.getRowValue(newRow))) {
+            if (!MATCHER.matches(_table, col.getName(), col.getRowValue(oldRow), col.getRowValue(newRow))) {
                 return true;
             }
         }
         return false;
     }
 
-    private static boolean anyUpdates(Joiner joiner, Object[] oldRow,
-        Object[] newRow) {
+    private static boolean anyUpdates(Joiner joiner, Object[] oldRow, Object[] newRow) {
         Table fromTable = joiner.getFromTable();
         for (Index.Column iCol : joiner.getColumns()) {
             Column col = iCol.getColumn();
-            if (!MATCHER.matches(fromTable, col.getName(),
-                col.getRowValue(oldRow), col.getRowValue(newRow))) {
+            if (!MATCHER.matches(fromTable, col.getName(), col.getRowValue(oldRow), col.getRowValue(newRow))) {
                 return true;
             }
         }

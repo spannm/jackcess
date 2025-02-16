@@ -21,29 +21,27 @@ import java.util.Objects;
  * This class will cache the associated complex values returned from one of the lookup methods. The various modification
  * methods will clear this cache automatically. The {@link #reset} method may be called manually to clear this internal
  * cache.
- *
- * @author James Ahlborn
  */
 public class ComplexValueForeignKeyImpl extends ComplexValueForeignKey {
     private static final long                      serialVersionUID = 20110805L;
 
-    private final transient Column                 _column;
-    private final int                              _value;
-    private transient List<? extends ComplexValue> _values;
+    private final transient Column                 mcolumn;
+    private final int                              mvalue;
+    private transient List<? extends ComplexValue> mvalues;
 
     public ComplexValueForeignKeyImpl(Column column, int value) {
-        _column = column;
-        _value = value;
+        mcolumn = column;
+        mvalue = value;
     }
 
     @Override
     public int get() {
-        return _value;
+        return mvalue;
     }
 
     @Override
     public Column getColumn() {
-        return _column;
+        return mcolumn;
     }
 
     @Override
@@ -52,7 +50,7 @@ public class ComplexValueForeignKeyImpl extends ComplexValueForeignKey {
     }
 
     protected ComplexColumnInfo<? extends ComplexValue> getComplexInfo() {
-        return _column.getComplexInfo();
+        return mcolumn.getComplexInfo();
     }
 
     protected VersionHistoryColumnInfo getVersionInfo() {
@@ -82,10 +80,10 @@ public class ComplexValueForeignKeyImpl extends ComplexValueForeignKey {
 
     @Override
     public List<? extends ComplexValue> getValues() throws IOException {
-        if (_values == null) {
-            _values = getComplexInfo().getValues(this);
+        if (mvalues == null) {
+            mvalues = getComplexInfo().getValues(this);
         }
-        return _values;
+        return mvalues;
     }
 
     @Override
@@ -127,7 +125,7 @@ public class ComplexValueForeignKeyImpl extends ComplexValueForeignKey {
     @Override
     public void reset() {
         // discard any cached values
-        _values = null;
+        mvalues = null;
     }
 
     @Override
@@ -158,25 +156,18 @@ public class ComplexValueForeignKeyImpl extends ComplexValueForeignKey {
     }
 
     @Override
-    public Attachment addAttachment(
-        String url, String name, String type, byte[] data,
-        Date timeStamp, Integer flags) throws IOException {
+    public Attachment addAttachment(String url, String name, String type, byte[] data, Date timeStamp, Integer flags) throws IOException {
         return addAttachmentImpl(url, name, type, data, timeStamp, flags);
     }
 
     @Override
-    public Attachment addAttachment(
-        String url, String name, String type, byte[] data,
-        LocalDateTime timeStamp, Integer flags) throws IOException {
+    public Attachment addAttachment(String url, String name, String type, byte[] data, LocalDateTime timeStamp, Integer flags) throws IOException {
         return addAttachmentImpl(url, name, type, data, timeStamp, flags);
     }
 
-    private Attachment addAttachmentImpl(
-        String url, String name, String type, byte[] data,
-        Object timeStamp, Integer flags) throws IOException {
+    private Attachment addAttachmentImpl(String url, String name, String type, byte[] data, Object timeStamp, Integer flags) throws IOException {
         reset();
-        Attachment a = AttachmentColumnInfoImpl.newAttachment(
-            this, url, name, type, data, timeStamp, flags);
+        Attachment a = AttachmentColumnInfoImpl.newAttachment(this, url, name, type, data, timeStamp, flags);
         getAttachmentInfo().addValue(a);
         return a;
     }
@@ -187,27 +178,18 @@ public class ComplexValueForeignKeyImpl extends ComplexValueForeignKey {
     }
 
     @Override
-    public Attachment addEncodedAttachment(
-        String url, String name, String type, byte[] encodedData,
-        Date timeStamp, Integer flags) throws IOException {
-        return addEncodedAttachmentImpl(url, name, type, encodedData, timeStamp,
-            flags);
+    public Attachment addEncodedAttachment(String url, String name, String type, byte[] encodedData, Date timeStamp, Integer flags) throws IOException {
+        return addEncodedAttachmentImpl(url, name, type, encodedData, timeStamp, flags);
     }
 
     @Override
-    public Attachment addEncodedAttachment(
-        String url, String name, String type, byte[] encodedData,
-        LocalDateTime timeStamp, Integer flags) throws IOException {
-        return addEncodedAttachmentImpl(url, name, type, encodedData, timeStamp,
-            flags);
+    public Attachment addEncodedAttachment(String url, String name, String type, byte[] encodedData, LocalDateTime timeStamp, Integer flags) throws IOException {
+        return addEncodedAttachmentImpl(url, name, type, encodedData, timeStamp, flags);
     }
 
-    private Attachment addEncodedAttachmentImpl(
-        String url, String name, String type, byte[] encodedData,
-        Object timeStamp, Integer flags) throws IOException {
+    private Attachment addEncodedAttachmentImpl(String url, String name, String type, byte[] encodedData, Object timeStamp, Integer flags) throws IOException {
         reset();
-        Attachment a = AttachmentColumnInfoImpl.newEncodedAttachment(
-            this, url, name, type, encodedData, timeStamp, flags);
+        Attachment a = AttachmentColumnInfoImpl.newEncodedAttachment(this, url, name, type, encodedData, timeStamp, flags);
         getAttachmentInfo().addValue(a);
         return a;
     }
@@ -278,13 +260,12 @@ public class ComplexValueForeignKeyImpl extends ComplexValueForeignKey {
 
     @Override
     public boolean equals(Object o) {
-        return super.equals(o)
-            && _column == ((ComplexValueForeignKeyImpl) o)._column;
+        return super.equals(o) && mcolumn == ((ComplexValueForeignKeyImpl) o).mcolumn;
     }
 
     @Override
     public int hashCode() {
-        return super.hashCode() + Objects.hash(_column);
+        return super.hashCode() + Objects.hash(mcolumn);
     }
 
     private Object now() {

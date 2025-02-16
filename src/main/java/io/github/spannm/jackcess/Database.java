@@ -30,8 +30,6 @@ import java.util.stream.StreamSupport;
  * Database instances do not implement any "transactional" support, and therefore concurrent editing of the same
  * database file by multiple Database instances (or with outside programs such as MS Access) <i>will generally result in
  * database file corruption</i>.
- *
- * @author James Ahlborn
  */
 public interface Database extends Iterable<Table>, Closeable, Flushable {
     /**

@@ -30,8 +30,6 @@ import java.util.stream.StreamSupport;
 
 /**
  * Utility code for the test cases.
- *
- * @author James Ahlborn
  */
 @SuppressWarnings("deprecation")
 public final class TestUtil {

@@ -4,8 +4,6 @@ import java.util.Map;
 
 /**
  * Complex value corresponding to an unsupported complex column type.
- *
- * @author James Ahlborn
  */
 public interface UnsupportedValue extends ComplexValue {
     Map<String, Object> getValues();

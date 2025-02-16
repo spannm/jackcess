@@ -9,8 +9,6 @@ import java.util.List;
  * instance. The TableDefinition instance only provides access to the table metadata, but no table data.
  * <p>
  * A TableDefinition instance is not thread-safe (see {@link Database} for more thread-safety details).
- *
- * @author James Ahlborn
  */
 public interface TableDefinition {
     /**

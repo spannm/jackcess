@@ -9,8 +9,6 @@ import java.nio.charset.Charset;
  * encoding/decoding support (due to possible export issues with calling encryption APIs). See the separate
  * <a href="https://sourceforge.net/projects/jackcessencrypt/">Jackcess Encrypt</a> project for an implementation of
  * this interface which supports various access database encryption types.
- *
- * @author James Ahlborn
  */
 public interface CodecProvider {
     /**

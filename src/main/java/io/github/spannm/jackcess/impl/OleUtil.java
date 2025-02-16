@@ -19,8 +19,6 @@ import java.util.regex.Pattern;
 
 /**
  * Utility code for working with OLE data.
- *
- * @author James Ahlborn
  */
 @SuppressWarnings("PMD.FieldDeclarationsShouldBeAtStartOfClass")
 public class OleUtil {
@@ -50,8 +48,7 @@ public class OleUtil {
         ContentType.LINK, ContentType.SIMPLE_PACKAGE, ContentType.OTHER);
     private static final byte[]                 NO_DATA                    = new byte[0];
     private static final int                    LINK_HEADER                = 0x01;
-    private static final byte[]                 PACKAGE_FOOTER             = {0x01, 0x05, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01, (byte) 0xAD, 0x05, (byte) 0xFE
-    };
+    private static final byte[]                 PACKAGE_FOOTER             = {0x01, 0x05, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01, (byte) 0xAD, 0x05, (byte) 0xFE};
 
     // regex pattern which matches all the crazy extra stuff in unicode
     private static final Pattern                UNICODE_ACCENT_PATTERN     =
@@ -63,9 +60,8 @@ public class OleUtil {
         CompoundPackageFactory compoundFactory = null;
         try {
             compoundFactory = (CompoundPackageFactory) Class.forName("io.github.spannm.jackcess.impl.CompoundOleUtil")
-                .getDeclaredConstructor()
-                .newInstance();
-        } catch (Throwable t) {
+                .getDeclaredConstructor().newInstance();
+        } catch (Throwable _ex) {
             // must not have poi, will load compound ole data as "other"
         }
         COMPOUND_FACTORY = compoundFactory;
@@ -154,8 +150,7 @@ public class OleUtil {
         }
     }
 
-    private static byte[] writePackageHeader(Builder oleBuilder,
-        long contentLen) {
+    private static byte[] writePackageHeader(Builder oleBuilder, long contentLen) {
 
         byte[] prettyNameBytes = getZeroTermStrBytes(oleBuilder.getPrettyName());
         String className = oleBuilder.getClassName();
@@ -293,8 +288,7 @@ public class OleUtil {
         int dataBlockPos = bb.position();
 
         if (SIMPLE_PACKAGE_TYPE.equalsIgnoreCase(typeName)) {
-            return createSimplePackageContent(
-                blob, prettyName, className, typeName, bb, dataBlockLen);
+            return createSimplePackageContent(blob, prettyName, className, typeName, bb, dataBlockLen);
         }
 
         // if COMPOUND_FACTORY is null, the poi library isn't available, so just
@@ -308,22 +302,17 @@ public class OleUtil {
 
         // this is either some other "special" (as yet unhandled) format, or it is
         // simply an embedded file (or it is compound data and poi isn't available)
-        return new OtherContentImpl(blob, prettyName, className,
-            typeName, dataBlockPos, dataBlockLen);
+        return new OtherContentImpl(blob, prettyName, className, typeName, dataBlockPos, dataBlockLen);
     }
 
-    private static ContentImpl createSimplePackageContent(
-        OleBlobImpl blob, String prettyName, String className, String typeName,
-        ByteBuffer blobBb, int dataBlockLen) {
+    private static ContentImpl createSimplePackageContent(OleBlobImpl blob, String prettyName, String className, String typeName, ByteBuffer blobBb, int dataBlockLen) {
 
         int dataBlockPos = blobBb.position();
-        ByteBuffer bb = PageChannel.narrowBuffer(blobBb, dataBlockPos,
-            dataBlockPos + dataBlockLen);
+        ByteBuffer bb = PageChannel.narrowBuffer(blobBb, dataBlockPos, dataBlockPos + dataBlockLen);
 
         int packageSig = bb.getShort();
         if (packageSig != PACKAGE_STREAM_SIGNATURE) {
-            return new OtherContentImpl(blob, prettyName, className,
-                typeName, dataBlockPos, dataBlockLen);
+            return new OtherContentImpl(blob, prettyName, className, typeName, dataBlockPos, dataBlockLen);
         }
 
         String fileName = readZeroTermStr(bb);
@@ -370,9 +359,7 @@ public class OleUtil {
                 strNum++;
             }
 
-            return new SimplePackageContentImpl(
-                blob, prettyName, className, typeName, dataPos, dataLen,
-                fileName, filePath, localFilePath);
+            return new SimplePackageContentImpl(blob, prettyName, className, typeName, dataPos, dataLen, fileName, filePath, localFilePath);
         }
 
         if (packageType == PS_LINKED_FILE) {
@@ -380,12 +367,10 @@ public class OleUtil {
             bb.getShort(); // unknown
             String linkStr = readZeroTermStr(bb);
 
-            return new LinkContentImpl(blob, prettyName, className, typeName,
-                fileName, linkStr, filePath);
+            return new LinkContentImpl(blob, prettyName, className, typeName, fileName, linkStr, filePath);
         }
 
-        return new OtherContentImpl(blob, prettyName, className,
-            typeName, dataBlockPos, dataBlockLen);
+        return new OtherContentImpl(blob, prettyName, className, typeName, dataBlockPos, dataBlockLen);
     }
 
     private static String readStr(ByteBuffer bb, int off, int len) {
@@ -404,8 +389,7 @@ public class OleUtil {
         return readStr(bb, off, len);
     }
 
-    private static String readStr(ByteBuffer bb, int off, int len,
-        Charset charset) {
+    private static String readStr(ByteBuffer bb, int off, int len, Charset charset) {
         String str = new String(bb.array(), off, len, charset);
         bb.position(off + len);
         if (str.charAt(str.length() - 1) == '\0') {
@@ -480,8 +464,7 @@ public class OleUtil {
 
         @Override
         public long position(byte[] pattern, long start) {
-            int pos = ByteUtil.findRange(PageChannel.wrap(_bytes),
-                fromJdbcOffset(start), pattern);
+            int pos = ByteUtil.findRange(PageChannel.wrap(_bytes), fromJdbcOffset(start), pattern);
             return pos >= 0 ? toJdbcOffset(pos) : pos;
         }
 
@@ -506,8 +489,7 @@ public class OleUtil {
         }
 
         @Override
-        public int setBytes(long pos, byte[] bytes, int offset, int lesn)
-            throws SQLException {
+        public int setBytes(long pos, byte[] bytes, int offset, int lesn) throws SQLException {
             throw new SQLFeatureNotSupportedException();
         }
 
@@ -537,8 +519,7 @@ public class OleUtil {
             if (_content != null) {
                 sb.append("content", _content);
             } else {
-                sb.append("bytes", _bytes)
-                  .append("content", "(uninitialized)");
+                sb.append("bytes", _bytes).append("content", "(uninitialized)");
             }
             return sb.toString();
         }
@@ -606,15 +587,12 @@ public class OleUtil {
         }
     }
 
-    abstract static class EmbeddedPackageContentImpl
-        extends EmbeddedContentImpl implements PackageContent {
+    abstract static class EmbeddedPackageContentImpl extends EmbeddedContentImpl implements PackageContent {
         private final String _prettyName;
         private final String _className;
         private final String _typeName;
 
-        protected EmbeddedPackageContentImpl(
-            OleBlobImpl blob, String prettyName, String className,
-            String typeName, int position, int length) {
+        protected EmbeddedPackageContentImpl(OleBlobImpl blob, String prettyName, String className, String typeName, int position, int length) {
             super(blob, position, length);
             _prettyName = prettyName;
             _className = className;
@@ -638,9 +616,7 @@ public class OleUtil {
 
         @Override
         protected ToStringBuilder toString(ToStringBuilder sb) {
-            sb.append("prettyName", _prettyName)
-              .append("className", _className)
-              .append("typeName", _typeName);
+            sb.append("prettyName", _prettyName).append("className", _className).append("typeName", _typeName);
             super.toString(sb);
             return sb;
         }
@@ -651,10 +627,7 @@ public class OleUtil {
         private final String _linkPath;
         private final String _filePath;
 
-        private LinkContentImpl(OleBlobImpl blob, String prettyName,
-            String className, String typeName,
-            String fileName, String linkPath,
-            String filePath) {
+        private LinkContentImpl(OleBlobImpl blob, String prettyName, String className, String typeName, String fileName, String linkPath, String filePath) {
             super(blob, prettyName, className, typeName, -1, -1);
             _fileName = fileName;
             _linkPath = linkPath;
@@ -688,25 +661,16 @@ public class OleUtil {
 
         @Override
         public String toString() {
-            return toString(ToStringBuilder.builder(this))
-                .append("fileName", _fileName)
-                .append("linkPath", _linkPath)
-                .append("filePath", _filePath)
-                .toString();
+            return toString(ToStringBuilder.builder(this)).append("fileName", _fileName).append("linkPath", _linkPath).append("filePath", _filePath).toString();
         }
     }
 
-    private static final class SimplePackageContentImpl
-        extends EmbeddedPackageContentImpl implements SimplePackageContent {
+    private static final class SimplePackageContentImpl extends EmbeddedPackageContentImpl implements SimplePackageContent {
         private final String _fileName;
         private final String _filePath;
         private final String _localFilePath;
 
-        private SimplePackageContentImpl(OleBlobImpl blob, String prettyName,
-            String className, String typeName,
-            int position, int length,
-            String fileName, String filePath,
-            String localFilePath) {
+        private SimplePackageContentImpl(OleBlobImpl blob, String prettyName, String className, String typeName, int position, int length, String fileName, String filePath, String localFilePath) {
             super(blob, prettyName, className, typeName, position, length);
             _fileName = fileName;
             _filePath = filePath;
@@ -735,18 +699,12 @@ public class OleUtil {
 
         @Override
         public String toString() {
-            return toString(ToStringBuilder.builder(this))
-                .append("fileName", _fileName)
-                .append("filePath", _filePath)
-                .append("localFilePath", _localFilePath)
-                .toString();
+            return toString(ToStringBuilder.builder(this)).append("fileName", _fileName).append("filePath", _filePath).append("localFilePath", _localFilePath).toString();
         }
     }
 
     private static final class OtherContentImpl extends EmbeddedPackageContentImpl implements OtherContent {
-        private OtherContentImpl(
-            OleBlobImpl blob, String prettyName, String className,
-            String typeName, int position, int length) {
+        private OtherContentImpl(OleBlobImpl blob, String prettyName, String className, String typeName, int position, int length) {
             super(blob, prettyName, className, typeName, position, length);
         }
 
@@ -757,8 +715,7 @@ public class OleUtil {
 
         @Override
         public String toString() {
-            return toString(ToStringBuilder.builder(this))
-                .toString();
+            return toString(ToStringBuilder.builder(this)).toString();
         }
     }
 
@@ -774,9 +731,7 @@ public class OleUtil {
 
         @Override
         public String toString() {
-            return toString(ToStringBuilder.builder(this))
-                .append("content", _blob._bytes)
-                .toString();
+            return toString(ToStringBuilder.builder(this)).append("content", _blob._bytes).toString();
         }
     }
 

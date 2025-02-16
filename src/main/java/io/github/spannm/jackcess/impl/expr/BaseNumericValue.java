@@ -20,8 +20,7 @@ public abstract class BaseNumericValue extends BaseValue {
 
     @Override
     public Value getAsDateTimeValue(LocaleContext ctx) {
-        Value dateValue = DefaultDateFunctions.numberToDateValue(
-            getNumber().doubleValue());
+        Value dateValue = DefaultDateFunctions.numberToDateValue(getNumber().doubleValue());
         if (dateValue == null) {
             throw invalidConversion(Value.Type.DATE_TIME);
         }

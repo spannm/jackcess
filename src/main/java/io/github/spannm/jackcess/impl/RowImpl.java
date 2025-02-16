@@ -15,8 +15,6 @@ import java.util.LinkedHashMap;
  * <p>
  * Note that the {@link #equals} and {@link #hashCode} methods work on the row contents <i>only</i> (i.e. they ignore
  * the id).
- *
- * @author James Ahlborn
  */
 public class RowImpl extends LinkedHashMap<String, Object> implements Row {
     private static final long serialVersionUID = 20130314L;

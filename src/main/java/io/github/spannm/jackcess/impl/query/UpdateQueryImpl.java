@@ -25,13 +25,10 @@ import java.util.List;
 /**
  * Concrete Query subclass which represents a row update query,
  * e.g.: {@code UPDATE table SET newValues}.
- *
- * @author James Ahlborn
  */
 public class UpdateQueryImpl extends QueryImpl implements UpdateQuery {
 
-    public UpdateQueryImpl(String name, List<Row> rows, int objectId,
-        int objectFlag) {
+    public UpdateQueryImpl(String name, List<Row> rows, int objectId, int objectFlag) {
         super(name, rows, objectId, objectFlag, Type.UPDATE);
     }
 
@@ -55,8 +52,7 @@ public class UpdateQueryImpl extends QueryImpl implements UpdateQuery {
         return new RowFormatter(getColumnRows()) {
             @Override
             protected void format(StringBuilder builder, Row row) {
-                toOptionalQuotedExpr(builder, row._name2, true)
-                    .append(" = ").append(row._expression);
+                toOptionalQuotedExpr(builder, row._name2, true).append(" = ").append(row._expression);
             }
         }.format();
     }

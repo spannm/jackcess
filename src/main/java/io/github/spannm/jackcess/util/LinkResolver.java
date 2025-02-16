@@ -9,8 +9,6 @@ import java.io.IOException;
 
 /**
  * Resolver for linked databases.
- *
- * @author James Ahlborn
  */
 @FunctionalInterface
 public interface LinkResolver {

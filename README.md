@@ -10,5 +10,5 @@ This project was forked from https://sourceforge.net/projects/jackcess/
 
 ---
 
-UCanAccess is licensed under the Apache License, Version 2.0. Please see here for detailed [license info](LICENSE.txt).
+Jackcess is licensed under the Apache License, Version 2.0. Please see here for detailed [license info](LICENSE.txt).
 

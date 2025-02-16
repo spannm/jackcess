@@ -11,8 +11,6 @@ import java.util.stream.StreamSupport;
 /**
  * Builder style class for constructing a {@link Database} Iterable/Iterator for {@link Table}s. By default, normal
  * (non-system, non-linked tables) and linked tables are included and system tables are not.
- *
- * @author James Ahlborn
  */
 public class TableIterableBuilder implements Iterable<Table> {
     private final Database _db;

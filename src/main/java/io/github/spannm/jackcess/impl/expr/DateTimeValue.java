@@ -8,29 +8,29 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 public class DateTimeValue extends BaseValue {
-    private final Type          _type;
-    private final LocalDateTime _val;
+    private final Type          type;
+    private final LocalDateTime val;
 
-    public DateTimeValue(Type type, LocalDateTime val) {
-        if (!type.isTemporal()) {
+    public DateTimeValue(Type _type, LocalDateTime _val) {
+        if (!_type.isTemporal()) {
             throw new IllegalArgumentException("invalid date/time type");
         }
-        _type = type;
-        _val = val;
+        type = _type;
+        val = _val;
     }
 
     @Override
     public Type getType() {
-        return _type;
+        return type;
     }
 
     @Override
     public Object get() {
-        return _val;
+        return val;
     }
 
     protected Double getNumber(LocaleContext ctx) {
-        return ColumnImpl.toDateDouble(_val);
+        return ColumnImpl.toDateDouble(val);
     }
 
     @Override
@@ -41,12 +41,12 @@ public class DateTimeValue extends BaseValue {
 
     @Override
     public String getAsString(LocaleContext ctx) {
-        return ValueSupport.getDateFormatForType(ctx, getType()).format(_val);
+        return ValueSupport.getDateFormatForType(ctx, getType()).format(val);
     }
 
     @Override
     public LocalDateTime getAsLocalDateTime(LocaleContext ctx) {
-        return _val;
+        return val;
     }
 
     @Override

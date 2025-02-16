@@ -10,8 +10,6 @@ import java.util.Collection;
 
 /**
  * ColumnImpl subclass which is used for long value data types.
- *
- * @author James Ahlborn
  */
 class LongValueColumnImpl extends ColumnImpl {
     /**
@@ -87,14 +85,12 @@ class LongValueColumnImpl extends ColumnImpl {
                 }
                 return null;
             default:
-                throw new RuntimeException(withErrorContext(
-                    "unexpected var length, long value type: " + getType()));
+                throw new RuntimeException(withErrorContext("unexpected var length, long value type: " + getType()));
         }
     }
 
     @Override
-    protected ByteBuffer writeRealData(Object obj, int remainingRowLength,
-        ByteOrder order) throws IOException {
+    protected ByteBuffer writeRealData(Object obj, int remainingRowLength, ByteOrder order) throws IOException {
         switch (getType()) {
             case OLE:
                 // should already be "encoded"
@@ -103,8 +99,7 @@ class LongValueColumnImpl extends ColumnImpl {
                 obj = encodeTextValue(obj, 0, getMaxLengthInUnits(), false).array();
                 break;
             default:
-                throw new RuntimeException(withErrorContext(
-                    "unexpected var length, long value type: " + getType()));
+                throw new RuntimeException(withErrorContext("unexpected var length, long value type: " + getType()));
         }
 
         // create long value buffer
@@ -132,8 +127,7 @@ class LongValueColumnImpl extends ColumnImpl {
             int rowLen = def.remaining();
             if (rowLen < length) {
                 // warn the caller, but return whatever we can
-                LOGGER.log(Level.WARNING, withErrorContext(
-                    "Value may be truncated: expected length " + length + " found " + rowLen));
+                LOGGER.log(Level.WARNING, withErrorContext("Value may be truncated: expected length " + length + " found " + rowLen));
                 rtn = new byte[rowLen];
             }
 
@@ -143,8 +137,7 @@ class LongValueColumnImpl extends ColumnImpl {
 
             // long value on other page(s)
             if (lvalDefinition.length != getFormat().SIZE_LONG_VALUE_DEF) {
-                throw new IOException(withErrorContext(
-                    "Expected " + getFormat().SIZE_LONG_VALUE_DEF + " bytes in long value definition, but found " + lvalDefinition.length));
+                throw new IOException(withErrorContext("Expected " + getFormat().SIZE_LONG_VALUE_DEF + " bytes in long value definition, but found " + lvalDefinition.length));
             }
 
             int rowNum = ByteUtil.getUnsignedByte(def);
@@ -221,15 +214,13 @@ class LongValueColumnImpl extends ColumnImpl {
      */
     protected ByteBuffer writeLongValue(byte[] value, int remainingRowLength) throws IOException {
         if (value.length > getType().getMaxSize()) {
-            throw new InvalidValueException(withErrorContext(
-                "value too big for column, max " + getType().getMaxSize() + ", got " + value.length));
+            throw new InvalidValueException(withErrorContext("value too big for column, max " + getType().getMaxSize() + ", got " + value.length));
         }
 
         // determine which type to write
         byte type = 0;
         int lvalDefLen = getFormat().SIZE_LONG_VALUE_DEF;
-        if (getFormat().SIZE_LONG_VALUE_DEF + value.length <= remainingRowLength
-            && value.length <= getFormat().MAX_INLINE_LONG_VALUE_SIZE) {
+        if (getFormat().SIZE_LONG_VALUE_DEF + value.length <= remainingRowLength && value.length <= getFormat().MAX_INLINE_LONG_VALUE_SIZE) {
             type = LONG_VALUE_TYPE_THIS_PAGE;
             lvalDefLen += value.length;
         } else if (value.length <= getFormat().MAX_LONG_VALUE_ROW_SIZE) {
@@ -259,8 +250,7 @@ class LongValueColumnImpl extends ColumnImpl {
                 case LONG_VALUE_TYPE_OTHER_PAGE:
                     lvalPage = _lvalBufferH.getLongValuePage(value.length);
                     firstLvalPageNum = _lvalBufferH.getPageNumber();
-                    firstLvalRow = (byte) TableImpl.addDataPageRow(lvalPage, value.length,
-                        getFormat(), 0);
+                    firstLvalRow = (byte) TableImpl.addDataPageRow(lvalPage, value.length, getFormat(), 0);
                     lvalPage.put(value);
                     getPageChannel().writePage(lvalPage, firstLvalPageNum);
                     break;
@@ -282,18 +272,15 @@ class LongValueColumnImpl extends ColumnImpl {
 
                         // figure out how much we will put in this page (we need 4 bytes for
                         // the next page pointer)
-                        int chunkLength = Math.min(getFormat().MAX_LONG_VALUE_ROW_SIZE - 4,
-                            remainingLen);
+                        int chunkLength = Math.min(getFormat().MAX_LONG_VALUE_ROW_SIZE - 4, remainingLen);
 
                         // figure out if we will need another page, and if so, allocate it
                         if (chunkLength < remainingLen) {
                             // force a new page to be allocated for the chunk after this
                             _lvalBufferH.clear();
-                            nextLvalPage = _lvalBufferH.getLongValuePage(
-                                remainingLen - chunkLength + 4);
+                            nextLvalPage = _lvalBufferH.getLongValuePage(remainingLen - chunkLength + 4);
                             nextLvalPageNum = _lvalBufferH.getPageNumber();
-                            nextLvalRowNum = TableImpl.getRowsOnDataPage(nextLvalPage,
-                                getFormat());
+                            nextLvalRowNum = TableImpl.getRowsOnDataPage(nextLvalPage, getFormat());
                         } else {
                             nextLvalPage = null;
                             nextLvalPageNum = 0;
@@ -322,8 +309,7 @@ class LongValueColumnImpl extends ColumnImpl {
                     break;
 
                 default:
-                    throw new IOException(withErrorContext(
-                        "Unrecognized long value type: " + type));
+                    throw new IOException(withErrorContext("Unrecognized long value type: " + type));
             }
 
             // update def
@@ -428,11 +414,9 @@ class LongValueColumnImpl extends ColumnImpl {
         /** Usage map of pages that this column owns with free space on them */
         private final UsageMap       _freeSpacePages;
         /** page buffer used to write "long value" data */
-        private final TempPageHolder _longValueBufferH =
-            TempPageHolder.newHolder(TempBufferHolder.Type.SOFT);
+        private final TempPageHolder _longValueBufferH = TempPageHolder.newHolder(TempBufferHolder.Type.SOFT);
 
-        private UmapLongValueBufferHolder(UsageMap ownedPages,
-            UsageMap freeSpacePages) {
+        private UmapLongValueBufferHolder(UsageMap ownedPages, UsageMap freeSpacePages) {
             _ownedPages = ownedPages;
             _freeSpacePages = freeSpacePages;
         }
@@ -451,8 +435,7 @@ class LongValueColumnImpl extends ColumnImpl {
         protected ByteBuffer findNewPage(int dataLength) throws IOException {
 
             // grab last owned page and check for free space.
-            ByteBuffer newPage = TableImpl.findFreeRowSpace(
-                _ownedPages, _freeSpacePages, _longValueBufferH);
+            ByteBuffer newPage = TableImpl.findFreeRowSpace(_ownedPages, _freeSpacePages, _longValueBufferH);
 
             if (newPage != null) {
                 if (TableImpl.rowFitsOnDataPage(dataLength, newPage, getFormat())) {

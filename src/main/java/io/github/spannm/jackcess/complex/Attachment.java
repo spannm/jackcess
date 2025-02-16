@@ -8,8 +8,6 @@ import java.util.Date;
 
 /**
  * Complex value corresponding to an attachment.
- *
- * @author James Ahlborn
  */
 public interface Attachment extends ComplexValue {
     byte[] getFileData() throws IOException;

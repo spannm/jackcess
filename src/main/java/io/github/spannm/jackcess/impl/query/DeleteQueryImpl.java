@@ -23,13 +23,10 @@ import java.util.List;
 /**
  * Concrete Query subclass which represents a delete query,
  * e.g.: {@code DELETE * FROM table WHERE expression}.
- *
- * @author James Ahlborn
  */
 public class DeleteQueryImpl extends BaseSelectQueryImpl implements DeleteQuery {
 
-    public DeleteQueryImpl(String name, List<Row> rows, int objectId,
-        int objectFlag) {
+    public DeleteQueryImpl(String name, List<Row> rows, int objectId, int objectFlag) {
         super(name, rows, objectId, objectFlag, Type.DELETE);
     }
 

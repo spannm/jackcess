@@ -12,8 +12,6 @@ import java.nio.channels.*;
  * <p>
  * Implementation note: this class is optimized for use with {@link Database}. Therefore not all methods may be
  * implemented.
- *
- * @author James Ahlborn
  */
 public class ReadOnlyFileChannel extends FileChannel {
     private final FileChannel _delegate;

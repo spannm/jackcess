@@ -8,8 +8,6 @@ import java.util.stream.IntStream;
  *
  * The class prefers interface {@link CharSequence} for inputs over {@code String} whenever possible, so that all implementations (e.g. {@link StringBuffer}, {@link StringBuilder}, {@link CharBuffer})
  * can benefit.
- *
- * @author Markus Spann
  */
 public final class StringUtil {
 

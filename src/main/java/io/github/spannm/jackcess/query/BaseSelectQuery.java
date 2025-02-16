@@ -4,8 +4,6 @@ import java.util.List;
 
 /**
  * Base interface for queries which represent some form of SELECT statement.
- *
- * @author James Ahlborn
  */
 public interface BaseSelectQuery extends Query {
 

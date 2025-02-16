@@ -22,8 +22,6 @@ import java.io.Serializable;
 
 /**
  * Uniquely identifies a row of data within the access database.
- *
- * @author James Ahlborn
  */
 public class RowIdImpl implements RowId, Serializable {
     private static final long serialVersionUID   = 20131014L;
@@ -57,12 +55,10 @@ public class RowIdImpl implements RowId, Serializable {
     }
 
     /** special rowId which will sort before any other valid rowId */
-    public static final RowIdImpl FIRST_ROW_ID = new RowIdImpl(
-        FIRST_PAGE_NUMBER, INVALID_ROW_NUMBER);
+    public static final RowIdImpl FIRST_ROW_ID = new RowIdImpl(FIRST_PAGE_NUMBER, INVALID_ROW_NUMBER);
 
     /** special rowId which will sort after any other valid rowId */
-    public static final RowIdImpl LAST_ROW_ID  = new RowIdImpl(
-        LAST_PAGE_NUMBER, INVALID_ROW_NUMBER);
+    public static final RowIdImpl LAST_ROW_ID  = new RowIdImpl(LAST_PAGE_NUMBER, INVALID_ROW_NUMBER);
 
     private final int             _pageNumber;
     private final int             _rowNumber;

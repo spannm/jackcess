@@ -12,8 +12,6 @@ import java.nio.ByteOrder;
  * <p>
  * These are the currently possible calculated types: FLOAT, DOUBLE, INT, LONG, BIG_INT, GUID, SHORT_DATE_TIME, MONEY,
  * BOOLEAN, NUMERIC, TEXT, MEMO.
- *
- * @author James Ahlborn
  */
 class CalculatedColumnUtil {
 
@@ -27,11 +25,9 @@ class CalculatedColumnUtil {
     static final short          CALC_FIXED_FIELD_LEN = 39;
 
     // fully encode calculated BOOLEAN "true" value
-    private static final byte[] CALC_BOOL_TRUE       = wrapCalculatedValue(
-        new byte[] {(byte) 0xFF});
+    private static final byte[] CALC_BOOL_TRUE       = wrapCalculatedValue(new byte[] {(byte) 0xFF});
     // fully encode calculated BOOLEAN "false" value
-    private static final byte[] CALC_BOOL_FALSE      = wrapCalculatedValue(
-        new byte[] {0});
+    private static final byte[] CALC_BOOL_FALSE      = wrapCalculatedValue(new byte[] {0});
 
     private CalculatedColumnUtil() {
     }
@@ -81,8 +77,7 @@ class CalculatedColumnUtil {
      * data.
      */
     private static ByteBuffer wrapCalculatedValue(ByteBuffer buffer) {
-        ByteBuffer newBuf = prepareWrappedCalcValue(
-            buffer.remaining(), buffer.order());
+        ByteBuffer newBuf = prepareWrappedCalcValue(buffer.remaining(), buffer.order());
         newBuf.put(buffer);
         newBuf.rewind();
         return newBuf;
@@ -94,8 +89,7 @@ class CalculatedColumnUtil {
      */
     private static byte[] wrapCalculatedValue(byte[] data) {
         int dataLen = data.length;
-        data = ByteUtil.copyOf(data, 0, dataLen + CALC_EXTRA_DATA_LEN,
-            CALC_DATA_OFFSET);
+        data = ByteUtil.copyOf(data, 0, dataLen + CALC_EXTRA_DATA_LEN, CALC_DATA_OFFSET);
         PageChannel.wrap(data).putInt(CALC_DATA_LEN_OFFSET, dataLen);
         return data;
     }
@@ -104,8 +98,7 @@ class CalculatedColumnUtil {
      * Prepares a calculated value buffer for data of the given length.
      */
     private static ByteBuffer prepareWrappedCalcValue(int dataLen, ByteOrder order) {
-        ByteBuffer buffer = ByteBuffer.allocate(
-            dataLen + CALC_EXTRA_DATA_LEN).order(order);
+        ByteBuffer buffer = ByteBuffer.allocate(dataLen + CALC_EXTRA_DATA_LEN).order(order);
         buffer.putInt(CALC_DATA_LEN_OFFSET, dataLen);
         buffer.position(CALC_DATA_OFFSET);
         return buffer;
@@ -142,12 +135,9 @@ class CalculatedColumnUtil {
         }
 
         @Override
-        protected ByteBuffer writeRealData(Object obj, int remainingRowLength,
-            ByteOrder order)
-            throws IOException {
+        protected ByteBuffer writeRealData(Object obj, int remainingRowLength, ByteOrder order) throws IOException {
             // we should only be working with fixed length types
-            ByteBuffer buffer = writeFixedLengthField(
-                obj, prepareWrappedCalcValue(getType().getFixedSize(), order));
+            ByteBuffer buffer = writeFixedLengthField(obj, prepareWrappedCalcValue(getType().getFixedSize(), order));
             buffer.rewind();
             return buffer;
         }
@@ -189,10 +179,8 @@ class CalculatedColumnUtil {
         }
 
         @Override
-        protected ByteBuffer writeRealData(Object obj, int remainingRowLength,
-            ByteOrder order) {
-            return ByteBuffer.wrap(
-                toBooleanValue(obj) ? CALC_BOOL_TRUE : CALC_BOOL_FALSE).order(order);
+        protected ByteBuffer writeRealData(Object obj, int remainingRowLength, ByteOrder order) {
+            return ByteBuffer.wrap(toBooleanValue(obj) ? CALC_BOOL_TRUE : CALC_BOOL_FALSE).order(order);
         }
     }
 
@@ -220,8 +208,7 @@ class CalculatedColumnUtil {
         protected int calcLengthInUnits() {
             // the byte "length" includes the calculated field overhead. remove
             // that to get the _actual_ data length (in units)
-            return getType().toUnitSize(getLength() - CALC_EXTRA_DATA_LEN,
-                getFormat());
+            return getType().toUnitSize(getLength() - CALC_EXTRA_DATA_LEN, getFormat());
         }
 
         @Override
@@ -230,11 +217,8 @@ class CalculatedColumnUtil {
         }
 
         @Override
-        protected ByteBuffer writeRealData(Object obj, int remainingRowLength,
-            ByteOrder order)
-            throws IOException {
-            return wrapCalculatedValue(super.writeRealData(
-                obj, remainingRowLength, order));
+        protected ByteBuffer writeRealData(Object obj, int remainingRowLength, ByteOrder order) throws IOException {
+            return wrapCalculatedValue(super.writeRealData(obj, remainingRowLength, order));
         }
     }
 
@@ -262,21 +246,17 @@ class CalculatedColumnUtil {
         protected int calcMaxLengthInUnits() {
             // the byte "length" includes the calculated field overhead. remove
             // that to get the _actual_ data length (in units)
-            return getType().toUnitSize(getType().getMaxSize() - CALC_EXTRA_DATA_LEN,
-                getFormat());
+            return getType().toUnitSize(getType().getMaxSize() - CALC_EXTRA_DATA_LEN, getFormat());
         }
 
         @Override
-        protected byte[] readLongValue(byte[] lvalDefinition)
-            throws IOException {
+        protected byte[] readLongValue(byte[] lvalDefinition) throws IOException {
             return unwrapCalculatedValue(super.readLongValue(lvalDefinition));
         }
 
         @Override
-        protected ByteBuffer writeLongValue(byte[] value, int remainingRowLength)
-            throws IOException {
-            return super.writeLongValue(
-                wrapCalculatedValue(value), remainingRowLength);
+        protected ByteBuffer writeLongValue(byte[] value, int remainingRowLength) throws IOException {
+            return super.writeLongValue(wrapCalculatedValue(value), remainingRowLength);
         }
     }
 
@@ -316,9 +296,7 @@ class CalculatedColumnUtil {
         }
 
         @Override
-        protected ByteBuffer writeRealData(Object obj, int remainingRowLength,
-            ByteOrder order)
-            throws IOException {
+        protected ByteBuffer writeRealData(Object obj, int remainingRowLength, ByteOrder order) throws IOException {
             int totalDataLen = Math.min(CALC_EXTRA_DATA_LEN + 16 + 4, getLength());
             // data length must be multiple of 4
             int dataLen = toMul4(totalDataLen - CALC_EXTRA_DATA_LEN);
@@ -348,9 +326,7 @@ class CalculatedColumnUtil {
             return toBigDecimal(tmpArr, negate, scale);
         }
 
-        private void writeCalcNumericValue(ByteBuffer buffer, Object value,
-            int dataLen)
-            throws IOException {
+        private void writeCalcNumericValue(ByteBuffer buffer, Object value, int dataLen) throws IOException {
             Object inValue = value;
             try {
                 BigDecimal decVal = toBigDecimal(value);
@@ -371,9 +347,7 @@ class CalculatedColumnUtil {
 
                 // check precision
                 if (decVal.precision() > getType().getMaxPrecision()) {
-                    throw new InvalidValueException(withErrorContext(
-                        "Numeric value is too big for specified precision "
-                            + getType().getMaxPrecision() + ": " + decVal));
+                    throw new InvalidValueException(withErrorContext("Numeric value is too big for specified precision " + getType().getMaxPrecision() + ": " + decVal));
                 }
 
                 // convert to unscaled BigInteger, big-endian bytes
@@ -389,9 +363,8 @@ class CalculatedColumnUtil {
                 buffer.put(signum < 0 ? NUMERIC_NEGATIVE_BYTE : 0);
                 buffer.put(intValBytes);
 
-            } catch (ArithmeticException e) {
-                throw new IOException(
-                    withErrorContext("Numeric value '" + inValue + "' out of range"), e);
+            } catch (ArithmeticException _ex) {
+                throw new IOException(withErrorContext("Numeric value '" + inValue + "' out of range"), _ex);
             }
         }
 

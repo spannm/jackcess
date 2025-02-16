@@ -22,14 +22,10 @@ import java.util.List;
 
 /**
  * Concrete Query subclass which represents a DDL query.
- *
- * @author James Ahlborn
  */
-public class DataDefinitionQueryImpl extends QueryImpl
-    implements DataDefinitionQuery {
+public class DataDefinitionQueryImpl extends QueryImpl implements DataDefinitionQuery {
 
-    public DataDefinitionQueryImpl(String name, List<Row> rows, int objectId,
-        int objectFlag) {
+    public DataDefinitionQueryImpl(String name, List<Row> rows, int objectId, int objectFlag) {
         super(name, rows, objectId, objectFlag, Type.DATA_DEFINITION);
     }
 

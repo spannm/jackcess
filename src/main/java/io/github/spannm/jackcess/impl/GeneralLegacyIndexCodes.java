@@ -21,6 +21,7 @@ import io.github.spannm.jackcess.impl.ByteUtil.ByteStream;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.UncheckedIOException;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -28,14 +29,11 @@ import java.util.Map;
 
 /**
  * Various constants used for creating "general legacy" (access 2000-2007) sort order text index entries.
- *
- * @author James Ahlborn
  */
 @SuppressWarnings("PMD.FieldDeclarationsShouldBeAtStartOfClass")
 public class GeneralLegacyIndexCodes {
 
-    static final int            MAX_TEXT_INDEX_CHAR_LENGTH      =
-        JetFormat.TEXT_FIELD_MAX_LENGTH / JetFormat.TEXT_FIELD_UNIT_SIZE;
+    static final int            MAX_TEXT_INDEX_CHAR_LENGTH      = JetFormat.TEXT_FIELD_MAX_LENGTH / JetFormat.TEXT_FIELD_UNIT_SIZE;
 
     static final byte           END_TEXT                        = (byte) 0x01;
     static final byte           END_EXTRA_TEXT                  = (byte) 0x00;
@@ -59,15 +57,12 @@ public class GeneralLegacyIndexCodes {
     static final byte           CRAZY_CODE_START                = (byte) 0x80;
     static final byte           CRAZY_CODE_1                    = (byte) 0x02;
     static final byte           CRAZY_CODE_2                    = (byte) 0x03;
-    static final byte[]         CRAZY_CODES_SUFFIX              =
-        new byte[] {(byte) 0xFF, (byte) 0x02, (byte) 0x80, (byte) 0xFF, (byte) 0x80};
+    static final byte[]         CRAZY_CODES_SUFFIX              = new byte[] {(byte) 0xFF, (byte) 0x02, (byte) 0x80, (byte) 0xFF, (byte) 0x80};
     static final byte           CRAZY_CODES_UNPRINT_SUFFIX      = (byte) 0xFF;
 
     // stash the codes in some resource files
-    private static final String CODES_FILE                      =
-        DatabaseImpl.RESOURCE_PATH + "index_codes_genleg.txt";
-    private static final String EXT_CODES_FILE                  =
-        DatabaseImpl.RESOURCE_PATH + "index_codes_ext_genleg.txt";
+    private static final String CODES_FILE                      = DatabaseImpl.RESOURCE_PATH + "index_codes_genleg.txt";
+    private static final String EXT_CODES_FILE                  = DatabaseImpl.RESOURCE_PATH + "index_codes_ext_genleg.txt";
 
     /**
      * Enum which classifies the types of char encoding strategies used when creating text index entries.
@@ -266,8 +261,7 @@ public class GeneralLegacyIndexCodes {
         private final byte[] _extraBytes;
         private final byte   _crazyFlag;
 
-        private InternationalExtCharHandler(byte[] bytes, byte[] extraBytes,
-            byte crazyFlag) {
+        private InternationalExtCharHandler(byte[] bytes, byte[] extraBytes, byte crazyFlag) {
             _bytes = bytes;
             _extraBytes = extraBytes;
             _crazyFlag = crazyFlag;
@@ -321,12 +315,12 @@ public class GeneralLegacyIndexCodes {
     }
 
     /** shared CharHandler instance for Type.IGNORED */
-    static final CharHandler IGNORED_CHAR_HANDLER   = new CharHandler() {
-        @Override
-        public Type getType() {
-            return Type.IGNORED;
-        }
-    };
+    static final CharHandler                 IGNORED_CHAR_HANDLER  = new CharHandler() {
+                                                                       @Override
+                                                                       public Type getType() {
+                                                                           return Type.IGNORED;
+                                                                       }
+                                                                   };
 
     /** the surrogate char buffers are computed on the fly. Re-use a buffer for those. */
     private static final ThreadLocal<byte[]> SURROGATE_CHAR_BUF    = ThreadLocal.withInitial(() -> new byte[2]);
@@ -355,45 +349,45 @@ public class GeneralLegacyIndexCodes {
      * shared CharHandler instance for "high surrogate" chars (which are computed)
      */
     static final CharHandler HIGH_SURROGATE_CHAR_HANDLER = new SurrogateCharHandler() {
-         @Override
-         public byte[] getInlineBytes(char c) {
-             // the high sorrogate bytes seems to be computed from a fixed offset
-             int idxC = asUnsignedChar(c) - 10238;
-             return toInlineBytes(idxC);
-         }
-     };
+                                                             @Override
+                                                             public byte[] getInlineBytes(char c) {
+                                                                 // the high sorrogate bytes seems to be computed from a fixed offset
+                                                                 int idxC = asUnsignedChar(c) - 10238;
+                                                                 return toInlineBytes(idxC);
+                                                             }
+                                                         };
 
     /**
      * shared CharHandler instance for "low surrogate" chars (which are computed)
      */
     static final CharHandler LOW_SURROGATE_CHAR_HANDLER  = new SurrogateCharHandler() {
-         @Override
-         public byte[] getInlineBytes(char c) {
-             // the low surrogate bytes are computed with a specific value based in
-             // its location in a 1024 character block.
-             int charOffset = (asUnsignedChar(c) - 0xdc00) % 1024;
+                                                             @Override
+                                                             public byte[] getInlineBytes(char c) {
+                                                                 // the low surrogate bytes are computed with a specific value based in
+                                                                 // its location in a 1024 character block.
+                                                                 int charOffset = (asUnsignedChar(c) - 0xdc00) % 1024;
 
-             int idxOffset = 0;
-             if (charOffset < 8) {
-                 idxOffset = 9992;
-             } else if (charOffset < (8 + 254)) {
-                 idxOffset = 9990;
-             } else if (charOffset < (8 + 254 + 254)) {
-                 idxOffset = 9988;
-             } else if (charOffset < (8 + 254 + 254 + 254)) {
-                 idxOffset = 9986;
-             } else {
-                 idxOffset = 9984;
-             }
-             int idxC = asUnsignedChar(c) - idxOffset;
-             return toInlineBytes(idxC);
-         }
-     };
+                                                                 int idxOffset = 0;
+                                                                 if (charOffset < 8) {
+                                                                     idxOffset = 9992;
+                                                                 } else if (charOffset < (8 + 254)) {
+                                                                     idxOffset = 9990;
+                                                                 } else if (charOffset < (8 + 254 + 254)) {
+                                                                     idxOffset = 9988;
+                                                                 } else if (charOffset < (8 + 254 + 254 + 254)) {
+                                                                     idxOffset = 9986;
+                                                                 } else {
+                                                                     idxOffset = 9984;
+                                                                 }
+                                                                 int idxC = asUnsignedChar(c) - idxOffset;
+                                                                 return toInlineBytes(idxC);
+                                                             }
+                                                         };
 
-    static final char        FIRST_CHAR             = (char) 0x0000;
-    static final char        LAST_CHAR              = (char) 0x00FF;
-    static final char        FIRST_EXT_CHAR         = LAST_CHAR + 1;
-    static final char        LAST_EXT_CHAR          = (char) 0xFFFF;
+    static final char        FIRST_CHAR                  = (char) 0x0000;
+    static final char        LAST_CHAR                   = (char) 0x00FF;
+    static final char        FIRST_EXT_CHAR              = LAST_CHAR + 1;
+    static final char        LAST_EXT_CHAR               = (char) 0xFFFF;
 
     private static final class Codes {
         /**
@@ -438,8 +432,7 @@ public class GeneralLegacyIndexCodes {
             prefixMap.put(type.getPrefixCode(), type);
         }
 
-        try (BufferedReader reader = new BufferedReader(new InputStreamReader(
-                DatabaseImpl.getResourceAsStream(codesFilePath), StandardCharsets.US_ASCII))) {
+        try (BufferedReader reader = new BufferedReader(new InputStreamReader(DatabaseImpl.getResourceAsStream(codesFilePath), StandardCharsets.US_ASCII))) {
 
             int start = asUnsignedChar(firstChar);
             int end = asUnsignedChar(lastChar);
@@ -459,8 +452,8 @@ public class GeneralLegacyIndexCodes {
                 values[i - start] = ch;
             }
 
-        } catch (IOException e) {
-            throw new RuntimeException("failed loading index codes file " + codesFilePath, e);
+        } catch (IOException _ex) {
+            throw new UncheckedIOException("failed loading index codes file " + codesFilePath, _ex);
         }
 
         return values;
@@ -469,8 +462,7 @@ public class GeneralLegacyIndexCodes {
     /**
      * Returns a CharHandler parsed from the given line from an index codes file.
      */
-    private static CharHandler parseCodes(Map<String, Type> prefixMap,
-        String codeLine) {
+    private static CharHandler parseCodes(Map<String, Type> prefixMap, String codeLine) {
         String prefix = codeLine.substring(0, 1);
         String suffix = codeLine.length() > 1 ? codeLine.substring(1) : "";
         return prefixMap.get(prefix).parseCodes(suffix.split(",", -1));
@@ -493,8 +485,7 @@ public class GeneralLegacyIndexCodes {
         if (codeStrings.length != 2) {
             throw new IllegalStateException("Unexpected code strings " + Arrays.toString(codeStrings));
         }
-        return new InternationalCharHandler(codesToBytes(codeStrings[0], true),
-            codesToBytes(codeStrings[1], true));
+        return new InternationalCharHandler(codesToBytes(codeStrings[0], true), codesToBytes(codeStrings[1], true));
     }
 
     /**
@@ -560,8 +551,7 @@ public class GeneralLegacyIndexCodes {
         byte[] bytes = new byte[codes.length() / 2];
         for (int i = 0; i < bytes.length; ++i) {
             int charIdx = i * 2;
-            bytes[i] = (byte) Integer.parseInt(codes.substring(charIdx, charIdx + 2),
-                16);
+            bytes[i] = (byte) Integer.parseInt(codes.substring(charIdx, charIdx + 2), 16);
         }
         return bytes;
     }
@@ -577,8 +567,7 @@ public class GeneralLegacyIndexCodes {
     /**
      * Converts an index value for a text column into the entry value (which is based on a variety of nifty codes).
      */
-    void writeNonNullIndexTextValue(
-        Object value, ByteStream bout, boolean isAscending) throws IOException {
+    void writeNonNullIndexTextValue(Object value, ByteStream bout, boolean isAscending) throws IOException {
         // convert to string
         String str = toIndexCharSequence(value);
 
@@ -629,8 +618,7 @@ public class GeneralLegacyIndexCodes {
                 }
 
                 // keep track of the unprintable codes for later
-                writeUnprintableCodes(curCharOffset, bytes, unprintableCodes,
-                    extraCodes);
+                writeUnprintableCodes(curCharOffset, bytes, unprintableCodes, extraCodes);
             }
 
             byte crazyFlag = ch.getCrazyFlag();
@@ -647,8 +635,7 @@ public class GeneralLegacyIndexCodes {
         // write end text flag
         bout.write(END_TEXT);
 
-        boolean hasExtraCodes = trimExtraCodes(
-            extraCodes, (byte) 0, INTERNATIONAL_EXTRA_PLACEHOLDER);
+        boolean hasExtraCodes = trimExtraCodes(extraCodes, (byte) 0, INTERNATIONAL_EXTRA_PLACEHOLDER);
         boolean hasUnprintableCodes = unprintableCodes != null;
         boolean hasCrazyCodes = crazyCodes != null;
         if (hasExtraCodes || hasUnprintableCodes || hasCrazyCodes) {
@@ -695,8 +682,7 @@ public class GeneralLegacyIndexCodes {
             bout.write(END_EXTRA_TEXT);
 
             // flip the bytes that we have written thus far for this text value
-            IndexData.flipBytes(bout.getBytes(), prevLength,
-                bout.getLength() - prevLength);
+            IndexData.flipBytes(bout.getBytes(), prevLength, bout.getLength() - prevLength);
         }
 
         // write end extra text
@@ -731,9 +717,7 @@ public class GeneralLegacyIndexCodes {
     /**
      * Encodes the given extra code info in the given stream.
      */
-    private static void writeExtraCodes(
-        int charOffset, byte[] bytes, byte extraCodeModifier,
-        ExtraCodesStream extraCodes) {
+    private static void writeExtraCodes(int charOffset, byte[] bytes, byte extraCodeModifier, ExtraCodesStream extraCodes) {
         // we fill in a placeholder value for any chars w/out extra codes
         int numChars = extraCodes.getNumChars();
         if (numChars < charOffset) {
@@ -774,8 +758,7 @@ public class GeneralLegacyIndexCodes {
      * Trims any bytes in the given range off of the end of the given stream, returning whether or not there are any
      * bytes left in the given stream after trimming.
      */
-    private static boolean trimExtraCodes(ByteStream extraCodes,
-        byte minTrimCode, byte maxTrimCode) {
+    private static boolean trimExtraCodes(ByteStream extraCodes, byte minTrimCode, byte maxTrimCode) {
         if (extraCodes == null) {
             return false;
         }
@@ -789,9 +772,7 @@ public class GeneralLegacyIndexCodes {
     /**
      * Encodes the given unprintable char codes in the given stream.
      */
-    private static void writeUnprintableCodes(
-        int charOffset, byte[] bytes, ByteStream unprintableCodes,
-        ExtraCodesStream extraCodes) {
+    private static void writeUnprintableCodes(int charOffset, byte[] bytes, ByteStream unprintableCodes, ExtraCodesStream extraCodes) {
         // the offset seems to be calculated based on the number of bytes in the
         // "extra codes" part of the entry (even if there are no extra codes bytes
         // actually written in the final entry).
@@ -800,17 +781,12 @@ public class GeneralLegacyIndexCodes {
             // we need to account for some extra codes which have not been written
             // yet. additionally, any unprintable bytes added to the beginning of
             // the extra codes are ignored.
-            unprintCharOffset = extraCodes.getLength()
-                + charOffset - extraCodes.getNumChars()
-                - extraCodes.getUnprintablePrefixLen();
+            unprintCharOffset = extraCodes.getLength() + charOffset - extraCodes.getNumChars() - extraCodes.getUnprintablePrefixLen();
         }
 
         // we write a whacky combo of bytes for each unprintable char which
         // includes a funky offset and extra char itself
-        int offset =
-            UNPRINTABLE_COUNT_START
-                + UNPRINTABLE_COUNT_MULTIPLIER * unprintCharOffset
-                | UNPRINTABLE_OFFSET_FLAGS;
+        int offset = UNPRINTABLE_COUNT_START + UNPRINTABLE_COUNT_MULTIPLIER * unprintCharOffset | UNPRINTABLE_OFFSET_FLAGS;
 
         // write offset as big-endian short
         unprintableCodes.write(offset >> 8 & 0xFF);

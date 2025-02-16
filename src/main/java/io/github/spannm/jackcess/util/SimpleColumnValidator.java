@@ -21,8 +21,6 @@ import io.github.spannm.jackcess.Column;
 
 /**
  * Simple concrete implementation of ColumnValidator which simply returns the given value.
- *
- * @author James Ahlborn
  */
 public class SimpleColumnValidator implements ColumnValidator {
     public static final SimpleColumnValidator INSTANCE = new SimpleColumnValidator();

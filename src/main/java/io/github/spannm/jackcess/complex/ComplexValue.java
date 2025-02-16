@@ -10,8 +10,6 @@ import java.io.ObjectStreamException;
 /**
  * Base interface for a value in a complex column (where there may be multiple values for a single row in the main
  * table).
- *
- * @author James Ahlborn
  */
 public interface ComplexValue {
     /**

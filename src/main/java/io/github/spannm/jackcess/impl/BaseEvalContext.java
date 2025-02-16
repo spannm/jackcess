@@ -20,8 +20,7 @@ import javax.script.Bindings;
 
 public abstract class BaseEvalContext implements EvalContext {
     /** map of all non-string data types */
-    private static final Map<DataType, Value.Type> TYPE_MAP =
-        new EnumMap<>(DataType.class);
+    private static final Map<DataType, Value.Type> TYPE_MAP = new EnumMap<>(DataType.class);
 
     static {
         TYPE_MAP.put(DataType.BOOLEAN, Value.Type.LONG);
@@ -114,9 +113,9 @@ public abstract class BaseEvalContext implements EvalContext {
     public Object eval() throws IOException {
         try {
             return _expr.eval(this);
-        } catch (Exception e) {
-            String msg = withErrorContext(e.getMessage());
-            throw new JackcessException(msg, e);
+        } catch (Exception _ex) {
+            String msg = withErrorContext(_ex.getMessage());
+            throw new JackcessException(msg, _ex);
         }
     }
 
@@ -133,8 +132,7 @@ public abstract class BaseEvalContext implements EvalContext {
         try {
             // expression engine always uses LocalDateTime, so force that date/time
             // type
-            val = ColumnImpl.toInternalValue(dType, val, getDatabase(),
-                ColumnImpl.LDT_DATE_TIME_FACTORY);
+            val = ColumnImpl.toInternalValue(dType, val, getDatabase(), ColumnImpl.LDT_DATE_TIME_FACTORY);
             if (val == null) {
                 return ValueSupport.NULL_VAL;
             }
@@ -159,8 +157,8 @@ public abstract class BaseEvalContext implements EvalContext {
                 default:
                     throw new RuntimeException("Unexpected type " + vType);
             }
-        } catch (IOException e) {
-            throw new EvalException("Failed converting value to type " + dType, e);
+        } catch (IOException _ex) {
+            throw new EvalException("Failed converting value to type " + dType, _ex);
         }
     }
 
@@ -182,8 +180,7 @@ public abstract class BaseEvalContext implements EvalContext {
 
         private Expression getExpr() {
             // when the expression is parsed we replace the raw version
-            Expression expr = Expressionator.parse(
-                _exprType, _exprStr, getResultType(), _dbCtx);
+            Expression expr = Expressionator.parse(_exprType, _exprStr, getResultType(), _dbCtx);
             _expr = expr;
             return expr;
         }

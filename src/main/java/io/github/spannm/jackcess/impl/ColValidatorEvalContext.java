@@ -27,8 +27,7 @@ public class ColValidatorEvalContext extends ColEvalContext {
     ColumnValidator toColumnValidator(ColumnValidator delegate) {
         return new InternalColumnValidator(delegate) {
             @Override
-            protected Object internalValidate(Column col, Object val)
-                throws IOException {
+            protected Object internalValidate(Column col, Object val) throws IOException {
                 return ColValidatorEvalContext.this.validate(val);
             }
 

@@ -18,8 +18,6 @@ import java.util.Map;
  * This class will cache the associated complex values returned from one of the lookup methods. The various modification
  * methods will clear this cache automatically. The {@link #reset} method may be called manually to clear this internal
  * cache.
- *
- * @author James Ahlborn
  */
 public abstract class ComplexValueForeignKey extends Number {
     private static final long serialVersionUID = 20130319L;

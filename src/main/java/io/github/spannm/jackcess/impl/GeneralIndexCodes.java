@@ -2,17 +2,13 @@ package io.github.spannm.jackcess.impl;
 
 /**
  * Various constants used for creating "general" (access 2010+) sort order text index entries.
- *
- * @author James Ahlborn
  */
 @SuppressWarnings("PMD.FieldDeclarationsShouldBeAtStartOfClass")
 public class GeneralIndexCodes extends GeneralLegacyIndexCodes {
 
     // stash the codes in some resource files
-    private static final String CODES_FILE     =
-        DatabaseImpl.RESOURCE_PATH + "index_codes_gen.txt";
-    private static final String EXT_CODES_FILE =
-        DatabaseImpl.RESOURCE_PATH + "index_codes_ext_gen.txt";
+    private static final String CODES_FILE     = DatabaseImpl.RESOURCE_PATH + "index_codes_gen.txt";
+    private static final String EXT_CODES_FILE = DatabaseImpl.RESOURCE_PATH + "index_codes_ext_gen.txt";
 
     private static final class Codes {
         /**

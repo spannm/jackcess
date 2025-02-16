@@ -15,42 +15,40 @@ import java.util.NoSuchElementException;
  * between both the primary column and the complex value column. The primary column only seems to have the simple
  * "multi-value" property and the rest seem to be on the complex value column. This PropertyMap implementation combines
  * them into one synthetic map.
- *
- * @author James Ahlborn
  */
 public class MultiValueColumnPropertyMap implements PropertyMap {
     /** properties from the primary column */
-    private final PropertyMap _primary;
+    private final PropertyMap primary;
     /** properties from the complex column */
-    private final PropertyMap _complex;
+    private final PropertyMap complex;
 
-    public MultiValueColumnPropertyMap(PropertyMap primary, PropertyMap complex) {
-        _primary = primary;
-        _complex = complex;
+    public MultiValueColumnPropertyMap(PropertyMap _primary, PropertyMap _complex) {
+        primary = _primary;
+        complex = _complex;
     }
 
     @Override
     public String getName() {
-        return _primary.getName();
+        return primary.getName();
     }
 
     @Override
     public int getSize() {
-        return _primary.getSize() + _complex.getSize();
+        return primary.getSize() + complex.getSize();
     }
 
     @Override
     public boolean isEmpty() {
-        return _primary.isEmpty() && _complex.isEmpty();
+        return primary.isEmpty() && complex.isEmpty();
     }
 
     @Override
     public Property get(String name) {
-        Property prop = _primary.get(name);
+        Property prop = primary.get(name);
         if (prop != null) {
             return prop;
         }
-        return _complex.get(name);
+        return complex.get(name);
     }
 
     @Override
@@ -79,9 +77,9 @@ public class MultiValueColumnPropertyMap implements PropertyMap {
         // the only property which seems to go in the "primary" is the "multi
         // value" property
         if (isPrimaryKey(name)) {
-            return _primary.put(name, DataType.BOOLEAN, value, true);
+            return primary.put(name, DataType.BOOLEAN, value, true);
         }
-        return _complex.put(name, type, value, isDdl);
+        return complex.put(name, type, value, isDdl);
     }
 
     @Override
@@ -92,9 +90,9 @@ public class MultiValueColumnPropertyMap implements PropertyMap {
 
         for (Property prop : props) {
             if (isPrimaryKey(prop.getName())) {
-                ((PropertyMapImpl) _primary).put(prop);
+                ((PropertyMapImpl) primary).put(prop);
             } else {
-                ((PropertyMapImpl) _complex).put(prop);
+                ((PropertyMapImpl) complex).put(prop);
             }
         }
     }
@@ -102,22 +100,22 @@ public class MultiValueColumnPropertyMap implements PropertyMap {
     @Override
     public Property remove(String name) {
         if (isPrimaryKey(name)) {
-            return _primary.remove(name);
+            return primary.remove(name);
         }
-        return _complex.remove(name);
+        return complex.remove(name);
     }
 
     @Override
     public void save() throws IOException {
-        _primary.save();
-        _complex.save();
+        primary.save();
+        complex.save();
     }
 
     @Override
     public Iterator<Property> iterator() {
         final List<Iterator<Property>> iters = new ArrayList<>(2);
-        iters.add(_primary.iterator());
-        iters.add(_complex.iterator());
+        iters.add(primary.iterator());
+        iters.add(complex.iterator());
 
         return new Iterator<>() {
             private Iterator<Property> _cur;

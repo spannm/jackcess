@@ -325,65 +325,65 @@ public class ExportUtil {
      * Builder which simplifies configuration of an export operation.
      */
     public static class Builder {
-        private Database     _db;
-        private String       _tableName;
-        private String       _ext    = DEFAULT_FILE_EXT;
-        private Cursor       _cursor;
-        private String       _delim  = DEFAULT_DELIMITER;
-        private char         _quote  = DEFAULT_QUOTE_CHAR;
-        private ExportFilter _filter = SimpleExportFilter.INSTANCE;
-        private boolean      _header;
+        private Database     mdb;
+        private String       mtableName;
+        private String       mext    = DEFAULT_FILE_EXT;
+        private Cursor       mcursor;
+        private String       mdelim  = DEFAULT_DELIMITER;
+        private char         mquote  = DEFAULT_QUOTE_CHAR;
+        private ExportFilter mfilter = SimpleExportFilter.INSTANCE;
+        private boolean      mheader;
 
-        public Builder(Database db) {
-            this(db, null);
+        public Builder(Database _db) {
+            this(_db, null);
         }
 
-        public Builder(Database db, String tableName) {
-            _db = db;
-            _tableName = tableName;
+        public Builder(Database _db, String _tableName) {
+            mdb = _db;
+            mtableName = _tableName;
         }
 
-        public Builder(Cursor cursor) {
-            _cursor = cursor;
+        public Builder(Cursor _cursor) {
+            mcursor = _cursor;
         }
 
-        public Builder withDatabase(Database db) {
-            _db = db;
+        public Builder withDatabase(Database _db) {
+            mdb = _db;
             return this;
         }
 
-        public Builder withTableName(String tableName) {
-            _tableName = tableName;
+        public Builder withTableName(String _tableName) {
+            mtableName = _tableName;
             return this;
         }
 
-        public Builder withCursor(Cursor cursor) {
-            _cursor = cursor;
+        public Builder withCursor(Cursor _cursor) {
+            mcursor = _cursor;
             return this;
         }
 
-        public Builder withDelimiter(String delim) {
-            _delim = delim;
+        public Builder withDelimiter(String _delim) {
+            mdelim = _delim;
             return this;
         }
 
-        public Builder withQuote(char quote) {
-            _quote = quote;
+        public Builder withQuote(char _quote) {
+            mquote = _quote;
             return this;
         }
 
-        public Builder withFilter(ExportFilter filter) {
-            _filter = filter;
+        public Builder withFilter(ExportFilter _filter) {
+            mfilter = _filter;
             return this;
         }
 
-        public Builder withHeader(boolean header) {
-            _header = header;
+        public Builder withHeader(boolean _header) {
+            mheader = _header;
             return this;
         }
 
-        public Builder withFileNameExtension(String ext) {
-            _ext = ext;
+        public Builder withFileNameExtension(String _ext) {
+            mext = _ext;
             return this;
         }
 
@@ -391,15 +391,15 @@ public class ExportUtil {
          * @see ExportUtil#exportAll(Database,File,String,boolean,String,char,ExportFilter)
          */
         public void exportAll(File dir) throws IOException {
-            ExportUtil.exportAll(_db, dir, _ext, _header, _delim, _quote, _filter);
+            ExportUtil.exportAll(mdb, dir, mext, mheader, mdelim, mquote, mfilter);
         }
 
         /**
          * @see ExportUtil#exportFile(Database,String,File,boolean,String,char,ExportFilter)
          */
         public void exportFile(File f) throws IOException {
-            ExportUtil.exportFile(_db, _tableName, f, _header, _delim, _quote,
-                _filter);
+            ExportUtil.exportFile(mdb, mtableName, f, mheader, mdelim, mquote,
+                mfilter);
         }
 
         /**
@@ -407,12 +407,12 @@ public class ExportUtil {
          * @see ExportUtil#exportWriter(Cursor,BufferedWriter,boolean,String,char,ExportFilter)
          */
         public void exportWriter(BufferedWriter writer) throws IOException {
-            if (_cursor != null) {
-                ExportUtil.exportWriter(_cursor, writer, _header, _delim,
-                    _quote, _filter);
+            if (mcursor != null) {
+                ExportUtil.exportWriter(mcursor, writer, mheader, mdelim,
+                    mquote, mfilter);
             } else {
-                ExportUtil.exportWriter(_db, _tableName, writer, _header, _delim,
-                    _quote, _filter);
+                ExportUtil.exportWriter(mdb, mtableName, writer, mheader, mdelim,
+                    mquote, mfilter);
             }
         }
     }

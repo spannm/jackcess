@@ -7,8 +7,6 @@ import java.util.List;
 /**
  * Base interface for classes which encapsulate information about an Access query. The {@link #toSQLString()} method can
  * be used to convert this object into the actual SQL string which this query data represents.
- *
- * @author James Ahlborn
  */
 public interface Query {
 

@@ -67,8 +67,7 @@ public final class ByteUtil {
      * @param offset offset at which to insert the int
      * @param order the order to insert the bytes of the int
      */
-    public static void put3ByteInt(ByteBuffer buffer, int val, int offset,
-        ByteOrder order) {
+    public static void put3ByteInt(ByteBuffer buffer, int val, int offset, ByteOrder order) {
 
         int offInc = 1;
         if (order == ByteOrder.BIG_ENDIAN) {
@@ -124,8 +123,7 @@ public final class ByteUtil {
      * @param order the order of the bytes of the int
      * @return The int
      */
-    public static int get3ByteInt(ByteBuffer buffer, int offset,
-        ByteOrder order) {
+    public static int get3ByteInt(ByteBuffer buffer, int offset, ByteOrder order) {
 
         int offInc = 1;
         if (order == ByteOrder.BIG_ENDIAN) {
@@ -235,8 +233,7 @@ public final class ByteUtil {
      * @param offset offset at which to insert the int
      * @param order the order to insert the bytes of the int
      */
-    public static void putInt(ByteBuffer buffer, int val, int offset,
-        ByteOrder order) {
+    public static void putInt(ByteBuffer buffer, int val, int offset, ByteOrder order) {
         ByteOrder origOrder = buffer.order();
         try {
             buffer.order(order).putInt(offset, val);
@@ -265,8 +262,7 @@ public final class ByteUtil {
      * @param offset Offset at which to read the value
      * @return The unsigned int
      */
-    public static int getUnsignedVarInt(ByteBuffer buffer, int offset,
-        int numBytes) {
+    public static int getUnsignedVarInt(ByteBuffer buffer, int offset, int numBytes) {
         switch (numBytes) {
             case 1:
                 return getUnsignedByte(buffer, offset);
@@ -336,24 +332,21 @@ public final class ByteUtil {
     /**
      * Sets all bits in the given byte range to 0.
      */
-    public static void clearRange(ByteBuffer buffer, int start,
-        int end) {
+    public static void clearRange(ByteBuffer buffer, int start, int end) {
         putRange(buffer, start, end, (byte) 0x00);
     }
 
     /**
      * Sets all bits in the given byte range to 1.
      */
-    public static void fillRange(ByteBuffer buffer, int start,
-        int end) {
+    public static void fillRange(ByteBuffer buffer, int start, int end) {
         putRange(buffer, start, end, (byte) 0xff);
     }
 
     /**
      * Sets all bytes in the given byte range to the given byte value.
      */
-    public static void putRange(ByteBuffer buffer, int start,
-        int end, byte b) {
+    public static void putRange(ByteBuffer buffer, int start, int end, byte b) {
         for (int i = start; i < end; ++i) {
             buffer.put(i, b);
         }
@@ -362,8 +355,7 @@ public final class ByteUtil {
     /**
      * Matches a pattern of bytes against the given buffer starting at the given offset.
      */
-    public static boolean matchesRange(ByteBuffer buffer, int start,
-        byte[] pattern) {
+    public static boolean matchesRange(ByteBuffer buffer, int start, byte[] pattern) {
         for (int i = 0; i < pattern.length; ++i) {
             if (pattern[i] != buffer.get(start + i)) {
                 return false;
@@ -444,8 +436,7 @@ public final class ByteUtil {
      * @param formatted flag indicating if formatting is required
      * @return The display String
      */
-    public static String toHexString(ByteBuffer buffer,
-        int offset, int size, boolean formatted) {
+    public static String toHexString(ByteBuffer buffer, int offset, int size, boolean formatted) {
 
         int bufLen = size * 2;
         if (formatted) {
@@ -499,8 +490,7 @@ public final class ByteUtil {
      * Writes a sequence of hexidecimal values into the given buffer, where every two characters represent one byte
      * value.
      */
-    public static void writeHexString(ByteBuffer buffer,
-        String hexStr) throws IOException {
+    public static void writeHexString(ByteBuffer buffer, String hexStr) throws IOException {
         char[] hexChars = hexStr.toCharArray();
         if (hexChars.length % 2 != 0) {
             throw new IOException("Hex string length must be even");
@@ -606,8 +596,7 @@ public final class ByteUtil {
     /**
      * Returns a copy of the given array of the given length starting at the given position.
      */
-    public static byte[] copyOf(byte[] arr, int offset, int newLength,
-        int dstOffset) {
+    public static byte[] copyOf(byte[] arr, int offset, int newLength, int dstOffset) {
         byte[] newArr = new byte[newLength];
         int srcLen = arr.length - offset;
         int dstLen = newLength - dstOffset;

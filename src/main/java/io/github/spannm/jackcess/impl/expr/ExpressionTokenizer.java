@@ -221,15 +221,11 @@ class ExpressionTokenizer {
         return parseStringUntil(buf, null, DATE_LIT_QUOTE_CHAR, false);
     }
 
-    static String parseStringUntil(ExprBuf buf, Character startChar,
-        char endChar, boolean allowDoubledEscape) {
-        return parseStringUntil(buf, startChar, endChar, allowDoubledEscape,
-            buf.getScratchBuffer()).toString();
+    static String parseStringUntil(ExprBuf buf, Character startChar, char endChar, boolean allowDoubledEscape) {
+        return parseStringUntil(buf, startChar, endChar, allowDoubledEscape, buf.getScratchBuffer()).toString();
     }
 
-    static StringBuilder parseStringUntil(
-        ExprBuf buf, Character startChar, char endChar, boolean allowDoubledEscape,
-        StringBuilder sb) {
+    static StringBuilder parseStringUntil(ExprBuf buf, Character startChar, char endChar, boolean allowDoubledEscape, StringBuilder sb) {
         boolean complete = false;
         while (buf.hasNext()) {
             char c = buf.next();
@@ -257,8 +253,7 @@ class ExpressionTokenizer {
     private static Token parseDateLiteral(ExprBuf buf) {
         String dateStr = parseDateLiteralString(buf);
 
-        TemporalConfig.Type type = determineDateType(
-            dateStr, buf.getContext());
+        TemporalConfig.Type type = determineDateType(dateStr, buf.getContext());
         if (type == null) {
             throw new ParseException("Invalid date/time literal " + dateStr + " " + buf);
         }
@@ -280,16 +275,13 @@ class ExpressionTokenizer {
                 lt = LocalTime.from(parsedInfo);
             }
 
-            return new Token(TokenType.LITERAL, LocalDateTime.of(ld, lt),
-                dateStr, type.getValueType());
-        } catch (DateTimeException de) {
-            throw new ParseException(
-                "Invalid date/time literal " + dateStr + " " + buf, de);
+            return new Token(TokenType.LITERAL, LocalDateTime.of(ld, lt), dateStr, type.getValueType());
+        } catch (DateTimeException _ex) {
+            throw new ParseException("Invalid date/time literal " + dateStr + " " + buf, _ex);
         }
     }
 
-    static TemporalConfig.Type determineDateType(
-        String dateStr, LocaleContext ctx) {
+    static TemporalConfig.Type determineDateType(String dateStr, LocaleContext ctx) {
         TemporalConfig cfg = ctx.getTemporalConfig();
         boolean hasDate = dateStr.indexOf(cfg.getDateSeparator()) >= 0;
         boolean hasTime = dateStr.indexOf(cfg.getTimeSeparator()) >= 0;
@@ -319,8 +311,7 @@ class ExpressionTokenizer {
         return strLen >= suffStrLen && str.regionMatches(true, strLen - suffStrLen, suffStr, 0, suffStrLen);
     }
 
-    private static Token maybeParseNumberLiteral(
-        char firstChar, ExprBuf buf, ParseContext context) {
+    private static Token maybeParseNumberLiteral(char firstChar, ExprBuf buf, ParseContext context) {
         StringBuilder sb = buf.getScratchBuffer().append(firstChar);
         boolean hasDigit = isDigit(firstChar);
 
@@ -328,8 +319,7 @@ class ExpressionTokenizer {
         boolean foundNum = false;
         boolean isFp = false;
         int expPos = -1;
-        char decimalSep = context.getNumericConfig().getDecimalFormatSymbols()
-            .getDecimalSeparator();
+        char decimalSep = context.getNumericConfig().getDecimalFormatSymbols().getDecimalSeparator();
 
         try {
 
@@ -377,7 +367,7 @@ class ExpressionTokenizer {
                         // (this will handle the case of int overflow)
                         num = Integer.valueOf(numStr);
                         numType = Value.Type.LONG;
-                    } catch (NumberFormatException ne) {
+                    } catch (NumberFormatException _ex) {
                         // fallback to decimal
                     }
                 }
@@ -389,9 +379,8 @@ class ExpressionTokenizer {
 
                 foundNum = true;
                 return new Token(TokenType.LITERAL, num, numStr, numType);
-            } catch (NumberFormatException ne) {
-                throw new ParseException(
-                    "Invalid number literal " + numStr + " " + buf, ne);
+            } catch (NumberFormatException _ex) {
+                throw new ParseException("Invalid number literal " + numStr + " " + buf, _ex);
             }
 
         } finally {
@@ -423,8 +412,7 @@ class ExpressionTokenizer {
         private final String                                      _str;
         private final ParseContext                                _ctx;
         private int                                               _pos;
-        private final Map<TemporalConfig.Type, DateTimeFormatter> _dateTimeFmts =
-            new EnumMap<>(TemporalConfig.Type.class);
+        private final Map<TemporalConfig.Type, DateTimeFormatter> _dateTimeFmts = new EnumMap<>(TemporalConfig.Type.class);
         private final StringBuilder                               _scratch      = new StringBuilder();
 
         ExprBuf(String str, ParseContext ctx) {
@@ -479,8 +467,7 @@ class ExpressionTokenizer {
         public DateTimeFormatter getParseDateTimeFormat(TemporalConfig.Type type) {
             DateTimeFormatter df = _dateTimeFmts.get(type);
             if (df == null) {
-                df = _ctx.createDateFormatter(
-                    _ctx.getTemporalConfig().getDateTimeFormat(type));
+                df = _ctx.createDateFormatter(_ctx.getTemporalConfig().getDateTimeFormat(type));
                 _dateTimeFmts.put(type, df);
             }
             return df;

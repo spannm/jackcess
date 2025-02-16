@@ -21,8 +21,6 @@ import java.nio.ByteBuffer;
 
 /**
  * Manages a reference to a page buffer.
- *
- * @author James Ahlborn
  */
 public final class TempPageHolder {
 
@@ -71,8 +69,7 @@ public final class TempPageHolder {
         return withPage(pageChannel, pageNumber, true);
     }
 
-    private ByteBuffer withPage(PageChannel pageChannel, int pageNumber,
-        boolean rewind) throws IOException {
+    private ByteBuffer withPage(PageChannel pageChannel, int pageNumber, boolean rewind) throws IOException {
         ByteBuffer buffer = _buffer.getPageBuffer(pageChannel);
         int modCount = _buffer.getModCount();
         if (pageNumber != _pageNumber || _bufferModCount != modCount) {
@@ -111,8 +108,7 @@ public final class TempPageHolder {
      * <code>getPage</code>/<code>setPage</code> call must reload page data) and is not the given buffer. Does not
      * necessarily release any memory.
      */
-    public void possiblyInvalidate(int modifiedPageNumber,
-        ByteBuffer modifiedBuffer) {
+    public void possiblyInvalidate(int modifiedPageNumber, ByteBuffer modifiedBuffer) {
         if (modifiedBuffer == _buffer.getExistingBuffer()) {
             // no worries, our buffer was the one modified (or is null, either way
             // we'll need to reload)

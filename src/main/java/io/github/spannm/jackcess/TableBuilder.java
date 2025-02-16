@@ -37,8 +37,6 @@ import java.util.*;
  *         .addColumns("ID").setPrimaryKey())
  *     .toTable(db);
  * </pre>
- *
- * @author James Ahlborn
  * @see ColumnBuilder
  * @see IndexBuilder
  * @see RelationshipBuilder

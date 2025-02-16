@@ -73,8 +73,7 @@ public abstract class JetFormat {
     /** amount of initial data to be read to determine database type */
     private static final int    HEADER_LENGTH       = 21;
 
-    private static final byte[] MSISAM_ENGINE       = new byte[] {'M', 'S', 'I', 'S', 'A', 'M', ' ', 'D', 'a', 't', 'a', 'b', 'a', 's', 'e'
-    };
+    private static final byte[] MSISAM_ENGINE       = new byte[] {'M', 'S', 'I', 'S', 'A', 'M', ' ', 'D', 'a', 't', 'a', 'b', 'a', 's', 'e'};
 
     /** mask used to obfuscate the db header */
     private static final byte[] BASE_HEADER_MASK    = new byte[] {
@@ -110,25 +109,19 @@ public abstract class JetFormat {
 
     // use nested inner class to avoid problematic static init loops
     private static final class PossibleFileFormats {
-        private static final Map<String, FileFormat> POSSIBLE_VERSION_3      =
-            Collections.singletonMap(null, FileFormat.V1997);
+        private static final Map<String, FileFormat> POSSIBLE_VERSION_3      = Collections.singletonMap(null, FileFormat.V1997);
 
         private static final Map<String, FileFormat> POSSIBLE_VERSION_4      = new HashMap<>();
 
-        private static final Map<String, FileFormat> POSSIBLE_VERSION_12     =
-            Collections.singletonMap(null, FileFormat.V2007);
+        private static final Map<String, FileFormat> POSSIBLE_VERSION_12     = Collections.singletonMap(null, FileFormat.V2007);
 
-        private static final Map<String, FileFormat> POSSIBLE_VERSION_14     =
-            Collections.singletonMap(null, FileFormat.V2010);
+        private static final Map<String, FileFormat> POSSIBLE_VERSION_14     = Collections.singletonMap(null, FileFormat.V2010);
 
-        private static final Map<String, FileFormat> POSSIBLE_VERSION_16     =
-            Collections.singletonMap(null, FileFormat.V2016);
+        private static final Map<String, FileFormat> POSSIBLE_VERSION_16     = Collections.singletonMap(null, FileFormat.V2016);
 
-        private static final Map<String, FileFormat> POSSIBLE_VERSION_17     =
-            Collections.singletonMap(null, FileFormat.V2019);
+        private static final Map<String, FileFormat> POSSIBLE_VERSION_17     = Collections.singletonMap(null, FileFormat.V2019);
 
-        private static final Map<String, FileFormat> POSSIBLE_VERSION_MSISAM =
-            Collections.singletonMap(null, FileFormat.MSISAM);
+        private static final Map<String, FileFormat> POSSIBLE_VERSION_MSISAM = Collections.singletonMap(null, FileFormat.MSISAM);
 
         static {
             POSSIBLE_VERSION_4.put(ACCESS_VERSION_2000, FileFormat.V2000);
@@ -138,11 +131,8 @@ public abstract class JetFormat {
     }
 
     /** calculated types supported in version 14 */
-    private static final Set<DataType> V14_CALC_TYPES =
-        EnumSet.of(DataType.BOOLEAN, DataType.BYTE, DataType.INT, DataType.LONG,
-            DataType.FLOAT, DataType.DOUBLE, DataType.GUID,
-            DataType.SHORT_DATE_TIME, DataType.MONEY, DataType.NUMERIC,
-            DataType.TEXT, DataType.MEMO);
+    private static final Set<DataType> V14_CALC_TYPES = EnumSet.of(DataType.BOOLEAN, DataType.BYTE, DataType.INT, DataType.LONG, DataType.FLOAT, DataType.DOUBLE, DataType.GUID,
+        DataType.SHORT_DATE_TIME, DataType.MONEY, DataType.NUMERIC, DataType.TEXT, DataType.MEMO);
 
     /** calculated types supported in version 16 */
     private static final Set<DataType> V16_CALC_TYPES = EnumSet.of(DataType.BIG_INT);
@@ -150,12 +140,9 @@ public abstract class JetFormat {
         V16_CALC_TYPES.addAll(V14_CALC_TYPES);
     }
 
-    private static final Set<DataType> V16_UNSUPP_TYPES =
-        EnumSet.of(DataType.EXT_DATE_TIME);
-    private static final Set<DataType> V12_UNSUPP_TYPES =
-        EnumSet.of(DataType.BIG_INT);
-    private static final Set<DataType> V3_UNSUPP_TYPES  =
-        EnumSet.of(DataType.COMPLEX_TYPE);
+    private static final Set<DataType> V16_UNSUPP_TYPES = EnumSet.of(DataType.EXT_DATE_TIME);
+    private static final Set<DataType> V12_UNSUPP_TYPES = EnumSet.of(DataType.BIG_INT);
+    private static final Set<DataType> V3_UNSUPP_TYPES  = EnumSet.of(DataType.COMPLEX_TYPE);
 
     static {
         V12_UNSUPP_TYPES.addAll(V16_UNSUPP_TYPES);
@@ -182,7 +169,7 @@ public abstract class JetFormat {
     // doesn't allow this; hence all the abstract defineXXX() methods.
 
     /** the name of this format */
-    private final String              _name;
+    private final String              name;
 
     /** the read/write mode of this format */
     public final boolean              READ_ONLY;
@@ -326,8 +313,8 @@ public abstract class JetFormat {
         throw new IOException("Unsupported " + (version < CODE_VERSION_3 ? "older" : "newer") + " version: " + version);
     }
 
-    private JetFormat(String name) {
-        _name = name;
+    private JetFormat(String _name) {
+        name = _name;
 
         READ_ONLY = defineReadOnly();
         INDEXES_SUPPORTED = defineIndexesSupported();
@@ -616,7 +603,7 @@ public abstract class JetFormat {
 
     @Override
     public String toString() {
-        return _name;
+        return name;
     }
 
     private static class Jet3Format extends JetFormat {

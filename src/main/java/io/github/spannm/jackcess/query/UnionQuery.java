@@ -4,8 +4,6 @@ import java.util.List;
 
 /**
  * Query interface which represents a UNION query, e.g.: {@code SELECT <query1> UNION SELECT <query2>}
- *
- * @author James Ahlborn
  */
 public interface UnionQuery extends Query {
     String getUnionType();

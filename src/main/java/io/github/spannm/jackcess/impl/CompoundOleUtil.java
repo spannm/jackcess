@@ -27,8 +27,6 @@ import java.util.List;
  * <p>
  * Note that all POI usage is restricted to this file so that the basic ole support in OleUtil can be utilized without
  * requiring POI.
- *
- * @author James Ahlborn
  */
 public class CompoundOleUtil implements CompoundPackageFactory {
     private static final String ENTRY_NAME_CHARSET = "UTF-8";
@@ -48,11 +46,8 @@ public class CompoundOleUtil implements CompoundPackageFactory {
      * Creates a nes CompoundContent for the given blob information.
      */
     @Override
-    public ContentImpl createCompoundPackageContent(
-        OleBlobImpl blob, String prettyName, String className, String typeName,
-        ByteBuffer blobBb, int dataBlockLen) {
-        return new CompoundContentImpl(blob, prettyName, className, typeName,
-            blobBb.position(), dataBlockLen);
+    public ContentImpl createCompoundPackageContent(OleBlobImpl blob, String prettyName, String className, String typeName, ByteBuffer blobBb, int dataBlockLen) {
+        return new CompoundContentImpl(blob, prettyName, className, typeName, blobBb.position(), dataBlockLen);
     }
 
     /**
@@ -65,8 +60,7 @@ public class CompoundOleUtil implements CompoundPackageFactory {
      * @throws FileNotFoundException if the entry does not exist
      * @throws IOException if some other io error occurs
      */
-    public static DocumentEntry getDocumentEntry(String entryName,
-        DirectoryEntry dir) throws IOException {
+    public static DocumentEntry getDocumentEntry(String entryName, DirectoryEntry dir) throws IOException {
         // split entry name into individual components and decode them
         List<String> entryNames = new ArrayList<>();
         for (String str : entryName.split(ENTRY_SEPARATOR)) {
@@ -99,26 +93,23 @@ public class CompoundOleUtil implements CompoundPackageFactory {
     private static String encodeEntryName(String name) {
         try {
             return URLEncoder.encode(name, ENTRY_NAME_CHARSET);
-        } catch (UnsupportedEncodingException e) {
-            throw new RuntimeException(e);
+        } catch (UnsupportedEncodingException _ex) {
+            throw new RuntimeException(_ex);
         }
     }
 
     private static String decodeEntryName(String name) {
         try {
             return URLDecoder.decode(name, ENTRY_NAME_CHARSET);
-        } catch (UnsupportedEncodingException e) {
-            throw new RuntimeException(e);
+        } catch (UnsupportedEncodingException _ex) {
+            throw new RuntimeException(_ex);
         }
     }
 
-    private static final class CompoundContentImpl
-        extends EmbeddedPackageContentImpl implements CompoundContent {
+    private static final class CompoundContentImpl extends EmbeddedPackageContentImpl implements CompoundContent {
         private POIFSFileSystem _fs;
 
-        private CompoundContentImpl(
-            OleBlobImpl blob, String prettyName, String className,
-            String typeName, int position, int length) {
+        private CompoundContentImpl(OleBlobImpl blob, String prettyName, String className, String typeName, int position, int length) {
             super(blob, prettyName, className, typeName, position, length);
         }
 
@@ -137,17 +128,15 @@ public class CompoundOleUtil implements CompoundPackageFactory {
         @Override
         public Iterator<Entry> iterator() {
             try {
-                return getEntries(new ArrayList<>(), getFileSystem().getRoot(),
-                    ENTRY_SEPARATOR).iterator();
-            } catch (IOException e) {
-                throw new UncheckedIOException(e);
+                return getEntries(new ArrayList<>(), getFileSystem().getRoot(), ENTRY_SEPARATOR).iterator();
+            } catch (IOException _ex) {
+                throw new UncheckedIOException(_ex);
             }
         }
 
         @Override
         public EntryImpl getEntry(String entryName) throws IOException {
-            return new EntryImpl(entryName,
-                getDocumentEntry(entryName, getFileSystem().getRoot()));
+            return new EntryImpl(entryName, getDocumentEntry(entryName, getFileSystem().getRoot()));
         }
 
         @Override
@@ -160,8 +149,7 @@ public class CompoundOleUtil implements CompoundPackageFactory {
             return getEntry(CONTENTS_ENTRY);
         }
 
-        private List<Entry> getEntries(List<Entry> entries, DirectoryEntry dir,
-            String prefix) {
+        private List<Entry> getEntries(List<Entry> entries, DirectoryEntry dir, String prefix) {
             for (org.apache.poi.poifs.filesystem.Entry entry : dir) {
                 if (entry instanceof DirectoryEntry) {
                     // .. recurse into this directory
@@ -188,22 +176,21 @@ public class CompoundOleUtil implements CompoundPackageFactory {
             ToStringBuilder sb = toString(ToStringBuilder.builder(this));
 
             try {
-                sb.append("hasContentsEntry", hasContentsEntry())
-                  .append("entries", getEntries(new ArrayList<>(), getFileSystem().getRoot(), ENTRY_SEPARATOR));
-            } catch (IOException e) {
-                sb.append("entries", "<" + e + ">");
+                sb.append("hasContentsEntry", hasContentsEntry()).append("entries", getEntries(new ArrayList<>(), getFileSystem().getRoot(), ENTRY_SEPARATOR));
+            } catch (IOException _ex) {
+                sb.append("entries", "<" + _ex + ">");
             }
 
             return sb.toString();
         }
 
         private final class EntryImpl implements CompoundContent.Entry {
-            private final String        _name;
-            private final DocumentEntry _docEntry;
+            private final String        mname;
+            private final DocumentEntry mdocEntry;
 
-            private EntryImpl(String name, DocumentEntry docEntry) {
-                _name = name;
-                _docEntry = docEntry;
+            private EntryImpl(String _name, DocumentEntry _docEntry) {
+                mname = _name;
+                mdocEntry = _docEntry;
             }
 
             @Override
@@ -213,7 +200,7 @@ public class CompoundOleUtil implements CompoundPackageFactory {
 
             @Override
             public String getName() {
-                return _name;
+                return mname;
             }
 
             @Override
@@ -228,12 +215,12 @@ public class CompoundOleUtil implements CompoundPackageFactory {
 
             @Override
             public long length() {
-                return _docEntry.getSize();
+                return mdocEntry.getSize();
             }
 
             @Override
             public InputStream getStream() throws IOException {
-                return new DocumentInputStream(_docEntry);
+                return new DocumentInputStream(mdocEntry);
             }
 
             @Override
@@ -245,10 +232,7 @@ public class CompoundOleUtil implements CompoundPackageFactory {
 
             @Override
             public String toString() {
-                return ToStringBuilder.valueBuilder(this)
-                    .append("name", _name)
-                    .append("length", length())
-                    .toString();
+                return ToStringBuilder.valueBuilder(this).append("name", mname).append("length", length()).toString();
             }
         }
     }

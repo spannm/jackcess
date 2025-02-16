@@ -27,8 +27,6 @@ import java.lang.System.Logger.Level;
  * Implementation of ErrorHandler which is useful for generating debug information about bad row data (great for bug
  * reports!). After logging a debug entry for the failed column, it will return some sort of replacement value, see
  * {@link ReplacementErrorHandler}.
- *
- * @author James Ahlborn
  */
 public class DebugErrorHandler extends ReplacementErrorHandler {
     private static final Logger LOGGER = System.getLogger(DebugErrorHandler.class.getName());

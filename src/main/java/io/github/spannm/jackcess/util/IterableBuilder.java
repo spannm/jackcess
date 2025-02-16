@@ -11,8 +11,6 @@ import java.util.stream.StreamSupport;
 
 /**
  * Builder style class for constructing a {@link Cursor} Iterable/Iterator.
- *
- * @author James Ahlborn
  */
 public class IterableBuilder implements Iterable<Row> {
     public enum Type {

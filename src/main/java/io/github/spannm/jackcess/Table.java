@@ -21,8 +21,6 @@ import java.util.stream.StreamSupport;
  * rows in another table based on a foreign-key relationship).
  * <p>
  * A Table instance is not thread-safe (see {@link Database} for more thread-safety details).
- *
- * @author James Ahlborn
  */
 public interface Table extends Iterable<Row>, TableDefinition {
     /**

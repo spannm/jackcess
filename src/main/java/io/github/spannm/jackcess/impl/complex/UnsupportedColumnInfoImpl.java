@@ -12,15 +12,10 @@ import java.util.Map;
 
 /**
  * Complex column info for an unsupported complex type.
- *
- * @author James Ahlborn
  */
-public class UnsupportedColumnInfoImpl
-    extends ComplexColumnInfoImpl<UnsupportedValue>
-    implements UnsupportedColumnInfo {
+public class UnsupportedColumnInfoImpl extends ComplexColumnInfoImpl<UnsupportedValue> implements UnsupportedColumnInfo {
 
-    public UnsupportedColumnInfoImpl(Column column, int complexId,
-        Table typeObjTable, Table flatTable) throws IOException {
+    public UnsupportedColumnInfoImpl(Column column, int complexId, Table typeObjTable, Table flatTable) throws IOException {
         super(column, complexId, typeObjTable, flatTable);
     }
 
@@ -34,9 +29,7 @@ public class UnsupportedColumnInfoImpl
     }
 
     @Override
-    protected UnsupportedValueImpl toValue(
-        ComplexValueForeignKey complexValueFk,
-        Row rawValue) {
+    protected UnsupportedValueImpl toValue(ComplexValueForeignKey complexValueFk, Row rawValue) {
         ComplexValue.Id id = getValueId(rawValue);
 
         Map<String, Object> values = new LinkedHashMap<>();
@@ -63,17 +56,14 @@ public class UnsupportedColumnInfoImpl
         return newValue(INVALID_FK, values);
     }
 
-    public static UnsupportedValue newValue(
-        ComplexValueForeignKey complexValueFk, Map<String, ?> values) {
-        return new UnsupportedValueImpl(INVALID_ID, complexValueFk,
-            new LinkedHashMap<>(values));
+    public static UnsupportedValue newValue(ComplexValueForeignKey complexValueFk, Map<String, ?> values) {
+        return new UnsupportedValueImpl(INVALID_ID, complexValueFk, new LinkedHashMap<>(values));
     }
 
     private static class UnsupportedValueImpl extends ComplexValueImpl implements UnsupportedValue {
         private final Map<String, Object> _values;
 
-        private UnsupportedValueImpl(Id id, ComplexValueForeignKey complexValueFk,
-            Map<String, Object> values) {
+        private UnsupportedValueImpl(Id id, ComplexValueForeignKey complexValueFk, Map<String, Object> values) {
             super(id, complexValueFk);
             _values = values;
         }

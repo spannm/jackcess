@@ -2,8 +2,6 @@ package io.github.spannm.jackcess.expr;
 
 /**
  * A FunctionLookup provides a source for {@link Function} instances used during expression evaluation.
- *
- * @author James Ahlborn
  */
 public interface FunctionLookup {
     /**

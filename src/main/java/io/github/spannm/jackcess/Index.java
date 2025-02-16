@@ -6,8 +6,6 @@ import java.util.List;
 /**
  * Access database index definition. A {@link Table} has a list of Index instances. Indexes can enable fast searches and
  * ordered traversal on a Table (for the indexed columns). These features can be utilized via an {@link IndexCursor}.
- *
- * @author James Ahlborn
  */
 public interface Index {
 

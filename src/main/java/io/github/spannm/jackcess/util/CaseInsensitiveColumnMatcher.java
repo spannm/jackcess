@@ -27,8 +27,6 @@ import java.io.UncheckedIOException;
 /**
  * Concrete implementation of ColumnMatcher which tests textual columns case-insensitively ({@link DataType#TEXT} and
  * {@link DataType#MEMO}), and all other columns using simple equality.
- *
- * @author James Ahlborn
  */
 public class CaseInsensitiveColumnMatcher implements ColumnMatcher {
 
@@ -50,9 +48,9 @@ public class CaseInsensitiveColumnMatcher implements ColumnMatcher {
             CharSequence cs2 = ColumnImpl.toCharSequence(value2);
 
             return cs1 == cs2 || cs1 != null && cs2 != null && cs1.toString().equalsIgnoreCase(cs2.toString());
-        } catch (IOException e) {
+        } catch (IOException _ex) {
             throw new UncheckedIOException("Could not read column " + columnName
-                + " value", e);
+                + " value", _ex);
         }
     }
 

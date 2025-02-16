@@ -30,8 +30,6 @@ import java.util.*;
  *     .setReadOnly(true)
  *     .open();
  * </pre>
- *
- * @author James Ahlborn
  */
 public class DatabaseBuilder {
     /** the file name of the mdb to open/create */

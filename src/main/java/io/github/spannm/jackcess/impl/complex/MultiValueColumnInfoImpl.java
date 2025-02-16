@@ -9,18 +9,14 @@ import java.io.IOException;
 
 /**
  * Complex column info for a column holding multiple simple values per row.
- *
- * @author James Ahlborn
  */
-public class MultiValueColumnInfoImpl extends ComplexColumnInfoImpl<SingleValue>
-    implements MultiValueColumnInfo {
-    private final Column _valueCol;
+public class MultiValueColumnInfoImpl extends ComplexColumnInfoImpl<SingleValue> implements MultiValueColumnInfo {
+    private final Column valueCol;
 
-    public MultiValueColumnInfoImpl(Column column, int complexId,
-        Table typeObjTable, Table flatTable) throws IOException {
+    public MultiValueColumnInfoImpl(Column column, int complexId, Table typeObjTable, Table flatTable) throws IOException {
         super(column, complexId, typeObjTable, flatTable);
 
-        _valueCol = getTypeColumns().get(0);
+        valueCol = getTypeColumns().get(0);
     }
 
     @Override
@@ -29,13 +25,11 @@ public class MultiValueColumnInfoImpl extends ComplexColumnInfoImpl<SingleValue>
     }
 
     public Column getValueColumn() {
-        return _valueCol;
+        return valueCol;
     }
 
     @Override
-    protected SingleValueImpl toValue(
-        ComplexValueForeignKey complexValueFk,
-        Row rawValue) {
+    protected SingleValueImpl toValue(ComplexValueForeignKey complexValueFk, Row rawValue) {
         ComplexValue.Id id = getValueId(rawValue);
         Object value = getValueColumn().getRowValue(rawValue);
 
@@ -53,16 +47,14 @@ public class MultiValueColumnInfoImpl extends ComplexColumnInfoImpl<SingleValue>
         return newSingleValue(INVALID_FK, value);
     }
 
-    public static SingleValue newSingleValue(
-        ComplexValueForeignKey complexValueFk, Object value) {
+    public static SingleValue newSingleValue(ComplexValueForeignKey complexValueFk, Object value) {
         return new SingleValueImpl(INVALID_ID, complexValueFk, value);
     }
 
     private static class SingleValueImpl extends ComplexValueImpl implements SingleValue {
         private Object _value;
 
-        private SingleValueImpl(Id id, ComplexValueForeignKey complexValueFk,
-            Object value) {
+        private SingleValueImpl(Id id, ComplexValueForeignKey complexValueFk, Object value) {
             super(id, complexValueFk);
             _value = value;
         }

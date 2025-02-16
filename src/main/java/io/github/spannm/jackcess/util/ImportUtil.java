@@ -31,8 +31,6 @@ import java.util.regex.Pattern;
  * Utility class for importing tables to an Access database from other sources. See the {@link Builder} for convenient
  * configuration of the import functionality. Note that most scenarios for customizing input data can be handled by
  * implementing a custom {@link ImportFilter}.
- *
- * @author James Ahlborn
  */
 public class ImportUtil {
     /** Batch commit size for copying other result sets into this database */

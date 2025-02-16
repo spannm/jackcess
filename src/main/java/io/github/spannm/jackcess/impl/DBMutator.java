@@ -5,8 +5,6 @@ import java.nio.charset.Charset;
 
 /**
  * Common helper class used to maintain state during database mutation.
- *
- * @author James Ahlborn
  */
 abstract class DBMutator {
     private final DatabaseImpl _database;
@@ -42,7 +40,7 @@ abstract class DBMutator {
     protected ColumnImpl.SortOrder getDbSortOrder() {
         try {
             return _database.getDefaultSortOrder();
-        } catch (IOException e) {
+        } catch (IOException _ex) {
             // ignored, just use the jet format default
         }
         return null;

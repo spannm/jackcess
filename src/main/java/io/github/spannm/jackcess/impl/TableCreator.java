@@ -7,17 +7,13 @@ import java.util.*;
 
 /**
  * Helper class used to maintain state during table creation.
- *
- * @author James Ahlborn
  */
 public class TableCreator extends TableMutator {
     private String                                _name;
     private List<ColumnBuilder>                   _columns;
     private List<IndexBuilder>                    _indexes;
-    private final List<IndexDataState>            _indexDataStates =
-        new ArrayList<>();
-    private final Map<ColumnBuilder, ColumnState> _columnStates    =
-        new IdentityHashMap<>();
+    private final List<IndexDataState>            _indexDataStates = new ArrayList<>();
+    private final Map<ColumnBuilder, ColumnState> _columnStates    = new IdentityHashMap<>();
     private final List<ColumnBuilder>             _lvalCols        = new ArrayList<>();
     private int                                   _tdefPageNumber  = PageChannel.INVALID_PAGE_NUMBER;
     private int                                   _umapPageNumber  = PageChannel.INVALID_PAGE_NUMBER;
@@ -75,8 +71,7 @@ public class TableCreator extends TableMutator {
                 }
             }
         }
-        throw new IllegalStateException(withErrorContext(
-            "could not find state for index"));
+        throw new IllegalStateException(withErrorContext("could not find state for index"));
     }
 
     public List<IndexDataState> getIndexDataStates() {
@@ -159,8 +154,7 @@ public class TableCreator extends TableMutator {
             TableImpl.writeTableDefinition(this);
 
             // update the database with the new table info
-            getDatabase().addNewTable(_name, _tdefPageNumber, DatabaseImpl.TYPE_TABLE,
-                null, null);
+            getDatabase().addNewTable(_name, _tdefPageNumber, DatabaseImpl.TYPE_TABLE, null, null);
 
             TableImpl newTable = getDatabase().getTable(_name);
 
@@ -174,8 +168,7 @@ public class TableCreator extends TableMutator {
             for (ColumnBuilder cb : _columns) {
                 Map<String, PropertyMap.Property> colProps = cb.getProperties();
                 if (colProps != null) {
-                    newTable.getColumn(cb.getName()).getProperties()
-                        .putAll(colProps.values());
+                    newTable.getColumn(cb.getName()).getProperties().putAll(colProps.values());
                     addedProps = true;
                 }
             }
@@ -219,12 +212,10 @@ public class TableCreator extends TableMutator {
         getDatabase().validateNewTableName(_name);
 
         if (_columns == null || _columns.isEmpty()) {
-            throw new IllegalArgumentException(withErrorContext(
-                "Cannot create table with no columns"));
+            throw new IllegalArgumentException(withErrorContext("Cannot create table with no columns"));
         }
         if (_columns.size() > getFormat().MAX_COLUMNS_PER_TABLE) {
-            throw new IllegalArgumentException(withErrorContext(
-                "Cannot create table with more than " + getFormat().MAX_COLUMNS_PER_TABLE + " columns"));
+            throw new IllegalArgumentException(withErrorContext("Cannot create table with more than " + getFormat().MAX_COLUMNS_PER_TABLE + " columns"));
         }
 
         Set<String> colNames = new HashSet<>();
@@ -245,8 +236,7 @@ public class TableCreator extends TableMutator {
         if (hasIndexes()) {
 
             if (_indexes.size() > getFormat().MAX_INDEXES_PER_TABLE) {
-                throw new IllegalArgumentException(withErrorContext(
-                    "Cannot create table with more than " + getFormat().MAX_INDEXES_PER_TABLE + " indexes"));
+                throw new IllegalArgumentException(withErrorContext("Cannot create table with more than " + getFormat().MAX_INDEXES_PER_TABLE + " indexes"));
             }
 
             // now, validate the indexes
@@ -287,8 +277,7 @@ public class TableCreator extends TableMutator {
         return true;
     }
 
-    private static boolean sameIndexData(
-        IndexBuilder.Column col1, IndexBuilder.Column col2) {
+    private static boolean sameIndexData(IndexBuilder.Column col1, IndexBuilder.Column col2) {
         return col1.getName().equals(col2.getName()) && col1.getFlags() == col2.getFlags();
     }
 

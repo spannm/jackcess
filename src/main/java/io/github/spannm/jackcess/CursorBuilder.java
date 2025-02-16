@@ -43,8 +43,6 @@ import java.util.Map;
  * <pre>
  * Row row = CursorBuilder.findRow(table, Collections.singletonMap(col, "foo"));
  * </pre>
- *
- * @author James Ahlborn
  */
 public class CursorBuilder {
     /** the table which the cursor will traverse */

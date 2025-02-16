@@ -4,8 +4,6 @@ import java.nio.ByteOrder;
 
 /**
  * ColumnImpl subclass which is used for unknown/unsupported data types.
- *
- * @author James Ahlborn
  */
 class UnsupportedColumnImpl extends ColumnImpl {
     private final byte _originalType;

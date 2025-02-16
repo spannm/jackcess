@@ -23,8 +23,6 @@ import java.util.List;
  *     .setCascadeDeletes()
  *     .toRelationship(db);
  * </pre>
- *
- * @author James Ahlborn
  * @see TableBuilder
  */
 public class RelationshipBuilder {

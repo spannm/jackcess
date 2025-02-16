@@ -18,8 +18,6 @@ import java.util.Set;
 
 /**
  * Utility code for loading complex columns.
- *
- * @author James Ahlborn
  */
 public class ComplexColumnSupport {
     private static final Logger        LOGGER                     = System.getLogger(ComplexColumnSupport.class.getName());
@@ -39,24 +37,19 @@ public class ComplexColumnSupport {
     /**
      * Creates a ComplexColumnInfo for a complex column.
      */
-    public static ComplexColumnInfo<? extends ComplexValue> create(
-        ColumnImpl column, ByteBuffer buffer, int offset) throws IOException {
-        int complexTypeId = buffer.getInt(
-            offset + column.getFormat().OFFSET_COLUMN_COMPLEX_ID);
+    public static ComplexColumnInfo<? extends ComplexValue> create(ColumnImpl column, ByteBuffer buffer, int offset) throws IOException {
+        int complexTypeId = buffer.getInt(offset + column.getFormat().OFFSET_COLUMN_COMPLEX_ID);
 
         DatabaseImpl db = column.getDatabase();
         TableImpl complexColumns = db.getSystemComplexColumns();
-        IndexCursor cursor = CursorBuilder.createCursor(
-            complexColumns.getPrimaryKeyIndex());
+        IndexCursor cursor = CursorBuilder.createCursor(complexColumns.getPrimaryKeyIndex());
         if (!cursor.findFirstRowByEntry(complexTypeId)) {
-            throw new IOException(column.withErrorContext(
-                "Could not find complex column info for complex column with id " + complexTypeId));
+            throw new IOException(column.withErrorContext("Could not find complex column info for complex column with id " + complexTypeId));
         }
         Row cColRow = cursor.getCurrentRow();
         int tableId = cColRow.getInt(COL_TABLE_ID);
         if (tableId != column.getTable().getTableDefPageNumber()) {
-            throw new IOException(column.withErrorContext(
-                "Found complex column for table " + tableId + " but expected table " + column.getTable().getTableDefPageNumber()));
+            throw new IOException(column.withErrorContext("Found complex column for table " + tableId + " but expected table " + column.getTable().getTableDefPageNumber()));
         }
         int flatTableId = cColRow.getInt(COL_FLAT_TABLE_ID);
         int typeObjId = cColRow.getInt(COL_COMPLEX_TYPE_OBJECT_ID);
@@ -65,28 +58,21 @@ public class ComplexColumnSupport {
         TableImpl flatTable = db.getTable(flatTableId);
 
         if (typeObjTable == null || flatTable == null) {
-            throw new IOException(column.withErrorContext(
-                "Could not find supporting tables (" + typeObjId + ", " + flatTableId
-                    + ") for complex column with id " + complexTypeId));
+            throw new IOException(column.withErrorContext("Could not find supporting tables (" + typeObjId + ", " + flatTableId + ") for complex column with id " + complexTypeId));
         }
 
         // we inspect the structore of the "type table" to determine what kind of
         // complex info we are dealing with
         if (isMultiValueColumn(typeObjTable)) {
-            return new MultiValueColumnInfoImpl(column, complexTypeId, typeObjTable,
-                flatTable);
+            return new MultiValueColumnInfoImpl(column, complexTypeId, typeObjTable, flatTable);
         } else if (isAttachmentColumn(typeObjTable)) {
-            return new AttachmentColumnInfoImpl(column, complexTypeId, typeObjTable,
-                flatTable);
+            return new AttachmentColumnInfoImpl(column, complexTypeId, typeObjTable, flatTable);
         } else if (isVersionHistoryColumn(typeObjTable)) {
-            return new VersionHistoryColumnInfoImpl(column, complexTypeId, typeObjTable,
-                flatTable);
+            return new VersionHistoryColumnInfoImpl(column, complexTypeId, typeObjTable, flatTable);
         }
 
-        LOGGER.log(Level.WARNING, column.withErrorContext(
-            "Unsupported complex column type " + typeObjTable.getName()));
-        return new UnsupportedColumnInfoImpl(column, complexTypeId, typeObjTable,
-            flatTable);
+        LOGGER.log(Level.WARNING, column.withErrorContext("Unsupported complex column type " + typeObjTable.getName()));
+        return new UnsupportedColumnInfoImpl(column, complexTypeId, typeObjTable, flatTable);
     }
 
     public static boolean isMultiValueColumn(Table typeObjTable) {

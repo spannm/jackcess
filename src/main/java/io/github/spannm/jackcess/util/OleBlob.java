@@ -73,8 +73,6 @@ import java.util.stream.StreamSupport;
  *     }
  * }
  * </pre>
- *
- * @author James Ahlborn
  */
 public interface OleBlob extends Blob, Closeable {
     /**

@@ -50,7 +50,7 @@ class DatabaseTest extends AbstractBaseTest {
             try {
                 DatabaseBuilder.newTable("test").toTable(db);
                 fail("created table with no columns?");
-            } catch (IllegalArgumentException e) {
+            } catch (IllegalArgumentException _ex) {
                 // success
             }
 
@@ -60,7 +60,7 @@ class DatabaseTest extends AbstractBaseTest {
                     .addColumn(DatabaseBuilder.newColumn("a", DataType.MEMO))
                     .toTable(db);
                 fail("created table with duplicate column names?");
-            } catch (IllegalArgumentException e) {
+            } catch (IllegalArgumentException _ex) {
                 // success
             }
 
@@ -70,7 +70,7 @@ class DatabaseTest extends AbstractBaseTest {
                         .withLengthInUnits(352))
                     .toTable(db);
                 fail("created table with invalid column length?");
-            } catch (IllegalArgumentException e) {
+            } catch (IllegalArgumentException _ex) {
                 // success
             }
 
@@ -79,7 +79,7 @@ class DatabaseTest extends AbstractBaseTest {
                     .addColumn(DatabaseBuilder.newColumn("A_" + createString(70), DataType.TEXT))
                     .toTable(db);
                 fail("created table with too long column name?");
-            } catch (IllegalArgumentException e) {
+            } catch (IllegalArgumentException _ex) {
                 // success
             }
 
@@ -92,7 +92,7 @@ class DatabaseTest extends AbstractBaseTest {
                     .addColumn(DatabaseBuilder.newColumn("A", DataType.TEXT))
                     .toTable(db);
                 fail("create duplicate tables?");
-            } catch (IllegalArgumentException e) {
+            } catch (IllegalArgumentException _ex) {
                 // success
             }
         }
@@ -270,7 +270,8 @@ class DatabaseTest extends AbstractBaseTest {
         assertFalse(bogusFile.exists());
         DatabaseBuilder dbb = DatabaseBuilder.newDatabase(bogusFile).withReadOnly(true).withAutoSync(getTestAutoSync());
         assertThrows(FileNotFoundException.class, () -> {
-            try (Database ignored = dbb.open()) {}
+            try (Database ignored = dbb.open()) {
+            }
         });
         assertFalse(bogusFile.exists());
     }
@@ -281,17 +282,11 @@ class DatabaseTest extends AbstractBaseTest {
         try (Database db = testDb.open()) {
             Table table = db.getTable("Table1");
 
-            Map<String, Object> expectedRow0 = new LinkedHashMap<>();
-            expectedRow0.put("id", 0);
-            expectedRow0.put("id2", 2);
-            expectedRow0.put("data", "foo");
-            expectedRow0.put("data2", "foo2");
+            Map<String, Object> expectedRow0 = new LinkedHashMap<>(Map.of(
+                "id", 0, "id2", 2, "data", "foo", "data2", "foo2"));
 
-            Map<String, Object> expectedRow1 = new LinkedHashMap<>();
-            expectedRow1.put("id", 3);
-            expectedRow1.put("id2", 5);
-            expectedRow1.put("data", "bar");
-            expectedRow1.put("data2", "bar2");
+            Map<String, Object> expectedRow1 = new LinkedHashMap<>(Map.of(
+                "id", 3, "id2", 5, "data", "bar", "data2", "bar2"));
 
             int rowNum = 0;
             Map<String, Object> row = null;
@@ -931,7 +926,7 @@ class DatabaseTest extends AbstractBaseTest {
     }
 
     private static void verifyFinderType(Database db, String clazzName) throws Exception {
-        java.lang.reflect.Field f = db.getClass().getDeclaredField("_tableFinder");
+        java.lang.reflect.Field f = db.getClass().getDeclaredField("mtableFinder");
         f.setAccessible(true);
         Object finder = f.get(db);
         assertNotNull(finder);

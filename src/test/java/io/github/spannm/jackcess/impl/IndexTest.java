@@ -316,8 +316,8 @@ class IndexTest extends AbstractBaseTest {
             try {
                 ((IndexImpl) index).getIndexData().prepareAddRow(
                     row, new RowIdImpl(400 + i, 0), null).commit();
-            } catch (IOException e) {
-                failure = e;
+            } catch (IOException _ex) {
+                failure = _ex;
             }
             if (expectedSuccess) {
                 assertNull(failure);

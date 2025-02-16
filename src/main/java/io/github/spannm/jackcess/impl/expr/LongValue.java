@@ -5,10 +5,10 @@ import io.github.spannm.jackcess.expr.LocaleContext;
 import java.math.BigDecimal;
 
 public class LongValue extends BaseNumericValue {
-    private final Integer _val;
+    private final Integer val;
 
-    public LongValue(Integer val) {
-        _val = val;
+    public LongValue(Integer _val) {
+        val = _val;
     }
 
     @Override
@@ -18,31 +18,31 @@ public class LongValue extends BaseNumericValue {
 
     @Override
     public Object get() {
-        return _val;
+        return val;
     }
 
     @Override
     protected Number getNumber() {
-        return _val;
+        return val;
     }
 
     @Override
     public boolean getAsBoolean(LocaleContext ctx) {
-        return _val.longValue() != 0L;
+        return val.longValue() != 0L;
     }
 
     @Override
     public Integer getAsLongInt(LocaleContext ctx) {
-        return _val;
+        return val;
     }
 
     @Override
     public BigDecimal getAsBigDecimal(LocaleContext ctx) {
-        return BigDecimal.valueOf(_val);
+        return BigDecimal.valueOf(val);
     }
 
     @Override
     public String getAsString(LocaleContext ctx) {
-        return _val.toString();
+        return val.toString();
     }
 }

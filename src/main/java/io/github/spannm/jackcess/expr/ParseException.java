@@ -2,8 +2,6 @@ package io.github.spannm.jackcess.expr;
 
 /**
  * Exception thrown when expression parsing fails.
- *
- * @author James Ahlborn
  */
 public class ParseException extends EvalException {
     private static final long serialVersionUID = 20180330L;

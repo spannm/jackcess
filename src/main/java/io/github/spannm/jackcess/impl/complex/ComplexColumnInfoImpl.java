@@ -14,30 +14,24 @@ import java.util.*;
 
 /**
  * Base class for the additional information tracked for complex columns.
- *
- * @author James Ahlborn
  */
-public abstract class ComplexColumnInfoImpl<V extends ComplexValue>
-    implements ComplexColumnInfo<V> {
+public abstract class ComplexColumnInfoImpl<V extends ComplexValue> implements ComplexColumnInfo<V> {
     private static final int                   INVALID_ID_VALUE = -1;
-    public static final ComplexValue.Id        INVALID_ID       = new ComplexValueIdImpl(
-        INVALID_ID_VALUE, null);
-    public static final ComplexValueForeignKey INVALID_FK       =
-        new ComplexValueForeignKeyImpl(null, INVALID_ID_VALUE);
+    public static final ComplexValue.Id        INVALID_ID       = new ComplexValueIdImpl(INVALID_ID_VALUE, null);
+    public static final ComplexValueForeignKey INVALID_FK       = new ComplexValueForeignKeyImpl(null, INVALID_ID_VALUE);
 
-    private final Column                       _column;
-    private final int                          _complexTypeId;
-    private final Table                        _flatTable;
-    private final List<Column>                 _typeCols;
-    private final Column                       _pkCol;
-    private final Column                       _complexValFkCol;
-    private IndexCursor                        _complexValIdCursor;
+    private final Column                       mcolumn;
+    private final int                          mcomplexTypeId;
+    private final Table                        mflatTable;
+    private final List<Column>                 mtypeCols;
+    private final Column                       mpkCol;
+    private final Column                       mcomplexValFkCol;
+    private IndexCursor                        momplexValIdCursor;
 
-    protected ComplexColumnInfoImpl(Column column, int complexTypeId,
-        Table typeObjTable, Table flatTable) throws IOException {
-        _column = column;
-        _complexTypeId = complexTypeId;
-        _flatTable = flatTable;
+    protected ComplexColumnInfoImpl(Column column, int complexTypeId, Table typeObjTable, Table flatTable) throws IOException {
+        mcolumn = column;
+        mcomplexTypeId = complexTypeId;
+        mflatTable = flatTable;
 
         // the flat table has all the "value" columns and 2 extra columns, a
         // primary key for each row, and a LONG value which is essentially a
@@ -46,7 +40,7 @@ public abstract class ComplexColumnInfoImpl<V extends ComplexValue>
         List<Column> otherCols = new ArrayList<>();
         diffFlatColumns(typeObjTable, flatTable, typeCols, otherCols);
 
-        _typeCols = Collections.unmodifiableList(typeCols);
+        mtypeCols = Collections.unmodifiableList(typeCols);
 
         Column pkCol = null;
         Column complexValFkCol = null;
@@ -59,12 +53,10 @@ public abstract class ComplexColumnInfoImpl<V extends ComplexValue>
         }
 
         if (pkCol == null || complexValFkCol == null) {
-            throw new IOException("Could not find expected columns in flat table "
-                + flatTable.getName() + " for complex column with id "
-                + complexTypeId);
+            throw new IOException("Could not find expected columns in flat table " + flatTable.getName() + " for complex column with id " + complexTypeId);
         }
-        _pkCol = pkCol;
-        _complexValFkCol = complexValFkCol;
+        mpkCol = pkCol;
+        mcomplexValFkCol = complexValFkCol;
     }
 
     public void postTableLoadInit() throws IOException {
@@ -72,7 +64,7 @@ public abstract class ComplexColumnInfoImpl<V extends ComplexValue>
     }
 
     public Column getColumn() {
-        return _column;
+        return mcolumn;
     }
 
     public Database getDatabase() {
@@ -80,22 +72,20 @@ public abstract class ComplexColumnInfoImpl<V extends ComplexValue>
     }
 
     public Column getPrimaryKeyColumn() {
-        return _pkCol;
+        return mpkCol;
     }
 
     public Column getComplexValueForeignKeyColumn() {
-        return _complexValFkCol;
+        return mcomplexValFkCol;
     }
 
     protected List<Column> getTypeColumns() {
-        return _typeCols;
+        return mtypeCols;
     }
 
     @Override
     public int countValues(int complexValueFk) throws IOException {
-        return getRawValues(complexValueFk,
-            Collections.singleton(_complexValFkCol.getName()))
-                .size();
+        return getRawValues(complexValueFk, Collections.singleton(mcomplexValFkCol.getName())).size();
     }
 
     @Override
@@ -103,23 +93,17 @@ public abstract class ComplexColumnInfoImpl<V extends ComplexValue>
         return getRawValues(complexValueFk, null);
     }
 
-    private Iterator<Row> getComplexValFkIter(
-        int complexValueFk, Collection<String> columnNames) throws IOException {
-        if (_complexValIdCursor == null) {
-            _complexValIdCursor = _flatTable.newCursor()
-                .withIndexByColumns(_complexValFkCol)
-                .toIndexCursor();
+    private Iterator<Row> getComplexValFkIter(int complexValueFk, Collection<String> columnNames) throws IOException {
+        if (momplexValIdCursor == null) {
+            momplexValIdCursor = mflatTable.newCursor().withIndexByColumns(mcomplexValFkCol).toIndexCursor();
         }
 
-        return _complexValIdCursor.newEntryIterable(complexValueFk)
-            .withColumnNames(columnNames).iterator();
+        return momplexValIdCursor.newEntryIterable(complexValueFk).withColumnNames(columnNames).iterator();
     }
 
     @Override
-    public List<Row> getRawValues(int complexValueFk,
-        Collection<String> columnNames) throws IOException {
-        Iterator<Row> entryIter =
-            getComplexValFkIter(complexValueFk, columnNames);
+    public List<Row> getRawValues(int complexValueFk, Collection<String> columnNames) throws IOException {
+        Iterator<Row> entryIter = getComplexValFkIter(complexValueFk, columnNames);
         if (!entryIter.hasNext()) {
             return List.of();
         }
@@ -142,8 +126,7 @@ public abstract class ComplexColumnInfoImpl<V extends ComplexValue>
         return toValues(complexValueFk, rawValues);
     }
 
-    protected List<V> toValues(ComplexValueForeignKey complexValueFk,
-        List<Row> rawValues) throws IOException {
+    protected List<V> toValues(ComplexValueForeignKey complexValueFk, List<Row> rawValues) throws IOException {
         List<V> values = new ArrayList<>();
         for (Row rawValue : rawValues) {
             values.add(toValue(complexValueFk, rawValue));
@@ -154,15 +137,15 @@ public abstract class ComplexColumnInfoImpl<V extends ComplexValue>
 
     @Override
     public ComplexValue.Id addRawValue(Map<String, ?> rawValue) throws IOException {
-        Object[] row = ((TableImpl) _flatTable).asRowWithRowId(rawValue);
-        _flatTable.addRow(row);
+        Object[] row = ((TableImpl) mflatTable).asRowWithRowId(rawValue);
+        mflatTable.addRow(row);
         return getValueId(row);
     }
 
     @Override
     public ComplexValue.Id addValue(V value) throws IOException {
         Object[] row = asRow(newRowArray(), value);
-        _flatTable.addRow(row);
+        mflatTable.addRow(row);
         ComplexValue.Id id = getValueId(row);
         value.setId(id);
         return id;
@@ -177,7 +160,7 @@ public abstract class ComplexColumnInfoImpl<V extends ComplexValue>
 
     @Override
     public ComplexValue.Id updateRawValue(Row rawValue) throws IOException {
-        _flatTable.updateRow(rawValue);
+        mflatTable.updateRow(rawValue);
         return getValueId(rawValue);
     }
 
@@ -227,11 +210,11 @@ public abstract class ComplexColumnInfoImpl<V extends ComplexValue>
     }
 
     private void updateRow(ComplexValue.Id id, Object[] row) throws IOException {
-        ((TableImpl) _flatTable).updateRow(id.getRowId(), row);
+        ((TableImpl) mflatTable).updateRow(id.getRowId(), row);
     }
 
     private void deleteRow(RowId rowId) throws IOException {
-        ((TableImpl) _flatTable).deleteRow(rowId);
+        ((TableImpl) mflatTable).deleteRow(rowId);
     }
 
     protected ComplexValueIdImpl getValueId(Row row) {
@@ -241,38 +224,29 @@ public abstract class ComplexColumnInfoImpl<V extends ComplexValue>
 
     protected ComplexValueIdImpl getValueId(Object[] row) {
         int idVal = (Integer) getPrimaryKeyColumn().getRowValue(row);
-        return new ComplexValueIdImpl(idVal,
-            ((TableImpl) _flatTable).getRowId(row));
+        return new ComplexValueIdImpl(idVal, ((TableImpl) mflatTable).getRowId(row));
     }
 
     protected Object[] asRow(Object[] row, V value) throws IOException {
         ComplexValue.Id id = value.getId();
-        _pkCol.setRowValue(
-            row, id != INVALID_ID ? id : Column.AUTO_NUMBER);
+        mpkCol.setRowValue(row, id != INVALID_ID ? id : Column.AUTO_NUMBER);
         ComplexValueForeignKey cFk = value.getComplexValueForeignKey();
-        _complexValFkCol.setRowValue(
-            row, cFk != INVALID_FK ? cFk : Column.AUTO_NUMBER);
+        mcomplexValFkCol.setRowValue(row, cFk != INVALID_FK ? cFk : Column.AUTO_NUMBER);
         return row;
     }
 
     private Object[] newRowArray() {
-        Object[] row = new Object[_flatTable.getColumnCount() + 1];
+        Object[] row = new Object[mflatTable.getColumnCount() + 1];
         row[row.length - 1] = ColumnImpl.RETURN_ROW_ID;
         return row;
     }
 
     @Override
     public String toString() {
-        return ToStringBuilder.valueBuilder(this)
-            .append("complexType", getType())
-            .append("complexTypeId", _complexTypeId)
-            .toString();
+        return ToStringBuilder.valueBuilder(this).append("complexType", getType()).append("complexTypeId", mcomplexTypeId).toString();
     }
 
-    protected static void diffFlatColumns(Table typeObjTable,
-        Table flatTable,
-        List<Column> typeCols,
-        List<Column> otherCols) {
+    protected static void diffFlatColumns(Table typeObjTable, Table flatTable, List<Column> typeCols, List<Column> otherCols) {
         // each "flat"" table has the columns from the "type" table, plus some
         // others. separate the "flat" columns into these 2 buckets
         for (Column col : flatTable.getColumns()) {
@@ -344,10 +318,7 @@ public abstract class ComplexColumnInfoImpl<V extends ComplexValue>
 
         @Override
         public boolean equals(Object o) {
-            return this == o
-                || o != null && getClass() == o.getClass()
-                  && Objects.equals(_id, ((ComplexValueImpl) o)._id)
-                  && _complexValueFk.equals(((ComplexValueImpl) o)._complexValueFk);
+            return this == o || o != null && getClass() == o.getClass() && Objects.equals(_id, ((ComplexValueImpl) o)._id) && _complexValueFk.equals(((ComplexValueImpl) o)._complexValueFk);
         }
     }
 

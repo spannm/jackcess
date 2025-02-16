@@ -5,8 +5,6 @@ import javax.script.Bindings;
 /**
  * EvalContext encapsulates all shared state for expression parsing and evaluation. It provides a bridge between the
  * expression execution engine and the current Database.
- *
- * @author James Ahlborn
  */
 public interface EvalContext extends LocaleContext {
     /**

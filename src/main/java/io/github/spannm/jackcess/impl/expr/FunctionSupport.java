@@ -40,8 +40,7 @@ public class FunctionSupport {
             }
         }
 
-        protected EvalException invalidFunctionCall(
-            Throwable t, Value[] params) {
+        protected EvalException invalidFunctionCall(Throwable t, Value[] params) {
             String paramStr = Arrays.toString(params);
             String msg = "Invalid function call {" + _name + "(" + paramStr.substring(1, paramStr.length() - 1) + ")}";
             return new EvalException(msg, t);
@@ -69,8 +68,8 @@ public class FunctionSupport {
             try {
                 validateNumParams(params);
                 return eval0(ctx);
-            } catch (Exception e) {
-                throw invalidFunctionCall(e, params);
+            } catch (Exception _ex) {
+                throw invalidFunctionCall(_ex, params);
             }
         }
 
@@ -87,8 +86,8 @@ public class FunctionSupport {
             try {
                 validateNumParams(params);
                 return eval1(ctx, params[0]);
-            } catch (Exception e) {
-                throw invalidFunctionCall(e, params);
+            } catch (Exception _ex) {
+                throw invalidFunctionCall(_ex, params);
             }
         }
 
@@ -109,8 +108,8 @@ public class FunctionSupport {
                     return param1;
                 }
                 return eval1(ctx, param1);
-            } catch (Exception e) {
-                throw invalidFunctionCall(e, params);
+            } catch (Exception _ex) {
+                throw invalidFunctionCall(_ex, params);
             }
         }
 
@@ -127,8 +126,8 @@ public class FunctionSupport {
             try {
                 validateNumParams(params);
                 return eval2(ctx, params[0], params[1]);
-            } catch (Exception e) {
-                throw invalidFunctionCall(e, params);
+            } catch (Exception _ex) {
+                throw invalidFunctionCall(_ex, params);
             }
         }
 
@@ -145,13 +144,12 @@ public class FunctionSupport {
             try {
                 validateNumParams(params);
                 return eval3(ctx, params[0], params[1], params[2]);
-            } catch (Exception e) {
-                throw invalidFunctionCall(e, params);
+            } catch (Exception _ex) {
+                throw invalidFunctionCall(_ex, params);
             }
         }
 
-        protected abstract Value eval3(EvalContext ctx,
-            Value param1, Value param2, Value param3);
+        protected abstract Value eval3(EvalContext ctx, Value param1, Value param2, Value param3);
     }
 
     public abstract static class FuncVar extends BaseFunction {
@@ -168,8 +166,8 @@ public class FunctionSupport {
             try {
                 validateNumParams(params);
                 return evalVar(ctx, params);
-            } catch (Exception e) {
-                throw invalidFunctionCall(e, params);
+            } catch (Exception _ex) {
+                throw invalidFunctionCall(_ex, params);
             }
         }
 
@@ -177,27 +175,27 @@ public class FunctionSupport {
     }
 
     public static class StringFuncWrapper implements Function {
-        private final String   _name;
-        private final Function _delegate;
+        private final String   mname;
+        private final Function mdelegate;
 
-        public StringFuncWrapper(Function delegate) {
-            _delegate = delegate;
-            _name = _delegate.getName() + NON_VAR_SUFFIX;
+        public StringFuncWrapper(Function _delegate) {
+            mdelegate = _delegate;
+            mname = mdelegate.getName() + NON_VAR_SUFFIX;
         }
 
         @Override
         public String getName() {
-            return _name;
+            return mname;
         }
 
         @Override
         public boolean isPure() {
-            return _delegate.isPure();
+            return mdelegate.isPure();
         }
 
         @Override
         public Value eval(EvalContext ctx, Value... params) {
-            Value result = _delegate.eval(ctx, params);
+            Value result = mdelegate.eval(ctx, params);
             if (result.isNull()) {
                 // non-variant version does not do null-propagation, so force
                 // exception to be thrown here
@@ -212,23 +210,19 @@ public class FunctionSupport {
         }
     }
 
-    public static boolean getOptionalBooleanParam(
-        LocaleContext ctx, Value[] params, int idx) {
+    public static boolean getOptionalBooleanParam(LocaleContext ctx, Value[] params, int idx) {
         return params.length > idx && params[idx].getAsBoolean(ctx);
     }
 
-    public static double getOptionalDoubleParam(
-        EvalContext ctx, Value[] params, int idx, double defValue) {
+    public static double getOptionalDoubleParam(EvalContext ctx, Value[] params, int idx, double defValue) {
         return params.length > idx ? params[idx].getAsDouble(ctx) : defValue;
     }
 
-    public static int getOptionalIntParam(
-        LocaleContext ctx, Value[] params, int idx, int defValue) {
+    public static int getOptionalIntParam(LocaleContext ctx, Value[] params, int idx, int defValue) {
         return getOptionalIntParam(ctx, params, idx, defValue, defValue);
     }
 
-    public static int getOptionalIntParam(
-        LocaleContext ctx, Value[] params, int idx, int defValue, int useDefValue) {
+    public static int getOptionalIntParam(LocaleContext ctx, Value[] params, int idx, int defValue, int useDefValue) {
         int val = defValue;
         if (params.length > idx) {
             val = params[idx].getAsLongInt(ctx);

@@ -25,14 +25,10 @@ import java.util.List;
 /**
  * Concrete Query subclass which represents a crosstab/pivot query, e.g.:
  * {@code TRANSFORM <expr> SELECT <query> PIVOT <expr>}
- *
- * @author James Ahlborn
  */
-public class CrossTabQueryImpl extends BaseSelectQueryImpl
-    implements CrossTabQuery {
+public class CrossTabQueryImpl extends BaseSelectQueryImpl implements CrossTabQuery {
 
-    public CrossTabQueryImpl(String name, List<Row> rows, int objectId,
-        int objectFlag) {
+    public CrossTabQueryImpl(String name, List<Row> rows, int objectId, int objectFlag) {
         super(name, rows, objectId, objectFlag, Type.CROSS_TAB);
     }
 
@@ -51,8 +47,7 @@ public class CrossTabQueryImpl extends BaseSelectQueryImpl
     }
 
     protected Row getPivotRow() {
-        return getUniqueRow(filterRowsByFlag(super.getColumnRows(),
-            CROSSTAB_PIVOT_FLAG));
+        return getUniqueRow(filterRowsByFlag(super.getColumnRows(), CROSSTAB_PIVOT_FLAG));
     }
 
     @Override
@@ -80,8 +75,7 @@ public class CrossTabQueryImpl extends BaseSelectQueryImpl
 
         toSQLSelectString(builder, true);
 
-        builder.append(NEWLINE).append("PIVOT ")
-            .append(getPivotExpression());
+        builder.append(NEWLINE).append("PIVOT ").append(getPivotExpression());
     }
 
 }

@@ -2,8 +2,6 @@ package io.github.spannm.jackcess.expr;
 
 /**
  * A Function provides an invokable handle to external functionality to an expression.
- *
- * @author James Ahlborn
  */
 public interface Function {
 

@@ -14,8 +14,6 @@ import java.util.regex.Pattern;
  * <p>
  * This class can be used as a value pattern in the various Cursor search methods, e.g.
  * {@link io.github.spannm.jackcess.Cursor#findFirstRow(io.github.spannm.jackcess.Column,Object)}.
- *
- * @author James Ahlborn
  */
 public class PatternColumnPredicate implements Predicate<Object> {
     private static final int LIKE_REGEX_FLAGS    = Pattern.DOTALL;
@@ -34,8 +32,8 @@ public class PatternColumnPredicate implements Predicate<Object> {
             CharSequence cs = ColumnImpl.toCharSequence(value);
 
             return _pattern.matcher(cs).matches();
-        } catch (IOException e) {
-            throw new UncheckedIOException("Could not coerece column value to string", e);
+        } catch (IOException _ex) {
+            throw new UncheckedIOException("Could not coerece column value to string", _ex);
         }
     }
 

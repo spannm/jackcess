@@ -20,14 +20,11 @@ import java.util.zip.InflaterInputStream;
 
 /**
  * Complex column info for a column holding 0 or more attachments per row.
- *
- * @author James Ahlborn
  */
 public class AttachmentColumnInfoImpl extends ComplexColumnInfoImpl<Attachment> implements AttachmentColumnInfo {
 
     /** some file formats which may not be worth re-compressing */
-    private static final Set<String> COMPRESSED_FORMATS   = Set.of(
-        "jpg", "zip", "gz", "bz2", "z", "7z", "cab", "rar", "mp3", "mpg");
+    private static final Set<String> COMPRESSED_FORMATS   = Set.of("jpg", "zip", "gz", "bz2", "z", "7z", "cab", "rar", "mp3", "mpg");
 
     private static final String      FILE_NAME_COL_NAME   = "FileName";
     private static final String      FILE_TYPE_COL_NAME   = "FileType";
@@ -46,8 +43,7 @@ public class AttachmentColumnInfoImpl extends ComplexColumnInfoImpl<Attachment> 
     private final Column             _fileTimeStampCol;
     private final Column             _fileFlagsCol;
 
-    public AttachmentColumnInfoImpl(Column column, int complexId,
-        Table typeObjTable, Table flatTable) throws IOException {
+    public AttachmentColumnInfoImpl(Column column, int complexId, Table typeObjTable, Table flatTable) throws IOException {
         super(column, complexId, typeObjTable, flatTable);
 
         Column fileUrlCol = null;
@@ -128,8 +124,7 @@ public class AttachmentColumnInfoImpl extends ComplexColumnInfoImpl<Attachment> 
     }
 
     @Override
-    protected AttachmentImpl toValue(ComplexValueForeignKey complexValueFk,
-        Row rawValue) {
+    protected AttachmentImpl toValue(ComplexValueForeignKey complexValueFk, Row rawValue) {
         ComplexValue.Id id = getValueId(rawValue);
         String url = (String) getFileUrlColumn().getRowValue(rawValue);
         String name = (String) getFileNameColumn().getRowValue(rawValue);
@@ -138,8 +133,7 @@ public class AttachmentColumnInfoImpl extends ComplexColumnInfoImpl<Attachment> 
         Object ts = getFileTimeStampColumn().getRowValue(rawValue);
         byte[] data = (byte[]) getFileDataColumn().getRowValue(rawValue);
 
-        return new AttachmentImpl(id, complexValueFk, url, name, type, null,
-            ts, flags, data);
+        return new AttachmentImpl(id, complexValueFk, url, name, type, null, ts, flags, data);
     }
 
     @Override
@@ -158,47 +152,32 @@ public class AttachmentColumnInfoImpl extends ComplexColumnInfoImpl<Attachment> 
         return newAttachment(INVALID_FK, data);
     }
 
-    public static Attachment newAttachment(ComplexValueForeignKey complexValueFk,
-        byte[] data) {
+    public static Attachment newAttachment(ComplexValueForeignKey complexValueFk, byte[] data) {
         return newAttachment(complexValueFk, null, null, null, data, null, null);
     }
 
-    public static Attachment newAttachment(
-        String url, String name, String type, byte[] data,
-        Object timeStamp, Integer flags) {
-        return newAttachment(INVALID_FK, url, name, type, data,
-            timeStamp, flags);
+    public static Attachment newAttachment(String url, String name, String type, byte[] data, Object timeStamp, Integer flags) {
+        return newAttachment(INVALID_FK, url, name, type, data, timeStamp, flags);
     }
 
-    public static Attachment newAttachment(
-        ComplexValueForeignKey complexValueFk, String url, String name,
-        String type, byte[] data, Object timeStamp, Integer flags) {
-        return new AttachmentImpl(INVALID_ID, complexValueFk, url, name, type,
-            data, timeStamp, flags, null);
+    public static Attachment newAttachment(ComplexValueForeignKey complexValueFk, String url, String name, String type, byte[] data, Object timeStamp, Integer flags) {
+        return new AttachmentImpl(INVALID_ID, complexValueFk, url, name, type, data, timeStamp, flags, null);
     }
 
     public static Attachment newEncodedAttachment(byte[] encodedData) {
         return newEncodedAttachment(INVALID_FK, encodedData);
     }
 
-    public static Attachment newEncodedAttachment(
-        ComplexValueForeignKey complexValueFk, byte[] encodedData) {
-        return newEncodedAttachment(complexValueFk, null, null, null, encodedData,
-            null, null);
+    public static Attachment newEncodedAttachment(ComplexValueForeignKey complexValueFk, byte[] encodedData) {
+        return newEncodedAttachment(complexValueFk, null, null, null, encodedData, null, null);
     }
 
-    public static Attachment newEncodedAttachment(
-        String url, String name, String type, byte[] encodedData,
-        Object timeStamp, Integer flags) {
-        return newEncodedAttachment(INVALID_FK, url, name, type,
-            encodedData, timeStamp, flags);
+    public static Attachment newEncodedAttachment(String url, String name, String type, byte[] encodedData, Object timeStamp, Integer flags) {
+        return newEncodedAttachment(INVALID_FK, url, name, type, encodedData, timeStamp, flags);
     }
 
-    public static Attachment newEncodedAttachment(
-        ComplexValueForeignKey complexValueFk, String url, String name,
-        String type, byte[] encodedData, Object timeStamp, Integer flags) {
-        return new AttachmentImpl(INVALID_ID, complexValueFk, url, name, type,
-            null, timeStamp, flags, encodedData);
+    public static Attachment newEncodedAttachment(ComplexValueForeignKey complexValueFk, String url, String name, String type, byte[] encodedData, Object timeStamp, Integer flags) {
+        return new AttachmentImpl(INVALID_ID, complexValueFk, url, name, type, null, timeStamp, flags, encodedData);
     }
 
     private static class AttachmentImpl extends ComplexValueImpl implements Attachment {
@@ -210,9 +189,7 @@ public class AttachmentColumnInfoImpl extends ComplexColumnInfoImpl<Attachment> 
         private Integer _flags;
         private byte[]  _encodedData;
 
-        private AttachmentImpl(Id id, ComplexValueForeignKey complexValueFk,
-            String url, String name, String type, byte[] data,
-            Object timeStamp, Integer flags, byte[] encodedData) {
+        private AttachmentImpl(Id id, ComplexValueForeignKey complexValueFk, String url, String name, String type, byte[] data, Object timeStamp, Integer flags, byte[] encodedData) {
 
             super(id, complexValueFk);
             _url = url;
@@ -332,8 +309,8 @@ public class AttachmentColumnInfoImpl extends ComplexColumnInfoImpl<Attachment> 
             String dataStr = null;
             try {
                 dataStr = ByteUtil.toHexString(getFileData());
-            } catch (IOException e) {
-                dataStr = e.toString();
+            } catch (IOException _ex) {
+                dataStr = _ex.toString();
             }
 
             return "Attachment(" + getComplexValueForeignKey() + "," + getId() + ") "
@@ -359,9 +336,7 @@ public class AttachmentColumnInfoImpl extends ComplexColumnInfoImpl<Attachment> 
 
             DataInputStream contentStream = null;
             try {
-                InputStream bin = new ByteArrayInputStream(
-                    _encodedData, WRAPPER_HEADER_SIZE,
-                    _encodedData.length - WRAPPER_HEADER_SIZE);
+                InputStream bin = new ByteArrayInputStream(_encodedData, WRAPPER_HEADER_SIZE, _encodedData.length - WRAPPER_HEADER_SIZE);
 
                 if (typeFlag == DATA_TYPE_COMPRESSED) {
                     // actual content is deflate compressed
@@ -421,8 +396,7 @@ public class AttachmentColumnInfoImpl extends ComplexColumnInfoImpl<Attachment> 
             try {
 
                 if (shouldCompress) {
-                    contentStream = new DeflaterOutputStream(
-                        contentStream, deflater = new Deflater(3));
+                    contentStream = new DeflaterOutputStream(contentStream, deflater = new Deflater(3));
                 }
 
                 // write the header w/ the file extension

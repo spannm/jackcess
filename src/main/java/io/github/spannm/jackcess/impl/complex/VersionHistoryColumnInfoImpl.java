@@ -18,16 +18,12 @@ import java.util.List;
  * Note, the strongly typed update/delete methods are <i>not</i> supported for version history columns (the data is
  * supposed to be immutable). That said, the "raw" update/delete methods are supported for those that <i>really</i> want
  * to muck with the version history data.
- *
- * @author James Ahlborn
  */
-public class VersionHistoryColumnInfoImpl extends ComplexColumnInfoImpl<Version>
-    implements VersionHistoryColumnInfo {
-    private final Column _valueCol;
-    private final Column _modifiedCol;
+public class VersionHistoryColumnInfoImpl extends ComplexColumnInfoImpl<Version> implements VersionHistoryColumnInfo {
+    private final Column mvalueCol;
+    private final Column mmodifiedCol;
 
-    public VersionHistoryColumnInfoImpl(Column column, int complexId,
-        Table typeObjTable, Table flatTable) throws IOException {
+    public VersionHistoryColumnInfoImpl(Column column, int complexId, Table typeObjTable, Table flatTable) throws IOException {
         super(column, complexId, typeObjTable, flatTable);
 
         Column valueCol = null;
@@ -45,8 +41,8 @@ public class VersionHistoryColumnInfoImpl extends ComplexColumnInfoImpl<Version>
             }
         }
 
-        _valueCol = valueCol;
-        _modifiedCol = modifiedCol;
+        mvalueCol = valueCol;
+        mmodifiedCol = modifiedCol;
     }
 
     @Override
@@ -55,17 +51,16 @@ public class VersionHistoryColumnInfoImpl extends ComplexColumnInfoImpl<Version>
 
         // link up with the actual versioned column. it should have the same name
         // as the "value" column in the type table.
-        Column versionedCol = getColumn().getTable().getColumn(
-            getValueColumn().getName());
+        Column versionedCol = getColumn().getTable().getColumn(getValueColumn().getName());
         ((ColumnImpl) versionedCol).setVersionHistoryColumn((ColumnImpl) getColumn());
     }
 
     public Column getValueColumn() {
-        return _valueCol;
+        return mvalueCol;
     }
 
     public Column getModifiedDateColumn() {
-        return _modifiedCol;
+        return mmodifiedCol;
     }
 
     @Override
@@ -75,25 +70,21 @@ public class VersionHistoryColumnInfoImpl extends ComplexColumnInfoImpl<Version>
 
     @Override
     public ComplexValue.Id updateValue(Version value) {
-        throw new UnsupportedOperationException(
-            "This column does not support value updates");
+        throw new UnsupportedOperationException("This column does not support value updates");
     }
 
     @Override
     public void deleteValue(Version value) {
-        throw new UnsupportedOperationException(
-            "This column does not support value deletes");
+        throw new UnsupportedOperationException("This column does not support value deletes");
     }
 
     @Override
     public void deleteAllValues(int complexValueFk) {
-        throw new UnsupportedOperationException(
-            "This column does not support value deletes");
+        throw new UnsupportedOperationException("This column does not support value deletes");
     }
 
     @Override
-    protected List<Version> toValues(ComplexValueForeignKey complexValueFk,
-        List<Row> rawValues) throws IOException {
+    protected List<Version> toValues(ComplexValueForeignKey complexValueFk, List<Row> rawValues) throws IOException {
         List<Version> versions = super.toValues(complexValueFk, rawValues);
 
         // order versions newest to oldest
@@ -103,8 +94,7 @@ public class VersionHistoryColumnInfoImpl extends ComplexColumnInfoImpl<Version>
     }
 
     @Override
-    protected VersionImpl toValue(ComplexValueForeignKey complexValueFk,
-        Row rawValue) {
+    protected VersionImpl toValue(ComplexValueForeignKey complexValueFk, Row rawValue) {
         ComplexValue.Id id = getValueId(rawValue);
         String value = (String) getValueColumn().getRowValue(rawValue);
         Object modifiedDate = getModifiedDateColumn().getRowValue(rawValue);
@@ -124,8 +114,7 @@ public class VersionHistoryColumnInfoImpl extends ComplexColumnInfoImpl<Version>
         return newVersion(INVALID_FK, value, modifiedDate);
     }
 
-    public static Version newVersion(ComplexValueForeignKey complexValueFk,
-        String value, Object modifiedDate) {
+    public static Version newVersion(ComplexValueForeignKey complexValueFk, String value, Object modifiedDate) {
         return new VersionImpl(INVALID_ID, complexValueFk, value, modifiedDate);
     }
 
@@ -133,8 +122,7 @@ public class VersionHistoryColumnInfoImpl extends ComplexColumnInfoImpl<Version>
         private final String _value;
         private final Object _modifiedDate;
 
-        private VersionImpl(Id id, ComplexValueForeignKey complexValueFk,
-            String value, Object modifiedDate) {
+        private VersionImpl(Id id, ComplexValueForeignKey complexValueFk, String value, Object modifiedDate) {
             super(id, complexValueFk);
             _value = value;
             _modifiedDate = modifiedDate;
@@ -194,20 +182,17 @@ public class VersionHistoryColumnInfoImpl extends ComplexColumnInfoImpl<Version>
 
         @Override
         public void update() {
-            throw new UnsupportedOperationException(
-                "This column does not support value updates");
+            throw new UnsupportedOperationException("This column does not support value updates");
         }
 
         @Override
         public void delete() {
-            throw new UnsupportedOperationException(
-                "This column does not support value deletes");
+            throw new UnsupportedOperationException("This column does not support value deletes");
         }
 
         @Override
         public String toString() {
-            return "Version(" + getComplexValueForeignKey() + "," + getId() + ") "
-                + getModifiedDateObject() + ", " + getValue();
+            return "Version(" + getComplexValueForeignKey() + "," + getId() + ") " + getModifiedDateObject() + ", " + getValue();
         }
     }
 

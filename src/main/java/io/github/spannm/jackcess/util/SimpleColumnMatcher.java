@@ -29,8 +29,6 @@ import java.util.Objects;
 /**
  * Simple concrete implementation of ColumnMatcher which tests for equality. If initial comparison fails, attempts to
  * coerce the values to a common type for comparison.
- *
- * @author James Ahlborn
  */
 public class SimpleColumnMatcher implements ColumnMatcher {
 
@@ -54,7 +52,7 @@ public class SimpleColumnMatcher implements ColumnMatcher {
                 Object internalV2 = ColumnImpl.toInternalValue(dataType, value2, db);
 
                 return equals(internalV1, internalV2);
-            } catch (IOException e) {
+            } catch (IOException _ex) {
                 // ignored, just go with the original result
             }
         }

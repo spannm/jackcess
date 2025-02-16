@@ -8,8 +8,6 @@ import javax.script.Bindings;
  * The EvalConfig allows for customization of the expression evaluation context for a given {@link Database} instance.
  *
  * @see io.github.spannm.jackcess.expr expression package docs
- *
- * @author James Ahlborn
  */
 public interface EvalConfig {
     /**

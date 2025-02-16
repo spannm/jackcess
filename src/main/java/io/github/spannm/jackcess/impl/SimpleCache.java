@@ -5,8 +5,6 @@ import java.util.Map;
 
 /**
  * Simple LRU cache implementation which keeps at most the configured maximum number of elements.
- *
- * @author James Ahlborn
  */
 public class SimpleCache<K, V> extends LinkedHashMap<K, V> {
     private static final long serialVersionUID = 20180313L;

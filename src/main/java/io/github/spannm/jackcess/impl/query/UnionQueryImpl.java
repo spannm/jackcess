@@ -24,12 +24,9 @@ import java.util.List;
 
 /**
  * Concrete Query subclass which represents a UNION query, e.g.: {@code SELECT <query1> UNION SELECT <query2>}
- *
- * @author James Ahlborn
  */
 public class UnionQueryImpl extends QueryImpl implements UnionQuery {
-    public UnionQueryImpl(String name, List<Row> rows, int objectId,
-        int objectFlag) {
+    public UnionQueryImpl(String name, List<Row> rows, int objectId, int objectFlag) {
         super(name, rows, objectId, objectFlag, Type.UNION);
     }
 
@@ -59,14 +56,12 @@ public class UnionQueryImpl extends QueryImpl implements UnionQuery {
                 return cleanUnionString(row._expression);
             }
         }
-        throw new IllegalStateException(
-            "Could not find union query with id " + id);
+        throw new IllegalStateException("Could not find union query with id " + id);
     }
 
     @Override
     protected void toSQLString(StringBuilder builder) {
-        builder.append(getUnionString1()).append(NEWLINE)
-            .append("UNION ");
+        builder.append(getUnionString1()).append(NEWLINE).append("UNION ");
         String unionType = getUnionType();
         if (!DEFAULT_TYPE.equals(unionType)) {
             builder.append(unionType).append(' ');

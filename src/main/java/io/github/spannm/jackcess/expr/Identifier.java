@@ -6,39 +6,37 @@ import java.util.Optional;
 /**
  * identifies a database entity (e.g. the name of a database field). An Identify must have an object name, but the
  * collection name and property name are optional.
- *
- * @author James Ahlborn
  */
 public class Identifier {
-    private final String _collectionName;
-    private final String _objectName;
-    private final String _propertyName;
+    private final String collectionName;
+    private final String objectName;
+    private final String propertyName;
 
-    public Identifier(String objectName) {
-        this(null, objectName, null);
+    public Identifier(String _objectName) {
+        this(null, _objectName, null);
     }
 
-    public Identifier(String collectionName, String objectName, String propertyName) {
-        _collectionName = collectionName;
-        _objectName = objectName;
-        _propertyName = propertyName;
+    public Identifier(String _collectionName, String _objectName, String _propertyName) {
+        collectionName = _collectionName;
+        objectName = _objectName;
+        propertyName = _propertyName;
     }
 
     public String getCollectionName() {
-        return _collectionName;
+        return collectionName;
     }
 
     public String getObjectName() {
-        return _objectName;
+        return objectName;
     }
 
     public String getPropertyName() {
-        return _propertyName;
+        return propertyName;
     }
 
     @Override
     public int hashCode() {
-        return _objectName.hashCode();
+        return objectName.hashCode();
     }
 
     @Override
@@ -49,17 +47,17 @@ public class Identifier {
 
         Identifier oi = (Identifier) o;
 
-        return Objects.equals(_objectName, oi._objectName)
-            && Objects.equals(_collectionName, oi._collectionName)
-            && Objects.equals(_propertyName, oi._propertyName);
+        return Objects.equals(objectName, oi.objectName)
+            && Objects.equals(collectionName, oi.collectionName)
+            && Objects.equals(propertyName, oi.propertyName);
     }
 
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
-        Optional.ofNullable(_collectionName).ifPresent(x -> sb.append('[').append(x).append("]."));
-        sb.append('[').append(_objectName).append(']');
-        Optional.ofNullable(_propertyName).ifPresent(x -> sb.append('[').append(x).append("]."));
+        Optional.ofNullable(collectionName).ifPresent(x -> sb.append('[').append(x).append("]."));
+        sb.append('[').append(objectName).append(']');
+        Optional.ofNullable(propertyName).ifPresent(x -> sb.append('[').append(x).append("]."));
         return sb.toString();
     }
 

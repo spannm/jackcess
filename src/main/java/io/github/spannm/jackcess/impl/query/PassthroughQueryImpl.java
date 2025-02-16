@@ -22,13 +22,10 @@ import java.util.List;
 
 /**
  * Concrete Query subclass which represents a query which will be executed via ODBC.
- *
- * @author James Ahlborn
  */
 public class PassthroughQueryImpl extends QueryImpl implements PassthroughQuery {
 
-    public PassthroughQueryImpl(String name, List<Row> rows, int objectId,
-        int objectFlag) {
+    public PassthroughQueryImpl(String name, List<Row> rows, int objectId, int objectFlag) {
         super(name, rows, objectId, objectFlag, Type.PASSTHROUGH);
     }
 

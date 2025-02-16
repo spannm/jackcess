@@ -10,8 +10,6 @@ import java.util.Set;
 
 /**
  * Common helper class used to maintain state during table mutation.
- *
- * @author James Ahlborn
  */
 public abstract class TableMutator extends DBMutator {
     private ColumnOffsets _colOffsets;
@@ -20,8 +18,7 @@ public abstract class TableMutator extends DBMutator {
         super(database);
     }
 
-    public void setColumnOffsets(
-        int fixedOffset, int varOffset, int longVarOffset) {
+    public void setColumnOffsets(int fixedOffset, int varOffset, int longVarOffset) {
         if (_colOffsets == null) {
             _colOffsets = new ColumnOffsets();
         }
@@ -40,47 +37,38 @@ public abstract class TableMutator extends DBMutator {
 
         // FIXME for now, we can't create complex columns
         if (column.getType() == DataType.COMPLEX_TYPE) {
-            throw new UnsupportedOperationException(withErrorContext(
-                "Complex column creation is not yet implemented"));
+            throw new UnsupportedOperationException(withErrorContext("Complex column creation is not yet implemented"));
         }
 
         column.validate(getFormat());
         if (!colNames.add(DatabaseImpl.toLookupName(column.getName()))) {
-            throw new IllegalArgumentException(withErrorContext(
-                "duplicate column name: " + column.getName()));
+            throw new IllegalArgumentException(withErrorContext("duplicate column name: " + column.getName()));
         }
 
         setColumnSortOrder(column);
     }
 
-    protected void validateIndex(Set<String> colNames, Set<String> idxNames,
-        boolean[] foundPk, IndexBuilder index) {
+    protected void validateIndex(Set<String> colNames, Set<String> idxNames, boolean[] foundPk, IndexBuilder index) {
 
         index.validate(colNames, getFormat());
         if (!idxNames.add(DatabaseImpl.toLookupName(index.getName()))) {
-            throw new IllegalArgumentException(withErrorContext(
-                "duplicate index name: " + index.getName()));
+            throw new IllegalArgumentException(withErrorContext("duplicate index name: " + index.getName()));
         }
         if (index.isPrimaryKey()) {
             if (foundPk[0]) {
-                throw new IllegalArgumentException(withErrorContext(
-                    "found second primary key index: " + index.getName()));
+                throw new IllegalArgumentException(withErrorContext("found second primary key index: " + index.getName()));
             }
             foundPk[0] = true;
         } else if (index.getType() == IndexImpl.FOREIGN_KEY_INDEX_TYPE) {
             if (getForeignKey(index) == null) {
-                throw new IllegalArgumentException(withErrorContext(
-                    "missing foreign key info for " + index.getName()));
+                throw new IllegalArgumentException(withErrorContext("missing foreign key info for " + index.getName()));
             }
         }
     }
 
-    protected void validateAutoNumberColumn(Set<DataType> autoTypes,
-        ColumnBuilder column) {
-        if (!column.getType().isMultipleAutoNumberAllowed()
-            && !autoTypes.add(column.getType())) {
-            throw new IllegalArgumentException(withErrorContext(
-                "Can have at most one AutoNumber column of type " + column.getType() + " per table"));
+    protected void validateAutoNumberColumn(Set<DataType> autoTypes, ColumnBuilder column) {
+        if (!column.getType().isMultipleAutoNumberAllowed() && !autoTypes.add(column.getType())) {
+            throw new IllegalArgumentException(withErrorContext("Can have at most one AutoNumber column of type " + column.getType() + " per table"));
         }
     }
 

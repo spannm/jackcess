@@ -23,8 +23,6 @@ import java.util.List;
 
 /**
  * Interface which allows customization of the behavior of the {@link ImportUtil} import methods.
- *
- * @author James Ahlborn
  */
 public interface ImportFilter {
 

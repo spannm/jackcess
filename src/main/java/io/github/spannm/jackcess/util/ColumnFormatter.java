@@ -18,8 +18,6 @@ import java.util.Map;
  * underlying Database's {@link EvalConfig} can be used to alter how this utility formats values. Note, formatted values
  * may be suitable for <i>display only</i> (i.e. a formatted value may not be accepted as an input value to a Table
  * add/update method).
- *
- * @author James Ahlborn
  */
 public class ColumnFormatter {
     private final ColumnImpl               _col;
@@ -110,7 +108,7 @@ public class ColumnFormatter {
         public String format(Object val) {
             try {
                 return _fmt.format(toValue(val)).getAsString(this);
-            } catch (EvalException ee) {
+            } catch (EvalException _ex) {
                 // invalid values for a given format result in returning the value as is
                 return val.toString();
             }

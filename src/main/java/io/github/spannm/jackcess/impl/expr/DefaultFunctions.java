@@ -471,8 +471,7 @@ public class DefaultFunctions {
         return null;
     }
 
-    private static boolean getOptionalTriStateBoolean(
-        EvalContext ctx, Value[] params, int idx, boolean defValue) {
+    private static boolean getOptionalTriStateBoolean(EvalContext ctx, Value[] params, int idx, boolean defValue) {
         boolean bv = defValue;
         if (params.length > idx) {
             int val = params[idx].getAsLongInt(ctx);

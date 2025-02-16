@@ -22,14 +22,10 @@ import java.util.List;
 
 /**
  * Concrete Query subclass which represents an table creation query, e.g.: {@code SELECT <query> INTO <newTable>}
- *
- * @author James Ahlborn
  */
-public class MakeTableQueryImpl extends BaseSelectQueryImpl
-    implements MakeTableQuery {
+public class MakeTableQueryImpl extends BaseSelectQueryImpl implements MakeTableQuery {
 
-    public MakeTableQueryImpl(String name, List<Row> rows, int objectId,
-        int objectFlag) {
+    public MakeTableQueryImpl(String name, List<Row> rows, int objectId, int objectFlag) {
         super(name, rows, objectId, objectFlag, Type.MAKE_TABLE);
     }
 

@@ -6,8 +6,6 @@ import java.time.format.DateTimeFormatter;
 
 /**
  * LocaleContext encapsulates all shared localization state for expression parsing and evaluation.
- *
- * @author James Ahlborn
  */
 public interface LocaleContext {
     /**

@@ -425,7 +425,7 @@ public class DefaultDateFunctions {
                 }
 
                 return ValueSupport.toValue(LocalDateTime.of(ld, lt));
-            } catch (DateTimeException de) {
+            } catch (DateTimeException _ex) {
                 // note a valid date/time
             }
         }
@@ -507,20 +507,17 @@ public class DefaultDateFunctions {
         return abbreviate ? TextStyle.SHORT : TextStyle.FULL;
     }
 
-    private static int weekOfYear(EvalContext ctx, Value param, int firstDay,
-        int firstWeekType) {
+    private static int weekOfYear(EvalContext ctx, Value param, int firstDay, int firstWeekType) {
         return weekOfYear(param.getAsLocalDateTime(ctx), firstDay, firstWeekType);
     }
 
-    private static int weekOfYear(LocalDateTime ldt, int firstDay,
-        int firstWeekType) {
+    private static int weekOfYear(LocalDateTime ldt, int firstDay, int firstWeekType) {
         WeekFields weekFields = weekFields(firstDay, firstWeekType);
         return ldt.get(weekFields.weekOfWeekBasedYear());
     }
 
     private static int weeksInYear(int year, WeekFields weekFields) {
-        return (int) LocalDate.of(year, 2, 1).range(weekFields.weekOfWeekBasedYear())
-            .getMaximum();
+        return (int) LocalDate.of(year, 2, 1).range(weekFields.weekOfWeekBasedYear()).getMaximum();
     }
 
     private static int getQuarter(LocalDateTime ldt) {

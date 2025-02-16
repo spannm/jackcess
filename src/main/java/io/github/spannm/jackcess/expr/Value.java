@@ -7,8 +7,6 @@ import java.time.LocalDateTime;
  * Wrapper for a typed primitive value used within the expression evaluation engine. Note that the "Null" value is
  * represented by an actual Value instance with the type of {@link Type#NULL}. Also note that all the conversion methods
  * will throw an {@link EvalException} if the conversion is not supported for the current value.
- *
- * @author James Ahlborn
  */
 public interface Value {
     /** the types supported within the expression evaluation engine */

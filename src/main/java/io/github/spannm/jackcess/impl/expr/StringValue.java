@@ -11,11 +11,11 @@ import java.text.DecimalFormatSymbols;
 public class StringValue extends BaseValue {
     private static final Object NOT_A_NUMBER = new Object();
 
-    private final String        _val;
-    private Object              _num;
+    private final String        val;
+    private Object              num;
 
-    public StringValue(String val) {
-        _val = val;
+    public StringValue(String _val) {
+        val = _val;
     }
 
     @Override
@@ -25,7 +25,7 @@ public class StringValue extends BaseValue {
 
     @Override
     public Object get() {
-        return _val;
+        return val;
     }
 
     @Override
@@ -36,7 +36,7 @@ public class StringValue extends BaseValue {
 
     @Override
     public String getAsString(LocaleContext ctx) {
-        return _val;
+        return val;
     }
 
     @Override
@@ -56,7 +56,7 @@ public class StringValue extends BaseValue {
 
     @Override
     public Value getAsDateTimeValue(LocaleContext ctx) {
-        Value dateValue = DefaultDateFunctions.stringToDateValue(ctx, _val);
+        Value dateValue = DefaultDateFunctions.stringToDateValue(ctx, val);
 
         if (dateValue == null) {
             // see if string can be coerced to number and then to value date (note,
@@ -78,22 +78,22 @@ public class StringValue extends BaseValue {
     }
 
     protected BigDecimal getNumber(LocaleContext ctx) {
-        if (_num instanceof BigDecimal) {
-            return (BigDecimal) _num;
+        if (num instanceof BigDecimal) {
+            return (BigDecimal) num;
         }
-        if (_num == null) {
+        if (num == null) {
             // see if it is parseable as a number
             try {
                 // ignore extraneous whitespace whitespace and handle "&[hH]" or
                 // "&[oO]" prefix (only supports integers)
-                String tmpVal = _val.trim();
+                String tmpVal = val.trim();
                 if (!tmpVal.isEmpty()) {
 
                     if (tmpVal.charAt(0) != ValueSupport.NUMBER_BASE_PREFIX) {
                         // convert to standard numeric support for parsing
                         tmpVal = toCanonicalNumberFormat(ctx, tmpVal);
-                        _num = ValueSupport.normalize(new BigDecimal(tmpVal));
-                        return (BigDecimal) _num;
+                        num = ValueSupport.normalize(new BigDecimal(tmpVal));
+                        return (BigDecimal) num;
                     }
 
                     // parse as hex/octal symbolic value
@@ -105,17 +105,17 @@ public class StringValue extends BaseValue {
 
                     // fall through to NaN
                 }
-            } catch (NumberFormatException nfe) {
+            } catch (NumberFormatException _ex) {
                 // fall through to NaN...
             }
-            _num = NOT_A_NUMBER;
+            num = NOT_A_NUMBER;
         }
         throw invalidConversion(Type.DOUBLE);
     }
 
     private BigDecimal parseIntegerString(String tmpVal, int radix) {
-        _num = new BigDecimal(ValueSupport.parseIntegerString(tmpVal, radix));
-        return (BigDecimal) _num;
+        num = new BigDecimal(ValueSupport.parseIntegerString(tmpVal, radix));
+        return (BigDecimal) num;
     }
 
     private static String toCanonicalNumberFormat(LocaleContext ctx, String tmpVal) {

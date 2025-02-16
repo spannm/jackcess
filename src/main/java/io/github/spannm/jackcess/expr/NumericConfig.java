@@ -11,12 +11,9 @@ import java.util.Locale;
  * A NumericConfig encapsulates number formatting options for expression evaluation. The default
  * {@link #US_NUMERIC_CONFIG} instance provides US specific locale configuration. Databases which have been built for
  * other locales can utilize custom implementations of NumericConfig in order to evaluate expressions correctly.
- *
- * @author James Ahlborn
  */
 public class NumericConfig {
-    public static final NumericConfig US_NUMERIC_CONFIG = new NumericConfig(
-        2, true, false, true, 3, Locale.US);
+    public static final NumericConfig US_NUMERIC_CONFIG = new NumericConfig(2, true, false, true, 3, Locale.US);
 
     public enum Type {
         CURRENCY,
@@ -27,112 +24,98 @@ public class NumericConfig {
         EURO
     }
 
-    private final int                  _numDecDigits;
-    private final boolean              _incLeadingDigit;
-    private final boolean              _useNegParens;
-    private final boolean              _useNegCurrencyParens;
-    private final int                  _numGroupDigits;
-    private final DecimalFormatSymbols _symbols;
-    private final NumberFormatter      _numFmt;
-    private final String               _currencyFormat;
-    private final String               _fixedFormat;
-    private final String               _standardFormat;
-    private final String               _percentFormat;
-    private final String               _scientificFormat;
-    private final String               _euroFormat;
+    private final int                  mnumDecDigits;
+    private final boolean              mincLeadingDigit;
+    private final boolean              museNegParens;
+    private final boolean              museNegCurrencyParens;
+    private final int                  mnumGroupDigits;
+    private final DecimalFormatSymbols msymbols;
+    private final NumberFormatter      mnumFmt;
+    private final String               mcurrencyFormat;
+    private final String               mfixedFormat;
+    private final String               mstandardFormat;
+    private final String               mpercentFormat;
+    private final String               mscientificFormat;
+    private final String               meuroFormat;
 
-    public NumericConfig(int numDecDigits, boolean incLeadingDigit,
-        boolean useNegParens, boolean useNegCurrencyParens,
-        int numGroupDigits, Locale locale) {
-        _numDecDigits = numDecDigits;
-        _incLeadingDigit = incLeadingDigit;
-        _useNegParens = useNegParens;
-        _useNegCurrencyParens = useNegCurrencyParens;
-        _numGroupDigits = numGroupDigits;
-        _symbols = DecimalFormatSymbols.getInstance(locale);
-        _numFmt = new NumberFormatter(_symbols);
+    public NumericConfig(int numDecDigits, boolean incLeadingDigit, boolean useNegParens, boolean useNegCurrencyParens, int numGroupDigits, Locale locale) {
+        mnumDecDigits = numDecDigits;
+        mincLeadingDigit = incLeadingDigit;
+        museNegParens = useNegParens;
+        museNegCurrencyParens = useNegCurrencyParens;
+        mnumGroupDigits = numGroupDigits;
+        msymbols = DecimalFormatSymbols.getInstance(locale);
+        mnumFmt = new NumberFormatter(msymbols);
 
-        _currencyFormat = FormatUtil.createNumberFormatPattern(
-            FormatUtil.NumPatternType.CURRENCY, _numDecDigits, _incLeadingDigit,
-            _useNegCurrencyParens, _numGroupDigits);
-        _fixedFormat = FormatUtil.createNumberFormatPattern(
-            FormatUtil.NumPatternType.GENERAL, _numDecDigits, true,
-            _useNegParens, 0);
-        _standardFormat = FormatUtil.createNumberFormatPattern(
-            FormatUtil.NumPatternType.GENERAL, _numDecDigits, _incLeadingDigit,
-            _useNegParens, _numGroupDigits);
-        _percentFormat = FormatUtil.createNumberFormatPattern(
-            FormatUtil.NumPatternType.PERCENT, _numDecDigits, _incLeadingDigit,
-            _useNegParens, 0);
-        _scientificFormat = FormatUtil.createNumberFormatPattern(
-            FormatUtil.NumPatternType.SCIENTIFIC, _numDecDigits, true,
-            false, 0);
-        _euroFormat = FormatUtil.createNumberFormatPattern(
-            FormatUtil.NumPatternType.EURO, _numDecDigits, _incLeadingDigit,
-            _useNegCurrencyParens, _numGroupDigits);
+        mcurrencyFormat = FormatUtil.createNumberFormatPattern(FormatUtil.NumPatternType.CURRENCY, mnumDecDigits, mincLeadingDigit, museNegCurrencyParens, mnumGroupDigits);
+        mfixedFormat = FormatUtil.createNumberFormatPattern(FormatUtil.NumPatternType.GENERAL, mnumDecDigits, true, museNegParens, 0);
+        mstandardFormat = FormatUtil.createNumberFormatPattern(FormatUtil.NumPatternType.GENERAL, mnumDecDigits, mincLeadingDigit, museNegParens, mnumGroupDigits);
+        mpercentFormat = FormatUtil.createNumberFormatPattern(FormatUtil.NumPatternType.PERCENT, mnumDecDigits, mincLeadingDigit, museNegParens, 0);
+        mscientificFormat = FormatUtil.createNumberFormatPattern(FormatUtil.NumPatternType.SCIENTIFIC, mnumDecDigits, true, false, 0);
+        meuroFormat = FormatUtil.createNumberFormatPattern(FormatUtil.NumPatternType.EURO, mnumDecDigits, mincLeadingDigit, museNegCurrencyParens, mnumGroupDigits);
     }
 
     public int getNumDecimalDigits() {
-        return _numDecDigits;
+        return mnumDecDigits;
     }
 
     public boolean includeLeadingDigit() {
-        return _incLeadingDigit;
+        return mincLeadingDigit;
     }
 
     public boolean useParensForNegatives() {
-        return _useNegParens;
+        return museNegParens;
     }
 
     public boolean useParensForCurrencyNegatives() {
-        return _useNegCurrencyParens;
+        return museNegCurrencyParens;
     }
 
     public int getNumGroupingDigits() {
-        return _numGroupDigits;
+        return mnumGroupDigits;
     }
 
     public String getNumberFormat(Type type) {
         switch (type) {
             case CURRENCY:
-                return _currencyFormat;
+                return mcurrencyFormat;
             case FIXED:
-                return _fixedFormat;
+                return mfixedFormat;
             case STANDARD:
-                return _standardFormat;
+                return mstandardFormat;
             case PERCENT:
-                return _percentFormat;
+                return mpercentFormat;
             case SCIENTIFIC:
-                return _scientificFormat;
+                return mscientificFormat;
             case EURO:
-                return _euroFormat;
+                return meuroFormat;
             default:
                 throw new IllegalArgumentException("unknown number type " + type);
         }
     }
 
     public DecimalFormatSymbols getDecimalFormatSymbols() {
-        return _symbols;
+        return msymbols;
     }
 
     /**
      * @return the given float formatted according to the current locale config
      */
     public String format(float f) {
-        return _numFmt.format(f);
+        return mnumFmt.format(f);
     }
 
     /**
      * @return the given double formatted according to the current locale config
      */
     public String format(double d) {
-        return _numFmt.format(d);
+        return mnumFmt.format(d);
     }
 
     /**
      * @return the given BigDecimal formatted according to the current locale config
      */
     public String format(BigDecimal bd) {
-        return _numFmt.format(bd);
+        return mnumFmt.format(bd);
     }
 }

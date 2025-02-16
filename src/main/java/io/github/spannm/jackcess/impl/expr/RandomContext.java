@@ -6,38 +6,35 @@ import java.util.Random;
 
 /**
  * This class effectively encapsulates the stateful logic of the "Rnd" function.
- *
- * @author James Ahlborn
  */
 public class RandomContext {
-    private Source               _defRnd;
-    private Map<Integer, Source> _rnds;
-    // default to the value access uses for "last val" when none has been
-    // returned yet
-    private float                _lastVal = 1.953125E-02f;
+    private Source               defRnd;
+    private Map<Integer, Source> rnds;
+    // default to the value access uses for "last val" when none has been returned yet
+    private float                lastVal = 1.953125E-02f;
 
     public RandomContext() {
     }
 
-    public float getRandom(Integer seed) {
+    public float getRandom(Integer _seed) {
 
-        if (seed == null) {
-            if (_defRnd == null) {
-                _defRnd = new SimpleSource(createRandom(System.currentTimeMillis()));
+        if (_seed == null) {
+            if (defRnd == null) {
+                defRnd = new SimpleSource(createRandom(System.currentTimeMillis()));
             }
-            return _defRnd.get();
+            return defRnd.get();
         }
 
-        if (_rnds == null) {
+        if (rnds == null) {
             // note, we don't use a SimpleCache here because if we discard a Random
             // instance, that will cause the values to be reset
-            _rnds = new HashMap<>();
+            rnds = new HashMap<>();
         }
 
-        Source rnd = _rnds.get(seed);
+        Source rnd = rnds.get(_seed);
         if (rnd == null) {
 
-            int seedInt = seed;
+            int seedInt = _seed;
             if (seedInt > 0) {
                 // normal random with a user specified seed
                 rnd = new SimpleSource(createRandom(seedInt));
@@ -49,19 +46,19 @@ public class RandomContext {
                 rnd = new LastValSource();
             }
 
-            _rnds.put(seed, rnd);
+            rnds.put(_seed, rnd);
         }
         return rnd.get();
     }
 
-    private float withLast(float lastVal) {
-        _lastVal = lastVal;
-        return lastVal;
+    private float withLast(float _lastVal) {
+        lastVal = _lastVal;
+        return _lastVal;
     }
 
     private void reset() {
-        if (_rnds != null) {
-            _rnds.clear();
+        if (rnds != null) {
+            rnds.clear();
         }
     }
 
@@ -79,29 +76,29 @@ public class RandomContext {
     }
 
     private class SimpleSource extends Source {
-        private final Random _rnd;
+        private final Random mrnd;
 
-        private SimpleSource(Random rnd) {
-            _rnd = rnd;
+        private SimpleSource(Random _rnd) {
+            mrnd = _rnd;
         }
 
         @Override
         protected float getImpl() {
-            return _rnd.nextFloat();
+            return mrnd.nextFloat();
         }
     }
 
     private class ResetSource extends Source {
-        private final float _val;
+        private final float mval;
 
-        private ResetSource(Random rnd) {
-            _val = rnd.nextFloat();
+        private ResetSource(Random _rnd) {
+            mval = _rnd.nextFloat();
         }
 
         @Override
         protected float getImpl() {
             reset();
-            return _val;
+            return mval;
         }
     }
 
@@ -111,7 +108,7 @@ public class RandomContext {
 
         @Override
         protected float getImpl() {
-            return _lastVal;
+            return lastVal;
         }
     }
 }

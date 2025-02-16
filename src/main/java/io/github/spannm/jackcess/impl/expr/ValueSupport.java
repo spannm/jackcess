@@ -93,13 +93,11 @@ public class ValueSupport {
     }
 
     public static Value toValue(LocalDate ld) {
-        return new DateTimeValue(
-            Value.Type.DATE, LocalDateTime.of(ld, ColumnImpl.BASE_LT));
+        return new DateTimeValue(Value.Type.DATE, LocalDateTime.of(ld, ColumnImpl.BASE_LT));
     }
 
     public static Value toValue(LocalTime lt) {
-        return new DateTimeValue(
-            Value.Type.TIME, LocalDateTime.of(ColumnImpl.BASE_LD, lt));
+        return new DateTimeValue(Value.Type.TIME, LocalDateTime.of(ColumnImpl.BASE_LD, lt));
     }
 
     public static Value toValue(LocalDateTime ldt) {

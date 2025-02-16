@@ -9,8 +9,6 @@ import java.sql.Types;
 /**
  * Implementation of SqlHelperImpl which works with the java.sql modules classes. This class is used if the java.sql
  * module is enabled in the application.
- *
- * @author James Ahlborn
  */
 public class SqlHelperImpl extends SqlHelper {
 
@@ -28,8 +26,8 @@ public class SqlHelperImpl extends SqlHelper {
             Blob b = (Blob) value;
             // note, start pos is 1-based
             return b.getBytes(1L, (int) b.length());
-        } catch (SQLException e) {
-            throw new IOException(e.getMessage(), e);
+        } catch (SQLException _ex) {
+            throw new IOException(_ex.getMessage(), _ex);
         }
     }
 
@@ -44,8 +42,8 @@ public class SqlHelperImpl extends SqlHelper {
             Clob c = (Clob) value;
             // note, start pos is 1-based
             return c.getSubString(1L, (int) c.length());
-        } catch (SQLException e) {
-            throw new IOException(e.getMessage(), e);
+        } catch (SQLException _ex) {
+            throw new IOException(_ex.getMessage(), _ex);
         }
     }
 

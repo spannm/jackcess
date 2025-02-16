@@ -2,8 +2,6 @@ package io.github.spannm.jackcess.impl;
 
 /**
  * ColumnImpl subclass which is used for numeric data types.
- *
- * @author James Ahlborn
  */
 class NumericColumnImpl extends ColumnImpl {
     /** Numeric precision */
@@ -14,8 +12,7 @@ class NumericColumnImpl extends ColumnImpl {
     NumericColumnImpl(InitArgs args) {
         super(args);
 
-        _precision = args.buffer.get(
-            args.offset + getFormat().OFFSET_COLUMN_PRECISION);
+        _precision = args.buffer.get(args.offset + getFormat().OFFSET_COLUMN_PRECISION);
         _scale = args.buffer.get(args.offset + getFormat().OFFSET_COLUMN_SCALE);
     }
 

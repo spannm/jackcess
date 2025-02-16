@@ -24,19 +24,15 @@ import java.util.List;
 
 /**
  * Base class for queries which represent some form of SELECT statement.
- *
- * @author James Ahlborn
  */
-public abstract class BaseSelectQueryImpl extends QueryImpl
-    implements BaseSelectQuery {
+public abstract class BaseSelectQueryImpl extends QueryImpl implements BaseSelectQuery {
 
     protected BaseSelectQueryImpl(String name, List<Row> rows, int objectId, int objectFlag, Type type) {
         super(name, rows, objectId, objectFlag, type);
     }
 
     @SuppressWarnings("PMD.LinguisticNaming")
-    protected void toSQLSelectString(StringBuilder builder,
-        boolean useSelectPrefix) {
+    protected void toSQLSelectString(StringBuilder builder, boolean useSelectPrefix) {
         if (useSelectPrefix) {
             builder.append("SELECT ");
             String selectType = getSelectType();
@@ -86,8 +82,7 @@ public abstract class BaseSelectQueryImpl extends QueryImpl
         }
 
         if (hasFlag(TOP_SELECT_TYPE)) {
-            StringBuilder builder = new StringBuilder("TOP ")
-                .append(getFlagRow()._name1);
+            StringBuilder builder = new StringBuilder("TOP ").append(getFlagRow()._name1);
             if (hasFlag(PERCENT_SELECT_TYPE)) {
                 builder.append(" PERCENT");
             }

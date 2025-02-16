@@ -7,8 +7,6 @@ import java.util.Date;
 
 /**
  * Complex value corresponding to a version of a memo column.
- *
- * @author James Ahlborn
  */
 public interface Version extends ComplexValue, Comparable<Version> {
     String getValue();

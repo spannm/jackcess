@@ -5,8 +5,6 @@ import java.util.TimeZone;
 
 /**
  * Provider of zone related info for date/time conversions.
- *
- * @author James Ahlborn
  */
 interface DateTimeContext {
     ZoneId getZoneId();

@@ -26,8 +26,6 @@ import java.util.Map;
 /**
  * Builder style class for constructing a {@link Column}. See {@link TableBuilder} for example usage. Additionally, a
  * Column can be added to an existing Table using the {@link #addToTable(Table)} method.
- *
- * @author James Ahlborn
  * @see TableBuilder
  */
 public class ColumnBuilder {

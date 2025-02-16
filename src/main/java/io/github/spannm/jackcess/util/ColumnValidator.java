@@ -23,8 +23,6 @@ import java.io.IOException;
 
 /**
  * Interface which allows for data manipulation/validation as values are being inserted into a database.
- *
- * @author James Ahlborn
  */
 @FunctionalInterface
 public interface ColumnValidator {

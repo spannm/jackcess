@@ -5,12 +5,11 @@ import io.github.spannm.jackcess.impl.ByteUtil.ByteStream;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.UncheckedIOException;
 import java.nio.charset.StandardCharsets;
 
 /**
  * Various constants used for creating "general" (access 1997) sort order text index entries.
- *
- * @author James Ahlborn
  */
 @SuppressWarnings("PMD.FieldDeclarationsShouldBeAtStartOfClass")
 public class General97IndexCodes extends GeneralLegacyIndexCodes {
@@ -72,8 +71,7 @@ public class General97IndexCodes extends GeneralLegacyIndexCodes {
      * Converts a 97 index value for a text column into the entry value (which is based on a variety of nifty codes).
      */
     @Override
-    void writeNonNullIndexTextValue(
-        Object value, ByteStream bout, boolean isAscending) throws IOException {
+    void writeNonNullIndexTextValue(Object value, ByteStream bout, boolean isAscending) throws IOException {
         // convert to string
         String str = toIndexCharSequence(value);
 
@@ -135,13 +133,11 @@ public class General97IndexCodes extends GeneralLegacyIndexCodes {
         if (!isAscending) {
 
             // flip the bytes that we have written thus far for this text value
-            IndexData.flipBytes(bout.getBytes(), prevLength,
-                bout.getLength() - prevLength);
+            IndexData.flipBytes(bout.getBytes(), prevLength, bout.getLength() - prevLength);
         }
     }
 
-    private static void writeExtraCodes(int numSigChars, byte[] bytes,
-        NibbleStream extraCodes) {
+    private static void writeExtraCodes(int numSigChars, byte[] bytes, NibbleStream extraCodes) {
         // need to fill in placeholder nibbles for any "significant" chars
         if (numSigChars > 0) {
             extraCodes.writeFillNibbles(numSigChars, INTERNATIONAL_EXTRA_PLACEHOLDER);
@@ -157,8 +153,7 @@ public class General97IndexCodes extends GeneralLegacyIndexCodes {
         int numMappings = asUnsignedChar(lastChar) - firstCharCode + 1;
         short[] values = new short[numMappings];
 
-        try (BufferedReader reader = new BufferedReader(
-                new InputStreamReader(DatabaseImpl.getResourceAsStream(mappingsFilePath), StandardCharsets.US_ASCII))) {
+        try (BufferedReader reader = new BufferedReader(new InputStreamReader(DatabaseImpl.getResourceAsStream(mappingsFilePath), StandardCharsets.US_ASCII))) {
             // this is a sparse file with entries like <fromCode>,<toCode>
             String mappingLine = null;
             while ((mappingLine = reader.readLine()) != null) {
@@ -174,8 +169,8 @@ public class General97IndexCodes extends GeneralLegacyIndexCodes {
                 values[fromCode - firstCharCode] = (short) toCode;
             }
 
-        } catch (IOException e) {
-            throw new RuntimeException("failed loading index mappings file " + mappingsFilePath, e);
+        } catch (IOException _ex) {
+            throw new UncheckedIOException("failed loading index mappings file " + mappingsFilePath, _ex);
         }
 
         return values;

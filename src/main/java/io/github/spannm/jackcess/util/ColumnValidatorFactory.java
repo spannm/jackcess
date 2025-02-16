@@ -21,8 +21,6 @@ import io.github.spannm.jackcess.Column;
 
 /**
  * Factory which generates appropriate ColumnValidators when Column instances are created.
- *
- * @author James Ahlborn
  */
 @FunctionalInterface
 public interface ColumnValidatorFactory {

@@ -7,8 +7,6 @@ import java.util.Locale;
  * A TemporalConfig encapsulates date/time formatting options for expression evaluation. The default
  * {@link #US_TEMPORAL_CONFIG} instance provides US specific locale configuration. Databases which have been built for
  * other locales can utilize custom implementations of TemporalConfig in order to evaluate expressions correctly.
- *
- * @author James Ahlborn
  */
 public class TemporalConfig {
     public static final String         US_DATE_FORMAT           = "M/d[/uuuu]";
@@ -21,9 +19,7 @@ public class TemporalConfig {
     public static final String         SHORT_TIME_FORMAT        = "HH:mm";
 
     /** default implementation which is configured for the US locale */
-    public static final TemporalConfig US_TEMPORAL_CONFIG       = new TemporalConfig(
-        US_DATE_FORMAT, US_LONG_DATE_FORMAT,
-        US_TIME_FORMAT_12_FORMAT, US_TIME_FORMAT_24_FORMAT, '/', ':', Locale.US);
+    public static final TemporalConfig US_TEMPORAL_CONFIG       = new TemporalConfig(US_DATE_FORMAT, US_LONG_DATE_FORMAT, US_TIME_FORMAT_12_FORMAT, US_TIME_FORMAT_24_FORMAT, '/', ':', Locale.US);
 
     public enum Type {
         DATE,
@@ -124,70 +120,68 @@ public class TemporalConfig {
         }
     }
 
-    private final Locale   _locale;
-    private final String   _dateFormat;
-    private final String   _longDateFormat;
-    private final String   _timeFormat12;
-    private final String   _timeFormat24;
-    private final char     _dateSeparator;
-    private final char     _timeSeparator;
-    private final String   _dateTimeFormat12;
-    private final String   _dateTimeFormat24;
-    private final String[] _amPmStrings;
+    private final Locale   mlocale;
+    private final String   mdateFormat;
+    private final String   mlongDateFormat;
+    private final String   mtimeFormat12;
+    private final String   mtimeFormat24;
+    private final char     mdateSeparator;
+    private final char     mtimeSeparator;
+    private final String   mdateTimeFormat12;
+    private final String   mdateTimeFormat24;
+    private final String[] mamPmStrings;
 
     /**
      * Instantiates a new TemporalConfig with the given configuration. Note that the date/time format variants will be
      * created by concatenating the relevant date and time formats, separated by a single space, e.g. "&lt;date&gt;
      * &lt;time&gt;".
      *
-     * @param dateFormat the date (no time) format
-     * @param timeFormat12 the 12 hour time format
-     * @param timeFormat24 the 24 hour time format
-     * @param dateSeparator the primary separator used to separate elements in the date format. this is used to identify
+     * @param _dateFormat the date (no time) format
+     * @param _timeFormat12 the 12 hour time format
+     * @param _timeFormat24 the 24 hour time format
+     * @param _dateSeparator the primary separator used to separate elements in the date format. this is used to identify
      *            the components of date/time string.
-     * @param timeSeparator the primary separator used to separate elements in the time format (both 12 hour and 24
+     * @param _timeSeparator the primary separator used to separate elements in the time format (both 12 hour and 24
      *            hour). this is used to identify the components of a date/time string. This value should differ from
      *            the dateSeparator.
      */
-    public TemporalConfig(String dateFormat, String longDateFormat,
-        String timeFormat12, String timeFormat24,
-        char dateSeparator, char timeSeparator, Locale locale) {
-        _locale = locale;
-        _dateFormat = dateFormat;
-        _longDateFormat = longDateFormat;
-        _timeFormat12 = timeFormat12;
-        _timeFormat24 = timeFormat24;
-        _dateSeparator = dateSeparator;
-        _timeSeparator = timeSeparator;
-        _dateTimeFormat12 = toDateTimeFormat(_dateFormat, _timeFormat12);
-        _dateTimeFormat24 = toDateTimeFormat(_dateFormat, _timeFormat24);
+    public TemporalConfig(String _dateFormat, String _longDateFormat, String _timeFormat12, String _timeFormat24, char _dateSeparator, char _timeSeparator, Locale _locale) {
+        mlocale = _locale;
+        mdateFormat = _dateFormat;
+        mlongDateFormat = _longDateFormat;
+        mtimeFormat12 = _timeFormat12;
+        mtimeFormat24 = _timeFormat24;
+        mdateSeparator = _dateSeparator;
+        mtimeSeparator = _timeSeparator;
+        mdateTimeFormat12 = toDateTimeFormat(mdateFormat, mtimeFormat12);
+        mdateTimeFormat24 = toDateTimeFormat(mdateFormat, mtimeFormat24);
         // there doesn't seem to be a good/easy way to get this in new jave.time
         // api, so just use old api
-        _amPmStrings = DateFormatSymbols.getInstance(locale).getAmPmStrings();
+        mamPmStrings = DateFormatSymbols.getInstance(_locale).getAmPmStrings();
     }
 
     public Locale getLocale() {
-        return _locale;
+        return mlocale;
     }
 
     public String getDateFormat() {
-        return _dateFormat;
+        return mdateFormat;
     }
 
     public String getTimeFormat12() {
-        return _timeFormat12;
+        return mtimeFormat12;
     }
 
     public String getTimeFormat24() {
-        return _timeFormat24;
+        return mtimeFormat24;
     }
 
     public String getDateTimeFormat12() {
-        return _dateTimeFormat12;
+        return mdateTimeFormat12;
     }
 
     public String getDateTimeFormat24() {
-        return _dateTimeFormat24;
+        return mdateTimeFormat24;
     }
 
     public String getDefaultDateFormat() {
@@ -203,11 +197,11 @@ public class TemporalConfig {
     }
 
     public char getDateSeparator() {
-        return _dateSeparator;
+        return mdateSeparator;
     }
 
     public char getTimeSeparator() {
-        return _timeSeparator;
+        return mtimeSeparator;
     }
 
     public String getDateTimeFormat(Type type) {
@@ -243,7 +237,7 @@ public class TemporalConfig {
     }
 
     public String[] getAmPmStrings() {
-        return _amPmStrings;
+        return mamPmStrings;
     }
 
     private static String toDateTimeFormat(String dateFormat, String timeFormat) {
@@ -251,7 +245,7 @@ public class TemporalConfig {
     }
 
     protected String getLongDateFormat() {
-        return _longDateFormat;
+        return mlongDateFormat;
     }
 
     protected String getMediumDateFormat() {

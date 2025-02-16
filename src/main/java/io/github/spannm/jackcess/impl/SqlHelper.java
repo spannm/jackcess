@@ -9,8 +9,6 @@ import java.io.IOException;
  * constructs), then jackcess will not require the module in order to function otherwise normally.
  * <p>
  * This base class is the "fallback" class if the java.sql module is not available.
- *
- * @author James Ahlborn
  */
 public class SqlHelper {
 
@@ -44,8 +42,7 @@ public class SqlHelper {
         // java.sql classes. if that fails, use this fallback instance instead.
         try {
             return (SqlHelper) Class.forName("io.github.spannm.jackcess.impl.SqlHelperImpl")
-                .getDeclaredConstructor()
-                .newInstance();
+                .getDeclaredConstructor().newInstance();
         } catch (Throwable ignored) {}
         return new SqlHelper();
     }

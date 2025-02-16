@@ -32,8 +32,6 @@ import java.util.*;
 /**
  * Base class for classes which encapsulate information about an Access query. The {@link #toSQLString()} method can be
  * used to convert this object into the actual SQL string which this query data represents.
- *
- * @author James Ahlborn
  */
 public abstract class QueryImpl implements Query {
     protected static final Logger LOGGER    = System.getLogger(QueryImpl.class.getName());
@@ -162,8 +160,7 @@ public abstract class QueryImpl implements Query {
         // handle any parameters
         List<String> params = getParameters();
         if (!params.isEmpty()) {
-            builder.append("PARAMETERS ").append(params)
-                .append(';').append(NEWLINE);
+            builder.append("PARAMETERS ").append(params).append(';').append(NEWLINE);
         }
     }
 
@@ -250,8 +247,7 @@ public abstract class QueryImpl implements Query {
                     continue;
                 }
 
-                throw new IllegalStateException(withErrorContext(
-                    "Inconsistent join types for " + fromTable + " and " + toTable));
+                throw new IllegalStateException(withErrorContext("Inconsistent join types for " + fromTable + " and " + toTable));
             }
 
             // new join expression
@@ -330,8 +326,7 @@ public abstract class QueryImpl implements Query {
 
     @Override
     public String toString() {
-        return String.format("%s[name=%s, rows=%d, objectId=%s, type=%s, objectFlag=%s]",
-            getClass().getSimpleName(), _name, _rows.size(), _objectId, _type, _objectFlag);
+        return String.format("%s[name=%s, rows=%d, objectId=%s, type=%s, objectFlag=%s]", getClass().getSimpleName(), _name, _rows.size(), _objectId, _type, _objectFlag);
     }
 
     /**
@@ -382,8 +377,8 @@ public abstract class QueryImpl implements Query {
                     // unknown querytype
                     throw new IllegalStateException(withErrorContext("unknown query object flag " + objTypeFlag, name));
             }
-        } catch (IllegalStateException e) {
-            LOGGER.log(Level.WARNING, withErrorContext("Failed parsing query", name), e);
+        } catch (IllegalStateException _ex) {
+            LOGGER.log(Level.WARNING, withErrorContext("Failed parsing query", name), _ex);
         }
 
         // return unknown query
@@ -420,12 +415,10 @@ public abstract class QueryImpl implements Query {
         if (rows.isEmpty()) {
             return EMPTY_ROW;
         }
-        throw new IllegalStateException(withErrorContext(
-            "Unexpected number of rows for" + rows));
+        throw new IllegalStateException(withErrorContext("Unexpected number of rows for" + rows));
     }
 
-    protected static List<Row> filterRowsByFlag(
-        List<Row> rows, final short flag) {
+    protected static List<Row> filterRowsByFlag(List<Row> rows, final short flag) {
         return new RowFilter() {
             @Override
             protected boolean keep(Row row) {
@@ -434,8 +427,7 @@ public abstract class QueryImpl implements Query {
         }.filter(rows);
     }
 
-    protected static List<Row> filterRowsByNotFlag(
-        List<Row> rows, final short flag) {
+    protected static List<Row> filterRowsByNotFlag(List<Row> rows, final short flag) {
         return new RowFilter() {
             @Override
             protected boolean keep(Row row) {
@@ -456,9 +448,7 @@ public abstract class QueryImpl implements Query {
         return i != null ? i : def;
     }
 
-    protected static StringBuilder toOptionalQuotedExpr(StringBuilder builder,
-        String fullExpr,
-        boolean isIdentifier) {
+    protected static StringBuilder toOptionalQuotedExpr(StringBuilder builder, String fullExpr, boolean isIdentifier) {
         String[] exprs = isIdentifier ? IDENTIFIER_SEP_PAT.split(fullExpr) : new String[] {fullExpr};
         for (int i = 0; i < exprs.length; ++i) {
             String expr = exprs[i];
@@ -474,8 +464,7 @@ public abstract class QueryImpl implements Query {
         return builder;
     }
 
-    protected static StringBuilder toQuotedExpr(StringBuilder builder,
-        String expr) {
+    protected static StringBuilder toQuotedExpr(StringBuilder builder, String expr) {
         return !isQuoted(expr) ? builder.append('[').append(expr).append(']') : builder.append(expr);
     }
 
@@ -483,9 +472,7 @@ public abstract class QueryImpl implements Query {
         return expr.length() >= 2 && expr.charAt(0) == '[' && expr.charAt(expr.length() - 1) == ']';
     }
 
-    protected static StringBuilder toRemoteDb(StringBuilder builder,
-        String remoteDbPath,
-        String remoteDbType) {
+    protected static StringBuilder toRemoteDb(StringBuilder builder, String remoteDbPath, String remoteDbType) {
         if (remoteDbPath != null || remoteDbType != null) {
             // note, always include path string, even if empty
             builder.append(" IN '");
@@ -500,8 +487,7 @@ public abstract class QueryImpl implements Query {
         return builder;
     }
 
-    protected static StringBuilder toAlias(StringBuilder builder,
-        String alias) {
+    protected static StringBuilder toAlias(StringBuilder builder, String alias) {
         if (alias != null) {
             toOptionalQuotedExpr(builder.append(" AS "), alias, false);
         }
@@ -517,8 +503,7 @@ public abstract class QueryImpl implements Query {
     }
 
     private static final class UnknownQueryImpl extends QueryImpl {
-        private UnknownQueryImpl(String name, List<Row> rows, int objectId,
-            int objectFlag) {
+        private UnknownQueryImpl(String name, List<Row> rows, int objectId, int objectFlag) {
             super(name, rows, objectId, objectFlag, Type.UNKNOWN);
         }
 
@@ -555,20 +540,11 @@ public abstract class QueryImpl implements Query {
         }
 
         public Row(io.github.spannm.jackcess.Row tableRow) {
-            this(tableRow.getId(),
-                tableRow.getByte(COL_ATTRIBUTE),
-                tableRow.getString(COL_EXPRESSION),
-                tableRow.getShort(COL_FLAG),
-                tableRow.getInt(COL_EXTRA),
-                tableRow.getString(COL_NAME1),
-                tableRow.getString(COL_NAME2),
-                tableRow.getInt(COL_OBJECTID),
-                tableRow.getBytes(COL_ORDER));
+            this(tableRow.getId(), tableRow.getByte(COL_ATTRIBUTE), tableRow.getString(COL_EXPRESSION), tableRow.getShort(COL_FLAG), tableRow.getInt(COL_EXTRA), tableRow.getString(COL_NAME1),
+                tableRow.getString(COL_NAME2), tableRow.getInt(COL_OBJECTID), tableRow.getBytes(COL_ORDER));
         }
 
-        public Row(RowId id, Byte attribute, String expression, Short flag,
-            Integer extra, String name1, String name2,
-            Integer objectId, byte[] order) {
+        public Row(RowId id, Byte attribute, String expression, Short flag, Integer extra, String name1, String name2, Integer objectId, byte[] order) {
             _id = id;
             this._attribute = attribute;
             this._expression = expression;
@@ -597,8 +573,8 @@ public abstract class QueryImpl implements Query {
 
         @Override
         public String toString() {
-            return String.format("%s[id=%s, attribute=%s, expression=%s, flag=%s, extra=%s, name1=%s, name2=%s, objectId=%s, order=%s]",
-                getClass().getSimpleName(), _id, _attribute, _expression, _flag, _extra, _name1, _name2, _objectId, Arrays.toString(_order));
+            return String.format("%s[id=%s, attribute=%s, expression=%s, flag=%s, extra=%s, name1=%s, name2=%s, objectId=%s, order=%s]", getClass().getSimpleName(), _id, _attribute, _expression,
+                _flag, _extra, _name1, _name2, _objectId, Arrays.toString(_order));
         }
     }
 
@@ -743,8 +719,7 @@ public abstract class QueryImpl implements Query {
         protected void toString(StringBuilder sb, boolean isTopLevel) {
             String joinType = JOIN_TYPE_MAP.get(_jType);
             if (joinType == null) {
-                throw new IllegalStateException(withErrorContext(
-                    "Unknown join type " + _jType));
+                throw new IllegalStateException(withErrorContext("Unknown join type " + _jType));
             }
 
             if (!isTopLevel) {

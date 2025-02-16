@@ -221,7 +221,7 @@ class OleBlobTest extends AbstractBaseTest {
                 DocumentEntry attachE = null;
                 try {
                     attachE = CompoundOleUtil.getDocumentEntry(e.getName(), attachFs.getRoot());
-                } catch (FileNotFoundException fnfe) {
+                } catch (FileNotFoundException _ex) {
                     // ignored, the ole data has extra entries
                     continue;
                 }

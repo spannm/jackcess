@@ -411,8 +411,8 @@ class ComplexColumnTest extends AbstractBaseTest {
     private static byte[] getAsciiBytes(String str) {
         try {
             return str.getBytes(StandardCharsets.US_ASCII);
-        } catch (Exception e) {
-            throw new RuntimeException(e);
+        } catch (Exception _ex) {
+            throw new RuntimeException(_ex);
         }
     }
 

@@ -29,8 +29,6 @@ import java.util.*;
 
 /**
  * Manager of the index pages for a IndexData.
- *
- * @author James Ahlborn
  */
 @SuppressWarnings("PMD.FieldDeclarationsShouldBeAtStartOfClass")
 public class IndexPageCache {
@@ -882,8 +880,8 @@ public class IndexPageCache {
                     collectPages(pages, childMain);
                 }
             }
-        } catch (IOException e) {
-            pages.add("DataPage[" + dpMain._pageNumber + "]: <" + e + ">");
+        } catch (IOException _ex) {
+            pages.add("DataPage[" + dpMain._pageNumber + "]: <" + _ex + ">");
         }
         return pages;
     }
@@ -907,9 +905,7 @@ public class IndexPageCache {
 
     @Override
     public String toString() {
-        return ToStringBuilder.builder(this)
-            .append("pages", _rootPage == null ? "(uninitialized)" : collectPages(new ArrayList<>(), _rootPage))
-            .toString();
+        return ToStringBuilder.builder(this).append("pages", _rootPage == null ? "(uninitialized)" : collectPages(new ArrayList<>(), _rootPage)).toString();
     }
 
     private String withErrorContext(String msg) {

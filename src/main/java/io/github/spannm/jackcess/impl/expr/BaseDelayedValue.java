@@ -7,16 +7,16 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 public abstract class BaseDelayedValue implements Value {
-    private Value _val;
+    private Value val;
 
     protected BaseDelayedValue() {
     }
 
     private Value getDelegate() {
-        if (_val == null) {
-            _val = eval();
+        if (val == null) {
+            val = eval();
         }
-        return _val;
+        return val;
     }
 
     @Override

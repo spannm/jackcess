@@ -7,8 +7,6 @@ import java.util.Collection;
  * separately from the core database functionality, most usage of Expressions will happen indirectly within the context
  * of normal database operations. Thus, most users will not ever directly interact with an Expression instance. That
  * said, Expressions may be executed independently of a Database instance if desired.
- *
- * @author James Ahlborn
  */
 public interface Expression {
 
