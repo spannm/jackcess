@@ -1,5 +1,6 @@
 package io.github.spannm.jackcess.impl;
 
+import io.github.spannm.jackcess.JackcessRuntimeException;
 import io.github.spannm.jackcess.impl.OleUtil.CompoundPackageFactory;
 import io.github.spannm.jackcess.impl.OleUtil.ContentImpl;
 import io.github.spannm.jackcess.impl.OleUtil.EmbeddedPackageContentImpl;
@@ -94,7 +95,7 @@ public class CompoundOleUtil implements CompoundPackageFactory {
         try {
             return URLEncoder.encode(name, ENTRY_NAME_CHARSET);
         } catch (UnsupportedEncodingException _ex) {
-            throw new RuntimeException(_ex);
+            throw new JackcessRuntimeException(_ex);
         }
     }
 
@@ -102,7 +103,7 @@ public class CompoundOleUtil implements CompoundPackageFactory {
         try {
             return URLDecoder.decode(name, ENTRY_NAME_CHARSET);
         } catch (UnsupportedEncodingException _ex) {
-            throw new RuntimeException(_ex);
+            throw new JackcessRuntimeException(_ex);
         }
     }
 

@@ -25,6 +25,7 @@ import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
@@ -163,7 +164,7 @@ public final class TestUtil {
     }
 
     public static List<Row> createExpectedTable(Row... rows) {
-        return List.of(rows);
+        return Arrays.stream(rows).collect(Collectors.toCollection(ArrayList::new));
     }
 
     public static void dumpDatabase(Database mdb) throws IOException {

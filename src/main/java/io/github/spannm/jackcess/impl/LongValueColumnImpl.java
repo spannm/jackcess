@@ -1,6 +1,7 @@
 package io.github.spannm.jackcess.impl;
 
 import io.github.spannm.jackcess.InvalidValueException;
+import io.github.spannm.jackcess.JackcessRuntimeException;
 
 import java.io.IOException;
 import java.lang.System.Logger.Level;
@@ -85,7 +86,7 @@ class LongValueColumnImpl extends ColumnImpl {
                 }
                 return null;
             default:
-                throw new RuntimeException(withErrorContext("unexpected var length, long value type: " + getType()));
+                throw new JackcessRuntimeException(withErrorContext("unexpected var length, long value type: " + getType()));
         }
     }
 
@@ -99,7 +100,7 @@ class LongValueColumnImpl extends ColumnImpl {
                 obj = encodeTextValue(obj, 0, getMaxLengthInUnits(), false).array();
                 break;
             default:
-                throw new RuntimeException(withErrorContext("unexpected var length, long value type: " + getType()));
+                throw new JackcessRuntimeException(withErrorContext("unexpected var length, long value type: " + getType()));
         }
 
         // create long value buffer

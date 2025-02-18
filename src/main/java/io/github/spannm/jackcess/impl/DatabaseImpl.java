@@ -522,6 +522,7 @@ public class DatabaseImpl implements Database, DateTimeContext {
         }
 
         boolean success = false;
+
         try {
 
             boolean wrapChannelRO = false;
@@ -536,14 +537,12 @@ public class DatabaseImpl implements Database, DateTimeContext {
                 }
             } else if (!closeChannel) {
                 // we are in read-only mode but the channel was opened externally, so
-                // we don't know if it is enforcing read-only status. wrap it just to
-                // be safe
+                // we don't know if it is enforcing read-only status. wrap it just to be safe
                 wrapChannelRO = true;
             }
 
             if (wrapChannelRO) {
-                // wrap the channel with a read-only version to enforce
-                // non-writability
+                // wrap the channel with a read-only version to enforce non-writability
                 channel = new ReadOnlyFileChannel(channel);
             }
 

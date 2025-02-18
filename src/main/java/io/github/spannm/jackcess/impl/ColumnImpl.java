@@ -1298,7 +1298,7 @@ public class ColumnImpl implements Column, Comparable<ColumnImpl>, DateTimeConte
                 // should already be "encoded"
                 break;
             default:
-                throw new RuntimeException(withErrorContext("unexpected inline var length type: " + getType()));
+                throw new JackcessRuntimeException(withErrorContext("unexpected inline var length type: " + getType()));
         }
 
         return ByteBuffer.wrap(toByteArray(obj)).order(order);

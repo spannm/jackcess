@@ -113,7 +113,7 @@ public class RelationshipBuilder {
                 _flags |= RelationshipImpl.RIGHT_OUTER_JOIN_FLAG;
                 break;
             default:
-                throw new RuntimeException("unexpected join type " + joinType);
+                throw new JackcessRuntimeException("Unexpected join type " + joinType);
         }
         return this;
     }

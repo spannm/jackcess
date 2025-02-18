@@ -3,6 +3,7 @@ package io.github.spannm.jackcess.test.source;
 import io.github.spannm.jackcess.Database;
 import io.github.spannm.jackcess.Database.FileFormat;
 import io.github.spannm.jackcess.DatabaseBuilder;
+import io.github.spannm.jackcess.JackcessRuntimeException;
 import io.github.spannm.jackcess.impl.DatabaseImpl;
 import io.github.spannm.jackcess.test.AbstractBaseTest;
 import io.github.spannm.jackcess.test.Basename;
@@ -69,7 +70,7 @@ public @interface TestDbSource {
                     try (Database db = new DatabaseBuilder().withFile(testFile).withReadOnly(true).open()) {
                         FileFormat dbFileFormat = db.getFileFormat();
                         if (dbFileFormat != fileFormat) {
-                            throw new RuntimeException("Expected " + fileFormat + " was " + dbFileFormat);
+                            throw new JackcessRuntimeException("Expected " + fileFormat + " was " + dbFileFormat);
                         }
                     } catch (IOException _ex) {
                         throw new UncheckedIOException(_ex);

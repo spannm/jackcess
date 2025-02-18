@@ -1,5 +1,7 @@
 package io.github.spannm.jackcess.impl;
 
+import io.github.spannm.jackcess.JackcessRuntimeException;
+
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
@@ -45,7 +47,7 @@ public class DefaultCodecProvider implements CodecProvider {
                 return UNSUPPORTED_HANDLER;
 
             default:
-                throw new RuntimeException("Unknown codec type " + format.CODEC_TYPE);
+                throw new JackcessRuntimeException("Unknown codec type " + format.CODEC_TYPE);
         }
     }
 

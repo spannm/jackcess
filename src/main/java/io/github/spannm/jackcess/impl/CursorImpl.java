@@ -238,7 +238,7 @@ public abstract class CursorImpl implements Cursor {
                 Map<String, ?> map = (Map<String, ?>) iterBuilder.getMatchPattern();
                 return new RowMatchIterator(iterBuilder.getColumnNames(), map, iterBuilder.isReset(), iterBuilder.isForward(), iterBuilder.getColumnMatcher());
             default:
-                throw new RuntimeException("unknown match type " + iterBuilder.getType());
+                throw new JackcessRuntimeException("Unknown match type " + iterBuilder.getType());
         }
     }
 

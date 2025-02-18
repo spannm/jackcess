@@ -374,7 +374,7 @@ public class IndexCodesTest extends AbstractBaseTest {
 
                 } else {
 
-                    // throw new RuntimeException("unhandled " + entryStr);
+                    // throw new JackcessRuntimeException("Unhandled " + entryStr);
                     getLogger().log(Level.WARNING, "unhandled {0}", entryStr);
                 }
 
@@ -426,7 +426,7 @@ public class IndexCodesTest extends AbstractBaseTest {
                 chars = unprint2Codes.get(cc);
                 if (chars != null) {
                     if (chars.length > 1) {
-                        throw new RuntimeException("long unprint codes");
+                        throw new JackcessRuntimeException("Long unprint codes");
                     }
                     int val = Integer.parseInt(chars[0], 16) - 2;
                     String valStr = ByteUtil.toHexString(new byte[] {
@@ -441,7 +441,7 @@ public class IndexCodesTest extends AbstractBaseTest {
                     String crazyCode = "";
                     if (crazyCodes != null) {
                         if (crazyCodes.length != 1 || !"A0".equals(crazyCodes[0])) {
-                            throw new RuntimeException("CC " + Arrays.toString(crazyCodes));
+                            throw new JackcessRuntimeException("CC " + Arrays.toString(crazyCodes));
                         }
                         crazyCode = "1";
                     }
@@ -451,7 +451,7 @@ public class IndexCodesTest extends AbstractBaseTest {
                     continue;
                 }
 
-                throw new RuntimeException("Unhandled char " + toUnicodeStr(c));
+                throw new JackcessRuntimeException("Unhandled char " + toUnicodeStr(c));
             }
             getLogger().log(Level.DEBUG, "\n*** END CODES");
         }
@@ -541,7 +541,7 @@ public class IndexCodesTest extends AbstractBaseTest {
 
                 } else {
 
-                    throw new RuntimeException("unhandled " + entryStr);
+                    throw new JackcessRuntimeException("Unhandled " + entryStr);
                 }
 
                 getLogger().log(Level.DEBUG, "Type: {0}", type);
@@ -592,7 +592,7 @@ public class IndexCodesTest extends AbstractBaseTest {
                 chars = unprint2Codes.get(cc);
                 if (chars != null) {
                     if (chars.length > 1) {
-                        throw new RuntimeException("long unprint codes");
+                        throw new JackcessRuntimeException("Long unprint codes");
                     }
                     int val = Integer.parseInt(chars[0], 16) - 2;
                     String valStr = ByteUtil.toHexString(new byte[] {(byte) val}).trim();
@@ -606,7 +606,7 @@ public class IndexCodesTest extends AbstractBaseTest {
                     String crazyCode = "";
                     if (crazyCodes != null) {
                         if (crazyCodes.length != 1 || !"A0".equals(crazyCodes[0])) {
-                            throw new RuntimeException("CC " + Arrays.toString(crazyCodes));
+                            throw new JackcessRuntimeException("CC " + Arrays.toString(crazyCodes));
                         }
                         crazyCode = "1";
                     }
@@ -616,7 +616,7 @@ public class IndexCodesTest extends AbstractBaseTest {
                     continue;
                 }
 
-                throw new RuntimeException("Unhandled char " + toUnicodeStr(c));
+                throw new JackcessRuntimeException("Unhandled char " + toUnicodeStr(c));
             }
             getLogger().log(Level.DEBUG, "\n*** END CODES");
         }

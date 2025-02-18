@@ -1,6 +1,7 @@
 package io.github.spannm.jackcess.impl;
 
 import io.github.spannm.jackcess.DataType;
+import io.github.spannm.jackcess.JackcessRuntimeException;
 import io.github.spannm.jackcess.util.OleBlob;
 import io.github.spannm.jackcess.util.OleBlob.*; // NOPMD
 import io.github.spannm.jackcess.util.ToStringBuilder;
@@ -112,7 +113,7 @@ public class OleUtil {
                     // nothing more to do
                     break;
                 default:
-                    throw new RuntimeException("unexpected type " + oleBuilder.getType());
+                    throw new JackcessRuntimeException("Unexpected type " + oleBuilder.getType());
             }
 
             long payloadLen = packageStreamHeader.length + packageStreamFooter.length + contentLen;

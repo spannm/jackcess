@@ -1,5 +1,7 @@
 package io.github.spannm.jackcess.expr;
 
+import io.github.spannm.jackcess.JackcessRuntimeException;
+
 import java.text.DateFormatSymbols;
 import java.util.Locale;
 
@@ -57,7 +59,7 @@ public class TemporalConfig {
                 case GENERAL_DATE:
                     return DATE_TIME;
                 default:
-                    throw new RuntimeException("invalid type " + this);
+                    throw new JackcessRuntimeException("Invalid type " + this);
             }
         }
 
@@ -81,7 +83,7 @@ public class TemporalConfig {
                 case GENERAL_DATE:
                     return Value.Type.DATE_TIME;
                 default:
-                    throw new RuntimeException("invalid type " + this);
+                    throw new JackcessRuntimeException("Invalid type " + this);
             }
         }
 

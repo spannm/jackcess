@@ -391,7 +391,7 @@ class ComplexColumnTest extends AbstractBaseTest {
         if ("test_data2.txt".equals(fname)) {
             return TEST2_BYTES;
         }
-        throw new RuntimeException("unexpected bytes");
+        throw new JackcessRuntimeException("Unexpected bytes");
     }
 
     private static byte[] getEncodedFileBytes(String fname) {
@@ -401,7 +401,7 @@ class ComplexColumnTest extends AbstractBaseTest {
         if ("test_data2.txt".equals(fname)) {
             return TEST2_ENC_BYTES;
         }
-        throw new RuntimeException("unexpected bytes");
+        throw new JackcessRuntimeException("Unexpected bytes");
     }
 
     private static byte b(int i) {
@@ -412,7 +412,7 @@ class ComplexColumnTest extends AbstractBaseTest {
         try {
             return str.getBytes(StandardCharsets.US_ASCII);
         } catch (Exception _ex) {
-            throw new RuntimeException(_ex);
+            throw new JackcessRuntimeException(_ex);
         }
     }
 

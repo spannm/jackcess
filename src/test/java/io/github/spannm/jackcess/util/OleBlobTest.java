@@ -95,7 +95,7 @@ class OleBlobTest extends AbstractBaseTest {
                             assertArrayEquals(sampleFileBytes, readToByteArray(oc.getStream(), oc.length()));
                             break;
                         default:
-                            throw new RuntimeException("unexpected id " + row);
+                            throw new JackcessRuntimeException("Unexpected id " + row);
                     }
                 }
             }
@@ -167,7 +167,7 @@ class OleBlobTest extends AbstractBaseTest {
                                     // the excel data seems to be modified when embedded as ole,
                                     // so we can't reallly test it against the attachment data
                                 } else {
-                                    throw new RuntimeException("unexpected compound entry " + name);
+                                    throw new JackcessRuntimeException("Unexpected compound entry " + name);
                                 }
                             }
                             break;
@@ -179,7 +179,7 @@ class OleBlobTest extends AbstractBaseTest {
                             break;
 
                         default:
-                            throw new RuntimeException("unexpected type " + content.getType());
+                            throw new JackcessRuntimeException("Unexpected type " + content.getType());
                     }
 
                 }

@@ -1,5 +1,6 @@
 package io.github.spannm.jackcess.impl.expr;
 
+import io.github.spannm.jackcess.JackcessRuntimeException;
 import io.github.spannm.jackcess.expr.LocaleContext;
 import io.github.spannm.jackcess.expr.ParseException;
 import io.github.spannm.jackcess.expr.TemporalConfig;
@@ -133,7 +134,7 @@ class ExpressionTokenizer {
                         break;
 
                     default:
-                        throw new RuntimeException("unknown char flag " + charFlag);
+                        throw new JackcessRuntimeException("Unknown char flag " + charFlag);
                 }
 
             } else {

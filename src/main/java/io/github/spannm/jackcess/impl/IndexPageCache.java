@@ -18,6 +18,7 @@ package io.github.spannm.jackcess.impl;
 
 import static io.github.spannm.jackcess.impl.IndexData.*;
 
+import io.github.spannm.jackcess.JackcessRuntimeException;
 import io.github.spannm.jackcess.impl.IndexData.DataPage;
 import io.github.spannm.jackcess.impl.IndexData.Entry;
 import io.github.spannm.jackcess.util.ToStringBuilder;
@@ -310,7 +311,7 @@ public class IndexPageCache {
                 break;
 
             default:
-                throw new RuntimeException(withErrorContext("unknown update type " + upType));
+                throw new JackcessRuntimeException(withErrorContext("unknown update type " + upType));
         }
 
         boolean updateLast = oldLastEntry != dpExtra._entryView.getLast();
@@ -463,7 +464,7 @@ public class IndexPageCache {
                 break;
 
             default:
-                throw new RuntimeException(withErrorContext("unknown update type " + upType));
+                throw new JackcessRuntimeException(withErrorContext("unknown update type " + upType));
         }
 
         if (idx < 0) {

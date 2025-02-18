@@ -2,6 +2,7 @@ package io.github.spannm.jackcess.impl;
 
 import io.github.spannm.jackcess.DataType;
 import io.github.spannm.jackcess.JackcessException;
+import io.github.spannm.jackcess.JackcessRuntimeException;
 import io.github.spannm.jackcess.expr.*;
 import io.github.spannm.jackcess.impl.expr.Expressionator;
 import io.github.spannm.jackcess.impl.expr.ValueSupport;
@@ -155,7 +156,7 @@ public abstract class BaseEvalContext implements EvalContext {
                     BigDecimal bd = ColumnImpl.toBigDecimal(val, getDatabase());
                     return ValueSupport.toValue(bd);
                 default:
-                    throw new RuntimeException("Unexpected type " + vType);
+                    throw new JackcessRuntimeException("Unexpected type " + vType);
             }
         } catch (IOException _ex) {
             throw new EvalException("Failed converting value to type " + dType, _ex);
