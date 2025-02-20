@@ -15,7 +15,7 @@
 
     <name>Jackcess</name>
     <description>A pure Java library for reading from and writing to MS Access databases</description>
-    <url>https://github.com/${developerId}/${project.artifactId}</url>
+    <url>${githubBaseUrl}${project.artifactId}</url>
     <inceptionYear>2005</inceptionYear>
 
     <organization>
@@ -35,7 +35,7 @@
             <id>${developerId}</id>
             <name>Markus Spann</name>
             <email>spannm@outlook.de</email>
-            <organizationUrl>https://github.com/${developerId}/</organizationUrl>
+            <organizationUrl>${githubBaseUrl}</organizationUrl>
             <timezone>+1</timezone>
         </developer>
     </developers>
@@ -80,6 +80,11 @@
             <name>Nexus Release Repository</name>
             <url>https://s01.oss.sonatype.org/service/local/staging/deploy/maven2</url>
         </repository>
+        <site>
+            <id>local</id>
+            <name>Local Maven site</name>
+            <url>file://${java.io.tmpdir}/${project.artifactId}/site-prepared</url>
+        </site>
     </distributionManagement>
 
     <properties>
@@ -89,6 +94,7 @@
         <project.build.targetJdk>11</project.build.targetJdk>
 
         <developerId>spannm</developerId>
+        <githubBaseUrl>https://github.com/${developerId}/</githubBaseUrl>
 
         <dep.poi.version>4.1.2</dep.poi.version>
 
@@ -98,8 +104,14 @@
 
         <!-- override basepom versions -->
         <dep.checkstyle.version>10.21.2</dep.checkstyle.version>
-        <dep.pmd.version>7.9.0</dep.pmd.version>
+        <dep.pmd.version>7.10.0</dep.pmd.version>
+        <dep.spotbugs.version>4.9.1</dep.spotbugs.version>
 
+        <!-- downgrade site plugin to work with site skin -->
+        <dep.plugin.site.version>3.21.0</dep.plugin.site.version>
+        <dep.plugin.maven-fluido-skin.version>2.0.1</dep.plugin.maven-fluido-skin.version>
+
+        <!-- additional plugins not defined in parent -->
         <dep.plugin.sortpom.version>4.0.0</dep.plugin.sortpom.version>
         <dep.plugin.sonar.version>3.10.0.2594</dep.plugin.sonar.version>
 
@@ -110,6 +122,8 @@
 
         <basepom.javadoc.skip>false</basepom.javadoc.skip>
         <basepom.javadoc.show>protected</basepom.javadoc.show>
+
+        <basepom.site.skip-deploy>false</basepom.site.skip-deploy>
     </properties>
 
     <dependencyManagement>
@@ -259,13 +273,40 @@
         </pluginManagement>
 
         <plugins>
-
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-jar-plugin</artifactId>
                 <configuration>
                     <archive>
+                        <addMavenDescriptor>true</addMavenDescriptor>
+                        <compress>true</compress>
+                        <index>false</index>
+                        <manifest>
+                            <addClasspath>false</addClasspath>
+                            <addDefaultEntries>true</addDefaultEntries>
+                            <addDefaultImplementationEntries>true</addDefaultImplementationEntries>
+                            <addDefaultSpecificationEntries>false</addDefaultSpecificationEntries>
+                            <addBuildEnvironmentEntries>true</addBuildEnvironmentEntries>
+                        </manifest>
                         <manifestEntries>
+                            <Build-Time>${maven.build.timestamp}</Build-Time>
+                            <Maven-Version>${maven.version}</Maven-Version>
+                            <Creation-Java-Vendor>${java.vendor}</Creation-Java-Vendor>
+                            <Creation-Java-Version>${java.version}</Creation-Java-Version>
+                            <Creation-Java-Runtime-Name>${java.runtime.name}</Creation-Java-Runtime-Name>
+                            <Creation-Java-Runtime-Version>${java.runtime.version}</Creation-Java-Runtime-Version>
+                            <Creation-Os-Name>${os.name}</Creation-Os-Name>
+                            <Creation-Os-Arch>${os.arch}</Creation-Os-Arch>
+                            <Creation-Os-Version>${os.version}</Creation-Os-Version>
+                            <Creation-User>${user.name}</Creation-User>
+                            <Creation-Timezone>${user.timezone}</Creation-Timezone>
+                            <Creation-Time>${maven.build.timestamp}</Creation-Time>
+                            <Project-Name>${project.name}</Project-Name>
+                            <Project-Description>${project.description}</Project-Description>
+                            <Project-Url>${project.url}</Project-Url>
+                            <Project-Inception-Year>${project.inceptionYear}</Project-Inception-Year>
+                            <Organization-Name>${project.organization.name}</Organization-Name>
+                            <Organization-Url>${project.organization.url}</Organization-Url>
                             <Automatic-Module-Name>io.github.spannm.jackcess</Automatic-Module-Name>
                         </manifestEntries>
                     </archive>
