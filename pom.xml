@@ -5,7 +5,7 @@
     <parent>
         <groupId>org.basepom</groupId>
         <artifactId>basepom-oss</artifactId>
-        <version>62</version>
+        <version>63</version>
     </parent>
 
     <groupId>io.github.spannm</groupId>
@@ -62,8 +62,7 @@
         <connection>scm:git:ssh//git@github.com/${developerId}/${project.artifactId}.git</connection>
         <developerConnection>scm:git:ssh://git@github.com/${developerId}/${project.artifactId}.git</developerConnection>
         <url>https://github.com/${developerId}/${project.artifactId}/tree/master</url>
-      <tag>HEAD</tag>
-  </scm>
+    </scm>
 
     <issueManagement>
         <system>Github</system>
@@ -99,10 +98,10 @@
 
         <dep.poi.version>4.1.2</dep.poi.version>
 
-        <dep.slf4j.version>2.0.16</dep.slf4j.version>
+        <dep.slf4j.version>2.0.17</dep.slf4j.version>
 
         <!-- test dependencies -->
-        <dep.junit.version>5.12.0</dep.junit.version>
+        <dep.junit.version>5.13.0</dep.junit.version>
 
         <!-- override basepom versions -->
         <dep.checkstyle.version>10.23.1</dep.checkstyle.version>
