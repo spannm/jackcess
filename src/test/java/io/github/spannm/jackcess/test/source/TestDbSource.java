@@ -13,6 +13,7 @@ import org.junit.jupiter.api.extension.ExtensionContext;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.ArgumentsProvider;
 import org.junit.jupiter.params.provider.ArgumentsSource;
+import org.junit.jupiter.params.support.ParameterDeclarations;
 import org.junit.platform.commons.support.AnnotationSupport;
 
 import java.io.File;
@@ -94,7 +95,7 @@ public @interface TestDbSource {
         }
 
         @Override
-        public Stream<Arguments> provideArguments(ExtensionContext _context) {
+        public Stream<Arguments> provideArguments(ParameterDeclarations _parameters, ExtensionContext _context) {
             TestDbSource src = _context.getElement().map(elem -> AnnotationSupport.findAnnotation(elem, TestDbSource.class).get()).orElse(null);
             return src == null ? Stream.empty() : getDbs(src.value(), FILE_FORMATS_WRITE).stream().map(Arguments::of);
         }

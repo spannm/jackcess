@@ -8,6 +8,7 @@ import org.junit.jupiter.api.extension.ExtensionContext;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.ArgumentsProvider;
 import org.junit.jupiter.params.provider.ArgumentsSource;
+import org.junit.jupiter.params.support.ParameterDeclarations;
 import org.junit.platform.commons.support.AnnotationSupport;
 
 import java.lang.annotation.ElementType;
@@ -32,7 +33,7 @@ public @interface TestDbReadOnlySource {
 
     class TestDbReadOnlyArgumentsProvider implements ArgumentsProvider {
         @Override
-        public Stream<Arguments> provideArguments(ExtensionContext _context) {
+        public Stream<Arguments> provideArguments(ParameterDeclarations _parameters, ExtensionContext _context) {
             TestDbReadOnlySource src = _context.getElement().map(elem -> AnnotationSupport.findAnnotation(elem, TestDbReadOnlySource.class).get()).orElse(null);
             return src == null ? Stream.empty() : TestDbArgumentsProvider.getDbs(src.value(), FileFormat.values()).stream().map(Arguments::of);
         }

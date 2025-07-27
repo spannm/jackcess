@@ -11,6 +11,7 @@ import org.junit.jupiter.api.extension.ExtensionContext;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.converter.ConvertWith;
 import org.junit.jupiter.params.provider.*;
+import org.junit.jupiter.params.support.ParameterDeclarations;
 import org.junit.platform.commons.support.AnnotationSupport;
 
 import java.lang.annotation.*;
@@ -908,8 +909,8 @@ class DefaultFunctionsTest extends AbstractBaseTest {
 
         class CustomFormatArgumentsProvider implements ArgumentsProvider {
             @Override
-            public Stream<Arguments> provideArguments(ExtensionContext context) {
-                return context.getElement().map(elem -> AnnotationSupport.findRepeatableAnnotations(elem, CustomFormatSource.class)).orElse(List.of()).stream()
+            public Stream<Arguments> provideArguments(ParameterDeclarations _parameters, ExtensionContext _context) {
+                return _context.getElement().map(elem -> AnnotationSupport.findRepeatableAnnotations(elem, CustomFormatSource.class)).orElse(List.of()).stream()
                     .flatMap(src -> IntStream.range(0, src.testValues().length).filter(i -> i % 2 == 0).mapToObj(i -> {
                         String expected = src.testValues()[i];
                         String val = src.testValues()[i + 1];

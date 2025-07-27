@@ -5,6 +5,7 @@ import org.junit.jupiter.api.extension.ExtensionContext;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.ArgumentsProvider;
 import org.junit.jupiter.params.provider.ArgumentsSource;
+import org.junit.jupiter.params.support.ParameterDeclarations;
 import org.junit.platform.commons.support.AnnotationSupport;
 
 import java.io.IOException;
@@ -36,7 +37,7 @@ public @interface DbsInPathSource {
     class DbsInPathSourceArgumentsProvider implements ArgumentsProvider {
 
         @Override
-        public Stream<Arguments> provideArguments(ExtensionContext _context) throws IOException {
+        public Stream<Arguments> provideArguments(ParameterDeclarations _parameters, ExtensionContext _context) throws IOException {
             DbsInPathSource src = _context.getElement().map(elem -> AnnotationSupport.findAnnotation(elem, DbsInPathSource.class).get()).orElse(null);
             Path path = Paths.get(src.value());
             try (Stream<Path> walk = Files.walk(path)) {

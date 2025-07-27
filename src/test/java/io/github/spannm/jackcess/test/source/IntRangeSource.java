@@ -5,6 +5,7 @@ import org.junit.jupiter.api.extension.ExtensionContext;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.ArgumentsProvider;
 import org.junit.jupiter.params.provider.ArgumentsSource;
+import org.junit.jupiter.params.support.ParameterDeclarations;
 import org.junit.platform.commons.support.AnnotationSupport;
 
 import java.lang.annotation.ElementType;
@@ -44,8 +45,8 @@ public @interface IntRangeSource {
     class IntRangeArgumentsProvider implements ArgumentsProvider {
 
         @Override
-        public Stream<Arguments> provideArguments(ExtensionContext context) {
-            Optional<IntRangeSource> optSrc = context.getElement().map(elem -> AnnotationSupport.findAnnotation(elem, IntRangeSource.class).get());
+        public Stream<Arguments> provideArguments(ParameterDeclarations _parameters, ExtensionContext _context) {
+            Optional<IntRangeSource> optSrc = _context.getElement().map(elem -> AnnotationSupport.findAnnotation(elem, IntRangeSource.class).get());
             return optSrc.map(cfg -> IntStream.range(cfg.start(), cfg.endInclusive() ? cfg.end() + 1 : cfg.end()).boxed().map(Arguments::of)).orElse(Stream.empty());
         }
 
