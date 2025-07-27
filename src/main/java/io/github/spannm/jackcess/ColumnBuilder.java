@@ -353,6 +353,14 @@ public class ColumnBuilder {
         _sortOrder = newTextSortOrder;
     }
 
+    public boolean storeInNullMask() {
+      return (getType() == DataType.BOOLEAN);
+    }
+
+    public int getFixedDataSize() {
+      return _type.getFixedSize(_length);
+    }
+
     /**
      * Checks that this column definition is valid.
      *

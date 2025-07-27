@@ -106,6 +106,9 @@ public abstract class TableMutator extends DBMutator {
         }
 
         public short getNextVariableOffset(ColumnBuilder col) {
+            if (!col.isVariableLength()) {
+                return _varOffset;
+            }
             if (!col.getType().isLongValue()) {
                 return _varOffset++;
             }
@@ -113,8 +116,12 @@ public abstract class TableMutator extends DBMutator {
         }
 
         public short getNextFixedOffset(ColumnBuilder col) {
+            if (col.storeInNullMask()) {
+                // booleans are stored in null mask, not in fixed data section
+                return 0;
+            }
             short offset = _fixedOffset;
-            _fixedOffset += (short) col.getType().getFixedSize(col.getLength());
+            _fixedOffset += col.getFixedDataSize();
             return offset;
         }
     }

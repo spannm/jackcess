@@ -231,13 +231,8 @@ public class ColumnImpl implements Column, Comparable<ColumnImpl>, DateTimeConte
 
         mautoNumberGenerator = createAutoNumberGenerator();
 
-        if (mvariableLength) {
-            mvarLenTableIndex = args.buffer.getShort(args.offset + getFormat().OFFSET_COLUMN_VARIABLE_TABLE_INDEX);
-            mfixedDataOffset = 0;
-        } else {
-            mfixedDataOffset = args.buffer.getShort(args.offset + getFormat().OFFSET_COLUMN_FIXED_DATA_OFFSET);
-            mvarLenTableIndex = 0;
-        }
+        mvarLenTableIndex = args.buffer.getShort(args.offset + getFormat().OFFSET_COLUMN_VARIABLE_TABLE_INDEX);
+        mfixedDataOffset = args.buffer.getShort(args.offset + getFormat().OFFSET_COLUMN_FIXED_DATA_OFFSET);
     }
 
     /**
@@ -424,6 +419,10 @@ public class ColumnImpl implements Column, Comparable<ColumnImpl>, DateTimeConte
 
     public int getFixedDataOffset() {
         return mfixedDataOffset;
+    }
+
+    protected int getFixedDataSize() {
+        return mtype.getFixedSize(mcolumnLength);
     }
 
     protected Charset getCharset() {
@@ -1312,7 +1311,7 @@ public class ColumnImpl implements Column, Comparable<ColumnImpl>, DateTimeConte
      * @return A buffer containing the bytes
      */
     protected ByteBuffer writeFixedLengthField(Object obj, ByteOrder order) throws IOException {
-        int size = getType().getFixedSize(mcolumnLength);
+        int size = getFixedDataSize();
 
         ByteBuffer buffer = writeFixedLengthField(obj, PageChannel.createBuffer(size, order));
         buffer.flip();
@@ -1802,11 +1801,7 @@ public class ColumnImpl implements Column, Comparable<ColumnImpl>, DateTimeConte
         buffer.putInt(TableImpl.MAGIC_TABLE_NUMBER); // constant magic number
         buffer.putShort(col.getColumnNumber()); // Column Number
 
-        if (col.isVariableLength()) {
-            buffer.putShort(colOffsets.getNextVariableOffset(col));
-        } else {
-            buffer.putShort((short) 0);
-        }
+        buffer.putShort(colOffsets.getNextVariableOffset(col));
 
         buffer.putShort(col.getColumnNumber()); // Column Number again
 

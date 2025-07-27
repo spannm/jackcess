@@ -718,7 +718,7 @@ public class TableImpl implements Table, PropertyMaps.Owner {
                 // read fixed length value (non-boolean at this point)
                 int dataStart = rowStart + format.OFFSET_COLUMN_FIXED_DATA_ROW_OFFSET;
                 colDataPos = dataStart + column.getFixedDataOffset();
-                colDataLen = column.getType().getFixedSize(column.getLength());
+                colDataLen = column.getFixedDataSize();
 
             } else {
                 int varDataStart;
@@ -1085,20 +1085,20 @@ public class TableImpl implements Table, PropertyMaps.Owner {
             tableBuffer.position(format.SIZE_TDEF_HEADER + _indexCount * format.SIZE_INDEX_DEFINITION + _columns.size() * format.SIZE_COLUMN_DEF_BLOCK);
 
             // figure out the data offsets for the new column
-            int fixedOffset = 0;
             int varOffset = 0;
-            if (column.isVariableLength()) {
-                // find the variable offset
-                for (ColumnImpl col : _varColumns) {
-                    if (col.getVarLenTableIndex() >= varOffset) {
-                        varOffset = col.getVarLenTableIndex() + 1;
-                    }
+            // find the variable offset
+            for (ColumnImpl col : _varColumns) {
+                if (col.isVariableLength() && (col.getVarLenTableIndex() >= varOffset)) {
+                    varOffset = col.getVarLenTableIndex() + 1;
                 }
-            } else {
+            }
+
+            int fixedOffset = 0;
+            if (!column.isVariableLength() && !column.storeInNullMask()) {
                 // find the fixed offset
                 for (ColumnImpl col : _columns) {
-                    if (!col.isVariableLength() && col.getFixedDataOffset() >= fixedOffset) {
-                        fixedOffset = col.getFixedDataOffset() + col.getType().getFixedSize(col.getLength());
+                    if (!col.isVariableLength() && (col.getFixedDataOffset() >= fixedOffset)) {
+                        fixedOffset = col.getFixedDataOffset() + col.getFixedDataSize();
                     }
                 }
             }
