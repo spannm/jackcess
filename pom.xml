@@ -104,9 +104,7 @@
         <dep.junit.version>5.13.4</dep.junit.version>
 
         <!-- override basepom versions -->
-        <dep.checkstyle.version>10.23.1</dep.checkstyle.version>
-        <dep.pmd.version>7.13.0</dep.pmd.version>
-        <dep.spotbugs.version>4.9.3</dep.spotbugs.version>
+        <!-- currently: none -->
 
         <!-- downgrade site plugin to work with site skin -->
         <dep.plugin.site.version>3.21.0</dep.plugin.site.version>
