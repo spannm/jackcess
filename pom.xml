@@ -71,14 +71,14 @@
 
     <distributionManagement>
         <snapshotRepository>
-            <id>sonatype-nexus-snapshots</id>
-            <name>Sonatype Nexus Snapshots</name>
-            <url>https://s01.oss.sonatype.org/content/repositories/snapshots</url>
+            <id>central</id>
+            <name>Sonatype Central Snapshots</name>
+            <url>${basepom.deploy.snapshot.url}</url>
         </snapshotRepository>
         <repository>
-            <id>sonatype-nexus-staging</id>
-            <name>Nexus Release Repository</name>
-            <url>https://s01.oss.sonatype.org/service/local/staging/deploy/maven2</url>
+            <id>central</id>
+            <name>Sonatype Central Staging Repository</name>
+            <url>https://central.sonatype.com</url>
         </repository>
         <site>
             <id>local</id>
@@ -104,7 +104,7 @@
         <dep.junit.version>5.13.4</dep.junit.version>
 
         <!-- override basepom versions -->
-        <!-- currently: none -->
+        <dep.plugin.central-publishing.version>0.8.0</dep.plugin.central-publishing.version>
 
         <!-- downgrade site plugin to work with site skin -->
         <dep.plugin.site.version>3.21.0</dep.plugin.site.version>
@@ -113,6 +113,8 @@
         <!-- additional plugins not defined in parent -->
         <dep.plugin.sortpom.version>4.0.0</dep.plugin.sortpom.version>
         <dep.plugin.sonar.version>3.10.0.2594</dep.plugin.sonar.version>
+
+        <basepom.deploy.snapshot.url>https://central.sonatype.com/repository/maven-snapshots/</basepom.deploy.snapshot.url>
 
         <basepom.check.skip-checkstyle>false</basepom.check.skip-checkstyle>
         <basepom.check.skip-pmd>false</basepom.check.skip-pmd>
@@ -279,6 +281,39 @@
         </pluginManagement>
 
         <plugins>
+
+            <plugin>
+                <!-- central-publishing-maven-plugin is the official tool for publishing artifacts to the new Sonatype Central Portal -->
+                <groupId>org.sonatype.central</groupId>
+                <artifactId>central-publishing-maven-plugin</artifactId>
+
+                <!-- The <extensions>true</extensions> attribute tells Maven to include the plugin's code in the build lifecycle,
+                     allowing it to hook into specific phases and extend Maven's default behavior.
+                     This lets the plugin take over the standard deploy goal and implement its own logic for deploying to the new Sonatype Central Portal. -->
+                <extensions>true</extensions>
+                <configuration>
+                    <skipPublishing>false</skipPublishing>
+                    <publishingServerId>central</publishingServerId>
+                    <!-- do not automatically release staged artifacts to Maven Central.
+                         This is the recommended setting for releases, as it allows us to manually inspect the staged repository
+                         in the Central Portal before officially publishing.
+                         For Snapshots, this parameter has no effect, as they are immediately available upon deployment. -->
+                    <autoPublish>false</autoPublish>
+
+                    <!-- instructs the plugin to wait until Sonatype's portal validates the artifacts.
+                         This ensures that the build doesn't complete until the artifacts have passed initial quality checks.
+                         Other options like ready or published can be used to control the waiting time. -->
+                    <waitUntil>validated</waitUntil>
+
+                    <!-- let build fail if a publishing error occurs.
+                         This is a crucial safety measure to prevent incomplete or incorrect artifacts from being left in a staged repository -->
+                    <failOnBuildFailure>true</failOnBuildFailure>
+
+                    <!-- generates all available checksum types (e.g., MD5, SHA-1, SHA-256) for the deployed artifacts -->
+                    <checksums>all</checksums>
+                </configuration>
+            </plugin>
+
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-jar-plugin</artifactId>
@@ -383,66 +418,6 @@
                             </execution>
                         </executions>
                     </plugin>
-                </plugins>
-            </build>
-        </profile>
-
-        <profile>
-            <id>release</id>
-            <activation>
-                <property>
-                    <name>performRelease</name>
-                    <value>true</value>
-                </property>
-            </activation>
-            <build>
-                <plugins>
-
-                    <plugin>
-                        <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-release-plugin</artifactId>
-                        <configuration>
-                            <autoVersionSubmodules>true</autoVersionSubmodules>
-                            <useReleaseProfile>false</useReleaseProfile>
-                            <releaseProfiles>release</releaseProfiles>
-                            <goals>deploy</goals>
-                        </configuration>
-                    </plugin>
-
-                    <plugin>
-                        <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-javadoc-plugin</artifactId>
-                        <configuration>
-                            <doclint>none</doclint>
-                        </configuration>
-                        <executions>
-                            <execution>
-                                <id>attach-javadocs</id>
-                                <goals>
-                                    <goal>jar</goal>
-                                </goals>
-                            </execution>
-                        </executions>
-                    </plugin>
-
-                    <plugin>
-                        <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-gpg-plugin</artifactId>
-                        <configuration>
-                            <executable>gpg</executable>
-                            <!--passphrase>${gpg.passphrase}</passphrase-->
-                        </configuration>
-                        <executions>
-                            <execution>
-                                <id>sign-artifacts</id>
-                                <goals>
-                                    <goal>sign</goal>
-                                </goals>
-                                <phase>verify</phase>
-                            </execution>
-                        </executions>
-                    </plugin>
-
                 </plugins>
             </build>
         </profile>
