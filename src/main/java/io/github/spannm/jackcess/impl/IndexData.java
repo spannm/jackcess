@@ -356,6 +356,7 @@ public class IndexData {
      * @param forceLoad if {@code false} only validate currently loaded index data pages, otherwise, load and validate all index pages
      */
     public void validate(boolean forceLoad) throws IOException {
+        initialize();
         _pageCache.validate(forceLoad);
     }
 
