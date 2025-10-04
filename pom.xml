@@ -96,7 +96,7 @@
         <developerId>spannm</developerId>
         <githubBaseUrl>https://github.com/${developerId}/</githubBaseUrl>
 
-        <dep.poi.version>4.1.2</dep.poi.version>
+        <dep.poi.version>5.4.1</dep.poi.version>
 
         <dep.slf4j.version>2.0.17</dep.slf4j.version>
 
