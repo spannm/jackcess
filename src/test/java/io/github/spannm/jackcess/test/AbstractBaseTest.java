@@ -25,8 +25,10 @@ import java.util.stream.StreamSupport;
 /**
  * Base class for JUnit test cases.<p>
  *
- * Logs entry to all test methods.<br>
+ * Logs entry and exit to/from all test methods.<br>
  * This class extends JUnit assertions to avoid the need for static imports in subclasses.
+ *
+ * @author Markus Spann
  */
 public abstract class AbstractBaseTest extends Assertions {
 
@@ -73,9 +75,9 @@ public abstract class AbstractBaseTest extends Assertions {
     @BeforeEach
     public final void logTestBegin(TestInfo _testInfo) {
         if (_testInfo.getTestMethod().isEmpty() || _testInfo.getDisplayName().startsWith(_testInfo.getTestMethod().get().getName())) {
-            getLogger().log(Level.INFO, ">>>> TEST: {0} <<<<", _testInfo.getDisplayName());
+            getLogger().log(Level.DEBUG, ">>>> TEST: {0} <<<<", _testInfo.getDisplayName());
         } else {
-            getLogger().log(Level.INFO, ">>>> TEST: {0} ({1}) <<<<",
+            getLogger().log(Level.DEBUG, ">>>> TEST: {0} ({1}) <<<<",
                 _testInfo.getTestMethod().get().getName(), _testInfo.getDisplayName());
         }
     }
