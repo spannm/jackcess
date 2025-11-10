@@ -7,7 +7,7 @@
     <parent>
         <groupId>org.basepom</groupId>
         <artifactId>basepom-oss</artifactId>
-        <version>65</version>
+        <version>66</version>
     </parent>
 
     <groupId>io.github.spannm</groupId>
@@ -107,9 +107,6 @@
 
         <!-- test dependencies -->
         <dep.junit.version>5.14.1</dep.junit.version>
-
-        <!-- override basepom versions -->
-        <dep.plugin.central-publishing.version>0.8.0</dep.plugin.central-publishing.version>
 
         <!-- downgrade site plugin to work with site skin -->
         <dep.plugin.site.version>3.21.0</dep.plugin.site.version>
