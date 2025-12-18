@@ -408,6 +408,8 @@
                 <sonar.skip>false</sonar.skip>
                 <sonar.host.url>https://sonarcloud.io</sonar.host.url>
                 <sonar.organization>spannm</sonar.organization>
+                <sonar.projectKey>${project.groupId}:${project.artifactId}}</sonar.projectKey>
+
                 <!-- sonar.token>YOUR_TOKEN_HERE</sonar.token -->
 
                 <basepom.test.skip>true</basepom.test.skip>
