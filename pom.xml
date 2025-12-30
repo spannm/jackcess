@@ -7,7 +7,7 @@
     <parent>
         <groupId>org.basepom</groupId>
         <artifactId>basepom-oss</artifactId>
-        <version>66</version>
+        <version>67</version>
     </parent>
 
     <groupId>io.github.spannm</groupId>
@@ -108,8 +108,6 @@
         <!-- test dependencies -->
         <dep.junit.version>5.14.1</dep.junit.version>
 
-        <!-- downgrade site plugin to work with site skin -->
-        <dep.plugin.site.version>3.21.0</dep.plugin.site.version>
         <dep.plugin.maven-fluido-skin.version>2.1.0</dep.plugin.maven-fluido-skin.version>
 
         <!-- additional plugins not defined in parent -->
