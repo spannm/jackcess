@@ -29,6 +29,7 @@
         <license>
             <name>The Apache License, Version 2.0</name>
             <url>https://www.apache.org/licenses/LICENSE-2.0</url>
+            <distribution>repo</distribution>
         </license>
     </licenses>
 
@@ -40,25 +41,24 @@
             <organizationUrl>${githubBaseUrl}</organizationUrl>
             <timezone>+1</timezone>
         </developer>
-    </developers>
 
-    <contributors>
-        <contributor>
+        <developer>
             <name>Tim McCune</name>
             <email>javajedi@users.sf.net</email>
             <roles>
                 <role>Original author and project founder</role>
-                <role>developer emeritus</role>
+                <role>Developer emeritus</role>
             </roles>
-        </contributor>
-        <contributor>
+        </developer>
+        <developer>
             <name>James Ahlborn</name>
             <email>jahlborn@users.sf.net</email>
             <roles>
-                <role>developer emeritus</role>
+                <role>Developer emeritus</role>
             </roles>
-        </contributor>
-    </contributors>
+        </developer>
+
+    </developers>
 
     <scm>
         <connection>scm:git:ssh//git@github.com/${developerId}/${project.artifactId}.git</connection>
@@ -121,7 +121,6 @@
         <basepom.check.skip-pmd>false</basepom.check.skip-pmd>
         <dep.checkstyle.version>10.26.1</dep.checkstyle.version>
         <basepom.check.skip-spotbugs>true</basepom.check.skip-spotbugs>
-        <basepom.check.skip-license>true</basepom.check.skip-license>
         <basepom.check.skip-dependency>false</basepom.check.skip-dependency>
         <basepom.check.fail-dependency>false</basepom.check.fail-dependency>
 
@@ -130,6 +129,11 @@
 
         <basepom.site.scm.branch>master</basepom.site.scm.branch>
         <basepom.site.skip-deploy>false</basepom.site.skip-deploy>
+
+        <basepom.check.skip-license>false</basepom.check.skip-license>
+        <basepom.check.fail-license>true</basepom.check.fail-license>
+        <basepom.license.skip-existing>true</basepom.license.skip-existing>
+        <basepom.license.header>src/license/header.txt</basepom.license.header>
     </properties>
 
     <dependencies>
@@ -233,6 +237,28 @@
                         <createBackupFile>false</createBackupFile>
                         <expandEmptyElements>false</expandEmptyElements>
                         <nrOfIndentSpace>4</nrOfIndentSpace>
+                    </configuration>
+                </plugin>
+
+                <plugin>
+                    <groupId>com.mycila</groupId>
+                    <artifactId>license-maven-plugin</artifactId>
+                    <configuration>
+                        <failIfUnknown>false</failIfUnknown>
+                        <licenseSets>
+                            <licenseSet>
+                                <header>${basepom.license.header}</header>
+                                <includes>
+                                    <include>src/*/java/**</include>
+                                </includes>
+                                <excludes>
+                                    <exclude>**/*.mdb</exclude>
+                                    <exclude>**/*.accdb</exclude>
+                                    <exclude>**/src/license/**</exclude>
+                                    <exclude>**/target/**</exclude>
+                                </excludes>
+                            </licenseSet>
+                        </licenseSets>
                     </configuration>
                 </plugin>
 
