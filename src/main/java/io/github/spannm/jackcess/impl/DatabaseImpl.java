@@ -18,6 +18,7 @@ package io.github.spannm.jackcess.impl;
 
 import io.github.spannm.jackcess.*;
 import io.github.spannm.jackcess.expr.EvalConfig;
+import io.github.spannm.jackcess.impl.IndexData.ColumnDescriptor;
 import io.github.spannm.jackcess.impl.query.QueryImpl;
 import io.github.spannm.jackcess.query.Query;
 import io.github.spannm.jackcess.util.*;
@@ -489,6 +490,24 @@ public class DatabaseImpl implements Database, DateTimeContext {
      * factory for the appropriate date/time type
      */
     private ColumnImpl.DateTimeFactory      _dtf;
+
+    /**
+     * Id of the "Databases" container object in the system catalog, resolved dynamically during
+     * {@link #readSystemCatalog} when the catalog index is unavailable (e.g. Turkish / LCID 1055).
+     * Preferred over the hardcoded {@link #DB_PARENT_ID} constant in {@link #getDbParentId()}
+     * because Turkish-collation databases may use a different catalog root id.
+     * {@code null} for normal databases.
+     */
+    private Integer                         dynamicDbParentId;
+
+    /**
+     * ParentId of {@code MSysObjects} itself within the system catalog, resolved during
+     * {@link #readSystemCatalog} when the catalog index is unavailable (e.g. Turkish / LCID 1055).
+     * Used by {@link #getSystemTable} to scope lookups to the correct system-object parent instead
+     * of {@link #mtableParentId} (which only covers user tables).
+     * {@code null} for normal databases where the index-based {@link DefaultTableFinder} is used.
+     */
+    private Integer                         msysParentId;
 
     /**
      * Open an existing Database. If the existing file is not writeable or the readOnly flag is {@code true}, the file will be opened read-only.
@@ -1045,24 +1064,84 @@ public class DatabaseImpl implements Database, DateTimeContext {
     private void readSystemCatalog(boolean ignoreSystemCatalogIndex) throws IOException {
         msystemCatalog = loadTable(TABLE_SYSTEM_CATALOG, PAGE_SYSTEM_CATALOG, SYSTEM_OBJECT_FLAGS, TYPE_TABLE);
 
-        if (!ignoreSystemCatalogIndex) {
-            try {
-                mtableFinder = new DefaultTableFinder(
-                    msystemCatalog.newCursor().withIndexByColumnNames(CAT_COL_PARENT_ID, CAT_COL_NAME).withColumnMatcher(CaseInsensitiveColumnMatcher.INSTANCE).toIndexCursor());
-            } catch (IllegalArgumentException _ex) {
-                LOGGER.log(Level.DEBUG, () -> withErrorContext("Could not find expected index on table " + msystemCatalog.getName()));
-                // use table scan instead
-                mtableFinder = new FallbackTableFinder(msystemCatalog.newCursor().withColumnMatcher(CaseInsensitiveColumnMatcher.INSTANCE).toCursor());
+        boolean forceScan = ignoreSystemCatalogIndex;
+        if (!forceScan) {
+            // Proactively check whether the (ParentId, Name) compound index on MSysObjects is
+            // read-only due to an unsupported collating sort order (e.g. Turkish / LCID 1055).
+            // If so, skip the index cursor and fall back to a table scan immediately, avoiding
+            // a misleading IllegalArgumentException at cursor-creation time
+            for (IndexImpl idx : msystemCatalog.getIndexes()) {
+                List<ColumnDescriptor> cols = idx.getColumns();
+                if (cols.size() == 2
+                    && CAT_COL_PARENT_ID.equals(cols.get(0).getName())
+                    && CAT_COL_NAME.equals(cols.get(1).getName())
+                    && idx.getIndexData().getUnsupportedReason() != null) {
+                    forceScan = true;
+                    LOGGER.log(Level.DEBUG, () -> withErrorContext(
+                        "System catalog index unsupported (" + idx.getIndexData().getUnsupportedReason() + "), forcing table scan"));
+                    break;
+                }
             }
-        } else {
-            LOGGER.log(Level.DEBUG, () -> withErrorContext("Ignoring index on table " + msystemCatalog.getName()));
-            // use table scan instead
-            mtableFinder = new FallbackTableFinder(msystemCatalog.newCursor().withColumnMatcher(CaseInsensitiveColumnMatcher.INSTANCE).toCursor());
         }
 
-        mtableParentId = mtableFinder.findObjectId(DB_PARENT_ID, SYSTEM_OBJECT_NAME_TABLES);
+        if (!forceScan) {
+            try {
+                mtableFinder = new DefaultTableFinder(
+                    msystemCatalog.newCursor()
+                        .withIndexByColumnNames(CAT_COL_PARENT_ID, CAT_COL_NAME)
+                        .withColumnMatcher(CaseInsensitiveColumnMatcher.INSTANCE)
+                        .toIndexCursor());
+            } catch (IllegalArgumentException _ex) {
+                LOGGER.log(Level.DEBUG, () -> withErrorContext("Could not find expected index on table " + msystemCatalog.getName()));
+                forceScan = true;
+            }
+        }
+
+        if (forceScan) {
+            mtableFinder = new FallbackTableFinder(
+                msystemCatalog.newCursor()
+                    .withColumnMatcher(CaseInsensitiveColumnMatcher.INSTANCE)
+                    .toCursor());
+        }
+
+        // When the system catalog index is unavailable (forceScan) the hardcoded DB_PARENT_ID
+        // constant (0xF000000) may not match the actual catalog root ID in the database file.
+        // In that case we resolve mtableParentId, dynamicDbParentId, and msysParentId by scanning
+        // MSysObjects once. For normal databases the index cursor is used and no scan is needed.
+        if (forceScan) {
+            for (Row row : CursorImpl.createCursor(msystemCatalog).newIterable().withColumnNames(SYSTEM_CATALOG_COLUMNS)) {
+                String name = row.getString(CAT_COL_NAME);
+                if (SYSTEM_OBJECT_NAME_TABLES.equalsIgnoreCase(name) && mtableParentId == null) {
+                    mtableParentId = row.getInt(CAT_COL_ID);
+                    LOGGER.log(Level.DEBUG, () -> withErrorContext(
+                        "Resolved mtableParentId=" + mtableParentId + " from '" + SYSTEM_OBJECT_NAME_TABLES + "' row"));
+                } else if (SYSTEM_OBJECT_NAME_DATABASES.equalsIgnoreCase(name) && dynamicDbParentId == null) {
+                    dynamicDbParentId = row.getInt(CAT_COL_ID);
+                    LOGGER.log(Level.DEBUG, () -> withErrorContext(
+                        "Resolved dynamicDbParentId=" + dynamicDbParentId + " from '" + SYSTEM_OBJECT_NAME_DATABASES + "' row"));
+                } else if (TABLE_SYSTEM_CATALOG.equalsIgnoreCase(name) && msysParentId == null) {
+                    msysParentId = row.getInt(CAT_COL_PARENT_ID);
+                    LOGGER.log(Level.DEBUG, () -> withErrorContext(
+                        "Resolved msysParentId=" + msysParentId + " from '" + TABLE_SYSTEM_CATALOG + "' row"));
+                }
+                if (mtableParentId != null && dynamicDbParentId != null && msysParentId != null) {
+                    break; // all IDs resolved, no need to scan further
+                }
+            }
+        }
 
         if (mtableParentId == null) {
+            mtableParentId = mtableFinder.findObjectId(DB_PARENT_ID, SYSTEM_OBJECT_NAME_TABLES);
+        }
+
+        if (mtableParentId == null) {
+            if (LOGGER.isLoggable(Level.WARNING)) {
+                for (Row row : CursorImpl.createCursor(msystemCatalog).newIterable().withColumnNames(SYSTEM_CATALOG_COLUMNS)) {
+                    LOGGER.log(Level.WARNING, withErrorContext(
+                        "MSysObjects row during failure scan: name=" + row.getString(CAT_COL_NAME)
+                        + ", parentId=" + row.getInt(CAT_COL_PARENT_ID)));
+                }
+            }
             throw new IOException(withErrorContext("Did not find required parent table id"));
         }
 
@@ -1445,6 +1524,15 @@ public class DatabaseImpl implements Database, DateTimeContext {
 
     @Override
     public TableImpl getSystemTable(String tableName) throws IOException {
+        // For databases with an unsupported system catalog index (e.g. Turkish / LCID 1055)
+        // msysParentId was resolved dynamically during readSystemCatalog(). Use it directly
+        // so that the lookup targets the correct parent scope instead of mtableParentId.
+        if (msysParentId != null) {
+            TableInfo tableInfo = mtableFinder.lookupTable(tableName, msysParentId);
+            if (tableInfo != null) {
+                return getTable(tableInfo, true);
+            }
+        }
         return getTable(tableName, true);
     }
 
@@ -1505,8 +1593,13 @@ public class DatabaseImpl implements Database, DateTimeContext {
     }
 
     private Integer getDbParentId() throws IOException {
+        // Prefer the ID resolved dynamically from the MSysObjects scan during readSystemCatalog().
+        // This is necessary for databases where DB_PARENT_ID (0xF000000) does not match the
+        // actual catalog root, e.g. databases with a non-General collating sort order.
+        if (dynamicDbParentId != null) {
+            return dynamicDbParentId;
+        }
         if (mdbParentId == null) {
-            // need the parent id of the databases objects
             mdbParentId = mtableFinder.findObjectId(DB_PARENT_ID, SYSTEM_OBJECT_NAME_DATABASES);
             if (mdbParentId == null) {
                 throw new IOException(withErrorContext("Did not find required parent db id"));
@@ -1943,7 +2036,7 @@ public class DatabaseImpl implements Database, DateTimeContext {
      * @return upper-case name suitable for use as a map key, or {@code null} if {@code name} is {@code null}
      */
     public static String toLookupName(String name) {
-        return name != null ? name.toUpperCase() : null;
+        return name != null ? name.toUpperCase(Locale.ROOT) : null;
     }
 
     /**
@@ -2365,7 +2458,7 @@ public class DatabaseImpl implements Database, DateTimeContext {
             int maxSynthId = findMaxSyntheticId();
             if (maxSynthId >= -1) {
                 // bummer, no more ids available
-                throw new IllegalStateException(withErrorContext("Too many database objects!"));
+                throw new IllegalStateException(withErrorContext("Too many database objects"));
             }
             return maxSynthId + 1;
         }
@@ -2427,6 +2520,8 @@ public class DatabaseImpl implements Database, DateTimeContext {
 
         public abstract TableInfo lookupTable(String tableName) throws IOException;
 
+        public abstract TableInfo lookupTable(String tableName, Integer parentId) throws IOException;
+
         protected abstract int findMaxSyntheticId() throws IOException;
     }
 
@@ -2460,8 +2555,12 @@ public class DatabaseImpl implements Database, DateTimeContext {
 
         @Override
         public TableInfo lookupTable(String tableName) throws IOException {
+            return lookupTable(tableName, mtableParentId);
+        }
 
-            if (findRow(mtableParentId, tableName) == null) {
+        @Override
+        public TableInfo lookupTable(String tableName, Integer parentId) throws IOException {
+            if (findRow(parentId, tableName) == null) {
                 return null;
             }
 
@@ -2523,8 +2622,18 @@ public class DatabaseImpl implements Database, DateTimeContext {
         }
 
         @Override
-        public TableInfo lookupTable(String tableName) {
+        public TableInfo lookupTable(String tableName) throws IOException {
+            return lookupTable(tableName, mtableParentId);
+        }
 
+        /**
+         * Scans the system catalog for a table with the given name under the given parent.
+         * If {@code parentId} is {@code null} the parent-id filter is skipped (wildcard scan),
+         * which is used by {@link DatabaseImpl#getSystemTable} when the system-object parent scope
+         * cannot be determined at call time.
+         */
+        @Override
+        public TableInfo lookupTable(String tableName, Integer parentId) throws IOException {
             for (Row row : _systemCatalogCursor.newIterable().withColumnNames(SYSTEM_CATALOG_TABLE_DETAIL_COLUMNS)) {
 
                 Short type = row.getShort(CAT_COL_TYPE);
@@ -2532,8 +2641,8 @@ public class DatabaseImpl implements Database, DateTimeContext {
                     continue;
                 }
 
-                int parentId = row.getInt(CAT_COL_PARENT_ID);
-                if (parentId != mtableParentId) {
+                int rowParentId = row.getInt(CAT_COL_PARENT_ID);
+                if (parentId != null && rowParentId != parentId) {
                     continue;
                 }
 
