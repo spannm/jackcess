@@ -131,21 +131,32 @@ public class ColumnImpl implements Column, Comparable<ColumnImpl>, DateTimeConte
      * <p>
      * Index entries for this order are encoded by {@link General97IndexCodes}.
      */
-    public static final SortOrder        GENERAL_97_SORT_ORDER            = new SortOrder(GENERAL_SORT_ORDER_VALUE, (short) -1);
+    public static final SortOrder        GENERAL_97_SORT_ORDER            = new SortOrder(GENERAL_SORT_ORDER_VALUE, -1);
 
     /**
      * Sort order used by Access 2000–2007 databases (LCID 1033, version 0).
      * <p>
      * Index entries for this order are encoded by {@link GeneralLegacyIndexCodes}.
      */
-    public static final SortOrder        GENERAL_LEGACY_SORT_ORDER        = new SortOrder(GENERAL_SORT_ORDER_VALUE, (short) 0);
+    public static final SortOrder        GENERAL_LEGACY_SORT_ORDER        = new SortOrder(GENERAL_SORT_ORDER_VALUE, 0);
 
     /**
      * Sort order used by Access 2010 and later databases (LCID 1033, version 1).
      * <p>
      * Index entries for this order are encoded by {@link GeneralIndexCodes}.
      */
-    public static final SortOrder        GENERAL_SORT_ORDER               = new SortOrder(GENERAL_SORT_ORDER_VALUE, (short) 1);
+    public static final SortOrder        GENERAL_SORT_ORDER               = new SortOrder(GENERAL_SORT_ORDER_VALUE, 1);
+
+    /**
+     * Sort order used by MS Access databases configured with the Turkish collation (LCID 1055, version 0).
+     * <p>
+     * Index entries for this sort order are encoded by {@code IndexData.TurkishTextColumnDescriptor}, which
+     * currently delegates to {@link GeneralLegacyIndexCodes} as a structurally compatible interim solution
+     * until the proprietary Turkish byte tables are reverse-engineered.
+     *
+     * @see IndexData
+     */
+    public static final SortOrder        TURKISH_SORT_ORDER               = new SortOrder((short) 1055, 0);
 
     /**
      * pattern matching textual guid strings (allows for optional surrounding '{' and '}')
@@ -2368,12 +2379,15 @@ public class ColumnImpl implements Column, Comparable<ColumnImpl>, DateTimeConte
      * {@link ColumnImpl#writeSortOrder} (private). They are compared using both fields so that,
      * for example, {@code GENERAL_LEGACY_SORT_ORDER} (1033/0) and {@code GENERAL_SORT_ORDER} (1033/1) are
      * treated as distinct collations.
-     *
-     * @see <a href="https://learn.microsoft.com/en-us/openspecs/office_file_formats/ms-accdt">MS-ACCDT: Access Database Template File Format</a>
      */
     public static final class SortOrder {
+
         private final short mvalue;
         private final short mversion;
+
+        public SortOrder(short _value, int _version) {
+            this(_value, (short) _version);
+        }
 
         public SortOrder(short _value, short _version) {
             mvalue = _value;
@@ -2395,13 +2409,86 @@ public class ColumnImpl implements Column, Comparable<ColumnImpl>, DateTimeConte
 
         @Override
         public boolean equals(Object o) {
-            return this == o || o != null && getClass() == o.getClass() && mvalue == ((SortOrder) o).mvalue && mversion == ((SortOrder) o).mversion;
+            return this == o || o != null
+                && getClass() == o.getClass()
+                && mvalue == ((SortOrder) o).mvalue
+                && mversion == ((SortOrder) o).mversion;
         }
 
         @Override
         public String toString() {
-            return ToStringBuilder.valueBuilder(this).append(null, mvalue + "(" + mversion + ")").toString();
+            String name = LcidNames.VALUES.get(mvalue);
+            String valueStr = mvalue + "(" + mversion + ")";
+            return ToStringBuilder.valueBuilder(this).append(null, name != null ? valueStr + ", " + name : valueStr).toString();
         }
+
+        /**
+         * Lazily-loaded map from Windows LCID to the English display name used in MS Access.
+         * <p>
+         * Holding the map in a nested class defers initialisation until the first call to
+         * {@link SortOrder#toString()}, keeping class-loading cost minimal for callers that
+         * never need the human-readable name.
+         * <p>
+         * Contains only the LCIDs that are known to appear as database-level or column-level
+         * sort orders in MS Access databases.
+         */
+        private static final class LcidNames {
+            private static final Map<Short, String> VALUES = Map.ofEntries(
+                // General / English
+                entry(1033, "General"),
+                // Western European languages
+                entry(1031, "German"),
+                entry(1036, "French"),
+                entry(1034, "Spanish"),
+                entry(1040, "Italian"),
+                entry(1043, "Dutch"),
+                entry(1046, "Portuguese"),
+                entry(1053, "Swedish"),
+                entry(1030, "Danish"),
+                entry(1044, "Norwegian"),
+                entry(1035, "Finnish"),
+                // Central/Eastern European
+                entry(1045, "Polish"),
+                entry(1029, "Czech"),
+                entry(1038, "Hungarian"),
+                entry(1050, "Croatian"),
+                entry(1051, "Slovak"),
+                entry(1060, "Slovenian"),
+                entry(1048, "Romanian"),
+                entry(1026, "Bulgarian"),
+                // Cyrillic
+                entry(1049, "Russian"),
+                entry(1058, "Ukrainian"),
+                // Baltic
+                entry(1061, "Estonian"),
+                entry(1062, "Latvian"),
+                entry(1063, "Lithuanian"),
+                // Turkish and related
+                entry(1055, "Turkish"),
+                entry(1068, "Azerbaijani"),
+                // Greek
+                entry(1032, "Greek"),
+                // East Asian
+                entry(1041, "Japanese"),
+                entry(1042, "Korean"),
+                entry(2052, "Chinese Simplified"),
+                entry(1028, "Chinese Traditional"),
+                // Arabic / Hebrew
+                entry(1025, "Arabic"),
+                entry(1037, "Hebrew"),
+                // Nordic
+                entry(1069, "Basque"),
+                entry(1027, "Catalan")
+            );
+
+            private LcidNames() {
+            }
+
+            private static Map.Entry<Short, String> entry(int lcid, String name) {
+                return Map.entry((short) lcid, name);
+            }
+        }
+
     }
 
     /**
@@ -2565,4 +2652,5 @@ public class ColumnImpl implements Column, Comparable<ColumnImpl>, DateTimeConte
     interface InMemoryBlob {
         byte[] getBytes() throws IOException;
     }
+
 }

@@ -1385,7 +1385,9 @@ public class IndexData {
      *       <td>{@link GenLegTextColumnDescriptor}</td><td>Access 2000–2007</td></tr>
      *   <tr><td>{@link ColumnImpl#GENERAL_97_SORT_ORDER}</td><td>1033</td><td>-1</td>
      *       <td>{@link Gen97TextColumnDescriptor}</td><td>Access 97</td></tr>
-     *   <tr><td>any other (e.g. Turkish 1055)</td><td>–</td><td>–</td>
+     *   <tr><td>{@link ColumnImpl#TURKISH_SORT_ORDER}</td><td>1055</td><td>0</td>
+     *       <td>{@link TurkishTextColumnDescriptor}</td><td>any (Turkish collation)</td></tr>
+     *   <tr><td>any other (e.g. Arabic 1025, Greek 1032)</td><td>–</td><td>–</td>
      *       <td>{@link ReadOnlyColumnDescriptor}</td><td>index write-disabled</td></tr>
      * </table>
      * <p>
@@ -1412,12 +1414,12 @@ public class IndexData {
                 ColumnImpl.SortOrder sortOrder = col.getTextSortOrder();
                 if (ColumnImpl.GENERAL_SORT_ORDER.equals(sortOrder)) {
                     return new GenTextColumnDescriptor(col, flags);
-                }
-                if (ColumnImpl.GENERAL_LEGACY_SORT_ORDER.equals(sortOrder)) {
+                } else if (ColumnImpl.GENERAL_LEGACY_SORT_ORDER.equals(sortOrder)) {
                     return new GenLegTextColumnDescriptor(col, flags);
-                }
-                if (ColumnImpl.GENERAL_97_SORT_ORDER.equals(sortOrder)) {
+                } else if (ColumnImpl.GENERAL_97_SORT_ORDER.equals(sortOrder)) {
                     return new Gen97TextColumnDescriptor(col, flags);
+                } else if (ColumnImpl.TURKISH_SORT_ORDER.equals(sortOrder)) {
+                    return new TurkishTextColumnDescriptor(col, flags);
                 }
                 // unsupported sort order
                 setUnsupportedReason("unsupported collating sort order " + sortOrder + " for text index", col);
@@ -1808,6 +1810,51 @@ public class IndexData {
         @Override
         protected void writeNonNullValue(Object value, ByteStream bout) throws IOException {
             General97IndexCodes.GEN_97_INSTANCE.writeNonNullIndexTextValue(value, bout, isAscending());
+        }
+    }
+
+    /**
+     * {@link ColumnDescriptor} for text columns using the Turkish sort order (LCID 1055, version 0).
+     * <p>
+     * <strong>Implementation note – structural compatibility over semantic accuracy:</strong><br>
+     * MS Access stores index entries in a proprietary, order-preserving byte format that is specific to each
+     * collation. The exact byte tables for the Turkish collation have not yet been reverse-engineered.
+     * Using a standard JVM {@link java.text.Collator} key ({@code CollationKey.toByteArray()}) is
+     * <em>not</em> an option: the ICU/CLDR sort-key format is fundamentally different from the MS Access
+     * format, and index pages written with JVM keys would be unreadable by MS Access (corrupted index).
+     * <p>
+     * As a pragmatic interim solution this descriptor delegates to
+     * {@link GeneralLegacyIndexCodes#GEN_LEG_INSTANCE}, which produces structurally valid MS Access index
+     * bytes. The trade-off:
+     * <ul>
+     *   <li><b>Pro:</b> index pages are structurally correct and can be read by MS Access without errors.
+     *       A subsequent "Compact &amp; Repair" in MS Access will rebuild the index with proper Turkish
+     *       collation weights.</li>
+     *   <li><b>Con:</b> Turkish-specific collation rules (e.g. the dotted/dotless-i distinction:
+     *       {@code i} / {@code ı}, {@code İ} / {@code I}) are not honoured in the written index.
+     *       Index-based ORDER BY and range queries on Turkish text may therefore return results in
+     *       General-Legacy rather than Turkish order.</li>
+     * </ul>
+     * <p>
+     * Once the Turkish byte tables are available, this class should be replaced by a dedicated
+     * {@code TurkishIndexCodes} implementation that encodes entries with full Turkish collation semantics,
+     * analogous to {@link GeneralLegacyIndexCodes} for the General sort order.
+     *
+     * @see ColumnImpl#TURKISH_SORT_ORDER
+     * @see GeneralLegacyIndexCodes
+     * @see <a href="https://github.com/spannm/ucanaccess/issues/35">UCanAccess issue #35</a>
+     */
+    private static final class TurkishTextColumnDescriptor extends ColumnDescriptor {
+        private TurkishTextColumnDescriptor(ColumnImpl column, byte flags) {
+            super(column, flags);
+        }
+
+        @Override
+        protected void writeNonNullValue(Object value, ByteStream bout) throws IOException {
+            // Delegate to General-Legacy encoding to produce structurally valid MS Access index bytes.
+            // Turkish-specific collation weights (dotted/dotless-i etc.) are not yet supported.
+            // See class-level Javadoc for details and the path to a full implementation.
+            GeneralLegacyIndexCodes.GEN_LEG_INSTANCE.writeNonNullIndexTextValue(value, bout, isAscending());
         }
     }
 
