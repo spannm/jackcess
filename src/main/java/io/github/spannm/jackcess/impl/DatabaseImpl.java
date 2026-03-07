@@ -1022,7 +1022,25 @@ public class DatabaseImpl implements Database, DateTimeContext {
     }
 
     /**
-     * Read the system catalog
+     * Reads and initialises the system catalog ({@code MSysObjects}).
+     * <p>
+     * The system catalog is the root of all object metadata in an MS Access database. This method:
+     * <ol>
+     *   <li>Loads {@code MSysObjects} from its well-known page number.</li>
+     *   <li>Attempts to create an index-backed cursor on the {@code (ParentId, Name)} compound index for fast
+     *       object lookup. If the index is absent or unsupported (e.g. because the database uses a non-General
+     *       sort order such as Turkish / LCID 1055 and the index is therefore marked read-only by
+     *       {@link IndexData#setUnsupportedReason}), it falls back to a full table scan via
+     *       {@link FallbackTableFinder}.</li>
+     *   <li>Resolves {@link #mtableParentId} – the catalog row ID of the virtual "Tables" container object.
+     *       This ID is used by all subsequent table lookups and must not be {@code null}.</li>
+     * </ol>
+     * <p>
+     * The {@code ignoreSystemCatalogIndex} flag can force the fallback path unconditionally (e.g. for
+     * repair/recovery scenarios or when the database is opened with relaxed read options).
+     *
+     * @param ignoreSystemCatalogIndex if {@code true}, skip the index cursor attempt and use a table scan
+     * @throws IOException if the system catalog cannot be read or if {@link #mtableParentId} cannot be resolved
      */
     private void readSystemCatalog(boolean ignoreSystemCatalogIndex) throws IOException {
         msystemCatalog = loadTable(TABLE_SYSTEM_CATALOG, PAGE_SYSTEM_CATALOG, SYSTEM_OBJECT_FLAGS, TYPE_TABLE);
@@ -1913,7 +1931,16 @@ public class DatabaseImpl implements Database, DateTimeContext {
     }
 
     /**
-     * @return a string usable in the _tableLookup map.
+     * Converts a table or object name to the canonical upper-case key used in the internal table-lookup cache.
+     * <p>
+     * {@link Locale#ROOT} is used deliberately so that the result is locale-independent.  Using the JVM default
+     * locale would produce incorrect results when the JVM locale is Turkish (or Azerbaijani): in those locales
+     * {@link String#toUpperCase()} maps the dotless {@code i} ({@code \u0131}) and the dotted {@code I}
+     * ({@code \u0049}) differently from all other locales, which would cause table lookups to fail for names
+     * containing the letter 'i'.
+     *
+     * @param name the object name to normalise; may be {@code null}
+     * @return upper-case name suitable for use as a map key, or {@code null} if {@code name} is {@code null}
      */
     public static String toLookupName(String name) {
         return name != null ? name.toUpperCase() : null;

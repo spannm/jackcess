@@ -28,7 +28,50 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * Various constants used for creating "general legacy" (access 2000-2007) sort order text index entries.
+ * Encoding logic for MS Access "General Legacy" (Access 2000–2007) text index entries.
+ * <p>
+ * MS Access stores text index values in a proprietary, order-preserving byte format rather than using
+ * standard Unicode sort keys. This class implements that format for the "General Legacy" sort order
+ * (LCID 1033, version 0). {@link GeneralIndexCodes} (Access 2010+) and {@link General97IndexCodes}
+ * (Access 97) extend or mirror this class for their respective format variants.
+ *
+ * <h2>Byte-format overview</h2>
+ * Each character in the input string contributes zero or more bytes to up to four output sections,
+ * which are written sequentially:
+ * <ol>
+ *   <li><b>Inline bytes</b> – the primary sort key bytes for the character. Written immediately into
+ *       the main output stream. Most printable ASCII characters contribute exactly one byte here.</li>
+ *   <li>{@value #END_TEXT} (0x01) – a terminator byte written after all inline bytes.</li>
+ *   <li><b>Extra / international bytes</b> (optional) – diacritic / accent weights for characters
+ *       that have a base character plus a modifier. Each normal char contributes a placeholder byte
+ *       ({@link #INTERNATIONAL_EXTRA_PLACEHOLDER} = 0x02); each accented char contributes its accent
+ *       code. Written after the terminator if any accented characters were present.</li>
+ *   <li><b>Unprintable bytes</b> (optional) – position-encoded bytes for control characters and other
+ *       non-printable code points. Written after extra bytes if present.</li>
+ *   <li><b>Crazy codes</b> (optional) – additional flags for a small set of special characters that
+ *       affect sort order in complex ways. Written last.</li>
+ * </ol>
+ *
+ * <h2>Character handlers ({@link CharHandler})</h2>
+ * Each of the 65 536 BMP characters is mapped to a {@link CharHandler} instance that supplies the
+ * byte values for each of the four sections above. Handlers for code points U+0000–U+00FF are loaded
+ * from {@code index_codes_genleg.txt}; handlers for U+0100–U+FFFF from
+ * {@code index_codes_ext_genleg.txt}. Both files live in the Jackcess classpath resources under
+ * {@link DatabaseImpl#RESOURCE_PATH}.
+ *
+ * <h2>Relevance for non-General sort orders</h2>
+ * Any sort order other than the three General variants (LCID 1033) currently lacks a corresponding
+ * implementation in Jackcess.  Attempting to write an index on a text column with, for example,
+ * Turkish sort order (LCID 1055) will cause {@link IndexData#setUnsupportedReason} to be called and
+ * the index to become read-only.  Adding support for a new locale requires reverse-engineering the
+ * MS Access byte tables for that locale and providing a new {@code *IndexCodes} class plus a
+ * corresponding {@link IndexData.ColumnDescriptor} subclass — <em>not</em> using
+ * {@link java.text.Collator#getCollationKey}, whose byte format is JVM-internal and incompatible with
+ * the MS Access format.
+ *
+ * @see GeneralIndexCodes
+ * @see General97IndexCodes
+ * @see IndexData#newColumnDescriptor
  */
 @SuppressWarnings("PMD.FieldDeclarationsShouldBeAtStartOfClass")
 public class GeneralLegacyIndexCodes {
@@ -132,7 +175,19 @@ public class GeneralLegacyIndexCodes {
     }
 
     /**
-     * Base class for the handlers which hold the text index character encoding information.
+     * Holds the MS Access index byte-encoding information for a single Unicode character.
+     * <p>
+     * Each character in a text value to be indexed contributes bytes to up to four distinct sections of the
+     * index entry (see class-level documentation of {@link GeneralLegacyIndexCodes}):
+     * <ul>
+     *   <li>{@link #getInlineBytes(char)} – primary sort key, written immediately.</li>
+     *   <li>{@link #getExtraBytes()} / {@link #getExtraByteModifier()} – accent/diacritic weight, written
+     *       after {@link #END_TEXT}.</li>
+     *   <li>{@link #getUnprintableBytes()} – position-encoded bytes for control characters.</li>
+     *   <li>{@link #getCrazyFlag()} – special ordering flag for a small set of characters.</li>
+     * </ul>
+     * Concrete subclasses are created by the {@link Type} enum's {@code parseCodes} factory methods from the
+     * resource files ({@code index_codes_genleg.txt} / {@code index_codes_ext_genleg.txt}).
      */
     abstract static class CharHandler {
         public abstract Type getType();

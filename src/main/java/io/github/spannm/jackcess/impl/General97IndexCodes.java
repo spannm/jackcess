@@ -25,7 +25,21 @@ import java.io.UncheckedIOException;
 import java.nio.charset.StandardCharsets;
 
 /**
- * Various constants used for creating "general" (access 1997) sort order text index entries.
+ * Encoding logic for MS Access "General 97" text index entries (Access 97; LCID 1033, version −1).
+ * <p>
+ * Extends {@link GeneralLegacyIndexCodes} with Access-97-specific character tables and an additional
+ * mapping file for extended characters. The overall byte-format structure is shared with the legacy
+ * variant, but Access 97 uses a narrower set of extended character mappings rather than per-character
+ * extra-byte tables.
+ * <p>
+ * Character handlers are loaded lazily from:
+ * <ul>
+ *   <li>{@code index_codes_gen_97.txt} – U+0000 to U+00FF</li>
+ *   <li>{@code index_mappings_ext_gen_97.txt} – mapping table for U+0152 to U+2122</li>
+ * </ul>
+ *
+ * @see ColumnImpl#GENERAL_97_SORT_ORDER
+ * @see GeneralLegacyIndexCodes
  */
 @SuppressWarnings("PMD.FieldDeclarationsShouldBeAtStartOfClass")
 public class General97IndexCodes extends GeneralLegacyIndexCodes {

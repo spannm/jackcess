@@ -123,21 +123,27 @@ public class ColumnImpl implements Column, Comparable<ColumnImpl>, DateTimeConte
 
     static final byte                    NUMERIC_NEGATIVE_BYTE            = (byte) 0x80;
 
-    /** the value for the "general" sort order */
+    /** Windows LCID for the "General" English/default sort order used by all three General variants. */
     private static final short           GENERAL_SORT_ORDER_VALUE         = 1033;
 
     /**
-     * the "general" text sort order, version (access 1997)
+     * Sort order used by Access 97 databases (LCID 1033, version −1).
+     * <p>
+     * Index entries for this order are encoded by {@link General97IndexCodes}.
      */
     public static final SortOrder        GENERAL_97_SORT_ORDER            = new SortOrder(GENERAL_SORT_ORDER_VALUE, (short) -1);
 
     /**
-     * the "general" text sort order, legacy version (access 2000-2007)
+     * Sort order used by Access 2000–2007 databases (LCID 1033, version 0).
+     * <p>
+     * Index entries for this order are encoded by {@link GeneralLegacyIndexCodes}.
      */
     public static final SortOrder        GENERAL_LEGACY_SORT_ORDER        = new SortOrder(GENERAL_SORT_ORDER_VALUE, (short) 0);
 
     /**
-     * the "general" text sort order, latest version (access 2010+)
+     * Sort order used by Access 2010 and later databases (LCID 1033, version 1).
+     * <p>
+     * Index entries for this order are encoded by {@link GeneralIndexCodes}.
      */
     public static final SortOrder        GENERAL_SORT_ORDER               = new SortOrder(GENERAL_SORT_ORDER_VALUE, (short) 1);
 
@@ -1878,7 +1884,28 @@ public class ColumnImpl implements Column, Comparable<ColumnImpl>, DateTimeConte
     }
 
     /**
-     * Reads the sort order info from the given buffer from the given position.
+     * Reads the collating sort order for a text column from the table-definition buffer.
+     * <p>
+     * The sort order occupies 2 or 4 bytes at {@code position}, depending on {@link JetFormat#SIZE_SORT_ORDER}:
+     * <ul>
+     *   <li>2 bytes: a single {@code SHORT} containing the LCID. The version is taken from
+     *       {@link JetFormat#DEFAULT_SORT_ORDER}.</li>
+     *   <li>4 bytes: the LCID as a {@code SHORT} at {@code position}, one unknown byte at {@code position+2},
+     *       and the version byte at {@code position+3}.</li>
+     * </ul>
+     * If the raw LCID value is {@code 0} (written by older Jackcess versions before sort-order support was added)
+     * the format's default sort order is returned.
+     * <p>
+     * For LCID 1033 (General) the version byte is used to distinguish the three known variants and one of the
+     * public constants ({@link #GENERAL_97_SORT_ORDER}, {@link #GENERAL_LEGACY_SORT_ORDER},
+     * {@link #GENERAL_SORT_ORDER}) is returned. For all other LCID/version combinations a new {@link SortOrder}
+     * instance is returned; the caller (typically {@link IndexData#newColumnDescriptor}) is responsible for
+     * deciding whether that sort order is supported for index write operations.
+     *
+     * @param buffer   table definition buffer, positioned arbitrarily (absolute read)
+     * @param position byte offset of the sort-order field within {@code buffer}
+     * @param format   JetFormat of the database, providing {@code SIZE_SORT_ORDER} and {@code DEFAULT_SORT_ORDER}
+     * @return the sort order for the column; never {@code null}
      */
     static SortOrder readSortOrder(ByteBuffer buffer, int position, JetFormat format) {
         short value = buffer.getShort(position);
@@ -2314,7 +2341,35 @@ public class ColumnImpl implements Column, Comparable<ColumnImpl>, DateTimeConte
     }
 
     /**
-     * Information about the sort order (collation) for a textual column.
+     * Collation sort order stored per text column in an MS Access database file.
+     * <p>
+     * A sort order consists of two fields that are read directly from the column definition in the table-definition
+     * page:
+     * <ul>
+     *   <li><b>value</b> – the Windows Locale Identifier (LCID), e.g. {@code 1033} for English/General or
+     *       {@code 1055} for Turkish.  Stored as a {@code SHORT} at the column's sort-order offset.</li>
+     *   <li><b>version</b> – a sub-version byte that disambiguates multiple collation algorithms for the same LCID.
+     *       Present only in JetFormat databases where {@code SIZE_SORT_ORDER == 4}; otherwise the format's default
+     *       version is used.</li>
+     * </ul>
+     * <p>
+     * The three sort orders that Jackcess can fully encode for text indexes are:
+     * <table border="1">
+     *   <caption>Known Sort Order Constants</caption>
+     *   <tr><th>Constant</th><th>LCID (value)</th><th>version</th><th>Access releases</th></tr>
+     *   <tr><td>{@link #GENERAL_97_SORT_ORDER}</td><td>1033</td><td>−1</td><td>Access 97</td></tr>
+     *   <tr><td>{@link #GENERAL_LEGACY_SORT_ORDER}</td><td>1033</td><td>0</td><td>Access 2000–2007</td></tr>
+     *   <tr><td>{@link #GENERAL_SORT_ORDER}</td><td>1033</td><td>1</td><td>Access 2010+</td></tr>
+     * </table>
+     * Any other {@code SortOrder} (e.g. Turkish, LCID 1055) causes the backing {@link IndexData} to become
+     * read-only for write operations; see {@link IndexData#setUnsupportedReason}.
+     * <p>
+     * Sort orders are read via {@link ColumnImpl#readSortOrder} and written via
+     * {@link ColumnImpl#writeSortOrder} (private). They are compared using both fields so that,
+     * for example, {@code GENERAL_LEGACY_SORT_ORDER} (1033/0) and {@code GENERAL_SORT_ORDER} (1033/1) are
+     * treated as distinct collations.
+     *
+     * @see <a href="https://learn.microsoft.com/en-us/openspecs/office_file_formats/ms-accdt">MS-ACCDT: Access Database Template File Format</a>
      */
     public static final class SortOrder {
         private final short mvalue;

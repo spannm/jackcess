@@ -17,7 +17,21 @@
 package io.github.spannm.jackcess.impl;
 
 /**
- * Various constants used for creating "general" (access 2010+) sort order text index entries.
+ * Encoding logic for MS Access "General" (Access 2010+) text index entries.
+ * <p>
+ * Extends {@link GeneralLegacyIndexCodes} with updated character tables for Unicode code points that
+ * were assigned or reweighted in the Access 2010 release. The byte-format structure (inline bytes,
+ * extra bytes, unprintable bytes, crazy codes) is identical to the legacy variant; only the per-character
+ * code tables differ.
+ * <p>
+ * Character handlers are loaded lazily from:
+ * <ul>
+ *   <li>{@code index_codes_gen.txt} – U+0000 to U+00FF</li>
+ *   <li>{@code index_codes_ext_gen.txt} – U+0100 to U+FFFF</li>
+ * </ul>
+ *
+ * @see ColumnImpl#GENERAL_SORT_ORDER
+ * @see GeneralLegacyIndexCodes
  */
 @SuppressWarnings("PMD.FieldDeclarationsShouldBeAtStartOfClass")
 public class GeneralIndexCodes extends GeneralLegacyIndexCodes {

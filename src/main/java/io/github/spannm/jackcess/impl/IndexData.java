@@ -33,9 +33,45 @@ import java.nio.ByteOrder;
 import java.util.*;
 
 /**
- * Access table index data. This is the actual data which backs a logical Index, where one or more logical indexes can be backed by the same index data.
+ * Low-level representation of an MS Access table index.
+ * <p>
+ * This is the physical index data stored on disk, which may back one or more logical {@link io.github.spannm.jackcess.Index} objects
+ * (e.g. a unique index and a foreign-key reference can share the same underlying data pages).
+ *
+ * <h2>Index entry encoding</h2>
+ * Each row value that participates in an index is encoded into a compact, order-preserving byte sequence (an <em>index entry</em>).
+ * The encoding is type-specific and is handled by inner {@link ColumnDescriptor} subclasses:
+ * <ul>
+ *   <li>Numeric types (INT, LONG, FLOAT, …) use big-endian binary representations with sign-bit adjustment.</li>
+ *   <li>Text columns use a <em>collation sort order</em> (see {@link ColumnImpl.SortOrder}) to map characters to
+ *       locale-sensitive byte codes. Jackcess currently supports the following sort orders:
+ *       <ul>
+ *         <li>{@link ColumnImpl#GENERAL_SORT_ORDER} – "General" (Access 2010+, LCID 1033, version 1)</li>
+ *         <li>{@link ColumnImpl#GENERAL_LEGACY_SORT_ORDER} – "General Legacy" (Access 2000–2007, LCID 1033, version 0)</li>
+ *         <li>{@link ColumnImpl#GENERAL_97_SORT_ORDER} – "General" (Access 97, LCID 1033, version −1)</li>
+ *       </ul>
+ *       Any other sort order causes the index to be marked <em>read-only</em> via {@link #setUnsupportedReason}; write operations
+ *       will throw {@link UnsupportedOperationException}. This is the root cause of
+ *       <a href="https://github.com/spannm/ucanaccess/issues/35">UCanAccess issue #35</a> for Turkish databases
+ *       (SortOrder 1055).
+ *   </li>
+ * </ul>
+ *
+ * <h2>Ascending vs. descending columns</h2>
+ * For descending index columns all bytes written by a {@link ColumnDescriptor} are XOR-flipped (0xFF) after encoding,
+ * so that a byte-wise ascending comparison of the raw entry bytes still yields the correct descending order.
+ *
+ * <h2>Index page structure</h2>
+ * Index entries are stored in a B-tree of index data pages managed by {@link IndexPageCache}. Leaf pages hold the
+ * actual encoded entries together with their {@link RowIdImpl}; intermediate pages hold separator entries pointing
+ * to child pages. Pages are read lazily (on first access) and written back via {@link #update()}.
  *
  * @author Tim McCune
+ *
+ * @see ColumnImpl.SortOrder
+ * @see GeneralLegacyIndexCodes
+ * @see GeneralIndexCodes
+ * @see General97IndexCodes
  */
 public class IndexData {
 
@@ -322,11 +358,41 @@ public class IndexData {
         return _rootPageNumber;
     }
 
+    /**
+     * Marks this index as unsupported for write operations due to a feature that Jackcess cannot (yet) encode.
+     * <p>
+     * Once called, {@link #_unsupportedReason} is set to a non-{@code null} string and every subsequent call to
+     * {@link #update()} will throw an {@link UnsupportedOperationException}. The index remains fully readable.
+     * <p>
+     * Current cases that trigger this method:
+     * <ul>
+     *   <li>A text column with an unrecognised collating sort order (e.g. Turkish / LCID 1055) – see
+     *       {@link #newColumnDescriptor} and {@link ColumnImpl.SortOrder}.</li>
+     *   <li>A column whose data type has no supported index encoding (e.g. OLE, ATTACHMENT).</li>
+     * </ul>
+     * The message is logged at {@link java.lang.System.Logger.Level#WARNING} for user tables and
+     * {@link java.lang.System.Logger.Level#DEBUG} for system tables (where unsupported indexes are expected and
+     * harmless).
+     *
+     * @param reason human-readable description of why the index cannot be written; will be enriched with
+     *               database/table/index context via {@link #withErrorContext(String)}
+     * @param col    the column whose descriptor triggered the unsupported condition
+     */
     private void setUnsupportedReason(String reason, ColumnImpl col) {
         _unsupportedReason = withErrorContext(reason);
         LOGGER.log(col.getTable().isSystem() ? Level.DEBUG : Level.WARNING, "{0}, making read-only", _unsupportedReason);
     }
 
+    /**
+     * Returns the reason why write operations are disabled for this index, or {@code null} if the index is fully writable.
+     * <p>
+     * A non-{@code null} value means that {@link #setUnsupportedReason} was called during index initialisation
+     * because Jackcess cannot encode entries for at least one of the index columns. Callers (e.g.
+     * {@code DatabaseImpl.readSystemCatalog}) may inspect this value to decide whether to fall back to a table scan
+     * instead of using an index cursor.
+     *
+     * @return unsupported reason string, or {@code null} if the index is writable
+     */
     String getUnsupportedReason() {
         return _unsupportedReason;
     }
@@ -1304,7 +1370,40 @@ public class IndexData {
     }
 
     /**
-     * Constructs a ColumnDescriptor of the relevant type for the given Column.
+     * Constructs the appropriate {@link ColumnDescriptor} for the given column and index flags.
+     * <p>
+     * The descriptor is responsible for encoding a single column value into the byte sequence that forms part of an
+     * index entry. The concrete subclass is chosen based on the column's data type and, for text columns, on the
+     * column's {@link ColumnImpl.SortOrder collating sort order}.
+     * <p>
+     * <strong>Text column dispatch:</strong>
+     * <table border="1" summary="sort order to descriptor mapping">
+     *   <tr><th>SortOrder</th><th>LCID</th><th>Version</th><th>Descriptor</th><th>Access versions</th></tr>
+     *   <tr><td>{@link ColumnImpl#GENERAL_SORT_ORDER}</td><td>1033</td><td>1</td>
+     *       <td>{@link GenTextColumnDescriptor}</td><td>Access 2010+</td></tr>
+     *   <tr><td>{@link ColumnImpl#GENERAL_LEGACY_SORT_ORDER}</td><td>1033</td><td>0</td>
+     *       <td>{@link GenLegTextColumnDescriptor}</td><td>Access 2000–2007</td></tr>
+     *   <tr><td>{@link ColumnImpl#GENERAL_97_SORT_ORDER}</td><td>1033</td><td>-1</td>
+     *       <td>{@link Gen97TextColumnDescriptor}</td><td>Access 97</td></tr>
+     *   <tr><td>any other (e.g. Turkish 1055)</td><td>–</td><td>–</td>
+     *       <td>{@link ReadOnlyColumnDescriptor}</td><td>index write-disabled</td></tr>
+     * </table>
+     * <p>
+     * If the sort order is not recognised, {@link #setUnsupportedReason} is called and a
+     * {@link ReadOnlyColumnDescriptor} is returned; the index becomes read-only for the lifetime of this
+     * {@code IndexData} instance.
+     * <p>
+     * To add support for a new sort order (e.g. Turkish / LCID 1055):
+     * <ol>
+     *   <li>Add a public constant to {@link ColumnImpl} (e.g. {@code TURKISH_SORT_ORDER}).</li>
+     *   <li>Implement a new {@link ColumnDescriptor} subclass that encodes text values using MS Access's
+     *       proprietary byte format for that locale (see {@link GeneralLegacyIndexCodes} as a reference).</li>
+     *   <li>Add a corresponding {@code else if} branch in this method.</li>
+     * </ol>
+     *
+     * @param col   the table column for which to create the descriptor
+     * @param flags raw index column flags (e.g. {@link #ASCENDING_COLUMN_FLAG})
+     * @return a {@link ColumnDescriptor} that can encode values of the given column for index entries
      */
     private ColumnDescriptor newColumnDescriptor(ColumnImpl col, byte flags) {
         switch (col.getType()) {
@@ -1386,7 +1485,20 @@ public class IndexData {
     }
 
     /**
-     * Information about the columns in an index. Also encodes new index values.
+     * Encodes column values into the byte sequences that make up an index entry.
+     * <p>
+     * Each participating column in an index contributes one segment to the overall entry bytes.  The segment is
+     * written by {@link #writeValue}, which handles {@code null} uniformly and delegates non-null values to the
+     * type-specific {@link #writeNonNullValue} implementation.
+     * <p>
+     * <strong>Byte ordering invariant:</strong> the byte sequences produced must be order-preserving with respect
+     * to a simple unsigned byte-by-byte comparison (big-endian).  For <em>descending</em> columns
+     * ({@link #isAscending()} returns {@code false}) the caller is expected to flip all bytes by XOR 0xFF after
+     * the segment has been written, so that ascending byte comparison still yields descending logical order.
+     * Subclasses must therefore write bytes as if the column were ascending; the flip is applied externally.
+     * <p>
+     * Concrete subclasses exist for every supported data type and text sort order; see
+     * {@link IndexData#newColumnDescriptor} for the dispatch logic.
      */
     public abstract static class ColumnDescriptor implements Index.Column {
         private final ColumnImpl _column;
@@ -1425,6 +1537,17 @@ public class IndexData {
             return value == null;
         }
 
+        /**
+         * Encodes {@code value} into the output stream as one index column segment.
+         * <p>
+         * If {@code value} is {@code null} a single null-flag byte is written (direction-sensitive). Otherwise, a
+         * start-flag byte is written first, followed by the type-specific encoding produced by
+         * {@link #writeNonNullValue}.
+         *
+         * @param value the column value to encode (may be {@code null})
+         * @param bout  the output stream that receives the encoded bytes
+         * @throws IOException if an I/O error occurs while writing
+         */
         protected final void writeValue(Object value, ByteStream bout) throws IOException {
             if (isNullValue(value)) {
                 // write null value
@@ -1438,6 +1561,22 @@ public class IndexData {
             writeNonNullValue(value, bout);
         }
 
+        /**
+         * Encodes a non-{@code null} column value into the output stream.
+         * <p>
+         * Implementations must produce a byte sequence that is order-preserving under unsigned byte-by-byte
+         * comparison in ascending order.  The leading start-flag and any null handling are already taken care of
+         * by {@link #writeValue}; this method only needs to write the value payload.
+         * <p>
+         * For text columns the encoding must match the MS Access proprietary collation byte format exactly so that
+         * entries written by Jackcess and entries written by Access are mutually compatible. Using a standard JVM
+         * {@link java.text.Collator} key ({@code CollationKey.toByteArray()}) is <em>not</em> compatible with this
+         * format.
+         *
+         * @param value the column value to encode; guaranteed non-{@code null} by {@link #writeValue}
+         * @param bout  the output stream that receives the encoded bytes
+         * @throws IOException if an I/O error occurs while writing
+         */
         protected abstract void writeNonNullValue(Object value, ByteStream bout) throws IOException;
 
         @Override
@@ -1611,7 +1750,14 @@ public class IndexData {
     }
 
     /**
-     * ColumnDescriptor for "general legacy" sort order text based columns.
+     * {@link ColumnDescriptor} for text columns using the <em>General Legacy</em> sort order
+     * (Access 2000–2007; LCID 1033, version 0).
+     * <p>
+     * Encoding is delegated to {@link GeneralLegacyIndexCodes}, which uses pre-computed per-character byte tables
+     * loaded from resource files to produce the MS Access proprietary collation key format.
+     *
+     * @see ColumnImpl#GENERAL_LEGACY_SORT_ORDER
+     * @see GeneralLegacyIndexCodes
      */
     private static final class GenLegTextColumnDescriptor extends ColumnDescriptor {
         private GenLegTextColumnDescriptor(ColumnImpl column, byte flags) {
@@ -1625,7 +1771,14 @@ public class IndexData {
     }
 
     /**
-     * ColumnDescriptor for "general" sort order (2010+) text based columns.
+     * {@link ColumnDescriptor} for text columns using the <em>General</em> sort order
+     * (Access 2010+; LCID 1033, version 1).
+     * <p>
+     * Encoding is delegated to {@link GeneralIndexCodes}, which extends {@link GeneralLegacyIndexCodes} with an
+     * updated character table for the Unicode 5.2+ additions introduced in Access 2010.
+     *
+     * @see ColumnImpl#GENERAL_SORT_ORDER
+     * @see GeneralIndexCodes
      */
     private static final class GenTextColumnDescriptor extends ColumnDescriptor {
         private GenTextColumnDescriptor(ColumnImpl column, byte flags) {
@@ -1639,7 +1792,13 @@ public class IndexData {
     }
 
     /**
-     * ColumnDescriptor for "general 97" sort order text based columns.
+     * {@link ColumnDescriptor} for text columns using the <em>General 97</em> sort order
+     * (Access 97; LCID 1033, version −1).
+     * <p>
+     * Encoding is delegated to {@link General97IndexCodes}.
+     *
+     * @see ColumnImpl#GENERAL_97_SORT_ORDER
+     * @see General97IndexCodes
      */
     private static final class Gen97TextColumnDescriptor extends ColumnDescriptor {
         private Gen97TextColumnDescriptor(ColumnImpl column, byte flags) {
@@ -1717,7 +1876,15 @@ public class IndexData {
     }
 
     /**
-     * ColumnDescriptor for columns which we cannot currently write.
+     * Sentinel {@link ColumnDescriptor} used when Jackcess cannot encode values for a particular column in an index.
+     * <p>
+     * An instance of this class is installed by {@link #newColumnDescriptor} whenever a TEXT/MEMO column has an
+     * unrecognised collating sort order (e.g. Turkish / LCID 1055) or when a data type has no supported index
+     * encoding.  Reading the index continues to work normally; any attempt to <em>write</em> throws
+     * {@link UnsupportedOperationException}.
+     * <p>
+     * The containing {@code IndexData}'s {@link #_unsupportedReason} field is always set before this descriptor is
+     * created, so the exception message will include the specific reason and the database/table/index context.
      */
     private final class ReadOnlyColumnDescriptor extends ColumnDescriptor {
         private ReadOnlyColumnDescriptor(ColumnImpl column, byte flags) {
