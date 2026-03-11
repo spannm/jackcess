@@ -21,17 +21,30 @@ import io.github.spannm.jackcess.impl.PageChannel;
 import java.lang.reflect.Array;
 import java.nio.ByteBuffer;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.IdentityHashMap;
 import java.util.Map;
 import java.util.Optional;
-import java.util.WeakHashMap;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
  * Builder for {@link Object#toString()} methods.
  */
 public class ToStringBuilder {
-    /** Object registry for avoidance of cycles. */
-    private static final Map<Object, Object> OBJ_REGISTRY        = new WeakHashMap<>();
+    /**
+     * Thread-local registry for cycle detection during {@code appendInternal}.
+     * Using {@link ThreadLocal} ensures thread safety without synchronization:
+     * each thread gets its own independent {@link Set}, so concurrent calls to
+     * {@code toString()} on different threads cannot interfere with each other.
+     * <p>
+     * The set is backed by an {@link IdentityHashMap} so that membership checks
+     * use reference equality ({@code ==}) instead of {@code equals}/{@code hashCode}.
+     * This is required because {@code hashCode()} on a self-referencing collection
+     * (e.g. {@code list.add(list)}) would itself cause a {@link StackOverflowError}.
+     */
+    private static final ThreadLocal<Set<Object>> OBJ_REGISTRY =
+        ThreadLocal.withInitial(() -> Collections.newSetFromMap(new IdentityHashMap<>()));
 
     private final StringBuilder              buffer;
     private final Object                     object;
@@ -44,7 +57,7 @@ public class ToStringBuilder {
     private final String                     nullText;
     private final String                     implSuffix;
     private boolean                          useIdentityHashCode = true;
-    private final int                        maxByteDetailLen    = 20;
+    private static final int                 MAX_BYTE_DETAIL_LEN = 20;
 
     ToStringBuilder(Object _object, String _fieldSeparator, boolean _fieldSeparatorAtStart, String _fieldNameValueSeparator, String _contentEnd, boolean _useIdentityHashCode) {
         buffer = new StringBuilder(512);
@@ -94,8 +107,15 @@ public class ToStringBuilder {
         return this;
     }
 
+    /**
+     * Appends the field only if {@code value} is non-null; null values are silently skipped.
+     * Use {@link #append(String, Object)} if null should be rendered as {@code <null>}.
+     */
     public ToStringBuilder appendIgnoreNull(String fieldName, Object value) {
-        return append(fieldName, value == null ? "" : value);
+        if (value != null) {
+            append(fieldName, value);
+        }
+        return this;
     }
 
     @Override
@@ -111,19 +131,20 @@ public class ToStringBuilder {
 
     void appendInternal(StringBuilder _buffer, String _fieldName, Object _value) {
         boolean primitiveWrapper = _value instanceof Number || _value instanceof Boolean || _value instanceof Character;
-        if (OBJ_REGISTRY.containsKey(_value) && !primitiveWrapper) {
+        Set<Object> registry = OBJ_REGISTRY.get();
+        if (registry.contains(_value) && !primitiveWrapper) {
             _buffer.append(_value.getClass().getName()).append('@').append(Integer.toHexString(System.identityHashCode(_value)));
             return;
         }
 
-        OBJ_REGISTRY.put(_value, null); // register object
+        registry.add(_value); // register object
 
         try {
             if (_value instanceof byte[]) {
                 ByteBuffer bb = PageChannel.wrap((byte[]) _value);
                 int len = bb.remaining();
-                _buffer.append('(').append(len).append(") ").append(ByteUtil.toHexString(bb, bb.position(), Math.min(len, maxByteDetailLen)));
-                if (len > maxByteDetailLen) {
+                _buffer.append('(').append(len).append(") ").append(ByteUtil.toHexString(bb, bb.position(), Math.min(len, MAX_BYTE_DETAIL_LEN)));
+                if (len > MAX_BYTE_DETAIL_LEN) {
                     _buffer.append("...");
                 }
             } else if (_value.getClass().isArray()) {
@@ -150,7 +171,7 @@ public class ToStringBuilder {
                 _buffer.append(_value);
             }
         } finally {
-            OBJ_REGISTRY.remove(_value); // unregister object
+            registry.remove(_value); // unregister object
         }
     }
 
@@ -159,23 +180,19 @@ public class ToStringBuilder {
         if (nm.endsWith(_implSuffix)) {
             nm = nm.substring(0, nm.length() - _implSuffix.length());
         }
-        int idx = nm.lastIndexOf('.');
-        return idx >= 0 ? nm.substring(idx + 1) : nm;
+        return nm;
     }
 
     static void removeLastFieldSeparator(StringBuilder _buffer, String _fieldSeparator) {
         int len = _buffer.length();
         int sepLen = _fieldSeparator.length();
         if (len > 0 && sepLen > 0 && len >= sepLen) {
-            boolean match = true;
             for (int i = 0; i < sepLen; i++) {
                 if (_buffer.charAt(len - 1 - i) != _fieldSeparator.charAt(sepLen - 1 - i)) {
                     return;
                 }
             }
-            if (match) {
-                _buffer.setLength(len - sepLen);
-            }
+            _buffer.setLength(len - sepLen);
         }
     }
 
