@@ -100,7 +100,7 @@ public class GeneralLegacyIndexCodes {
     static final byte           CRAZY_CODE_START                = (byte) 0x80;
     static final byte           CRAZY_CODE_1                    = (byte) 0x02;
     static final byte           CRAZY_CODE_2                    = (byte) 0x03;
-    static final byte[]         CRAZY_CODES_SUFFIX              = new byte[] {(byte) 0xFF, (byte) 0x02, (byte) 0x80, (byte) 0xFF, (byte) 0x80};
+    static final byte[]         CRAZY_CODES_SUFFIX              = {(byte) 0xFF, (byte) 0x02, (byte) 0x80, (byte) 0xFF, (byte) 0x80};
     static final byte           CRAZY_CODES_UNPRINT_SUFFIX      = (byte) 0xFF;
 
     // stash the codes in some resource files

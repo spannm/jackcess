@@ -441,7 +441,7 @@ class DatabaseTest extends AbstractBaseTest {
             assertEquals(new BigDecimal("-1"), row.get("col6"));
             assertEquals(BigDecimal.ONE, row.get("col7"));
 
-            Object[] tmpRow = new Object[] {"foo", BigDecimal.ONE, new BigDecimal(3), new BigDecimal("13"), new BigDecimal("-17"), BigDecimal.ZERO, new BigDecimal("8734")};
+            Object[] tmpRow = {"foo", BigDecimal.ONE, new BigDecimal(3), new BigDecimal("13"), new BigDecimal("-17"), BigDecimal.ZERO, new BigDecimal("8734")};
             t.addRow(tmpRow);
             t.reset();
 

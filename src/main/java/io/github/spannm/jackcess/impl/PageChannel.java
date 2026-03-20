@@ -38,7 +38,7 @@ public class PageChannel implements Channel, Flushable {
     /**
      * invalid page header, used when deallocating old pages. data pages generally have 4 interesting bytes at the beginning which we want to reset.
      */
-    private static final byte[]   INVALID_PAGE_BYTE_HEADER = new byte[] {
+    private static final byte[]   INVALID_PAGE_BYTE_HEADER = {
         PageTypes.INVALID,
         (byte) 0,
         (byte) 0,

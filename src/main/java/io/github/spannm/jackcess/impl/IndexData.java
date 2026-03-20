@@ -187,7 +187,7 @@ public class IndexData {
     /** Usage map of pages that this index owns */
     private UsageMap                       _ownedPages;
     /**
-     * <code>true</code> if the index entries have been initialized, <code>false</code> otherwise
+     * {@code true} if the index entries have been initialized, {@code false} otherwise
      */
     private boolean                        _initialized;
     /** modification count for the table, keeps cursors up-to-date */

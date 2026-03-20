@@ -28,7 +28,7 @@ import java.util.Arrays;
  */
 public final class ByteUtil {
 
-    private static final String[] HEX_CHARS           = new String[] {"0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "A", "B", "C", "D", "E", "F"};
+    private static final String[] HEX_CHARS           = {"0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "A", "B", "C", "D", "E", "F"};
 
     private static final int      NUM_BYTES_PER_BLOCK = 4;
     private static final int      NUM_BYTES_PER_LINE  = 24;

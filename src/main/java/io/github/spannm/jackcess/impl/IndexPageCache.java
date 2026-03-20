@@ -1042,9 +1042,6 @@ public class IndexPageCache {
         public int           _totalEntrySize;
         public boolean       _modified;
 
-        private DataPageExtra() {
-        }
-
         public void setEntryView(DataPageMain main) throws IOException {
             _entryView = new EntryListView(main, this);
         }

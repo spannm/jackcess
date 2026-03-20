@@ -56,9 +56,6 @@ public class CompoundOleUtil implements CompoundPackageFactory {
         POIFSFileSystem.class.getName();
     }
 
-    public CompoundOleUtil() {
-    }
-
     /**
      * Creates a nes CompoundContent for the given blob information.
      */

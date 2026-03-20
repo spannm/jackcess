@@ -29,9 +29,6 @@ public class RandomContext {
     // default to the value access uses for "last val" when none has been returned yet
     private float                lastVal = 1.953125E-02f;
 
-    public RandomContext() {
-    }
-
     public float getRandom(Integer _seed) {
 
         if (_seed == null) {
@@ -119,8 +116,6 @@ public class RandomContext {
     }
 
     private class LastValSource extends Source {
-        private LastValSource() {
-        }
 
         @Override
         protected float getImpl() {

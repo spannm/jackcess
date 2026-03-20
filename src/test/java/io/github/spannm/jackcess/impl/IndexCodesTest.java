@@ -183,7 +183,7 @@ public class IndexCodesTest extends AbstractBaseTest {
             char c13 = (char) 0x005F; // _ (long inline)
             char c14 = (char) 0xFFFE; // removed
 
-            char[] cs = new char[] {
+            char[] cs = {
                 c7,
                 c8,
                 c3,

@@ -84,7 +84,7 @@ public class ExportUtil {
      * @param db Database the table to export belongs to
      * @param dir The directory where the new files will be created
      * @param ext The file extension of the new files
-     * @param header If <code>true</code> the first line contains the column names
+     * @param header If {@code true} the first line contains the column names
      *
      * @see #exportFile(Database,String,File,boolean,String,char,ExportFilter)
      * @see Builder
@@ -105,8 +105,8 @@ public class ExportUtil {
      * @param db Database the table to export belongs to
      * @param dir The directory where the new files will be created
      * @param ext The file extension of the new files
-     * @param header If <code>true</code> the first line contains the column names
-     * @param delim The column delimiter, <code>null</code> for default (comma)
+     * @param header If {@code true} the first line contains the column names
+     * @param delim The column delimiter, {@code null} for default (comma)
      * @param quote The quote character
      * @param filter valid export filter
      *
@@ -148,8 +148,8 @@ public class ExportUtil {
      * @param db Database the table to export belongs to
      * @param tableName Name of the table to export
      * @param f New file to create
-     * @param header If <code>true</code> the first line contains the column names
-     * @param delim The column delimiter, <code>null</code> for default (comma)
+     * @param header If {@code true} the first line contains the column names
+     * @param delim The column delimiter, {@code null} for default (comma)
      * @param quote The quote character
      * @param filter valid export filter
      *
@@ -190,8 +190,8 @@ public class ExportUtil {
      * @param db Database the table to export belongs to
      * @param tableName Name of the table to export
      * @param out Writer to export to
-     * @param header If <code>true</code> the first line contains the column names
-     * @param delim The column delimiter, <code>null</code> for default (comma)
+     * @param header If {@code true} the first line contains the column names
+     * @param delim The column delimiter, {@code null} for default (comma)
      * @param quote The quote character
      * @param filter valid export filter
      *
@@ -209,8 +209,8 @@ public class ExportUtil {
      *
      * @param cursor Cursor to export
      * @param out Writer to export to
-     * @param header If <code>true</code> the first line contains the column names
-     * @param delim The column delimiter, <code>null</code> for default (comma)
+     * @param header If {@code true} the first line contains the column names
+     * @param delim The column delimiter, {@code null} for default (comma)
      * @param quote The quote character
      * @param filter valid export filter
      *

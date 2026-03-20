@@ -28,9 +28,6 @@ import java.sql.Types;
  */
 public class SqlHelperImpl extends SqlHelper {
 
-    public SqlHelperImpl() {
-    }
-
     @Override
     public boolean isBlob(Object value) {
         return value instanceof Blob;

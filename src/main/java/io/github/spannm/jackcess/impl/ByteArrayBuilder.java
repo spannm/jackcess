@@ -29,9 +29,6 @@ public class ByteArrayBuilder {
     private int              _pos;
     private final List<Data> _data = new ArrayList<>();
 
-    public ByteArrayBuilder() {
-    }
-
     public int position() {
         return _pos;
     }

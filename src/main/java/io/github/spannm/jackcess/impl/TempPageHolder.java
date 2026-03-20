@@ -96,7 +96,7 @@ public final class TempPageHolder {
     }
 
     /**
-     * Forces any current page data to be disregarded (any <code>getPage</code>/<code>setPage</code> call must reload
+     * Forces any current page data to be disregarded (any {@code getPage}/{@code setPage} call must reload
      * page data). Does not necessarily release any memory.
      */
     public void invalidate() {
@@ -105,7 +105,7 @@ public final class TempPageHolder {
 
     /**
      * Forces any current page data to be disregarded if it matches the given page number (any
-     * <code>getPage</code>/<code>setPage</code> call must reload page data) and is not the given buffer. Does not
+     * {@code getPage}/{@code setPage} call must reload page data) and is not the given buffer. Does not
      * necessarily release any memory.
      */
     public void possiblyInvalidate(int modifiedPageNumber, ByteBuffer modifiedBuffer) {
@@ -120,7 +120,7 @@ public final class TempPageHolder {
     }
 
     /**
-     * Forces any current page data to be disregarded (any <code>getPage</code>/<code>setPage</code> call must reload
+     * Forces any current page data to be disregarded (any {@code getPage}/{@code setPage} call must reload
      * page data) and releases any referenced memory.
      */
     public void clear() {

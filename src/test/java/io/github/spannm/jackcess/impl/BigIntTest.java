@@ -52,7 +52,7 @@ class BigIntTest extends AbstractBaseTest {
                 .addIndex(newIndex("idx").withColumns("num1"))
                 .toTable(db);
 
-            long[] vals = new long[] {0L, -10L, 3844L, -45309590834L, 50392084913L, 65000L, -6489273L};
+            long[] vals = {0L, -10L, 3844L, -45309590834L, 50392084913L, 65000L, -6489273L};
 
             List<Map<String, Object>> expectedTable = new ArrayList<>();
 

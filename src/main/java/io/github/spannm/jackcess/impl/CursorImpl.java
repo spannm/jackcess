@@ -836,8 +836,6 @@ public abstract class CursorImpl implements Cursor {
      * Value object which maintains the current position of the cursor.
      */
     protected abstract static class PositionImpl implements Position {
-        protected PositionImpl() {
-        }
 
         @Override
         public final int hashCode() {

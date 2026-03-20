@@ -602,8 +602,6 @@ public abstract class QueryImpl implements Query {
     }
 
     protected abstract static class RowFilter {
-        protected RowFilter() {
-        }
 
         public List<Row> filter(List<Row> list) {
             list.removeIf(row -> !keep(row));

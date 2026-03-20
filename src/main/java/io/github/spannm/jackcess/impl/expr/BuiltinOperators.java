@@ -271,7 +271,7 @@ public class BuiltinOperators {
     }
 
     private static Value nonNullConcat(LocaleContext ctx, Value param1, Value param2) {
-        return toValue(param1.getAsString(ctx).concat(param2.getAsString(ctx)));
+        return toValue(param1.getAsString(ctx) + param2.getAsString(ctx));
     }
 
     public static Value not(LocaleContext ctx, Value param1) {

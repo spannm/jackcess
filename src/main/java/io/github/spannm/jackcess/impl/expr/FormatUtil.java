@@ -558,7 +558,7 @@ public class FormatUtil {
         // keep track of some extra state while parsing the format, whether or not
         // there was an am/pm pattern and whether or not there was a general
         // date/time pattern
-        boolean[] fmtState = new boolean[] {false, false};
+        boolean[] fmtState = {false, false};
         List<DateFormatBuilder> dfbs = new ArrayList<>();
 
         BUF_LOOP: while (buf.hasNext()) {

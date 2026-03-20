@@ -65,7 +65,7 @@ public class RowIdImpl implements RowId, Serializable {
     private final Type            _type;
 
     /**
-     * Creates a new <code>RowId</code> instance.
+     * Creates a new {@code RowId} instance.
      *
      */
     public RowIdImpl(int pageNumber, int rowNumber) {

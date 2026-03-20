@@ -1623,7 +1623,7 @@ public class ColumnImpl implements Column, Comparable<ColumnImpl>, DateTimeConte
     }
 
     /**
-     * @return an appropriate BigDecimal representation of the given object. <code>null</code> is returned as 0 and
+     * @return an appropriate BigDecimal representation of the given object. {@code null} is returned as 0 and
      *         Numbers are converted using their double representation.
      */
     BigDecimal toBigDecimal(Object value) {
@@ -1631,7 +1631,7 @@ public class ColumnImpl implements Column, Comparable<ColumnImpl>, DateTimeConte
     }
 
     /**
-     * @return an appropriate BigDecimal representation of the given object. <code>null</code> is returned as 0 and
+     * @return an appropriate BigDecimal representation of the given object. {@code null} is returned as 0 and
      *         Numbers are converted using their double representation.
      */
     static BigDecimal toBigDecimal(Object value, DatabaseImpl db) {
@@ -1655,7 +1655,7 @@ public class ColumnImpl implements Column, Comparable<ColumnImpl>, DateTimeConte
     }
 
     /**
-     * @return an appropriate Number representation of the given object. <code>null</code> is returned as 0 and Strings
+     * @return an appropriate Number representation of the given object. {@code null} is returned as 0 and Strings
      *         are parsed as Doubles.
      */
     private Number toNumber(Object value) {
@@ -1663,7 +1663,7 @@ public class ColumnImpl implements Column, Comparable<ColumnImpl>, DateTimeConte
     }
 
     /**
-     * @return an appropriate Number representation of the given object. <code>null</code> is returned as 0 and Strings
+     * @return an appropriate Number representation of the given object. {@code null} is returned as 0 and Strings
      *         are parsed as Doubles.
      */
     private static Number toNumber(Object value, DatabaseImpl db) {
@@ -2180,8 +2180,6 @@ public class ColumnImpl implements Column, Comparable<ColumnImpl>, DateTimeConte
     }
 
     private final class LongAutoNumberGenerator extends AutoNumberGenerator {
-        private LongAutoNumberGenerator() {
-        }
 
         @Override
         public Object getLast() {
@@ -2222,9 +2220,6 @@ public class ColumnImpl implements Column, Comparable<ColumnImpl>, DateTimeConte
     private final class GuidAutoNumberGenerator extends AutoNumberGenerator {
         private Object _lastAutoNumber;
 
-        private GuidAutoNumberGenerator() {
-        }
-
         @Override
         public Object getLast() {
             return _lastAutoNumber;
@@ -2255,8 +2250,6 @@ public class ColumnImpl implements Column, Comparable<ColumnImpl>, DateTimeConte
     }
 
     private final class ComplexTypeAutoNumberGenerator extends AutoNumberGenerator {
-        private ComplexTypeAutoNumberGenerator() {
-        }
 
         @Override
         public Object getLast() {
@@ -2480,9 +2473,6 @@ public class ColumnImpl implements Column, Comparable<ColumnImpl>, DateTimeConte
                 entry(1069, "Basque"),
                 entry(1027, "Catalan")
             );
-
-            private LcidNames() {
-            }
 
             private static Map.Entry<Short, String> entry(int lcid, String name) {
                 return Map.entry((short) lcid, name);

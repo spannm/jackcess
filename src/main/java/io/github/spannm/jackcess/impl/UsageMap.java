@@ -549,8 +549,6 @@ public class UsageMap {
      * should be called by PageChannel.
      */
     private class GlobalInlineHandler extends InlineHandler {
-        private GlobalInlineHandler() {
-        }
 
         @Override
         public boolean containsPageNumber(int pageNumber) {

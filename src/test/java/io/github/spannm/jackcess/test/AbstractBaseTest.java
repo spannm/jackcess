@@ -151,7 +151,7 @@ public abstract class AbstractBaseTest extends Assertions {
         AUTO_SYNC.set(autoSync);
     }
 
-    public static <T> List<T> toList(Iterable<T> iterable) {
+    public static <T> List<T> toList(Iterable<? extends T> iterable) {
         return StreamSupport.stream(iterable.spliterator(), false).collect(Collectors.toList());
     }
 

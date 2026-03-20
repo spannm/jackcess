@@ -27,9 +27,6 @@ public class SimpleExportFilter implements ExportFilter {
 
     public static final SimpleExportFilter INSTANCE = new SimpleExportFilter();
 
-    public SimpleExportFilter() {
-    }
-
     @Override
     public List<Column> filterColumns(List<Column> columns) {
         return columns;

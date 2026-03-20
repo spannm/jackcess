@@ -49,7 +49,7 @@ public class DatabaseImpl implements Database, DateTimeContext {
     /**
      * this is the default "userId" used if we cannot find existing info. this seems to be some standard "Admin" userId for access files
      */
-    private static final byte[]                             SYS_DEFAULT_SID       = new byte[] {(byte) 0xA6, (byte) 0x33};
+    private static final byte[]                             SYS_DEFAULT_SID       = {(byte) 0xA6, (byte) 0x33};
 
     /**
      * the default value for the resource path used to load classpath resources.

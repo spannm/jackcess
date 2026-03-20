@@ -73,10 +73,10 @@ public abstract class JetFormat {
     /** amount of initial data to be read to determine database type */
     private static final int    HEADER_LENGTH       = 21;
 
-    private static final byte[] MSISAM_ENGINE       = new byte[] {'M', 'S', 'I', 'S', 'A', 'M', ' ', 'D', 'a', 't', 'a', 'b', 'a', 's', 'e'};
+    private static final byte[] MSISAM_ENGINE       = {'M', 'S', 'I', 'S', 'A', 'M', ' ', 'D', 'a', 't', 'a', 'b', 'a', 's', 'e'};
 
     /** mask used to obfuscate the db header */
-    private static final byte[] BASE_HEADER_MASK    = new byte[] {
+    private static final byte[] BASE_HEADER_MASK    = {
         (byte) 0xB5, (byte) 0x6F, (byte) 0x03, (byte) 0x62, (byte) 0x61, (byte) 0x08, (byte) 0xC2, (byte) 0x55, (byte) 0xEB,
         (byte) 0xA9, (byte) 0x67, (byte) 0x72, (byte) 0x43, (byte) 0x3F, (byte) 0x00, (byte) 0x9C, (byte) 0x7A, (byte) 0x9F,
         (byte) 0x90, (byte) 0xFF, (byte) 0x80, (byte) 0x9A, (byte) 0x31, (byte) 0xC5, (byte) 0x79, (byte) 0xBA, (byte) 0xED,

@@ -39,16 +39,16 @@ public class UsageMapTest extends AbstractBaseTest {
         int expectedFirstPage;
         int expectedLastPage;
         FileFormat expectedFileFormat = testDB.getExpectedFileFormat();
-        if (FileFormat.V2000.equals(expectedFileFormat)) {
+        if (FileFormat.V2000 == expectedFileFormat) {
             expectedFirstPage = 743;
             expectedLastPage = 767;
-        } else if (FileFormat.V2003.equals(expectedFileFormat)) {
+        } else if (FileFormat.V2003 == expectedFileFormat) {
             expectedFirstPage = 16;
             expectedLastPage = 799;
-        } else if (FileFormat.V2007.equals(expectedFileFormat)) {
+        } else if (FileFormat.V2007 == expectedFileFormat) {
             expectedFirstPage = 94;
             expectedLastPage = 511;
-        } else if (FileFormat.V2010.equals(expectedFileFormat)) {
+        } else if (FileFormat.V2010 == expectedFileFormat) {
             expectedFirstPage = 109;
             expectedLastPage = 511;
         } else {

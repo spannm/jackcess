@@ -344,10 +344,10 @@ public class TableImpl implements Table, PropertyMaps.Owner {
      * Returns the <i>approximate</i> number of database pages owned by this table and all related indexes (this number
      * does <i>not</i> take into account pages used for large OLE/MEMO fields).
      * <p>
-     * To calculate the approximate number of bytes owned by a table: <code>
+     * To calculate the approximate number of bytes owned by a table: {@code
      * int approxTableBytes = (table.getApproximateOwnedPageCount() *
      *                         table.getFormat().PAGE_SIZE);
-     * </code>
+     * }
      */
     public int getApproximateOwnedPageCount() {
 

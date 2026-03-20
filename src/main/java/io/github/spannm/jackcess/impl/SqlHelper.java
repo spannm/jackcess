@@ -30,9 +30,6 @@ public class SqlHelper {
 
     public static final SqlHelper INSTANCE = loadInstance();
 
-    public SqlHelper() {
-    }
-
     public boolean isBlob(Object value) {
         return false;
     }

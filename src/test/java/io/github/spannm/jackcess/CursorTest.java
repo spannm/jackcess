@@ -86,7 +86,7 @@ class CursorTest extends AbstractBaseTest {
 
     private static List<Map<String, Object>> createUnorderedTestTableData() {
         List<Map<String, Object>> expectedRows = new ArrayList<>();
-        int[] ids = new int[] {3, 7, 6, 1, 2, 9, 0, 5, 4, 8};
+        int[] ids = {3, 7, 6, 1, 2, 9, 0, 5, 4, 8};
         for (int i : ids) {
             expectedRows.add(createExpectedRow("id", i, "value", "data" + i));
         }
@@ -108,7 +108,7 @@ class CursorTest extends AbstractBaseTest {
     private static List<Map<String, Object>> createDupeTestTableData() {
         List<Map<String, Object>> expectedRows =
             new ArrayList<>();
-        int[] ids = new int[] {3, 7, 6, 1, 2, 9, 0, 5, 4, 8};
+        int[] ids = {3, 7, 6, 1, 2, 9, 0, 5, 4, 8};
         for (int i : ids) {
             expectedRows.add(createExpectedRow("id", i, "value", "data" + i % 3));
         }

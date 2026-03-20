@@ -28,9 +28,6 @@ public class SimpleImportFilter implements ImportFilter {
 
     public static final SimpleImportFilter INSTANCE = new SimpleImportFilter();
 
-    public SimpleImportFilter() {
-    }
-
     @Override
     public List<ColumnBuilder> filterColumns(List<ColumnBuilder> destColumns, ResultSetMetaData srcColumns) {
         return destColumns;
