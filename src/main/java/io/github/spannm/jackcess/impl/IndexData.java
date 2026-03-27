@@ -49,11 +49,13 @@ import java.util.*;
  *         <li>{@link ColumnImpl#GENERAL_SORT_ORDER} – "General" (Access 2010+, LCID 1033, version 1)</li>
  *         <li>{@link ColumnImpl#GENERAL_LEGACY_SORT_ORDER} – "General Legacy" (Access 2000–2007, LCID 1033, version 0)</li>
  *         <li>{@link ColumnImpl#GENERAL_97_SORT_ORDER} – "General" (Access 97, LCID 1033, version −1)</li>
+ *         <li>{@link ColumnImpl#RUSSIAN_SORT_ORDER} – Russian/Cyrillic (LCID 1049, version 0)</li>
+ *         <li>{@link ColumnImpl#TURKISH_SORT_ORDER} – Turkish (LCID 1055, version 0)</li>
  *       </ul>
  *       Any other sort order causes the index to be marked <em>read-only</em> via {@link #setUnsupportedReason}; write operations
  *       will throw {@link UnsupportedOperationException}. This is the root cause of
- *       <a href="https://github.com/spannm/ucanaccess/issues/35">UCanAccess issue #35</a> for Turkish databases
- *       (SortOrder 1055).
+ *       <a href="https://github.com/spannm/ucanaccess/issues/35">UCanAccess issue #35</a> for databases with unsupported collations
+ *       (e.g. Turkish LCID 1055, Russian LCID 1049).
  *   </li>
  * </ul>
  *
@@ -1385,6 +1387,8 @@ public class IndexData {
      *       <td>{@link GenLegTextColumnDescriptor}</td><td>Access 2000–2007</td></tr>
      *   <tr><td>{@link ColumnImpl#GENERAL_97_SORT_ORDER}</td><td>1033</td><td>-1</td>
      *       <td>{@link Gen97TextColumnDescriptor}</td><td>Access 97</td></tr>
+     *   <tr><td>{@link ColumnImpl#RUSSIAN_SORT_ORDER}</td><td>1049</td><td>0</td>
+     *       <td>{@link RussianTextColumnDescriptor}</td><td>any (Russian/Cyrillic collation)</td></tr>
      *   <tr><td>{@link ColumnImpl#TURKISH_SORT_ORDER}</td><td>1055</td><td>0</td>
      *       <td>{@link TurkishTextColumnDescriptor}</td><td>any (Turkish collation)</td></tr>
      *   <tr><td>any other (e.g. Arabic 1025, Greek 1032)</td><td>–</td><td>–</td>
@@ -1418,6 +1422,8 @@ public class IndexData {
                     return new GenLegTextColumnDescriptor(col, flags);
                 } else if (ColumnImpl.GENERAL_97_SORT_ORDER.equals(sortOrder)) {
                     return new Gen97TextColumnDescriptor(col, flags);
+                } else if (ColumnImpl.RUSSIAN_SORT_ORDER.equals(sortOrder)) {
+                    return new RussianTextColumnDescriptor(col, flags);
                 } else if (ColumnImpl.TURKISH_SORT_ORDER.equals(sortOrder)) {
                     return new TurkishTextColumnDescriptor(col, flags);
                 }
@@ -1853,6 +1859,49 @@ public class IndexData {
         protected void writeNonNullValue(Object value, ByteStream bout) throws IOException {
             // Delegate to General-Legacy encoding to produce structurally valid MS Access index bytes.
             // Turkish-specific collation weights (dotted/dotless-i etc.) are not yet supported.
+            // See class-level Javadoc for details and the path to a full implementation.
+            GeneralLegacyIndexCodes.GEN_LEG_INSTANCE.writeNonNullIndexTextValue(value, bout, isAscending());
+        }
+    }
+
+    /**
+     * {@link ColumnDescriptor} for text columns using the Russian/Cyrillic sort order (LCID 1049, version 0).
+     * <p>
+     * <strong>Implementation note – structural compatibility over semantic accuracy:</strong><br>
+     * MS Access stores index entries in a proprietary, order-preserving byte format that is specific to each
+     * collation. The exact byte tables for the Russian collation have not yet been reverse-engineered.
+     * Using a standard JVM {@link java.text.Collator} key ({@code CollationKey.toByteArray()}) is
+     * <em>not</em> an option: the ICU/CLDR sort-key format is fundamentally different from the MS Access
+     * format, and index pages written with JVM keys would be unreadable by MS Access (corrupted index).
+     * <p>
+     * As a pragmatic interim solution this descriptor delegates to
+     * {@link GeneralLegacyIndexCodes#GEN_LEG_INSTANCE}, which produces structurally valid MS Access index
+     * bytes. The trade-off:
+     * <ul>
+     *   <li><b>Pro:</b> index pages are structurally correct and can be read by MS Access without errors.
+     *       A subsequent "Compact &amp; Repair" in MS Access will rebuild the index with proper Russian
+     *       collation weights.</li>
+     *   <li><b>Con:</b> Russian/Cyrillic-specific collation rules are not honoured in the written index.
+     *       Index-based ORDER BY and range queries on Russian text may therefore return results in
+     *       General-Legacy rather than Russian order.</li>
+     * </ul>
+     * <p>
+     * Once the Russian byte tables are available, this class should be replaced by a dedicated
+     * {@code RussianIndexCodes} implementation that encodes entries with full Russian collation semantics,
+     * analogous to {@link GeneralLegacyIndexCodes} for the General sort order.
+     *
+     * @see ColumnImpl#RUSSIAN_SORT_ORDER
+     * @see GeneralLegacyIndexCodes
+     */
+    private static final class RussianTextColumnDescriptor extends ColumnDescriptor {
+        private RussianTextColumnDescriptor(ColumnImpl column, byte flags) {
+            super(column, flags);
+        }
+
+        @Override
+        protected void writeNonNullValue(Object value, ByteStream bout) throws IOException {
+            // Delegate to General-Legacy encoding to produce structurally valid MS Access index bytes.
+            // Russian/Cyrillic-specific collation weights are not yet supported.
             // See class-level Javadoc for details and the path to a full implementation.
             GeneralLegacyIndexCodes.GEN_LEG_INSTANCE.writeNonNullIndexTextValue(value, bout, isAscending());
         }
