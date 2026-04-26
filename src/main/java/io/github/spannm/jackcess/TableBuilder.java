@@ -225,6 +225,16 @@ public class TableBuilder {
         return new TableCreator((DatabaseImpl) db).createTable(this);
     }
 
+    @Override
+    public String toString() {
+        return new StringJoiner(", ", getClass().getSimpleName() + "[", "]")
+            .add("name=" + _name)
+            .add("columns=" + _columns)
+            .add("indexes=" + _indexes)
+            .add("props=" + _props)
+            .toString();
+    }
+
     /**
      * @return A table or column name escaped for Access
      */

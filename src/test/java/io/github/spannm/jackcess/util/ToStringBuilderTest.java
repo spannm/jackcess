@@ -26,7 +26,7 @@ import org.junit.jupiter.api.Test;
 
 import java.util.*;
 
-@DisplayName("ToStringBuilder")
+@SuppressWarnings("checkstyle:MethodName")
 class ToStringBuilderTest {
 
     // Helper types  (must be static top-level or static members of the

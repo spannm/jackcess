@@ -2032,7 +2032,7 @@ public class TableImpl implements Table, PropertyMaps.Owner {
 
                     int rowSize = rowData.remaining();
                     if (rowSize > getFormat().MAX_ROW_SIZE) {
-                        throw new InvalidValueException(withErrorContext("Row size " + rowSize + " is too large"));
+                        throw new InvalidValueException(withErrorContext("Row size " + rowSize + " is too large (" + getFormat().MAX_ROW_SIZE + ")"));
                     }
 
                     // get page with space
@@ -2264,7 +2264,7 @@ public class TableImpl implements Table, PropertyMaps.Owner {
             ByteBuffer newRowData = createRow(row, _writeRowBufferH.getPageBuffer(getPageChannel()), oldRowSize, keepRawVarValues);
 
             if (newRowData.limit() > getFormat().MAX_ROW_SIZE) {
-                throw new InvalidValueException(withErrorContext("Row size " + newRowData.limit() + " is too large"));
+                throw new InvalidValueException(withErrorContext("Row size " + newRowData.limit() + " is too large (" + getFormat().MAX_ROW_SIZE + ")"));
             }
 
             if (!_indexDatas.isEmpty()) {
@@ -2596,12 +2596,17 @@ public class TableImpl implements Table, PropertyMaps.Owner {
 
             buffer.putShort((short) eod); // EOD marker
 
-            // Now write out variable length offsets
-            // Offsets are stored in reverse order
-            for (int i = _maxVarColumnCount - 1; i >= 0; i--) {
-                buffer.putShort(varColumnOffsets[i]);
+            try {
+                // Now write out variable length offsets
+                // Offsets are stored in reverse order
+                for (int i = _maxVarColumnCount - 1; i >= 0; i--) {
+                    buffer.putShort(varColumnOffsets[i]);
+                }
+                buffer.putShort(_maxVarColumnCount); // Number of var length columns
+            } catch (BufferOverflowException _ex) {
+                // if the data is too big for the buffer, then we have gone over the max row size
+                throw new InvalidValueException(withErrorContext("Row size " + buffer.limit() + " is too large"));
             }
-            buffer.putShort(_maxVarColumnCount); // Number of var length columns
 
         } else {
 

@@ -22,6 +22,7 @@ import io.github.spannm.jackcess.impl.*;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.StringJoiner;
 
 /**
  * Builder style class for constructing a {@link Column}. See {@link TableBuilder} for example usage. Additionally, a
@@ -469,4 +470,21 @@ public class ColumnBuilder {
     private String withErrorContext(String msg) {
         return msg + "(Column=" + getName() + ")";
     }
+
+    @Override
+    public String toString() {
+        return new StringJoiner(", ", getClass().getSimpleName() + "[", "]")
+            .add("name=" + _name)
+            .add("type=" + _type)
+            .add("length=" + _length)
+            .add("precision=" + _precision)
+            .add("scale=" + _scale)
+            .add("autoNumber=" + _autoNumber)
+            .add("compressedUnicode=" + _compressedUnicode)
+            .add("calculated=" + _calculated)
+            .add("hyperlink=" + _hyperlink)
+            .add("props=" + _props)
+            .toString();
+    }
+
 }
