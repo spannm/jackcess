@@ -126,7 +126,11 @@ public class IndexPageCache {
     }
 
     /**
-     * Prepares any non-empty modified pages for writing as the second pass during a {@link #write} call. Updates entry prefixes, promotes/demotes tail pages, and splits pages as needed.
+     * Prepares any non-empty modified pages for writing as the second pass
+     * during a {@link #write} call. Updates entry prefixes, promotes/demotes
+     * tail pages, and splits pages as needed.
+     *
+     * @throws IOException if an error occurs during page access or validation
      */
     private void preparePagesForWriting() throws IOException {
         boolean splitPages = false;
@@ -153,7 +157,11 @@ public class IndexPageCache {
                         }
                     } else {
                         if (size > 1) {
-                            promoteTail(cacheDataPage);
+                            // only a leaf page can become a tail page
+                            DataPageMain lastChild = dpMain.getChildPage(cacheDataPage._extra._entryView.getLast());
+                            if (lastChild._leaf) {
+                                promoteTail(cacheDataPage, lastChild);
+                            }
                         }
                     }
                 }
@@ -757,17 +765,22 @@ public class IndexPageCache {
 
     /**
      * Makes the last normal entry of the given page the tail entry on that page, done when there are multiple entries on a page and no tail entry.
+     * <p>
+     * This is used during index updates to ensure that a non-leaf page is not
+     * accidentally treated as a tail page. It updates the parent references
+     * and ensures the page is correctly positioned in the internal cache.
      *
-     * @param cacheDataPage the page whose tail must be updated
+     * @param cachePage the cache data page being processed
+     * @param tailPage the main data page to be promoted
+     * @throws IOException if the promotion fails due to I/O errors
      */
-    private void promoteTail(CacheDataPage cacheDataPage) throws IOException {
+    private void promoteTail(CacheDataPage cacheDataPage, DataPageMain lastMain) throws IOException {
         // there's not tail currently on this page, make last entry a tail
         DataPageMain dpMain = cacheDataPage._main;
         DataPageExtra dpExtra = cacheDataPage._extra;
 
         setModified(cacheDataPage);
 
-        DataPageMain lastMain = dpMain.getChildPage(dpExtra._entryView.getLast());
         CacheDataPage lastDataPage = new CacheDataPage(lastMain);
 
         // move the "last" normal entry to the tail entry
