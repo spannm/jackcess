@@ -170,6 +170,17 @@ public class ColumnImpl implements Column, Comparable<ColumnImpl>, DateTimeConte
     public static final SortOrder        TURKISH_SORT_ORDER               = new SortOrder((short) 1055, 0);
 
     /**
+     * Sort order used by MS Access databases configured with the Ukrainian/Cyrillic collation (LCID 1058, version 0).
+     * <p>
+     * Index entries for this sort order are encoded by {@code IndexData.UkrainianTextColumnDescriptor}, which
+     * currently delegates to {@link GeneralLegacyIndexCodes} as a structurally compatible interim solution
+     * until the proprietary Ukrainian byte tables are reverse-engineered.
+     *
+     * @see IndexData
+     */
+    public static final SortOrder        UKRAINIAN_SORT_ORDER             = new SortOrder((short) 1058, 0);
+
+    /**
      * pattern matching textual guid strings (allows for optional surrounding '{' and '}')
      */
     private static final Pattern         GUID_PATTERN                     = Pattern
@@ -2375,14 +2386,15 @@ public class ColumnImpl implements Column, Comparable<ColumnImpl>, DateTimeConte
      *   <tr><td>{@link #GENERAL_97_SORT_ORDER}</td><td>1033</td><td>−1</td><td>Access 97</td></tr>
      *   <tr><td>{@link #GENERAL_LEGACY_SORT_ORDER}</td><td>1033</td><td>0</td><td>Access 2000–2007</td></tr>
      *   <tr><td>{@link #GENERAL_SORT_ORDER}</td><td>1033</td><td>1</td><td>Access 2010+</td></tr>
-     *   <tr><td>{@link #TURKISH_SORT_ORDER}</td><td>1055</td><td>0</td><td>Turkish (interim)</td></tr>
      *   <tr><td>{@link #RUSSIAN_SORT_ORDER}</td><td>1049</td><td>0</td><td>Russian (interim)</td></tr>
+     *   <tr><td>{@link #TURKISH_SORT_ORDER}</td><td>1055</td><td>0</td><td>Turkish (interim)</td></tr>
+     *   <tr><td>{@link #UKRAINIAN_SORT_ORDER}</td><td>1058</td><td>0</td><td>Ukrainian (interim)</td></tr>
      * </table>
-     * For the Turkish and Russian sort orders, the backing {@link IndexData} encodes text using a structurally
-     * compatible but semantically approximate format (via GeneralLegacyIndexCodes) until the proprietary byte
-     * tables are reverse-engineered; see {@link IndexData#setUnsupportedReason} and the respective descriptor
-     * Javadoc. Any other (unrecognized) {@code SortOrder} causes the backing {@link IndexData} to become
-     * read-only for write operations; see {@link IndexData#setUnsupportedReason}.
+     * For the Russian, Turkish, and Ukrainian sort orders, the backing {@link IndexData} encodes text using a
+     * structurally compatible but semantically approximate format (via GeneralLegacyIndexCodes) until the
+     * proprietary byte tables are reverse-engineered; see {@link IndexData#setUnsupportedReason} and the
+     * respective descriptor Javadoc. Any other (unrecognized) {@code SortOrder} causes the backing
+     * {@link IndexData} to become read-only for write operations; see {@link IndexData#setUnsupportedReason}.
      * <p>
      * Sort orders are read via {@link ColumnImpl#readSortOrder} and written via
      * {@link ColumnImpl#writeSortOrder} (private). They are compared using both fields so that,
