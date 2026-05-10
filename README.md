@@ -1,27 +1,15 @@
-<div style="text-align: center;">
-  <p>
-    <a href="https://central.sonatype.com/artifact/io.github.spannm/jackcess">
-      <img src="https://img.shields.io/maven-central/v/io.github.spannm/jackcess?label=Maven%20Central&style=flat-square" alt="Maven Central Version">
-    </a>
-    <img src="https://img.shields.io/maven-central/last-update/io.github.spannm/jackcess?label=Updated&style=flat-square&color=blue" alt="Maven Central Last Update">
-    <a href="https://github.com/spannm/jackcess/stargazers">
-      <img src="https://img.shields.io/github/stars/spannm/jackcess?logo=github&label=&logoColor=white&labelColor=555555&color=007ec6&style=flat-square" alt="GitHub Stars">
-    </a>
-    <br>
-    <a href="https://github.com/spannm/jackcess/actions/workflows/ci_jdk11_ubuntu.yml">
-      <img src="https://img.shields.io/github/actions/workflow/status/spannm/jackcess/ci_jdk11_ubuntu.yml?label=Build%20JDK%2011%20Linux&style=flat-square" alt="GitHub Actions Workflow Status">
-    </a>
-    <a href="https://github.com/spannm/jackcess/actions/workflows/ci_jdk11_win.yml">
-      <img src="https://img.shields.io/github/actions/workflow/status/spannm/jackcess/ci_jdk11_win.yml?label=Build%20JDK%2011%20Win&style=flat-square" alt="GitHub Actions Workflow Status">
-    </a>
-    <a href="https://javadoc.io/doc/io.github.spannm/jackcess">
-      <img src="https://javadoc.io/badge2/io.github.spannm/jackcess/javadoc.svg?label=Javadoc&style=flat-square" alt="Javadoc">
-    </a>
-  </p>
-
-  <h1>Welcome to Jackcess</h1>
-  <h3>The Pure Java API for Microsoft Access Databases</h3>
+<div align="center">
+  <a href="https://central.sonatype.com/artifact/io.github.spannm/jackcess"><img src="https://img.shields.io/maven-central/v/io.github.spannm/jackcess?label=Maven%20Central&style=flat-square" alt="Maven Central Version"></a>
+  <img src="https://img.shields.io/maven-central/last-update/io.github.spannm/jackcess?label=Updated&style=flat-square&color=blue" alt="Maven Central Last Update">
+  <a href="https://github.com/spannm/jackcess/stargazers"><img src="https://img.shields.io/github/stars/spannm/jackcess?logo=github&label=&logoColor=white&labelColor=555555&color=007ec6&style=flat-square" alt="GitHub Stars"></a>
+  <br>
+  <a href="https://github.com/spannm/jackcess/actions/workflows/ci_jdk11_ubuntu.yml"><img src="https://img.shields.io/github/actions/workflow/status/spannm/jackcess/ci_jdk11_ubuntu.yml?label=Build%20(JDK%2011%20Linux)&style=flat-square" alt="GitHub Actions Workflow Status"></a>
+  <a href="https://github.com/spannm/jackcess/actions/workflows/ci_jdk11_win.yml"><img src="https://img.shields.io/github/actions/workflow/status/spannm/jackcess/ci_jdk11_win.yml?label=Build%20(JDK%2011%20Win)&style=flat-square" alt="GitHub Actions Workflow Status"></a>
+  <a href="https://javadoc.io/doc/io.github.spannm/jackcess"><img src="https://javadoc.io/badge2/io.github.spannm/jackcess/javadoc.svg?style=flat-square" alt="Javadoc"></a>
 </div>
+
+<h1 align="center">Welcome to Jackcess</h1>
+<h3 align="center">The Pure Java API for Microsoft Access Databases</h3>
 
 **Jackcess** is an open-source Java library for reading from and writing to Microsoft Access databases (`.mdb` and `.accdb`).
 
