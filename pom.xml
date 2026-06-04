@@ -100,7 +100,7 @@
 
         <dep.poi.version>5.5.1</dep.poi.version>
 
-        <dep.slf4j.version>2.0.17</dep.slf4j.version>
+        <dep.slf4j.version>2.0.18</dep.slf4j.version>
 
         <!-- test dependencies -->
         <dep.junit.version>5.14.3</dep.junit.version>
