@@ -98,6 +98,8 @@
         <developerId>spannm</developerId>
         <githubBaseUrl>https://github.com/${developerId}/</githubBaseUrl>
 
+        <module.name>${project.groupId}.${project.artifactId}</module.name>
+
         <dep.poi.version>5.5.1</dep.poi.version>
 
         <dep.slf4j.version>2.0.18</dep.slf4j.version>
@@ -361,7 +363,7 @@
                             <addDefaultSpecificationEntries>false</addDefaultSpecificationEntries>
                             <addBuildEnvironmentEntries>true</addBuildEnvironmentEntries>
                         </manifest>
-                        <manifestEntries>
+                        <manifestEntries combine.children="append">
                             <Build-Time>${maven.build.timestamp}</Build-Time>
                             <Project-Java-Version>${project.build.targetJdk}</Project-Java-Version>
 
@@ -382,6 +384,8 @@
 
                             <Organization-Name>${project.organization.name}</Organization-Name>
                             <Organization-Url>${project.organization.url}</Organization-Url>
+
+                            <Automatic-Module-Name>${module.name}</Automatic-Module-Name>
                         </manifestEntries>
                     </archive>
                 </configuration>
