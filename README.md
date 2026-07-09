@@ -55,14 +55,14 @@ To use Jackcess in your project, add the following dependency.
 <dependency>
     <groupId>io.github.spannm</groupId>
     <artifactId>jackcess</artifactId>
-    <version>5.1.4</version>
+    <version>5.1.5</version>
 </dependency>
 ```
 
 ### Gradle (Groovy / `build.gradle`)
 
 ```groovy
-implementation 'io.github.spannm:jackcess:5.1.4'
+implementation 'io.github.spannm:jackcess:5.1.5'
 ```
 
 ## 🚦 Usage Example
