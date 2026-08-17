@@ -1077,7 +1077,7 @@ public class TableImpl implements Table, PropertyMaps.Owner {
             // update various bits of the table def
             ByteUtil.forward(tableBuffer, 29);
             tableBuffer.putShort((short) (_maxColumnCount + 1));
-            short varColCount = (short) (_varColumns.size() + (isVarCol ? 1 : 0));
+            short varColCount = (short) (_maxVarColumnCount + (isVarCol ? 1 : 0));
             tableBuffer.putShort(varColCount);
             tableBuffer.putShort((short) (_columns.size() + 1));
 
