@@ -40,7 +40,9 @@ import java.util.Random;
  * <p>
  * The primary features of this utility:
  * <ul>
- * <li>Supports custom behavior for non-mdb files and default behavior for mdb files, see {@link #loadCustomFile}</li>
+ * <li>Supports custom behavior for non-mdb files, see {@link #loadCustomFile}</li>
+ * <li>Standard Access database links are denied by default; trusted applications may explicitly delegate to
+ * {@link LinkResolver#UNRESTRICTED}</li>
  * <li>Temp db can be an actual file or entirely in memory</li>
  * <li>Linked tables are loaded on-demand, see {@link #loadCustomTable}</li>
  * <li>Temp db files will be automatically deleted on close</li>
@@ -112,13 +114,17 @@ public abstract class CustomLinkResolver implements LinkResolver {
      *         getDefaultTempDirectory());
      * }
      *
-     * // not a custmom file, load using the default behavior
+     * // not a custom file, load using the default behavior
      * return LinkResolver.DEFAULT.resolveLinkedDatabase(linkerDb, linkeeFileName);
      * </pre>
+     * The fallback behavior denies automatic linked database resolution. The {@link #loadCustomFile} implementation is
+     * application-provided and is responsible for validating its own input. Override this method and explicitly
+     * delegate to {@link LinkResolver#UNRESTRICTED} only when linked database paths come from a trusted source.
      *
      * @see #loadCustomFile
      * @see #createTempDb
      * @see LinkResolver#DEFAULT
+     * @see LinkResolver#UNRESTRICTED
      */
     @Override
     public Database resolveLinkedDatabase(Database linkerDb, String linkeeFileName) throws IOException {

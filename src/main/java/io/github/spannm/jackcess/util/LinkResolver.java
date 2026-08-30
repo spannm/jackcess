@@ -22,6 +22,7 @@ import io.github.spannm.jackcess.impl.DatabaseImpl;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.AccessDeniedException;
 
 /**
  * Resolver for linked databases.
@@ -29,14 +30,29 @@ import java.io.IOException;
 @FunctionalInterface
 public interface LinkResolver {
     /**
-     * default link resolver used if none provided
+     * Unrestricted link resolver which opens any linked database path.
+     * <p>
+     * This resolver preserves the historical behavior of {@link #DEFAULT}, including automatic access to network
+     * paths. It should only be used when linked database paths come from a trusted source.
      */
-    LinkResolver DEFAULT = (linkerDb, linkeeFileName) -> {
+    LinkResolver UNRESTRICTED = (linkerDb, linkeeFileName) -> {
         // if linker is read-only, open linkee read-only
         boolean readOnly = linkerDb instanceof DatabaseImpl && ((DatabaseImpl) linkerDb).isReadOnly();
         return new DatabaseBuilder()
             .withFile(new File(linkeeFileName))
             .withReadOnly(readOnly).open();
+    };
+
+    /**
+     * Default link resolver used if none is provided.
+     * <p>
+     * Automatic linked database resolution is disabled to prevent an untrusted database from initiating a network
+     * connection or opening an arbitrary local database. Applications which intentionally use trusted linked databases
+     * must explicitly configure {@link #UNRESTRICTED} or a custom resolver which enforces an application-specific
+     * policy.
+     */
+    LinkResolver DEFAULT = (linkerDb, linkeeFileName) -> {
+        throw new AccessDeniedException(linkeeFileName, null, "Automatic linked database resolution is disabled");
     };
 
     /**

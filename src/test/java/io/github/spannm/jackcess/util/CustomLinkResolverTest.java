@@ -23,8 +23,8 @@ import io.github.spannm.jackcess.test.TestUtil;
 import io.github.spannm.jackcess.test.source.FileFormatSource;
 import org.junit.jupiter.params.ParameterizedTest;
 
-import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.nio.file.AccessDeniedException;
 import java.nio.file.Path;
 
 class CustomLinkResolverTest extends AbstractBaseTest {
@@ -62,7 +62,7 @@ class CustomLinkResolverTest extends AbstractBaseTest {
 
             assertNull(db.getTable("Table4"));
 
-            assertThrows(FileNotFoundException.class, () -> db.getTable("Table3"));
+            assertThrows(AccessDeniedException.class, () -> db.getTable("Table3"));
         }
     }
 

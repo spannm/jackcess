@@ -27,8 +27,8 @@ import io.github.spannm.jackcess.test.source.TestDbSource;
 import org.junit.jupiter.params.ParameterizedTest;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.nio.file.AccessDeniedException;
 import java.util.List;
 import java.util.Map;
 
@@ -39,7 +39,7 @@ class LinkedTableTest extends AbstractBaseTest {
     void testLinkedTables(TestDb testDb) throws IOException {
 
         try (Database db = testDb.openCopy()) {
-            assertThrows(FileNotFoundException.class, () -> db.getTable("Table2"));
+            assertThrows(AccessDeniedException.class, () -> db.getTable("Table2"));
 
             TableMetaData tmd = db.getTableMetaData("Table2");
             assertEquals("Table2", tmd.getName());

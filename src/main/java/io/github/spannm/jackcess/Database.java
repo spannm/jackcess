@@ -289,7 +289,8 @@ public interface Database extends Iterable<Table>, Closeable, Flushable {
     LinkResolver getLinkResolver();
 
     /**
-     * Sets a new LinkResolver. If {@code null}, resets to the {@link LinkResolver#DEFAULT}.
+     * Sets a new LinkResolver. If {@code null}, resets to the {@link LinkResolver#DEFAULT}, which disables automatic
+     * linked database resolution. Use {@link LinkResolver#UNRESTRICTED} only for trusted linked database paths.
      */
     void setLinkResolver(LinkResolver newLinkResolver);
 
