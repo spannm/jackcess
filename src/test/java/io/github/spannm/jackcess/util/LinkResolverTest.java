@@ -46,6 +46,7 @@ class LinkResolverTest extends AbstractBaseTest {
                 () -> LinkResolver.DEFAULT.resolveLinkedDatabase(linkerDb, linkedDbName));
 
             assertEquals(linkedDbName, ex.getFile());
+            assertTrue(ex.getReason().contains("LinkResolver.UNRESTRICTED"));
         }
     }
 

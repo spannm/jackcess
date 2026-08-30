@@ -30,10 +30,10 @@ import java.nio.file.AccessDeniedException;
 @FunctionalInterface
 public interface LinkResolver {
     /**
-     * Unrestricted link resolver which opens any linked database path.
+     * Legacy unrestricted link resolver.
      * <p>
-     * This resolver preserves the historical behavior of {@link #DEFAULT}, including automatic access to network
-     * paths. It should only be used when linked database paths come from a trusted source.
+     * <strong>Security warning:</strong> This resolver opens paths obtained directly from the database file, including
+     * UNC/network paths and arbitrary local paths. Do not use this resolver for untrusted database files.
      */
     LinkResolver UNRESTRICTED = (linkerDb, linkeeFileName) -> {
         // if linker is read-only, open linkee read-only
@@ -52,7 +52,9 @@ public interface LinkResolver {
      * policy.
      */
     LinkResolver DEFAULT = (linkerDb, linkeeFileName) -> {
-        throw new AccessDeniedException(linkeeFileName, null, "Automatic linked database resolution is disabled");
+        throw new AccessDeniedException(linkeeFileName, null,
+            "Automatic linked database resolution is disabled. Configure LinkResolver.UNRESTRICTED for trusted "
+                + "databases or provide a custom LinkResolver.");
     };
 
     /**
