@@ -31,17 +31,17 @@ public class MakeTableQueryImpl extends BaseSelectQueryImpl implements MakeTable
 
     @Override
     public String getTargetTable() {
-        return getTypeRow()._name1;
+        return getTypeRow().name1;
     }
 
     @Override
     public String getRemoteDbPath() {
-        return getTypeRow()._name2;
+        return getTypeRow().name2;
     }
 
     @Override
     public String getRemoteDbType() {
-        return getTypeRow()._expression;
+        return getTypeRow().expression;
     }
 
     @Override

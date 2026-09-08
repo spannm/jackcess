@@ -21,18 +21,18 @@ import io.github.spannm.jackcess.expr.Identifier;
 import io.github.spannm.jackcess.expr.Value;
 
 public abstract class RowEvalContext extends BaseEvalContext {
-    private Object[] _row;
+    private Object[] row;
 
     public RowEvalContext(DatabaseImpl db) {
         super(db.getEvalContext());
     }
 
     protected void setRow(Object[] row) {
-        _row = row;
+        this.row = row;
     }
 
     protected void reset() {
-        _row = null;
+        row = null;
     }
 
     @Override
@@ -48,7 +48,7 @@ public abstract class RowEvalContext extends BaseEvalContext {
 
         ColumnImpl col = table.getColumn(identifier.getObjectName());
 
-        Object val = col.getRowValue(_row);
+        Object val = col.getRowValue(row);
 
         return toValue(val, col.getType());
     }

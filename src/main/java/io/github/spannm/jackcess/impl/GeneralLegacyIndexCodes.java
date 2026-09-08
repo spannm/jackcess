@@ -161,14 +161,14 @@ public class GeneralLegacyIndexCodes {
             }
         };
 
-        private final String _prefixCode;
+        private final String prefixCode;
 
         Type(String prefixCode) {
-            _prefixCode = prefixCode;
+            this.prefixCode = prefixCode;
         }
 
         public String getPrefixCode() {
-            return _prefixCode;
+            return prefixCode;
         }
 
         public abstract CharHandler parseCodes(String[] codeStrings);
@@ -221,10 +221,10 @@ public class GeneralLegacyIndexCodes {
      * CharHandler for Type.SIMPLE
      */
     private static final class SimpleCharHandler extends CharHandler {
-        private final byte[] _bytes;
+        private final byte[] bytes;
 
         private SimpleCharHandler(byte[] bytes) {
-            _bytes = bytes;
+            this.bytes = bytes;
         }
 
         @Override
@@ -234,7 +234,7 @@ public class GeneralLegacyIndexCodes {
 
         @Override
         public byte[] getInlineBytes(char c) {
-            return _bytes;
+            return bytes;
         }
     }
 
@@ -242,12 +242,12 @@ public class GeneralLegacyIndexCodes {
      * CharHandler for Type.INTERNATIONAL
      */
     private static final class InternationalCharHandler extends CharHandler {
-        private final byte[] _bytes;
-        private final byte[] _extraBytes;
+        private final byte[] bytes;
+        private final byte[] extraBytes;
 
         private InternationalCharHandler(byte[] bytes, byte[] extraBytes) {
-            _bytes = bytes;
-            _extraBytes = extraBytes;
+            this.bytes = bytes;
+            this.extraBytes = extraBytes;
         }
 
         @Override
@@ -257,12 +257,12 @@ public class GeneralLegacyIndexCodes {
 
         @Override
         public byte[] getInlineBytes(char c) {
-            return _bytes;
+            return bytes;
         }
 
         @Override
         public byte[] getExtraBytes() {
-            return _extraBytes;
+            return extraBytes;
         }
     }
 
@@ -270,10 +270,10 @@ public class GeneralLegacyIndexCodes {
      * CharHandler for Type.UNPRINTABLE
      */
     private static final class UnprintableCharHandler extends CharHandler {
-        private final byte[] _unprintBytes;
+        private final byte[] unprintBytes;
 
         private UnprintableCharHandler(byte[] unprintBytes) {
-            _unprintBytes = unprintBytes;
+            this.unprintBytes = unprintBytes;
         }
 
         @Override
@@ -283,7 +283,7 @@ public class GeneralLegacyIndexCodes {
 
         @Override
         public byte[] getUnprintableBytes() {
-            return _unprintBytes;
+            return unprintBytes;
         }
     }
 
@@ -291,10 +291,10 @@ public class GeneralLegacyIndexCodes {
      * CharHandler for Type.UNPRINTABLE_EXT
      */
     private static final class UnprintableExtCharHandler extends CharHandler {
-        private final byte _extraByteMod;
+        private final byte extraByteMod;
 
         private UnprintableExtCharHandler(Byte extraByteMod) {
-            _extraByteMod = extraByteMod;
+            this.extraByteMod = extraByteMod;
         }
 
         @Override
@@ -304,7 +304,7 @@ public class GeneralLegacyIndexCodes {
 
         @Override
         public byte getExtraByteModifier() {
-            return _extraByteMod;
+            return extraByteMod;
         }
     }
 
@@ -312,14 +312,14 @@ public class GeneralLegacyIndexCodes {
      * CharHandler for Type.INTERNATIONAL_EXT
      */
     private static final class InternationalExtCharHandler extends CharHandler {
-        private final byte[] _bytes;
-        private final byte[] _extraBytes;
-        private final byte   _crazyFlag;
+        private final byte[] bytes;
+        private final byte[] extraBytes;
+        private final byte   crazyFlag;
 
         private InternationalExtCharHandler(byte[] bytes, byte[] extraBytes, byte crazyFlag) {
-            _bytes = bytes;
-            _extraBytes = extraBytes;
-            _crazyFlag = crazyFlag;
+            this.bytes = bytes;
+            this.extraBytes = extraBytes;
+            this.crazyFlag = crazyFlag;
         }
 
         @Override
@@ -329,17 +329,17 @@ public class GeneralLegacyIndexCodes {
 
         @Override
         public byte[] getInlineBytes(char c) {
-            return _bytes;
+            return bytes;
         }
 
         @Override
         public byte[] getExtraBytes() {
-            return _extraBytes;
+            return extraBytes;
         }
 
         @Override
         public byte getCrazyFlag() {
-            return _crazyFlag;
+            return crazyFlag;
         }
     }
 
@@ -347,10 +347,10 @@ public class GeneralLegacyIndexCodes {
      * CharHandler for Type.SIGNIFICANT
      */
     private static final class SignificantCharHandler extends CharHandler {
-        private final byte[] _bytes;
+        private final byte[] bytes;
 
         private SignificantCharHandler(byte[] bytes) {
-            _bytes = bytes;
+            this.bytes = bytes;
         }
 
         @Override
@@ -360,7 +360,7 @@ public class GeneralLegacyIndexCodes {
 
         @Override
         public byte[] getInlineBytes(char c) {
-            return _bytes;
+            return bytes;
         }
 
         @Override
@@ -894,27 +894,27 @@ public class GeneralLegacyIndexCodes {
      * prefix.
      */
     private static final class ExtraCodesStream extends ByteStream {
-        private int _numChars;
-        private int _unprintablePrefixLen;
+        private int numChars;
+        private int unprintablePrefixLen;
 
         private ExtraCodesStream(int length) {
             super(length);
         }
 
         public int getNumChars() {
-            return _numChars;
+            return numChars;
         }
 
         public void incrementNumChars(int inc) {
-            _numChars += inc;
+            numChars += inc;
         }
 
         public int getUnprintablePrefixLen() {
-            return _unprintablePrefixLen;
+            return unprintablePrefixLen;
         }
 
         public void setUnprintablePrefixLen(int len) {
-            _unprintablePrefixLen = len;
+            unprintablePrefixLen = len;
         }
     }
 

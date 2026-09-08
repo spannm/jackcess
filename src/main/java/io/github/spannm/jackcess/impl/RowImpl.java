@@ -35,25 +35,25 @@ import java.util.LinkedHashMap;
 public class RowImpl extends LinkedHashMap<String, Object> implements Row {
     private static final long serialVersionUID = 20130314L;
 
-    private final RowIdImpl   _id;
+    private final RowIdImpl   id;
 
     public RowImpl(RowIdImpl id) {
-        _id = id;
+        this.id = id;
     }
 
     public RowImpl(RowIdImpl id, int expectedSize) {
         super(expectedSize);
-        _id = id;
+        this.id = id;
     }
 
     public RowImpl(Row row) {
         super(row);
-        _id = (RowIdImpl) row.getId();
+        id = (RowIdImpl) row.getId();
     }
 
     @Override
     public RowIdImpl getId() {
-        return _id;
+        return id;
     }
 
     @Override
@@ -124,7 +124,7 @@ public class RowImpl extends LinkedHashMap<String, Object> implements Row {
 
     @Override
     public String toString() {
-        return ToStringBuilder.valueBuilder("Row[" + _id + "]")
+        return ToStringBuilder.valueBuilder("Row[" + id + "]")
             .append(null, this)
             .toString();
     }

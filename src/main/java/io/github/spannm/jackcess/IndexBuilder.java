@@ -31,32 +31,32 @@ public class IndexBuilder {
     public static final String PRIMARY_KEY_NAME = "PrimaryKey";
 
     /** name of the new index */
-    private String             _name;
+    private String             name;
     /** the type of the index */
-    private byte               _type;
+    private byte               type;
     /**
      * additional index flags (UNKNOWN_INDEX_FLAG always seems to be set in access 2000+)
      */
-    private byte               _flags           = IndexData.UNKNOWN_INDEX_FLAG;
+    private byte               flags           = IndexData.UNKNOWN_INDEX_FLAG;
     /** the names and orderings of the indexed columns */
-    private final List<Column> _columns         = new ArrayList<>();
+    private final List<Column> columns         = new ArrayList<>();
     /** 0-based index number */
-    private int                _indexNumber;
+    private int                indexNumber;
 
     public IndexBuilder(String name) {
-        _name = name;
+        this.name = name;
     }
 
     public String getName() {
-        return _name;
+        return name;
     }
 
     public byte getType() {
-        return _type;
+        return type;
     }
 
     public byte getFlags() {
-        return _flags;
+        return flags;
     }
 
     public boolean isPrimaryKey() {
@@ -72,14 +72,14 @@ public class IndexBuilder {
     }
 
     public List<Column> getColumns() {
-        return _columns;
+        return columns;
     }
 
     /**
      * Sets the name of the index.
      */
-    public IndexBuilder withName(String name) {
-        _name = name;
+    public IndexBuilder withName(String newName) {
+        name = newName;
         return this;
     }
 
@@ -103,8 +103,8 @@ public class IndexBuilder {
 
     public IndexBuilder withColumns(boolean ascending, Iterable<String> names) {
         if (names != null) {
-            for (String name : names) {
-                _columns.add(new Column(name, ascending));
+            for (String colName : names) {
+                columns.add(new Column(colName, ascending));
             }
         }
         return this;
@@ -114,13 +114,13 @@ public class IndexBuilder {
      * Sets this index to be a primary key index (additionally sets the index as unique and required).
      */
     public IndexBuilder withPrimaryKey() {
-        _type = IndexImpl.PRIMARY_KEY_INDEX_TYPE;
+        type = IndexImpl.PRIMARY_KEY_INDEX_TYPE;
         withRequired();
         return withUnique();
     }
 
-    public IndexBuilder withType(byte type) {
-        _type = type;
+    public IndexBuilder withType(byte newType) {
+        type = newType;
         return this;
     }
 
@@ -128,7 +128,7 @@ public class IndexBuilder {
      * Sets this index to enforce uniqueness.
      */
     public IndexBuilder withUnique() {
-        _flags |= IndexData.UNIQUE_INDEX_FLAG;
+        flags |= IndexData.UNIQUE_INDEX_FLAG;
         return this;
     }
 
@@ -136,7 +136,7 @@ public class IndexBuilder {
      * Sets this index to enforce required.
      */
     public IndexBuilder withRequired() {
-        _flags |= IndexData.REQUIRED_INDEX_FLAG;
+        flags |= IndexData.REQUIRED_INDEX_FLAG;
         return this;
     }
 
@@ -144,16 +144,16 @@ public class IndexBuilder {
      * Sets this index to ignore null values.
      */
     public IndexBuilder withIgnoreNulls() {
-        _flags |= IndexData.IGNORE_NULLS_INDEX_FLAG;
+        flags |= IndexData.IGNORE_NULLS_INDEX_FLAG;
         return this;
     }
 
     public int getIndexNumber() {
-        return _indexNumber;
+        return indexNumber;
     }
 
     public void setIndexNumber(int newIndexNumber) {
-        _indexNumber = newIndexNumber;
+        indexNumber = newIndexNumber;
     }
 
     /**
@@ -212,21 +212,21 @@ public class IndexBuilder {
      */
     public static class Column {
         /** name of the column to be indexed */
-        private       String _name;
+        private       String name;
         /** column flags (ordering) */
-        private final byte   _flags;
+        private final byte   flags;
 
         private Column(String name, boolean ascending) {
-            _name = name;
-            _flags = ascending ? IndexData.ASCENDING_COLUMN_FLAG : 0;
+            this.name = name;
+            flags = ascending ? IndexData.ASCENDING_COLUMN_FLAG : 0;
         }
 
         public String getName() {
-            return _name;
+            return name;
         }
 
-        public Column withName(String name) {
-            _name = name;
+        public Column withName(String newName) {
+            name = newName;
             return this;
         }
 
@@ -235,7 +235,7 @@ public class IndexBuilder {
         }
 
         public byte getFlags() {
-            return _flags;
+            return flags;
         }
     }
 

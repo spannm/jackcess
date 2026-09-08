@@ -25,19 +25,19 @@ import java.util.Map;
 public class SimpleCache<K, V> extends LinkedHashMap<K, V> {
     private static final long serialVersionUID = 20180313L;
 
-    private final int         _maxSize;
+    private final int         maxSize;
 
     public SimpleCache(int maxSize) {
         super(16, 0.75f, true);
-        _maxSize = maxSize;
+        this.maxSize = maxSize;
     }
 
     protected int getMaxSize() {
-        return _maxSize;
+        return maxSize;
     }
 
     @Override
     protected boolean removeEldestEntry(Map.Entry<K, V> e) {
-        return size() > _maxSize;
+        return size() > maxSize;
     }
 }

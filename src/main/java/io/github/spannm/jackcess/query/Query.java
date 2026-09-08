@@ -38,20 +38,20 @@ public interface Query {
         UNION(UNION_QUERY_OBJECT_FLAG, 9),
         UNKNOWN(-1, -1);
 
-        private final int   _objectFlag;
-        private final short _value;
+        private final int   objectFlag;
+        private final short value;
 
         Type(int objectFlag, int value) {
-            _objectFlag = objectFlag;
-            _value = (short) value;
+            this.objectFlag = objectFlag;
+            this.value = (short) value;
         }
 
         public int getObjectFlag() {
-            return _objectFlag;
+            return objectFlag;
         }
 
         public short getValue() {
-            return _value;
+            return value;
         }
 
         public static boolean isUnknown(Type _type) {

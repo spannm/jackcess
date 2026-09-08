@@ -248,130 +248,130 @@ public interface OleBlob extends Blob, Closeable {
         public static final String PACKAGE_PRETTY_NAME = "Packager Shell Object";
         public static final String PACKAGE_TYPE_NAME   = "Package";
 
-        private ContentType        _type;
-        private byte[]             _bytes;
-        private InputStream        _stream;
-        private long               _contentLen;
-        private String             _fileName;
-        private String             _filePath;
-        private String             _prettyName;
-        private String             _className;
-        private String             _typeName;
+        private ContentType        type;
+        private byte[]             bytes;
+        private InputStream        stream;
+        private long               contentLen;
+        private String             fileName;
+        private String             filePath;
+        private String             prettyName;
+        private String             className;
+        private String             typeName;
 
         public ContentType getType() {
-            return _type;
+            return type;
         }
 
         public byte[] getBytes() {
-            return _bytes;
+            return bytes;
         }
 
         public InputStream getStream() {
-            return _stream;
+            return stream;
         }
 
         public long getContentLength() {
-            return _contentLen;
+            return contentLen;
         }
 
         public String getFileName() {
-            return _fileName;
+            return fileName;
         }
 
         public String getFilePath() {
-            return _filePath;
+            return filePath;
         }
 
         public String getPrettyName() {
-            return _prettyName;
+            return prettyName;
         }
 
         public String getClassName() {
-            return _className;
+            return className;
         }
 
         public String getTypeName() {
-            return _typeName;
+            return typeName;
         }
 
-        public Builder withSimplePackageBytes(byte[] bytes) {
-            _bytes = bytes;
-            _contentLen = bytes.length;
+        public Builder withSimplePackageBytes(byte[] newBytes) {
+            bytes = newBytes;
+            contentLen = newBytes.length;
             setDefaultPackageType();
-            _type = ContentType.SIMPLE_PACKAGE;
+            type = ContentType.SIMPLE_PACKAGE;
             return this;
         }
 
         public Builder withSimplePackageStream(InputStream in, long length) {
-            _stream = in;
-            _contentLen = length;
+            stream = in;
+            contentLen = length;
             setDefaultPackageType();
-            _type = ContentType.SIMPLE_PACKAGE;
+            type = ContentType.SIMPLE_PACKAGE;
             return this;
         }
 
-        public Builder withSimplePackageFileName(String fileName) {
-            _fileName = fileName;
+        public Builder withSimplePackageFileName(String newFileName) {
+            fileName = newFileName;
             setDefaultPackageType();
-            _type = ContentType.SIMPLE_PACKAGE;
+            type = ContentType.SIMPLE_PACKAGE;
             return this;
         }
 
-        public Builder withSimplePackageFilePath(String filePath) {
-            _filePath = filePath;
+        public Builder withSimplePackageFilePath(String newFilePath) {
+            filePath = newFilePath;
             setDefaultPackageType();
-            _type = ContentType.SIMPLE_PACKAGE;
+            type = ContentType.SIMPLE_PACKAGE;
             return this;
         }
 
         public Builder withSimplePackage(File f) throws FileNotFoundException {
-            _fileName = f.getName();
-            _filePath = f.getAbsolutePath();
+            fileName = f.getName();
+            filePath = f.getAbsolutePath();
             return withSimplePackageStream(new FileInputStream(f), f.length());
         }
 
-        public Builder withLinkFileName(String fileName) {
-            _fileName = fileName;
+        public Builder withLinkFileName(String newFileName) {
+            fileName = newFileName;
             setDefaultPackageType();
-            _type = ContentType.LINK;
+            type = ContentType.LINK;
             return this;
         }
 
         public Builder withLinkPath(String link) {
-            _filePath = link;
+            filePath = link;
             setDefaultPackageType();
-            _type = ContentType.LINK;
+            type = ContentType.LINK;
             return this;
         }
 
         public Builder withLink(File f) {
-            _fileName = f.getName();
-            _filePath = f.getAbsolutePath();
+            fileName = f.getName();
+            filePath = f.getAbsolutePath();
             setDefaultPackageType();
-            _type = ContentType.LINK;
+            type = ContentType.LINK;
             return this;
         }
 
         private void setDefaultPackageType() {
-            if (_prettyName == null) {
-                _prettyName = PACKAGE_PRETTY_NAME;
+            if (prettyName == null) {
+                prettyName = PACKAGE_PRETTY_NAME;
             }
-            if (_className == null) {
-                _className = PACKAGE_TYPE_NAME;
+            if (className == null) {
+                className = PACKAGE_TYPE_NAME;
             }
         }
 
-        public Builder withOtherBytes(byte[] bytes) {
-            _bytes = bytes;
-            _contentLen = bytes.length;
-            _type = ContentType.OTHER;
+        public Builder withOtherBytes(byte[] newBytes) {
+            bytes = newBytes;
+            contentLen = newBytes.length;
+            type = ContentType.OTHER;
             return this;
         }
 
         public Builder withOtherStream(InputStream in, long length) {
-            _stream = in;
-            _contentLen = length;
-            _type = ContentType.OTHER;
+            stream = in;
+            contentLen = length;
+            type = ContentType.OTHER;
             return this;
         }
 
@@ -379,18 +379,18 @@ public interface OleBlob extends Blob, Closeable {
             return withOtherStream(new FileInputStream(f), f.length());
         }
 
-        public Builder withPackagePrettyName(String prettyName) {
-            _prettyName = prettyName;
+        public Builder withPackagePrettyName(String newPrettyName) {
+            prettyName = newPrettyName;
             return this;
         }
 
-        public Builder withPackageClassName(String className) {
-            _className = className;
+        public Builder withPackageClassName(String newClassName) {
+            className = newClassName;
             return this;
         }
 
-        public Builder withPackageTypeName(String typeName) {
-            _typeName = typeName;
+        public Builder withPackageTypeName(String newTypeName) {
+            typeName = newTypeName;
             return this;
         }
 

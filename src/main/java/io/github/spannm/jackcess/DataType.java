@@ -163,8 +163,8 @@ public enum DataType {
 
     static {
         for (DataType type : values()) {
-            if (type._sqlType != null) {
-                SQL_TYPES.put(type._sqlType, new DataType[] {type});
+            if (type.sqlType != null) {
+                SQL_TYPES.put(type.sqlType, new DataType[] {type});
             }
         }
         SQL_TYPES.put(Types.BIT, new DataType[] {BYTE});
@@ -192,42 +192,42 @@ public enum DataType {
     }
 
     private static final Map<Byte, DataType> DATA_TYPES_BY_VALUE =
-        Arrays.stream(values()).filter(DataType::isSupported).collect(Collectors.toMap(k -> k._value, v -> v));
+        Arrays.stream(values()).filter(DataType::isSupported).collect(Collectors.toMap(k -> k.value, v -> v));
 
     /** is this a variable length field */
-    private final boolean                    _variableLength;
+    private final boolean                    variableLength;
     /** is this a long value field */
-    private final boolean                    _longValue;
+    private final boolean                    longValue;
     /** does this field have scale/precision */
-    private final boolean                    _hasScalePrecision;
+    private final boolean                    hasScalePrecision;
     /** Internal Access value */
-    private final byte                       _value;
+    private final byte                       value;
     /** TODO */
-    private final String                     _typeName;
+    private final String                     typeName;
     /** Size in bytes of fixed length columns */
-    private final Integer                    _fixedSize;
+    private final Integer                    fixedSize;
     /** min in bytes size for var length columns */
-    private final int                        _minSize;
+    private final int                        minSize;
     /** default size in bytes for var length columns */
-    private final int                        _defaultSize;
+    private final int                        defaultSize;
     /** Max size in bytes for var length columns */
-    private final int                        _maxSize;
+    private final int                        maxSize;
     /** SQL type equivalent, or null if none defined */
-    private final Integer                    _sqlType;
+    private final Integer                    sqlType;
     /** min scale value */
-    private final int                        _minScale;
+    private final int                        minScale;
     /** the default scale value */
-    private final int                        _defaultScale;
+    private final int                        defaultScale;
     /** max scale value */
-    private final int                        _maxScale;
+    private final int                        maxScale;
     /** min precision value */
-    private final int                        _minPrecision;
+    private final int                        minPrecision;
     /** the default precision value */
-    private final int                        _defaultPrecision;
+    private final int                        defaultPrecision;
     /** max precision value */
-    private final int                        _maxPrecision;
+    private final int                        maxPrecision;
     /** the number of bytes per "unit" for this data type */
-    private final int                        _unitSize;
+    private final int                        unitSize;
 
     DataType(byte value, String typeName, Integer sqlType, Integer fixedSize) {
         this(value, typeName, sqlType, fixedSize, false, false, 0, 0, 0, 1);
@@ -241,35 +241,35 @@ public enum DataType {
     DataType(byte value, String typeName, Integer sqlType, Integer fixedSize, boolean variableLength, boolean longValue,
         int minSize, int defaultSize, int maxSize, boolean hasScalePrecision,
         int minScale, int defaultScale, int maxScale, int minPrecision, int defaultPrecision, int maxPrecision, int unitSize) {
-        _value = value;
-        _typeName = typeName;
-        _sqlType = sqlType;
-        _fixedSize = fixedSize;
-        _variableLength = variableLength;
-        _longValue = longValue;
-        _minSize = minSize;
-        _defaultSize = defaultSize;
-        _maxSize = maxSize;
-        _hasScalePrecision = hasScalePrecision;
-        _minScale = minScale;
-        _defaultScale = defaultScale;
-        _maxScale = maxScale;
-        _minPrecision = minPrecision;
-        _defaultPrecision = defaultPrecision;
-        _maxPrecision = maxPrecision;
-        _unitSize = unitSize;
+        this.value = value;
+        this.typeName = typeName;
+        this.sqlType = sqlType;
+        this.fixedSize = fixedSize;
+        this.variableLength = variableLength;
+        this.longValue = longValue;
+        this.minSize = minSize;
+        this.defaultSize = defaultSize;
+        this.maxSize = maxSize;
+        this.hasScalePrecision = hasScalePrecision;
+        this.minScale = minScale;
+        this.defaultScale = defaultScale;
+        this.maxScale = maxScale;
+        this.minPrecision = minPrecision;
+        this.defaultPrecision = defaultPrecision;
+        this.maxPrecision = maxPrecision;
+        this.unitSize = unitSize;
     }
 
     public byte getValue() {
-        return _value;
+        return value;
     }
 
     public String getTypeName() {
-        return _typeName;
+        return typeName;
     }
 
     public boolean isVariableLength() {
-        return _variableLength;
+        return variableLength;
     }
 
     public boolean isTrueVariableLength() {
@@ -279,11 +279,11 @@ public enum DataType {
     }
 
     public boolean isLongValue() {
-        return _longValue;
+        return longValue;
     }
 
     public boolean getHasScalePrecision() {
-        return _hasScalePrecision;
+        return hasScalePrecision;
     }
 
     public int getFixedSize() {
@@ -291,11 +291,11 @@ public enum DataType {
     }
 
     public int getFixedSize(Short colLength) {
-        if (_fixedSize != null) {
+        if (fixedSize != null) {
             if (colLength != null) {
-                return Math.max(_fixedSize, colLength);
+                return Math.max(fixedSize, colLength);
             }
-            return _fixedSize;
+            return fixedSize;
         }
         if (colLength != null) {
             return colLength;
@@ -304,57 +304,57 @@ public enum DataType {
     }
 
     public int getMinSize() {
-        return _minSize;
+        return minSize;
     }
 
     public int getDefaultSize() {
-        return _defaultSize;
+        return defaultSize;
     }
 
     public int getMaxSize() {
-        return _maxSize;
+        return maxSize;
     }
 
     public int getSQLType() throws IOException {
-        if (_sqlType != null) {
-            return _sqlType;
+        if (sqlType != null) {
+            return sqlType;
         }
         throw new JackcessException("Unsupported data type: " + this);
     }
 
     public int getMinScale() {
-        return _minScale;
+        return minScale;
     }
 
     public int getDefaultScale() {
-        return _defaultScale;
+        return defaultScale;
     }
 
     public int getMaxScale() {
-        return _maxScale;
+        return maxScale;
     }
 
     public int getMinPrecision() {
-        return _minPrecision;
+        return minPrecision;
     }
 
     public int getDefaultPrecision() {
-        return _defaultPrecision;
+        return defaultPrecision;
     }
 
     public int getMaxPrecision() {
-        return _maxPrecision;
+        return maxPrecision;
     }
 
     public int getUnitSize() {
-        return _unitSize;
+        return unitSize;
     }
 
     public int getUnitSize(JetFormat format) {
         if (format != null && isTextual()) {
             return format.SIZE_TEXT_FIELD_UNIT;
         }
-        return _unitSize;
+        return unitSize;
     }
 
     public int toUnitSize(int size) {
@@ -365,12 +365,12 @@ public enum DataType {
         return size / getUnitSize(format);
     }
 
-    public int fromUnitSize(int unitSize) {
-        return fromUnitSize(unitSize, null);
+    public int fromUnitSize(int size) {
+        return fromUnitSize(size, null);
     }
 
-    public int fromUnitSize(int unitSize, JetFormat format) {
-        return unitSize * getUnitSize(format);
+    public int fromUnitSize(int size, JetFormat format) {
+        return size * getUnitSize(format);
     }
 
     public boolean isValidSize(int size) {

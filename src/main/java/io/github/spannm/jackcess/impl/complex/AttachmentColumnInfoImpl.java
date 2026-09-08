@@ -52,86 +52,86 @@ public class AttachmentColumnInfoImpl extends ComplexColumnInfoImpl<Attachment> 
     private static final int         WRAPPER_HEADER_SIZE  = 8;
     private static final int         CONTENT_HEADER_SIZE  = 12;
 
-    private final Column             _fileUrlCol;
-    private final Column             _fileNameCol;
-    private final Column             _fileTypeCol;
-    private final Column             _fileDataCol;
-    private final Column             _fileTimeStampCol;
-    private final Column             _fileFlagsCol;
+    private final Column             fileUrlCol;
+    private final Column             fileNameCol;
+    private final Column             fileTypeCol;
+    private final Column             fileDataCol;
+    private final Column             fileTimeStampCol;
+    private final Column             fileFlagsCol;
 
     public AttachmentColumnInfoImpl(Column column, int complexId, Table typeObjTable, Table flatTable) throws IOException {
         super(column, complexId, typeObjTable, flatTable);
 
-        Column fileUrlCol = null;
-        Column fileNameCol = null;
-        Column fileTypeCol = null;
-        Column fileDataCol = null;
-        Column fileTimeStampCol = null;
-        Column fileFlagsCol = null;
+        Column foundFileUrlCol = null;
+        Column foundFileNameCol = null;
+        Column foundFileTypeCol = null;
+        Column foundFileDataCol = null;
+        Column foundFileTimeStampCol = null;
+        Column foundFileFlagsCol = null;
 
         for (Column col : getTypeColumns()) {
             switch (col.getType()) {
                 case TEXT:
                     if (FILE_NAME_COL_NAME.equalsIgnoreCase(col.getName())) {
-                        fileNameCol = col;
+                        foundFileNameCol = col;
                     } else if (FILE_TYPE_COL_NAME.equalsIgnoreCase(col.getName())) {
-                        fileTypeCol = col;
+                        foundFileTypeCol = col;
                     } else {
                         // if names don't match, assign in order: name, type
-                        if (fileNameCol == null) {
-                            fileNameCol = col;
-                        } else if (fileTypeCol == null) {
-                            fileTypeCol = col;
+                        if (foundFileNameCol == null) {
+                            foundFileNameCol = col;
+                        } else if (foundFileTypeCol == null) {
+                            foundFileTypeCol = col;
                         }
                     }
                     break;
                 case LONG:
-                    fileFlagsCol = col;
+                    foundFileFlagsCol = col;
                     break;
                 case SHORT_DATE_TIME:
-                    fileTimeStampCol = col;
+                    foundFileTimeStampCol = col;
                     break;
                 case OLE:
-                    fileDataCol = col;
+                    foundFileDataCol = col;
                     break;
                 case MEMO:
-                    fileUrlCol = col;
+                    foundFileUrlCol = col;
                     break;
                 default:
                     // ignore
             }
         }
 
-        _fileUrlCol = fileUrlCol;
-        _fileNameCol = fileNameCol;
-        _fileTypeCol = fileTypeCol;
-        _fileDataCol = fileDataCol;
-        _fileTimeStampCol = fileTimeStampCol;
-        _fileFlagsCol = fileFlagsCol;
+        fileUrlCol = foundFileUrlCol;
+        fileNameCol = foundFileNameCol;
+        fileTypeCol = foundFileTypeCol;
+        fileDataCol = foundFileDataCol;
+        fileTimeStampCol = foundFileTimeStampCol;
+        fileFlagsCol = foundFileFlagsCol;
     }
 
     public Column getFileUrlColumn() {
-        return _fileUrlCol;
+        return fileUrlCol;
     }
 
     public Column getFileNameColumn() {
-        return _fileNameCol;
+        return fileNameCol;
     }
 
     public Column getFileTypeColumn() {
-        return _fileTypeCol;
+        return fileTypeCol;
     }
 
     public Column getFileDataColumn() {
-        return _fileDataCol;
+        return fileDataCol;
     }
 
     public Column getFileTimeStampColumn() {
-        return _fileTimeStampCol;
+        return fileTimeStampCol;
     }
 
     public Column getFileFlagsColumn() {
-        return _fileFlagsCol;
+        return fileFlagsCol;
     }
 
     @Override
@@ -197,117 +197,117 @@ public class AttachmentColumnInfoImpl extends ComplexColumnInfoImpl<Attachment> 
     }
 
     private static class AttachmentImpl extends ComplexValueImpl implements Attachment {
-        private String  _url;
-        private String  _name;
-        private String  _type;
-        private byte[]  _data;
-        private Object  _timeStamp;
-        private Integer _flags;
-        private byte[]  _encodedData;
+        private String  url;
+        private String  name;
+        private String  type;
+        private byte[]  data;
+        private Object  timeStamp;
+        private Integer flags;
+        private byte[]  encodedData;
 
         private AttachmentImpl(Id id, ComplexValueForeignKey complexValueFk, String url, String name, String type, byte[] data, Object timeStamp, Integer flags, byte[] encodedData) {
 
             super(id, complexValueFk);
-            _url = url;
-            _name = name;
-            _type = type;
-            _data = data;
-            _timeStamp = timeStamp;
-            _flags = flags;
-            _encodedData = encodedData;
+            this.url = url;
+            this.name = name;
+            this.type = type;
+            this.data = data;
+            this.timeStamp = timeStamp;
+            this.flags = flags;
+            this.encodedData = encodedData;
         }
 
         @Override
         public byte[] getFileData() throws IOException {
-            if (_data == null && _encodedData != null) {
-                _data = decodeData();
+            if (data == null && encodedData != null) {
+                data = decodeData();
             }
-            return _data;
+            return data;
         }
 
         @Override
-        public void setFileData(byte[] data) {
-            _data = data;
-            _encodedData = null;
+        public void setFileData(byte[] newData) {
+            data = newData;
+            encodedData = null;
         }
 
         @Override
         public byte[] getEncodedFileData() throws IOException {
-            if (_encodedData == null && _data != null) {
-                _encodedData = encodeData();
+            if (encodedData == null && data != null) {
+                encodedData = encodeData();
             }
-            return _encodedData;
+            return encodedData;
         }
 
         @Override
-        public void setEncodedFileData(byte[] data) {
-            _encodedData = data;
-            _data = null;
+        public void setEncodedFileData(byte[] newEncodedData) {
+            encodedData = newEncodedData;
+            data = null;
         }
 
         @Override
         public String getFileName() {
-            return _name;
+            return name;
         }
 
         @Override
         public void setFileName(String fileName) {
-            _name = fileName;
+            name = fileName;
         }
 
         @Override
         public String getFileUrl() {
-            return _url;
+            return url;
         }
 
         @Override
         public void setFileUrl(String fileUrl) {
-            _url = fileUrl;
+            url = fileUrl;
         }
 
         @Override
         public String getFileType() {
-            return _type;
+            return type;
         }
 
         @Override
         public void setFileType(String fileType) {
-            _type = fileType;
+            type = fileType;
         }
 
         @Override
         public Date getFileTimeStamp() {
-            return (Date) _timeStamp;
+            return (Date) timeStamp;
         }
 
         @Override
         public void setFileTimeStamp(Date fileTimeStamp) {
-            _timeStamp = fileTimeStamp;
+            timeStamp = fileTimeStamp;
         }
 
         @Override
         public LocalDateTime getFileLocalTimeStamp() {
-            return (LocalDateTime) _timeStamp;
+            return (LocalDateTime) timeStamp;
         }
 
         @Override
         public void setFileLocalTimeStamp(LocalDateTime fileTimeStamp) {
-            _timeStamp = fileTimeStamp;
+            timeStamp = fileTimeStamp;
         }
 
         @Override
         public Object getFileTimeStampObject() {
-            return _timeStamp;
+            return timeStamp;
         }
 
         @Override
         public Integer getFileFlags() {
-            return _flags;
+            return flags;
         }
 
         @Override
         public void setFileFlags(Integer fileFlags) {
-            _flags = fileFlags;
+            flags = fileFlags;
         }
 
         @Override
@@ -340,19 +340,19 @@ public class AttachmentColumnInfoImpl extends ComplexColumnInfoImpl<Attachment> 
         @SuppressWarnings("PMD.UseTryWithResources")
         private byte[] decodeData() throws IOException {
 
-            if (_encodedData.length < WRAPPER_HEADER_SIZE) {
+            if (encodedData.length < WRAPPER_HEADER_SIZE) {
                 // nothing we can do
                 throw new IOException("Unknown encoded attachment data format");
             }
 
             // read initial header info
-            ByteBuffer bb = PageChannel.wrap(_encodedData);
+            ByteBuffer bb = PageChannel.wrap(encodedData);
             int typeFlag = bb.getInt();
             int dataLen = bb.getInt();
 
             DataInputStream contentStream = null;
             try {
-                InputStream bin = new ByteArrayInputStream(_encodedData, WRAPPER_HEADER_SIZE, _encodedData.length - WRAPPER_HEADER_SIZE);
+                InputStream bin = new ByteArrayInputStream(encodedData, WRAPPER_HEADER_SIZE, encodedData.length - WRAPPER_HEADER_SIZE);
 
                 if (typeFlag == DATA_TYPE_COMPRESSED) {
                     // actual content is deflate compressed
@@ -390,15 +390,15 @@ public class AttachmentColumnInfoImpl extends ComplexColumnInfoImpl<Attachment> 
         private byte[] encodeData() throws IOException {
 
             // possibly compress data based on file type
-            String type = _type != null ? _type.toLowerCase() : "";
-            boolean shouldCompress = !COMPRESSED_FORMATS.contains(type);
+            String lcType = type != null ? type.toLowerCase() : "";
+            boolean shouldCompress = !COMPRESSED_FORMATS.contains(lcType);
 
             // encode extension, which ends w/ a null byte
-            type += '\0';
-            ByteBuffer typeBytes = ColumnImpl.encodeUncompressedText(type, JetFormat.VERSION_12.CHARSET);
+            lcType += '\0';
+            ByteBuffer typeBytes = ColumnImpl.encodeUncompressedText(lcType, JetFormat.VERSION_12.CHARSET);
             int headerLen = typeBytes.remaining() + CONTENT_HEADER_SIZE;
 
-            int dataLen = _data.length;
+            int dataLen = data.length;
             ByteUtil.ByteStream dataStream = new ByteUtil.ByteStream(WRAPPER_HEADER_SIZE + headerLen + dataLen);
 
             // write the wrapper header info
@@ -420,12 +420,12 @@ public class AttachmentColumnInfoImpl extends ComplexColumnInfoImpl<Attachment> 
                 PageChannel.wrap(tmpBytes)
                     .putInt(headerLen)
                     .putInt(UNKNOWN_HEADER_VAL)
-                    .putInt(type.length());
+                    .putInt(lcType.length());
                 contentStream.write(tmpBytes);
                 contentStream.write(typeBytes.array(), 0, typeBytes.remaining());
 
                 // write the _actual_ contents
-                contentStream.write(_data);
+                contentStream.write(data);
                 contentStream.close();
                 contentStream = null;
 

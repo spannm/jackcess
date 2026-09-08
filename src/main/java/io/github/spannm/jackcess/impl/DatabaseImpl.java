@@ -489,7 +489,7 @@ public class DatabaseImpl implements Database, DateTimeContext {
     /**
      * factory for the appropriate date/time type
      */
-    private ColumnImpl.DateTimeFactory      _dtf;
+    private ColumnImpl.DateTimeFactory      dtf;
 
     /**
      * Id of the "Databases" container object in the system catalog, resolved dynamically during
@@ -660,7 +660,7 @@ public class DatabaseImpl implements Database, DateTimeContext {
         mevaluateExpressions = getDefaultEvaluateExpressions();
         mfileFormat = fileFormat;
         setZoneInfo(timeZone, null);
-        _dtf = ColumnImpl.getDateTimeFactory(getDefaultDateTimeType());
+        dtf = ColumnImpl.getDateTimeFactory(getDefaultDateTimeType());
         mpageChannel = new PageChannel(channel, closeChannel, mformat, autoSync);
         if (provider == null) {
             provider = DefaultCodecProvider.INSTANCE;
@@ -811,17 +811,17 @@ public class DatabaseImpl implements Database, DateTimeContext {
 
     @Override
     public DateTimeType getDateTimeType() {
-        return _dtf.getType();
+        return dtf.getType();
     }
 
     @Override
     public void setDateTimeType(DateTimeType dateTimeType) {
-        _dtf = ColumnImpl.getDateTimeFactory(dateTimeType);
+        dtf = ColumnImpl.getDateTimeFactory(dateTimeType);
     }
 
     @Override
     public ColumnImpl.DateTimeFactory getDateTimeFactory() {
-        return _dtf;
+        return dtf;
     }
 
     @Override
@@ -1501,9 +1501,9 @@ public class DatabaseImpl implements Database, DateTimeContext {
         // find all the query rows
         for (Row row : CursorImpl.createCursor(mqueries)) {
             QueryImpl.Row queryRow = new QueryImpl.Row(row);
-            List<QueryImpl.Row> queryRows = queryRowMap.get(queryRow._objectId);
+            List<QueryImpl.Row> queryRows = queryRowMap.get(queryRow.objectId);
             if (queryRows == null) {
-                LOGGER.log(Level.WARNING, withErrorContext("Found rows for query with id " + queryRow._objectId + " missing from system catalog"));
+                LOGGER.log(Level.WARNING, withErrorContext("Found rows for query with id " + queryRow.objectId + " missing from system catalog"));
                 continue;
             }
             queryRows.add(queryRow);
@@ -1892,7 +1892,7 @@ public class DatabaseImpl implements Database, DateTimeContext {
 
     // intended for test use only
     public void clearTableCache() {
-        mtableCache._tables.clear();
+        mtableCache.tables.clear();
     }
 
     @Override
@@ -1967,7 +1967,7 @@ public class DatabaseImpl implements Database, DateTimeContext {
             getClass().getSimpleName(), mfile, mname, mreadOnly, mtableParentId, mformat, mtableNames, mpageChannel, msystemCatalog, mtableFinder, maccessControlEntries, mrelParentId, mrelationships,
             mqueries, mcomplexCols, mnewTableSIDs, mdbErrorHandler, mfileFormat, mcharset, mtimeZone, mzoneId, mdefaultSortOrder, mdefaultCodePage, mcolumnOrder, menforceForeignKeys,
             mallowAutoNumInsert, mevaluateExpressions, mvalidatorFactory, mtableCache, mpropsHandler, mdbParentId, Arrays.toString(mnewObjOwner), mdbPropMaps, msummaryPropMaps, muserDefPropMaps,
-            mlinkResolver, mlinkedDbs, mfkEnforcerSharedState, mevalCtx, _dtf);
+            mlinkResolver, mlinkedDbs, mfkEnforcerSharedState, mevalCtx, dtf);
     }
 
     /**
@@ -2290,13 +2290,13 @@ public class DatabaseImpl implements Database, DateTimeContext {
      * Utility class for storing linked table info
      */
     private static class LinkedTableInfo extends TableInfo {
-        private final String _linkedDbName;
-        private final String _linkedTableName;
+        private final String linkedDbName;
+        private final String linkedTableName;
 
         private LinkedTableInfo(Integer newPageNumber, String newTableName, int newFlags, Short newTableType, String newLinkedDbName, String newLinkedTableName) {
             super(newPageNumber, newTableName, newFlags, newTableType);
-            _linkedDbName = newLinkedDbName;
-            _linkedTableName = newLinkedTableName;
+            linkedDbName = newLinkedDbName;
+            linkedTableName = newLinkedTableName;
         }
 
         @Override
@@ -2311,12 +2311,12 @@ public class DatabaseImpl implements Database, DateTimeContext {
 
         @Override
         public String getLinkedTableName() {
-            return _linkedTableName;
+            return linkedTableName;
         }
 
         @Override
         public String getLinkedDbName() {
-            return _linkedDbName;
+            return linkedDbName;
         }
     }
 
@@ -2324,13 +2324,13 @@ public class DatabaseImpl implements Database, DateTimeContext {
      * Utility class for storing linked ODBC table info
      */
     private static class LinkedODBCTableInfo extends TableInfo {
-        private final String _linkedTableName;
-        private final String _connectionName;
+        private final String linkedTableName;
+        private final String connectionName;
 
         private LinkedODBCTableInfo(Integer newPageNumber, String newTableName, int newFlags, Short newTableType, String connectName, String newLinkedTableName) {
             super(newPageNumber, newTableName, newFlags, newTableType);
-            _linkedTableName = newLinkedTableName;
-            _connectionName = connectName;
+            linkedTableName = newLinkedTableName;
+            connectionName = connectName;
         }
 
         @Override
@@ -2345,12 +2345,12 @@ public class DatabaseImpl implements Database, DateTimeContext {
 
         @Override
         public String getLinkedTableName() {
-            return _linkedTableName;
+            return linkedTableName;
         }
 
         @Override
         public String getConnectionName() {
-            return _connectionName;
+            return connectionName;
         }
 
         @Override
@@ -2368,15 +2368,15 @@ public class DatabaseImpl implements Database, DateTimeContext {
      * Table iterator for this database, unmodifiable.
      */
     private class TableIterator implements Iterator<Table> {
-        private final Iterator<String> _tableNameIter;
+        private final Iterator<String> tableNameIter;
 
         private TableIterator(Set<String> tableNames) {
-            _tableNameIter = tableNames.iterator();
+            tableNameIter = tableNames.iterator();
         }
 
         @Override
         public boolean hasNext() {
-            return _tableNameIter.hasNext();
+            return tableNameIter.hasNext();
         }
 
         @Override
@@ -2385,7 +2385,7 @@ public class DatabaseImpl implements Database, DateTimeContext {
                 throw new NoSuchElementException();
             }
             try {
-                return getTable(_tableNameIter.next(), true);
+                return getTable(tableNameIter.next(), true);
             } catch (IOException _ex) {
                 throw new UncheckedIOException(_ex);
             }
@@ -2465,15 +2465,15 @@ public class DatabaseImpl implements Database, DateTimeContext {
 
         public Iterator<TableMetaData> iterateTableMetaData() throws IOException {
             return new Iterator<>() {
-                private final Iterator<Row> _iter = getTableNamesCursor().newIterable().withColumnNames(SYSTEM_CATALOG_TABLE_DETAIL_COLUMNS).iterator();
-                private TableMetaData       _next;
+                private final Iterator<Row> iter = getTableNamesCursor().newIterable().withColumnNames(SYSTEM_CATALOG_TABLE_DETAIL_COLUMNS).iterator();
+                private TableMetaData       next;
 
                 @Override
                 public boolean hasNext() {
-                    if (_next == null && _iter.hasNext()) {
-                        _next = nextTableMetaData(_iter);
+                    if (next == null && iter.hasNext()) {
+                        next = nextTableMetaData(iter);
                     }
-                    return _next != null;
+                    return next != null;
                 }
 
                 @Override
@@ -2482,8 +2482,8 @@ public class DatabaseImpl implements Database, DateTimeContext {
                         throw new NoSuchElementException();
                     }
 
-                    TableMetaData next = _next;
-                    _next = null;
+                    TableMetaData next = this.next;
+                    this.next = null;
                     return next;
                 }
             };
@@ -2529,28 +2529,28 @@ public class DatabaseImpl implements Database, DateTimeContext {
      * Normal table lookup handler, using catalog table index.
      */
     private final class DefaultTableFinder extends TableFinder {
-        private final IndexCursor _systemCatalogCursor;
-        private IndexCursor       _systemCatalogIdCursor;
+        private final IndexCursor systemCatalogCursor;
+        private IndexCursor       systemCatalogIdCursor;
 
         private DefaultTableFinder(IndexCursor systemCatalogCursor) {
-            _systemCatalogCursor = systemCatalogCursor;
+            this.systemCatalogCursor = systemCatalogCursor;
         }
 
         private void initIdCursor() throws IOException {
-            if (_systemCatalogIdCursor == null) {
-                _systemCatalogIdCursor = msystemCatalog.newCursor().withIndexByColumnNames(CAT_COL_ID).toIndexCursor();
+            if (systemCatalogIdCursor == null) {
+                systemCatalogIdCursor = msystemCatalog.newCursor().withIndexByColumnNames(CAT_COL_ID).toIndexCursor();
             }
         }
 
         @Override
         protected Cursor findRow(Integer parentId, String name) throws IOException {
-            return _systemCatalogCursor.findFirstRowByEntry(parentId, name) ? _systemCatalogCursor : null;
+            return systemCatalogCursor.findFirstRowByEntry(parentId, name) ? systemCatalogCursor : null;
         }
 
         @Override
         protected Cursor findRow(Integer objectId) throws IOException {
             initIdCursor();
-            return _systemCatalogIdCursor.findFirstRowByEntry(objectId) ? _systemCatalogIdCursor : null;
+            return systemCatalogIdCursor.findFirstRowByEntry(objectId) ? systemCatalogIdCursor : null;
         }
 
         @Override
@@ -2564,7 +2564,7 @@ public class DatabaseImpl implements Database, DateTimeContext {
                 return null;
             }
 
-            Row row = _systemCatalogCursor.getCurrentRow(SYSTEM_CATALOG_TABLE_DETAIL_COLUMNS);
+            Row row = systemCatalogCursor.getCurrentRow(SYSTEM_CATALOG_TABLE_DETAIL_COLUMNS);
             Short type = row.getShort(CAT_COL_TYPE);
 
             if (!isTableType(type)) {
@@ -2578,22 +2578,22 @@ public class DatabaseImpl implements Database, DateTimeContext {
 
         @Override
         protected Cursor getTableNamesCursor() throws IOException {
-            return _systemCatalogCursor.getIndex().newCursor().withStartEntry(mtableParentId, IndexData.MIN_VALUE).withEndEntry(mtableParentId, IndexData.MAX_VALUE).toIndexCursor();
+            return systemCatalogCursor.getIndex().newCursor().withStartEntry(mtableParentId, IndexData.MIN_VALUE).withEndEntry(mtableParentId, IndexData.MAX_VALUE).toIndexCursor();
         }
 
         @Override
         protected int findMaxSyntheticId() throws IOException {
             initIdCursor();
-            _systemCatalogIdCursor.reset();
+            systemCatalogIdCursor.reset();
 
             // synthetic ids count up from min integer. so the current, highest,
             // in-use synthetic id is the max id < 0.
-            _systemCatalogIdCursor.findClosestRowByEntry(0);
-            if (!_systemCatalogIdCursor.moveToPreviousRow()) {
+            systemCatalogIdCursor.findClosestRowByEntry(0);
+            if (!systemCatalogIdCursor.moveToPreviousRow()) {
                 return Integer.MIN_VALUE;
             }
             ColumnImpl idCol = msystemCatalog.getColumn(CAT_COL_ID);
-            return (Integer) _systemCatalogIdCursor.getCurrentRowValue(idCol);
+            return (Integer) systemCatalogIdCursor.getCurrentRowValue(idCol);
         }
     }
 
@@ -2601,10 +2601,10 @@ public class DatabaseImpl implements Database, DateTimeContext {
      * Fallback table lookup handler, using catalog table scans.
      */
     private final class FallbackTableFinder extends TableFinder {
-        private final Cursor _systemCatalogCursor;
+        private final Cursor systemCatalogCursor;
 
         private FallbackTableFinder(Cursor systemCatalogCursor) {
-            _systemCatalogCursor = systemCatalogCursor;
+            this.systemCatalogCursor = systemCatalogCursor;
         }
 
         @Override
@@ -2612,13 +2612,13 @@ public class DatabaseImpl implements Database, DateTimeContext {
             Map<String, Object> rowPat = new HashMap<>();
             rowPat.put(CAT_COL_PARENT_ID, parentId);
             rowPat.put(CAT_COL_NAME, name);
-            return _systemCatalogCursor.findFirstRow(rowPat) ? _systemCatalogCursor : null;
+            return systemCatalogCursor.findFirstRow(rowPat) ? systemCatalogCursor : null;
         }
 
         @Override
         protected Cursor findRow(Integer objectId) throws IOException {
             ColumnImpl idCol = msystemCatalog.getColumn(CAT_COL_ID);
-            return _systemCatalogCursor.findFirstRow(idCol, objectId) ? _systemCatalogCursor : null;
+            return systemCatalogCursor.findFirstRow(idCol, objectId) ? systemCatalogCursor : null;
         }
 
         @Override
@@ -2634,7 +2634,7 @@ public class DatabaseImpl implements Database, DateTimeContext {
          */
         @Override
         public TableInfo lookupTable(String tableName, Integer parentId) throws IOException {
-            for (Row row : _systemCatalogCursor.newIterable().withColumnNames(SYSTEM_CATALOG_TABLE_DETAIL_COLUMNS)) {
+            for (Row row : systemCatalogCursor.newIterable().withColumnNames(SYSTEM_CATALOG_TABLE_DETAIL_COLUMNS)) {
 
                 Short type = row.getShort(CAT_COL_TYPE);
                 if (!isTableType(type)) {
@@ -2659,17 +2659,17 @@ public class DatabaseImpl implements Database, DateTimeContext {
 
         @Override
         protected Cursor getTableNamesCursor() {
-            return _systemCatalogCursor;
+            return systemCatalogCursor;
         }
 
         @Override
         protected int findMaxSyntheticId() throws IOException {
             // find max id < 0
             ColumnImpl idCol = msystemCatalog.getColumn(CAT_COL_ID);
-            _systemCatalogCursor.reset();
+            systemCatalogCursor.reset();
             int curMaxSynthId = Integer.MIN_VALUE;
-            while (_systemCatalogCursor.moveToNextRow()) {
-                int id = (Integer) _systemCatalogCursor.getCurrentRowValue(idCol);
+            while (systemCatalogCursor.moveToNextRow()) {
+                int id = (Integer) systemCatalogCursor.getCurrentRowValue(idCol);
                 if (id > curMaxSynthId && id < 0) {
                     curMaxSynthId = id;
                 }
@@ -2682,15 +2682,15 @@ public class DatabaseImpl implements Database, DateTimeContext {
      * WeakReference for a Table which holds the table pageNumber (for later cache purging).
      */
     private static final class WeakTableReference extends WeakReference<TableImpl> {
-        private final Integer _pageNumber;
+        private final Integer pageNumber;
 
         private WeakTableReference(Integer pageNumber, TableImpl table, ReferenceQueue<TableImpl> queue) {
             super(table, queue);
-            _pageNumber = pageNumber;
+            this.pageNumber = pageNumber;
         }
 
         public Integer getPageNumber() {
-            return _pageNumber;
+            return pageNumber;
         }
     }
 
@@ -2698,11 +2698,11 @@ public class DatabaseImpl implements Database, DateTimeContext {
      * Cache of currently in-use tables, allows re-use of existing tables.
      */
     private static final class TableCache {
-        private final Map<Integer, WeakTableReference> _tables = new HashMap<>();
-        private final ReferenceQueue<TableImpl>        _queue  = new ReferenceQueue<>();
+        private final Map<Integer, WeakTableReference> tables = new HashMap<>();
+        private final ReferenceQueue<TableImpl>        queue  = new ReferenceQueue<>();
 
         public TableImpl get(Integer pageNumber) {
-            WeakTableReference ref = _tables.get(pageNumber);
+            WeakTableReference ref = tables.get(pageNumber);
             return ref != null ? ref.get() : null;
         }
 
@@ -2710,16 +2710,16 @@ public class DatabaseImpl implements Database, DateTimeContext {
             purgeOldRefs();
 
             Integer pageNumber = table.getTableDefPageNumber();
-            WeakTableReference ref = new WeakTableReference(pageNumber, table, _queue);
-            _tables.put(pageNumber, ref);
+            WeakTableReference ref = new WeakTableReference(pageNumber, table, queue);
+            tables.put(pageNumber, ref);
 
             return table;
         }
 
         private void purgeOldRefs() {
             WeakTableReference oldRef = null;
-            while ((oldRef = (WeakTableReference) _queue.poll()) != null) {
-                _tables.remove(oldRef.getPageNumber());
+            while ((oldRef = (WeakTableReference) queue.poll()) != null) {
+                tables.remove(oldRef.getPageNumber());
             }
         }
     }
@@ -2728,20 +2728,20 @@ public class DatabaseImpl implements Database, DateTimeContext {
      * Internal details for each FileFormat
      */
     public static final class FileFormatDetails {
-        private final String    _emptyFile;
-        private final JetFormat _format;
+        private final String    emptyFile;
+        private final JetFormat format;
 
         private FileFormatDetails(String emptyFile, JetFormat format) {
-            _emptyFile = emptyFile;
-            _format = format;
+            this.emptyFile = emptyFile;
+            this.format = format;
         }
 
         public String getEmptyFilePath() {
-            return _emptyFile;
+            return emptyFile;
         }
 
         public JetFormat getFormat() {
-            return _format;
+            return format;
         }
     }
 }

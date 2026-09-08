@@ -675,21 +675,21 @@ public abstract class CursorImpl implements Cursor {
      * Base implementation of iterator for this cursor, modifiable.
      */
     protected abstract class BaseIterator implements Iterator<Row> {
-        protected final Collection<String> _columnNames;
-        protected final boolean            _moveForward;
-        protected final ColumnMatcher      _colMatcher;
-        protected Boolean                  _hasNext;
-        protected boolean                  _validRow;
+        protected final Collection<String> columnNames;
+        protected final boolean            moveForward;
+        protected final ColumnMatcher      colMatcher;
+        protected Boolean                  cachedHasNext;
+        protected boolean                  validRow;
 
         protected BaseIterator(Collection<String> columnNames, boolean reset, boolean moveForward, ColumnMatcher columnMatcher) {
-            _columnNames = columnNames;
-            _moveForward = moveForward;
-            _colMatcher = columnMatcher != null ? columnMatcher : mcolumnMatcher;
+            this.columnNames = columnNames;
+            this.moveForward = moveForward;
+            colMatcher = columnMatcher != null ? columnMatcher : mcolumnMatcher;
             try {
                 if (reset) {
-                    reset(_moveForward);
+                    reset(moveForward);
                 } else if (isCurrentRowValid()) {
-                    _hasNext = _validRow = true;
+                    cachedHasNext = validRow = true;
                 }
             } catch (IOException _ex) {
                 throw new UncheckedIOException(_ex);
@@ -698,15 +698,15 @@ public abstract class CursorImpl implements Cursor {
 
         @Override
         public boolean hasNext() {
-            if (_hasNext == null) {
+            if (cachedHasNext == null) {
                 try {
-                    _hasNext = findNext();
-                    _validRow = _hasNext;
+                    cachedHasNext = findNext();
+                    validRow = cachedHasNext;
                 } catch (IOException _ex) {
                     throw new UncheckedIOException(_ex);
                 }
             }
-            return _hasNext;
+            return cachedHasNext;
         }
 
         @Override
@@ -715,8 +715,8 @@ public abstract class CursorImpl implements Cursor {
                 throw new NoSuchElementException();
             }
             try {
-                Row rtn = getCurrentRow(_columnNames);
-                _hasNext = null;
+                Row rtn = getCurrentRow(columnNames);
+                cachedHasNext = null;
                 return rtn;
             } catch (IOException _ex) {
                 throw new UncheckedIOException(_ex);
@@ -725,10 +725,10 @@ public abstract class CursorImpl implements Cursor {
 
         @Override
         public void remove() {
-            if (_validRow) {
+            if (validRow) {
                 try {
                     deleteCurrentRow();
-                    _validRow = false;
+                    validRow = false;
                 } catch (IOException _ex) {
                     throw new UncheckedIOException(_ex);
                 }
@@ -750,7 +750,7 @@ public abstract class CursorImpl implements Cursor {
 
         @Override
         protected boolean findNext() throws IOException {
-            return moveToAnotherRow(_moveForward);
+            return moveToAnotherRow(moveForward);
         }
     }
 
@@ -758,20 +758,20 @@ public abstract class CursorImpl implements Cursor {
      * Row iterator for this cursor, modifiable.
      */
     private final class ColumnMatchIterator extends BaseIterator {
-        private final ColumnImpl _columnPattern;
-        private final Object     _valuePattern;
-        private final Object     _searchInfo;
+        private final ColumnImpl columnPattern;
+        private final Object     valuePattern;
+        private final Object     searchInfo;
 
         private ColumnMatchIterator(Collection<String> columnNames, ColumnImpl columnPattern, Object valuePattern, boolean reset, boolean moveForward, ColumnMatcher columnMatcher) {
             super(columnNames, reset, moveForward, columnMatcher);
-            _columnPattern = columnPattern;
-            _valuePattern = valuePattern;
-            _searchInfo = prepareSearchInfo(columnPattern, valuePattern);
+            this.columnPattern = columnPattern;
+            this.valuePattern = valuePattern;
+            searchInfo = prepareSearchInfo(columnPattern, valuePattern);
         }
 
         @Override
         protected boolean findNext() throws IOException {
-            return findAnotherRow(_columnPattern, _valuePattern, false, _moveForward, _colMatcher, _searchInfo);
+            return findAnotherRow(columnPattern, valuePattern, false, moveForward, colMatcher, searchInfo);
         }
     }
 
@@ -779,18 +779,18 @@ public abstract class CursorImpl implements Cursor {
      * Row iterator for this cursor, modifiable.
      */
     private final class RowMatchIterator extends BaseIterator {
-        private final Map<String, ?> _rowPattern;
-        private final Object         _searchInfo;
+        private final Map<String, ?> rowPattern;
+        private final Object         searchInfo;
 
         private RowMatchIterator(Collection<String> columnNames, Map<String, ?> rowPattern, boolean reset, boolean moveForward, ColumnMatcher columnMatcher) {
             super(columnNames, reset, moveForward, columnMatcher);
-            _rowPattern = rowPattern;
-            _searchInfo = prepareSearchInfo(rowPattern);
+            this.rowPattern = rowPattern;
+            searchInfo = prepareSearchInfo(rowPattern);
         }
 
         @Override
         protected boolean findNext() throws IOException {
-            return findAnotherRow(_rowPattern, false, _moveForward, _colMatcher, _searchInfo);
+            return findAnotherRow(rowPattern, false, moveForward, colMatcher, searchInfo);
         }
     }
 
@@ -808,27 +808,27 @@ public abstract class CursorImpl implements Cursor {
      * check the validity of a Savepoint.
      */
     protected static final class IdImpl implements Id {
-        private final int _tablePageNumber;
-        private final int _indexNumber;
+        private final int tablePageNumber;
+        private final int indexNumber;
 
         protected IdImpl(TableImpl table, IndexImpl index) {
-            _tablePageNumber = table.getTableDefPageNumber();
-            _indexNumber = index != null ? index.getIndexNumber() : -1;
+            tablePageNumber = table.getTableDefPageNumber();
+            indexNumber = index != null ? index.getIndexNumber() : -1;
         }
 
         @Override
         public int hashCode() {
-            return _tablePageNumber;
+            return tablePageNumber;
         }
 
         @Override
         public boolean equals(Object o) {
-            return this == o || o != null && getClass() == o.getClass() && _tablePageNumber == ((IdImpl) o)._tablePageNumber && _indexNumber == ((IdImpl) o)._indexNumber;
+            return this == o || o != null && getClass() == o.getClass() && tablePageNumber == ((IdImpl) o).tablePageNumber && indexNumber == ((IdImpl) o).indexNumber;
         }
 
         @Override
         public String toString() {
-            return getClass().getSimpleName() + " " + _tablePageNumber + ":" + _indexNumber;
+            return getClass().getSimpleName() + " " + tablePageNumber + ":" + indexNumber;
         }
     }
 
@@ -865,33 +865,33 @@ public abstract class CursorImpl implements Cursor {
      * Value object which represents a complete save state of the cursor.
      */
     protected static final class SavepointImpl implements Savepoint {
-        private final IdImpl       _cursorId;
-        private final PositionImpl _curPos;
-        private final PositionImpl _prevPos;
+        private final IdImpl       cursorId;
+        private final PositionImpl curPos;
+        private final PositionImpl prevPos;
 
         private SavepointImpl(IdImpl cursorId, PositionImpl curPos, PositionImpl prevPos) {
-            _cursorId = cursorId;
-            _curPos = curPos;
-            _prevPos = prevPos;
+            this.cursorId = cursorId;
+            this.curPos = curPos;
+            this.prevPos = prevPos;
         }
 
         @Override
         public IdImpl getCursorId() {
-            return _cursorId;
+            return cursorId;
         }
 
         @Override
         public PositionImpl getCurrentPosition() {
-            return _curPos;
+            return curPos;
         }
 
         private PositionImpl getPreviousPosition() {
-            return _prevPos;
+            return prevPos;
         }
 
         @Override
         public String toString() {
-            return String.format("%s[cursorId=%s, curPos=%s, prevPos=%s]", getClass().getSimpleName(), _cursorId, _curPos, _prevPos);
+            return String.format("%s[cursorId=%s, curPos=%s, prevPos=%s]", getClass().getSimpleName(), cursorId, curPos, prevPos);
         }
     }
 

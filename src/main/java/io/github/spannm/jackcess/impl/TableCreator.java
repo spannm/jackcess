@@ -25,23 +25,23 @@ import java.util.*;
  * Helper class used to maintain state during table creation.
  */
 public class TableCreator extends TableMutator {
-    private String                                _name;
-    private List<ColumnBuilder>                   _columns;
-    private List<IndexBuilder>                    _indexes;
-    private final List<IndexDataState>            _indexDataStates = new ArrayList<>();
-    private final Map<ColumnBuilder, ColumnState> _columnStates    = new IdentityHashMap<>();
-    private final List<ColumnBuilder>             _lvalCols        = new ArrayList<>();
-    private int                                   _tdefPageNumber  = PageChannel.INVALID_PAGE_NUMBER;
-    private int                                   _umapPageNumber  = PageChannel.INVALID_PAGE_NUMBER;
-    private int                                   _indexCount;
-    private int                                   _logicalIndexCount;
+    private String                                name;
+    private List<ColumnBuilder>                   columns;
+    private List<IndexBuilder>                    indexes;
+    private final List<IndexDataState>            indexDataStates = new ArrayList<>();
+    private final Map<ColumnBuilder, ColumnState> columnStates    = new IdentityHashMap<>();
+    private final List<ColumnBuilder>             lvalCols        = new ArrayList<>();
+    private int                                   tdefPageNumber  = PageChannel.INVALID_PAGE_NUMBER;
+    private int                                   umapPageNumber  = PageChannel.INVALID_PAGE_NUMBER;
+    private int                                   indexCount;
+    private int                                   logicalIndexCount;
 
     public TableCreator(DatabaseImpl database) {
         super(database);
     }
 
     public String getName() {
-        return _name;
+        return name;
     }
 
     @Override
@@ -51,36 +51,36 @@ public class TableCreator extends TableMutator {
 
     @Override
     public int getTdefPageNumber() {
-        return _tdefPageNumber;
+        return tdefPageNumber;
     }
 
     public int getUmapPageNumber() {
-        return _umapPageNumber;
+        return umapPageNumber;
     }
 
     public List<ColumnBuilder> getColumns() {
-        return _columns;
+        return columns;
     }
 
     public List<IndexBuilder> getIndexes() {
-        return _indexes;
+        return indexes;
     }
 
     public boolean hasIndexes() {
-        return !_indexes.isEmpty();
+        return !indexes.isEmpty();
     }
 
     public int getIndexCount() {
-        return _indexCount;
+        return indexCount;
     }
 
     public int getLogicalIndexCount() {
-        return _logicalIndexCount;
+        return logicalIndexCount;
     }
 
     @Override
     public IndexDataState getIndexDataState(IndexBuilder idx) {
-        for (IndexDataState idxDataState : _indexDataStates) {
+        for (IndexDataState idxDataState : indexDataStates) {
             for (IndexBuilder curIdx : idxDataState.getIndexes()) {
                 if (idx == curIdx) {
                     return idxDataState;
@@ -91,21 +91,21 @@ public class TableCreator extends TableMutator {
     }
 
     public List<IndexDataState> getIndexDataStates() {
-        return _indexDataStates;
+        return indexDataStates;
     }
 
     @Override
     public ColumnState getColumnState(ColumnBuilder col) {
-        return _columnStates.get(col);
+        return columnStates.get(col);
     }
 
     public List<ColumnBuilder> getLongValueColumns() {
-        return _lvalCols;
+        return lvalCols;
     }
 
     @Override
     short getColumnNumber(String colName) {
-        for (ColumnBuilder col : _columns) {
+        for (ColumnBuilder col : columns) {
             if (col.getName().equalsIgnoreCase(colName)) {
                 return col.getColumnNumber();
             }
@@ -118,7 +118,7 @@ public class TableCreator extends TableMutator {
      */
     public short countNonLongVariableLength() {
         short rtn = 0;
-        for (ColumnBuilder col : _columns) {
+        for (ColumnBuilder col : columns) {
             if (col.isVariableLength() && !col.getType().isLongValue()) {
                 rtn++;
             }
@@ -131,30 +131,30 @@ public class TableCreator extends TableMutator {
      */
     public TableImpl createTable(TableBuilder table) throws IOException {
 
-        _name = table.getName();
-        _columns = table.getColumns();
-        _indexes = table.getIndexes();
-        if (_indexes == null) {
-            _indexes = List.of();
+        name = table.getName();
+        columns = table.getColumns();
+        indexes = table.getIndexes();
+        if (indexes == null) {
+            indexes = List.of();
         }
 
         validate();
 
         // assign column numbers and do some assorted column bookkeeping
         short columnNumber = (short) 0;
-        for (ColumnBuilder col : _columns) {
+        for (ColumnBuilder col : columns) {
             col.setColumnNumber(columnNumber++);
             if (col.getType().isLongValue()) {
-                _lvalCols.add(col);
+                lvalCols.add(col);
                 // only lval columns need extra state
-                _columnStates.put(col, new ColumnState());
+                columnStates.put(col, new ColumnState());
             }
         }
 
         if (hasIndexes()) {
             // sort out index numbers (and backing index data).
-            for (IndexBuilder idx : _indexes) {
-                idx.setIndexNumber(_logicalIndexCount++);
+            for (IndexBuilder idx : indexes) {
+                idx.setIndexNumber(logicalIndexCount++);
                 findIndexDataState(idx);
             }
         }
@@ -163,16 +163,16 @@ public class TableCreator extends TableMutator {
         try {
 
             // reserve some pages
-            _tdefPageNumber = reservePageNumber();
-            _umapPageNumber = reservePageNumber();
+            tdefPageNumber = reservePageNumber();
+            umapPageNumber = reservePageNumber();
 
             // Write the tdef page to disk.
             TableImpl.writeTableDefinition(this);
 
             // update the database with the new table info
-            getDatabase().addNewTable(_name, _tdefPageNumber, DatabaseImpl.TYPE_TABLE, null, null);
+            getDatabase().addNewTable(name, tdefPageNumber, DatabaseImpl.TYPE_TABLE, null, null);
 
-            TableImpl newTable = getDatabase().getTable(_name);
+            TableImpl newTable = getDatabase().getTable(name);
 
             // add any table properties
             boolean addedProps = false;
@@ -181,7 +181,7 @@ public class TableCreator extends TableMutator {
                 newTable.getProperties().putAll(props.values());
                 addedProps = true;
             }
-            for (ColumnBuilder cb : _columns) {
+            for (ColumnBuilder cb : columns) {
                 Map<String, PropertyMap.Property> colProps = cb.getProperties();
                 if (colProps != null) {
                     newTable.getColumn(cb.getName()).getProperties().putAll(colProps.values());
@@ -205,7 +205,7 @@ public class TableCreator extends TableMutator {
 
         // search for an index which matches the given index (in terms of the
         // backing data)
-        for (IndexDataState idxDataState : _indexDataStates) {
+        for (IndexDataState idxDataState : indexDataStates) {
             if (sameIndexData(idxDataState.getFirstIndex(), idx)) {
                 idxDataState.addIndex(idx);
                 return idxDataState;
@@ -214,9 +214,9 @@ public class TableCreator extends TableMutator {
 
         // no matches found, need new index data state
         IndexDataState idxDataState = new IndexDataState();
-        idxDataState.setIndexDataNumber(_indexCount++);
+        idxDataState.setIndexDataNumber(indexCount++);
         idxDataState.addIndex(idx);
-        _indexDataStates.add(idxDataState);
+        indexDataStates.add(idxDataState);
         return idxDataState;
     }
 
@@ -225,18 +225,18 @@ public class TableCreator extends TableMutator {
      */
     private void validate() throws IOException {
 
-        getDatabase().validateNewTableName(_name);
+        getDatabase().validateNewTableName(name);
 
-        if (_columns == null || _columns.isEmpty()) {
+        if (columns == null || columns.isEmpty()) {
             throw new IllegalArgumentException(withErrorContext("Cannot create table with no columns"));
         }
-        if (_columns.size() > getFormat().MAX_COLUMNS_PER_TABLE) {
+        if (columns.size() > getFormat().MAX_COLUMNS_PER_TABLE) {
             throw new IllegalArgumentException(withErrorContext("Cannot create table with more than " + getFormat().MAX_COLUMNS_PER_TABLE + " columns"));
         }
 
         Set<String> colNames = new HashSet<>();
         // next, validate the column definitions
-        for (ColumnBuilder column : _columns) {
+        for (ColumnBuilder column : columns) {
             validateColumn(colNames, column);
         }
 
@@ -251,14 +251,14 @@ public class TableCreator extends TableMutator {
 
         if (hasIndexes()) {
 
-            if (_indexes.size() > getFormat().MAX_INDEXES_PER_TABLE) {
+            if (indexes.size() > getFormat().MAX_INDEXES_PER_TABLE) {
                 throw new IllegalArgumentException(withErrorContext("Cannot create table with more than " + getFormat().MAX_INDEXES_PER_TABLE + " indexes"));
             }
 
             // now, validate the indexes
             Set<String> idxNames = new HashSet<>();
             boolean[] foundPk = new boolean[1];
-            for (IndexBuilder index : _indexes) {
+            for (IndexBuilder index : indexes) {
                 validateIndex(colNames, idxNames, foundPk, index);
             }
         }
@@ -266,7 +266,7 @@ public class TableCreator extends TableMutator {
 
     private List<ColumnBuilder> getAutoNumberColumns() {
         List<ColumnBuilder> autoCols = new ArrayList<>(1);
-        for (ColumnBuilder c : _columns) {
+        for (ColumnBuilder c : columns) {
             if (c.isAutoNumber()) {
                 autoCols.add(c);
             }

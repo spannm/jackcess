@@ -31,38 +31,38 @@ import java.io.IOException;
  */
 class ComplexColumnImpl extends ColumnImpl {
     /** additional information specific to complex columns */
-    private final ComplexColumnInfo<? extends ComplexValue> _complexInfo;
+    private final ComplexColumnInfo<? extends ComplexValue> complexInfo;
     /** properties for multi-value column */
-    private PropertyMap                                     _mvProps;
+    private PropertyMap                                     mvProps;
 
     ComplexColumnImpl(InitArgs args) throws IOException {
         super(args);
-        _complexInfo = ComplexColumnSupport.create(this, args.buffer, args.offset);
+        complexInfo = ComplexColumnSupport.create(this, args.buffer, args.offset);
     }
 
     @Override
     void postTableLoadInit() throws IOException {
-        if (_complexInfo != null) {
-            ((ComplexColumnInfoImpl<? extends ComplexValue>) _complexInfo).postTableLoadInit();
+        if (complexInfo != null) {
+            ((ComplexColumnInfoImpl<? extends ComplexValue>) complexInfo).postTableLoadInit();
         }
         super.postTableLoadInit();
     }
 
     @Override
     public PropertyMap getProperties() throws IOException {
-        if (_complexInfo.getType() == ComplexDataType.MULTI_VALUE) {
-            if (_mvProps == null) {
+        if (complexInfo.getType() == ComplexDataType.MULTI_VALUE) {
+            if (mvProps == null) {
                 PropertyMap primaryProps = super.getProperties();
-                PropertyMap complexProps = ((MultiValueColumnInfoImpl) _complexInfo).getValueColumn().getProperties();
-                _mvProps = new MultiValueColumnPropertyMap(primaryProps, complexProps);
+                PropertyMap complexProps = ((MultiValueColumnInfoImpl) complexInfo).getValueColumn().getProperties();
+                mvProps = new MultiValueColumnPropertyMap(primaryProps, complexProps);
             }
-            return _mvProps;
+            return mvProps;
         }
         return super.getProperties();
     }
 
     @Override
     public ComplexColumnInfo<? extends ComplexValue> getComplexInfo() {
-        return _complexInfo;
+        return complexInfo;
     }
 }

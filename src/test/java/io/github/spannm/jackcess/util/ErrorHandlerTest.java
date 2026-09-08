@@ -99,7 +99,7 @@ class ErrorHandlerTest extends AbstractBaseTest {
 
     @SuppressWarnings("unchecked")
     private static void replaceColumn(Table t, String colName) throws Exception {
-        Field colsField = TableImpl.class.getDeclaredField("_columns");
+        Field colsField = TableImpl.class.getDeclaredField("columns");
         colsField.setAccessible(true);
         List<Column> cols = (List<Column>) colsField.get(t);
 

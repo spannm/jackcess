@@ -77,16 +77,16 @@ public class UnsupportedColumnInfoImpl extends ComplexColumnInfoImpl<Unsupported
     }
 
     private static class UnsupportedValueImpl extends ComplexValueImpl implements UnsupportedValue {
-        private final Map<String, Object> _values;
+        private final Map<String, Object> values;
 
         private UnsupportedValueImpl(Id id, ComplexValueForeignKey complexValueFk, Map<String, Object> values) {
             super(id, complexValueFk);
-            _values = values;
+            this.values = values;
         }
 
         @Override
         public Map<String, Object> getValues() {
-            return _values;
+            return values;
         }
 
         @Override

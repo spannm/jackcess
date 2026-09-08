@@ -39,29 +39,29 @@ public class UsageMap {
     private static final int   INVALID_BIT_INDEX           = -1;
 
     /** owning database */
-    private final DatabaseImpl _database;
+    private final DatabaseImpl database;
     /** Page number of the map table declaration */
-    private final int          _tablePageNum;
+    private final int          tablePageNum;
     /** Offset of the data page at which the usage map data starts */
-    private int                _startOffset;
+    private int                startOffset;
     /** Offset of the data page at which the usage map declaration starts */
-    private final short        _rowStart;
+    private final short        rowStart;
     /** First page that this usage map applies to */
-    private int                _startPage;
+    private int                startPage;
     /** Last page that this usage map applies to */
-    private int                _endPage;
-    /** bits representing page numbers used, offset from _startPage */
-    private final BitSet       _pageNumbers                = new BitSet();
+    private int                endPage;
+    /** bits representing page numbers used, offset from startPage */
+    private final BitSet       pageNumbers                = new BitSet();
     /** Buffer that contains the usage map table declaration page */
-    private final ByteBuffer   _tableBuffer;
+    private final ByteBuffer   tableBuffer;
     /**
      * modification count on the usage map, used to keep the cursors in sync
      */
-    private int                _modCount;
+    private int                modCount;
     /**
      * the current handler implementation for reading/writing the specific usage map type. note, this may change over time.
      */
-    private Handler            _handler;
+    private Handler            handler;
 
     /** Error message prefix used when map type is unrecognized. */
     static final String        MSG_PREFIX_UNRECOGNIZED_MAP = "Unrecognized map type: ";
@@ -73,16 +73,16 @@ public class UsageMap {
      * @param rowStart Offset at which the declaration starts in the buffer
      */
     private UsageMap(DatabaseImpl database, ByteBuffer tableBuffer, int pageNum, short rowStart) {
-        _database = database;
-        _tableBuffer = tableBuffer;
-        _tablePageNum = pageNum;
-        _rowStart = rowStart;
-        _tableBuffer.position(_rowStart + getFormat().OFFSET_USAGE_MAP_START);
-        _startOffset = _tableBuffer.position();
+        this.database = database;
+        this.tableBuffer = tableBuffer;
+        tablePageNum = pageNum;
+        this.rowStart = rowStart;
+        this.tableBuffer.position(this.rowStart + getFormat().OFFSET_USAGE_MAP_START);
+        startOffset = this.tableBuffer.position();
     }
 
     public DatabaseImpl getDatabase() {
-        return _database;
+        return database;
     }
 
     public JetFormat getFormat() {
@@ -132,9 +132,9 @@ public class UsageMap {
 
     private void initHandler(byte mapType, boolean isGlobal) throws IOException {
         if (mapType == MAP_TYPE_INLINE) {
-            _handler = isGlobal ? new GlobalInlineHandler() : new InlineHandler();
+            handler = isGlobal ? new GlobalInlineHandler() : new InlineHandler();
         } else if (mapType == MAP_TYPE_REFERENCE) {
-            _handler = isGlobal ? new GlobalReferenceHandler() : new ReferenceHandler();
+            handler = isGlobal ? new GlobalReferenceHandler() : new ReferenceHandler();
         } else {
             throw new IOException(MSG_PREFIX_UNRECOGNIZED_MAP + mapType);
         }
@@ -145,11 +145,11 @@ public class UsageMap {
     }
 
     public int getPageCount() {
-        return _pageNumbers.cardinality();
+        return pageNumbers.cardinality();
     }
 
     protected short getRowStart() {
-        return _rowStart;
+        return rowStart;
     }
 
     protected int getRowEnd() {
@@ -157,40 +157,40 @@ public class UsageMap {
     }
 
     protected void setStartOffset(int startOffset) {
-        _startOffset = startOffset;
+        this.startOffset = startOffset;
     }
 
     protected int getStartOffset() {
-        return _startOffset;
+        return startOffset;
     }
 
     protected ByteBuffer getTableBuffer() {
-        return _tableBuffer;
+        return tableBuffer;
     }
 
     protected int getTablePageNumber() {
-        return _tablePageNum;
+        return tablePageNum;
     }
 
     protected int getStartPage() {
-        return _startPage;
+        return startPage;
     }
 
     protected int getEndPage() {
-        return _endPage;
+        return endPage;
     }
 
     protected BitSet getPageNumbers() {
-        return _pageNumbers;
+        return pageNumbers;
     }
 
     protected void setPageRange(int newStartPage, int newEndPage) {
-        _startPage = newStartPage;
-        _endPage = newEndPage;
+        startPage = newStartPage;
+        endPage = newEndPage;
     }
 
     protected boolean isPageWithinRange(int pageNumber) {
-        return pageNumber >= _startPage && pageNumber < _endPage;
+        return pageNumber >= startPage && pageNumber < endPage;
     }
 
     protected int getFirstPageNumber() {
@@ -202,11 +202,11 @@ public class UsageMap {
     }
 
     protected int getNextBitIndex(int curIndex) {
-        return _pageNumbers.nextSetBit(curIndex + 1);
+        return pageNumbers.nextSetBit(curIndex + 1);
     }
 
     protected int getLastPageNumber() {
-        return bitIndexToPageNumber(getPrevBitIndex(_pageNumbers.length()), RowIdImpl.FIRST_PAGE_NUMBER);
+        return bitIndexToPageNumber(getPrevBitIndex(pageNumbers.length()), RowIdImpl.FIRST_PAGE_NUMBER);
     }
 
     protected int getPrevPageNumber(int curPage) {
@@ -215,36 +215,36 @@ public class UsageMap {
 
     protected int getPrevBitIndex(int curIndex) {
         curIndex--;
-        while (curIndex >= 0 && !_pageNumbers.get(curIndex)) {
+        while (curIndex >= 0 && !pageNumbers.get(curIndex)) {
             curIndex--;
         }
         return curIndex;
     }
 
     protected int bitIndexToPageNumber(int bitIndex, int invalidPageNumber) {
-        return bitIndex >= 0 ? _startPage + bitIndex : invalidPageNumber;
+        return bitIndex >= 0 ? startPage + bitIndex : invalidPageNumber;
     }
 
     protected int pageNumberToBitIndex(int pageNumber) {
-        return pageNumber >= 0 ? pageNumber - _startPage : INVALID_BIT_INDEX;
+        return pageNumber >= 0 ? pageNumber - startPage : INVALID_BIT_INDEX;
     }
 
     protected void clearTableAndPages() {
         // reset some values
-        _pageNumbers.clear();
-        _startPage = 0;
-        _endPage = 0;
-        ++_modCount;
+        pageNumbers.clear();
+        startPage = 0;
+        endPage = 0;
+        ++modCount;
 
         // clear out the table data (everything except map type)
         int tableStart = getRowStart() + 1;
         int tableEnd = getRowEnd();
-        ByteUtil.clearRange(_tableBuffer, tableStart, tableEnd);
+        ByteUtil.clearRange(tableBuffer, tableStart, tableEnd);
     }
 
     protected void writeTable() throws IOException {
         // note, we only want to write the row data with which we are working
-        getPageChannel().writePage(_tableBuffer, _tablePageNum, _rowStart);
+        getPageChannel().writePage(tableBuffer, tablePageNum, rowStart);
     }
 
     /**
@@ -260,9 +260,9 @@ public class UsageMap {
                         int pageNumberOffset = byteCount * 8 + i + bufferStartPage;
                         int pageNumber = bitIndexToPageNumber(pageNumberOffset, PageChannel.INVALID_PAGE_NUMBER);
                         if (!isPageWithinRange(pageNumber)) {
-                            throw new IllegalStateException("found page number " + pageNumber + " in usage map outside of expected range " + _startPage + " to " + _endPage);
+                            throw new IllegalStateException("found page number " + pageNumber + " in usage map outside of expected range " + startPage + " to " + endPage);
                         }
-                        _pageNumbers.set(pageNumberOffset);
+                        pageNumbers.set(pageNumberOffset);
                     }
                 }
             }
@@ -274,15 +274,15 @@ public class UsageMap {
      * Determines if the given page number is contained in this map.
      */
     public boolean containsPageNumber(int pageNumber) {
-        return _handler.containsPageNumber(pageNumber);
+        return handler.containsPageNumber(pageNumber);
     }
 
     /**
      * Add a page number to this usage map
      */
     public void addPageNumber(int pageNumber) throws IOException {
-        ++_modCount;
-        _handler.addOrRemovePageNumber(pageNumber, true, false);
+        ++modCount;
+        handler.addOrRemovePageNumber(pageNumber, true, false);
     }
 
     /**
@@ -293,32 +293,32 @@ public class UsageMap {
     }
 
     private void removePageNumber(int pageNumber, boolean force) throws IOException {
-        ++_modCount;
-        _handler.addOrRemovePageNumber(pageNumber, false, force);
+        ++modCount;
+        handler.addOrRemovePageNumber(pageNumber, false, force);
     }
 
     protected void updateMap(int absolutePageNumber, int bufferRelativePageNumber, ByteBuffer buffer, boolean add, boolean force) throws IOException {
         // Find the byte to which to apply the bitmask and create the bitmask
         int offset = bufferRelativePageNumber / 8;
         int bitmask = 1 << bufferRelativePageNumber % 8;
-        byte b = buffer.get(_startOffset + offset);
+        byte b = buffer.get(startOffset + offset);
 
         // check current value for this page number
         int pageNumberOffset = pageNumberToBitIndex(absolutePageNumber);
-        boolean isOn = _pageNumbers.get(pageNumberOffset);
+        boolean isOn = pageNumbers.get(pageNumberOffset);
         if (isOn == add && !force) {
-            throw new IOException("Page number " + absolutePageNumber + " already " + (add ? "added to" : "removed from") + " usage map, expected range " + _startPage + " to " + _endPage);
+            throw new IOException("Page number " + absolutePageNumber + " already " + (add ? "added to" : "removed from") + " usage map, expected range " + startPage + " to " + endPage);
         }
 
         // Apply the bitmask
         if (add) {
             b |= bitmask;
-            _pageNumbers.set(pageNumberOffset);
+            pageNumbers.set(pageNumberOffset);
         } else {
             b &= ~bitmask;
-            _pageNumbers.clear(pageNumberOffset);
+            pageNumbers.clear(pageNumberOffset);
         }
-        buffer.put(_startOffset + offset, b);
+        buffer.put(startOffset + offset, b);
     }
 
     /**
@@ -326,20 +326,20 @@ public class UsageMap {
      */
     private void promoteInlineHandlerToReferenceHandler(int newPageNumber) throws IOException {
         // copy current page number info to new references and then clear old
-        int oldStartPage = _startPage;
-        BitSet oldPageNumbers = (BitSet) _pageNumbers.clone();
+        int oldStartPage = startPage;
+        BitSet oldPageNumbers = (BitSet) pageNumbers.clone();
 
         // clear out the main table (inline usage map data and start page)
         clearTableAndPages();
 
         // set the new map type
-        _tableBuffer.put(getRowStart(), MAP_TYPE_REFERENCE);
+        tableBuffer.put(getRowStart(), MAP_TYPE_REFERENCE);
 
         // write the new table data
         writeTable();
 
         // set new handler
-        _handler = new ReferenceHandler();
+        handler = new ReferenceHandler();
 
         // update new handler with old data
         reAddPages(oldStartPage, oldPageNumbers, newPageNumber);
@@ -382,7 +382,7 @@ public class UsageMap {
             rangeToString(ranges, curRangeStart, prevPage);
         }
 
-        return ToStringBuilder.valueBuilder(_handler.getClass().getSimpleName()).append("range", "(" + _startPage + "-" + _endPage + ")").append("pageNumbers", ranges).toString();
+        return ToStringBuilder.valueBuilder(handler.getClass().getSimpleName()).append("range", "(" + startPage + "-" + endPage + ")").append("pageNumbers", ranges).toString();
     }
 
     private static void rangeToString(List<String> ranges, int rangeStart, int rangeEnd) {
@@ -422,17 +422,17 @@ public class UsageMap {
      * @author Tim McCune
      */
     private class InlineHandler extends Handler {
-        private final int _maxInlinePages;
+        private final int maxInlinePages;
 
         protected InlineHandler() {
-            _maxInlinePages = (getInlineDataEnd() - getInlineDataStart()) * 8;
-            int startPage = getTableBuffer().getInt(getRowStart() + 1);
-            setInlinePageRange(startPage);
+            maxInlinePages = (getInlineDataEnd() - getInlineDataStart()) * 8;
+            int inlineStartPage = getTableBuffer().getInt(getRowStart() + 1);
+            setInlinePageRange(inlineStartPage);
             processMap(getTableBuffer(), 0);
         }
 
         protected final int getMaxInlinePages() {
-            return _maxInlinePages;
+            return maxInlinePages;
         }
 
         protected final int getInlineDataStart() {
@@ -446,8 +446,8 @@ public class UsageMap {
         /**
          * Sets the page range for an inline usage map starting from the given page.
          */
-        private void setInlinePageRange(int startPage) {
-            setPageRange(startPage, startPage + getMaxInlinePages());
+        private void setInlinePageRange(int newStartPage) {
+            setPageRange(newStartPage, newStartPage + getMaxInlinePages());
         }
 
         @Override
@@ -506,7 +506,7 @@ public class UsageMap {
 
                     // this should not happen, we are removing a page which is not in
                     // the map
-                    throw new IOException("Page number " + pageNumber + " already removed from usage map" + ", expected range " + _startPage + " to " + _endPage);
+                    throw new IOException("Page number " + pageNumber + " already removed from usage map" + ", expected range " + startPage + " to " + endPage);
                 }
             }
         }
@@ -525,9 +525,9 @@ public class UsageMap {
             clearTableAndPages();
 
             // write new start page
-            ByteBuffer tableBuffer = getTableBuffer();
-            tableBuffer.position(getRowStart() + 1);
-            tableBuffer.putInt(newStartPage);
+            ByteBuffer curTableBuffer = getTableBuffer();
+            curTableBuffer.position(getRowStart() + 1);
+            curTableBuffer.putInt(newStartPage);
 
             // write the new table data
             writeTable();
@@ -601,7 +601,7 @@ public class UsageMap {
             if (firstPage <= PageChannel.INVALID_PAGE_NUMBER) {
 
                 // this is the common case where we left everything behind
-                ByteUtil.fillRange(_tableBuffer, getInlineDataStart(), getInlineDataEnd());
+                ByteUtil.fillRange(tableBuffer, getInlineDataStart(), getInlineDataEnd());
 
                 // write out the updated table
                 writeTable();
@@ -631,14 +631,14 @@ public class UsageMap {
      */
     private class ReferenceHandler extends Handler {
         /** Buffer that contains the current reference map page */
-        private final TempPageHolder _mapPageHolder = TempPageHolder.newHolder(TempBufferHolder.Type.SOFT);
-        private final int            _maxPagesPerUsageMapPage;
+        private final TempPageHolder mapPageHolder = TempPageHolder.newHolder(TempBufferHolder.Type.SOFT);
+        private final int            maxPagesPerUsageMapPage;
 
         private ReferenceHandler() throws IOException {
-            _maxPagesPerUsageMapPage = (getFormat().PAGE_SIZE - getFormat().OFFSET_USAGE_MAP_PAGE_DATA) * 8;
+            maxPagesPerUsageMapPage = (getFormat().PAGE_SIZE - getFormat().OFFSET_USAGE_MAP_PAGE_DATA) * 8;
             int numUsagePages = (getRowEnd() - getRowStart() - 1) / 4;
             setStartOffset(getFormat().OFFSET_USAGE_MAP_PAGE_DATA);
-            setPageRange(0, numUsagePages * _maxPagesPerUsageMapPage);
+            setPageRange(0, numUsagePages * maxPagesPerUsageMapPage);
 
             // there is no "start page" for a reference usage map, so we get an
             // extra page reference on top of the number of page references that fit
@@ -646,19 +646,19 @@ public class UsageMap {
             for (int i = 0; i < numUsagePages; i++) {
                 int mapPageNum = getTableBuffer().getInt(calculateMapPagePointerOffset(i));
                 if (mapPageNum > 0) {
-                    ByteBuffer mapPageBuffer = _mapPageHolder.withPage(getPageChannel(), mapPageNum);
+                    ByteBuffer mapPageBuffer = mapPageHolder.withPage(getPageChannel(), mapPageNum);
                     byte pageType = mapPageBuffer.get();
                     if (pageType != PageTypes.USAGE_MAP) {
                         throw new IOException("Looking for usage map at page " + mapPageNum + ", but page type is " + pageType);
                     }
                     mapPageBuffer.position(getFormat().OFFSET_USAGE_MAP_PAGE_DATA);
-                    processMap(mapPageBuffer, _maxPagesPerUsageMapPage * i);
+                    processMap(mapPageBuffer, maxPagesPerUsageMapPage * i);
                 }
             }
         }
 
         protected final int getMaxPagesPerUsagePage() {
-            return _maxPagesPerUsageMapPage;
+            return maxPagesPerUsageMapPage;
         }
 
         @Override
@@ -673,11 +673,11 @@ public class UsageMap {
             int mapPageNum = getTableBuffer().getInt(calculateMapPagePointerOffset(pageIndex));
             ByteBuffer mapPageBuffer = null;
             if (mapPageNum > 0) {
-                mapPageBuffer = _mapPageHolder.withPage(getPageChannel(), mapPageNum);
+                mapPageBuffer = mapPageHolder.withPage(getPageChannel(), mapPageNum);
             } else {
                 // Need to create a new usage map page
                 mapPageBuffer = createNewUsageMapPage(pageIndex);
-                mapPageNum = _mapPageHolder.getPageNumber();
+                mapPageNum = mapPageHolder.getPageNumber();
             }
             updateMap(pageNumber, pageNumber - getMaxPagesPerUsagePage() * pageIndex, mapPageBuffer, add, force);
             getPageChannel().writePage(mapPageBuffer, mapPageNum);
@@ -690,7 +690,7 @@ public class UsageMap {
          */
         private ByteBuffer createNewUsageMapPage(int pageIndex) throws IOException {
             ByteBuffer mapPageBuffer = allocateNewUsageMapPage(pageIndex);
-            int mapPageNum = _mapPageHolder.getPageNumber();
+            int mapPageNum = mapPageHolder.getPageNumber();
             getTableBuffer().putInt(calculateMapPagePointerOffset(pageIndex), mapPageNum);
             writeTable();
             return mapPageBuffer;
@@ -701,7 +701,7 @@ public class UsageMap {
         }
 
         protected ByteBuffer allocateNewUsageMapPage(int pageIndex) throws IOException {
-            ByteBuffer mapPageBuffer = _mapPageHolder.withNewPage(getPageChannel());
+            ByteBuffer mapPageBuffer = mapPageHolder.withNewPage(getPageChannel());
             mapPageBuffer.put(PageTypes.USAGE_MAP);
             mapPageBuffer.put((byte) 0x01); // Unknown
             mapPageBuffer.putShort((short) 0); // Unknown
@@ -720,8 +720,8 @@ public class UsageMap {
      * should be called by PageChannel.
      */
     private class GlobalReferenceHandler extends ReferenceHandler {
-        private boolean _allocatingPage;
-        private Integer _pendingPage;
+        private boolean allocatingPage;
+        private Integer pendingPage;
 
         private GlobalReferenceHandler() throws IOException {
         }
@@ -734,19 +734,19 @@ public class UsageMap {
 
         @Override
         public void addOrRemovePageNumber(int pageNumber, boolean add, boolean force) throws IOException {
-            if (_allocatingPage && !add) {
+            if (allocatingPage && !add) {
                 // we are in the midst of allocating a page for ourself, keep track of
                 // this new page so we can mark it later...
-                if (_pendingPage != null) {
+                if (pendingPage != null) {
                     throw new IllegalStateException("should only have single pending page");
                 }
-                _pendingPage = pageNumber;
+                pendingPage = pageNumber;
                 return;
             }
 
             super.addOrRemovePageNumber(pageNumber, add, force);
 
-            while (_pendingPage != null) {
+            while (pendingPage != null) {
 
                 // while updating our usage map, we needed to allocate a new page (and
                 // thus mark a new page as used). we delayed that marking so that we
@@ -755,8 +755,8 @@ public class UsageMap {
                 // off the wall chance that adding this page requires allocating a new
                 // page. in theory, we could do this more than once, but not
                 // forever).
-                int removedPageNumber = _pendingPage;
-                _pendingPage = null;
+                int removedPageNumber = pendingPage;
+                pendingPage = null;
 
                 super.addOrRemovePageNumber(removedPageNumber, false, true);
             }
@@ -767,7 +767,7 @@ public class UsageMap {
             try {
                 // keep track of the fact that we are actively allocating a page for our
                 // own use so that we can break the potential cycle.
-                _allocatingPage = true;
+                allocatingPage = true;
 
                 ByteBuffer mapPageBuffer = super.allocateNewUsageMapPage(pageIndex);
 
@@ -782,12 +782,12 @@ public class UsageMap {
                 int maxPagesPerUmapPage = getMaxPagesPerUsagePage();
                 int firstNewPage = pageIndex * maxPagesPerUmapPage;
                 int lastNewPage = firstNewPage + maxPagesPerUmapPage;
-                _pageNumbers.set(firstNewPage, lastNewPage);
+                pageNumbers.set(firstNewPage, lastNewPage);
 
                 return mapPageBuffer;
 
             } finally {
-                _allocatingPage = false;
+                allocatingPage = false;
             }
         }
     }
@@ -797,18 +797,18 @@ public class UsageMap {
      */
     public final class PageCursor {
         /** handler for moving the page cursor forward */
-        private final DirHandler _forwardDirHandler = new ForwardDirHandler();
+        private final DirHandler forwardDirHandler = new ForwardDirHandler();
         /** handler for moving the page cursor backward */
-        private final DirHandler _reverseDirHandler = new ReverseDirHandler();
+        private final DirHandler reverseDirHandler = new ReverseDirHandler();
         /** the current used page number */
-        private int              _curPageNumber;
+        private int              curPageNumber;
         /** the previous used page number */
-        private int              _prevPageNumber;
+        private int              prevPageNumber;
         /**
          * the last read modification count on the UsageMap. we track this so that the cursor can detect updates to the
          * usage map while traversing and act accordingly
          */
-        private int              _lastModCount;
+        private int              lastModCount;
 
         private PageCursor() {
             reset();
@@ -822,14 +822,14 @@ public class UsageMap {
          * Returns the DirHandler for the given direction
          */
         private DirHandler getDirHandler(boolean moveForward) {
-            return moveForward ? _forwardDirHandler : _reverseDirHandler;
+            return moveForward ? forwardDirHandler : reverseDirHandler;
         }
 
         /**
          * Returns {@code true} if this cursor is up-to-date with respect to its usage map.
          */
         public boolean isUpToDate() {
-            return _modCount == _lastModCount;
+            return modCount == lastModCount;
         }
 
         /**
@@ -850,22 +850,22 @@ public class UsageMap {
          * Gets another page in the given direction, returning the new page.
          */
         private int getAnotherPage(boolean moveForward) {
-            DirHandler handler = getDirHandler(moveForward);
-            if (_curPageNumber == handler.getEndPageNumber()) {
+            DirHandler dirHandler = getDirHandler(moveForward);
+            if (curPageNumber == dirHandler.getEndPageNumber()) {
                 if (!isUpToDate()) {
-                    restorePosition(_prevPageNumber);
+                    restorePosition(prevPageNumber);
                     // drop through and retry moving to another page
                 } else {
                     // at end, no more
-                    return _curPageNumber;
+                    return curPageNumber;
                 }
             }
 
             checkForModification();
 
-            _prevPageNumber = _curPageNumber;
-            _curPageNumber = handler.getAnotherPageNumber(_curPageNumber);
-            return _curPageNumber;
+            prevPageNumber = curPageNumber;
+            curPageNumber = dirHandler.getAnotherPageNumber(curPageNumber);
+            return curPageNumber;
         }
 
         /**
@@ -893,26 +893,26 @@ public class UsageMap {
          * Resets this page cursor for traversing the given direction.
          */
         protected void reset(boolean moveForward) {
-            _curPageNumber = getDirHandler(moveForward).getBeginningPageNumber();
-            _prevPageNumber = _curPageNumber;
-            _lastModCount = _modCount;
+            curPageNumber = getDirHandler(moveForward).getBeginningPageNumber();
+            prevPageNumber = curPageNumber;
+            lastModCount = modCount;
         }
 
         /**
          * Restores a current position for the cursor (current position becomes previous position).
          */
-        private void restorePosition(int curPageNumber) {
-            restorePosition(curPageNumber, _curPageNumber);
+        private void restorePosition(int newCurPageNumber) {
+            restorePosition(newCurPageNumber, curPageNumber);
         }
 
         /**
          * Restores a current and previous position for the cursor.
          */
-        protected void restorePosition(int curPageNumber, int prevPageNumber) {
-            if (curPageNumber != _curPageNumber || prevPageNumber != _prevPageNumber) {
-                _prevPageNumber = updatePosition(prevPageNumber);
-                _curPageNumber = updatePosition(curPageNumber);
-                _lastModCount = _modCount;
+        protected void restorePosition(int newCurPageNumber, int newPrevPageNumber) {
+            if (newCurPageNumber != curPageNumber || newPrevPageNumber != prevPageNumber) {
+                prevPageNumber = updatePosition(newPrevPageNumber);
+                curPageNumber = updatePosition(newCurPageNumber);
+                lastModCount = modCount;
             } else {
                 checkForModification();
             }
@@ -923,9 +923,9 @@ public class UsageMap {
          */
         private void checkForModification() {
             if (!isUpToDate()) {
-                _prevPageNumber = updatePosition(_prevPageNumber);
-                _curPageNumber = updatePosition(_curPageNumber);
-                _lastModCount = _modCount;
+                prevPageNumber = updatePosition(prevPageNumber);
+                curPageNumber = updatePosition(curPageNumber);
+                lastModCount = modCount;
             }
         }
 
@@ -940,14 +940,14 @@ public class UsageMap {
 
         @Override
         public String toString() {
-            return String.format("%s[curPageNumber=%s, prevPageNumber=%s]", getClass().getSimpleName(), _curPageNumber, _prevPageNumber);
+            return String.format("%s[curPageNumber=%s, prevPageNumber=%s]", getClass().getSimpleName(), curPageNumber, prevPageNumber);
         }
 
         /**
          * Handles moving the cursor in a given direction. Separates cursor logic from value storage.
          */
         private abstract class DirHandler {
-            public abstract int getAnotherPageNumber(int curPageNumber);
+            public abstract int getAnotherPageNumber(int fromPageNumber);
 
             public abstract int getBeginningPageNumber();
 
@@ -959,11 +959,11 @@ public class UsageMap {
          */
         private final class ForwardDirHandler extends DirHandler {
             @Override
-            public int getAnotherPageNumber(int curPageNumber) {
-                if (curPageNumber == getBeginningPageNumber()) {
+            public int getAnotherPageNumber(int fromPageNumber) {
+                if (fromPageNumber == getBeginningPageNumber()) {
                     return getFirstPageNumber();
                 }
-                return getNextPageNumber(curPageNumber);
+                return getNextPageNumber(fromPageNumber);
             }
 
             @Override
@@ -982,11 +982,11 @@ public class UsageMap {
          */
         private final class ReverseDirHandler extends DirHandler {
             @Override
-            public int getAnotherPageNumber(int curPageNumber) {
-                if (curPageNumber == getBeginningPageNumber()) {
+            public int getAnotherPageNumber(int fromPageNumber) {
+                if (fromPageNumber == getBeginningPageNumber()) {
                     return getLastPageNumber();
                 }
-                return getPrevPageNumber(curPageNumber);
+                return getPrevPageNumber(fromPageNumber);
             }
 
             @Override

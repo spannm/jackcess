@@ -697,10 +697,10 @@ public class IndexCodesTest extends AbstractBaseTest {
     }
 
     public static String entryToString(Cursor.Position curPos) throws Exception, IllegalAccessException {
-        Field eField = curPos.getClass().getDeclaredField("_entry");
+        Field eField = curPos.getClass().getDeclaredField("entry");
         eField.setAccessible(true);
         IndexData.Entry entry = (IndexData.Entry) eField.get(curPos);
-        Field ebField = entry.getClass().getDeclaredField("_entryBytes");
+        Field ebField = entry.getClass().getDeclaredField("entryBytes");
         ebField.setAccessible(true);
         byte[] entryBytes = (byte[]) ebField.get(entry);
 

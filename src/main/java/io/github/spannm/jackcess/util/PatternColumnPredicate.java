@@ -35,10 +35,10 @@ public class PatternColumnPredicate implements Predicate<Object> {
     private static final int LIKE_REGEX_FLAGS    = Pattern.DOTALL;
     private static final int CI_LIKE_REGEX_FLAGS = LIKE_REGEX_FLAGS | Pattern.CASE_INSENSITIVE | Pattern.UNICODE_CASE;
 
-    private final Pattern    _pattern;
+    private final Pattern    pattern;
 
     public PatternColumnPredicate(Pattern pattern) {
-        _pattern = pattern;
+        this.pattern = pattern;
     }
 
     @Override
@@ -47,7 +47,7 @@ public class PatternColumnPredicate implements Predicate<Object> {
             // convert column value to string
             CharSequence cs = ColumnImpl.toCharSequence(value);
 
-            return _pattern.matcher(cs).matches();
+            return pattern.matcher(cs).matches();
         } catch (IOException _ex) {
             throw new UncheckedIOException("Could not coerece column value to string", _ex);
         }

@@ -431,57 +431,57 @@ public class OleUtil {
     }
 
     static final class OleBlobImpl implements OleBlob, ColumnImpl.InMemoryBlob {
-        private byte[]      _bytes;
-        private ContentImpl _content;
+        private byte[]      bytes;
+        private ContentImpl content;
 
         private OleBlobImpl(byte[] bytes) {
-            _bytes = bytes;
+            this.bytes = bytes;
         }
 
         @Override
         public void writeTo(OutputStream out) throws IOException {
-            out.write(_bytes);
+            out.write(bytes);
         }
 
         @Override
         public Content getContent() throws IOException {
-            if (_content == null) {
-                _content = parseContent(this);
+            if (content == null) {
+                content = parseContent(this);
             }
-            return _content;
+            return content;
         }
 
         @Override
         public InputStream getBinaryStream() {
-            return new ByteArrayInputStream(_bytes);
+            return new ByteArrayInputStream(bytes);
         }
 
         @Override
         public InputStream getBinaryStream(long pos, long len) {
-            return new ByteArrayInputStream(_bytes, fromJdbcOffset(pos), (int) len);
+            return new ByteArrayInputStream(bytes, fromJdbcOffset(pos), (int) len);
         }
 
         @Override
         public long length() {
-            return _bytes.length;
+            return bytes.length;
         }
 
         @Override
         public byte[] getBytes() throws IOException {
-            if (_bytes == null) {
+            if (bytes == null) {
                 throw new IOException("blob is closed");
             }
-            return _bytes;
+            return bytes;
         }
 
         @Override
         public byte[] getBytes(long pos, int len) {
-            return ByteUtil.copyOf(_bytes, fromJdbcOffset(pos), len);
+            return ByteUtil.copyOf(bytes, fromJdbcOffset(pos), len);
         }
 
         @Override
         public long position(byte[] pattern, long start) {
-            int pos = ByteUtil.findRange(PageChannel.wrap(_bytes), fromJdbcOffset(start), pattern);
+            int pos = ByteUtil.findRange(PageChannel.wrap(bytes), fromJdbcOffset(start), pattern);
             return pos >= 0 ? toJdbcOffset(pos) : pos;
         }
 
@@ -501,12 +501,12 @@ public class OleUtil {
         }
 
         @Override
-        public int setBytes(long pos, byte[] bytes) throws SQLException {
+        public int setBytes(long pos, byte[] newBytes) throws SQLException {
             throw new SQLFeatureNotSupportedException();
         }
 
         @Override
-        public int setBytes(long pos, byte[] bytes, int offset, int lesn) throws SQLException {
+        public int setBytes(long pos, byte[] newBytes, int offset, int lesn) throws SQLException {
             throw new SQLFeatureNotSupportedException();
         }
 
@@ -517,9 +517,9 @@ public class OleUtil {
 
         @Override
         public void close() {
-            _bytes = null;
-            ByteUtil.closeQuietly(_content);
-            _content = null;
+            bytes = null;
+            ByteUtil.closeQuietly(content);
+            content = null;
         }
 
         private static int toJdbcOffset(int off) {
@@ -533,25 +533,25 @@ public class OleUtil {
         @Override
         public String toString() {
             ToStringBuilder sb = ToStringBuilder.builder(this);
-            if (_content != null) {
-                sb.append("content", _content);
+            if (content != null) {
+                sb.append("content", content);
             } else {
-                sb.append("bytes", _bytes).append("content", "(uninitialized)");
+                sb.append("bytes", bytes).append("content", "(uninitialized)");
             }
             return sb.toString();
         }
     }
 
     abstract static class ContentImpl implements Content, Closeable {
-        protected final OleBlobImpl _blob;
+        protected final OleBlobImpl blob;
 
         protected ContentImpl(OleBlobImpl blob) {
-            _blob = blob;
+            this.blob = blob;
         }
 
         @Override
         public OleBlobImpl getBlob() {
-            return _blob;
+            return blob;
         }
 
         protected byte[] getBytes() throws IOException {
@@ -570,85 +570,85 @@ public class OleUtil {
     }
 
     abstract static class EmbeddedContentImpl extends ContentImpl implements EmbeddedContent {
-        private final int _position;
-        private final int _length;
+        private final int position;
+        private final int length;
 
         protected EmbeddedContentImpl(OleBlobImpl blob, int position, int length) {
             super(blob);
-            _position = position;
-            _length = length;
+            this.position = position;
+            this.length = length;
         }
 
         @Override
         public long length() {
-            return _length;
+            return length;
         }
 
         @Override
         public InputStream getStream() throws IOException {
-            return new ByteArrayInputStream(getBytes(), _position, _length);
+            return new ByteArrayInputStream(getBytes(), position, length);
         }
 
         @Override
         public void writeTo(OutputStream out) throws IOException {
-            out.write(getBytes(), _position, _length);
+            out.write(getBytes(), position, length);
         }
 
         @Override
         protected ToStringBuilder toString(ToStringBuilder sb) {
             super.toString(sb);
-            if (_position >= 0) {
-                sb.append("content", ByteBuffer.wrap(_blob._bytes, _position, _length));
+            if (position >= 0) {
+                sb.append("content", ByteBuffer.wrap(blob.bytes, position, length));
             }
             return sb;
         }
     }
 
     abstract static class EmbeddedPackageContentImpl extends EmbeddedContentImpl implements PackageContent {
-        private final String _prettyName;
-        private final String _className;
-        private final String _typeName;
+        private final String prettyName;
+        private final String className;
+        private final String typeName;
 
         protected EmbeddedPackageContentImpl(OleBlobImpl blob, String prettyName, String className, String typeName, int position, int length) {
             super(blob, position, length);
-            _prettyName = prettyName;
-            _className = className;
-            _typeName = typeName;
+            this.prettyName = prettyName;
+            this.className = className;
+            this.typeName = typeName;
         }
 
         @Override
         public String getPrettyName() {
-            return _prettyName;
+            return prettyName;
         }
 
         @Override
         public String getClassName() {
-            return _className;
+            return className;
         }
 
         @Override
         public String getTypeName() {
-            return _typeName;
+            return typeName;
         }
 
         @Override
         protected ToStringBuilder toString(ToStringBuilder sb) {
-            sb.append("prettyName", _prettyName).append("className", _className).append("typeName", _typeName);
+            sb.append("prettyName", prettyName).append("className", className).append("typeName", typeName);
             super.toString(sb);
             return sb;
         }
     }
 
     private static final class LinkContentImpl extends EmbeddedPackageContentImpl implements LinkContent {
-        private final String _fileName;
-        private final String _linkPath;
-        private final String _filePath;
+        private final String fileName;
+        private final String linkPath;
+        private final String filePath;
 
         private LinkContentImpl(OleBlobImpl blob, String prettyName, String className, String typeName, String fileName, String linkPath, String filePath) {
             super(blob, prettyName, className, typeName, -1, -1);
-            _fileName = fileName;
-            _linkPath = linkPath;
-            _filePath = filePath;
+            this.fileName = fileName;
+            this.linkPath = linkPath;
+            this.filePath = filePath;
         }
 
         @Override
@@ -658,17 +658,17 @@ public class OleUtil {
 
         @Override
         public String getFileName() {
-            return _fileName;
+            return fileName;
         }
 
         @Override
         public String getLinkPath() {
-            return _linkPath;
+            return linkPath;
         }
 
         @Override
         public String getFilePath() {
-            return _filePath;
+            return filePath;
         }
 
         @Override
@@ -678,20 +678,20 @@ public class OleUtil {
 
         @Override
         public String toString() {
-            return toString(ToStringBuilder.builder(this)).append("fileName", _fileName).append("linkPath", _linkPath).append("filePath", _filePath).toString();
+            return toString(ToStringBuilder.builder(this)).append("fileName", fileName).append("linkPath", linkPath).append("filePath", filePath).toString();
         }
     }
 
     private static final class SimplePackageContentImpl extends EmbeddedPackageContentImpl implements SimplePackageContent {
-        private final String _fileName;
-        private final String _filePath;
-        private final String _localFilePath;
+        private final String fileName;
+        private final String filePath;
+        private final String localFilePath;
 
         private SimplePackageContentImpl(OleBlobImpl blob, String prettyName, String className, String typeName, int position, int length, String fileName, String filePath, String localFilePath) {
             super(blob, prettyName, className, typeName, position, length);
-            _fileName = fileName;
-            _filePath = filePath;
-            _localFilePath = localFilePath;
+            this.fileName = fileName;
+            this.filePath = filePath;
+            this.localFilePath = localFilePath;
         }
 
         @Override
@@ -701,22 +701,22 @@ public class OleUtil {
 
         @Override
         public String getFileName() {
-            return _fileName;
+            return fileName;
         }
 
         @Override
         public String getFilePath() {
-            return _filePath;
+            return filePath;
         }
 
         @Override
         public String getLocalFilePath() {
-            return _localFilePath;
+            return localFilePath;
         }
 
         @Override
         public String toString() {
-            return toString(ToStringBuilder.builder(this)).append("fileName", _fileName).append("filePath", _filePath).append("localFilePath", _localFilePath).toString();
+            return toString(ToStringBuilder.builder(this)).append("fileName", fileName).append("filePath", filePath).append("localFilePath", localFilePath).toString();
         }
     }
 
@@ -748,7 +748,7 @@ public class OleUtil {
 
         @Override
         public String toString() {
-            return toString(ToStringBuilder.builder(this)).append("content", _blob._bytes).toString();
+            return toString(ToStringBuilder.builder(this)).append("content", blob.bytes).toString();
         }
     }
 

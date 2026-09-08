@@ -25,7 +25,7 @@ import java.io.IOException;
  */
 public class ReplacementErrorHandler implements ErrorHandler {
 
-    private final Object _replacement;
+    private final Object replacement;
 
     /**
      * Constructs a ReplacementErrorHandler which replaces all errored values with {@code null}.
@@ -38,13 +38,13 @@ public class ReplacementErrorHandler implements ErrorHandler {
      * Constructs a ReplacementErrorHandler which replaces all errored values with the given Object.
      */
     public ReplacementErrorHandler(Object replacement) {
-        _replacement = replacement;
+        this.replacement = replacement;
     }
 
     @Override
     public Object handleRowError(Column column, byte[] columnData,
         Location location, Exception error) throws IOException {
-        return _replacement;
+        return replacement;
     }
 
 }

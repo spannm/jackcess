@@ -27,16 +27,16 @@ import java.util.*;
  * Utility for finding rows based on pre-defined, foreign-key table relationships.
  */
 public class Joiner {
-    private final Index                        _fromIndex;
-    private final List<? extends Index.Column> _fromCols;
-    private final IndexCursor                  _toCursor;
-    private final Object[]                     _entryValues;
+    private final Index                        fromIndex;
+    private final List<? extends Index.Column> fromCols;
+    private final IndexCursor                  toCursor;
+    private final Object[]                     entryValues;
 
     private Joiner(Index fromIndex, IndexCursor toCursor) {
-        _fromIndex = fromIndex;
-        _fromCols = _fromIndex.getColumns();
-        _entryValues = new Object[_fromCols.size()];
-        _toCursor = toCursor;
+        this.fromIndex = fromIndex;
+        fromCols = this.fromIndex.getColumns();
+        entryValues = new Object[fromCols.size()];
+        this.toCursor = toCursor;
     }
 
     /**
@@ -77,7 +77,7 @@ public class Joiner {
     }
 
     public Index getFromIndex() {
-        return _fromIndex;
+        return fromIndex;
     }
 
     public Table getToTable() {
@@ -89,12 +89,12 @@ public class Joiner {
     }
 
     public IndexCursor getToCursor() {
-        return _toCursor;
+        return toCursor;
     }
 
     public List<? extends Index.Column> getColumns() {
         // note, this list is already unmodifiable, no need to re-wrap
-        return _fromCols;
+        return fromCols;
     }
 
     /**
@@ -103,7 +103,7 @@ public class Joiner {
      */
     public boolean hasRows(Map<String, ?> fromRow) throws IOException {
         toEntryValues(fromRow);
-        return _toCursor.findFirstRowByEntry(_entryValues);
+        return toCursor.findFirstRowByEntry(entryValues);
     }
 
     /**
@@ -112,7 +112,7 @@ public class Joiner {
      */
     public boolean hasRows(Object[] fromRow) throws IOException {
         toEntryValues(fromRow);
-        return _toCursor.findFirstRowByEntry(_entryValues);
+        return toCursor.findFirstRowByEntry(entryValues);
     }
 
     /**
@@ -133,7 +133,7 @@ public class Joiner {
      * @param columnNames desired columns in the from table row
      */
     public Row findFirstRow(Map<String, ?> fromRow, Collection<String> columnNames) throws IOException {
-        return hasRows(fromRow) ? _toCursor.getCurrentRow(columnNames) : null;
+        return hasRows(fromRow) ? toCursor.getCurrentRow(columnNames) : null;
     }
 
     /**
@@ -143,7 +143,7 @@ public class Joiner {
      */
     public EntryIterableBuilder findRows(Map<String, ?> fromRow) {
         toEntryValues(fromRow);
-        return _toCursor.newEntryIterable(_entryValues);
+        return toCursor.newEntryIterable(entryValues);
     }
 
     /**
@@ -154,7 +154,7 @@ public class Joiner {
      */
     public EntryIterableBuilder findRows(Object[] fromRow) {
         toEntryValues(fromRow);
-        return _toCursor.newEntryIterable(_entryValues);
+        return toCursor.newEntryIterable(entryValues);
     }
 
     /**
@@ -191,22 +191,22 @@ public class Joiner {
     }
 
     /**
-     * Fills in the _entryValues with the relevant info from the given "from" table row.
+     * Fills in the entryValues with the relevant info from the given "from" table row.
      */
     @SuppressWarnings("PMD.LinguisticNaming")
     private void toEntryValues(Map<String, ?> fromRow) {
-        for (int i = 0; i < _entryValues.length; ++i) {
-            _entryValues[i] = _fromCols.get(i).getColumn().getRowValue(fromRow);
+        for (int i = 0; i < entryValues.length; ++i) {
+            entryValues[i] = fromCols.get(i).getColumn().getRowValue(fromRow);
         }
     }
 
     /**
-     * Fills in the _entryValues with the relevant info from the given "from" table row.
+     * Fills in the entryValues with the relevant info from the given "from" table row.
      */
     @SuppressWarnings("PMD.LinguisticNaming")
     private void toEntryValues(Object[] fromRow) {
-        for (int i = 0; i < _entryValues.length; ++i) {
-            _entryValues[i] = _fromCols.get(i).getColumn().getRowValue(fromRow);
+        for (int i = 0; i < entryValues.length; ++i) {
+            entryValues[i] = fromCols.get(i).getColumn().getRowValue(fromRow);
         }
     }
 
@@ -218,7 +218,7 @@ public class Joiner {
 
         String fromType = "] (primary)";
         String toType = "] (secondary)";
-        if (!((IndexImpl) _fromIndex).getReference().isPrimaryTable()) {
+        if (!((IndexImpl) fromIndex).getReference().isPrimaryTable()) {
             fromType = "] (secondary)";
             toType = "] (primary)";
         }
@@ -226,16 +226,16 @@ public class Joiner {
         sb.append(getFromTable().getName())
           .append('[')
 
-          .append(_fromCols.get(0).getName());
-        for (int i = 1; i < _fromCols.size(); ++i) {
-            sb.append(',').append(_fromCols.get(i).getName());
+          .append(fromCols.get(0).getName());
+        for (int i = 1; i < fromCols.size(); ++i) {
+            sb.append(',').append(fromCols.get(i).getName());
         }
         sb.append(fromType)
 
           .append(" to ")
           .append(getToTable().getName())
           .append('[');
-        List<? extends Index.Column> toCols = _toCursor.getIndex().getColumns();
+        List<? extends Index.Column> toCols = toCursor.getIndex().getColumns();
         sb.append(toCols.get(0).getName());
         for (int i = 1; i < toCols.size(); ++i) {
             sb.append(',').append(toCols.get(i).getName());

@@ -52,8 +52,8 @@ public class UnionQueryImpl extends QueryImpl implements UnionQuery {
 
     private String getUnionString(String id) {
         for (Row row : getTableRows()) {
-            if (id.equals(row._name2)) {
-                return cleanUnionString(row._expression);
+            if (id.equals(row.name2)) {
+                return cleanUnionString(row.expression);
             }
         }
         throw new IllegalStateException("Could not find union query with id " + id);

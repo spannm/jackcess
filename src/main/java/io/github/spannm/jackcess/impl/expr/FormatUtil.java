@@ -185,7 +185,7 @@ public class FormatUtil {
     private static final Map<String, DateFormatBuilder> DATE_FMT_BUILDERS = new HashMap<>();
 
     static {
-        DATE_FMT_BUILDERS.put("c", (dtfb, args, hasAmPm, dtType) -> dtfb.append(ValueSupport.getDateFormatForType(args._ctx, dtType)));
+        DATE_FMT_BUILDERS.put("c", (dtfb, args, hasAmPm, dtType) -> dtfb.append(ValueSupport.getDateFormatForType(args.ctx, dtType)));
         DATE_FMT_BUILDERS.put("d", new SimpleDFB("d"));
         DATE_FMT_BUILDERS.put("dd", new SimpleDFB("dd"));
         DATE_FMT_BUILDERS.put("ddd", new SimpleDFB("eee"));
@@ -224,7 +224,7 @@ public class FormatUtil {
         DATE_FMT_BUILDERS.put("A/P", new AmPmDFB("A", "P"));
         DATE_FMT_BUILDERS.put("a/p", new AmPmDFB("a", "p"));
         DATE_FMT_BUILDERS.put("AMPM", (dtfb, args, hasAmPm, dtType) -> {
-            String[] amPmStrs = args._ctx.getTemporalConfig().getAmPmStrings();
+            String[] amPmStrs = args.ctx.getTemporalConfig().getAmPmStrings();
             new AmPmDFB(amPmStrs[0], amPmStrs[1]).build(dtfb, args, hasAmPm, dtType);
         });
         fillInPartialPrefixes();
@@ -240,77 +240,77 @@ public class FormatUtil {
     private static final boolean[]                      NO_FMT_TYPES = new boolean[NUM_NF_FMTS];
 
     private static final class Args {
-        private final EvalContext _ctx;
-        private Value             _expr;
-        private final int         _firstDay;
-        private final int         _firstWeekType;
+        private final EvalContext ctx;
+        private Value             expr;
+        private final int         firstDay;
+        private final int         firstWeekType;
 
         private Args(EvalContext ctx, Value expr, int firstDay, int firstWeekType) {
-            _ctx = ctx;
-            _expr = expr;
-            _firstDay = firstDay;
-            _firstWeekType = firstWeekType;
+            this.ctx = ctx;
+            this.expr = expr;
+            this.firstDay = firstDay;
+            this.firstWeekType = firstWeekType;
         }
 
-        public Args withExpr(Value expr) {
-            _expr = expr;
+        public Args withExpr(Value newExpr) {
+            expr = newExpr;
             return this;
         }
 
         public Value getNonNullExpr() {
-            return _expr.isNull() ? ValueSupport.EMPTY_STR_VAL : _expr;
+            return expr.isNull() ? ValueSupport.EMPTY_STR_VAL : expr;
         }
 
         public boolean isNullOrEmptyString() {
-            return _expr.isNull() || _expr.getType().isString() && getAsString().isEmpty();
+            return expr.isNull() || expr.getType().isString() && getAsString().isEmpty();
         }
 
         public boolean maybeCoerceToEmptyString() {
             if (isNullOrEmptyString()) {
                 // ensure that we have a non-null value when formatting (null acts
                 // like empty string)
-                _expr = ValueSupport.EMPTY_STR_VAL;
+                expr = ValueSupport.EMPTY_STR_VAL;
                 return true;
             }
             return false;
         }
 
         public Args coerceToDateTimeValue() {
-            if (!_expr.getType().isTemporal()) {
+            if (!expr.getType().isTemporal()) {
 
                 // format coerces boolean strings to numbers
                 Value boolExpr = null;
-                if (_expr.getType().isString() && (boolExpr = maybeGetStringAsBooleanValue()) != null) {
-                    _expr = boolExpr;
+                if (expr.getType().isString() && (boolExpr = maybeGetStringAsBooleanValue()) != null) {
+                    expr = boolExpr;
                 }
 
                 // StringValue already handles most String -> Number -> Date/Time, so
                 // most other convertions work here (and failures are thrown so that
                 // default handling kicks in)
-                _expr = _expr.getAsDateTimeValue(_ctx);
+                expr = expr.getAsDateTimeValue(ctx);
             }
             return this;
         }
 
         public Args coerceToNumberValue() {
-            if (!_expr.getType().isNumeric()) {
-                if (_expr.getType().isString()) {
+            if (!expr.getType().isNumeric()) {
+                if (expr.getType().isString()) {
 
                     // format coerces "true"/"false" to boolean values
                     Value boolExpr = maybeGetStringAsBooleanValue();
                     if (boolExpr != null) {
-                        _expr = boolExpr;
+                        expr = boolExpr;
                     } else {
-                        BigDecimal bd = DefaultFunctions.maybeGetAsBigDecimal(_ctx, _expr);
+                        BigDecimal bd = DefaultFunctions.maybeGetAsBigDecimal(ctx, expr);
                         if (bd != null) {
-                            _expr = ValueSupport.toValue(bd);
+                            expr = ValueSupport.toValue(bd);
                         } else {
                             // convert to date to number. this doesn't happen as part of the
                             // default value coercion behavior, but the format method tries
                             // harder
-                            Value maybe = DefaultFunctions.maybeGetAsDateTimeValue(_ctx, _expr);
+                            Value maybe = DefaultFunctions.maybeGetAsDateTimeValue(ctx, expr);
                             if (maybe != null) {
-                                _expr = ValueSupport.toValue(maybe.getAsDouble(_ctx));
+                                expr = ValueSupport.toValue(maybe.getAsDouble(ctx));
                             } else {
                                 // string which can't be converted to number force failure
                                 // here so default formatting will kick in
@@ -320,7 +320,7 @@ public class FormatUtil {
                     }
                 } else {
                     // convert date to number
-                    _expr = ValueSupport.toValue(_expr.getAsDouble(_ctx));
+                    expr = ValueSupport.toValue(expr.getAsDouble(ctx));
                 }
             }
             return this;
@@ -340,12 +340,12 @@ public class FormatUtil {
 
         public BigDecimal getAsBigDecimal() {
             coerceToNumberValue();
-            return _expr.getAsBigDecimal(_ctx);
+            return expr.getAsBigDecimal(ctx);
         }
 
         public LocalDateTime getAsLocalDateTime() {
             coerceToDateTimeValue();
-            return _expr.getAsLocalDateTime(_ctx);
+            return expr.getAsLocalDateTime(ctx);
         }
 
         public boolean getAsBoolean() {
@@ -354,15 +354,15 @@ public class FormatUtil {
             // returned as is. so we use coerceToNumberValue to force the exception
             // to be thrown which results in the "default" formatting behavior.
             coerceToNumberValue();
-            return _expr.getAsBoolean(_ctx);
+            return expr.getAsBoolean(ctx);
         }
 
         public String getAsString() {
-            return _expr.getAsString(_ctx);
+            return expr.getAsString(ctx);
         }
 
         public Value format(Fmt fmt) {
-            Value origExpr = _expr;
+            Value origExpr = expr;
             try {
                 return fmt.format(this);
             } catch (EvalException _ex) {
@@ -687,13 +687,13 @@ public class FormatUtil {
     private static DateTimeFormatter createDateTimeFormatter(List<DateFormatBuilder> dfbs, Args args, boolean hasAmPm, Value.Type dtType) {
         DateTimeFormatterBuilder dtfb = new DateTimeFormatterBuilder();
         dfbs.forEach(d -> d.build(dtfb, args, hasAmPm, dtType));
-        return dtfb.toFormatter(args._ctx.getTemporalConfig().getLocale());
+        return dtfb.toFormatter(args.ctx.getTemporalConfig().getLocale());
     }
 
     private static Value formatDateTime(Args args, DateTimeFormatter dateFmt, DateTimeFormatter timeFmt, DateTimeFormatter dtFmt) {
         LocalDateTime ldt = args.getAsLocalDateTime();
         DateTimeFormatter fmt = null;
-        switch (args._expr.getType()) {
+        switch (args.expr.getType()) {
             case DATE:
                 fmt = dateFmt;
                 break;
@@ -893,7 +893,7 @@ public class FormatUtil {
         }
 
         NumberFormatter.NotationType expType = expTypes[fmtIdx];
-        DecimalFormat df = args._ctx.createDecimalFormat(fmtStr);
+        DecimalFormat df = args.ctx.createDecimalFormat(fmtStr);
 
         if (df.getMaximumFractionDigits() > 0) {
             // if the decimal is included in the format, access always shows it
@@ -1129,31 +1129,31 @@ public class FormatUtil {
     }
 
     private static final class PredefDateFmt implements Fmt {
-        private final TemporalConfig.Type _type;
+        private final TemporalConfig.Type type;
 
         private PredefDateFmt(TemporalConfig.Type type) {
-            _type = type;
+            this.type = type;
         }
 
         @Override
         public Value format(Args args) {
-            DateTimeFormatter dtf = args._ctx.createDateFormatter(args._ctx.getTemporalConfig().getDateTimeFormat(_type));
+            DateTimeFormatter dtf = args.ctx.createDateFormatter(args.ctx.getTemporalConfig().getDateTimeFormat(type));
             return ValueSupport.toValue(dtf.format(args.getAsLocalDateTime()));
         }
     }
 
     private static final class PredefBoolFmt implements Fmt {
-        private final Value _trueVal;
-        private final Value _falseVal;
+        private final Value trueVal;
+        private final Value falseVal;
 
         private PredefBoolFmt(String trueStr, String falseStr) {
-            _trueVal = ValueSupport.toValue(trueStr);
-            _falseVal = ValueSupport.toValue(falseStr);
+            trueVal = ValueSupport.toValue(trueStr);
+            falseVal = ValueSupport.toValue(falseStr);
         }
 
         @Override
         public Value format(Args args) {
-            return args.getAsBoolean() ? _trueVal : _falseVal;
+            return args.getAsBoolean() ? trueVal : falseVal;
         }
     }
 
@@ -1168,47 +1168,47 @@ public class FormatUtil {
     }
 
     private static final class PredefNumberFmt extends BaseNumberFmt {
-        private final NumericConfig.Type _type;
+        private final NumericConfig.Type type;
 
         private PredefNumberFmt(NumericConfig.Type type) {
-            _type = type;
+            this.type = type;
         }
 
         @Override
         protected NumberFormat getNumberFormat(Args args) {
-            return args._ctx.createDecimalFormat(args._ctx.getNumericConfig().getNumberFormat(_type));
+            return args.ctx.createDecimalFormat(args.ctx.getNumericConfig().getNumberFormat(type));
         }
     }
 
     private static final class ScientificPredefNumberFmt extends BaseNumberFmt {
         @Override
         protected NumberFormat getNumberFormat(Args args) {
-            NumberFormat df = args._ctx.createDecimalFormat(args._ctx.getNumericConfig().getNumberFormat(NumericConfig.Type.SCIENTIFIC));
+            NumberFormat df = args.ctx.createDecimalFormat(args.ctx.getNumericConfig().getNumberFormat(NumericConfig.Type.SCIENTIFIC));
             df = new NumberFormatter.ScientificFormat(df);
             return df;
         }
     }
 
     private static final class SimpleDFB implements DateFormatBuilder {
-        private final String _pat;
+        private final String pat;
 
         private SimpleDFB(String pat) {
-            _pat = pat;
+            this.pat = pat;
         }
 
         @Override
         public void build(DateTimeFormatterBuilder dtfb, Args args, boolean hasAmPm, Value.Type dtType) {
-            dtfb.appendPattern(_pat);
+            dtfb.appendPattern(pat);
         }
     }
 
     private static final class HourlyDFB implements DateFormatBuilder {
-        private final String _pat12;
-        private final String _pat24;
+        private final String pat12;
+        private final String pat24;
 
         private HourlyDFB(String pat12, String pat24) {
-            _pat12 = pat12;
-            _pat24 = pat24;
+            this.pat12 = pat12;
+            this.pat24 = pat24;
         }
 
         @Override
@@ -1216,27 +1216,27 @@ public class FormatUtil {
             // annoyingly the "hour" patterns are the same and depend on the
             // existence of the am/pm pattern to determine how they function (12 vs
             // 24 hour).
-            dtfb.appendPattern(hasAmPm ? _pat12 : _pat24);
+            dtfb.appendPattern(hasAmPm ? pat12 : pat24);
         }
     }
 
     private static final class PredefDFB implements DateFormatBuilder {
-        private final TemporalConfig.Type _type;
+        private final TemporalConfig.Type type;
 
         private PredefDFB(TemporalConfig.Type type) {
-            _type = type;
+            this.type = type;
         }
 
         @Override
         public void build(DateTimeFormatterBuilder dtfb, Args args, boolean hasAmPm, Value.Type dtType) {
-            dtfb.appendPattern(args._ctx.getTemporalConfig().getDateTimeFormat(_type));
+            dtfb.appendPattern(args.ctx.getTemporalConfig().getDateTimeFormat(type));
         }
     }
 
     private abstract static class WeekBasedDFB implements DateFormatBuilder {
         @Override
         public void build(DateTimeFormatterBuilder dtfb, Args args, boolean hasAmPm, Value.Type dtType) {
-            dtfb.appendValue(getField(DefaultDateFunctions.weekFields(args._firstDay, args._firstWeekType)));
+            dtfb.appendValue(getField(DefaultDateFunctions.weekFields(args.firstDay, args.firstWeekType)));
         }
 
         protected abstract TemporalField getField(WeekFields weekFields);
@@ -1285,89 +1285,89 @@ public class FormatUtil {
     }
 
     private static final class CustomFmt implements Fmt {
-        private final Fmt _fmt;
-        private final Fmt _emptyFmt;
+        private final Fmt fmt;
+        private final Fmt emptyFmt;
 
         private CustomFmt(Fmt fmt) {
             this(fmt, NULL_FMT);
         }
 
         private CustomFmt(Fmt fmt, Fmt emptyFmt) {
-            _fmt = fmt;
-            _emptyFmt = emptyFmt;
+            this.fmt = fmt;
+            this.emptyFmt = emptyFmt;
         }
 
         @Override
         public Value format(Args args) {
-            Fmt fmt = _fmt;
+            Fmt curFmt = fmt;
             if (args.maybeCoerceToEmptyString()) {
-                fmt = _emptyFmt;
+                curFmt = emptyFmt;
             }
-            return fmt.format(args);
+            return curFmt.format(args);
         }
     }
 
     private static final class CharSourceFmt implements Fmt {
-        private final List<BiConsumer<StringBuilder, CharSource>> _subFmts;
-        private final int                                         _numPlaceholders;
-        private final boolean                                     _rightAligned;
-        private final TextCase                                    _textCase;
+        private final List<BiConsumer<StringBuilder, CharSource>> subFmts;
+        private final int                                         numPlaceholders;
+        private final boolean                                     rightAligned;
+        private final TextCase                                    textCase;
 
         private CharSourceFmt(List<BiConsumer<StringBuilder, CharSource>> subFmts, int numPlaceholders, boolean rightAligned, TextCase textCase) {
-            _subFmts = subFmts;
-            _numPlaceholders = numPlaceholders;
-            _rightAligned = rightAligned;
-            _textCase = textCase;
+            this.subFmts = subFmts;
+            this.numPlaceholders = numPlaceholders;
+            this.rightAligned = rightAligned;
+            this.textCase = textCase;
         }
 
         @Override
         public Value format(Args args) {
-            CharSource cs = new CharSource(args.getAsString(), _numPlaceholders, _rightAligned, _textCase);
+            CharSource cs = new CharSource(args.getAsString(), numPlaceholders, rightAligned, textCase);
             StringBuilder sb = new StringBuilder();
-            _subFmts.forEach(fmt -> fmt.accept(sb, cs));
+            subFmts.forEach(fmt -> fmt.accept(sb, cs));
             cs.appendRemaining(sb);
             return ValueSupport.toValue(sb.toString());
         }
     }
 
     private static final class CharSource {
-        private int            _prefLen;
-        private final String   _str;
-        private int            _strPos;
-        private final TextCase _textCase;
+        private int            prefLen;
+        private final String   str;
+        private int            strPos;
+        private final TextCase textCase;
 
         private CharSource(String str, int len, boolean rightAligned, TextCase textCase) {
-            _str = str;
-            _textCase = textCase;
+            this.str = str;
+            this.textCase = textCase;
             int strLen = str.length();
             if (len > strLen) {
                 if (rightAligned) {
-                    _prefLen = len - strLen;
+                    prefLen = len - strLen;
                 }
             } else if (len < strLen) {
                 // it doesn't make sense to me, but the meaning of "right aligned"
                 // seems to flip when the string is longer than the format length
                 if (!rightAligned) {
-                    _strPos = strLen - len;
+                    strPos = strLen - len;
                 }
             }
         }
 
         public int next() {
-            if (_prefLen > 0) {
-                --_prefLen;
+            if (prefLen > 0) {
+                --prefLen;
                 return NO_CHAR;
             }
-            if (_strPos < _str.length()) {
-                return _textCase.apply(_str.charAt(_strPos++));
+            if (strPos < str.length()) {
+                return textCase.apply(str.charAt(strPos++));
             }
             return NO_CHAR;
         }
 
         public void appendRemaining(StringBuilder sb) {
-            int strLen = _str.length();
-            while (_strPos < strLen) {
-                sb.append(_textCase.apply(_str.charAt(_strPos++)));
+            int strLen = str.length();
+            while (strPos < strLen) {
+                sb.append(textCase.apply(str.charAt(strPos++)));
             }
         }
     }
@@ -1375,7 +1375,7 @@ public class FormatUtil {
     private abstract static class BaseCustomNumberFmt implements Fmt {
         @Override
         public Value format(Args args) {
-            if (args._expr.isNull()) {
+            if (args.expr.isNull()) {
                 return formatNull(args);
             }
 
@@ -1395,50 +1395,50 @@ public class FormatUtil {
     }
 
     private static final class CustomGeneralFmt extends BaseCustomNumberFmt {
-        private final Value _posVal;
-        private final Value _negVal;
-        private final Value _zeroVal;
-        private final Value _nullVal;
+        private final Value posVal;
+        private final Value negVal;
+        private final Value zeroVal;
+        private final Value nullVal;
 
         private CustomGeneralFmt(Value posVal, Value negVal, Value zeroVal, Value nullVal) {
-            _posVal = posVal;
-            _negVal = negVal;
-            _zeroVal = zeroVal;
-            _nullVal = nullVal;
+            this.posVal = posVal;
+            this.negVal = negVal;
+            this.zeroVal = zeroVal;
+            this.nullVal = nullVal;
         }
 
         @Override
         protected Value formatNull(Args args) {
-            return _nullVal;
+            return nullVal;
         }
 
         @Override
         protected Value formatPos(BigDecimal bd, Args args) {
-            return _posVal;
+            return posVal;
         }
 
         @Override
         protected Value formatNeg(BigDecimal bd, Args args) {
-            return _negVal;
+            return negVal;
         }
 
         @Override
         protected Value formatZero(BigDecimal bd, Args args) {
-            return _zeroVal;
+            return zeroVal;
         }
     }
 
     private static final class CustomNumberFmt extends BaseCustomNumberFmt {
-        private final BDFormat _posFmt;
-        private final BDFormat _negFmt;
-        private final BDFormat _zeroFmt;
-        private final BDFormat _nullFmt;
+        private final BDFormat posFmt;
+        private final BDFormat negFmt;
+        private final BDFormat zeroFmt;
+        private final BDFormat nullFmt;
 
         private CustomNumberFmt(BDFormat posFmt, BDFormat negFmt, BDFormat zeroFmt, BDFormat nullFmt) {
-            _posFmt = posFmt;
-            _negFmt = negFmt;
-            _zeroFmt = zeroFmt;
-            _nullFmt = nullFmt;
+            this.posFmt = posFmt;
+            this.negFmt = negFmt;
+            this.zeroFmt = zeroFmt;
+            this.nullFmt = nullFmt;
         }
 
         private Value formatMaybeZero(BigDecimal bd, BDFormat fmt) {
@@ -1451,7 +1451,7 @@ public class FormatUtil {
                 bd = bd.setScale(maxDecDigits, NumberFormatter.ROUND_MODE);
                 if (BigDecimal.ZERO.compareTo(bd) == 0) {
                     // fall back to zero format
-                    fmt = _zeroFmt;
+                    fmt = zeroFmt;
                 }
             }
 
@@ -1460,22 +1460,22 @@ public class FormatUtil {
 
         @Override
         protected Value formatNull(Args args) {
-            return ValueSupport.toValue(_nullFmt.format(BigDecimal.ZERO));
+            return ValueSupport.toValue(nullFmt.format(BigDecimal.ZERO));
         }
 
         @Override
         protected Value formatPos(BigDecimal bd, Args args) {
-            return formatMaybeZero(bd, _posFmt);
+            return formatMaybeZero(bd, posFmt);
         }
 
         @Override
         protected Value formatNeg(BigDecimal bd, Args args) {
-            return formatMaybeZero(bd.negate(), _negFmt);
+            return formatMaybeZero(bd.negate(), negFmt);
         }
 
         @Override
         protected Value formatZero(BigDecimal bd, Args args) {
-            return ValueSupport.toValue(_zeroFmt.format(bd));
+            return ValueSupport.toValue(zeroFmt.format(bd));
         }
     }
 
@@ -1488,49 +1488,49 @@ public class FormatUtil {
     }
 
     private static final class LiteralBDFormat extends BDFormat {
-        private final String _str;
+        private final String str;
 
         private LiteralBDFormat(String str) {
-            _str = str;
+            this.str = str;
         }
 
         @Override
         public String format(BigDecimal bd) {
-            return _str;
+            return str;
         }
     }
 
     private static class BaseBDFormat extends BDFormat {
-        private final NumberFormat _nf;
+        private final NumberFormat nf;
 
         private BaseBDFormat(NumberFormat nf) {
-            _nf = nf;
+            this.nf = nf;
         }
 
         @Override
         public String format(BigDecimal bd) {
-            return _nf.format(bd);
+            return nf.format(bd);
         }
     }
 
     private static final class DecimalBDFormat extends BaseBDFormat {
-        private final int _maxDecDigits;
+        private final int maxDecDigits;
 
         private DecimalBDFormat(DecimalFormat df) {
             super(df);
 
-            int maxDecDigits = df.getMaximumFractionDigits();
+            int digits = df.getMaximumFractionDigits();
             int mult = df.getMultiplier();
             while (mult > 1) {
-                maxDecDigits++;
+                digits++;
                 mult /= 10;
             }
-            _maxDecDigits = maxDecDigits;
+            maxDecDigits = digits;
         }
 
         @Override
         public int getMaxDecimalDigits() {
-            return _maxDecDigits;
+            return maxDecDigits;
         }
     }
 }

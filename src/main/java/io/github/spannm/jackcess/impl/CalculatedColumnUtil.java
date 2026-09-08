@@ -124,7 +124,7 @@ class CalculatedColumnUtil {
      * General calculated column implementation.
      */
     private static class CalcColImpl extends ColumnImpl {
-        private CalcColEvalContext _calcCol;
+        private CalcColEvalContext calcCol;
 
         CalcColImpl(InitArgs args) {
             super(args);
@@ -132,12 +132,12 @@ class CalculatedColumnUtil {
 
         @Override
         protected CalcColEvalContext getCalculationContext() {
-            return _calcCol;
+            return calcCol;
         }
 
         @Override
-        protected void setCalcColEvalContext(CalcColEvalContext calcCol) {
-            _calcCol = calcCol;
+        protected void setCalcColEvalContext(CalcColEvalContext newCalcCol) {
+            calcCol = newCalcCol;
         }
 
         @Override
@@ -163,7 +163,7 @@ class CalculatedColumnUtil {
      * Calculated BOOLEAN column implementation.
      */
     private static class CalcBooleanColImpl extends ColumnImpl {
-        private CalcColEvalContext _calcCol;
+        private CalcColEvalContext calcCol;
 
         CalcBooleanColImpl(InitArgs args) {
             super(args);
@@ -171,12 +171,12 @@ class CalculatedColumnUtil {
 
         @Override
         protected CalcColEvalContext getCalculationContext() {
-            return _calcCol;
+            return calcCol;
         }
 
         @Override
-        protected void setCalcColEvalContext(CalcColEvalContext calcCol) {
-            _calcCol = calcCol;
+        protected void setCalcColEvalContext(CalcColEvalContext newCalcCol) {
+            calcCol = newCalcCol;
         }
 
         @Override
@@ -204,7 +204,7 @@ class CalculatedColumnUtil {
      * Calculated TEXT column implementation.
      */
     private static class CalcTextColImpl extends TextColumnImpl {
-        private CalcColEvalContext _calcCol;
+        private CalcColEvalContext calcCol;
 
         CalcTextColImpl(InitArgs args) {
             super(args);
@@ -212,12 +212,12 @@ class CalculatedColumnUtil {
 
         @Override
         protected CalcColEvalContext getCalculationContext() {
-            return _calcCol;
+            return calcCol;
         }
 
         @Override
-        protected void setCalcColEvalContext(CalcColEvalContext calcCol) {
-            _calcCol = calcCol;
+        protected void setCalcColEvalContext(CalcColEvalContext newCalcCol) {
+            calcCol = newCalcCol;
         }
 
         @Override
@@ -242,7 +242,7 @@ class CalculatedColumnUtil {
      * Calculated MEMO column implementation.
      */
     private static class CalcMemoColImpl extends MemoColumnImpl {
-        private CalcColEvalContext _calcCol;
+        private CalcColEvalContext calcCol;
 
         CalcMemoColImpl(InitArgs args) {
             super(args);
@@ -250,12 +250,12 @@ class CalculatedColumnUtil {
 
         @Override
         protected CalcColEvalContext getCalculationContext() {
-            return _calcCol;
+            return calcCol;
         }
 
         @Override
-        protected void setCalcColEvalContext(CalcColEvalContext calcCol) {
-            _calcCol = calcCol;
+        protected void setCalcColEvalContext(CalcColEvalContext newCalcCol) {
+            calcCol = newCalcCol;
         }
 
         @Override
@@ -280,7 +280,7 @@ class CalculatedColumnUtil {
      * Calculated NUMERIC column implementation.
      */
     private static class CalcNumericColImpl extends NumericColumnImpl {
-        private CalcColEvalContext _calcCol;
+        private CalcColEvalContext calcCol;
 
         CalcNumericColImpl(InitArgs args) {
             super(args);
@@ -288,12 +288,12 @@ class CalculatedColumnUtil {
 
         @Override
         protected CalcColEvalContext getCalculationContext() {
-            return _calcCol;
+            return calcCol;
         }
 
         @Override
-        protected void setCalcColEvalContext(CalcColEvalContext calcCol) {
-            _calcCol = calcCol;
+        protected void setCalcColEvalContext(CalcColEvalContext newCalcCol) {
+            calcCol = newCalcCol;
         }
 
         @Override

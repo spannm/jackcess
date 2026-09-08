@@ -19,23 +19,23 @@ package io.github.spannm.jackcess.impl;
 import io.github.spannm.jackcess.expr.Value;
 
 public abstract class ColEvalContext extends BaseEvalContext {
-    private final ColumnImpl _col;
+    private final ColumnImpl col;
 
     public ColEvalContext(ColumnImpl col) {
         super(col.getDatabase().getEvalContext());
-        _col = col;
+        this.col = col;
     }
 
     protected ColumnImpl getCol() {
-        return _col;
+        return col;
     }
 
     @Override
     protected String withErrorContext(String msg) {
-        return _col.withErrorContext(msg);
+        return col.withErrorContext(msg);
     }
 
     protected Value toValue(Object val) {
-        return toValue(val, _col.getType());
+        return toValue(val, col.getType());
     }
 }

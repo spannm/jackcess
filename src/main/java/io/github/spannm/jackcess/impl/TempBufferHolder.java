@@ -45,22 +45,22 @@ public abstract class TempBufferHolder {
     }
 
     /** whether or not every get automatically rewinds the buffer */
-    private final boolean   _autoRewind;
+    private final boolean   autoRewind;
     /** ByteOrder for all allocated buffers */
-    private final ByteOrder _order;
+    private final ByteOrder order;
     /** the mod count of the current buffer (changes on every realloc) */
-    private int             _modCount;
+    private int             modCount;
 
     protected TempBufferHolder(boolean autoRewind, ByteOrder order) {
-        _autoRewind = autoRewind;
-        _order = order;
+        this.autoRewind = autoRewind;
+        this.order = order;
     }
 
     /**
      * @return the modification count of the current buffer (this count is changed every time the buffer is reallocated)
      */
     public int getModCount() {
-        return _modCount;
+        return modCount;
     }
 
     /**
@@ -108,13 +108,13 @@ public abstract class TempBufferHolder {
     public final ByteBuffer getBuffer(PageChannel pageChannel, int size) {
         ByteBuffer buffer = getExistingBuffer();
         if (buffer == null || buffer.capacity() < size) {
-            buffer = PageChannel.createBuffer(size, _order);
-            ++_modCount;
+            buffer = PageChannel.createBuffer(size, order);
+            ++modCount;
             setNewBuffer(buffer);
         } else {
             buffer.limit(size);
         }
-        if (_autoRewind) {
+        if (autoRewind) {
             buffer.rewind();
         }
         return buffer;
@@ -139,7 +139,7 @@ public abstract class TempBufferHolder {
      * TempBufferHolder which has a hard reference to the buffer.
      */
     private static final class HardTempBufferHolder extends TempBufferHolder {
-        private ByteBuffer _buffer;
+        private ByteBuffer buffer;
 
         private HardTempBufferHolder(boolean autoRewind, ByteOrder order) {
             super(autoRewind, order);
@@ -147,17 +147,17 @@ public abstract class TempBufferHolder {
 
         @Override
         public ByteBuffer getExistingBuffer() {
-            return _buffer;
+            return buffer;
         }
 
         @Override
         protected void setNewBuffer(ByteBuffer newBuffer) {
-            _buffer = newBuffer;
+            buffer = newBuffer;
         }
 
         @Override
         public void clear() {
-            _buffer = null;
+            buffer = null;
         }
     }
 
@@ -165,7 +165,7 @@ public abstract class TempBufferHolder {
      * TempBufferHolder which has a soft reference to the buffer.
      */
     private static final class SoftTempBufferHolder extends TempBufferHolder {
-        private Reference<ByteBuffer> _buffer = EMPTY_BUFFER_REF;
+        private Reference<ByteBuffer> buffer = EMPTY_BUFFER_REF;
 
         private SoftTempBufferHolder(boolean autoRewind, ByteOrder order) {
             super(autoRewind, order);
@@ -173,18 +173,18 @@ public abstract class TempBufferHolder {
 
         @Override
         public ByteBuffer getExistingBuffer() {
-            return _buffer.get();
+            return buffer.get();
         }
 
         @Override
         protected void setNewBuffer(ByteBuffer newBuffer) {
-            _buffer.clear();
-            _buffer = new SoftReference<>(newBuffer);
+            buffer.clear();
+            buffer = new SoftReference<>(newBuffer);
         }
 
         @Override
         public void clear() {
-            _buffer.clear();
+            buffer.clear();
         }
     }
 

@@ -45,28 +45,28 @@ public class RelationshipBuilder {
     private static final int   JOIN_FLAGS = RelationshipImpl.LEFT_OUTER_JOIN_FLAG | RelationshipImpl.RIGHT_OUTER_JOIN_FLAG;
 
     /** relationship flags (default to "don't enforce") */
-    private int                _flags     = RelationshipImpl.NO_REFERENTIAL_INTEGRITY_FLAG;
-    private final String       _fromTable;
-    private final String       _toTable;
-    private final List<String> _fromCols  = new ArrayList<>();
-    private final List<String> _toCols    = new ArrayList<>();
-    private String             _name      = null;
+    private int                flags     = RelationshipImpl.NO_REFERENTIAL_INTEGRITY_FLAG;
+    private final String       fromTable;
+    private final String       toTable;
+    private final List<String> fromCols  = new ArrayList<>();
+    private final List<String> toCols    = new ArrayList<>();
+    private String             name      = null;
 
     public RelationshipBuilder(Table fromTable, Table toTable) {
         this(fromTable.getName(), toTable.getName());
     }
 
     public RelationshipBuilder(String fromTable, String toTable) {
-        _fromTable = fromTable;
-        _toTable = toTable;
+        this.fromTable = fromTable;
+        this.toTable = toTable;
     }
 
     /**
      * Adds a pair of columns to the relationship.
      */
     public RelationshipBuilder addColumns(String fromCol, String toCol) {
-        _fromCols.add(fromCol);
-        _toCols.add(toCol);
+        fromCols.add(fromCol);
+        toCols.add(toCol);
         return this;
     }
 
@@ -123,10 +123,10 @@ public class RelationshipBuilder {
                 // nothing to do
                 break;
             case LEFT_OUTER:
-                _flags |= RelationshipImpl.LEFT_OUTER_JOIN_FLAG;
+                flags |= RelationshipImpl.LEFT_OUTER_JOIN_FLAG;
                 break;
             case RIGHT_OUTER:
-                _flags |= RelationshipImpl.RIGHT_OUTER_JOIN_FLAG;
+                flags |= RelationshipImpl.RIGHT_OUTER_JOIN_FLAG;
                 break;
             default:
                 throw new JackcessRuntimeException("Unexpected join type " + joinType);
@@ -140,7 +140,7 @@ public class RelationshipBuilder {
      * Default = null, meaning that the standard Access naming convention will be used.
      */
     public RelationshipBuilder withName(String relationshipName) {
-        _name = relationshipName;
+        name = relationshipName;
         return this;
     }
 
@@ -149,27 +149,27 @@ public class RelationshipBuilder {
     }
 
     public int getFlags() {
-        return _flags;
+        return flags;
     }
 
     public String getFromTable() {
-        return _fromTable;
+        return fromTable;
     }
 
     public String getToTable() {
-        return _toTable;
+        return toTable;
     }
 
     public List<String> getFromColumns() {
-        return _fromCols;
+        return fromCols;
     }
 
     public List<String> getToColumns() {
-        return _toCols;
+        return toCols;
     }
 
     public String getName() {
-        return _name;
+        return name;
     }
 
     /**
@@ -180,17 +180,17 @@ public class RelationshipBuilder {
     }
 
     private RelationshipBuilder withFlag(int flagMask) {
-        _flags |= flagMask;
+        flags |= flagMask;
         return this;
     }
 
     private RelationshipBuilder clearFlag(int flagMask) {
-        _flags &= ~flagMask;
+        flags &= ~flagMask;
         return this;
     }
 
     private boolean hasFlag(int flagMask) {
-        return (_flags & flagMask) != 0;
+        return (flags & flagMask) != 0;
     }
 
 }

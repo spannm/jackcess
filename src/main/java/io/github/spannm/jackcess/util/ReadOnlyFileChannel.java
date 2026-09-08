@@ -30,41 +30,41 @@ import java.nio.channels.*;
  * implemented.
  */
 public class ReadOnlyFileChannel extends FileChannel {
-    private final FileChannel _delegate;
+    private final FileChannel delegate;
 
     public ReadOnlyFileChannel(FileChannel delegate) {
-        _delegate = delegate;
+        this.delegate = delegate;
     }
 
     @Override
     public int read(ByteBuffer dst) throws IOException {
-        return _delegate.read(dst);
+        return delegate.read(dst);
     }
 
     @Override
     public long read(ByteBuffer[] dsts, int offset, int length) throws IOException {
-        return _delegate.read(dsts, offset, length);
+        return delegate.read(dsts, offset, length);
     }
 
     @Override
     public int read(ByteBuffer dst, long position) throws IOException {
-        return _delegate.read(dst, position);
+        return delegate.read(dst, position);
     }
 
     @Override
     public long position() throws IOException {
-        return _delegate.position();
+        return delegate.position();
     }
 
     @Override
     public FileChannel position(long newPosition) throws IOException {
-        _delegate.position(newPosition);
+        delegate.position(newPosition);
         return this;
     }
 
     @Override
     public long size() throws IOException {
-        return _delegate.size();
+        return delegate.size();
     }
 
     @Override
@@ -79,7 +79,7 @@ public class ReadOnlyFileChannel extends FileChannel {
 
     @Override
     public long transferTo(long position, long count, WritableByteChannel target) throws IOException {
-        return _delegate.transferTo(position, count, target);
+        return delegate.transferTo(position, count, target);
     }
 
     @Override
@@ -119,6 +119,6 @@ public class ReadOnlyFileChannel extends FileChannel {
 
     @Override
     protected void implCloseChannel() throws IOException {
-        _delegate.close();
+        delegate.close();
     }
 }

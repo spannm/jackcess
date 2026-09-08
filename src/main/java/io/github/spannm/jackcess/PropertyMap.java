@@ -190,20 +190,20 @@ public interface PropertyMap extends Iterable<PropertyMap.Property> {
         TOGGLE_BUTTON(122),
         WEB_BROWSER(128);
 
-        private final Short _value;
+        private final Short value;
 
         DisplayControl(int value) {
-            _value = (short) value;
+            this.value = (short) value;
         }
 
         @Override
         public Short getValue() {
-            return _value;
+            return value;
         }
 
         @Override
         public String toString() {
-            return name() + "[" + _value + "]";
+            return name() + "[" + value + "]";
         }
     }
 
@@ -214,20 +214,20 @@ public interface PropertyMap extends Iterable<PropertyMap.Property> {
         HTMLRICHTEXT(1),
         PLAIN(0);
 
-        private final Byte _value;
+        private final Byte value;
 
         TextFormat(int value) {
-            _value = (byte) value;
+            this.value = (byte) value;
         }
 
         @Override
         public Byte getValue() {
-            return _value;
+            return value;
         }
 
         @Override
         public String toString() {
-            return name() + "[" + _value + "]";
+            return name() + "[" + value + "]";
         }
     }
 
@@ -247,20 +247,20 @@ public interface PropertyMap extends Iterable<PropertyMap.Property> {
         HANGULFULL(9),
         HANGUL(10);
 
-        private final Byte _value;
+        private final Byte value;
 
         IMEMode(int value) {
-            _value = (byte) value;
+            this.value = (byte) value;
         }
 
         @Override
         public Byte getValue() {
-            return _value;
+            return value;
         }
 
         @Override
         public String toString() {
-            return name() + "[" + _value + "]";
+            return name() + "[" + value + "]";
         }
     }
 
@@ -273,20 +273,20 @@ public interface PropertyMap extends Iterable<PropertyMap.Property> {
         SPEAKING(2),
         NONE(3);
 
-        private final Byte _value;
+        private final Byte value;
 
         IMESentenceMode(int value) {
-            _value = (byte) value;
+            this.value = (byte) value;
         }
 
         @Override
         public Byte getValue() {
-            return _value;
+            return value;
         }
 
         @Override
         public String toString() {
-            return name() + "[" + _value + "]";
+            return name() + "[" + value + "]";
         }
     }
 

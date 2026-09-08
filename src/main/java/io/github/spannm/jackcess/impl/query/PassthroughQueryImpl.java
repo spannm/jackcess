@@ -31,12 +31,12 @@ public class PassthroughQueryImpl extends QueryImpl implements PassthroughQuery 
 
     @Override
     public String getConnectionString() {
-        return getTypeRow()._name1;
+        return getTypeRow().name1;
     }
 
     @Override
     public String getPassthroughString() {
-        return getTypeRow()._expression;
+        return getTypeRow().expression;
     }
 
     @Override

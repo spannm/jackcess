@@ -31,37 +31,37 @@ import java.util.stream.StreamSupport;
  * Builder style class for constructing an {@link IndexCursor} entry Iterable/Iterator.
  */
 public class EntryIterableBuilder implements Iterable<Row> {
-    private final IndexCursor  _cursor;
+    private final IndexCursor  cursor;
 
-    private Collection<String> _columnNames;
-    private Object[]           _entryValues;
-    private ColumnMatcher      _columnMatcher;
+    private Collection<String> columnNames;
+    private Object[]           entryValues;
+    private ColumnMatcher      columnMatcher;
 
     public EntryIterableBuilder(IndexCursor cursor, Object... entryValues) {
-        _cursor = cursor;
-        _entryValues = entryValues;
+        this.cursor = cursor;
+        this.entryValues = entryValues;
     }
 
     public Collection<String> getColumnNames() {
-        return _columnNames;
+        return columnNames;
     }
 
     public ColumnMatcher getColumnMatcher() {
-        return _columnMatcher;
+        return columnMatcher;
     }
 
     public Object[] getEntryValues() {
-        return _entryValues;
+        return entryValues;
     }
 
-    public EntryIterableBuilder withColumnNames(Collection<String> columnNames) {
-        _columnNames = columnNames;
+    public EntryIterableBuilder withColumnNames(Collection<String> newColumnNames) {
+        columnNames = newColumnNames;
         return this;
     }
 
-    public EntryIterableBuilder addColumnNames(Iterable<String> columnNames) {
-        if (columnNames != null) {
-            for (String name : columnNames) {
+    public EntryIterableBuilder addColumnNames(Iterable<String> newColumnNames) {
+        if (newColumnNames != null) {
+            for (String name : newColumnNames) {
                 addColumnName(name);
             }
         }
@@ -77,9 +77,9 @@ public class EntryIterableBuilder implements Iterable<Row> {
         return this;
     }
 
-    public EntryIterableBuilder addColumnNames(String... columnNames) {
-        if (columnNames != null) {
-            for (String name : columnNames) {
+    public EntryIterableBuilder addColumnNames(String... newColumnNames) {
+        if (newColumnNames != null) {
+            for (String name : newColumnNames) {
                 addColumnName(name);
             }
         }
@@ -87,25 +87,25 @@ public class EntryIterableBuilder implements Iterable<Row> {
     }
 
     private void addColumnName(String columnName) {
-        if (_columnNames == null) {
-            _columnNames = new HashSet<>();
+        if (columnNames == null) {
+            columnNames = new HashSet<>();
         }
-        _columnNames.add(columnName);
+        columnNames.add(columnName);
     }
 
-    public EntryIterableBuilder withEntryValues(Object... entryValues) {
-        _entryValues = entryValues;
+    public EntryIterableBuilder withEntryValues(Object... newEntryValues) {
+        entryValues = newEntryValues;
         return this;
     }
 
-    public EntryIterableBuilder withColumnMatcher(ColumnMatcher columnMatcher) {
-        _columnMatcher = columnMatcher;
+    public EntryIterableBuilder withColumnMatcher(ColumnMatcher newColumnMatcher) {
+        columnMatcher = newColumnMatcher;
         return this;
     }
 
     @Override
     public Iterator<Row> iterator() {
-        return ((IndexCursorImpl) _cursor).entryIterator(this);
+        return ((IndexCursorImpl) cursor).entryIterator(this);
     }
 
     /**

@@ -22,23 +22,23 @@ import io.github.spannm.jackcess.impl.expr.Expressionator;
 import java.io.IOException;
 
 public class RowValidatorEvalContext extends RowEvalContext {
-    private final TableImpl _table;
-    private String          _helpStr;
+    private final TableImpl table;
+    private String          helpStr;
 
     public RowValidatorEvalContext(TableImpl table) {
         super(table.getDatabase());
-        _table = table;
+        this.table = table;
     }
 
-    RowValidatorEvalContext withExpr(String exprStr, String helpStr) {
+    RowValidatorEvalContext withExpr(String exprStr, String newHelpStr) {
         setExpr(Expressionator.Type.RECORD_VALIDATOR, exprStr);
-        _helpStr = helpStr;
+        helpStr = newHelpStr;
         return this;
     }
 
     @Override
     protected TableImpl getTable() {
-        return _table;
+        return table;
     }
 
     public void validate(Object[] row) throws IOException {
@@ -46,7 +46,7 @@ public class RowValidatorEvalContext extends RowEvalContext {
             setRow(row);
             Boolean result = (Boolean) eval();
             if (!result) {
-                String msg = _helpStr != null ? _helpStr : "Invalid row";
+                String msg = helpStr != null ? helpStr : "Invalid row";
                 throw new InvalidValueException(withErrorContext(msg));
             }
         } finally {
@@ -56,6 +56,6 @@ public class RowValidatorEvalContext extends RowEvalContext {
 
     @Override
     protected String withErrorContext(String msg) {
-        return _table.withErrorContext(msg);
+        return table.withErrorContext(msg);
     }
 }

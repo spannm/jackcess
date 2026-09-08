@@ -54,43 +54,43 @@ public class PropertyMapImpl implements PropertyMap {
         DEFAULT_TYPES.put(IME_SENTENCE_MODE_PROP, new PropDef(DataType.BYTE, false));
     }
 
-    private final String                _mapName;
-    private final short                 _mapType;
-    private final Map<String, Property> _props = new LinkedHashMap<>();
-    private final PropertyMaps          _owner;
+    private final String                mapName;
+    private final short                 mapType;
+    private final Map<String, Property> props = new LinkedHashMap<>();
+    private final PropertyMaps          owner;
 
     public PropertyMapImpl(String name, short type, PropertyMaps owner) {
-        _mapName = name;
-        _mapType = type;
-        _owner = owner;
+        mapName = name;
+        mapType = type;
+        this.owner = owner;
     }
 
     @Override
     public String getName() {
-        return _mapName;
+        return mapName;
     }
 
     public short getType() {
-        return _mapType;
+        return mapType;
     }
 
     public PropertyMaps getOwner() {
-        return _owner;
+        return owner;
     }
 
     @Override
     public int getSize() {
-        return _props.size();
+        return props.size();
     }
 
     @Override
     public boolean isEmpty() {
-        return _props.isEmpty();
+        return props.isEmpty();
     }
 
     @Override
     public Property get(String name) {
-        return _props.get(DatabaseImpl.toLookupName(name));
+        return props.get(DatabaseImpl.toLookupName(name));
     }
 
     @Override
@@ -119,12 +119,12 @@ public class PropertyMapImpl implements PropertyMap {
     }
 
     @Override
-    public void putAll(Iterable<? extends Property> props) {
-        if (props == null) {
+    public void putAll(Iterable<? extends Property> newProps) {
+        if (newProps == null) {
             return;
         }
 
-        for (Property prop : props) {
+        for (Property prop : newProps) {
             put(prop);
         }
     }
@@ -139,18 +139,18 @@ public class PropertyMapImpl implements PropertyMap {
     @Override
     public PropertyImpl put(String name, DataType type, Object value, boolean isDdl) {
         PropertyImpl prop = (PropertyImpl) createProperty(name, type, value, isDdl);
-        _props.put(DatabaseImpl.toLookupName(name), prop);
+        props.put(DatabaseImpl.toLookupName(name), prop);
         return prop;
     }
 
     @Override
     public PropertyImpl remove(String name) {
-        return (PropertyImpl) _props.remove(DatabaseImpl.toLookupName(name));
+        return (PropertyImpl) props.remove(DatabaseImpl.toLookupName(name));
     }
 
     @Override
     public Iterator<Property> iterator() {
-        return _props.values().iterator();
+        return props.values().iterator();
     }
 
     @Override
@@ -189,8 +189,8 @@ public class PropertyMapImpl implements PropertyMap {
 
         if (pd != null) {
             // update according to the default info
-            type = type == null ? pd._type : type;
-            isDdl |= pd._isDdl;
+            type = type == null ? pd.type : type;
+            isDdl |= pd.isDdl;
         } else if (type == null) {
             // choose the type based on the value
             if (value instanceof String) {
@@ -225,41 +225,41 @@ public class PropertyMapImpl implements PropertyMap {
      * Info about a property defined in a PropertyMap.
      */
     static final class PropertyImpl implements PropertyMap.Property {
-        private final String   _name;
-        private final DataType _type;
-        private final boolean  _ddl;
-        private Object         _value;
+        private final String   name;
+        private final DataType type;
+        private final boolean  ddl;
+        private Object         value;
 
         private PropertyImpl(String name, DataType type, Object value, boolean ddl) {
-            _name = name;
-            _type = type;
-            _ddl = ddl;
-            _value = value;
+            this.name = name;
+            this.type = type;
+            this.ddl = ddl;
+            this.value = value;
         }
 
         @Override
         public String getName() {
-            return _name;
+            return name;
         }
 
         @Override
         public DataType getType() {
-            return _type;
+            return type;
         }
 
         @Override
         public Object getValue() {
-            return _value;
+            return value;
         }
 
         @Override
         public void setValue(Object newValue) {
-            _value = newValue;
+            value = newValue;
         }
 
         @Override
         public boolean isDdl() {
-            return _ddl;
+            return ddl;
         }
 
         @Override
@@ -268,7 +268,7 @@ public class PropertyMapImpl implements PropertyMap {
             if (val instanceof byte[]) {
                 val = ByteUtil.toHexString((byte[]) val);
             }
-            return getName() + "[" + getType() + (_ddl ? ":ddl" : "") + "]=" + val;
+            return getName() + "[" + getType() + (ddl ? ":ddl" : "") + "]=" + val;
         }
     }
 
@@ -276,12 +276,12 @@ public class PropertyMapImpl implements PropertyMap {
      * Helper for holding info about default properties
      */
     private static final class PropDef {
-        private final DataType _type;
-        private final boolean  _isDdl;
+        private final DataType type;
+        private final boolean  isDdl;
 
         private PropDef(DataType type, boolean isDdl) {
-            _type = type;
-            _isDdl = isDdl;
+            this.type = type;
+            this.isDdl = isDdl;
         }
     }
 }

@@ -28,43 +28,43 @@ import java.util.*;
  * Helper class used to maintain state during table mutation.
  */
 public class TableUpdater extends TableMutator {
-    private final TableImpl               _table;
+    private final TableImpl               table;
 
-    private ColumnBuilder                 _column;
-    private IndexBuilder                  _index;
-    private int                           _origTdefLen;
-    private int                           _addedTdefLen;
-    private final List<Integer>           _nextPages = new ArrayList<>(1);
-    private ColumnState                   _colState;
-    private IndexDataState                _idxDataState;
-    private IndexImpl.ForeignKeyReference _fkReference;
+    private ColumnBuilder                 column;
+    private IndexBuilder                  index;
+    private int                           origTdefLen;
+    private int                           addedTdefLen;
+    private final List<Integer>           nextPages = new ArrayList<>(1);
+    private ColumnState                   colState;
+    private IndexDataState                idxDataState;
+    private IndexImpl.ForeignKeyReference fkReference;
 
     public TableUpdater(TableImpl table) {
         super(table.getDatabase());
-        _table = table;
+        this.table = table;
     }
 
     public ColumnBuilder getColumn() {
-        return _column;
+        return column;
     }
 
     public IndexBuilder getIndex() {
-        return _index;
+        return index;
     }
 
     @Override
     String getTableName() {
-        return _table.getName();
+        return table.getName();
     }
 
     @Override
     public int getTdefPageNumber() {
-        return _table.getTableDefPageNumber();
+        return table.getTableDefPageNumber();
     }
 
     @Override
     short getColumnNumber(String colName) {
-        for (ColumnImpl col : _table.getColumns()) {
+        for (ColumnImpl col : table.getColumns()) {
             if (col.getName().equalsIgnoreCase(colName)) {
                 return col.getColumnNumber();
             }
@@ -74,82 +74,82 @@ public class TableUpdater extends TableMutator {
 
     @Override
     public ColumnState getColumnState(ColumnBuilder col) {
-        return col == _column ? _colState : null;
+        return col == column ? colState : null;
     }
 
     @Override
     public IndexDataState getIndexDataState(IndexBuilder idx) {
-        return idx == _index ? _idxDataState : null;
+        return idx == index ? idxDataState : null;
     }
 
-    void setForeignKey(IndexImpl.ForeignKeyReference fkReference) {
-        _fkReference = fkReference;
+    void setForeignKey(IndexImpl.ForeignKeyReference newFkReference) {
+        fkReference = newFkReference;
     }
 
     @Override
     public IndexImpl.ForeignKeyReference getForeignKey(IndexBuilder idx) {
-        return idx == _index ? _fkReference : null;
+        return idx == index ? fkReference : null;
     }
 
     int getAddedTdefLen() {
-        return _addedTdefLen;
+        return addedTdefLen;
     }
 
     void addTdefLen(int add) {
-        _addedTdefLen += add;
+        addedTdefLen += add;
     }
 
     void setOrigTdefLen(int len) {
-        _origTdefLen = len;
+        origTdefLen = len;
     }
 
     List<Integer> getNextPages() {
-        return _nextPages;
+        return nextPages;
     }
 
     void resetTdefInfo() {
-        _addedTdefLen = 0;
-        _origTdefLen = 0;
-        _nextPages.clear();
+        addedTdefLen = 0;
+        origTdefLen = 0;
+        nextPages.clear();
     }
 
-    public ColumnImpl addColumn(ColumnBuilder column) throws IOException {
+    public ColumnImpl addColumn(ColumnBuilder newColumn) throws IOException {
 
-        _column = column;
+        column = newColumn;
 
         validateAddColumn();
 
         // assign column number and do some assorted column bookkeeping
-        short columnNumber = (short) _table.getMaxColumnCount();
-        _column.setColumnNumber(columnNumber);
-        if (_column.getType().isLongValue()) {
-            _colState = new ColumnState();
+        short columnNumber = (short) table.getMaxColumnCount();
+        this.column.setColumnNumber(columnNumber);
+        if (this.column.getType().isLongValue()) {
+            colState = new ColumnState();
         }
 
         getPageChannel().startExclusiveWrite();
         try {
 
-            return _table.mutateAddColumn(this);
+            return table.mutateAddColumn(this);
 
         } finally {
             getPageChannel().finishWrite();
         }
     }
 
-    public IndexImpl addIndex(IndexBuilder index) throws IOException {
-        return addIndex(index, false, (byte) 0, (byte) 0);
+    public IndexImpl addIndex(IndexBuilder newIndex) throws IOException {
+        return addIndex(newIndex, false, (byte) 0, (byte) 0);
     }
 
-    IndexImpl addIndex(IndexBuilder index, boolean isInternal, byte ignoreIdxFlags, byte ignoreColFlags) throws IOException {
-        _index = index;
+    IndexImpl addIndex(IndexBuilder newIndex, boolean isInternal, byte ignoreIdxFlags, byte ignoreColFlags) throws IOException {
+        index = newIndex;
 
         if (!isInternal) {
             validateAddIndex();
         }
 
         // assign index number and do some assorted index bookkeeping
-        int indexNumber = _table.getLogicalIndexCount();
-        _index.setIndexNumber(indexNumber);
+        int indexNumber = table.getLogicalIndexCount();
+        this.index.setIndexNumber(indexNumber);
 
         // initialize backing index state
         initIndexDataState(ignoreIdxFlags, ignoreColFlags);
@@ -163,15 +163,15 @@ public class TableUpdater extends TableMutator {
         }
         try {
 
-            if (_idxDataState.getIndexDataNumber() == _table.getIndexCount()) {
+            if (idxDataState.getIndexDataNumber() == table.getIndexCount()) {
                 // we need a new backing index data
-                _table.mutateAddIndexData(this);
+                table.mutateAddIndexData(this);
 
                 // we need to modify the table def again when adding the Index, so reset
                 resetTdefInfo();
             }
 
-            return _table.mutateAddIndex(this);
+            return table.mutateAddIndex(this);
 
         } finally {
             getPageChannel().finishWrite();
@@ -180,52 +180,52 @@ public class TableUpdater extends TableMutator {
 
     boolean validateUpdatedTdef(ByteBuffer tableBuffer) {
         // sanity check the updates
-        return _origTdefLen + _addedTdefLen == tableBuffer.limit();
+        return origTdefLen + addedTdefLen == tableBuffer.limit();
     }
 
     private void validateAddColumn() {
 
-        if (_column == null) {
+        if (column == null) {
             throw new IllegalArgumentException(withErrorContext("Cannot add column with no column"));
         }
-        if (_table.getColumnCount() + 1 > getFormat().MAX_COLUMNS_PER_TABLE) {
+        if (table.getColumnCount() + 1 > getFormat().MAX_COLUMNS_PER_TABLE) {
             throw new IllegalArgumentException(withErrorContext("Cannot add column to table with " + getFormat().MAX_COLUMNS_PER_TABLE + " columns"));
         }
 
         Set<String> colNames = getColumnNames();
         // next, validate the column definition
-        validateColumn(colNames, _column);
+        validateColumn(colNames, column);
 
-        if (_column.isAutoNumber()) {
+        if (column.isAutoNumber()) {
             // for most autonumber types, we can only have one of each type
             Set<DataType> autoTypes = EnumSet.noneOf(DataType.class);
-            for (ColumnImpl column : _table.getAutoNumberColumns()) {
-                autoTypes.add(column.getType());
+            for (ColumnImpl autoCol : table.getAutoNumberColumns()) {
+                autoTypes.add(autoCol.getType());
             }
 
-            validateAutoNumberColumn(autoTypes, _column);
+            validateAutoNumberColumn(autoTypes, column);
         }
     }
 
     private void validateAddIndex() {
 
-        if (_index == null) {
+        if (index == null) {
             throw new IllegalArgumentException(withErrorContext("Cannot add index with no index"));
         }
-        if (_table.getLogicalIndexCount() + 1 > getFormat().MAX_INDEXES_PER_TABLE) {
+        if (table.getLogicalIndexCount() + 1 > getFormat().MAX_INDEXES_PER_TABLE) {
             throw new IllegalArgumentException(withErrorContext("Cannot add index to table with " + getFormat().MAX_INDEXES_PER_TABLE + " indexes"));
         }
 
         boolean[] foundPk = new boolean[1];
-        Set<String> idxNames = getIndexNames(_table, foundPk);
+        Set<String> idxNames = getIndexNames(table, foundPk);
         // next, validate the index definition
-        validateIndex(getColumnNames(), idxNames, foundPk, _index);
+        validateIndex(getColumnNames(), idxNames, foundPk, index);
     }
 
     private Set<String> getColumnNames() {
         Set<String> colNames = new HashSet<>();
-        for (ColumnImpl column : _table.getColumns()) {
-            colNames.add(DatabaseImpl.toLookupName(column.getName()));
+        for (ColumnImpl col : table.getColumns()) {
+            colNames.add(DatabaseImpl.toLookupName(col.getName()));
         }
         return colNames;
     }
@@ -243,16 +243,16 @@ public class TableUpdater extends TableMutator {
 
     private void initIndexDataState(byte ignoreIdxFlags, byte ignoreColFlags) {
 
-        _idxDataState = new IndexDataState();
-        _idxDataState.addIndex(_index);
+        idxDataState = new IndexDataState();
+        idxDataState.addIndex(index);
 
         // search for an existing index which matches the given index (in terms of
         // the backing data)
-        IndexData idxData = findIndexData(_index, _table, ignoreIdxFlags, ignoreColFlags);
+        IndexData idxData = findIndexData(index, table, ignoreIdxFlags, ignoreColFlags);
 
-        int idxDataNumber = idxData != null ? idxData.getIndexDataNumber() : _table.getIndexCount();
+        int idxDataNumber = idxData != null ? idxData.getIndexDataNumber() : table.getIndexCount();
 
-        _idxDataState.setIndexDataNumber(idxDataNumber);
+        idxDataState.setIndexDataNumber(idxDataNumber);
     }
 
     static IndexData findIndexData(IndexBuilder idx, TableImpl table, byte ignoreIdxFlags, byte ignoreColFlags) {
@@ -290,11 +290,11 @@ public class TableUpdater extends TableMutator {
     @Override
     protected String withErrorContext(String msg) {
         String objStr = "";
-        if (_column != null) {
-            objStr = ";Column=" + _column.getName();
-        } else if (_index != null) {
-            objStr = ";Index=" + _index.getName();
+        if (column != null) {
+            objStr = ";Column=" + column.getName();
+        } else if (index != null) {
+            objStr = ";Index=" + index.getName();
         }
-        return msg + "(Table=" + _table.getName() + objStr + ")";
+        return msg + "(Table=" + table.getName() + objStr + ")";
     }
 }

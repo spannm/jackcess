@@ -72,14 +72,14 @@ public class NumberFormatter {
     private static final String     POS_INF_STR      = "1.#INF";
     private static final String     NEG_INF_STR      = "-1.#INF";
 
-    private final TypeFormatter     _fltFmt;
-    private final TypeFormatter     _dblFmt;
-    private final TypeFormatter     _decFmt;
+    private final TypeFormatter     fltFmt;
+    private final TypeFormatter     dblFmt;
+    private final TypeFormatter     decFmt;
 
     public NumberFormatter(DecimalFormatSymbols syms) {
-        _fltFmt = new TypeFormatter(FLT_SIG_DIGITS, syms);
-        _dblFmt = new TypeFormatter(DBL_SIG_DIGITS, syms);
-        _decFmt = new TypeFormatter(DEC_SIG_DIGITS, syms);
+        fltFmt = new TypeFormatter(FLT_SIG_DIGITS, syms);
+        dblFmt = new TypeFormatter(DBL_SIG_DIGITS, syms);
+        decFmt = new TypeFormatter(DEC_SIG_DIGITS, syms);
     }
 
     @SuppressWarnings("PMD.AvoidDecimalLiteralsInBigDecimalConstructor")
@@ -92,7 +92,7 @@ public class NumberFormatter {
             return f < 0f ? NEG_INF_STR : POS_INF_STR;
         }
 
-        return _fltFmt.format(new BigDecimal(f, FLT_MATH_CONTEXT));
+        return fltFmt.format(new BigDecimal(f, FLT_MATH_CONTEXT));
     }
 
     @SuppressWarnings("PMD.AvoidDecimalLiteralsInBigDecimalConstructor")
@@ -105,11 +105,11 @@ public class NumberFormatter {
             return d < 0d ? NEG_INF_STR : POS_INF_STR;
         }
 
-        return _dblFmt.format(new BigDecimal(d, DBL_MATH_CONTEXT));
+        return dblFmt.format(new BigDecimal(d, DBL_MATH_CONTEXT));
     }
 
     public String format(BigDecimal bd) {
-        return _decFmt.format(bd.round(DEC_MATH_CONTEXT));
+        return decFmt.format(bd.round(DEC_MATH_CONTEXT));
     }
 
     private static ScientificFormat createScientificFormat(int prec, DecimalFormatSymbols syms) {
@@ -121,32 +121,32 @@ public class NumberFormatter {
     }
 
     private static final class TypeFormatter {
-        private final DecimalFormat    _df;
-        private final ScientificFormat _dfS;
-        private final int              _prec;
+        private final DecimalFormat    df;
+        private final ScientificFormat dfS;
+        private final int              prec;
 
         private TypeFormatter(int prec, DecimalFormatSymbols syms) {
-            _prec = prec;
-            _df = new DecimalFormat("0.#", syms);
-            _df.setMaximumIntegerDigits(prec);
-            _df.setMaximumFractionDigits(prec);
-            _df.setRoundingMode(ROUND_MODE);
-            _dfS = createScientificFormat(prec, syms);
+            this.prec = prec;
+            df = new DecimalFormat("0.#", syms);
+            df.setMaximumIntegerDigits(prec);
+            df.setMaximumFractionDigits(prec);
+            df.setRoundingMode(ROUND_MODE);
+            dfS = createScientificFormat(prec, syms);
         }
 
         public String format(BigDecimal bd) {
             bd = bd.stripTrailingZeros();
-            int prec = bd.precision();
+            int bdPrec = bd.precision();
             int scale = bd.scale();
 
-            int sigDigits = prec;
+            int sigDigits = bdPrec;
             if (scale < 0) {
                 sigDigits -= scale;
-            } else if (scale > prec) {
-                sigDigits += scale - prec;
+            } else if (scale > bdPrec) {
+                sigDigits += scale - bdPrec;
             }
 
-            return sigDigits > _prec ? _dfS.format(bd) : _df.format(bd);
+            return sigDigits > prec ? dfS.format(bd) : df.format(bd);
         }
     }
 
@@ -159,22 +159,22 @@ public class NumberFormatter {
     public static class ScientificFormat extends NumberFormat {
         private static final long  serialVersionUID = 0L;
 
-        private final NumberFormat _df;
-        private final NotationType _type;
+        private final NumberFormat df;
+        private final NotationType type;
 
         public ScientificFormat(NumberFormat df) {
             this(df, NotationType.EXP_E_PLUS);
         }
 
         public ScientificFormat(NumberFormat df, NotationType type) {
-            _df = df;
-            _type = type;
+            this.df = df;
+            this.type = type;
         }
 
         @Override
         public StringBuffer format(Object number, StringBuffer toAppendTo, FieldPosition pos) {
-            StringBuffer sb = _df.format(number, toAppendTo, pos);
-            _type.format(sb, sb.lastIndexOf("E"));
+            StringBuffer sb = df.format(number, toAppendTo, pos);
+            type.format(sb, sb.lastIndexOf("E"));
             return sb;
         }
 
@@ -195,12 +195,12 @@ public class NumberFormatter {
 
         @Override
         public int getMaximumFractionDigits() {
-            return _df.getMaximumFractionDigits();
+            return df.getMaximumFractionDigits();
         }
 
         @Override
         public int getMinimumFractionDigits() {
-            return _df.getMinimumFractionDigits();
+            return df.getMinimumFractionDigits();
         }
     }
 }

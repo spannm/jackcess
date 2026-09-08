@@ -49,31 +49,31 @@ import java.util.*;
  */
 public class DatabaseBuilder {
     /** the file name of the mdb to open/create */
-    private Path                              _mdbFile;
+    private Path                              mdbFile;
     /** whether or not to open existing mdb read-only */
-    private boolean                           _readOnly;
+    private boolean                           readOnly;
     /** whether or not to auto-sync writes to the filesystem */
-    private boolean                           _autoSync = Database.DEFAULT_AUTO_SYNC;
+    private boolean                           autoSync = Database.DEFAULT_AUTO_SYNC;
     /** optional charset for mdbs with unspecified charsets */
-    private Charset                           _charset;
+    private Charset                           charset;
     /** optional timezone override for interpreting dates */
-    private TimeZone                          _timeZone;
+    private TimeZone                          timeZone;
     /** optional CodecProvider for handling encoded mdbs */
-    private CodecProvider                     _codecProvider;
+    private CodecProvider                     codecProvider;
     /** FileFormat to use when creating a new mdb */
-    private FileFormat               _fileFormat;
+    private FileFormat               fileFormat;
     /**
      * optional pre-opened FileChannel, will _not_ be closed by Database close
      */
-    private FileChannel                       _channel;
+    private FileChannel                       channel;
     /** database properties (if any) */
-    private Map<String, PropertyMap.Property> _dbProps;
+    private Map<String, PropertyMap.Property> dbProps;
     /** database summary properties (if any) */
-    private Map<String, PropertyMap.Property> _summaryProps;
+    private Map<String, PropertyMap.Property> summaryProps;
     /** database user-defined (if any) */
-    private Map<String, PropertyMap.Property> _userProps;
+    private Map<String, PropertyMap.Property> userProps;
     /** flag indicating that the system catalog index is borked */
-    private boolean                           _ignoreBrokenSystemCatalogIndex;
+    private boolean                           ignoreBrokenSystemCatalogIndex;
 
     public DatabaseBuilder() {
         this((Path) null);
@@ -86,31 +86,31 @@ public class DatabaseBuilder {
 
     @Deprecated
     public DatabaseBuilder(Path mdbFile) {
-        _mdbFile = mdbFile;
+        this.mdbFile = mdbFile;
     }
 
     /**
      * File containing an existing database for {@link #open} or target file for new database for {@link #create} (in
      * which case, <b>tf this file already exists, it will be overwritten.</b>)
      */
-    public DatabaseBuilder withFile(File mdbFile) {
-        return withPath(toPath(mdbFile));
+    public DatabaseBuilder withFile(File newMdbFile) {
+        return withPath(toPath(newMdbFile));
     }
 
     /**
      * File containing an existing database for {@link #open} or target file for new database for {@link #create} (in
      * which case, <b>tf this file already exists, it will be overwritten.</b>)
      */
-    public DatabaseBuilder withPath(Path mdbFile) {
-        _mdbFile = mdbFile;
+    public DatabaseBuilder withPath(Path newMdbFile) {
+        mdbFile = newMdbFile;
         return this;
     }
 
     /**
      * Sets flag which, iff {@code true}, will force opening file in read-only mode ({@link #open} only).
      */
-    public DatabaseBuilder withReadOnly(boolean readOnly) {
-        _readOnly = readOnly;
+    public DatabaseBuilder withReadOnly(boolean newReadOnly) {
+        readOnly = newReadOnly;
         return this;
     }
 
@@ -121,24 +121,24 @@ public class DatabaseBuilder {
      * be much faster, but may leave the database in an inconsistent state if failures are encountered during writing.
      * Writes may be flushed at any time using {@link Database#flush}.
      */
-    public DatabaseBuilder withAutoSync(boolean autoSync) {
-        _autoSync = autoSync;
+    public DatabaseBuilder withAutoSync(boolean newAutoSync) {
+        autoSync = newAutoSync;
         return this;
     }
 
     /**
      * Sets the Charset to use, if {@code null}, uses default.
      */
-    public DatabaseBuilder withCharset(Charset charset) {
-        _charset = charset;
+    public DatabaseBuilder withCharset(Charset newCharset) {
+        charset = newCharset;
         return this;
     }
 
     /**
      * Sets the TimeZone to use for interpreting dates, if {@code null}, uses default
      */
-    public DatabaseBuilder withTimeZone(TimeZone timeZone) {
-        _timeZone = timeZone;
+    public DatabaseBuilder withTimeZone(TimeZone newTimeZone) {
+        timeZone = newTimeZone;
         return this;
     }
 
@@ -146,16 +146,16 @@ public class DatabaseBuilder {
      * Sets the CodecProvider for handling page encoding/decoding, may be {@code null} if no special encoding is
      * necessary
      */
-    public DatabaseBuilder withCodecProvider(CodecProvider codecProvider) {
-        _codecProvider = codecProvider;
+    public DatabaseBuilder withCodecProvider(CodecProvider newCodecProvider) {
+        codecProvider = newCodecProvider;
         return this;
     }
 
     /**
      * Sets the version of new database ({@link #create} only).
      */
-    public DatabaseBuilder withFileFormat(FileFormat fileFormat) {
-        _fileFormat = fileFormat;
+    public DatabaseBuilder withFileFormat(FileFormat newFileFormat) {
+        fileFormat = newFileFormat;
         return this;
     }
 
@@ -165,8 +165,8 @@ public class DatabaseBuilder {
      * {@link MemFileChannel}). If provided, the File parameter will be available from {@link Database#getFile}, but
      * otherwise ignored.
      */
-    public DatabaseBuilder withChannel(FileChannel channel) {
-        _channel = channel;
+    public DatabaseBuilder withChannel(FileChannel newChannel) {
+        channel = newChannel;
         return this;
     }
 
@@ -183,7 +183,7 @@ public class DatabaseBuilder {
      */
     public DatabaseBuilder putDatabaseProperty(String name, DataType type,
         Object value) {
-        _dbProps = putProperty(_dbProps, name, type, value);
+        dbProps = putProperty(dbProps, name, type, value);
         return this;
     }
 
@@ -200,7 +200,7 @@ public class DatabaseBuilder {
      */
     public DatabaseBuilder putSummaryProperty(String name, DataType type,
         Object value) {
-        _summaryProps = putProperty(_summaryProps, name, type, value);
+        summaryProps = putProperty(summaryProps, name, type, value);
         return this;
     }
 
@@ -217,7 +217,7 @@ public class DatabaseBuilder {
      */
     public DatabaseBuilder putUserDefinedProperty(String name, DataType type,
         Object value) {
-        _userProps = putProperty(_userProps, name, type, value);
+        userProps = putProperty(userProps, name, type, value);
         return this;
     }
 
@@ -236,7 +236,7 @@ public class DatabaseBuilder {
      * tables. This will make table retrieval slower, but can be used to workaround broken indexes.
      */
     public DatabaseBuilder withIgnoreBrokenSystemCatalogIndex(boolean ignore) {
-        _ignoreBrokenSystemCatalogIndex = ignore;
+        ignoreBrokenSystemCatalogIndex = ignore;
         return this;
     }
 
@@ -244,9 +244,9 @@ public class DatabaseBuilder {
      * Opens an existing new Database using the configured information.
      */
     public Database open() throws IOException {
-        return DatabaseImpl.open(_mdbFile, _readOnly, _channel, _autoSync, _charset,
-            _timeZone, _codecProvider,
-            _ignoreBrokenSystemCatalogIndex);
+        return DatabaseImpl.open(mdbFile, readOnly, channel, autoSync, charset,
+            timeZone, codecProvider,
+            ignoreBrokenSystemCatalogIndex);
     }
 
     /**
@@ -254,20 +254,20 @@ public class DatabaseBuilder {
      */
     @SuppressWarnings("java:S2095") // suppress sonarcloud warning regarding try-with-resources
     public Database create() throws IOException {
-        Database db = DatabaseImpl.create(_fileFormat, _mdbFile, _channel, _autoSync, _charset, _timeZone);
-        if (_dbProps != null) {
+        Database db = DatabaseImpl.create(fileFormat, mdbFile, channel, autoSync, charset, timeZone);
+        if (dbProps != null) {
             PropertyMap props = db.getDatabaseProperties();
-            props.putAll(_dbProps.values());
+            props.putAll(dbProps.values());
             props.save();
         }
-        if (_summaryProps != null) {
+        if (summaryProps != null) {
             PropertyMap props = db.getSummaryProperties();
-            props.putAll(_summaryProps.values());
+            props.putAll(summaryProps.values());
             props.save();
         }
-        if (_userProps != null) {
+        if (userProps != null) {
             PropertyMap props = db.getUserDefinedProperties();
-            props.putAll(_userProps.values());
+            props.putAll(userProps.values());
             props.save();
         }
         return db;

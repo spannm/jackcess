@@ -63,19 +63,19 @@ public class IndexImpl implements Index, Comparable<IndexImpl> {
     /**
      * the actual data backing this index (more than one index may be backed by the same data
      */
-    private final IndexData           _data;
+    private final IndexData           data;
     /** 0-based index number */
-    private final int                 _indexNumber;
+    private final int                 indexNumber;
     /** the type of the index */
-    private final byte                _indexType;
+    private final byte                indexType;
     /** Index name */
-    private String                    _name;
+    private String                    name;
     /** foreign key reference info, if any */
-    private final ForeignKeyReference _reference;
+    private final ForeignKeyReference reference;
 
     protected IndexImpl(ByteBuffer tableBuffer, List<IndexData> indexDatas, JetFormat format) {
         ByteUtil.forward(tableBuffer, format.SKIP_BEFORE_INDEX_SLOT); // Forward past Unknown
-        _indexNumber = tableBuffer.getInt();
+        indexNumber = tableBuffer.getInt();
         int indexDataNumber = tableBuffer.getInt();
 
         // read foreign key reference info
@@ -85,24 +85,24 @@ public class IndexImpl implements Index, Comparable<IndexImpl> {
         byte cascadeUpdatesFlag = tableBuffer.get();
         byte cascadeDeletesFlag = tableBuffer.get();
 
-        _indexType = tableBuffer.get();
+        indexType = tableBuffer.get();
 
-        if (_indexType == FOREIGN_KEY_INDEX_TYPE && relIndexNumber != INVALID_INDEX_NUMBER) {
-            _reference = new ForeignKeyReference(relIndexType, relIndexNumber, relTablePageNumber, (cascadeUpdatesFlag & CASCADE_UPDATES_FLAG) != 0, (cascadeDeletesFlag & CASCADE_DELETES_FLAG) != 0,
+        if (indexType == FOREIGN_KEY_INDEX_TYPE && relIndexNumber != INVALID_INDEX_NUMBER) {
+            reference = new ForeignKeyReference(relIndexType, relIndexNumber, relTablePageNumber, (cascadeUpdatesFlag & CASCADE_UPDATES_FLAG) != 0, (cascadeDeletesFlag & CASCADE_DELETES_FLAG) != 0,
                 (cascadeDeletesFlag & CASCADE_NULL_FLAG) != 0);
         } else {
-            _reference = null;
+            reference = null;
         }
 
         ByteUtil.forward(tableBuffer, format.SKIP_AFTER_INDEX_SLOT); // Skip past Unknown
 
-        _data = indexDatas.get(indexDataNumber);
+        data = indexDatas.get(indexDataNumber);
 
-        _data.addIndex(this);
+        data.addIndex(this);
     }
 
     public IndexData getIndexData() {
-        return _data;
+        return data;
     }
 
     @Override
@@ -119,7 +119,7 @@ public class IndexImpl implements Index, Comparable<IndexImpl> {
     }
 
     public int getIndexNumber() {
-        return _indexNumber;
+        return indexNumber;
     }
 
     public byte getIndexFlags() {
@@ -136,42 +136,42 @@ public class IndexImpl implements Index, Comparable<IndexImpl> {
 
     @Override
     public String getName() {
-        return _name;
+        return name;
     }
 
     void setName(String name) {
-        _name = name;
+        this.name = name;
     }
 
     @Override
     public boolean isPrimaryKey() {
-        return _indexType == PRIMARY_KEY_INDEX_TYPE;
+        return indexType == PRIMARY_KEY_INDEX_TYPE;
     }
 
     @Override
     public boolean isForeignKey() {
-        return _indexType == FOREIGN_KEY_INDEX_TYPE;
+        return indexType == FOREIGN_KEY_INDEX_TYPE;
     }
 
     public ForeignKeyReference getReference() {
-        return _reference;
+        return reference;
     }
 
     @Override
     public IndexImpl getReferencedIndex() throws IOException {
 
-        if (_reference == null) {
+        if (reference == null) {
             return null;
         }
 
-        TableImpl refTable = getTable().getDatabase().getTable(_reference.getOtherTablePageNumber());
+        TableImpl refTable = getTable().getDatabase().getTable(reference.getOtherTablePageNumber());
 
         if (refTable == null) {
-            throw new IOException(withErrorContext("Reference to missing table " + _reference.getOtherTablePageNumber()));
+            throw new IOException(withErrorContext("Reference to missing table " + reference.getOtherTablePageNumber()));
         }
 
         IndexImpl refIndex = null;
-        int idxNumber = _reference.getOtherIndexNumber();
+        int idxNumber = reference.getOtherIndexNumber();
         for (IndexImpl idx : refTable.getIndexes()) {
             if (idx.getIndexNumber() == idxNumber) {
                 refIndex = idx;
@@ -185,7 +185,7 @@ public class IndexImpl implements Index, Comparable<IndexImpl> {
 
         // finally verify that we found the expected index (should reference this index)
         ForeignKeyReference otherRef = refIndex.getReference();
-        if (otherRef == null || otherRef.getOtherTablePageNumber() != getTable().getTableDefPageNumber() || otherRef.getOtherIndexNumber() != _indexNumber) {
+        if (otherRef == null || otherRef.getOtherTablePageNumber() != getTable().getTableDefPageNumber() || otherRef.getOtherIndexNumber() != indexNumber) {
             throw new IOException(withErrorContext("Found unexpected index " + refIndex.getName() + " on table " + refTable.getName() + " with reference " + otherRef));
         }
 
@@ -326,18 +326,18 @@ public class IndexImpl implements Index, Comparable<IndexImpl> {
 
     @Override
     public String toString() {
-        ToStringBuilder sb = ToStringBuilder.builder(this).append("name", "(" + getTable().getName() + ") " + _name).append("number", _indexNumber).append("isPrimaryKey", isPrimaryKey())
+        ToStringBuilder sb = ToStringBuilder.builder(this).append("name", "(" + getTable().getName() + ") " + name).append("number", indexNumber).append("isPrimaryKey", isPrimaryKey())
             .append("isForeignKey", isForeignKey());
-        if (_reference != null) {
-            sb.append("foreignKeyReference", _reference);
+        if (reference != null) {
+            sb.append("foreignKeyReference", reference);
         }
-        sb.append("data", _data);
+        sb.append("data", data);
         return sb.toString();
     }
 
     @Override
     public int compareTo(IndexImpl other) {
-        return Integer.compare(_indexNumber, other.getIndexNumber());
+        return Integer.compare(indexNumber, other.getIndexNumber());
     }
 
     /**
@@ -408,24 +408,24 @@ public class IndexImpl implements Index, Comparable<IndexImpl> {
      * Information about a foreign key reference defined in an index (when referential integrity should be enforced).
      */
     public static class ForeignKeyReference {
-        private final byte    _tableType;
-        private final int     _otherIndexNumber;
-        private final int     _otherTablePageNumber;
-        private final boolean _cascadeUpdates;
-        private final boolean _cascadeDeletes;
-        private final boolean _cascadeNull;
+        private final byte    tableType;
+        private final int     otherIndexNumber;
+        private final int     otherTablePageNumber;
+        private final boolean cascadeUpdates;
+        private final boolean cascadeDeletes;
+        private final boolean cascadeNull;
 
         public ForeignKeyReference(byte tableType, int otherIndexNumber, int otherTablePageNumber, boolean cascadeUpdates, boolean cascadeDeletes, boolean cascadeNull) {
-            _tableType = tableType;
-            _otherIndexNumber = otherIndexNumber;
-            _otherTablePageNumber = otherTablePageNumber;
-            _cascadeUpdates = cascadeUpdates;
-            _cascadeDeletes = cascadeDeletes;
-            _cascadeNull = cascadeNull;
+            this.tableType = tableType;
+            this.otherIndexNumber = otherIndexNumber;
+            this.otherTablePageNumber = otherTablePageNumber;
+            this.cascadeUpdates = cascadeUpdates;
+            this.cascadeDeletes = cascadeDeletes;
+            this.cascadeNull = cascadeNull;
         }
 
         public byte getTableType() {
-            return _tableType;
+            return tableType;
         }
 
         public boolean isPrimaryTable() {
@@ -433,28 +433,28 @@ public class IndexImpl implements Index, Comparable<IndexImpl> {
         }
 
         public int getOtherIndexNumber() {
-            return _otherIndexNumber;
+            return otherIndexNumber;
         }
 
         public int getOtherTablePageNumber() {
-            return _otherTablePageNumber;
+            return otherTablePageNumber;
         }
 
         public boolean isCascadeUpdates() {
-            return _cascadeUpdates;
+            return cascadeUpdates;
         }
 
         public boolean isCascadeDeletes() {
-            return _cascadeDeletes;
+            return cascadeDeletes;
         }
 
         public boolean isCascadeNullOnDelete() {
-            return _cascadeNull;
+            return cascadeNull;
         }
 
         @Override
         public String toString() {
-            return ToStringBuilder.builder(this).append("otherIndexNumber", _otherIndexNumber).append("otherTablePageNum", _otherTablePageNumber).append("isPrimaryTable", isPrimaryTable())
+            return ToStringBuilder.builder(this).append("otherIndexNumber", otherIndexNumber).append("otherTablePageNum", otherTablePageNumber).append("isPrimaryTable", isPrimaryTable())
                 .append("isCascadeUpdates", isCascadeUpdates()).append("isCascadeDeletes", isCascadeDeletes()).append("isCascadeNullOnDelete", isCascadeNullOnDelete()).toString();
         }
     }

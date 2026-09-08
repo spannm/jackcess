@@ -135,33 +135,33 @@ public class VersionHistoryColumnInfoImpl extends ComplexColumnInfoImpl<Version>
     }
 
     private static class VersionImpl extends ComplexValueImpl implements Version {
-        private final String _value;
-        private final Object _modifiedDate;
+        private final String value;
+        private final Object modifiedDate;
 
         private VersionImpl(Id id, ComplexValueForeignKey complexValueFk, String value, Object modifiedDate) {
             super(id, complexValueFk);
-            _value = value;
-            _modifiedDate = modifiedDate;
+            this.value = value;
+            this.modifiedDate = modifiedDate;
         }
 
         @Override
         public String getValue() {
-            return _value;
+            return value;
         }
 
         @Override
         public Date getModifiedDate() {
-            return (Date) _modifiedDate;
+            return (Date) modifiedDate;
         }
 
         @Override
         public LocalDateTime getModifiedLocalDate() {
-            return (LocalDateTime) _modifiedDate;
+            return (LocalDateTime) modifiedDate;
         }
 
         @Override
         public Object getModifiedDateObject() {
-            return _modifiedDate;
+            return modifiedDate;
         }
 
         @Override

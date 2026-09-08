@@ -210,14 +210,14 @@ public class General97IndexCodes extends GeneralLegacyIndexCodes {
      * Extension of ByteStream which enables writing individual nibbles.
      */
     protected static final class NibbleStream extends ByteStream {
-        private int _nibbleLen;
+        private int nibbleLen;
 
         protected NibbleStream(int length) {
             super(length);
         }
 
         private boolean nextIsHi() {
-            return _nibbleLen % 2 == 0;
+            return nibbleLen % 2 == 0;
         }
 
         private static int asLowNibble(int b) {
@@ -229,7 +229,7 @@ public class General97IndexCodes extends GeneralLegacyIndexCodes {
         }
 
         private void writeLowNibble(int b) {
-            int byteOff = _nibbleLen / 2;
+            int byteOff = nibbleLen / 2;
             setBits(byteOff, (byte) asLowNibble(b));
         }
 
@@ -241,12 +241,12 @@ public class General97IndexCodes extends GeneralLegacyIndexCodes {
                 writeLowNibble(b);
             }
 
-            ++_nibbleLen;
+            ++nibbleLen;
         }
 
         public void writeFillNibbles(int length, byte b) {
 
-            int newNibbleLen = _nibbleLen + length;
+            int newNibbleLen = nibbleLen + length;
             ensureCapacity((newNibbleLen + 1) / 2);
 
             if (!nextIsHi()) {
@@ -267,7 +267,7 @@ public class General97IndexCodes extends GeneralLegacyIndexCodes {
                 write(asHiNibble(b));
             }
 
-            _nibbleLen = newNibbleLen;
+            nibbleLen = newNibbleLen;
         }
 
     }

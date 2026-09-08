@@ -48,62 +48,62 @@ public class RelationshipImpl implements Relationship {
     public static final int    RIGHT_OUTER_JOIN_FLAG         = 0x02000000;
 
     /** the name of this relationship */
-    private final String       _name;
+    private final String       name;
     /** the "from" table in this relationship */
-    private final Table        _fromTable;
+    private final Table        fromTable;
     /** the "to" table in this relationship */
-    private final Table        _toTable;
+    private final Table        toTable;
     /**
      * the columns in the "from" table in this relationship (aligned w/ toColumns list)
      */
-    private final List<Column> _toColumns;
+    private final List<Column> toColumns;
     /**
      * the columns in the "to" table in this relationship (aligned w/ toColumns list)
      */
-    private final List<Column> _fromColumns;
+    private final List<Column> fromColumns;
     /** the various flags describing this relationship */
-    private final int          _flags;
+    private final int          flags;
 
     public RelationshipImpl(String name, Table fromTable, Table toTable, int flags, int numCols) {
         this(name, fromTable, toTable, flags, Collections.nCopies(numCols, null), Collections.nCopies(numCols, null));
     }
 
     public RelationshipImpl(String name, Table fromTable, Table toTable, int flags, List<? extends Column> fromCols, List<? extends Column> toCols) {
-        _name = name;
-        _fromTable = fromTable;
-        _fromColumns = new ArrayList<>(fromCols);
-        _toTable = toTable;
-        _toColumns = new ArrayList<>(toCols);
-        _flags = flags;
+        this.name = name;
+        this.fromTable = fromTable;
+        fromColumns = new ArrayList<>(fromCols);
+        this.toTable = toTable;
+        toColumns = new ArrayList<>(toCols);
+        this.flags = flags;
     }
 
     @Override
     public String getName() {
-        return _name;
+        return name;
     }
 
     @Override
     public Table getFromTable() {
-        return _fromTable;
+        return fromTable;
     }
 
     @Override
     public List<Column> getFromColumns() {
-        return _fromColumns;
+        return fromColumns;
     }
 
     @Override
     public Table getToTable() {
-        return _toTable;
+        return toTable;
     }
 
     @Override
     public List<Column> getToColumns() {
-        return _toColumns;
+        return toColumns;
     }
 
     public int getFlags() {
-        return _flags;
+        return flags;
     }
 
     @Override
@@ -158,12 +158,12 @@ public class RelationshipImpl implements Relationship {
     @Override
     public String toString() {
         return ToStringBuilder.builder(this)
-            .append("name", _name)
-            .append("fromTable", _fromTable.getName())
-            .append("fromColumns", _fromColumns)
-            .append("toTable", _toTable.getName())
-            .append("toColumns", _toColumns)
-            .append("flags", Integer.toHexString(_flags))
+            .append("name", name)
+            .append("fromTable", fromTable.getName())
+            .append("fromColumns", fromColumns)
+            .append("toTable", toTable.getName())
+            .append("toColumns", toColumns)
+            .append("flags", Integer.toHexString(flags))
             .toString();
     }
 

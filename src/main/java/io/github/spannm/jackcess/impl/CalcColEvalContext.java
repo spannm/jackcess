@@ -22,11 +22,11 @@ import io.github.spannm.jackcess.impl.expr.Expressionator;
 import java.io.IOException;
 
 public class CalcColEvalContext extends RowEvalContext {
-    private final ColumnImpl _col;
+    private final ColumnImpl col;
 
     public CalcColEvalContext(ColumnImpl col) {
         super(col.getDatabase());
-        _col = col;
+        this.col = col;
     }
 
     CalcColEvalContext withExpr(String exprStr) {
@@ -36,12 +36,12 @@ public class CalcColEvalContext extends RowEvalContext {
 
     @Override
     protected TableImpl getTable() {
-        return _col.getTable();
+        return col.getTable();
     }
 
     @Override
     public Value.Type getResultType() {
-        return toValueType(_col.getType());
+        return toValueType(col.getType());
     }
 
     public Object eval(Object[] row) throws IOException {
@@ -55,6 +55,6 @@ public class CalcColEvalContext extends RowEvalContext {
 
     @Override
     protected String withErrorContext(String msg) {
-        return _col.withErrorContext(msg);
+        return col.withErrorContext(msg);
     }
 }

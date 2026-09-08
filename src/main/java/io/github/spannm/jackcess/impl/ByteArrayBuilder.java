@@ -26,11 +26,11 @@ import java.util.List;
  * {@link #toArray} is called.
  */
 public class ByteArrayBuilder {
-    private int              _pos;
-    private final List<Data> _data = new ArrayList<>();
+    private int              pos;
+    private final List<Data> data = new ArrayList<>();
 
     public int position() {
-        return _pos;
+        return pos;
     }
 
     public ByteArrayBuilder reserveInt() {
@@ -42,54 +42,54 @@ public class ByteArrayBuilder {
     }
 
     public ByteArrayBuilder reserve(int bytes) {
-        _pos += bytes;
+        pos += bytes;
         return this;
     }
 
     public ByteArrayBuilder put(byte val) {
-        return put(new ByteData(_pos, val));
+        return put(new ByteData(pos, val));
     }
 
     public ByteArrayBuilder putInt(int val) {
-        return putInt(_pos, val);
+        return putInt(pos, val);
     }
 
-    public ByteArrayBuilder putInt(int pos, int val) {
-        return put(new IntData(pos, val));
+    public ByteArrayBuilder putInt(int atPos, int val) {
+        return put(new IntData(atPos, val));
     }
 
     public ByteArrayBuilder putShort(short val) {
-        return putShort(_pos, val);
+        return putShort(pos, val);
     }
 
-    public ByteArrayBuilder putShort(int pos, short val) {
-        return put(new ShortData(pos, val));
+    public ByteArrayBuilder putShort(int atPos, short val) {
+        return put(new ShortData(atPos, val));
     }
 
     public ByteArrayBuilder put(byte[] val) {
-        return put(new BytesData(_pos, val));
+        return put(new BytesData(pos, val));
     }
 
     public ByteArrayBuilder put(ByteBuffer val) {
-        return put(new BufData(_pos, val));
+        return put(new BufData(pos, val));
     }
 
-    private ByteArrayBuilder put(Data data) {
-        _data.add(data);
-        int endPos = data.getEndPos();
-        if (endPos > _pos) {
-            _pos = endPos;
+    private ByteArrayBuilder put(Data newData) {
+        data.add(newData);
+        int endPos = newData.getEndPos();
+        if (endPos > pos) {
+            pos = endPos;
         }
         return this;
     }
 
     public ByteBuffer toBuffer() {
-        return toBuffer(PageChannel.wrap(new byte[_pos]));
+        return toBuffer(PageChannel.wrap(new byte[pos]));
     }
 
     public ByteBuffer toBuffer(ByteBuffer buf) {
-        for (Data data : _data) {
-            data.write(buf);
+        for (Data d : data) {
+            d.write(buf);
         }
         buf.rewind();
         return buf;
@@ -100,14 +100,14 @@ public class ByteArrayBuilder {
     }
 
     private abstract static class Data {
-        private final int _pos;
+        private final int pos;
 
         protected Data(int pos) {
-            _pos = pos;
+            this.pos = pos;
         }
 
         public int getPos() {
-            return _pos;
+            return pos;
         }
 
         public int getEndPos() {
@@ -120,11 +120,11 @@ public class ByteArrayBuilder {
     }
 
     private static final class IntData extends Data {
-        private final int _val;
+        private final int val;
 
         private IntData(int pos, int val) {
             super(pos);
-            _val = val;
+            this.val = val;
         }
 
         @Override
@@ -134,16 +134,16 @@ public class ByteArrayBuilder {
 
         @Override
         public void write(ByteBuffer buf) {
-            buf.putInt(getPos(), _val);
+            buf.putInt(getPos(), val);
         }
     }
 
     private static final class ShortData extends Data {
-        private final short _val;
+        private final short val;
 
         private ShortData(int pos, short val) {
             super(pos);
-            _val = val;
+            this.val = val;
         }
 
         @Override
@@ -153,16 +153,16 @@ public class ByteArrayBuilder {
 
         @Override
         public void write(ByteBuffer buf) {
-            buf.putShort(getPos(), _val);
+            buf.putShort(getPos(), val);
         }
     }
 
     private static final class ByteData extends Data {
-        private final byte _val;
+        private final byte val;
 
         private ByteData(int pos, byte val) {
             super(pos);
-            _val = val;
+            this.val = val;
         }
 
         @Override
@@ -172,47 +172,47 @@ public class ByteArrayBuilder {
 
         @Override
         public void write(ByteBuffer buf) {
-            buf.put(getPos(), _val);
+            buf.put(getPos(), val);
         }
     }
 
     private static final class BytesData extends Data {
-        private final byte[] _val;
+        private final byte[] val;
 
         private BytesData(int pos, byte[] val) {
             super(pos);
-            _val = val;
+            this.val = val;
         }
 
         @Override
         public int size() {
-            return _val.length;
+            return val.length;
         }
 
         @Override
         public void write(ByteBuffer buf) {
             buf.position(getPos());
-            buf.put(_val);
+            buf.put(val);
         }
     }
 
     private static final class BufData extends Data {
-        private final ByteBuffer _val;
+        private final ByteBuffer val;
 
         private BufData(int pos, ByteBuffer val) {
             super(pos);
-            _val = val;
+            this.val = val;
         }
 
         @Override
         public int size() {
-            return _val.remaining();
+            return val.remaining();
         }
 
         @Override
         public void write(ByteBuffer buf) {
             buf.position(getPos());
-            buf.put(_val);
+            buf.put(val);
         }
     }
 }

@@ -28,21 +28,21 @@ import java.util.Set;
  * Common helper class used to maintain state during table mutation.
  */
 public abstract class TableMutator extends DBMutator {
-    private ColumnOffsets _colOffsets;
+    private ColumnOffsets colOffsets;
 
     protected TableMutator(DatabaseImpl database) {
         super(database);
     }
 
     public void setColumnOffsets(int fixedOffset, int varOffset, int longVarOffset) {
-        if (_colOffsets == null) {
-            _colOffsets = new ColumnOffsets();
+        if (colOffsets == null) {
+            colOffsets = new ColumnOffsets();
         }
-        _colOffsets.set(fixedOffset, varOffset, longVarOffset);
+        colOffsets.set(fixedOffset, varOffset, longVarOffset);
     }
 
     public ColumnOffsets getColumnOffsets() {
-        return _colOffsets;
+        return colOffsets;
     }
 
     public IndexImpl.ForeignKeyReference getForeignKey(IndexBuilder idx) {
@@ -111,24 +111,24 @@ public abstract class TableMutator extends DBMutator {
      * Maintains additional state used during column writing.
      */
     static final class ColumnOffsets {
-        private short _fixedOffset;
-        private short _varOffset;
-        private short _longVarOffset;
+        private short fixedOffset;
+        private short varOffset;
+        private short longVarOffset;
 
-        public void set(int fixedOffset, int varOffset, int longVarOffset) {
-            _fixedOffset = (short) fixedOffset;
-            _varOffset = (short) varOffset;
-            _longVarOffset = (short) longVarOffset;
+        public void set(int newFixedOffset, int newVarOffset, int newLongVarOffset) {
+            fixedOffset = (short) newFixedOffset;
+            varOffset = (short) newVarOffset;
+            longVarOffset = (short) newLongVarOffset;
         }
 
         public short getNextVariableOffset(ColumnBuilder col) {
             if (!col.isVariableLength()) {
-                return _varOffset;
+                return varOffset;
             }
             if (!col.getType().isLongValue()) {
-                return _varOffset++;
+                return varOffset++;
             }
-            return _longVarOffset++;
+            return longVarOffset++;
         }
 
         public short getNextFixedOffset(ColumnBuilder col) {
@@ -136,8 +136,8 @@ public abstract class TableMutator extends DBMutator {
                 // booleans are stored in null mask, not in fixed data section
                 return 0;
             }
-            short offset = _fixedOffset;
-            _fixedOffset += col.getFixedDataSize();
+            short offset = fixedOffset;
+            fixedOffset += col.getFixedDataSize();
             return offset;
         }
     }
@@ -146,33 +146,33 @@ public abstract class TableMutator extends DBMutator {
      * Maintains additional state used during column creation.
      */
     static final class ColumnState {
-        private byte _umapOwnedRowNumber;
-        private byte _umapFreeRowNumber;
+        private byte umapOwnedRowNumber;
+        private byte umapFreeRowNumber;
         // we always put both usage maps on the same page
-        private int  _umapPageNumber;
+        private int  umapPageNumber;
 
         public byte getUmapOwnedRowNumber() {
-            return _umapOwnedRowNumber;
+            return umapOwnedRowNumber;
         }
 
         public void setUmapOwnedRowNumber(byte newUmapOwnedRowNumber) {
-            _umapOwnedRowNumber = newUmapOwnedRowNumber;
+            umapOwnedRowNumber = newUmapOwnedRowNumber;
         }
 
         public byte getUmapFreeRowNumber() {
-            return _umapFreeRowNumber;
+            return umapFreeRowNumber;
         }
 
         public void setUmapFreeRowNumber(byte newUmapFreeRowNumber) {
-            _umapFreeRowNumber = newUmapFreeRowNumber;
+            umapFreeRowNumber = newUmapFreeRowNumber;
         }
 
         public int getUmapPageNumber() {
-            return _umapPageNumber;
+            return umapPageNumber;
         }
 
         public void setUmapPageNumber(int newUmapPageNumber) {
-            _umapPageNumber = newUmapPageNumber;
+            umapPageNumber = newUmapPageNumber;
         }
     }
 
@@ -180,56 +180,56 @@ public abstract class TableMutator extends DBMutator {
      * Maintains additional state used during index data creation.
      */
     static final class IndexDataState {
-        private final List<IndexBuilder> _indexes = new ArrayList<>();
-        private int                      _indexDataNumber;
-        private byte                     _umapRowNumber;
-        private int                      _umapPageNumber;
-        private int                      _rootPageNumber;
+        private final List<IndexBuilder> indexes = new ArrayList<>();
+        private int                      indexDataNumber;
+        private byte                     umapRowNumber;
+        private int                      umapPageNumber;
+        private int                      rootPageNumber;
 
         public IndexBuilder getFirstIndex() {
             // all indexes which have the same backing IndexDataState will have
             // equivalent columns and flags.
-            return _indexes.get(0);
+            return indexes.get(0);
         }
 
         public List<IndexBuilder> getIndexes() {
-            return _indexes;
+            return indexes;
         }
 
         public void addIndex(IndexBuilder idx) {
-            _indexes.add(idx);
+            indexes.add(idx);
         }
 
         public int getIndexDataNumber() {
-            return _indexDataNumber;
+            return indexDataNumber;
         }
 
         public void setIndexDataNumber(int newIndexDataNumber) {
-            _indexDataNumber = newIndexDataNumber;
+            indexDataNumber = newIndexDataNumber;
         }
 
         public byte getUmapRowNumber() {
-            return _umapRowNumber;
+            return umapRowNumber;
         }
 
         public void setUmapRowNumber(byte newUmapRowNumber) {
-            _umapRowNumber = newUmapRowNumber;
+            umapRowNumber = newUmapRowNumber;
         }
 
         public int getUmapPageNumber() {
-            return _umapPageNumber;
+            return umapPageNumber;
         }
 
         public void setUmapPageNumber(int newUmapPageNumber) {
-            _umapPageNumber = newUmapPageNumber;
+            umapPageNumber = newUmapPageNumber;
         }
 
         public int getRootPageNumber() {
-            return _rootPageNumber;
+            return rootPageNumber;
         }
 
         public void setRootPageNumber(int newRootPageNumber) {
-            _rootPageNumber = newRootPageNumber;
+            rootPageNumber = newRootPageNumber;
         }
     }
 }

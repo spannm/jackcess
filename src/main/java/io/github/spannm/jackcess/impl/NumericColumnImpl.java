@@ -21,24 +21,24 @@ package io.github.spannm.jackcess.impl;
  */
 class NumericColumnImpl extends ColumnImpl {
     /** Numeric precision */
-    private final byte _precision;
+    private final byte precision;
     /** Numeric scale */
-    private final byte _scale;
+    private final byte scale;
 
     NumericColumnImpl(InitArgs args) {
         super(args);
 
-        _precision = args.buffer.get(args.offset + getFormat().OFFSET_COLUMN_PRECISION);
-        _scale = args.buffer.get(args.offset + getFormat().OFFSET_COLUMN_SCALE);
+        precision = args.buffer.get(args.offset + getFormat().OFFSET_COLUMN_PRECISION);
+        scale = args.buffer.get(args.offset + getFormat().OFFSET_COLUMN_SCALE);
     }
 
     @Override
     public byte getPrecision() {
-        return _precision;
+        return precision;
     }
 
     @Override
     public byte getScale() {
-        return _scale;
+        return scale;
     }
 }

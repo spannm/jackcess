@@ -61,9 +61,9 @@ public abstract class CustomLinkResolver implements LinkResolver {
     /** temp dbs end up in the system temp dir by default */
     public static final Path       DEFAULT_TEMP_DIR  = null;
 
-    private final FileFormat       _defaultFormat;
-    private final boolean          _defaultInMemory;
-    private final Path             _defaultTempDir;
+    private final FileFormat       defaultFormat;
+    private final boolean          defaultInMemory;
+    private final Path             defaultTempDir;
 
     /**
      * Creates a CustomLinkResolver using the default behavior for creating temp dbs, see {@link #DEFAULT_FORMAT},
@@ -84,21 +84,21 @@ public abstract class CustomLinkResolver implements LinkResolver {
      */
     protected CustomLinkResolver(FileFormat defaultFormat, boolean defaultInMemory,
         Path defaultTempDir) {
-        _defaultFormat = defaultFormat;
-        _defaultInMemory = defaultInMemory;
-        _defaultTempDir = defaultTempDir;
+        this.defaultFormat = defaultFormat;
+        this.defaultInMemory = defaultInMemory;
+        this.defaultTempDir = defaultTempDir;
     }
 
     protected FileFormat getDefaultFormat() {
-        return _defaultFormat;
+        return defaultFormat;
     }
 
     protected boolean isDefaultInMemory() {
-        return _defaultInMemory;
+        return defaultInMemory;
     }
 
     protected Path getDefaultTempDirectory() {
-        return _defaultTempDir;
+        return defaultTempDir;
     }
 
     /**
@@ -229,8 +229,8 @@ public abstract class CustomLinkResolver implements LinkResolver {
      * Subclass of DatabaseImpl which allows us to load tables "on demand" as well as delete the temporary db on close.
      */
     private static class TempDatabaseImpl extends DatabaseImpl {
-        private final CustomLinkResolver _resolver;
-        private final Object             _customFile;
+        private final CustomLinkResolver resolver;
+        private final Object             customFile;
 
         protected TempDatabaseImpl(CustomLinkResolver resolver, Object customFile,
             Path file, FileChannel channel,
@@ -238,15 +238,15 @@ public abstract class CustomLinkResolver implements LinkResolver {
             throws IOException {
             super(file, channel, true, false, fileFormat, null, null, null,
                 readOnly, false);
-            _resolver = resolver;
-            _customFile = customFile;
+            this.resolver = resolver;
+            this.customFile = customFile;
         }
 
         @Override
         protected TableImpl getTable(String name, boolean includeSystemTables)
             throws IOException {
             TableImpl table = super.getTable(name, includeSystemTables);
-            if (table == null && _resolver.loadCustomTable(this, _customFile, name)) {
+            if (table == null && resolver.loadCustomTable(this, customFile, name)) {
                 table = super.getTable(name, includeSystemTables);
             }
             return table;
@@ -258,7 +258,7 @@ public abstract class CustomLinkResolver implements LinkResolver {
                 super.close();
             } finally {
                 deleteDbFile(getPath());
-                closeCustomFile(_customFile);
+                closeCustomFile(customFile);
             }
         }
 

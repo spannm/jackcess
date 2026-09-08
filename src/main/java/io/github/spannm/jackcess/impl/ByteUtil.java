@@ -643,42 +643,42 @@ public final class ByteUtil {
      * Utility byte stream similar to ByteArrayOutputStream but with extended accessibility to the bytes.
      */
     public static class ByteStream extends OutputStream {
-        private byte[] _bytes;
-        private int    _length;
-        private int    _lastLength;
+        private byte[] bytes;
+        private int    length;
+        private int    lastLength;
 
         public ByteStream() {
             this(32);
         }
 
         public ByteStream(int capacity) {
-            _bytes = new byte[capacity];
+            bytes = new byte[capacity];
         }
 
         public int getLength() {
-            return _length;
+            return length;
         }
 
         public byte[] getBytes() {
-            return _bytes;
+            return bytes;
         }
 
         protected void ensureNewCapacity(int numBytes) {
-            ensureCapacity(_length + numBytes);
+            ensureCapacity(length + numBytes);
         }
 
         protected void ensureCapacity(int newLength) {
-            if (newLength > _bytes.length) {
+            if (newLength > bytes.length) {
                 byte[] temp = new byte[newLength * 2];
-                System.arraycopy(_bytes, 0, temp, 0, _length);
-                _bytes = temp;
+                System.arraycopy(bytes, 0, temp, 0, length);
+                bytes = temp;
             }
         }
 
         @Override
         public void write(int b) {
             ensureNewCapacity(1);
-            _bytes[_length++] = (byte) b;
+            bytes[length++] = (byte) b;
         }
 
         @Override
@@ -687,66 +687,66 @@ public final class ByteUtil {
         }
 
         @Override
-        public void write(byte[] b, int offset, int length) {
-            ensureNewCapacity(length);
-            System.arraycopy(b, offset, _bytes, _length, length);
-            _length += length;
+        public void write(byte[] b, int offset, int len) {
+            ensureNewCapacity(len);
+            System.arraycopy(b, offset, bytes, length, len);
+            length += len;
         }
 
         public byte get(int offset) {
-            return _bytes[offset];
+            return bytes[offset];
         }
 
         public void set(int offset, byte b) {
-            _bytes[offset] = b;
+            bytes[offset] = b;
         }
 
         public void setBits(int offset, byte b) {
-            _bytes[offset] |= b;
+            bytes[offset] |= b;
         }
 
-        public void writeFill(int length, byte b) {
-            ensureNewCapacity(length);
-            int oldLength = _length;
-            _length += length;
-            Arrays.fill(_bytes, oldLength, _length, b);
+        public void writeFill(int len, byte b) {
+            ensureNewCapacity(len);
+            int oldLength = length;
+            length += len;
+            Arrays.fill(bytes, oldLength, length, b);
         }
 
         public void skip(int n) {
             ensureNewCapacity(n);
-            _length += n;
+            length += n;
         }
 
         public void writeTo(ByteStream out) {
-            out.write(_bytes, 0, _length);
+            out.write(bytes, 0, length);
         }
 
         public byte[] toByteArray() {
 
             byte[] result = null;
-            if (_length == _bytes.length) {
-                result = _bytes;
-                _bytes = null;
+            if (length == bytes.length) {
+                result = bytes;
+                bytes = null;
             } else {
-                result = copyOf(_bytes, _length);
-                if (_lastLength == _length) {
+                result = copyOf(bytes, length);
+                if (lastLength == length) {
                     // if we get the same result length bytes twice in a row, clear the
-                    // _bytes so that the next _bytes will be _lastLength
-                    _bytes = null;
+                    // bytes so that the next bytes will be lastLength
+                    bytes = null;
                 }
             }
 
             // save result length so we can potentially get the right length of the
             // next byte[] in reset()
-            _lastLength = _length;
+            lastLength = length;
 
             return result;
         }
 
         public void reset() {
-            _length = 0;
-            if (_bytes == null) {
-                _bytes = new byte[_lastLength];
+            length = 0;
+            if (bytes == null) {
+                bytes = new byte[lastLength];
             }
         }
 
@@ -754,7 +754,7 @@ public final class ByteUtil {
             int minTrim = asUnsignedByte(minTrimCode);
             int maxTrim = asUnsignedByte(maxTrimCode);
 
-            int idx = _length - 1;
+            int idx = length - 1;
             while (idx >= 0) {
                 int val = asUnsignedByte(get(idx));
                 if (val >= minTrim && val <= maxTrim) {
@@ -764,7 +764,7 @@ public final class ByteUtil {
                 }
             }
 
-            _length = idx + 1;
+            length = idx + 1;
         }
     }
 

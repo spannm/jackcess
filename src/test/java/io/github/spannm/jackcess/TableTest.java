@@ -33,18 +33,18 @@ import java.util.TimeZone;
 
 class TableTest extends AbstractBaseTest {
 
-    private final PageChannel      _pageChannel = new PageChannel(true) {
+    private final PageChannel      pageChannel = new PageChannel(true) {
                                                 };
-    private final List<ColumnImpl> _columns     = new ArrayList<>();
-    private TestTable              _testTable;
-    private int                    _varLenIdx;
-    private int                    _fixedOffset;
+    private final List<ColumnImpl> columns     = new ArrayList<>();
+    private TestTable              testTable;
+    private int                    varLenIdx;
+    private int                    fixedOffset;
 
     private void reset() {
-        _testTable = null;
-        _columns.clear();
-        _varLenIdx = 0;
-        _fixedOffset = 0;
+        testTable = null;
+        columns.clear();
+        varLenIdx = 0;
+        fixedOffset = 0;
     }
 
     @Test
@@ -55,7 +55,7 @@ class TableTest extends AbstractBaseTest {
         newTestColumn(DataType.TEXT, false);
         newTestTable();
 
-        int colCount = _columns.size();
+        int colCount = columns.size();
         ByteBuffer buffer = createRow(9, "Tim", "McCune");
 
         assertEquals((short) colCount, buffer.getShort());
@@ -108,22 +108,22 @@ class TableTest extends AbstractBaseTest {
     }
 
     private ByteBuffer createRow(Object... row) throws IOException {
-        return _testTable.createRow(row);
+        return testTable.createRow(row);
     }
 
     private ByteBuffer[] encodeColumns(Object... row) throws IOException {
-        ByteBuffer[] result = new ByteBuffer[_columns.size()];
-        for (int i = 0; i < _columns.size(); i++) {
-            ColumnImpl col = _columns.get(i);
-            result[i] = col.write(row[i], _testTable.getFormat().MAX_ROW_SIZE);
+        ByteBuffer[] result = new ByteBuffer[columns.size()];
+        for (int i = 0; i < columns.size(); i++) {
+            ColumnImpl col = columns.get(i);
+            result[i] = col.write(row[i], testTable.getFormat().MAX_ROW_SIZE);
         }
         return result;
     }
 
     private Object[] decodeColumns(ByteBuffer[] buffers) throws IOException {
-        Object[] result = new Object[_columns.size()];
-        for (int i = 0; i < _columns.size(); i++) {
-            ColumnImpl col = _columns.get(i);
+        Object[] result = new Object[columns.size()];
+        for (int i = 0; i < columns.size(); i++) {
+            ColumnImpl col = columns.get(i);
             result[i] = col.read(toBytes(buffers[i]));
         }
         return result;
@@ -137,28 +137,28 @@ class TableTest extends AbstractBaseTest {
     }
 
     private TableImpl newTestTable() {
-        _testTable = new TestTable();
-        return _testTable;
+        testTable = new TestTable();
+        return testTable;
     }
 
     private void newTestColumn(DataType type, boolean compressedUnicode) {
 
-        int nextColIdx = _columns.size();
+        int nextColIdx = columns.size();
         int nextVarLenIdx = 0;
         int nextFixedOff = 0;
 
         if (type.isVariableLength()) {
-            nextVarLenIdx = _varLenIdx++;
+            nextVarLenIdx = varLenIdx++;
         } else {
-            nextFixedOff = _fixedOffset;
-            _fixedOffset += type.getFixedSize();
+            nextFixedOff = fixedOffset;
+            fixedOffset += type.getFixedSize();
         }
 
         ColumnImpl col = new ColumnImpl(null, null, type, nextColIdx, nextFixedOff,
             nextVarLenIdx) {
             @Override
             public TableImpl getTable() {
-                return _testTable;
+                return testTable;
             }
 
             @Override
@@ -187,12 +187,12 @@ class TableTest extends AbstractBaseTest {
             }
         };
 
-        _columns.add(col);
+        columns.add(col);
     }
 
     private class TestTable extends TableImpl {
         private TestTable() {
-            super(true, _columns);
+            super(true, columns);
         }
 
         public ByteBuffer createRow(Object... row) throws IOException {
@@ -201,7 +201,7 @@ class TableTest extends AbstractBaseTest {
 
         @Override
         public PageChannel getPageChannel() {
-            return _pageChannel;
+            return pageChannel;
         }
 
         @Override

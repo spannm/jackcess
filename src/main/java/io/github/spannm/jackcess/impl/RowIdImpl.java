@@ -60,26 +60,26 @@ public class RowIdImpl implements RowId, Serializable {
     /** special rowId which will sort after any other valid rowId */
     public static final RowIdImpl LAST_ROW_ID  = new RowIdImpl(LAST_PAGE_NUMBER, INVALID_ROW_NUMBER);
 
-    private final int             _pageNumber;
-    private final int             _rowNumber;
-    private final Type            _type;
+    private final int             pageNumber;
+    private final int             rowNumber;
+    private final Type            type;
 
     /**
      * Creates a new {@code RowId} instance.
      *
      */
     public RowIdImpl(int pageNumber, int rowNumber) {
-        _pageNumber = pageNumber;
-        _rowNumber = rowNumber;
-        _type = _pageNumber == FIRST_PAGE_NUMBER ? Type.ALWAYS_FIRST : _pageNumber == LAST_PAGE_NUMBER ? Type.ALWAYS_LAST : Type.NORMAL;
+        this.pageNumber = pageNumber;
+        this.rowNumber = rowNumber;
+        type = this.pageNumber == FIRST_PAGE_NUMBER ? Type.ALWAYS_FIRST : this.pageNumber == LAST_PAGE_NUMBER ? Type.ALWAYS_LAST : Type.NORMAL;
     }
 
     public int getPageNumber() {
-        return _pageNumber;
+        return pageNumber;
     }
 
     public int getRowNumber() {
-        return _rowNumber;
+        return rowNumber;
     }
 
     /**
@@ -90,7 +90,7 @@ public class RowIdImpl implements RowId, Serializable {
     }
 
     public Type getType() {
-        return _type;
+        return type;
     }
 
     @Override

@@ -280,61 +280,61 @@ public abstract class ComplexColumnInfoImpl<V extends ComplexValue> implements C
     protected abstract V toValue(ComplexValueForeignKey complexValueFk, Row rawValues);
 
     protected abstract static class ComplexValueImpl implements ComplexValue {
-        private Id                     _id;
-        private ComplexValueForeignKey _complexValueFk;
+        private Id                     id;
+        private ComplexValueForeignKey complexValueFk;
 
         protected ComplexValueImpl(Id id, ComplexValueForeignKey complexValueFk) {
-            _id = id;
-            _complexValueFk = complexValueFk;
+            this.id = id;
+            this.complexValueFk = complexValueFk;
         }
 
         @Override
         public Id getId() {
-            return _id;
+            return id;
         }
 
         @Override
         public void setId(Id id) {
-            if (Objects.equals(_id, id)) {
+            if (Objects.equals(this.id, id)) {
                 // harmless, ignore
                 return;
             }
-            if (_id != INVALID_ID) {
+            if (this.id != INVALID_ID) {
                 throw new IllegalStateException("id may not be reset");
             }
-            _id = id;
+            this.id = id;
         }
 
         @Override
         public ComplexValueForeignKey getComplexValueForeignKey() {
-            return _complexValueFk;
+            return complexValueFk;
         }
 
         @Override
-        public void setComplexValueForeignKey(ComplexValueForeignKey complexValueFk) {
-            if (Objects.equals(_complexValueFk, complexValueFk)) {
+        public void setComplexValueForeignKey(ComplexValueForeignKey newComplexValueFk) {
+            if (Objects.equals(complexValueFk, newComplexValueFk)) {
                 // harmless, ignore
                 return;
             }
-            if (_complexValueFk != INVALID_FK) {
+            if (complexValueFk != INVALID_FK) {
                 throw new IllegalStateException("complexValueFk may not be reset");
             }
-            _complexValueFk = complexValueFk;
+            complexValueFk = newComplexValueFk;
         }
 
         @Override
         public Column getColumn() {
-            return _complexValueFk.getColumn();
+            return complexValueFk.getColumn();
         }
 
         @Override
         public int hashCode() {
-            return _id.get() * 37 ^ _complexValueFk.hashCode();
+            return id.get() * 37 ^ complexValueFk.hashCode();
         }
 
         @Override
         public boolean equals(Object o) {
-            return this == o || o != null && getClass() == o.getClass() && Objects.equals(_id, ((ComplexValueImpl) o)._id) && _complexValueFk.equals(((ComplexValueImpl) o)._complexValueFk);
+            return this == o || o != null && getClass() == o.getClass() && Objects.equals(id, ((ComplexValueImpl) o).id) && complexValueFk.equals(((ComplexValueImpl) o).complexValueFk);
         }
     }
 
@@ -344,22 +344,22 @@ public abstract class ComplexColumnInfoImpl<V extends ComplexValue> implements C
     private static final class ComplexValueIdImpl extends ComplexValue.Id {
         private static final long serialVersionUID = 20130318L;
 
-        private final int         _value;
-        private final RowId       _rowId;
+        private final int         value;
+        private final RowId       rowId;
 
         protected ComplexValueIdImpl(int value, RowId rowId) {
-            _value = value;
-            _rowId = rowId;
+            this.value = value;
+            this.rowId = rowId;
         }
 
         @Override
         public int get() {
-            return _value;
+            return value;
         }
 
         @Override
         public RowId getRowId() {
-            return _rowId;
+            return rowId;
         }
     }
 

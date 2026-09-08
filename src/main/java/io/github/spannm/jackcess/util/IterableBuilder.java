@@ -35,40 +35,40 @@ public class IterableBuilder implements Iterable<Row> {
         ROW_MATCH
     }
 
-    private final Cursor       _cursor;
-    private Type               _type    = Type.SIMPLE;
-    private boolean            _forward = true;
-    private boolean            _reset   = true;
-    private Collection<String> _columnNames;
-    private ColumnMatcher      _columnMatcher;
-    private Object             _matchPattern;
+    private final Cursor       cursor;
+    private Type               type    = Type.SIMPLE;
+    private boolean            forward = true;
+    private boolean            reset   = true;
+    private Collection<String> columnNames;
+    private ColumnMatcher      columnMatcher;
+    private Object             matchPattern;
 
     public IterableBuilder(Cursor cursor) {
-        _cursor = cursor;
+        this.cursor = cursor;
     }
 
     public Collection<String> getColumnNames() {
-        return _columnNames;
+        return columnNames;
     }
 
     public ColumnMatcher getColumnMatcher() {
-        return _columnMatcher;
+        return columnMatcher;
     }
 
     public boolean isForward() {
-        return _forward;
+        return forward;
     }
 
     public boolean isReset() {
-        return _reset;
+        return reset;
     }
 
     public Object getMatchPattern() {
-        return _matchPattern;
+        return matchPattern;
     }
 
     public Type getType() {
-        return _type;
+        return type;
     }
 
     public IterableBuilder forward() {
@@ -79,24 +79,24 @@ public class IterableBuilder implements Iterable<Row> {
         return withForward(false);
     }
 
-    public IterableBuilder withForward(boolean forward) {
-        _forward = forward;
+    public IterableBuilder withForward(boolean newForward) {
+        forward = newForward;
         return this;
     }
 
-    public IterableBuilder reset(boolean reset) {
-        _reset = reset;
+    public IterableBuilder reset(boolean newReset) {
+        reset = newReset;
         return this;
     }
 
-    public IterableBuilder withColumnNames(Collection<String> columnNames) {
-        _columnNames = columnNames;
+    public IterableBuilder withColumnNames(Collection<String> newColumnNames) {
+        columnNames = newColumnNames;
         return this;
     }
 
-    public IterableBuilder addColumnNames(Iterable<String> columnNames) {
-        if (columnNames != null) {
-            for (String name : columnNames) {
+    public IterableBuilder addColumnNames(Iterable<String> newColumnNames) {
+        if (newColumnNames != null) {
+            for (String name : newColumnNames) {
                 addColumnName(name);
             }
         }
@@ -112,9 +112,9 @@ public class IterableBuilder implements Iterable<Row> {
         return this;
     }
 
-    public IterableBuilder addColumnNames(String... columnNames) {
-        if (columnNames != null) {
-            for (String name : columnNames) {
+    public IterableBuilder addColumnNames(String... newColumnNames) {
+        if (newColumnNames != null) {
+            for (String name : newColumnNames) {
                 addColumnName(name);
             }
         }
@@ -122,51 +122,51 @@ public class IterableBuilder implements Iterable<Row> {
     }
 
     private void addColumnName(String columnName) {
-        if (_columnNames == null) {
-            _columnNames = new HashSet<>();
+        if (columnNames == null) {
+            columnNames = new HashSet<>();
         }
-        _columnNames.add(columnName);
+        columnNames.add(columnName);
     }
 
     public IterableBuilder withMatchPattern(Column columnPattern,
         Object valuePattern) {
-        _type = Type.COLUMN_MATCH;
-        _matchPattern = new AbstractMap.SimpleImmutableEntry<>(
+        type = Type.COLUMN_MATCH;
+        matchPattern = new AbstractMap.SimpleImmutableEntry<>(
             columnPattern, valuePattern);
         return this;
     }
 
     public IterableBuilder withMatchPattern(String columnNamePattern, Object valuePattern) {
-        return withMatchPattern(_cursor.getTable().getColumn(columnNamePattern), valuePattern);
+        return withMatchPattern(cursor.getTable().getColumn(columnNamePattern), valuePattern);
     }
 
     public IterableBuilder withMatchPattern(Map<String, ?> rowPattern) {
-        _type = Type.ROW_MATCH;
-        _matchPattern = rowPattern;
+        type = Type.ROW_MATCH;
+        matchPattern = rowPattern;
         return this;
     }
 
     public IterableBuilder addMatchPattern(String columnNamePattern,
         Object valuePattern) {
-        _type = Type.ROW_MATCH;
+        type = Type.ROW_MATCH;
         @SuppressWarnings("unchecked")
-        Map<String, Object> matchPattern = (Map<String, Object>) _matchPattern;
-        if (matchPattern == null) {
-            matchPattern = new HashMap<>();
-            _matchPattern = matchPattern;
+        Map<String, Object> newMatchPattern = (Map<String, Object>) matchPattern;
+        if (newMatchPattern == null) {
+            newMatchPattern = new HashMap<>();
+            matchPattern = newMatchPattern;
         }
-        matchPattern.put(columnNamePattern, valuePattern);
+        newMatchPattern.put(columnNamePattern, valuePattern);
         return this;
     }
 
-    public IterableBuilder withColumnMatcher(ColumnMatcher columnMatcher) {
-        _columnMatcher = columnMatcher;
+    public IterableBuilder withColumnMatcher(ColumnMatcher newColumnMatcher) {
+        columnMatcher = newColumnMatcher;
         return this;
     }
 
     @Override
     public Iterator<Row> iterator() {
-        return ((CursorImpl) _cursor).iterator(this);
+        return ((CursorImpl) cursor).iterator(this);
     }
 
     /**

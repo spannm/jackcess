@@ -121,7 +121,7 @@ public class CompoundOleUtil implements CompoundPackageFactory {
     }
 
     private static final class CompoundContentImpl extends EmbeddedPackageContentImpl implements CompoundContent {
-        private POIFSFileSystem _fs;
+        private POIFSFileSystem fs;
 
         private CompoundContentImpl(OleBlobImpl blob, String prettyName, String className, String typeName, int position, int length) {
             super(blob, prettyName, className, typeName, position, length);
@@ -133,10 +133,10 @@ public class CompoundOleUtil implements CompoundPackageFactory {
         }
 
         private POIFSFileSystem getFileSystem() throws IOException {
-            if (_fs == null) {
-                _fs = new POIFSFileSystem(MemFileChannel.newChannel(getStream(), "r"));
+            if (fs == null) {
+                fs = new POIFSFileSystem(MemFileChannel.newChannel(getStream(), "r"));
             }
-            return _fs;
+            return fs;
         }
 
         @Override
@@ -180,8 +180,8 @@ public class CompoundOleUtil implements CompoundPackageFactory {
 
         @Override
         public void close() {
-            ByteUtil.closeQuietly(_fs);
-            _fs = null;
+            ByteUtil.closeQuietly(fs);
+            fs = null;
             super.close();
         }
 

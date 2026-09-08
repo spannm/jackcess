@@ -134,24 +134,24 @@ public class MultiValueColumnPropertyMap implements PropertyMap {
         iters.add(complex.iterator());
 
         return new Iterator<>() {
-            private Iterator<Property> _cur;
-            private Property           _next = findNext();
+            private Iterator<Property> cur;
+            private Property           next = findNext();
 
             private Property findNext() {
                 while (!iters.isEmpty()) {
-                    _cur = iters.get(0);
-                    if (_cur.hasNext()) {
-                        return _cur.next();
+                    cur = iters.get(0);
+                    if (cur.hasNext()) {
+                        return cur.next();
                     }
                     iters.remove(0);
-                    _cur = null;
+                    cur = null;
                 }
                 return null;
             }
 
             @Override
             public boolean hasNext() {
-                return _next != null;
+                return next != null;
             }
 
             @Override
@@ -159,16 +159,16 @@ public class MultiValueColumnPropertyMap implements PropertyMap {
                 if (!hasNext()) {
                     throw new NoSuchElementException();
                 }
-                Property prop = _next;
-                _next = findNext();
+                Property prop = next;
+                next = findNext();
                 return prop;
             }
 
             @Override
             public void remove() {
-                if (_cur != null) {
-                    _cur.remove();
-                    _cur = null;
+                if (cur != null) {
+                    cur.remove();
+                    cur = null;
                 }
             }
         };

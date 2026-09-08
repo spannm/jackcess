@@ -52,7 +52,7 @@ public class UpdateQueryImpl extends QueryImpl implements UpdateQuery {
         return new RowFormatter(getColumnRows()) {
             @Override
             protected void format(StringBuilder builder, Row row) {
-                toOptionalQuotedExpr(builder, row._name2, true).append(" = ").append(row._expression);
+                toOptionalQuotedExpr(builder, row.name2, true).append(" = ").append(row.expression);
             }
         }.format();
     }

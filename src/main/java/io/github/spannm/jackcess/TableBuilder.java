@@ -86,49 +86,49 @@ public class TableBuilder {
     }
 
     /** name of the new table */
-    private String                            _name;
+    private String                            name;
     /** columns for the new table */
-    private final List<ColumnBuilder>         _columns = new ArrayList<>();
+    private final List<ColumnBuilder>         columns = new ArrayList<>();
     /** indexes for the new table */
-    private final List<IndexBuilder>          _indexes = new ArrayList<>();
+    private final List<IndexBuilder>          indexes = new ArrayList<>();
     /** whether or not table/column/index names are automatically escaped */
-    private boolean                           _escapeIdentifiers;
+    private boolean                           escapeIdentifiers;
     /** table properties (if any) */
-    private Map<String, PropertyMap.Property> _props;
+    private Map<String, PropertyMap.Property> props;
 
     public TableBuilder(String name) {
         this(name, false);
     }
 
     public TableBuilder(String name, boolean escapeIdentifiers) {
-        _name = name;
-        _escapeIdentifiers = escapeIdentifiers;
-        if (_escapeIdentifiers) {
-            _name = escapeIdentifier(_name);
+        this.name = name;
+        this.escapeIdentifiers = escapeIdentifiers;
+        if (escapeIdentifiers) {
+            this.name = escapeIdentifier(name);
         }
     }
 
     public String getName() {
-        return _name;
+        return name;
     }
 
     /**
      * Adds a Column to the new table.
      */
     public TableBuilder addColumn(ColumnBuilder column) {
-        if (_escapeIdentifiers) {
+        if (escapeIdentifiers) {
             column.escapeName();
         }
-        _columns.add(column);
+        columns.add(column);
         return this;
     }
 
     /**
      * Adds the Columns to the new table.
      */
-    public TableBuilder addColumns(Collection<? extends ColumnBuilder> columns) {
-        if (columns != null) {
-            for (ColumnBuilder col : columns) {
+    public TableBuilder addColumns(Collection<? extends ColumnBuilder> newColumns) {
+        if (newColumns != null) {
+            for (ColumnBuilder col : newColumns) {
                 addColumn(col);
             }
         }
@@ -136,29 +136,29 @@ public class TableBuilder {
     }
 
     public List<ColumnBuilder> getColumns() {
-        return _columns;
+        return columns;
     }
 
     /**
      * Adds an IndexBuilder to the new table.
      */
     public TableBuilder addIndex(IndexBuilder index) {
-        if (_escapeIdentifiers) {
+        if (escapeIdentifiers) {
             index.withName(escapeIdentifier(index.getName()));
             for (IndexBuilder.Column col : index.getColumns()) {
                 col.withName(escapeIdentifier(col.getName()));
             }
         }
-        _indexes.add(index);
+        indexes.add(index);
         return this;
     }
 
     /**
      * Adds the Indexes to the new table.
      */
-    public TableBuilder addIndexes(Collection<? extends IndexBuilder> indexes) {
-        if (indexes != null) {
-            for (IndexBuilder col : indexes) {
+    public TableBuilder addIndexes(Collection<? extends IndexBuilder> newIndexes) {
+        if (newIndexes != null) {
+            for (IndexBuilder col : newIndexes) {
                 addIndex(col);
             }
         }
@@ -166,14 +166,14 @@ public class TableBuilder {
     }
 
     public List<IndexBuilder> getIndexes() {
-        return _indexes;
+        return indexes;
     }
 
     /**
      * Sets whether or not subsequently added columns will have their names automatically escaped
      */
-    public TableBuilder withEscapeIdentifiers(boolean escapeIdentifiers) {
-        _escapeIdentifiers = escapeIdentifiers;
+    public TableBuilder withEscapeIdentifiers(boolean newEscapeIdentifiers) {
+        escapeIdentifiers = newEscapeIdentifiers;
         return this;
     }
 
@@ -191,7 +191,7 @@ public class TableBuilder {
      * Escapes the new table's name using {@link TableBuilder#escapeIdentifier}.
      */
     public TableBuilder escapeName() {
-        _name = escapeIdentifier(_name);
+        name = escapeIdentifier(name);
         return this;
     }
 
@@ -199,23 +199,23 @@ public class TableBuilder {
      * Sets the table property with the given name to the given value. Attempts to determine the type of the property
      * (see {@link PropertyMap#put(String,Object)} for details on determining the property type).
      */
-    public TableBuilder putProperty(String name, Object value) {
-        return putProperty(name, null, value);
+    public TableBuilder putProperty(String propName, Object value) {
+        return putProperty(propName, null, value);
     }
 
     /**
      * Sets the table property with the given name and type to the given value.
      */
-    public TableBuilder putProperty(String name, DataType type, Object value) {
-        if (_props == null) {
-            _props = new HashMap<>();
+    public TableBuilder putProperty(String propName, DataType propType, Object value) {
+        if (props == null) {
+            props = new HashMap<>();
         }
-        _props.put(name, PropertyMapImpl.createProperty(name, type, value));
+        props.put(propName, PropertyMapImpl.createProperty(propName, propType, value));
         return this;
     }
 
     public Map<String, PropertyMap.Property> getProperties() {
-        return _props;
+        return props;
     }
 
     /**
@@ -228,10 +228,10 @@ public class TableBuilder {
     @Override
     public String toString() {
         return new StringJoiner(", ", getClass().getSimpleName() + "[", "]")
-            .add("name=" + _name)
-            .add("columns=" + _columns)
-            .add("indexes=" + _indexes)
-            .add("props=" + _props)
+            .add("name=" + name)
+            .add("columns=" + columns)
+            .add("indexes=" + indexes)
+            .add("props=" + props)
             .toString();
     }
 

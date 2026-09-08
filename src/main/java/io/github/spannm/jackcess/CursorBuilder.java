@@ -46,33 +46,33 @@ import java.util.Map;
  */
 public class CursorBuilder {
     /** the table which the cursor will traverse */
-    private final TableImpl  _table;
+    private final TableImpl  table;
     /** optional index to use in traversal */
-    private IndexImpl        _index;
+    private IndexImpl        index;
     /** optional start row for an index cursor */
-    private Object[]         _startRow;
+    private Object[]         startRow;
     /** whether or not start row for an index cursor is inclusive */
-    private boolean          _startRowInclusive = true;
+    private boolean          startRowInclusive = true;
     /** optional end row for an index cursor */
-    private Object[]         _endRow;
+    private Object[]         endRow;
     /** whether or not end row for an index cursor is inclusive */
-    private boolean          _endRowInclusive   = true;
+    private boolean          endRowInclusive   = true;
     /** whether to start at beginning or end of cursor */
-    private boolean          _beforeFirst       = true;
+    private boolean          beforeFirst       = true;
     /** optional save point to restore to the cursor */
-    private Cursor.Savepoint _savepoint;
+    private Cursor.Savepoint savepoint;
     /** ColumnMatcher to be used when matching column values */
-    private ColumnMatcher    _columnMatcher;
+    private ColumnMatcher    columnMatcher;
 
     public CursorBuilder(Table table) {
-        _table = (TableImpl) table;
+        this.table = (TableImpl) table;
     }
 
     /**
      * Sets the cursor so that it will start at the beginning (unless a savepoint is given).
      */
     public CursorBuilder beforeFirst() {
-        _beforeFirst = true;
+        beforeFirst = true;
         return this;
     }
 
@@ -80,23 +80,23 @@ public class CursorBuilder {
      * Sets the cursor so that it will start at the end (unless a savepoint is given).
      */
     public CursorBuilder afterLast() {
-        _beforeFirst = false;
+        beforeFirst = false;
         return this;
     }
 
     /**
      * Sets a savepoint to restore for the initial position of the cursor.
      */
-    public CursorBuilder restoreSavepoint(Cursor.Savepoint savepoint) {
-        _savepoint = savepoint;
+    public CursorBuilder restoreSavepoint(Cursor.Savepoint newSavepoint) {
+        savepoint = newSavepoint;
         return this;
     }
 
     /**
      * Sets an index to use for the cursor.
      */
-    public CursorBuilder withIndex(Index index) {
-        _index = (IndexImpl) index;
+    public CursorBuilder withIndex(Index newIndex) {
+        index = (IndexImpl) newIndex;
         return this;
     }
 
@@ -106,7 +106,7 @@ public class CursorBuilder {
      * @throws IllegalArgumentException if no index can be found on the table with the given name
      */
     public CursorBuilder withIndexByName(String indexName) {
-        return withIndex(_table.getIndex(indexName));
+        return withIndex(table.getIndex(indexName));
     }
 
     /**
@@ -135,12 +135,12 @@ public class CursorBuilder {
      * Searches for an index with the given column names.
      */
     private CursorBuilder withIndexByColumns(List<String> searchColumns) {
-        IndexImpl index = _table.findIndexForColumns(
+        IndexImpl foundIndex = table.findIndexForColumns(
             searchColumns, TableImpl.IndexFeature.ANY_MATCH);
-        if (index == null) {
-            throw new IllegalArgumentException("Index with columns " + searchColumns + " does not exist in table " + _table);
+        if (foundIndex == null) {
+            throw new IllegalArgumentException("Index with columns " + searchColumns + " does not exist in table " + table);
         }
-        _index = index;
+        index = foundIndex;
         return this;
     }
 
@@ -162,7 +162,7 @@ public class CursorBuilder {
      */
     public CursorBuilder withSpecificEntry(Object... specificEntry) {
         if (specificEntry != null) {
-            withSpecificRow(_index.constructIndexRowFromEntry(specificEntry));
+            withSpecificRow(index.constructIndexRowFromEntry(specificEntry));
         }
         return this;
     }
@@ -172,8 +172,8 @@ public class CursorBuilder {
      * <p>
      * A valid index must be specified before calling this method.
      */
-    public CursorBuilder withStartRow(Object... startRow) {
-        _startRow = startRow;
+    public CursorBuilder withStartRow(Object... newStartRow) {
+        startRow = newStartRow;
         return this;
     }
 
@@ -185,7 +185,7 @@ public class CursorBuilder {
      */
     public CursorBuilder withStartEntry(Object... startEntry) {
         if (startEntry != null) {
-            withStartRow(_index.constructPartialIndexRowFromEntry(
+            withStartRow(index.constructPartialIndexRowFromEntry(
                 IndexData.MIN_VALUE, startEntry));
         }
         return this;
@@ -195,7 +195,7 @@ public class CursorBuilder {
      * Sets whether the starting row for a range based index cursor is inclusive or exclusive.
      */
     public CursorBuilder withStartRowInclusive(boolean inclusive) {
-        _startRowInclusive = inclusive;
+        startRowInclusive = inclusive;
         return this;
     }
 
@@ -204,8 +204,8 @@ public class CursorBuilder {
      * <p>
      * A valid index must be specified before calling this method.
      */
-    public CursorBuilder withEndRow(Object... endRow) {
-        _endRow = endRow;
+    public CursorBuilder withEndRow(Object... newEndRow) {
+        endRow = newEndRow;
         return this;
     }
 
@@ -217,7 +217,7 @@ public class CursorBuilder {
      */
     public CursorBuilder withEndEntry(Object... endEntry) {
         if (endEntry != null) {
-            withEndRow(_index.constructPartialIndexRowFromEntry(IndexData.MAX_VALUE, endEntry));
+            withEndRow(index.constructPartialIndexRowFromEntry(IndexData.MAX_VALUE, endEntry));
         }
         return this;
     }
@@ -226,15 +226,15 @@ public class CursorBuilder {
      * Sets whether the ending row for a range based index cursor is inclusive or exclusive.
      */
     public CursorBuilder withEndRowInclusive(boolean inclusive) {
-        _endRowInclusive = inclusive;
+        endRowInclusive = inclusive;
         return this;
     }
 
     /**
      * Sets the ColumnMatcher to use for matching row patterns.
      */
-    public CursorBuilder withColumnMatcher(ColumnMatcher columnMatcher) {
-        _columnMatcher = columnMatcher;
+    public CursorBuilder withColumnMatcher(ColumnMatcher newColumnMatcher) {
+        columnMatcher = newColumnMatcher;
         return this;
     }
 
@@ -250,20 +250,20 @@ public class CursorBuilder {
      */
     public Cursor toCursor() throws IOException {
         CursorImpl cursor = null;
-        if (_index == null) {
-            cursor = CursorImpl.createCursor(_table);
+        if (index == null) {
+            cursor = CursorImpl.createCursor(table);
         } else {
-            cursor = IndexCursorImpl.createCursor(_table, _index,
-                _startRow, _startRowInclusive,
-                _endRow, _endRowInclusive);
+            cursor = IndexCursorImpl.createCursor(table, index,
+                startRow, startRowInclusive,
+                endRow, endRowInclusive);
         }
-        cursor.setColumnMatcher(_columnMatcher);
-        if (_savepoint == null) {
-            if (!_beforeFirst) {
+        cursor.setColumnMatcher(columnMatcher);
+        if (savepoint == null) {
+            if (!beforeFirst) {
                 cursor.afterLast();
             }
         } else {
-            cursor.restoreSavepoint(_savepoint);
+            cursor.restoreSavepoint(savepoint);
         }
         return cursor;
     }

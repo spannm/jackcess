@@ -30,30 +30,30 @@ public class TableScanCursor extends CursorImpl {
     private static final ScanPosition LAST_SCAN_POSITION  = new ScanPosition(RowIdImpl.LAST_ROW_ID);
 
     /** ScanDirHandler for forward traversal */
-    private final ScanDirHandler      _forwardDirHandler  = new ForwardScanDirHandler();
+    private final ScanDirHandler      forwardDirHandler  = new ForwardScanDirHandler();
     /** ScanDirHandler for backward traversal */
-    private final ScanDirHandler      _reverseDirHandler  = new ReverseScanDirHandler();
+    private final ScanDirHandler      reverseDirHandler  = new ReverseScanDirHandler();
     /** Cursor over the pages that this table owns */
-    private final UsageMap.PageCursor _ownedPagesCursor;
+    private final UsageMap.PageCursor ownedPagesCursor;
 
     public TableScanCursor(TableImpl table) {
         super(new IdImpl(table, null), table, FIRST_SCAN_POSITION, LAST_SCAN_POSITION);
-        _ownedPagesCursor = table.getOwnedPagesCursor();
+        ownedPagesCursor = table.getOwnedPagesCursor();
     }
 
     @Override
     protected ScanDirHandler getDirHandler(boolean moveForward) {
-        return moveForward ? _forwardDirHandler : _reverseDirHandler;
+        return moveForward ? forwardDirHandler : reverseDirHandler;
     }
 
     @Override
     protected boolean isUpToDate() {
-        return super.isUpToDate() && _ownedPagesCursor.isUpToDate();
+        return super.isUpToDate() && ownedPagesCursor.isUpToDate();
     }
 
     @Override
     protected void reset(boolean moveForward) {
-        _ownedPagesCursor.reset(moveForward);
+        ownedPagesCursor.reset(moveForward);
         super.reset(moveForward);
     }
 
@@ -62,7 +62,7 @@ public class TableScanCursor extends CursorImpl {
         if (!(curPos instanceof ScanPosition) || !(prevPos instanceof ScanPosition)) {
             throw new IllegalArgumentException("Restored positions must be scan positions");
         }
-        _ownedPagesCursor.restorePosition(curPos.getRowId().getPageNumber(), prevPos.getRowId().getPageNumber());
+        ownedPagesCursor.restorePosition(curPos.getRowId().getPageNumber(), prevPos.getRowId().getPageNumber());
         super.restorePositionImpl(curPos, prevPos);
     }
 
@@ -143,7 +143,7 @@ public class TableScanCursor extends CursorImpl {
 
         @Override
         public int getAnotherPageNumber() {
-            return _ownedPagesCursor.getNextPage();
+            return ownedPagesCursor.getNextPage();
         }
 
         @Override
@@ -173,7 +173,7 @@ public class TableScanCursor extends CursorImpl {
 
         @Override
         public int getAnotherPageNumber() {
-            return _ownedPagesCursor.getPreviousPage();
+            return ownedPagesCursor.getPreviousPage();
         }
 
         @Override
@@ -186,15 +186,15 @@ public class TableScanCursor extends CursorImpl {
      * Value object which maintains the current position of a TableScanCursor.
      */
     private static final class ScanPosition extends PositionImpl {
-        private final RowIdImpl _rowId;
+        private final RowIdImpl rowId;
 
         private ScanPosition(RowIdImpl rowId) {
-            _rowId = rowId;
+            this.rowId = rowId;
         }
 
         @Override
         public RowIdImpl getRowId() {
-            return _rowId;
+            return rowId;
         }
 
         @Override

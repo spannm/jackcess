@@ -27,19 +27,19 @@ public class FunctionSupport {
     }
 
     public abstract static class BaseFunction implements Function {
-        private final String _name;
-        private final int    _minParams;
-        private final int    _maxParams;
+        private final String name;
+        private final int    minParams;
+        private final int    maxParams;
 
         protected BaseFunction(String name, int minParams, int maxParams) {
-            _name = name;
-            _minParams = minParams;
-            _maxParams = maxParams;
+            this.name = name;
+            this.minParams = minParams;
+            this.maxParams = maxParams;
         }
 
         @Override
         public String getName() {
-            return _name;
+            return name;
         }
 
         @Override
@@ -50,15 +50,15 @@ public class FunctionSupport {
 
         protected void validateNumParams(Value[] params) {
             int num = params.length;
-            if (num < _minParams || num > _maxParams) {
-                String range = _minParams == _maxParams ? "" + _minParams : _minParams + " to " + _maxParams;
+            if (num < minParams || num > maxParams) {
+                String range = minParams == maxParams ? "" + minParams : minParams + " to " + maxParams;
                 throw new EvalException("Invalid number of parameters " + num + " passed, expected " + range);
             }
         }
 
         protected EvalException invalidFunctionCall(Throwable t, Value[] params) {
             String paramStr = Arrays.toString(params);
-            String msg = "Invalid function call {" + _name + "(" + paramStr.substring(1, paramStr.length() - 1) + ")}";
+            String msg = "Invalid function call {" + name + "(" + paramStr.substring(1, paramStr.length() - 1) + ")}";
             return new EvalException(msg, t);
         }
 

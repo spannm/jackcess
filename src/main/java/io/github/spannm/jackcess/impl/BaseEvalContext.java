@@ -52,49 +52,49 @@ public abstract class BaseEvalContext implements EvalContext {
         TYPE_MAP.put(DataType.BIG_INT, Value.Type.BIG_DEC);
     }
 
-    private final DBEvalContext _dbCtx;
-    private Expression          _expr;
+    private final DBEvalContext dbCtx;
+    private Expression          expr;
 
     protected BaseEvalContext(DBEvalContext dbCtx) {
-        _dbCtx = dbCtx;
+        this.dbCtx = dbCtx;
     }
 
     void setExpr(Expressionator.Type exprType, String exprStr) {
-        _expr = new RawExpr(exprType, exprStr);
+        expr = new RawExpr(exprType, exprStr);
     }
 
     protected DatabaseImpl getDatabase() {
-        return _dbCtx.getDatabase();
+        return dbCtx.getDatabase();
     }
 
     @Override
     public TemporalConfig getTemporalConfig() {
-        return _dbCtx.getTemporalConfig();
+        return dbCtx.getTemporalConfig();
     }
 
     @Override
     public DateTimeFormatter createDateFormatter(String formatStr) {
-        return _dbCtx.createDateFormatter(formatStr);
+        return dbCtx.createDateFormatter(formatStr);
     }
 
     @Override
     public ZoneId getZoneId() {
-        return _dbCtx.getZoneId();
+        return dbCtx.getZoneId();
     }
 
     @Override
     public NumericConfig getNumericConfig() {
-        return _dbCtx.getNumericConfig();
+        return dbCtx.getNumericConfig();
     }
 
     @Override
     public DecimalFormat createDecimalFormat(String formatStr) {
-        return _dbCtx.createDecimalFormat(formatStr);
+        return dbCtx.createDecimalFormat(formatStr);
     }
 
     @Override
     public float getRandom(Integer seed) {
-        return _dbCtx.getRandom(seed);
+        return dbCtx.getRandom(seed);
     }
 
     @Override
@@ -114,22 +114,22 @@ public abstract class BaseEvalContext implements EvalContext {
 
     @Override
     public Bindings getBindings() {
-        return _dbCtx.getBindings();
+        return dbCtx.getBindings();
     }
 
     @Override
     public Object get(String key) {
-        return _dbCtx.getBindings().get(key);
+        return dbCtx.getBindings().get(key);
     }
 
     @Override
     public void put(String key, Object value) {
-        _dbCtx.getBindings().put(key, value);
+        dbCtx.getBindings().put(key, value);
     }
 
     public Object eval() throws IOException {
         try {
-            return _expr.eval(this);
+            return expr.eval(this);
         } catch (Exception _ex) {
             String msg = withErrorContext(_ex.getMessage());
             throw new JackcessException(msg, _ex);
@@ -137,12 +137,12 @@ public abstract class BaseEvalContext implements EvalContext {
     }
 
     public void collectIdentifiers(Collection<Identifier> identifiers) {
-        _expr.collectIdentifiers(identifiers);
+        expr.collectIdentifiers(identifiers);
     }
 
     @Override
     public String toString() {
-        return _expr.toString();
+        return expr.toString();
     }
 
     protected Value toValue(Object val, DataType dType) {
@@ -187,19 +187,19 @@ public abstract class BaseEvalContext implements EvalContext {
     protected abstract String withErrorContext(String msg);
 
     private class RawExpr implements Expression {
-        private final Expressionator.Type _exprType;
-        private final String              _exprStr;
+        private final Expressionator.Type exprType;
+        private final String              exprStr;
 
         private RawExpr(Expressionator.Type exprType, String exprStr) {
-            _exprType = exprType;
-            _exprStr = exprStr;
+            this.exprType = exprType;
+            this.exprStr = exprStr;
         }
 
         private Expression getExpr() {
             // when the expression is parsed we replace the raw version
-            Expression expr = Expressionator.parse(_exprType, _exprStr, getResultType(), _dbCtx);
-            _expr = expr;
-            return expr;
+            Expression parsedExpr = Expressionator.parse(exprType, exprStr, getResultType(), dbCtx);
+            BaseEvalContext.this.expr = parsedExpr;
+            return parsedExpr;
         }
 
         @Override
@@ -214,7 +214,7 @@ public abstract class BaseEvalContext implements EvalContext {
 
         @Override
         public String toRawString() {
-            return _exprStr;
+            return exprStr;
         }
 
         @Override

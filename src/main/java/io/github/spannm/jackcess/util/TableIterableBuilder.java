@@ -29,39 +29,39 @@ import java.util.stream.StreamSupport;
  * (non-system, non-linked tables) and linked tables are included and system tables are not.
  */
 public class TableIterableBuilder implements Iterable<Table> {
-    private final Database _db;
-    private boolean        _includeNormalTables = true;
-    private boolean        _includeSystemTables;
-    private boolean        _includeLinkedTables = true;
+    private final Database db;
+    private boolean        includeNormalTables = true;
+    private boolean        includeSystemTables;
+    private boolean        includeLinkedTables = true;
 
     public TableIterableBuilder(Database db) {
-        _db = db;
+        this.db = db;
     }
 
     public boolean isIncludeNormalTables() {
-        return _includeNormalTables;
+        return includeNormalTables;
     }
 
     public boolean isIncludeSystemTables() {
-        return _includeSystemTables;
+        return includeSystemTables;
     }
 
     public boolean isIncludeLinkedTables() {
-        return _includeLinkedTables;
+        return includeLinkedTables;
     }
 
-    public TableIterableBuilder withIncludeNormalTables(boolean includeNormalTables) {
-        _includeNormalTables = includeNormalTables;
+    public TableIterableBuilder withIncludeNormalTables(boolean newIncludeNormalTables) {
+        includeNormalTables = newIncludeNormalTables;
         return this;
     }
 
-    public TableIterableBuilder withIncludeSystemTables(boolean includeSystemTables) {
-        _includeSystemTables = includeSystemTables;
+    public TableIterableBuilder withIncludeSystemTables(boolean newIncludeSystemTables) {
+        includeSystemTables = newIncludeSystemTables;
         return this;
     }
 
-    public TableIterableBuilder withIncludeLinkedTables(boolean includeLinkedTables) {
-        _includeLinkedTables = includeLinkedTables;
+    public TableIterableBuilder withIncludeLinkedTables(boolean newIncludeLinkedTables) {
+        includeLinkedTables = newIncludeLinkedTables;
         return this;
     }
 
@@ -85,7 +85,7 @@ public class TableIterableBuilder implements Iterable<Table> {
 
     @Override
     public Iterator<Table> iterator() {
-        return ((DatabaseImpl) _db).iterator(this);
+        return ((DatabaseImpl) db).iterator(this);
     }
 
     /**

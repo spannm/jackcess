@@ -31,35 +31,35 @@ final class FKEnforcer {
     // fk constraints always work with indexes, which are always case-insensitive
     private static final ColumnMatcher MATCHER = CaseInsensitiveColumnMatcher.INSTANCE;
 
-    private final TableImpl            _table;
-    private List<ColumnImpl>           _cols;
-    private List<Joiner>               _primaryJoinersChkUp;
-    private List<Joiner>               _primaryJoinersChkDel;
-    private List<Joiner>               _primaryJoinersDoUp;
-    private List<Joiner>               _primaryJoinersDoDel;
-    private List<Joiner>               _primaryJoinersDoNull;
-    private List<Joiner>               _secondaryJoiners;
+    private final TableImpl            table;
+    private List<ColumnImpl>           cols;
+    private List<Joiner>               primaryJoinersChkUp;
+    private List<Joiner>               primaryJoinersChkDel;
+    private List<Joiner>               primaryJoinersDoUp;
+    private List<Joiner>               primaryJoinersDoDel;
+    private List<Joiner>               primaryJoinersDoNull;
+    private List<Joiner>               secondaryJoiners;
 
     FKEnforcer(TableImpl table) {
-        _table = table;
+        this.table = table;
 
         // at this point, only init the index columns
         initColumns();
     }
 
     private void initColumns() {
-        Set<ColumnImpl> cols = new TreeSet<>();
-        for (IndexImpl idx : _table.getIndexes()) {
+        Set<ColumnImpl> foundCols = new TreeSet<>();
+        for (IndexImpl idx : table.getIndexes()) {
             IndexImpl.ForeignKeyReference ref = idx.getReference();
             if (ref != null) {
                 // compile an ordered list of all columns in this table which are
                 // involved in foreign key relationships with other tables
                 for (IndexData.ColumnDescriptor iCol : idx.getColumns()) {
-                    cols.add(iCol.getColumn());
+                    foundCols.add(iCol.getColumn());
                 }
             }
         }
-        _cols = !cols.isEmpty() ? List.copyOf(cols) : List.of();
+        cols = !foundCols.isEmpty() ? List.copyOf(foundCols) : List.of();
     }
 
     /**
@@ -70,51 +70,51 @@ final class FKEnforcer {
         initColumns();
 
         // clear any existing joiners (will be re-created on next use)
-        _primaryJoinersChkUp = null;
-        _primaryJoinersChkDel = null;
-        _primaryJoinersDoUp = null;
-        _primaryJoinersDoDel = null;
-        _primaryJoinersDoNull = null;
-        _secondaryJoiners = null;
+        primaryJoinersChkUp = null;
+        primaryJoinersChkDel = null;
+        primaryJoinersDoUp = null;
+        primaryJoinersDoDel = null;
+        primaryJoinersDoNull = null;
+        secondaryJoiners = null;
     }
 
     /**
      * Does secondary initialization, if necessary.
      */
     private void initialize() throws IOException {
-        if (_secondaryJoiners != null) {
+        if (secondaryJoiners != null) {
             // already initialized
             return;
         }
 
         // initialize all the joiners
-        _primaryJoinersChkUp = new ArrayList<>(1);
-        _primaryJoinersChkDel = new ArrayList<>(1);
-        _primaryJoinersDoUp = new ArrayList<>(1);
-        _primaryJoinersDoDel = new ArrayList<>(1);
-        _primaryJoinersDoNull = new ArrayList<>(1);
-        _secondaryJoiners = new ArrayList<>(1);
+        primaryJoinersChkUp = new ArrayList<>(1);
+        primaryJoinersChkDel = new ArrayList<>(1);
+        primaryJoinersDoUp = new ArrayList<>(1);
+        primaryJoinersDoDel = new ArrayList<>(1);
+        primaryJoinersDoNull = new ArrayList<>(1);
+        secondaryJoiners = new ArrayList<>(1);
 
-        for (IndexImpl idx : _table.getIndexes()) {
+        for (IndexImpl idx : table.getIndexes()) {
             IndexImpl.ForeignKeyReference ref = idx.getReference();
             if (ref != null) {
 
                 Joiner joiner = Joiner.create(idx);
                 if (ref.isPrimaryTable()) {
                     if (ref.isCascadeUpdates()) {
-                        _primaryJoinersDoUp.add(joiner);
+                        primaryJoinersDoUp.add(joiner);
                     } else {
-                        _primaryJoinersChkUp.add(joiner);
+                        primaryJoinersChkUp.add(joiner);
                     }
                     if (ref.isCascadeDeletes()) {
-                        _primaryJoinersDoDel.add(joiner);
+                        primaryJoinersDoDel.add(joiner);
                     } else if (ref.isCascadeNullOnDelete()) {
-                        _primaryJoinersDoNull.add(joiner);
+                        primaryJoinersDoNull.add(joiner);
                     } else {
-                        _primaryJoinersChkDel.add(joiner);
+                        primaryJoinersChkDel.add(joiner);
                     }
                 } else {
-                    _secondaryJoiners.add(joiner);
+                    secondaryJoiners.add(joiner);
                 }
             }
         }
@@ -131,7 +131,7 @@ final class FKEnforcer {
         }
         initialize();
 
-        for (Joiner joiner : _secondaryJoiners) {
+        for (Joiner joiner : secondaryJoiners) {
             requirePrimaryValues(joiner, row);
         }
     }
@@ -150,13 +150,13 @@ final class FKEnforcer {
 
         initialize();
 
-        SharedState ss = _table.getDatabase().getFKEnforcerSharedState();
+        SharedState ss = table.getDatabase().getFKEnforcerSharedState();
 
         if (ss.isUpdating()) {
             // we only check the primary relationships for the "top-level" of an
             // update operation. in nested levels we are only ever changing the fk
             // values themselves, so we always know the new values are valid.
-            for (Joiner joiner : _secondaryJoiners) {
+            for (Joiner joiner : secondaryJoiners) {
                 if (anyUpdates(joiner, oldRow, newRow)) {
                     requirePrimaryValues(joiner, newRow);
                 }
@@ -168,7 +168,7 @@ final class FKEnforcer {
 
             // now, check the tables for which we are the primary table in the
             // relationship (but not cascading)
-            for (Joiner joiner : _primaryJoinersChkUp) {
+            for (Joiner joiner : primaryJoinersChkUp) {
                 if (anyUpdates(joiner, oldRow, newRow)) {
                     requireNoSecondaryValues(joiner, oldRow);
                 }
@@ -176,7 +176,7 @@ final class FKEnforcer {
 
             // lastly, update the tables for which we are the primary table in the
             // relationship
-            for (Joiner joiner : _primaryJoinersDoUp) {
+            for (Joiner joiner : primaryJoinersDoUp) {
                 if (anyUpdates(joiner, oldRow, newRow)) {
                     updateSecondaryValues(joiner, oldRow, newRow);
                 }
@@ -200,19 +200,19 @@ final class FKEnforcer {
 
         // first, check the tables for which we are the primary table in the
         // relationship (but not cascading)
-        for (Joiner joiner : _primaryJoinersChkDel) {
+        for (Joiner joiner : primaryJoinersChkDel) {
             requireNoSecondaryValues(joiner, row);
         }
 
         // next, delete from the tables for which we are the primary table in
         // the relationship
-        for (Joiner joiner : _primaryJoinersDoDel) {
+        for (Joiner joiner : primaryJoinersDoDel) {
             joiner.deleteRows(row);
         }
 
         // lastly, null the tables for which we are the primary table in
         // the relationship
-        for (Joiner joiner : _primaryJoinersDoNull) {
+        for (Joiner joiner : primaryJoinersDoNull) {
             nullSecondaryValues(joiner, row);
         }
     }
@@ -273,8 +273,8 @@ final class FKEnforcer {
     }
 
     private boolean anyUpdates(Object[] oldRow, Object[] newRow) {
-        for (ColumnImpl col : _cols) {
-            if (!MATCHER.matches(_table, col.getName(), col.getRowValue(oldRow), col.getRowValue(newRow))) {
+        for (ColumnImpl col : cols) {
+            if (!MATCHER.matches(table, col.getName(), col.getRowValue(oldRow), col.getRowValue(newRow))) {
                 return true;
             }
         }
@@ -302,7 +302,7 @@ final class FKEnforcer {
     }
 
     private boolean enforcing() {
-        return _table.getDatabase().isEnforceForeignKeys();
+        return table.getDatabase().isEnforceForeignKeys();
     }
 
     static SharedState initSharedState() {
@@ -314,21 +314,21 @@ final class FKEnforcer {
      */
     static final class SharedState {
         /** current depth of cascading update calls across one or more tables */
-        private int _updateDepth;
+        private int updateDepth;
 
         private SharedState() {
         }
 
         public boolean isUpdating() {
-            return _updateDepth == 0;
+            return updateDepth == 0;
         }
 
         public void pushUpdate() {
-            ++_updateDepth;
+            ++updateDepth;
         }
 
         public void popUpdate() {
-            --_updateDepth;
+            --updateDepth;
         }
     }
 }

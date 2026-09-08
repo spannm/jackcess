@@ -82,7 +82,7 @@ public abstract class BaseSelectQueryImpl extends QueryImpl implements BaseSelec
         }
 
         if (hasFlag(TOP_SELECT_TYPE)) {
-            StringBuilder builder = new StringBuilder("TOP ").append(getFlagRow()._name1);
+            StringBuilder builder = new StringBuilder("TOP ").append(getFlagRow().name1);
             if (hasFlag(PERCENT_SELECT_TYPE)) {
                 builder.append(" PERCENT");
             }
@@ -98,8 +98,8 @@ public abstract class BaseSelectQueryImpl extends QueryImpl implements BaseSelec
             @Override
             protected void format(StringBuilder builder, Row row) {
                 // note column expression are always quoted appropriately
-                builder.append(row._expression);
-                toAlias(builder, row._name1);
+                builder.append(row.expression);
+                toAlias(builder, row.name1);
             }
         }.format();
         if (hasFlag(SELECT_STAR_SELECT_TYPE)) {
@@ -138,14 +138,14 @@ public abstract class BaseSelectQueryImpl extends QueryImpl implements BaseSelec
         return new RowFormatter(getGroupByRows()) {
             @Override
             protected void format(StringBuilder builder, Row row) {
-                builder.append(row._expression);
+                builder.append(row.expression);
             }
         }.format();
     }
 
     @Override
     public String getHavingExpression() {
-        return getHavingRow()._expression;
+        return getHavingRow().expression;
     }
 
     @Override

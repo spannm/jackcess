@@ -47,8 +47,8 @@ class LongValueColumnImpl extends ColumnImpl {
     private static final int      LONG_VALUE_TYPE_MASK        = 0xC0000000;
 
     /** Holds additional info for writing long values */
-    private LongValueBufferHolder _lvalBufferH;
-    private int                   _maxLenInUnits              = INVALID_LENGTH;
+    private LongValueBufferHolder lvalBufferH;
+    private int                   maxLenInUnits              = INVALID_LENGTH;
 
     LongValueColumnImpl(InitArgs args) {
         super(args);
@@ -56,32 +56,32 @@ class LongValueColumnImpl extends ColumnImpl {
 
     @Override
     public int getOwnedPageCount() {
-        return _lvalBufferH == null ? 0 : _lvalBufferH.getOwnedPageCount();
+        return lvalBufferH == null ? 0 : lvalBufferH.getOwnedPageCount();
     }
 
     @Override
     void setUsageMaps(UsageMap ownedPages, UsageMap freeSpacePages) {
-        _lvalBufferH = new UmapLongValueBufferHolder(ownedPages, freeSpacePages);
+        lvalBufferH = new UmapLongValueBufferHolder(ownedPages, freeSpacePages);
     }
 
     @Override
     void collectUsageMapPages(Collection<Integer> pages) {
-        _lvalBufferH.collectUsageMapPages(pages);
+        lvalBufferH.collectUsageMapPages(pages);
     }
 
     @Override
     void postTableLoadInit() throws IOException {
-        if (_lvalBufferH == null) {
-            _lvalBufferH = new LegacyLongValueBufferHolder();
+        if (lvalBufferH == null) {
+            lvalBufferH = new LegacyLongValueBufferHolder();
         }
         super.postTableLoadInit();
     }
 
     protected final int getMaxLengthInUnits() {
-        if (_maxLenInUnits == INVALID_LENGTH) {
-            _maxLenInUnits = calcMaxLengthInUnits();
+        if (maxLenInUnits == INVALID_LENGTH) {
+            maxLenInUnits = calcMaxLengthInUnits();
         }
-        return _maxLenInUnits;
+        return maxLenInUnits;
     }
 
     protected int calcMaxLengthInUnits() {
@@ -265,8 +265,8 @@ class LongValueColumnImpl extends ColumnImpl {
             // write other page(s)
             switch (type) {
                 case LONG_VALUE_TYPE_OTHER_PAGE:
-                    lvalPage = _lvalBufferH.getLongValuePage(value.length);
-                    firstLvalPageNum = _lvalBufferH.getPageNumber();
+                    lvalPage = lvalBufferH.getLongValuePage(value.length);
+                    firstLvalPageNum = lvalBufferH.getPageNumber();
                     firstLvalRow = (byte) TableImpl.addDataPageRow(lvalPage, value.length, getFormat(), 0);
                     lvalPage.put(value);
                     getPageChannel().writePage(lvalPage, firstLvalPageNum);
@@ -277,8 +277,8 @@ class LongValueColumnImpl extends ColumnImpl {
                     ByteBuffer buffer = ByteBuffer.wrap(value);
                     int remainingLen = buffer.remaining();
                     buffer.limit(0);
-                    lvalPage = _lvalBufferH.getLongValuePage(remainingLen);
-                    firstLvalPageNum = _lvalBufferH.getPageNumber();
+                    lvalPage = lvalBufferH.getLongValuePage(remainingLen);
+                    firstLvalPageNum = lvalBufferH.getPageNumber();
                     firstLvalRow = (byte) TableImpl.getRowsOnDataPage(lvalPage, getFormat());
                     int lvalPageNum = firstLvalPageNum;
                     ByteBuffer nextLvalPage = null;
@@ -294,9 +294,9 @@ class LongValueColumnImpl extends ColumnImpl {
                         // figure out if we will need another page, and if so, allocate it
                         if (chunkLength < remainingLen) {
                             // force a new page to be allocated for the chunk after this
-                            _lvalBufferH.clear();
-                            nextLvalPage = _lvalBufferH.getLongValuePage(remainingLen - chunkLength + 4);
-                            nextLvalPageNum = _lvalBufferH.getPageNumber();
+                            lvalBufferH.clear();
+                            nextLvalPage = lvalBufferH.getLongValuePage(remainingLen - chunkLength + 4);
+                            nextLvalPageNum = lvalBufferH.getPageNumber();
                             nextLvalRowNum = TableImpl.getRowsOnDataPage(nextLvalPage, getFormat());
                         } else {
                             nextLvalPage = null;
@@ -364,12 +364,12 @@ class LongValueColumnImpl extends ColumnImpl {
          */
         public ByteBuffer getLongValuePage(int dataLength) throws IOException {
 
-            TempPageHolder lvalBufferH = getBufferHolder();
+            TempPageHolder pageHolder = getBufferHolder();
             dataLength = Math.min(dataLength, getFormat().MAX_LONG_VALUE_ROW_SIZE);
 
             ByteBuffer lvalPage = null;
-            if (lvalBufferH.getPageNumber() != PageChannel.INVALID_PAGE_NUMBER) {
-                lvalPage = lvalBufferH.getPage(getPageChannel());
+            if (pageHolder.getPageNumber() != PageChannel.INVALID_PAGE_NUMBER) {
+                lvalPage = pageHolder.getPage(getPageChannel());
                 if (TableImpl.rowFitsOnDataPage(dataLength, lvalPage, getFormat())) {
                     // the current page has space
                     return lvalPage;
@@ -427,32 +427,32 @@ class LongValueColumnImpl extends ColumnImpl {
      */
     private final class UmapLongValueBufferHolder extends LongValueBufferHolder {
         /** Usage map of pages that this column owns */
-        private final UsageMap       _ownedPages;
+        private final UsageMap       ownedPages;
         /** Usage map of pages that this column owns with free space on them */
-        private final UsageMap       _freeSpacePages;
+        private final UsageMap       freeSpacePages;
         /** page buffer used to write "long value" data */
-        private final TempPageHolder _longValueBufferH = TempPageHolder.newHolder(TempBufferHolder.Type.SOFT);
+        private final TempPageHolder longValueBufferH = TempPageHolder.newHolder(TempBufferHolder.Type.SOFT);
 
         private UmapLongValueBufferHolder(UsageMap ownedPages, UsageMap freeSpacePages) {
-            _ownedPages = ownedPages;
-            _freeSpacePages = freeSpacePages;
+            this.ownedPages = ownedPages;
+            this.freeSpacePages = freeSpacePages;
         }
 
         @Override
         protected TempPageHolder getBufferHolder() {
-            return _longValueBufferH;
+            return longValueBufferH;
         }
 
         @Override
         public int getOwnedPageCount() {
-            return _ownedPages.getPageCount();
+            return ownedPages.getPageCount();
         }
 
         @Override
         protected ByteBuffer findNewPage(int dataLength) throws IOException {
 
             // grab last owned page and check for free space.
-            ByteBuffer newPage = TableImpl.findFreeRowSpace(_ownedPages, _freeSpacePages, _longValueBufferH);
+            ByteBuffer newPage = TableImpl.findFreeRowSpace(ownedPages, freeSpacePages, longValueBufferH);
 
             if (newPage != null) {
                 if (TableImpl.rowFitsOnDataPage(dataLength, newPage, getFormat())) {
@@ -465,8 +465,8 @@ class LongValueColumnImpl extends ColumnImpl {
             // nothing found on current pages, need new page
             newPage = super.findNewPage(dataLength);
             int pageNumber = getPageNumber();
-            _ownedPages.addPageNumber(pageNumber);
-            _freeSpacePages.addPageNumber(pageNumber);
+            ownedPages.addPageNumber(pageNumber);
+            freeSpacePages.addPageNumber(pageNumber);
             return newPage;
         }
 
@@ -474,15 +474,15 @@ class LongValueColumnImpl extends ColumnImpl {
         public void clear() throws IOException {
             int pageNumber = getPageNumber();
             if (pageNumber != PageChannel.INVALID_PAGE_NUMBER) {
-                _freeSpacePages.removePageNumber(pageNumber);
+                freeSpacePages.removePageNumber(pageNumber);
             }
             super.clear();
         }
 
         @Override
         public void collectUsageMapPages(Collection<Integer> pages) {
-            pages.add(_ownedPages.getTablePageNumber());
-            pages.add(_freeSpacePages.getTablePageNumber());
+            pages.add(ownedPages.getTablePageNumber());
+            pages.add(freeSpacePages.getTablePageNumber());
         }
     }
 }

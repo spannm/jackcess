@@ -32,87 +32,87 @@ import java.util.StringJoiner;
 public class ColumnBuilder {
 
     /** name of the new column */
-    private String                            _name;
+    private String                            name;
     /** the type of the new column */
-    private DataType                          _type;
+    private DataType                          type;
     /** optional length for the new column */
-    private Short                             _length;
+    private Short                             length;
     /** optional precision for the new column */
-    private Byte                              _precision;
+    private Byte                              precision;
     /** optional scale for the new column */
-    private Byte                              _scale;
+    private Byte                              scale;
     /** whether or not the column is auto-number */
-    private boolean                           _autoNumber;
+    private boolean                           autoNumber;
     /** whether or not the column allows compressed unicode */
-    private boolean                           _compressedUnicode;
+    private boolean                           compressedUnicode;
     /** whether or not the column is calculated */
-    private boolean                           _calculated;
+    private boolean                           calculated;
     /** whether or not the column is a hyperlink (memo only) */
-    private boolean                           _hyperlink;
+    private boolean                           hyperlink;
     /** 0-based column number */
-    private short                             _columnNumber;
+    private short                             columnNumber;
     /** the collating sort order for a text field */
-    private ColumnImpl.SortOrder              _sortOrder;
+    private ColumnImpl.SortOrder              sortOrder;
     /** table properties (if any) */
-    private Map<String, PropertyMap.Property> _props;
+    private Map<String, PropertyMap.Property> props;
 
     public ColumnBuilder(String name) {
         this(name, null);
     }
 
     public ColumnBuilder(String name, DataType type) {
-        _name = name;
-        _type = type;
+        this.name = name;
+        this.type = type;
     }
 
     public String getName() {
-        return _name;
+        return name;
     }
 
     /**
      * Sets the type for the new column.
      */
-    public ColumnBuilder withType(DataType type) {
-        _type = type;
+    public ColumnBuilder withType(DataType newType) {
+        type = newType;
         return this;
     }
 
     public DataType getType() {
-        return _type;
+        return type;
     }
 
     /**
      * Sets the type for the new column based on the given SQL type.
      */
-    public ColumnBuilder withSqlType(int type) throws IOException {
-        return withSqlType(type, 0, null);
+    public ColumnBuilder withSqlType(int sqlType) throws IOException {
+        return withSqlType(sqlType, 0, null);
     }
 
     /**
      * Sets the type for the new column based on the given SQL type and target data length (in type specific units).
      */
-    public ColumnBuilder withSqlType(int type, int lengthInUnits) throws IOException {
-        return withSqlType(type, lengthInUnits, null);
+    public ColumnBuilder withSqlType(int sqlType, int lengthInUnits) throws IOException {
+        return withSqlType(sqlType, lengthInUnits, null);
     }
 
     /**
      * Sets the type for the new column based on the given SQL type, target data length (in type specific units), and
      * target FileFormat.
      */
-    public ColumnBuilder withSqlType(int type, int lengthInUnits, FileFormat fileFormat) throws IOException {
-        return withType(DataType.fromSQLType(type, lengthInUnits, fileFormat));
+    public ColumnBuilder withSqlType(int sqlType, int lengthInUnits, FileFormat fileFormat) throws IOException {
+        return withType(DataType.fromSQLType(sqlType, lengthInUnits, fileFormat));
     }
 
     /**
      * Sets the precision for the new column.
      */
     public ColumnBuilder withPrecision(int newPrecision) {
-        _precision = (byte) newPrecision;
+        precision = (byte) newPrecision;
         return this;
     }
 
     public byte getPrecision() {
-        return _precision != null ? _precision : (byte) _type.getDefaultPrecision();
+        return precision != null ? precision : (byte) type.getDefaultPrecision();
     }
 
     /**
@@ -120,8 +120,8 @@ public class ColumnBuilder {
      * precision.
      */
     public ColumnBuilder withMaxPrecision() {
-        if (_type.getHasScalePrecision()) {
-            withPrecision(_type.getMaxPrecision());
+        if (type.getHasScalePrecision()) {
+            withPrecision(type.getMaxPrecision());
         }
         return this;
     }
@@ -130,12 +130,12 @@ public class ColumnBuilder {
      * Sets the scale for the new column.
      */
     public ColumnBuilder withScale(int newScale) {
-        _scale = (byte) newScale;
+        scale = (byte) newScale;
         return this;
     }
 
     public byte getScale() {
-        return _scale != null ? _scale : (byte) _type.getDefaultScale();
+        return scale != null ? scale : (byte) type.getDefaultScale();
     }
 
     /**
@@ -143,8 +143,8 @@ public class ColumnBuilder {
      * scale.
      */
     public ColumnBuilder withMaxScale() {
-        if (_type.getHasScalePrecision()) {
-            withScale(_type.getMaxScale());
+        if (type.getHasScalePrecision()) {
+            withScale(type.getMaxScale());
         }
         return this;
     }
@@ -152,20 +152,20 @@ public class ColumnBuilder {
     /**
      * Sets the length (in bytes) for the new column.
      */
-    public ColumnBuilder withLength(int length) {
-        _length = (short) length;
+    public ColumnBuilder withLength(int newLength) {
+        length = (short) newLength;
         return this;
     }
 
     public short getLength() {
-        return _length != null ? _length : (short) (!_type.isVariableLength() ? _type.getFixedSize() : _type.getDefaultSize());
+        return length != null ? length : (short) (!type.isVariableLength() ? type.getFixedSize() : type.getDefaultSize());
     }
 
     /**
      * Sets the length (in type specific units) for the new column.
      */
     public ColumnBuilder withLengthInUnits(int unitLength) {
-        return withLength(_type.fromUnitSize(unitLength));
+        return withLength(type.fromUnitSize(unitLength));
     }
 
     /**
@@ -174,8 +174,8 @@ public class ColumnBuilder {
      */
     public ColumnBuilder withMaxLength() {
         // length setting only makes sense for variable length columns
-        if (_type.isVariableLength()) {
-            withLength(_type.getMaxSize());
+        if (type.isVariableLength()) {
+            withLength(type.getMaxSize());
         }
         return this;
     }
@@ -183,37 +183,37 @@ public class ColumnBuilder {
     /**
      * Sets whether of not the new column is an auto-number column.
      */
-    public ColumnBuilder withAutoNumber(boolean autoNumber) {
-        _autoNumber = autoNumber;
+    public ColumnBuilder withAutoNumber(boolean newAutoNumber) {
+        autoNumber = newAutoNumber;
         return this;
     }
 
     public boolean isAutoNumber() {
-        return _autoNumber;
+        return autoNumber;
     }
 
     /**
      * Sets whether of not the new column allows unicode compression.
      */
-    public ColumnBuilder withCompressedUnicode(boolean compressedUnicode) {
-        _compressedUnicode = compressedUnicode;
+    public ColumnBuilder withCompressedUnicode(boolean newCompressedUnicode) {
+        compressedUnicode = newCompressedUnicode;
         return this;
     }
 
     public boolean isCompressedUnicode() {
-        return _compressedUnicode;
+        return compressedUnicode;
     }
 
     /**
      * Sets whether of not the new column is a calculated column.
      */
-    public ColumnBuilder withCalculated(boolean calculated) {
-        _calculated = calculated;
+    public ColumnBuilder withCalculated(boolean newCalculated) {
+        calculated = newCalculated;
         return this;
     }
 
     public boolean isCalculated() {
-        return _calculated;
+        return calculated;
     }
 
     /**
@@ -233,58 +233,58 @@ public class ColumnBuilder {
     /**
      * Sets whether of not the new column allows unicode compression.
      */
-    public ColumnBuilder withHyperlink(boolean hyperlink) {
-        _hyperlink = hyperlink;
+    public ColumnBuilder withHyperlink(boolean newHyperlink) {
+        hyperlink = newHyperlink;
         return this;
     }
 
     public boolean isHyperlink() {
-        return _hyperlink;
+        return hyperlink;
     }
 
     /**
      * Sets the column property with the given name to the given value. Attempts to determine the type of the property
      * (see {@link PropertyMap#put(String,Object)} for details on determining the property type).
      */
-    public ColumnBuilder withProperty(String name, Object value) {
-        return withProperty(name, null, value);
+    public ColumnBuilder withProperty(String propName, Object value) {
+        return withProperty(propName, null, value);
     }
 
     /**
      * Sets the column property with the given name and type to the given value.
      */
-    public ColumnBuilder withProperty(String name, DataType type, Object value) {
-        setProperty(name, PropertyMapImpl.createProperty(name, type, value));
+    public ColumnBuilder withProperty(String propName, DataType propType, Object value) {
+        setProperty(propName, PropertyMapImpl.createProperty(propName, propType, value));
         return this;
     }
 
     public Map<String, PropertyMap.Property> getProperties() {
-        return _props;
+        return props;
     }
 
-    private void setProperty(String name, PropertyMap.Property prop) {
+    private void setProperty(String propName, PropertyMap.Property prop) {
         if (prop == null) {
             return;
         }
-        if (_props == null) {
-            _props = new HashMap<>();
+        if (props == null) {
+            props = new HashMap<>();
         }
-        _props.put(name, prop);
+        props.put(propName, prop);
     }
 
-    private PropertyMap.Property getProperty(String name) {
-        return _props != null ? _props.get(name) : null;
+    private PropertyMap.Property getProperty(String propName) {
+        return props != null ? props.get(propName) : null;
     }
 
     /**
      * Sets all attributes except name from the given Column template (including all column properties except GUID).
      */
     public ColumnBuilder withFromColumn(Column template) throws IOException {
-        DataType type = template.getType();
-        withType(type);
+        DataType templateType = template.getType();
+        withType(templateType);
         withLengthInUnits(template.getLengthInUnits());
         withAutoNumber(template.isAutoNumber());
-        if (type.getHasScalePrecision()) {
+        if (templateType.getHasScalePrecision()) {
             withScale(template.getScale());
             withPrecision(template.getPrecision());
         }
@@ -310,21 +310,21 @@ public class ColumnBuilder {
      * Sets all attributes except name from the given Column template.
      */
     public ColumnBuilder withFromColumn(ColumnBuilder template) {
-        DataType type = template.getType();
-        _type = type;
-        _length = template._length;
-        _autoNumber = template._autoNumber;
+        DataType templateType = template.getType();
+        type = templateType;
+        length = template.length;
+        autoNumber = template.autoNumber;
         if (type.getHasScalePrecision()) {
-            _scale = template._scale;
-            _precision = template._precision;
+            scale = template.scale;
+            precision = template.precision;
         }
-        _calculated = template._calculated;
-        _compressedUnicode = template._compressedUnicode;
-        _hyperlink = template._hyperlink;
-        _sortOrder = template._sortOrder;
+        calculated = template.calculated;
+        compressedUnicode = template.compressedUnicode;
+        hyperlink = template.hyperlink;
+        sortOrder = template.sortOrder;
 
-        if (template._props != null) {
-            _props = new HashMap<>(template._props);
+        if (template.props != null) {
+            props = new HashMap<>(template.props);
         }
 
         return this;
@@ -334,24 +334,24 @@ public class ColumnBuilder {
      * Escapes the new column's name using {@link TableBuilder#escapeIdentifier}.
      */
     public ColumnBuilder escapeName() {
-        _name = TableBuilder.escapeIdentifier(_name);
+        name = TableBuilder.escapeIdentifier(name);
         return this;
     }
 
     public short getColumnNumber() {
-        return _columnNumber;
+        return columnNumber;
     }
 
     public void setColumnNumber(short newColumnNumber) {
-        _columnNumber = newColumnNumber;
+        columnNumber = newColumnNumber;
     }
 
     public ColumnImpl.SortOrder getTextSortOrder() {
-        return _sortOrder;
+        return sortOrder;
     }
 
     public void setTextSortOrder(ColumnImpl.SortOrder newTextSortOrder) {
-        _sortOrder = newTextSortOrder;
+        sortOrder = newTextSortOrder;
     }
 
     public boolean storeInNullMask() {
@@ -359,7 +359,7 @@ public class ColumnBuilder {
     }
 
     public int getFixedDataSize() {
-      return _type.getFixedSize(_length);
+      return type.getFixedSize(length);
     }
 
     /**
@@ -474,16 +474,16 @@ public class ColumnBuilder {
     @Override
     public String toString() {
         return new StringJoiner(", ", getClass().getSimpleName() + "[", "]")
-            .add("name=" + _name)
-            .add("type=" + _type)
-            .add("length=" + _length)
-            .add("precision=" + _precision)
-            .add("scale=" + _scale)
-            .add("autoNumber=" + _autoNumber)
-            .add("compressedUnicode=" + _compressedUnicode)
-            .add("calculated=" + _calculated)
-            .add("hyperlink=" + _hyperlink)
-            .add("props=" + _props)
+            .add("name=" + name)
+            .add("type=" + type)
+            .add("length=" + length)
+            .add("precision=" + precision)
+            .add("scale=" + scale)
+            .add("autoNumber=" + autoNumber)
+            .add("compressedUnicode=" + compressedUnicode)
+            .add("calculated=" + calculated)
+            .add("hyperlink=" + hyperlink)
+            .add("props=" + props)
             .toString();
     }
 

@@ -515,55 +515,55 @@ public class ImportUtil {
      * Builder which simplifies configuration of an import operation.
      */
     public static class Builder {
-        private Database     _db;
-        private String       _tableName;
-        private String       _delim  = ExportUtil.DEFAULT_DELIMITER;
-        private char         _quote  = ExportUtil.DEFAULT_QUOTE_CHAR;
-        private ImportFilter _filter = SimpleImportFilter.INSTANCE;
-        private boolean      _useExistingTable;
-        private boolean      _header = true;
+        private Database     db;
+        private String       tableName;
+        private String       delim  = ExportUtil.DEFAULT_DELIMITER;
+        private char         quote  = ExportUtil.DEFAULT_QUOTE_CHAR;
+        private ImportFilter filter = SimpleImportFilter.INSTANCE;
+        private boolean      useExistingTable;
+        private boolean      header = true;
 
         public Builder(Database db) {
             this(db, null);
         }
 
         public Builder(Database db, String tableName) {
-            _db = db;
-            _tableName = tableName;
+            this.db = db;
+            this.tableName = tableName;
         }
 
-        public Builder withDatabase(Database db) {
-            _db = db;
+        public Builder withDatabase(Database newDb) {
+            db = newDb;
             return this;
         }
 
-        public Builder withTableName(String tableName) {
-            _tableName = tableName;
+        public Builder withTableName(String newTableName) {
+            tableName = newTableName;
             return this;
         }
 
-        public Builder withDelimiter(String delim) {
-            _delim = delim;
+        public Builder withDelimiter(String newDelim) {
+            delim = newDelim;
             return this;
         }
 
-        public Builder withQuote(char quote) {
-            _quote = quote;
+        public Builder withQuote(char newQuote) {
+            quote = newQuote;
             return this;
         }
 
-        public Builder withFilter(ImportFilter filter) {
-            _filter = filter;
+        public Builder withFilter(ImportFilter newFilter) {
+            filter = newFilter;
             return this;
         }
 
-        public Builder withUseExistingTable(boolean useExistingTable) {
-            _useExistingTable = useExistingTable;
+        public Builder withUseExistingTable(boolean newUseExistingTable) {
+            useExistingTable = newUseExistingTable;
             return this;
         }
 
-        public Builder withHeader(boolean header) {
-            _header = header;
+        public Builder withHeader(boolean newHeader) {
+            header = newHeader;
             return this;
         }
 
@@ -572,24 +572,24 @@ public class ImportUtil {
          */
         public String importResultSet(ResultSet source)
             throws SQLException, IOException {
-            return ImportUtil.importResultSet(source, _db, _tableName, _filter,
-                _useExistingTable);
+            return ImportUtil.importResultSet(source, db, tableName, filter,
+                useExistingTable);
         }
 
         /**
          * @see ImportUtil#importFile(File,Database,String,String,char,ImportFilter,boolean,boolean)
          */
         public String importFile(File f) throws IOException {
-            return ImportUtil.importFile(f, _db, _tableName, _delim, _quote, _filter,
-                _useExistingTable, _header);
+            return ImportUtil.importFile(f, db, tableName, delim, quote, filter,
+                useExistingTable, header);
         }
 
         /**
          * @see ImportUtil#importReader(BufferedReader,Database,String,String,char,ImportFilter,boolean,boolean)
          */
         public String importReader(BufferedReader reader) throws IOException {
-            return ImportUtil.importReader(reader, _db, _tableName, _delim, _quote,
-                _filter, _useExistingTable, _header);
+            return ImportUtil.importReader(reader, db, tableName, delim, quote,
+                filter, useExistingTable, header);
         }
     }
 

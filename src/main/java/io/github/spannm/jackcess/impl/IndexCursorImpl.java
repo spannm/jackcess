@@ -405,10 +405,10 @@ public class IndexCursorImpl extends CursorImpl implements IndexCursor {
      * Value object which maintains the current position of an IndexCursor.
      */
     private static final class IndexPosition extends PositionImpl {
-        private final IndexData.Entry _entry;
+        private final IndexData.Entry entry;
 
         private IndexPosition(IndexData.Entry entry) {
-            _entry = entry;
+            this.entry = entry;
         }
 
         @Override
@@ -417,7 +417,7 @@ public class IndexCursorImpl extends CursorImpl implements IndexCursor {
         }
 
         public IndexData.Entry getEntry() {
-            return _entry;
+            return entry;
         }
 
         @Override
@@ -441,8 +441,8 @@ public class IndexCursorImpl extends CursorImpl implements IndexCursor {
             super(_columnNames, false, MOVE_FORWARD, columnMatcher);
             mrowValues = _rowValues;
             try {
-                _hasNext = findFirstRowByEntryImpl(_rowValues, true, mcolumnMatcher);
-                _validRow = _hasNext;
+                cachedHasNext = findFirstRowByEntryImpl(_rowValues, true, mcolumnMatcher);
+                validRow = cachedHasNext;
             } catch (IOException _ex) {
                 throw new UncheckedIOException(_ex);
             }
@@ -450,7 +450,7 @@ public class IndexCursorImpl extends CursorImpl implements IndexCursor {
 
         @Override
         protected boolean findNext() throws IOException {
-            return moveToNextRow() && currentRowMatchesEntryImpl(mrowValues, _colMatcher);
+            return moveToNextRow() && currentRowMatchesEntryImpl(mrowValues, colMatcher);
         }
     }
 

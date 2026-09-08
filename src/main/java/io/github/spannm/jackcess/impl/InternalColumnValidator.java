@@ -27,41 +27,41 @@ import java.io.IOException;
  * "external" behavior.
  */
 abstract class InternalColumnValidator implements ColumnValidator {
-    private ColumnValidator _delegate;
+    private ColumnValidator delegate;
 
     protected InternalColumnValidator(ColumnValidator delegate) {
-        _delegate = delegate;
+        this.delegate = delegate;
     }
 
     ColumnValidator getExternal() {
-        ColumnValidator extValidator = _delegate;
+        ColumnValidator extValidator = delegate;
         while (extValidator instanceof InternalColumnValidator) {
-            extValidator = ((InternalColumnValidator) extValidator)._delegate;
+            extValidator = ((InternalColumnValidator) extValidator).delegate;
         }
         return extValidator;
     }
 
     void setExternal(ColumnValidator extValidator) {
         InternalColumnValidator intValidator = this;
-        while (intValidator._delegate instanceof InternalColumnValidator) {
-            intValidator = (InternalColumnValidator) intValidator._delegate;
+        while (intValidator.delegate instanceof InternalColumnValidator) {
+            intValidator = (InternalColumnValidator) intValidator.delegate;
         }
-        intValidator._delegate = extValidator;
+        intValidator.delegate = extValidator;
     }
 
     @Override
     public final Object validate(Column col, Object val) throws IOException {
-        val = _delegate.validate(col, val);
+        val = delegate.validate(col, val);
         return internalValidate(col, val);
     }
 
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder("{");
-        if (_delegate instanceof InternalColumnValidator) {
-            ((InternalColumnValidator) _delegate).appendToString(sb);
-        } else if (_delegate != SimpleColumnValidator.INSTANCE) {
-            sb.append("custom=").append(_delegate);
+        if (delegate instanceof InternalColumnValidator) {
+            ((InternalColumnValidator) delegate).appendToString(sb);
+        } else if (delegate != SimpleColumnValidator.INSTANCE) {
+            sb.append("custom=").append(delegate);
         }
         if (sb.length() > 1) {
             sb.append(';');

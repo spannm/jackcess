@@ -426,81 +426,81 @@ class ExpressionTokenizer {
     }
 
     static final class ExprBuf {
-        private final String                                      _str;
-        private final ParseContext                                _ctx;
-        private int                                               _pos;
-        private final Map<TemporalConfig.Type, DateTimeFormatter> _dateTimeFmts = new EnumMap<>(TemporalConfig.Type.class);
-        private final StringBuilder                               _scratch      = new StringBuilder();
+        private final String                                      str;
+        private final ParseContext                                ctx;
+        private int                                               pos;
+        private final Map<TemporalConfig.Type, DateTimeFormatter> dateTimeFmts = new EnumMap<>(TemporalConfig.Type.class);
+        private final StringBuilder                               scratch      = new StringBuilder();
 
         ExprBuf(String str, ParseContext ctx) {
-            _str = str;
-            _ctx = ctx;
+            this.str = str;
+            this.ctx = ctx;
         }
 
         private int len() {
-            return _str.length();
+            return str.length();
         }
 
         public int curPos() {
-            return _pos;
+            return pos;
         }
 
         public int prevPos() {
-            return _pos - 1;
+            return pos - 1;
         }
 
         public boolean hasNext() {
-            return _pos < len();
+            return pos < len();
         }
 
         public char next() {
-            return _str.charAt(_pos++);
+            return str.charAt(pos++);
         }
 
         public void popPrev() {
-            --_pos;
+            --pos;
         }
 
         public int peekNext() {
             if (!hasNext()) {
                 return EOF;
             }
-            return _str.charAt(_pos);
+            return str.charAt(pos);
         }
 
-        public void reset(int pos) {
-            _pos = pos;
+        public void reset(int newPos) {
+            pos = newPos;
         }
 
         public StringBuilder getScratchBuffer() {
-            _scratch.setLength(0);
-            return _scratch;
+            scratch.setLength(0);
+            return scratch;
         }
 
         public ParseContext getContext() {
-            return _ctx;
+            return ctx;
         }
 
         public DateTimeFormatter getParseDateTimeFormat(TemporalConfig.Type type) {
-            DateTimeFormatter df = _dateTimeFmts.get(type);
+            DateTimeFormatter df = dateTimeFmts.get(type);
             if (df == null) {
-                df = _ctx.createDateFormatter(_ctx.getTemporalConfig().getDateTimeFormat(type));
-                _dateTimeFmts.put(type, df);
+                df = ctx.createDateFormatter(ctx.getTemporalConfig().getDateTimeFormat(type));
+                dateTimeFmts.put(type, df);
             }
             return df;
         }
 
         @Override
         public String toString() {
-            return "[char " + _pos + "] '" + _str + "'";
+            return "[char " + pos + "] '" + str + "'";
         }
     }
 
     static final class Token {
-        private final TokenType  _type;
-        private final Object     _val;
-        private final String     _valStr;
-        private final Value.Type _valType;
+        private final TokenType  type;
+        private final Object     val;
+        private final String     valStr;
+        private final Value.Type valType;
 
         private Token(TokenType type, String val) {
             this(type, val, val);
@@ -511,36 +511,36 @@ class ExpressionTokenizer {
         }
 
         private Token(TokenType type, Object val, String valStr, Value.Type valType) {
-            _type = type;
-            _val = val != null ? val : valStr;
-            _valStr = valStr;
-            _valType = valType;
+            this.type = type;
+            this.val = val != null ? val : valStr;
+            this.valStr = valStr;
+            this.valType = valType;
         }
 
         public TokenType getType() {
-            return _type;
+            return type;
         }
 
         public Object getValue() {
-            return _val;
+            return val;
         }
 
         public String getValueStr() {
-            return _valStr;
+            return valStr;
         }
 
         public Value.Type getValueType() {
-            return _valType;
+            return valType;
         }
 
         @Override
         public String toString() {
-            if (_type == TokenType.SPACE) {
+            if (type == TokenType.SPACE) {
                 return "' '";
             }
-            String str = "[" + _type + "] '" + _val + "'";
-            if (_valType != null) {
-                str += " (" + _valType + ")";
+            String str = "[" + type + "] '" + val + "'";
+            if (valType != null) {
+                str += " (" + valType + ")";
             }
             return str;
         }

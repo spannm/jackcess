@@ -38,22 +38,22 @@ public abstract class QueryImpl implements Query {
 
     private static final Row      EMPTY_ROW = new Row();
 
-    private final String          _name;
-    private final List<Row>       _rows;
-    private final int             _objectId;
-    private final int             _objectFlag;
-    private final Type            _type;
+    private final String          name;
+    private final List<Row>       rows;
+    private final int             objectId;
+    private final int             objectFlag;
+    private final Type            type;
 
     protected QueryImpl(String name, List<Row> rows, int objectId, int objectFlag, Type type) {
-        _name = name;
-        _rows = rows;
-        _objectId = objectId;
-        _type = type;
-        _objectFlag = objectFlag;
+        this.name = name;
+        this.rows = rows;
+        this.objectId = objectId;
+        this.type = type;
+        this.objectFlag = objectFlag;
 
         if (type != Type.UNKNOWN) {
-            short foundType = getShortValue(getQueryType(rows), _type.getValue());
-            if (foundType != _type.getValue()) {
+            short foundType = getShortValue(getQueryType(rows), type.getValue());
+            if (foundType != type.getValue()) {
                 throw new IllegalStateException(withErrorContext("Unexpected query type " + foundType));
             }
         }
@@ -64,7 +64,7 @@ public abstract class QueryImpl implements Query {
      */
     @Override
     public String getName() {
-        return _name;
+        return name;
     }
 
     /**
@@ -72,12 +72,12 @@ public abstract class QueryImpl implements Query {
      */
     @Override
     public Type getType() {
-        return _type;
+        return type;
     }
 
     @Override
     public boolean isHidden() {
-        return (_objectFlag & DatabaseImpl.HIDDEN_OBJECT_FLAG) != 0;
+        return (objectFlag & DatabaseImpl.HIDDEN_OBJECT_FLAG) != 0;
     }
 
     /**
@@ -85,19 +85,19 @@ public abstract class QueryImpl implements Query {
      */
     @Override
     public int getObjectId() {
-        return _objectId;
+        return objectId;
     }
 
     @Override
     public int getObjectFlag() {
-        return _objectFlag;
+        return objectFlag;
     }
 
     /**
      * Returns the rows from the system query table from which the query information was derived.
      */
     public List<Row> getRows() {
-        return _rows;
+        return rows;
     }
 
     protected List<Row> getRowsByAttribute(Byte attribute) {
@@ -169,14 +169,14 @@ public abstract class QueryImpl implements Query {
         return new RowFormatter(getParameterRows()) {
             @Override
             protected void format(StringBuilder builder, Row row) {
-                String typeName = DataType.getTypeName(row._flag);
+                String typeName = DataType.getTypeName(row.flag);
                 if (typeName == null) {
-                    throw new IllegalStateException(withErrorContext("Unknown param type " + row._flag));
+                    throw new IllegalStateException(withErrorContext("Unknown param type " + row.flag));
                 }
 
-                builder.append(row._name1).append(' ').append(typeName);
-                if (TEXT_FLAG.equals(row._flag) && getIntValue(row._extra, 0) > 0) {
-                    builder.append('(').append(row._extra).append(')');
+                builder.append(row.name1).append(' ').append(typeName);
+                if (TEXT_FLAG.equals(row.flag) && getIntValue(row.extra, 0) > 0) {
+                    builder.append('(').append(row.extra).append(')');
                 }
             }
         }.format();
@@ -188,15 +188,15 @@ public abstract class QueryImpl implements Query {
         for (Row table : getTableRows()) {
             StringBuilder builder = new StringBuilder();
 
-            if (table._expression != null) {
-                toQuotedExpr(builder, table._expression).append(IDENTIFIER_SEP_CHAR);
+            if (table.expression != null) {
+                toQuotedExpr(builder, table.expression).append(IDENTIFIER_SEP_CHAR);
             }
-            if (table._name1 != null) {
-                toOptionalQuotedExpr(builder, table._name1, true);
+            if (table.name1 != null) {
+                toOptionalQuotedExpr(builder, table.name1, true);
             }
-            toAlias(builder, table._name2);
+            toAlias(builder, table.name2);
 
-            String key = table._name2 != null ? table._name2 : table._name1;
+            String key = table.name2 != null ? table.name2 : table.name1;
             tableExprs.add(new SimpleTable(key, builder.toString()));
         }
 
@@ -204,8 +204,8 @@ public abstract class QueryImpl implements Query {
         List<Row> joins = getJoinRows();
         for (Row joinRow : joins) {
 
-            String fromTable = joinRow._name1;
-            String toTable = joinRow._name2;
+            String fromTable = joinRow.name1;
+            String toTable = joinRow.name2;
 
             TableSource fromTs = null;
             TableSource toTs = null;
@@ -241,7 +241,7 @@ public abstract class QueryImpl implements Query {
 
             if (fromTs == toTs) {
 
-                if (fromTs.sameJoin(joinRow._flag, joinRow._expression)) {
+                if (fromTs.sameJoin(joinRow.flag, joinRow.expression)) {
                     // easy-peasy, we just added the join expression to existing join,
                     // nothing more to do
                     continue;
@@ -251,7 +251,7 @@ public abstract class QueryImpl implements Query {
             }
 
             // new join expression
-            tableExprs.add(new Join(fromTs, toTs, joinRow._flag, joinRow._expression));
+            tableExprs.add(new Join(fromTs, toTs, joinRow.flag, joinRow.expression));
         }
 
         // convert join objects to SQL strings
@@ -264,23 +264,23 @@ public abstract class QueryImpl implements Query {
     }
 
     protected String getFromRemoteDbPath() {
-        return getRemoteDatabaseRow()._name1;
+        return getRemoteDatabaseRow().name1;
     }
 
     protected String getFromRemoteDbType() {
-        return getRemoteDatabaseRow()._expression;
+        return getRemoteDatabaseRow().expression;
     }
 
     protected String getWhereExpression() {
-        return getWhereRow()._expression;
+        return getWhereRow().expression;
     }
 
     protected List<String> getOrderings() {
         return new RowFormatter(getOrderByRows()) {
             @Override
             protected void format(StringBuilder builder, Row row) {
-                builder.append(row._expression);
-                if (DESCENDING_FLAG.equalsIgnoreCase(row._name1)) {
+                builder.append(row.expression);
+                if (DESCENDING_FLAG.equalsIgnoreCase(row.name1)) {
                     builder.append(" DESC");
                 }
             }
@@ -326,7 +326,7 @@ public abstract class QueryImpl implements Query {
 
     @Override
     public String toString() {
-        return String.format("%s[name=%s, rows=%d, objectId=%s, type=%s, objectFlag=%s]", getClass().getSimpleName(), _name, _rows.size(), _objectId, _type, _objectFlag);
+        return String.format("%s[name=%s, rows=%d, objectId=%s, type=%s, objectFlag=%s]", getClass().getSimpleName(), name, rows.size(), objectId, type, objectFlag);
     }
 
     /**
@@ -386,13 +386,13 @@ public abstract class QueryImpl implements Query {
     }
 
     private static Short getQueryType(List<Row> rows) {
-        return getFirstRowByAttribute(rows, TYPE_ATTRIBUTE)._flag;
+        return getFirstRowByAttribute(rows, TYPE_ATTRIBUTE).flag;
     }
 
     private static List<Row> getRowsByAttribute(List<Row> rows, Byte attribute) {
         List<Row> result = new ArrayList<>();
         for (Row row : rows) {
-            if (attribute.equals(row._attribute)) {
+            if (attribute.equals(row.attribute)) {
                 result.add(row);
             }
         }
@@ -401,21 +401,21 @@ public abstract class QueryImpl implements Query {
 
     private static Row getFirstRowByAttribute(List<Row> rows, Byte attribute) {
         for (Row row : rows) {
-            if (attribute.equals(row._attribute)) {
+            if (attribute.equals(row.attribute)) {
                 return row;
             }
         }
         return EMPTY_ROW;
     }
 
-    protected Row getUniqueRow(List<Row> rows) {
-        if (rows.size() == 1) {
-            return rows.get(0);
+    protected Row getUniqueRow(List<Row> rowList) {
+        if (rowList.size() == 1) {
+            return rowList.get(0);
         }
-        if (rows.isEmpty()) {
+        if (rowList.isEmpty()) {
             return EMPTY_ROW;
         }
-        throw new IllegalStateException(withErrorContext("Unexpected number of rows for" + rows));
+        throw new IllegalStateException(withErrorContext("Unexpected number of rows for" + rowList));
     }
 
     protected static List<Row> filterRowsByFlag(List<Row> rows, final short flag) {
@@ -437,7 +437,7 @@ public abstract class QueryImpl implements Query {
     }
 
     protected static boolean hasFlag(Row row, int flagMask) {
-        return (getShortValue(row._flag, 0) & flagMask) != 0;
+        return (getShortValue(row.flag, 0) & flagMask) != 0;
     }
 
     protected static short getShortValue(Short s, int def) {
@@ -517,26 +517,26 @@ public abstract class QueryImpl implements Query {
      * Struct containing the information from a single row of the system query table.
      */
     public static final class Row {
-        private final RowId  _id;
-        public final Byte    _attribute;
-        public final String  _expression;
-        public final Short   _flag;
-        public final Integer _extra;
-        public final String  _name1;
-        public final String  _name2;
-        public final Integer _objectId;
-        public final byte[]  _order;
+        private final RowId  id;
+        public final Byte    attribute;
+        public final String  expression;
+        public final Short   flag;
+        public final Integer extra;
+        public final String  name1;
+        public final String  name2;
+        public final Integer objectId;
+        public final byte[]  order;
 
         private Row() {
-            _id = null;
-            _attribute = null;
-            _expression = null;
-            _flag = null;
-            _extra = null;
-            _name1 = null;
-            _name2 = null;
-            _objectId = null;
-            _order = null;
+            id = null;
+            attribute = null;
+            expression = null;
+            flag = null;
+            extra = null;
+            name1 = null;
+            name2 = null;
+            objectId = null;
+            order = null;
         }
 
         public Row(io.github.spannm.jackcess.Row tableRow) {
@@ -545,44 +545,44 @@ public abstract class QueryImpl implements Query {
         }
 
         public Row(RowId id, Byte attribute, String expression, Short flag, Integer extra, String name1, String name2, Integer objectId, byte[] order) {
-            _id = id;
-            this._attribute = attribute;
-            this._expression = expression;
-            this._flag = flag;
-            this._extra = extra;
-            this._name1 = name1;
-            this._name2 = name2;
-            this._objectId = objectId;
-            this._order = order;
+            this.id = id;
+            this.attribute = attribute;
+            this.expression = expression;
+            this.flag = flag;
+            this.extra = extra;
+            this.name1 = name1;
+            this.name2 = name2;
+            this.objectId = objectId;
+            this.order = order;
         }
 
         public io.github.spannm.jackcess.Row toTableRow() {
-            io.github.spannm.jackcess.Row tableRow = new RowImpl((RowIdImpl) _id);
+            io.github.spannm.jackcess.Row tableRow = new RowImpl((RowIdImpl) id);
 
-            tableRow.put(COL_ATTRIBUTE, _attribute);
-            tableRow.put(COL_EXPRESSION, _expression);
-            tableRow.put(COL_FLAG, _flag);
-            tableRow.put(COL_EXTRA, _extra);
-            tableRow.put(COL_NAME1, _name1);
-            tableRow.put(COL_NAME2, _name2);
-            tableRow.put(COL_OBJECTID, _objectId);
-            tableRow.put(COL_ORDER, _order);
+            tableRow.put(COL_ATTRIBUTE, attribute);
+            tableRow.put(COL_EXPRESSION, expression);
+            tableRow.put(COL_FLAG, flag);
+            tableRow.put(COL_EXTRA, extra);
+            tableRow.put(COL_NAME1, name1);
+            tableRow.put(COL_NAME2, name2);
+            tableRow.put(COL_OBJECTID, objectId);
+            tableRow.put(COL_ORDER, order);
 
             return tableRow;
         }
 
         @Override
         public String toString() {
-            return String.format("%s[id=%s, attribute=%s, expression=%s, flag=%s, extra=%s, name1=%s, name2=%s, objectId=%s, order=%s]", getClass().getSimpleName(), _id, _attribute, _expression,
-                _flag, _extra, _name1, _name2, _objectId, Arrays.toString(_order));
+            return String.format("%s[id=%s, attribute=%s, expression=%s, flag=%s, extra=%s, name1=%s, name2=%s, objectId=%s, order=%s]", getClass().getSimpleName(), id, attribute, expression,
+                flag, extra, name1, name2, objectId, Arrays.toString(order));
         }
     }
 
     protected abstract static class RowFormatter {
-        private final List<Row> _list;
+        private final List<Row> list;
 
         protected RowFormatter(List<Row> list) {
-            _list = list;
+            this.list = list;
         }
 
         public List<String> format() {
@@ -590,7 +590,7 @@ public abstract class QueryImpl implements Query {
         }
 
         public List<String> format(List<String> strs) {
-            for (Row row : _list) {
+            for (Row row : list) {
                 StringBuilder builder = new StringBuilder();
                 format(builder, row);
                 strs.add(builder.toString());
@@ -661,26 +661,26 @@ public abstract class QueryImpl implements Query {
      * Table data provided by a single table expression.
      */
     private static final class SimpleTable extends TableSource {
-        private final String _tableName;
-        private final String _tableExpr;
+        private final String tableName;
+        private final String tableExpr;
 
         private SimpleTable(String tableName) {
             this(tableName, toOptionalQuotedExpr(new StringBuilder(), tableName, true).toString());
         }
 
         private SimpleTable(String tableName, String tableExpr) {
-            _tableName = tableName;
-            _tableExpr = tableExpr;
+            this.tableName = tableName;
+            this.tableExpr = tableExpr;
         }
 
         @Override
         protected void toString(StringBuilder sb, boolean isTopLevel) {
-            sb.append(_tableExpr);
+            sb.append(tableExpr);
         }
 
         @Override
         public boolean containsTable(String table) {
-            return _tableName.equalsIgnoreCase(table);
+            return tableName.equalsIgnoreCase(table);
         }
 
         @Override
@@ -693,11 +693,11 @@ public abstract class QueryImpl implements Query {
      * Table data provided by a join expression.
      */
     private final class Join extends TableSource {
-        private final TableSource  _from;
-        private final TableSource  _to;
-        private final short        _jType;
+        private final TableSource  from;
+        private final TableSource  to;
+        private final short        jType;
         // combine all the join expressions with "AND"
-        private final List<String> _on = new AppendableList<>() {
+        private final List<String> on = new AppendableList<>() {
                                            private static final long serialVersionUID = 0L;
 
                                            @Override
@@ -707,33 +707,33 @@ public abstract class QueryImpl implements Query {
                                        };
 
         private Join(TableSource from, TableSource to, short type, String on) {
-            _from = from;
-            _to = to;
-            _jType = type;
-            _on.add(on);
+            this.from = from;
+            this.to = to;
+            jType = type;
+            this.on.add(on);
         }
 
         @Override
         protected void toString(StringBuilder sb, boolean isTopLevel) {
-            String joinType = JOIN_TYPE_MAP.get(_jType);
+            String joinType = JOIN_TYPE_MAP.get(jType);
             if (joinType == null) {
-                throw new IllegalStateException(withErrorContext("Unknown join type " + _jType));
+                throw new IllegalStateException(withErrorContext("Unknown join type " + jType));
             }
 
             if (!isTopLevel) {
                 sb.append('(');
             }
 
-            _from.toString(sb, false);
+            from.toString(sb, false);
             sb.append(joinType);
-            _to.toString(sb, false);
+            to.toString(sb, false);
             sb.append(" ON ");
 
-            boolean multiOnExpr = _on.size() > 1;
+            boolean multiOnExpr = on.size() > 1;
             if (multiOnExpr) {
                 sb.append('(');
             }
-            sb.append(_on);
+            sb.append(on);
             if (multiOnExpr) {
                 sb.append(')');
             }
@@ -745,14 +745,14 @@ public abstract class QueryImpl implements Query {
 
         @Override
         public boolean containsTable(String table) {
-            return _from.containsTable(table) || _to.containsTable(table);
+            return from.containsTable(table) || to.containsTable(table);
         }
 
         @Override
-        public boolean sameJoin(short type, String on) {
-            if (_jType == type) {
+        public boolean sameJoin(short newType, String onExpr) {
+            if (jType == newType) {
                 // note, AND conditions are added in _reverse_ order
-                _on.add(0, on);
+                on.add(0, onExpr);
                 return true;
             }
             return false;

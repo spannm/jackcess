@@ -26,33 +26,33 @@ import java.nio.ByteBuffer;
 public class NullMask {
 
     /** num row columns */
-    private final int    _columnCount;
+    private final int    columnCount;
     /** The actual bitmask */
-    private final byte[] _mask;
+    private final byte[] mask;
 
     /**
      * @param columnCount Number of columns in the row that this mask will be used for
      */
     public NullMask(int columnCount) {
-        _columnCount = columnCount;
+        this.columnCount = columnCount;
         // we leave everything initially marked as null so that we don't need to
         // do anything for deleted columns (we only need to mark as non-null
         // valid columns for which we actually have values).
-        _mask = new byte[(_columnCount + 7) / 8];
+        mask = new byte[(columnCount + 7) / 8];
     }
 
     /**
      * Read a mask in from a buffer
      */
     public void read(ByteBuffer buffer) {
-        buffer.get(_mask);
+        buffer.get(mask);
     }
 
     /**
      * Write a mask to a buffer
      */
     public void write(ByteBuffer buffer) {
-        buffer.put(_mask);
+        buffer.put(mask);
     }
 
     /**
@@ -64,7 +64,7 @@ public class NullMask {
         int columnNumber = column.getColumnNumber();
         // if new columns were added to the table, old null masks may not include
         // them (meaning the field is null)
-        return columnNumber >= _columnCount || (_mask[byteIndex(columnNumber)] & bitMask(columnNumber)) == 0;
+        return columnNumber >= columnCount || (mask[byteIndex(columnNumber)] & bitMask(columnNumber)) == 0;
     }
 
     /**
@@ -75,14 +75,14 @@ public class NullMask {
     public void markNotNull(ColumnImpl column) {
         int columnNumber = column.getColumnNumber();
         int maskIndex = byteIndex(columnNumber);
-        _mask[maskIndex] = (byte) (_mask[maskIndex] | bitMask(columnNumber));
+        mask[maskIndex] = (byte) (mask[maskIndex] | bitMask(columnNumber));
     }
 
     /**
      * @return Size in bytes of this mask
      */
     public int byteSize() {
-        return _mask.length;
+        return mask.length;
     }
 
     private static int byteIndex(int columnNumber) {

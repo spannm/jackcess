@@ -223,13 +223,13 @@ public class ColumnImpl implements Column, Comparable<ColumnImpl>, DateTimeConte
     /** the auto number generator for this column (if autonumber column) */
     private final AutoNumberGenerator    mautoNumberGenerator;
     /** properties for this column, if any */
-    private PropertyMap                  _props;
+    private PropertyMap                  props;
     /** Validator for writing new values */
-    private ColumnValidator              _validator                       = SimpleColumnValidator.INSTANCE;
+    private ColumnValidator              validator                       = SimpleColumnValidator.INSTANCE;
     /** default value generator */
-    private ColDefaultValueEvalContext   _defValue;
+    private ColDefaultValueEvalContext   defValue;
     /** length of the column in units, lazily computed */
-    private int                          _lengthInUnits                   = INVALID_LENGTH;
+    private int                          lengthInUnits                   = INVALID_LENGTH;
 
     protected ColumnImpl(TableImpl _table, String _name, DataType _type, int _colNumber, int _fixedOffset, int _varLenIndex) {
         mtable = _table;
@@ -437,10 +437,10 @@ public class ColumnImpl implements Column, Comparable<ColumnImpl>, DateTimeConte
 
     @Override
     public final short getLengthInUnits() {
-        if (_lengthInUnits == INVALID_LENGTH) {
-            _lengthInUnits = calcLengthInUnits();
+        if (lengthInUnits == INVALID_LENGTH) {
+            lengthInUnits = calcLengthInUnits();
         }
-        return (short) _lengthInUnits;
+        return (short) lengthInUnits;
     }
 
     protected int calcLengthInUnits() {
@@ -542,8 +542,8 @@ public class ColumnImpl implements Column, Comparable<ColumnImpl>, DateTimeConte
             if (getDatabase().isEvaluateExpressions()) {
 
                 // init calc col expression evaluator
-                PropertyMap props = getProperties();
-                String calcExpr = (String) props.getValue(PropertyMap.EXPRESSION_PROP);
+                PropertyMap calcProps = getProperties();
+                String calcExpr = (String) calcProps.getValue(PropertyMap.EXPRESSION_PROP);
                 calcCol = new CalcColEvalContext(this).withExpr(calcExpr);
             }
 
@@ -555,22 +555,22 @@ public class ColumnImpl implements Column, Comparable<ColumnImpl>, DateTimeConte
 
         // discard any existing internal validators and re-compute them
         // (essentially unwrap the external validator)
-        _validator = getColumnValidator();
-        _defValue = null;
+        validator = getColumnValidator();
+        defValue = null;
 
-        PropertyMap props = getProperties();
+        PropertyMap colProps = getProperties();
 
         // if the "required" property is enabled, add appropriate validator
-        boolean required = (Boolean) props.getValue(PropertyMap.REQUIRED_PROP, Boolean.FALSE);
+        boolean required = (Boolean) colProps.getValue(PropertyMap.REQUIRED_PROP, Boolean.FALSE);
         if (required) {
-            _validator = new RequiredColValidator(_validator);
+            validator = new RequiredColValidator(validator);
         }
 
         // if the "allow zero len" property is disabled (textual columns only),
         // add appropriate validator
-        boolean allowZeroLen = !getType().isTextual() || (Boolean) props.getValue(PropertyMap.ALLOW_ZERO_LEN_PROP, Boolean.TRUE);
+        boolean allowZeroLen = !getType().isTextual() || (Boolean) colProps.getValue(PropertyMap.ALLOW_ZERO_LEN_PROP, Boolean.TRUE);
         if (!allowZeroLen) {
-            _validator = new NoZeroLenColValidator(_validator);
+            validator = new NoZeroLenColValidator(validator);
         }
 
         // only check for props based exprs if this is enabled
@@ -578,17 +578,17 @@ public class ColumnImpl implements Column, Comparable<ColumnImpl>, DateTimeConte
             return;
         }
 
-        String exprStr = PropertyMaps.getTrimmedStringProperty(props, PropertyMap.VALIDATION_RULE_PROP);
+        String exprStr = PropertyMaps.getTrimmedStringProperty(colProps, PropertyMap.VALIDATION_RULE_PROP);
 
         if (exprStr != null) {
-            String helpStr = PropertyMaps.getTrimmedStringProperty(props, PropertyMap.VALIDATION_TEXT_PROP);
+            String helpStr = PropertyMaps.getTrimmedStringProperty(colProps, PropertyMap.VALIDATION_TEXT_PROP);
 
-            _validator = new ColValidatorEvalContext(this).withExpr(exprStr, helpStr).toColumnValidator(_validator);
+            validator = new ColValidatorEvalContext(this).withExpr(exprStr, helpStr).toColumnValidator(validator);
         }
 
-        String defValueStr = PropertyMaps.getTrimmedStringProperty(props, PropertyMap.DEFAULT_VALUE_PROP);
+        String defValueStr = PropertyMaps.getTrimmedStringProperty(colProps, PropertyMap.DEFAULT_VALUE_PROP);
         if (defValueStr != null) {
-            _defValue = new ColDefaultValueEvalContext(this).withExpr(defValueStr);
+            defValue = new ColDefaultValueEvalContext(this).withExpr(defValueStr);
         }
     }
 
@@ -599,7 +599,7 @@ public class ColumnImpl implements Column, Comparable<ColumnImpl>, DateTimeConte
     @Override
     public ColumnValidator getColumnValidator() {
         // unwrap any "internal" validator
-        return _validator instanceof InternalColumnValidator ? ((InternalColumnValidator) _validator).getExternal() : _validator;
+        return validator instanceof InternalColumnValidator ? ((InternalColumnValidator) validator).getExternal() : validator;
     }
 
     @Override
@@ -623,10 +623,10 @@ public class ColumnImpl implements Column, Comparable<ColumnImpl>, DateTimeConte
         }
 
         // handle delegation if "internal" validator in use
-        if (_validator instanceof InternalColumnValidator) {
-            ((InternalColumnValidator) _validator).setExternal(newValidator);
+        if (validator instanceof InternalColumnValidator) {
+            ((InternalColumnValidator) validator).setExternal(newValidator);
         } else {
-            _validator = newValidator;
+            validator = newValidator;
         }
     }
 
@@ -661,10 +661,10 @@ public class ColumnImpl implements Column, Comparable<ColumnImpl>, DateTimeConte
 
     @Override
     public PropertyMap getProperties() throws IOException {
-        if (_props == null) {
-            _props = getTable().getPropertyMaps().get(getName());
+        if (props == null) {
+            props = getTable().getPropertyMaps().get(getName());
         }
-        return _props;
+        return props;
     }
 
     @Override
@@ -1266,14 +1266,14 @@ public class ColumnImpl implements Column, Comparable<ColumnImpl>, DateTimeConte
      * Returns a default value for this column
      */
     public Object generateDefaultValue() throws IOException {
-        return _defValue != null ? _defValue.eval() : null;
+        return defValue != null ? defValue.eval() : null;
     }
 
     /**
      * Passes the given obj through the currently configured validator for this column and returns the result.
      */
     public Object validate(Object obj) throws IOException {
-        return _validator.validate(this, obj);
+        return validator.validate(this, obj);
     }
 
     /**
@@ -1599,8 +1599,8 @@ public class ColumnImpl implements Column, Comparable<ColumnImpl>, DateTimeConte
         if (mautoNumber) {
             sb.append("lastAutoNumber", mautoNumberGenerator.getLast());
         }
-        return sb.appendIgnoreNull("complexInfo", getComplexInfo()).appendIgnoreNull("validator", _validator != SimpleColumnValidator.INSTANCE ? _validator : null)
-            .appendIgnoreNull("defaultValue", _defValue).toString();
+        return sb.appendIgnoreNull("complexInfo", getComplexInfo()).appendIgnoreNull("validator", validator != SimpleColumnValidator.INSTANCE ? validator : null)
+            .appendIgnoreNull("defaultValue", defValue).toString();
     }
 
     /**
@@ -2081,15 +2081,15 @@ public class ColumnImpl implements Column, Comparable<ColumnImpl>, DateTimeConte
         private static final long    serialVersionUID = 0L;
 
         /** cached bits of the original date value */
-        private final transient long _dateBits;
+        private final transient long dateBits;
 
         private DateExt(long time, long dateBits) {
             super(time);
-            _dateBits = dateBits;
+            this.dateBits = dateBits;
         }
 
         public long getDateBits() {
-            return _dateBits;
+            return dateBits;
         }
 
         @Override
@@ -2140,15 +2140,15 @@ public class ColumnImpl implements Column, Comparable<ColumnImpl>, DateTimeConte
     private static final class RawData implements Serializable, InMemoryBlob {
         private static final long serialVersionUID = 0L;
 
-        private final byte[]      _bytes;
+        private final byte[]      bytes;
 
         private RawData(byte[] bytes) {
-            _bytes = bytes;
+            this.bytes = bytes;
         }
 
         @Override
         public byte[] getBytes() {
-            return _bytes;
+            return bytes;
         }
 
         @Override
@@ -2240,29 +2240,29 @@ public class ColumnImpl implements Column, Comparable<ColumnImpl>, DateTimeConte
     }
 
     private final class GuidAutoNumberGenerator extends AutoNumberGenerator {
-        private Object _lastAutoNumber;
+        private Object lastAutoNumber;
 
         @Override
         public Object getLast() {
-            return _lastAutoNumber;
+            return lastAutoNumber;
         }
 
         @Override
         public Object getNext(TableImpl.WriteRowState writeRowState) {
             // format guids consistently w/ Column.readGUIDValue()
-            _lastAutoNumber = "{" + UUID.randomUUID() + "}";
-            return _lastAutoNumber;
+            lastAutoNumber = "{" + UUID.randomUUID() + "}";
+            return lastAutoNumber;
         }
 
         @Override
         public Object handleInsert(TableImpl.WriteRowState writeRowState, Object inRowValue) throws IOException {
-            _lastAutoNumber = toCharSequence(inRowValue);
-            return _lastAutoNumber;
+            lastAutoNumber = toCharSequence(inRowValue);
+            return lastAutoNumber;
         }
 
         @Override
         public void restoreLast(Object last) {
-            _lastAutoNumber = null;
+            lastAutoNumber = null;
         }
 
         @Override
@@ -2334,10 +2334,10 @@ public class ColumnImpl implements Column, Comparable<ColumnImpl>, DateTimeConte
     }
 
     private final class UnsupportedAutoNumberGenerator extends AutoNumberGenerator {
-        private final DataType _genType;
+        private final DataType genType;
 
         private UnsupportedAutoNumberGenerator(DataType genType) {
-            _genType = genType;
+            this.genType = genType;
         }
 
         @Override
@@ -2362,7 +2362,7 @@ public class ColumnImpl implements Column, Comparable<ColumnImpl>, DateTimeConte
 
         @Override
         public DataType getType() {
-            return _genType;
+            return genType;
         }
     }
 

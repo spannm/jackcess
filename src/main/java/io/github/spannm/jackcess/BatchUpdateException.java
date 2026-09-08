@@ -23,14 +23,14 @@ package io.github.spannm.jackcess;
 public class BatchUpdateException extends JackcessException {
     private static final long serialVersionUID = 20131123L;
 
-    private final int         _updateCount;
+    private final int         updateCount;
 
     public BatchUpdateException(int updateCount, String msg, Throwable cause) {
         super(msg + ": " + cause, cause);
-        _updateCount = updateCount;
+        this.updateCount = updateCount;
     }
 
     public int getUpdateCount() {
-        return _updateCount;
+        return updateCount;
     }
 }

@@ -27,30 +27,30 @@ public abstract class TopoSorter<E> {
     private static final int    TEMP_MARK = 1;
     private static final int    PERM_MARK = 2;
 
-    private final List<E>       _values;
-    private final List<Node<E>> _nodes    = new ArrayList<>();
-    private final boolean       _reverse;
+    private final List<E>       values;
+    private final List<Node<E>> nodes    = new ArrayList<>();
+    private final boolean       reverse;
 
     protected TopoSorter(List<E> values, boolean reverse) {
-        _values = values;
-        _reverse = reverse;
+        this.values = values;
+        this.reverse = reverse;
     }
 
     public void sort() {
 
-        for (E val : _values) {
+        for (E val : values) {
             Node<E> node = new Node<>(val);
-            fillDescendents(val, node._descs);
+            fillDescendents(val, node.descs);
 
             // build the internal list in reverse so that we maintain the "original"
             // order of items which we don't need to re-arrange
-            _nodes.add(0, node);
+            nodes.add(0, node);
         }
 
-        _values.clear();
+        values.clear();
 
-        for (Node<E> node : _nodes) {
-            if (node._mark != UNMARKED) {
+        for (Node<E> node : nodes) {
+            if (node.mark != UNMARKED) {
                 continue;
             }
 
@@ -60,33 +60,33 @@ public abstract class TopoSorter<E> {
 
     private void visit(Node<E> node) {
 
-        if (node._mark == PERM_MARK) {
+        if (node.mark == PERM_MARK) {
             return;
         }
 
-        if (node._mark == TEMP_MARK) {
+        if (node.mark == TEMP_MARK) {
             throw new IllegalStateException("Cycle detected");
         }
 
-        node._mark = TEMP_MARK;
+        node.mark = TEMP_MARK;
 
-        for (E descVal : node._descs) {
+        for (E descVal : node.descs) {
             Node<E> desc = findDescendent(descVal);
             visit(desc);
         }
 
-        node._mark = PERM_MARK;
+        node.mark = PERM_MARK;
 
-        if (_reverse) {
-            _values.add(node._val);
+        if (reverse) {
+            values.add(node.val);
         } else {
-            _values.add(0, node._val);
+            values.add(0, node.val);
         }
     }
 
     private Node<E> findDescendent(E val) {
-        for (Node<E> node : _nodes) {
-            if (node._val == val) {
+        for (Node<E> node : nodes) {
+            if (node.val == val) {
                 return node;
             }
         }
@@ -96,12 +96,12 @@ public abstract class TopoSorter<E> {
     protected abstract void fillDescendents(E from, List<E> descendents);
 
     private static class Node<E> {
-        private final E       _val;
-        private final List<E> _descs = new ArrayList<>();
-        private int           _mark  = UNMARKED;
+        private final E       val;
+        private final List<E> descs = new ArrayList<>();
+        private int           mark  = UNMARKED;
 
         private Node(E val) {
-            _val = val;
+            this.val = val;
         }
     }
 }

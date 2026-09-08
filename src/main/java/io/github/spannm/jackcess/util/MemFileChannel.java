@@ -54,23 +54,23 @@ public class MemFileChannel extends FileChannel {
     private static final int      INIT_CHUNKS     = 128;
 
     /** current read/write position */
-    private long                  _position;
+    private long                  position;
     /** current amount of actual data in the file */
-    private long                  _size;
+    private long                  size;
     /**
      * chunks containing the file data. the length of the chunk array is always a power of 2 and the chunks are always
      * CHUNK_SIZE.
      */
-    private byte[][]              _data;
+    private byte[][]              data;
 
     private MemFileChannel() {
         this(0L, 0L, EMPTY_DATA);
     }
 
     private MemFileChannel(long position, long size, byte[][] data) {
-        _position = position;
-        _size = size;
-        _data = data;
+        this.position = position;
+        this.size = size;
+        this.data = data;
     }
 
     /**
@@ -164,29 +164,29 @@ public class MemFileChannel extends FileChannel {
 
     @Override
     public int read(ByteBuffer dst) {
-        int bytesRead = read(dst, _position);
+        int bytesRead = read(dst, position);
         if (bytesRead > 0) {
-            _position += bytesRead;
+            position += bytesRead;
         }
         return bytesRead;
     }
 
     @Override
-    public int read(ByteBuffer dst, long position) {
-        if (position >= _size) {
+    public int read(ByteBuffer dst, long readPos) {
+        if (readPos >= size) {
             return -1;
         }
 
-        int numBytes = (int) Math.min(dst.remaining(), _size - position);
+        int numBytes = (int) Math.min(dst.remaining(), size - readPos);
         int rem = numBytes;
 
         while (rem > 0) {
-            byte[] chunk = _data[getChunkIndex(position)];
-            int chunkOffset = getChunkOffset(position);
+            byte[] chunk = data[getChunkIndex(readPos)];
+            int chunkOffset = getChunkOffset(readPos);
             int bytesRead = Math.min(rem, CHUNK_SIZE - chunkOffset);
             dst.put(chunk, chunkOffset, bytesRead);
             rem -= bytesRead;
-            position += bytesRead;
+            readPos += bytesRead;
         }
 
         return numBytes;
@@ -194,29 +194,29 @@ public class MemFileChannel extends FileChannel {
 
     @Override
     public int write(ByteBuffer src) {
-        int bytesWritten = write(src, _position);
-        _position += bytesWritten;
+        int bytesWritten = write(src, position);
+        position += bytesWritten;
         return bytesWritten;
     }
 
     @Override
-    public int write(ByteBuffer src, long position) {
+    public int write(ByteBuffer src, long writePos) {
         int numBytes = src.remaining();
-        long newSize = position + numBytes;
+        long newSize = writePos + numBytes;
         ensureCapacity(newSize);
 
         int rem = numBytes;
         while (rem > 0) {
-            byte[] chunk = _data[getChunkIndex(position)];
-            int chunkOffset = getChunkOffset(position);
+            byte[] chunk = data[getChunkIndex(writePos)];
+            int chunkOffset = getChunkOffset(writePos);
             int bytesWritten = Math.min(rem, CHUNK_SIZE - chunkOffset);
             src.get(chunk, chunkOffset, bytesWritten);
             rem -= bytesWritten;
-            position += bytesWritten;
+            writePos += bytesWritten;
         }
 
-        if (newSize > _size) {
-            _size = newSize;
+        if (newSize > size) {
+            size = newSize;
         }
 
         return numBytes;
@@ -224,7 +224,7 @@ public class MemFileChannel extends FileChannel {
 
     @Override
     public long position() {
-        return _position;
+        return position;
     }
 
     @Override
@@ -232,13 +232,13 @@ public class MemFileChannel extends FileChannel {
         if (newPosition < 0L) {
             throw new IllegalArgumentException("negative position");
         }
-        _position = newPosition;
+        position = newPosition;
         return this;
     }
 
     @Override
     public long size() {
-        return _size;
+        return size;
     }
 
     @Override
@@ -246,15 +246,15 @@ public class MemFileChannel extends FileChannel {
         if (newSize < 0L) {
             throw new IllegalArgumentException("negative size");
         }
-        if (newSize < _size) {
+        if (newSize < size) {
             // we'll optimize for memory over speed and aggressively free unused
             // chunks
-            for (int i = getNumChunks(newSize); i < getNumChunks(_size); ++i) {
-                _data[i] = null;
+            for (int i = getNumChunks(newSize); i < getNumChunks(size); ++i) {
+                data[i] = null;
             }
-            _size = newSize;
+            size = newSize;
         }
-        _position = Math.min(newSize, _position);
+        position = Math.min(newSize, position);
         return this;
     }
 
@@ -269,25 +269,25 @@ public class MemFileChannel extends FileChannel {
      * @see #transferTo(long,long,WritableByteChannel)
      */
     public long transferTo(WritableByteChannel dst) throws IOException {
-        return transferTo(0L, _size, dst);
+        return transferTo(0L, size, dst);
     }
 
     @Override
-    public long transferTo(long position, long count, WritableByteChannel dst) throws IOException {
-        if (position >= _size) {
+    public long transferTo(long srcPos, long count, WritableByteChannel dst) throws IOException {
+        if (srcPos >= size) {
             return 0L;
         }
 
-        count = Math.min(count, _size - position);
+        count = Math.min(count, size - srcPos);
 
-        int chunkIndex = getChunkIndex(position);
-        int chunkOffset = getChunkOffset(position);
+        int chunkIndex = getChunkIndex(srcPos);
+        int chunkOffset = getChunkOffset(srcPos);
 
         long numBytes = 0L;
         while (count > 0L) {
 
             int chunkBytes = (int) Math.min(count, CHUNK_SIZE - chunkOffset);
-            ByteBuffer src = ByteBuffer.wrap(_data[chunkIndex], chunkOffset,
+            ByteBuffer src = ByteBuffer.wrap(data[chunkIndex], chunkOffset,
                 chunkBytes);
 
             do {
@@ -313,7 +313,7 @@ public class MemFileChannel extends FileChannel {
      * @see #transferTo(long,long,WritableByteChannel)
      */
     public long transferTo(OutputStream dst) throws IOException {
-        return transferTo(0L, _size, dst);
+        return transferTo(0L, size, dst);
     }
 
     /**
@@ -321,22 +321,22 @@ public class MemFileChannel extends FileChannel {
      *
      * @see #transferTo(long,long,WritableByteChannel)
      */
-    public long transferTo(long position, long count, OutputStream dst) throws IOException {
-        return transferTo(position, count, Channels.newChannel(dst));
+    public long transferTo(long srcPos, long count, OutputStream dst) throws IOException {
+        return transferTo(srcPos, count, Channels.newChannel(dst));
     }
 
     @Override
-    public long transferFrom(ReadableByteChannel src, long position, long count) throws IOException {
-        int chunkIndex = getChunkIndex(position);
-        int chunkOffset = getChunkOffset(position);
+    public long transferFrom(ReadableByteChannel src, long dstPos, long count) throws IOException {
+        int chunkIndex = getChunkIndex(dstPos);
+        int chunkOffset = getChunkOffset(dstPos);
 
         long numBytes = 0L;
         while (count > 0L) {
 
-            ensureCapacity(position + numBytes + 1);
+            ensureCapacity(dstPos + numBytes + 1);
 
             int chunkBytes = (int) Math.min(count, CHUNK_SIZE - chunkOffset);
-            ByteBuffer dst = ByteBuffer.wrap(_data[chunkIndex], chunkOffset,
+            ByteBuffer dst = ByteBuffer.wrap(data[chunkIndex], chunkOffset,
                 chunkBytes);
             do {
                 int bytesRead = src.read(dst);
@@ -346,7 +346,7 @@ public class MemFileChannel extends FileChannel {
                 }
                 numBytes += bytesRead;
                 count -= bytesRead;
-                _size = Math.max(_size, position + numBytes);
+                size = Math.max(size, dstPos + numBytes);
             } while (dst.hasRemaining());
 
             chunkIndex++;
@@ -359,23 +359,23 @@ public class MemFileChannel extends FileChannel {
     @Override
     protected void implCloseChannel() {
         // release data
-        _data = EMPTY_DATA;
-        _size = _position = 0L;
+        data = EMPTY_DATA;
+        size = position = 0L;
     }
 
     private void ensureCapacity(long newSize) {
-        if (newSize <= _size) {
+        if (newSize <= size) {
             // nothing to do
             return;
         }
 
         int newNumChunks = getNumChunks(newSize);
-        int numChunks = getNumChunks(_size);
+        int numChunks = getNumChunks(size);
 
-        if (newNumChunks > _data.length) {
+        if (newNumChunks > data.length) {
 
             // need to extend chunk array (use powers of 2)
-            int newDataLen = Math.max(_data.length, INIT_CHUNKS);
+            int newDataLen = Math.max(data.length, INIT_CHUNKS);
             while (newDataLen < newNumChunks) {
                 newDataLen <<= 1;
             }
@@ -383,14 +383,14 @@ public class MemFileChannel extends FileChannel {
             byte[][] newData = new byte[newDataLen][];
 
             // copy existing chunks
-            System.arraycopy(_data, 0, newData, 0, numChunks);
+            System.arraycopy(data, 0, newData, 0, numChunks);
 
-            _data = newData;
+            data = newData;
         }
 
         // allocate new chunks
         for (int i = numChunks; i < newNumChunks; ++i) {
-            _data[i] = new byte[CHUNK_SIZE];
+            data[i] = new byte[CHUNK_SIZE];
         }
     }
 
@@ -419,7 +419,7 @@ public class MemFileChannel extends FileChannel {
     public long read(ByteBuffer[] dsts, int offset, int length) {
         long numBytes = 0L;
         for (int i = offset; i < offset + length; ++i) {
-            if (_position >= _size) {
+            if (position >= size) {
                 return numBytes > 0L ? numBytes : -1L;
             }
             numBytes += read(dsts[i]);
@@ -428,17 +428,17 @@ public class MemFileChannel extends FileChannel {
     }
 
     @Override
-    public MappedByteBuffer map(MapMode mode, long position, long size) {
+    public MappedByteBuffer map(MapMode mode, long pos, long len) {
         throw new UnsupportedOperationException();
     }
 
     @Override
-    public FileLock lock(long position, long size, boolean shared) {
+    public FileLock lock(long pos, long len, boolean shared) {
         throw new UnsupportedOperationException();
     }
 
     @Override
-    public FileLock tryLock(long position, long size, boolean shared) {
+    public FileLock tryLock(long pos, long len, boolean shared) {
         throw new UnsupportedOperationException();
     }
 
@@ -447,7 +447,7 @@ public class MemFileChannel extends FileChannel {
      */
     private static final class ReadOnlyChannel extends MemFileChannel {
         private ReadOnlyChannel(MemFileChannel channel) {
-            super(channel._position, channel._size, channel._data);
+            super(channel.position, channel.size, channel.data);
         }
 
         @Override

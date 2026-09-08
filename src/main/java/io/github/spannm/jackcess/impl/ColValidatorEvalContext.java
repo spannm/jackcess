@@ -27,24 +27,24 @@ import io.github.spannm.jackcess.util.ColumnValidator;
 import java.io.IOException;
 
 public class ColValidatorEvalContext extends ColEvalContext {
-    private String _helpStr;
-    private Object _val;
+    private String helpStr;
+    private Object val;
 
     public ColValidatorEvalContext(ColumnImpl col) {
         super(col);
     }
 
-    ColValidatorEvalContext withExpr(String exprStr, String helpStr) {
+    ColValidatorEvalContext withExpr(String exprStr, String newHelpStr) {
         setExpr(Expressionator.Type.FIELD_VALIDATOR, exprStr);
-        _helpStr = helpStr;
+        helpStr = newHelpStr;
         return this;
     }
 
     ColumnValidator toColumnValidator(ColumnValidator delegate) {
         return new InternalColumnValidator(delegate) {
             @Override
-            protected Object internalValidate(Column col, Object val) throws IOException {
-                return ColValidatorEvalContext.this.validate(val);
+            protected Object internalValidate(Column col, Object colVal) throws IOException {
+                return ColValidatorEvalContext.this.validate(colVal);
             }
 
             @Override
@@ -55,12 +55,12 @@ public class ColValidatorEvalContext extends ColEvalContext {
     }
 
     private void reset() {
-        _val = null;
+        val = null;
     }
 
     @Override
     public Value getThisColumnValue() {
-        return toValue(_val);
+        return toValue(val);
     }
 
     @Override
@@ -73,15 +73,15 @@ public class ColValidatorEvalContext extends ColEvalContext {
         return getThisColumnValue();
     }
 
-    private Object validate(Object val) throws IOException {
+    private Object validate(Object newVal) throws IOException {
         try {
-            _val = val;
+            val = newVal;
             Boolean result = (Boolean) eval();
             if (!result) {
-                String msg = _helpStr != null ? _helpStr : "Invalid column value '" + val + "'";
+                String msg = helpStr != null ? helpStr : "Invalid column value '" + newVal + "'";
                 throw new InvalidValueException(withErrorContext(msg));
             }
-            return val;
+            return newVal;
         } finally {
             reset();
         }

@@ -23,26 +23,26 @@ import java.nio.charset.Charset;
  * Common helper class used to maintain state during database mutation.
  */
 abstract class DBMutator {
-    private final DatabaseImpl _database;
+    private final DatabaseImpl database;
 
     protected DBMutator(DatabaseImpl database) {
-        _database = database;
+        this.database = database;
     }
 
     public DatabaseImpl getDatabase() {
-        return _database;
+        return database;
     }
 
     public JetFormat getFormat() {
-        return _database.getFormat();
+        return database.getFormat();
     }
 
     public PageChannel getPageChannel() {
-        return _database.getPageChannel();
+        return database.getPageChannel();
     }
 
     public Charset getCharset() {
-        return _database.getCharset();
+        return database.getCharset();
     }
 
     public int reservePageNumber() throws IOException {
@@ -55,7 +55,7 @@ abstract class DBMutator {
 
     protected ColumnImpl.SortOrder getDbSortOrder() {
         try {
-            return _database.getDefaultSortOrder();
+            return database.getDefaultSortOrder();
         } catch (IOException _ex) {
             // ignored, just use the jet format default
         }

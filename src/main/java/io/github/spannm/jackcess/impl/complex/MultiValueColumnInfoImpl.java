@@ -68,21 +68,21 @@ public class MultiValueColumnInfoImpl extends ComplexColumnInfoImpl<SingleValue>
     }
 
     private static class SingleValueImpl extends ComplexValueImpl implements SingleValue {
-        private Object _value;
+        private Object value;
 
         private SingleValueImpl(Id id, ComplexValueForeignKey complexValueFk, Object value) {
             super(id, complexValueFk);
-            _value = value;
+            this.value = value;
         }
 
         @Override
         public Object get() {
-            return _value;
+            return value;
         }
 
         @Override
-        public void set(Object value) {
-            _value = value;
+        public void set(Object newValue) {
+            value = newValue;
         }
 
         @Override

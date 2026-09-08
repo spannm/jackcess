@@ -22,16 +22,16 @@ import java.nio.ByteOrder;
  * ColumnImpl subclass which is used for unknown/unsupported data types.
  */
 class UnsupportedColumnImpl extends ColumnImpl {
-    private final byte _originalType;
+    private final byte originalType;
 
     UnsupportedColumnImpl(InitArgs args) {
         super(args);
-        _originalType = args.colType;
+        originalType = args.colType;
     }
 
     @Override
     byte getOriginalDataType() {
-        return _originalType;
+        return originalType;
     }
 
     @Override

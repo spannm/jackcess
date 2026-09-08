@@ -143,10 +143,10 @@ public abstract class RowFilter implements Predicate<Row> {
      * Iterable which creates a filtered view of a another row iterable.
      */
     private class FilterIterable implements Iterable<Row> {
-        private final Iterable<? extends Row> _iterable;
+        private final Iterable<? extends Row> iterable;
 
         private FilterIterable(Iterable<? extends Row> iterable) {
-            _iterable = iterable;
+            this.iterable = iterable;
         }
 
         /**
@@ -156,27 +156,27 @@ public abstract class RowFilter implements Predicate<Row> {
         @Override
         public Iterator<Row> iterator() {
             return new Iterator<>() {
-                private final Iterator<? extends Row> _iter = _iterable.iterator();
-                private Row                           _next;
+                private final Iterator<? extends Row> iter = iterable.iterator();
+                private Row                            next;
 
                 @Override
                 public boolean hasNext() {
-                    while (_iter.hasNext()) {
-                        _next = _iter.next();
-                        if (matches(_next)) {
+                    while (iter.hasNext()) {
+                        next = iter.next();
+                        if (matches(next)) {
                             return true;
                         }
                     }
-                    _next = null;
+                    next = null;
                     return false;
                 }
 
                 @Override
                 public Row next() {
-                    if (_next == null) {
+                    if (next == null) {
                         throw new NoSuchElementException();
                     }
-                    return _next;
+                    return next;
                 }
 
             };

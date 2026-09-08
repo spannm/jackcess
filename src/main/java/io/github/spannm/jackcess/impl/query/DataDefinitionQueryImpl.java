@@ -31,7 +31,7 @@ public class DataDefinitionQueryImpl extends QueryImpl implements DataDefinition
 
     @Override
     public String getDDLString() {
-        return getTypeRow()._expression;
+        return getTypeRow().expression;
     }
 
     @Override

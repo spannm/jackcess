@@ -539,12 +539,12 @@ class QueryTest extends AbstractBaseTest {
     }
 
     private static void replaceRows(Query query, Row... rows) {
-        removeRows(query, rows[0]._attribute);
+        removeRows(query, rows[0].attribute);
         addRows(query, rows);
     }
 
     private static void removeRows(Query query, Byte attr) {
-        ((QueryImpl) query).getRows().removeIf(row -> attr.equals(row._attribute));
+        ((QueryImpl) query).getRows().removeIf(row -> attr.equals(row.attribute));
     }
 
     private static void removeLastRows(Query query, int num) {

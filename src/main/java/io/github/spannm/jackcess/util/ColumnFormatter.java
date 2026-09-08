@@ -36,14 +36,14 @@ import java.util.Map;
  * add/update method).
  */
 public class ColumnFormatter {
-    private final ColumnImpl               _col;
-    private final FormatEvalContext        _ctx;
-    private String                         _fmtStr;
-    private FormatUtil.StandaloneFormatter _fmt;
+    private final ColumnImpl               col;
+    private final FormatEvalContext        ctx;
+    private String                         fmtStr;
+    private FormatUtil.StandaloneFormatter fmt;
 
     public ColumnFormatter(Column col) throws IOException {
-        _col = (ColumnImpl) col;
-        _ctx = new FormatEvalContext(_col);
+        this.col = (ColumnImpl) col;
+        ctx = new FormatEvalContext(this.col);
         reload();
     }
 
@@ -51,19 +51,19 @@ public class ColumnFormatter {
      * Returns the currently loaded "Format" property for this formatter, may be {@code null}.
      */
     public String getFormatString() {
-        return _fmtStr;
+        return fmtStr;
     }
 
     /**
      * Sets the given format string as the "Format" property for the underlying Column and reloads this formatter.
      *
-     * @param fmtStr the new format string. may be {@code null}, in which case the "Format" property is removed from the
+     * @param newFmtStr the new format string. may be {@code null}, in which case the "Format" property is removed from the
      *            underlying Column
      */
-    public void setFormatString(String fmtStr) throws IOException {
-        PropertyMap props = _col.getProperties();
-        if (!StringUtil.isEmpty(fmtStr)) {
-            props.put(PropertyMap.FORMAT_PROP, fmtStr);
+    public void setFormatString(String newFmtStr) throws IOException {
+        PropertyMap props = col.getProperties();
+        if (!StringUtil.isEmpty(newFmtStr)) {
+            props.put(PropertyMap.FORMAT_PROP, newFmtStr);
         } else {
             props.remove(PropertyMap.FORMAT_PROP);
         }
@@ -80,7 +80,7 @@ public class ColumnFormatter {
      * @return the formatted result, always non-{@code null}
      */
     public String format(Object val) {
-        return _ctx.format(val);
+        return ctx.format(val);
     }
 
     /**
@@ -89,7 +89,7 @@ public class ColumnFormatter {
      * @return the formatted result, always non-{@code null}
      */
     public String getRowValue(Object[] rowArray) {
-        return format(_col.getRowValue(rowArray));
+        return format(col.getRowValue(rowArray));
     }
 
     /**
@@ -98,7 +98,7 @@ public class ColumnFormatter {
      * @return the formatted result, always non-{@code null}
      */
     public String getRowValue(Map<String, ?> rowMap) {
-        return format(_col.getRowValue(rowMap));
+        return format(col.getRowValue(rowMap));
     }
 
     /**
@@ -106,11 +106,11 @@ public class ColumnFormatter {
      * Database has been modified), this method may be called to reload the format for the underlying Column.
      */
     public final void reload() throws IOException {
-        _fmt = null;
-        _fmtStr = null;
+        fmt = null;
+        fmtStr = null;
 
-        _fmtStr = (String) _col.getProperties().getValue(PropertyMap.FORMAT_PROP);
-        _fmt = FormatUtil.createStandaloneFormatter(_ctx, _fmtStr, 1, 1);
+        fmtStr = (String) col.getProperties().getValue(PropertyMap.FORMAT_PROP);
+        fmt = FormatUtil.createStandaloneFormatter(ctx, fmtStr, 1, 1);
     }
 
     /**
@@ -123,7 +123,7 @@ public class ColumnFormatter {
 
         public String format(Object val) {
             try {
-                return _fmt.format(toValue(val)).getAsString(this);
+                return fmt.format(toValue(val)).getAsString(this);
             } catch (EvalException _ex) {
                 // invalid values for a given format result in returning the value as is
                 return val.toString();

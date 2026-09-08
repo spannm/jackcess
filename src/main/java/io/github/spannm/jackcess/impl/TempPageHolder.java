@@ -24,17 +24,17 @@ import java.nio.ByteBuffer;
  */
 public final class TempPageHolder {
 
-    private int                    _pageNumber = PageChannel.INVALID_PAGE_NUMBER;
-    private final TempBufferHolder _buffer;
+    private int                    pageNumber = PageChannel.INVALID_PAGE_NUMBER;
+    private final TempBufferHolder buffer;
     /**
      * the last "modification" count of the buffer that this holder observed. this is tracked so that the page data can
      * be re-read if the underlying buffer has been discarded since the last page read
      */
-    private int                    _bufferModCount;
+    private int                    bufferModCount;
 
     private TempPageHolder(TempBufferHolder.Type type) {
-        _buffer = TempBufferHolder.newHolder(type, false);
-        _bufferModCount = _buffer.getModCount();
+        buffer = TempBufferHolder.newHolder(type, false);
+        bufferModCount = buffer.getModCount();
     }
 
     /**
@@ -50,14 +50,14 @@ public final class TempPageHolder {
      * @return the currently set page number
      */
     public int getPageNumber() {
-        return _pageNumber;
+        return pageNumber;
     }
 
     /**
      * @return the page for the current page number, reading as necessary, position and limit are unchanged
      */
     public ByteBuffer getPage(PageChannel pageChannel) throws IOException {
-        return withPage(pageChannel, _pageNumber, false);
+        return withPage(pageChannel, pageNumber, false);
     }
 
     /**
@@ -65,22 +65,22 @@ public final class TempPageHolder {
      *
      * @return the page for the new page number, reading as necessary, resets position
      */
-    public ByteBuffer withPage(PageChannel pageChannel, int pageNumber) throws IOException {
-        return withPage(pageChannel, pageNumber, true);
+    public ByteBuffer withPage(PageChannel pageChannel, int newPageNumber) throws IOException {
+        return withPage(pageChannel, newPageNumber, true);
     }
 
-    private ByteBuffer withPage(PageChannel pageChannel, int pageNumber, boolean rewind) throws IOException {
-        ByteBuffer buffer = _buffer.getPageBuffer(pageChannel);
-        int modCount = _buffer.getModCount();
-        if (pageNumber != _pageNumber || _bufferModCount != modCount) {
-            _pageNumber = pageNumber;
-            _bufferModCount = modCount;
-            pageChannel.readPage(buffer, _pageNumber);
+    private ByteBuffer withPage(PageChannel pageChannel, int newPageNumber, boolean rewind) throws IOException {
+        ByteBuffer pageBuffer = buffer.getPageBuffer(pageChannel);
+        int modCount = buffer.getModCount();
+        if (newPageNumber != pageNumber || bufferModCount != modCount) {
+            pageNumber = newPageNumber;
+            bufferModCount = modCount;
+            pageChannel.readPage(pageBuffer, pageNumber);
         } else if (rewind) {
-            buffer.rewind();
+            pageBuffer.rewind();
         }
 
-        return buffer;
+        return pageBuffer;
     }
 
     /**
@@ -90,9 +90,9 @@ public final class TempPageHolder {
         // ditch any current data
         clear();
         // allocate a new page in the database
-        _pageNumber = pageChannel.allocateNewPage();
+        pageNumber = pageChannel.allocateNewPage();
         // return a new buffer
-        return _buffer.getPageBuffer(pageChannel);
+        return buffer.getPageBuffer(pageChannel);
     }
 
     /**
@@ -100,7 +100,7 @@ public final class TempPageHolder {
      * page data). Does not necessarily release any memory.
      */
     public void invalidate() {
-        possiblyInvalidate(_pageNumber, null);
+        possiblyInvalidate(pageNumber, null);
     }
 
     /**
@@ -109,13 +109,13 @@ public final class TempPageHolder {
      * necessarily release any memory.
      */
     public void possiblyInvalidate(int modifiedPageNumber, ByteBuffer modifiedBuffer) {
-        if (modifiedBuffer == _buffer.getExistingBuffer()) {
+        if (modifiedBuffer == buffer.getExistingBuffer()) {
             // no worries, our buffer was the one modified (or is null, either way
             // we'll need to reload)
             return;
         }
-        if (modifiedPageNumber == _pageNumber) {
-            _pageNumber = PageChannel.INVALID_PAGE_NUMBER;
+        if (modifiedPageNumber == pageNumber) {
+            pageNumber = PageChannel.INVALID_PAGE_NUMBER;
         }
     }
 
@@ -125,7 +125,7 @@ public final class TempPageHolder {
      */
     public void clear() {
         invalidate();
-        _buffer.clear();
+        buffer.clear();
     }
 
 }

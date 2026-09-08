@@ -78,80 +78,80 @@ public class TableImpl implements Table, PropertyMaps.Owner {
     private static final Comparator<ColumnImpl> DISPLAY_ORDER_COMPARATOR  = Comparator.comparingInt(ColumnImpl::getDisplayIndex);
 
     /** owning database */
-    private final DatabaseImpl                  _database;
+    private final DatabaseImpl                  database;
     /** additional table flags from the catalog entry */
-    private final int                           _flags;
+    private final int                           flags;
     /** Type of the table (either TYPE_SYSTEM or TYPE_USER) */
-    private final byte                          _tableType;
+    private final byte                          tableType;
     /** Number of actual indexes on the table */
-    private int                                 _indexCount;
+    private int                                 indexCount;
     /** Number of logical indexes for the table */
-    private int                                 _logicalIndexCount;
+    private int                                 logicalIndexCount;
     /** page number of the definition of this table */
-    private final int                           _tableDefPageNumber;
+    private final int                           tableDefPageNumber;
     /** max Number of columns in the table (includes previous deletions) */
-    private short                               _maxColumnCount;
+    private short                               maxColumnCount;
     /** max Number of variable columns in the table */
-    private short                               _maxVarColumnCount;
+    private short                               maxVarColumnCount;
     /** List of columns in this table, ordered by column number */
-    private final List<ColumnImpl>              _columns                  = new ArrayList<>();
+    private final List<ColumnImpl>              columns                  = new ArrayList<>();
     /** List of variable length columns in this table, ordered by offset */
-    private final List<ColumnImpl>              _varColumns               = new ArrayList<>();
+    private final List<ColumnImpl>              varColumns               = new ArrayList<>();
     /** List of autonumber columns in this table, ordered by column number */
-    private final List<ColumnImpl>              _autoNumColumns           = new ArrayList<>(1);
+    private final List<ColumnImpl>              autoNumColumns           = new ArrayList<>(1);
     /** handler for calculated columns */
-    private final CalcColEvaluator              _calcColEval              = new CalcColEvaluator();
+    private final CalcColEvaluator              calcColEval              = new CalcColEvaluator();
     /**
      * List of indexes on this table (multiple logical indexes may be backed by the same index data)
      */
-    private final List<IndexImpl>               _indexes                  = new ArrayList<>();
+    private final List<IndexImpl>               indexes                  = new ArrayList<>();
     /**
      * List of index datas on this table (the actual backing data for an index)
      */
-    private final List<IndexData>               _indexDatas               = new ArrayList<>();
+    private final List<IndexData>               indexDatas               = new ArrayList<>();
     /** List of columns in this table which are in one or more indexes */
-    private final Set<ColumnImpl>               _indexColumns             = new LinkedHashSet<>();
+    private final Set<ColumnImpl>               indexColumns             = new LinkedHashSet<>();
     /** Table name as stored in Database */
-    private final String                        _name;
+    private final String                        name;
     /** Usage map of pages that this table owns */
-    private final UsageMap                      _ownedPages;
+    private final UsageMap                      ownedPages;
     /** Usage map of pages that this table owns with free space on them */
-    private final UsageMap                      _freeSpacePages;
+    private final UsageMap                      freeSpacePages;
     /** Number of rows in the table */
-    private int                                 _rowCount;
+    private int                                 rowCount;
     /** last long auto number for the table */
-    private int                                 _lastLongAutoNumber;
+    private int                                 lastLongAutoNumber;
     /** last complex type auto number for the table */
-    private int                                 _lastComplexTypeAutoNumber;
+    private int                                 lastComplexTypeAutoNumber;
     /** modification count for the table, keeps row-states up-to-date */
-    private int                                 _modCount;
+    private int                                 modCount;
     /** page buffer used to update data pages when adding rows */
-    private final TempPageHolder                _addRowBufferH            = TempPageHolder.newHolder(TempBufferHolder.Type.SOFT);
+    private final TempPageHolder                addRowBufferH            = TempPageHolder.newHolder(TempBufferHolder.Type.SOFT);
     /** page buffer used to update the table def page */
-    private final TempPageHolder                _tableDefBufferH          = TempPageHolder.newHolder(TempBufferHolder.Type.SOFT);
+    private final TempPageHolder                tableDefBufferH          = TempPageHolder.newHolder(TempBufferHolder.Type.SOFT);
     /** buffer used to writing rows of data */
-    private final TempBufferHolder              _writeRowBufferH          = TempBufferHolder.newHolder(TempBufferHolder.Type.SOFT, true);
+    private final TempBufferHolder              writeRowBufferH          = TempBufferHolder.newHolder(TempBufferHolder.Type.SOFT, true);
     /** page buffer used to write out-of-row "long value" data */
-    private final TempPageHolder                _longValueBufferH         = TempPageHolder.newHolder(TempBufferHolder.Type.SOFT);
+    private final TempPageHolder                longValueBufferH         = TempPageHolder.newHolder(TempBufferHolder.Type.SOFT);
     /** optional error handler to use when row errors are encountered */
-    private ErrorHandler                        _tableErrorHandler;
+    private ErrorHandler                        tableErrorHandler;
     /** properties for this table */
-    private PropertyMap                         _props;
+    private PropertyMap                         props;
     /** properties group for this table (and columns) */
-    private PropertyMaps                        _propertyMaps;
+    private PropertyMaps                        propertyMaps;
     /**
      * optional flag indicating whether or not auto numbers can be directly inserted by the user
      */
-    private Boolean                             _allowAutoNumInsert;
+    private Boolean                             allowAutoNumInsert;
     /** foreign-key enforcer for this table */
-    private final FKEnforcer                    _fkEnforcer;
+    private final FKEnforcer                    fkEnforcer;
     /** table validator if any (and enabled) */
-    private RowValidatorEvalContext             _rowValidator;
+    private RowValidatorEvalContext             rowValidator;
 
     /**
      * default cursor for iterating through the table, kept here for basic table traversal
      */
-    private CursorImpl                          _defaultCursor;
+    private CursorImpl                          defaultCursor;
 
     /**
      * Only used by unit tests
@@ -160,27 +160,27 @@ public class TableImpl implements Table, PropertyMaps.Owner {
         if (!testing) {
             throw new IllegalArgumentException();
         }
-        _database = null;
-        _tableDefPageNumber = PageChannel.INVALID_PAGE_NUMBER;
-        _name = null;
+        database = null;
+        tableDefPageNumber = PageChannel.INVALID_PAGE_NUMBER;
+        name = null;
 
-        _columns.addAll(columns);
-        for (ColumnImpl col : _columns) {
+        this.columns.addAll(columns);
+        for (ColumnImpl col : columns) {
             if (col.getType().isVariableLength()) {
-                _varColumns.add(col);
+                varColumns.add(col);
             }
         }
-        _maxColumnCount = (short) _columns.size();
-        _maxVarColumnCount = (short) _varColumns.size();
+        maxColumnCount = (short) columns.size();
+        maxVarColumnCount = (short) varColumns.size();
         initAutoNumberColumns();
 
-        _fkEnforcer = null;
-        _flags = 0;
-        _tableType = TYPE_USER;
-        _indexCount = 0;
-        _logicalIndexCount = 0;
-        _ownedPages = null;
-        _freeSpacePages = null;
+        fkEnforcer = null;
+        flags = 0;
+        tableType = TYPE_USER;
+        indexCount = 0;
+        logicalIndexCount = 0;
+        ownedPages = null;
+        freeSpacePages = null;
     }
 
     /**
@@ -190,33 +190,33 @@ public class TableImpl implements Table, PropertyMaps.Owner {
      * @param name Table name
      */
     protected TableImpl(DatabaseImpl database, ByteBuffer tableBuffer, int pageNumber, String name, int flags) throws IOException {
-        _database = database;
-        _tableDefPageNumber = pageNumber;
-        _name = name;
-        _flags = flags;
+        this.database = database;
+        tableDefPageNumber = pageNumber;
+        this.name = name;
+        this.flags = flags;
 
         // read table definition
         tableBuffer = loadCompleteTableDefinitionBuffer(tableBuffer, null);
 
-        _rowCount = tableBuffer.getInt(getFormat().OFFSET_NUM_ROWS);
-        _lastLongAutoNumber = tableBuffer.getInt(getFormat().OFFSET_NEXT_AUTO_NUMBER);
+        rowCount = tableBuffer.getInt(getFormat().OFFSET_NUM_ROWS);
+        lastLongAutoNumber = tableBuffer.getInt(getFormat().OFFSET_NEXT_AUTO_NUMBER);
         if (getFormat().OFFSET_NEXT_COMPLEX_AUTO_NUMBER >= 0) {
-            _lastComplexTypeAutoNumber = tableBuffer.getInt(getFormat().OFFSET_NEXT_COMPLEX_AUTO_NUMBER);
+            lastComplexTypeAutoNumber = tableBuffer.getInt(getFormat().OFFSET_NEXT_COMPLEX_AUTO_NUMBER);
         }
-        _tableType = tableBuffer.get(getFormat().OFFSET_TABLE_TYPE);
-        _maxColumnCount = tableBuffer.getShort(getFormat().OFFSET_MAX_COLS);
-        _maxVarColumnCount = tableBuffer.getShort(getFormat().OFFSET_NUM_VAR_COLS);
+        tableType = tableBuffer.get(getFormat().OFFSET_TABLE_TYPE);
+        maxColumnCount = tableBuffer.getShort(getFormat().OFFSET_MAX_COLS);
+        maxVarColumnCount = tableBuffer.getShort(getFormat().OFFSET_NUM_VAR_COLS);
         short columnCount = tableBuffer.getShort(getFormat().OFFSET_NUM_COLS);
-        _logicalIndexCount = tableBuffer.getInt(getFormat().OFFSET_NUM_INDEX_SLOTS);
-        _indexCount = tableBuffer.getInt(getFormat().OFFSET_NUM_INDEXES);
+        logicalIndexCount = tableBuffer.getInt(getFormat().OFFSET_NUM_INDEX_SLOTS);
+        indexCount = tableBuffer.getInt(getFormat().OFFSET_NUM_INDEXES);
 
         tableBuffer.position(getFormat().OFFSET_OWNED_PAGES);
-        _ownedPages = UsageMap.read(getDatabase(), tableBuffer);
+        ownedPages = UsageMap.read(getDatabase(), tableBuffer);
         tableBuffer.position(getFormat().OFFSET_FREE_SPACE_PAGES);
-        _freeSpacePages = UsageMap.read(getDatabase(), tableBuffer);
+        freeSpacePages = UsageMap.read(getDatabase(), tableBuffer);
 
-        for (int i = 0; i < _indexCount; i++) {
-            _indexDatas.add(IndexData.create(this, tableBuffer, i, getFormat()));
+        for (int i = 0; i < indexCount; i++) {
+            indexDatas.add(IndexData.create(this, tableBuffer, i, getFormat()));
         }
 
         readColumnDefinitions(tableBuffer, columnCount);
@@ -230,21 +230,21 @@ public class TableImpl implements Table, PropertyMaps.Owner {
 
         // re-sort columns if necessary
         if (getDatabase().getColumnOrder() != ColumnOrder.DATA) {
-            _columns.sort(DISPLAY_ORDER_COMPARATOR);
+            columns.sort(DISPLAY_ORDER_COMPARATOR);
         }
 
-        for (ColumnImpl col : _columns) {
+        for (ColumnImpl col : columns) {
             // some columns need to do extra work after the table is completely
             // loaded
             col.postTableLoadInit();
         }
 
-        _fkEnforcer = new FKEnforcer(this);
+        fkEnforcer = new FKEnforcer(this);
 
         if (!isSystem()) {
             // after fully constructed, allow column/row validators to be configured
             // (but only for user tables)
-            for (ColumnImpl col : _columns) {
+            for (ColumnImpl col : columns) {
                 col.initColumnValidator();
             }
 
@@ -255,50 +255,50 @@ public class TableImpl implements Table, PropertyMaps.Owner {
     private void reloadRowValidator() throws IOException {
 
         // reset table row validator before proceeding
-        _rowValidator = null;
+        rowValidator = null;
 
         if (!getDatabase().isEvaluateExpressions()) {
             return;
         }
 
-        PropertyMap props = getProperties();
+        PropertyMap tblProps = getProperties();
 
-        String exprStr = PropertyMaps.getTrimmedStringProperty(props, PropertyMap.VALIDATION_RULE_PROP);
+        String exprStr = PropertyMaps.getTrimmedStringProperty(tblProps, PropertyMap.VALIDATION_RULE_PROP);
 
         if (exprStr != null) {
-            String helpStr = PropertyMaps.getTrimmedStringProperty(props, PropertyMap.VALIDATION_TEXT_PROP);
+            String helpStr = PropertyMaps.getTrimmedStringProperty(tblProps, PropertyMap.VALIDATION_TEXT_PROP);
 
-            _rowValidator = new RowValidatorEvalContext(this).withExpr(exprStr, helpStr);
+            rowValidator = new RowValidatorEvalContext(this).withExpr(exprStr, helpStr);
         }
     }
 
     @Override
     public String getName() {
-        return _name;
+        return name;
     }
 
     @Override
     public boolean isHidden() {
-        return (_flags & DatabaseImpl.HIDDEN_OBJECT_FLAG) != 0;
+        return (flags & DatabaseImpl.HIDDEN_OBJECT_FLAG) != 0;
     }
 
     @Override
     public boolean isSystem() {
-        return _tableType != TYPE_USER;
+        return tableType != TYPE_USER;
     }
 
     public int getMaxColumnCount() {
-        return _maxColumnCount;
+        return maxColumnCount;
     }
 
     @Override
     public int getColumnCount() {
-        return _columns.size();
+        return columns.size();
     }
 
     @Override
     public DatabaseImpl getDatabase() {
-        return _database;
+        return database;
     }
 
     public JetFormat getFormat() {
@@ -311,26 +311,26 @@ public class TableImpl implements Table, PropertyMaps.Owner {
 
     @Override
     public ErrorHandler getErrorHandler() {
-        return _tableErrorHandler != null ? _tableErrorHandler : getDatabase().getErrorHandler();
+        return tableErrorHandler != null ? tableErrorHandler : getDatabase().getErrorHandler();
     }
 
     @Override
     public void setErrorHandler(ErrorHandler newErrorHandler) {
-        _tableErrorHandler = newErrorHandler;
+        tableErrorHandler = newErrorHandler;
     }
 
     public int getTableDefPageNumber() {
-        return _tableDefPageNumber;
+        return tableDefPageNumber;
     }
 
     @Override
     public boolean isAllowAutoNumberInsert() {
-        return _allowAutoNumInsert != null ? _allowAutoNumInsert : getDatabase().isAllowAutoNumberInsert();
+        return allowAutoNumInsert != null ? allowAutoNumInsert : getDatabase().isAllowAutoNumberInsert();
     }
 
     @Override
-    public void setAllowAutoNumberInsert(Boolean allowAutoNumInsert) {
-        _allowAutoNumInsert = allowAutoNumInsert;
+    public void setAllowAutoNumberInsert(Boolean newAllowAutoNumInsert) {
+        allowAutoNumInsert = newAllowAutoNumInsert;
     }
 
     public RowState createRowState() {
@@ -338,7 +338,7 @@ public class TableImpl implements Table, PropertyMaps.Owner {
     }
 
     public UsageMap.PageCursor getOwnedPagesCursor() {
-        return _ownedPages.cursor();
+        return ownedPages.cursor();
     }
 
     /**
@@ -354,15 +354,15 @@ public class TableImpl implements Table, PropertyMaps.Owner {
 
         // add a page for the table def (although that might actually be more than
         // one page)
-        int count = _ownedPages.getPageCount() + 1;
+        int count = ownedPages.getPageCount() + 1;
 
-        for (ColumnImpl col : _columns) {
+        for (ColumnImpl col : columns) {
             count += col.getOwnedPageCount();
         }
 
         // note, we count owned pages from _physical_ indexes, not logical indexes
         // (otherwise we could double count pages)
-        for (IndexData indexData : _indexDatas) {
+        for (IndexData indexData : indexDatas) {
             count += indexData.getOwnedPageCount();
         }
 
@@ -370,27 +370,27 @@ public class TableImpl implements Table, PropertyMaps.Owner {
     }
 
     protected TempPageHolder getLongValueBuffer() {
-        return _longValueBufferH;
+        return longValueBufferH;
     }
 
     @Override
     public List<ColumnImpl> getColumns() {
-        return Collections.unmodifiableList(_columns);
+        return Collections.unmodifiableList(columns);
     }
 
     @Override
-    public ColumnImpl getColumn(String name) {
-        for (ColumnImpl column : _columns) {
-            if (column.getName().equalsIgnoreCase(name)) {
+    public ColumnImpl getColumn(String colName) {
+        for (ColumnImpl column : columns) {
+            if (column.getName().equalsIgnoreCase(colName)) {
                 return column;
             }
         }
-        throw new IllegalArgumentException(withErrorContext("Column with name " + name + " does not exist in this table"));
+        throw new IllegalArgumentException(withErrorContext("Column with name " + colName + " does not exist in this table"));
     }
 
-    public boolean hasColumn(String name) {
-        for (ColumnImpl column : _columns) {
-            if (column.getName().equalsIgnoreCase(name)) {
+    public boolean hasColumn(String colName) {
+        for (ColumnImpl column : columns) {
+            if (column.getName().equalsIgnoreCase(colName)) {
                 return true;
             }
         }
@@ -399,36 +399,36 @@ public class TableImpl implements Table, PropertyMaps.Owner {
 
     @Override
     public PropertyMap getProperties() throws IOException {
-        if (_props == null) {
-            _props = getPropertyMaps().getDefault();
+        if (props == null) {
+            props = getPropertyMaps().getDefault();
         }
-        return _props;
+        return props;
     }
 
     @Override
     public LocalDateTime getCreatedDate() throws IOException {
-        return getDatabase().getCreateDateForObject(_tableDefPageNumber);
+        return getDatabase().getCreateDateForObject(tableDefPageNumber);
     }
 
     @Override
     public LocalDateTime getUpdatedDate() throws IOException {
-        return getDatabase().getUpdateDateForObject(_tableDefPageNumber);
+        return getDatabase().getUpdateDateForObject(tableDefPageNumber);
     }
 
     /**
      * @return all PropertyMaps for this table (and columns)
      */
     public PropertyMaps getPropertyMaps() throws IOException {
-        if (_propertyMaps == null) {
-            _propertyMaps = getDatabase().getPropertiesForObject(_tableDefPageNumber, this);
+        if (propertyMaps == null) {
+            propertyMaps = getDatabase().getPropertiesForObject(tableDefPageNumber, this);
         }
-        return _propertyMaps;
+        return propertyMaps;
     }
 
     @Override
     public void propertiesUpdated() throws IOException {
         // propagate update to columns
-        for (ColumnImpl col : _columns) {
+        for (ColumnImpl col : columns) {
             col.propertiesUpdated();
         }
 
@@ -436,27 +436,27 @@ public class TableImpl implements Table, PropertyMaps.Owner {
 
         // calculated columns will need to be re-sorted (their expressions may
         // have changed when their properties were updated)
-        _calcColEval.reSort();
+        calcColEval.reSort();
     }
 
     @Override
     public List<IndexImpl> getIndexes() {
-        return Collections.unmodifiableList(_indexes);
+        return Collections.unmodifiableList(indexes);
     }
 
     @Override
-    public IndexImpl getIndex(String name) {
-        for (IndexImpl index : _indexes) {
-            if (index.getName().equalsIgnoreCase(name)) {
+    public IndexImpl getIndex(String indexName) {
+        for (IndexImpl index : indexes) {
+            if (index.getName().equalsIgnoreCase(indexName)) {
                 return index;
             }
         }
-        throw new IllegalArgumentException(withErrorContext("Index with name " + name + " does not exist on this table"));
+        throw new IllegalArgumentException(withErrorContext("Index with name " + indexName + " does not exist on this table"));
     }
 
     @Override
     public IndexImpl getPrimaryKeyIndex() {
-        for (IndexImpl index : _indexes) {
+        for (IndexImpl index : indexes) {
             if (index.isPrimaryKey()) {
                 return index;
             }
@@ -466,7 +466,7 @@ public class TableImpl implements Table, PropertyMaps.Owner {
 
     @Override
     public IndexImpl getForeignKeyIndex(Table otherTable) {
-        for (IndexImpl index : _indexes) {
+        for (IndexImpl index : indexes) {
             if (index.isForeignKey() && index.getReference() != null && index.getReference().getOtherTablePageNumber() == ((TableImpl) otherTable).getTableDefPageNumber()) {
                 return index;
             }
@@ -478,32 +478,32 @@ public class TableImpl implements Table, PropertyMaps.Owner {
      * @return All of the IndexData on this table (unmodifiable List)
      */
     public List<IndexData> getIndexDatas() {
-        return Collections.unmodifiableList(_indexDatas);
+        return Collections.unmodifiableList(indexDatas);
     }
 
     /**
      * Only called by unit tests
      */
     public int getLogicalIndexCount() {
-        return _logicalIndexCount;
+        return logicalIndexCount;
     }
 
     int getIndexCount() {
-        return _indexCount;
+        return indexCount;
     }
 
     public IndexImpl findIndexForColumns(Collection<String> searchColumns, IndexFeature feature) {
 
         IndexImpl partialIndex = null;
-        for (IndexImpl index : _indexes) {
+        for (IndexImpl index : indexes) {
 
-            Collection<? extends Index.Column> indexColumns = index.getColumns();
-            if (indexColumns.size() < searchColumns.size()) {
+            Collection<? extends Index.Column> idxColumns = index.getColumns();
+            if (idxColumns.size() < searchColumns.size()) {
                 continue;
             }
-            boolean exactMatch = indexColumns.size() == searchColumns.size();
+            boolean exactMatch = idxColumns.size() == searchColumns.size();
 
-            Iterator<? extends Index.Column> iIter = indexColumns.iterator();
+            Iterator<? extends Index.Column> iIter = idxColumns.iterator();
             boolean searchMatches = true;
             for (String sColName : searchColumns) {
                 String iColName = iIter.next().getName();
@@ -519,7 +519,7 @@ public class TableImpl implements Table, PropertyMaps.Owner {
                     return index;
                 }
 
-                if (!exactMatch && feature == IndexFeature.ANY_MATCH && (partialIndex == null || indexColumns.size() < partialIndex.getColumnCount())) {
+                if (!exactMatch && feature == IndexFeature.ANY_MATCH && (partialIndex == null || idxColumns.size() < partialIndex.getColumnCount())) {
                     // this is a better partial index match
                     partialIndex = index;
                 }
@@ -530,15 +530,15 @@ public class TableImpl implements Table, PropertyMaps.Owner {
     }
 
     List<ColumnImpl> getAutoNumberColumns() {
-        return _autoNumColumns;
+        return autoNumColumns;
     }
 
     @Override
     public CursorImpl getDefaultCursor() {
-        if (_defaultCursor == null) {
-            _defaultCursor = CursorImpl.createCursor(this);
+        if (defaultCursor == null) {
+            defaultCursor = CursorImpl.createCursor(this);
         }
-        return _defaultCursor;
+        return defaultCursor;
     }
 
     @Override
@@ -593,12 +593,12 @@ public class TableImpl implements Table, PropertyMaps.Owner {
 
             // attempt to fill in index column values
             Object[] rowValues = null;
-            if (!_indexDatas.isEmpty()) {
+            if (!indexDatas.isEmpty()) {
 
                 // move to row data to get index values
                 rowBuffer = positionAtRowData(rowState, rowId);
 
-                for (ColumnImpl idxCol : _indexColumns) {
+                for (ColumnImpl idxCol : indexColumns) {
                     getRowColumn(getFormat(), rowBuffer, idxCol, rowState, null);
                 }
 
@@ -606,7 +606,7 @@ public class TableImpl implements Table, PropertyMaps.Owner {
                 rowValues = rowState.getRowCacheValues();
 
                 // check foreign keys before proceeding w/ deletion
-                _fkEnforcer.deleteRow(rowValues);
+                fkEnforcer.deleteRow(rowValues);
 
                 // move back to the header
                 rowBuffer = positionAtRowHeader(rowState, rowId);
@@ -618,7 +618,7 @@ public class TableImpl implements Table, PropertyMaps.Owner {
             writeDataPage(rowBuffer, pageNumber);
 
             // update the indexes
-            for (IndexData indexData : _indexDatas) {
+            for (IndexData indexData : indexDatas) {
                 indexData.deleteRow(rowValues, rowId);
             }
 
@@ -663,7 +663,7 @@ public class TableImpl implements Table, PropertyMaps.Owner {
         ByteBuffer rowBuffer = positionAtRowData(rowState, rowId);
         requireNonDeletedRow(rowState, rowId);
 
-        return getRow(getFormat(), rowState, rowBuffer, _columns, columnNames);
+        return getRow(getFormat(), rowState, rowBuffer, columns, columnNames);
     }
 
     /**
@@ -1091,18 +1091,18 @@ public class TableImpl implements Table, PropertyMaps.Owner {
             ////
             // update various bits of the table def
             ByteUtil.forward(tableBuffer, 29);
-            tableBuffer.putShort((short) (_maxColumnCount + 1));
-            short varColCount = (short) (_maxVarColumnCount + (isVarCol ? 1 : 0));
+            tableBuffer.putShort((short) (maxColumnCount + 1));
+            short varColCount = (short) (maxVarColumnCount + (isVarCol ? 1 : 0));
             tableBuffer.putShort(varColCount);
-            tableBuffer.putShort((short) (_columns.size() + 1));
+            tableBuffer.putShort((short) (columns.size() + 1));
 
             // move to end of column def blocks
-            tableBuffer.position(format.SIZE_TDEF_HEADER + _indexCount * format.SIZE_INDEX_DEFINITION + _columns.size() * format.SIZE_COLUMN_DEF_BLOCK);
+            tableBuffer.position(format.SIZE_TDEF_HEADER + indexCount * format.SIZE_INDEX_DEFINITION + columns.size() * format.SIZE_COLUMN_DEF_BLOCK);
 
             // figure out the data offsets for the new column
             int varOffset = 0;
             // find the variable offset
-            for (ColumnImpl col : _varColumns) {
+            for (ColumnImpl col : varColumns) {
                 if (col.isVariableLength() && (col.getVarLenTableIndex() >= varOffset)) {
                     varOffset = col.getVarLenTableIndex() + 1;
                 }
@@ -1111,7 +1111,7 @@ public class TableImpl implements Table, PropertyMaps.Owner {
             int fixedOffset = 0;
             if (!column.isVariableLength() && !column.storeInNullMask()) {
                 // find the fixed offset
-                for (ColumnImpl col : _columns) {
+                for (ColumnImpl col : columns) {
                     if (!col.isVariableLength() && (col.getFixedDataOffset() >= fixedOffset)) {
                         fixedOffset = col.getFixedDataOffset() + col.getFixedDataSize();
                     }
@@ -1126,7 +1126,7 @@ public class TableImpl implements Table, PropertyMaps.Owner {
             ColumnImpl.writeDefinition(mutator, column, tableBuffer);
 
             // skip existing column names and write new name
-            skipNames(tableBuffer, _columns.size());
+            skipNames(tableBuffer, columns.size());
             ByteUtil.insertEmptyData(tableBuffer, nameByteLen);
             writeName(tableBuffer, column.getName(), mutator.getCharset());
 
@@ -1141,9 +1141,9 @@ public class TableImpl implements Table, PropertyMaps.Owner {
                 colState.setUmapFreeRowNumber((byte) (rowNum + 1));
 
                 // skip past index defs
-                ByteUtil.forward(tableBuffer, _indexCount * format.SIZE_INDEX_COLUMN_BLOCK);
-                ByteUtil.forward(tableBuffer, _logicalIndexCount * format.SIZE_INDEX_INFO_BLOCK);
-                skipNames(tableBuffer, _logicalIndexCount);
+                ByteUtil.forward(tableBuffer, indexCount * format.SIZE_INDEX_COLUMN_BLOCK);
+                ByteUtil.forward(tableBuffer, logicalIndexCount * format.SIZE_INDEX_INFO_BLOCK);
+                skipNames(tableBuffer, logicalIndexCount);
 
                 // skip existing usage maps
                 while (tableBuffer.remaining() >= 2) {
@@ -1168,35 +1168,35 @@ public class TableImpl implements Table, PropertyMaps.Owner {
             validateTableDefUpdate(mutator, tableBuffer);
 
             // before writing the new table def, create the column
-            newCol = ColumnImpl.create(this, tableBuffer, colDefPos, column.getName(), _columns.size());
-            newCol.setColumnIndex(_columns.size());
+            newCol = ColumnImpl.create(this, tableBuffer, colDefPos, column.getName(), columns.size());
+            newCol.setColumnIndex(columns.size());
 
             ////
             // write updated table def back to the database
-            writeTableDefinitionBuffer(tableBuffer, _tableDefPageNumber, mutator, mutator.getNextPages());
+            writeTableDefinitionBuffer(tableBuffer, tableDefPageNumber, mutator, mutator.getNextPages());
             success = true;
 
         } finally {
             if (!success) {
                 // need to discard modified table buffer
-                _tableDefBufferH.invalidate();
+                tableDefBufferH.invalidate();
             }
         }
 
         ////
         // now, update current TableImpl
 
-        _columns.add(newCol);
-        ++_maxColumnCount;
+        columns.add(newCol);
+        ++maxColumnCount;
         if (newCol.isVariableLength()) {
-            _varColumns.add(newCol);
-            ++_maxVarColumnCount;
+            varColumns.add(newCol);
+            ++maxVarColumnCount;
         }
         if (newCol.isAutoNumber()) {
-            _autoNumColumns.add(newCol);
+            autoNumColumns.add(newCol);
         }
         if (newCol.isCalculated()) {
-            _calcColEval.add(newCol);
+            calcColEval.add(newCol);
         }
 
         if (umapPos >= 0) {
@@ -1247,21 +1247,21 @@ public class TableImpl implements Table, PropertyMaps.Owner {
             ////
             // update various bits of the table def
             ByteUtil.forward(tableBuffer, 39);
-            tableBuffer.putInt(_indexCount + 1);
+            tableBuffer.putInt(indexCount + 1);
 
             // move to end of index data def blocks
-            tableBuffer.position(format.SIZE_TDEF_HEADER + _indexCount * format.SIZE_INDEX_DEFINITION);
+            tableBuffer.position(format.SIZE_TDEF_HEADER + indexCount * format.SIZE_INDEX_DEFINITION);
 
             // write index row count definition (empty initially)
             ByteUtil.insertEmptyData(tableBuffer, format.SIZE_INDEX_DEFINITION);
             IndexData.writeRowCountDefinitions(mutator, tableBuffer, 1);
 
             // skip columns and column names
-            ByteUtil.forward(tableBuffer, _columns.size() * format.SIZE_COLUMN_DEF_BLOCK);
-            skipNames(tableBuffer, _columns.size());
+            ByteUtil.forward(tableBuffer, columns.size() * format.SIZE_COLUMN_DEF_BLOCK);
+            skipNames(tableBuffer, columns.size());
 
             // move to end of current index datas
-            ByteUtil.forward(tableBuffer, _indexCount * format.SIZE_INDEX_COLUMN_BLOCK);
+            ByteUtil.forward(tableBuffer, indexCount * format.SIZE_INDEX_COLUMN_BLOCK);
 
             // allocate usage maps and root page
             TableMutator.IndexDataState idxDataState = mutator.getIndexDataState(index);
@@ -1283,17 +1283,17 @@ public class TableImpl implements Table, PropertyMaps.Owner {
             tableBuffer.position(0);
             newIdxData = IndexData.create(this, tableBuffer, idxDataState.getIndexDataNumber(), format);
             tableBuffer.position(idxDataDefPos);
-            newIdxData.read(tableBuffer, _columns);
+            newIdxData.read(tableBuffer, columns);
 
             ////
             // write updated table def back to the database
-            writeTableDefinitionBuffer(tableBuffer, _tableDefPageNumber, mutator, mutator.getNextPages());
+            writeTableDefinitionBuffer(tableBuffer, tableDefPageNumber, mutator, mutator.getNextPages());
             success = true;
 
         } finally {
             if (!success) {
                 // need to discard modified table buffer
-                _tableDefBufferH.invalidate();
+                tableDefBufferH.invalidate();
             }
         }
 
@@ -1301,11 +1301,11 @@ public class TableImpl implements Table, PropertyMaps.Owner {
         // now, update current TableImpl
 
         for (IndexData.ColumnDescriptor iCol : newIdxData.getColumns()) {
-            _indexColumns.add(iCol.getColumn());
+            indexColumns.add(iCol.getColumn());
         }
 
-        ++_indexCount;
-        _indexDatas.add(newIdxData);
+        ++indexCount;
+        indexDatas.add(newIdxData);
 
         completeTableMutation(tableBuffer);
 
@@ -1323,7 +1323,7 @@ public class TableImpl implements Table, PropertyMaps.Owner {
         }
 
         // iterate through all the rows and add them to the index
-        Object[] rowVals = new Object[_columns.size()];
+        Object[] rowVals = new Object[columns.size()];
         for (Row row : getDefaultCursor().newIterable().addColumns(idxCols)) {
             for (Column col : idxCols) {
                 col.setRowValue(rowVals, col.getRowValue(row));
@@ -1360,26 +1360,26 @@ public class TableImpl implements Table, PropertyMaps.Owner {
             ////
             // update various bits of the table def
             ByteUtil.forward(tableBuffer, 35);
-            tableBuffer.putInt(_logicalIndexCount + 1);
+            tableBuffer.putInt(logicalIndexCount + 1);
 
             // move to end of index data def blocks
-            tableBuffer.position(format.SIZE_TDEF_HEADER + _indexCount * format.SIZE_INDEX_DEFINITION);
+            tableBuffer.position(format.SIZE_TDEF_HEADER + indexCount * format.SIZE_INDEX_DEFINITION);
 
             // skip columns and column names
-            ByteUtil.forward(tableBuffer, _columns.size() * format.SIZE_COLUMN_DEF_BLOCK);
-            skipNames(tableBuffer, _columns.size());
+            ByteUtil.forward(tableBuffer, columns.size() * format.SIZE_COLUMN_DEF_BLOCK);
+            skipNames(tableBuffer, columns.size());
 
             // move to end of current index datas
-            ByteUtil.forward(tableBuffer, _indexCount * format.SIZE_INDEX_COLUMN_BLOCK);
+            ByteUtil.forward(tableBuffer, indexCount * format.SIZE_INDEX_COLUMN_BLOCK);
             // move to end of current indexes
-            ByteUtil.forward(tableBuffer, _logicalIndexCount * format.SIZE_INDEX_INFO_BLOCK);
+            ByteUtil.forward(tableBuffer, logicalIndexCount * format.SIZE_INDEX_INFO_BLOCK);
 
             int idxDefPos = tableBuffer.position();
             ByteUtil.insertEmptyData(tableBuffer, format.SIZE_INDEX_INFO_BLOCK);
             IndexImpl.writeDefinition(mutator, index, tableBuffer);
 
             // skip existing index names and write new name
-            skipNames(tableBuffer, _logicalIndexCount);
+            skipNames(tableBuffer, logicalIndexCount);
             ByteUtil.insertEmptyData(tableBuffer, nameByteLen);
             writeName(tableBuffer, index.getName(), mutator.getCharset());
 
@@ -1388,26 +1388,26 @@ public class TableImpl implements Table, PropertyMaps.Owner {
 
             // before writing the new table def, create the index
             tableBuffer.position(idxDefPos);
-            newIdx = new IndexImpl(tableBuffer, _indexDatas, format);
+            newIdx = new IndexImpl(tableBuffer, indexDatas, format);
             newIdx.setName(index.getName());
 
             ////
             // write updated table def back to the database
-            writeTableDefinitionBuffer(tableBuffer, _tableDefPageNumber, mutator, mutator.getNextPages());
+            writeTableDefinitionBuffer(tableBuffer, tableDefPageNumber, mutator, mutator.getNextPages());
             success = true;
 
         } finally {
             if (!success) {
                 // need to discard modified table buffer
-                _tableDefBufferH.invalidate();
+                tableDefBufferH.invalidate();
             }
         }
 
         ////
         // now, update current TableImpl
 
-        ++_logicalIndexCount;
-        _indexes.add(newIdx);
+        ++logicalIndexCount;
+        indexes.add(newIdx);
 
         completeTableMutation(tableBuffer);
 
@@ -1422,14 +1422,14 @@ public class TableImpl implements Table, PropertyMaps.Owner {
 
     private void completeTableMutation(ByteBuffer tableBuffer) {
         // lastly, may need to clear table def buffer
-        _tableDefBufferH.possiblyInvalidate(_tableDefPageNumber, tableBuffer);
+        tableDefBufferH.possiblyInvalidate(tableDefPageNumber, tableBuffer);
 
         // update any foreign key enforcing
-        _fkEnforcer.reset();
+        fkEnforcer.reset();
 
         // update modification count so any active RowStates can keep themselves
         // up-to-date
-        ++_modCount;
+        ++modCount;
     }
 
     /**
@@ -1443,7 +1443,7 @@ public class TableImpl implements Table, PropertyMaps.Owner {
 
     private ByteBuffer loadCompleteTableDefinitionBufferForUpdate(TableUpdater mutator) throws IOException {
         // load complete table definition
-        ByteBuffer tableBuffer = _tableDefBufferH.withPage(getPageChannel(), _tableDefPageNumber);
+        ByteBuffer tableBuffer = tableDefBufferH.withPage(getPageChannel(), tableDefPageNumber);
         tableBuffer = loadCompleteTableDefinitionBuffer(tableBuffer, mutator.getNextPages());
 
         // make sure the table buffer has enough room for the new info
@@ -1539,14 +1539,14 @@ public class TableImpl implements Table, PropertyMaps.Owner {
     }
 
     void collectUsageMapPages(Collection<Integer> pages) {
-        pages.add(_ownedPages.getTablePageNumber());
-        pages.add(_freeSpacePages.getTablePageNumber());
+        pages.add(ownedPages.getTablePageNumber());
+        pages.add(freeSpacePages.getTablePageNumber());
 
-        for (IndexData idx : _indexDatas) {
+        for (IndexData idx : indexDatas) {
             idx.collectUsageMapPages(pages);
         }
 
-        for (ColumnImpl col : _columns) {
+        for (ColumnImpl col : columns) {
             col.collectUsageMapPages(pages);
         }
     }
@@ -1757,7 +1757,7 @@ public class TableImpl implements Table, PropertyMaps.Owner {
     }
 
     private void readColumnDefinitions(ByteBuffer tableBuffer, short columnCount) throws IOException {
-        int colOffset = getFormat().OFFSET_INDEX_DEF_BLOCK + _indexCount * getFormat().SIZE_INDEX_DEFINITION;
+        int colOffset = getFormat().OFFSET_INDEX_DEF_BLOCK + indexCount * getFormat().SIZE_INDEX_DEFINITION;
 
         tableBuffer.position(colOffset + columnCount * getFormat().SIZE_COLUMN_HEADER);
         List<String> colNames = new ArrayList<>(columnCount);
@@ -1768,51 +1768,51 @@ public class TableImpl implements Table, PropertyMaps.Owner {
         int dispIndex = 0;
         for (int i = 0; i < columnCount; i++) {
             ColumnImpl column = ColumnImpl.create(this, tableBuffer, colOffset + i * getFormat().SIZE_COLUMN_HEADER, colNames.get(i), dispIndex++);
-            _columns.add(column);
+            columns.add(column);
             if (column.isVariableLength()) {
                 // also shove it in the variable columns list, which is ordered
-                // differently from the _columns list
-                _varColumns.add(column);
+                // differently from the columns list
+                varColumns.add(column);
             }
         }
 
-        Collections.sort(_columns);
+        Collections.sort(columns);
         initAutoNumberColumns();
         initCalculatedColumns();
 
         // setup the data index for the columns
         int colIdx = 0;
-        for (ColumnImpl col : _columns) {
+        for (ColumnImpl col : columns) {
             col.setColumnIndex(colIdx++);
         }
 
         // sort variable length columns based on their index into the variable
         // length offset table, because we will write the columns in this order
-        _varColumns.sort(VAR_LEN_COLUMN_COMPARATOR);
+        varColumns.sort(VAR_LEN_COLUMN_COMPARATOR);
     }
 
     private void readIndexDefinitions(ByteBuffer tableBuffer) throws IOException {
         // read index column information
-        for (int i = 0; i < _indexCount; i++) {
-            IndexData idxData = _indexDatas.get(i);
-            idxData.read(tableBuffer, _columns);
+        for (int i = 0; i < indexCount; i++) {
+            IndexData idxData = indexDatas.get(i);
+            idxData.read(tableBuffer, columns);
             // keep track of all columns involved in indexes
             for (IndexData.ColumnDescriptor iCol : idxData.getColumns()) {
-                _indexColumns.add(iCol.getColumn());
+                indexColumns.add(iCol.getColumn());
             }
         }
 
         // read logical index info (may be more logical indexes than index datas)
-        for (int i = 0; i < _logicalIndexCount; i++) {
-            _indexes.add(new IndexImpl(tableBuffer, _indexDatas, getFormat()));
+        for (int i = 0; i < logicalIndexCount; i++) {
+            indexes.add(new IndexImpl(tableBuffer, indexDatas, getFormat()));
         }
 
         // read logical index names
-        for (int i = 0; i < _logicalIndexCount; i++) {
-            _indexes.get(i).setName(readName(tableBuffer));
+        for (int i = 0; i < logicalIndexCount; i++) {
+            indexes.get(i).setName(readName(tableBuffer));
         }
 
-        Collections.sort(_indexes);
+        Collections.sort(indexes);
     }
 
     private boolean readColumnUsageMaps(ByteBuffer tableBuffer) throws IOException {
@@ -1835,7 +1835,7 @@ public class TableImpl implements Table, PropertyMaps.Owner {
             LOGGER.log(Level.WARNING, withErrorContext("Invalid column " + umapColNum + " usage map definition: " + _ex));
         }
 
-        for (ColumnImpl col : _columns) {
+        for (ColumnImpl col : columns) {
             if (col.getColumnNumber() == umapColNum) {
                 col.setUsageMaps(colOwnedPages, colFreeSpacePages);
                 break;
@@ -1854,11 +1854,11 @@ public class TableImpl implements Table, PropertyMaps.Owner {
 
         // possibly invalidate the add row buffer if a different data buffer is
         // being written (e.g. this happens during deleteRow)
-        _addRowBufferH.possiblyInvalidate(pageNumber, pageBuffer);
+        addRowBufferH.possiblyInvalidate(pageNumber, pageBuffer);
 
         // update modification count so any active RowStates can keep themselves
         // up-to-date
-        ++_modCount;
+        ++modCount;
     }
 
     /**
@@ -1902,14 +1902,14 @@ public class TableImpl implements Table, PropertyMaps.Owner {
      * @return the generated RowId added to a row of values created via {@link #asRowWithRowId}
      */
     public RowId getRowId(Object[] row) {
-        return (RowId) row[_columns.size()];
+        return (RowId) row[columns.size()];
     }
 
     /**
      * Converts a map of columnName -&gt; columnValue to an array of row values.
      */
     private Object[] asRow(Map<String, ?> rowMap, Object defaultValue, boolean returnRowId) {
-        int len = _columns.size();
+        int len = columns.size();
         if (returnRowId) {
             len++;
         }
@@ -1923,7 +1923,7 @@ public class TableImpl implements Table, PropertyMaps.Owner {
         if (rowMap == null) {
             return row;
         }
-        for (ColumnImpl col : _columns) {
+        for (ColumnImpl col : columns) {
             if (rowMap.containsKey(col.getName())) {
                 col.setRowValue(row, col.getRowValue(rowMap));
             }
@@ -1942,7 +1942,7 @@ public class TableImpl implements Table, PropertyMaps.Owner {
 
         addRow(rowValues);
 
-        returnRowValues(row, rowValues, _columns);
+        returnRowValues(row, rowValues, columns);
         return row;
     }
 
@@ -1963,7 +1963,7 @@ public class TableImpl implements Table, PropertyMaps.Owner {
         for (int i = 0; i < rowValuesList.size(); ++i) {
             Map<String, Object> row = rows.get(i);
             Object[] rowValues = rowValuesList.get(i);
-            returnRowValues(row, rowValues, _columns);
+            returnRowValues(row, rowValues, columns);
         }
         return rows;
     }
@@ -1992,11 +1992,11 @@ public class TableImpl implements Table, PropertyMaps.Owner {
             int pageNumber = PageChannel.INVALID_PAGE_NUMBER;
             int updateCount = 0;
             int autoNumAssignCount = 0;
-            WriteRowState writeRowState = !_autoNumColumns.isEmpty() ? new WriteRowState() : null;
+            WriteRowState writeRowState = !autoNumColumns.isEmpty() ? new WriteRowState() : null;
             try {
 
                 List<Object[]> dupeRows = null;
-                final int numCols = _columns.size();
+                final int numCols = columns.size();
                 for (int i = 0; i < rows.size(); i++) {
 
                     // we need to make sure the row is the right length and is an
@@ -2018,7 +2018,7 @@ public class TableImpl implements Table, PropertyMaps.Owner {
                     }
 
                     // handle various value massaging activities
-                    for (ColumnImpl column : _columns) {
+                    for (ColumnImpl column : columns) {
                         if (!column.isAutoNumber()) {
                             Object val = column.getRowValue(row);
                             if (val == null) {
@@ -2035,15 +2035,15 @@ public class TableImpl implements Table, PropertyMaps.Owner {
 
                     // need to assign calculated values after all the other fields are
                     // filled in but before final validation
-                    _calcColEval.calculate(row);
+                    calcColEval.calculate(row);
 
                     // run row validation if enabled
-                    if (_rowValidator != null) {
-                        _rowValidator.validate(row);
+                    if (rowValidator != null) {
+                        rowValidator.validate(row);
                     }
 
                     // write the row of data to a temporary buffer
-                    ByteBuffer rowData = createRow(row, _writeRowBufferH.getPageBuffer(getPageChannel()));
+                    ByteBuffer rowData = createRow(row, writeRowBufferH.getPageBuffer(getPageChannel()));
 
                     int rowSize = rowData.remaining();
                     if (rowSize > getFormat().MAX_ROW_SIZE) {
@@ -2052,7 +2052,7 @@ public class TableImpl implements Table, PropertyMaps.Owner {
 
                     // get page with space
                     dataPage = findFreeRowSpace(rowSize, dataPage, pageNumber);
-                    pageNumber = _addRowBufferH.getPageNumber();
+                    pageNumber = addRowBufferH.getPageNumber();
 
                     // determine where this row will end up on the page
                     int rowNum = getRowsOnDataPage(dataPage, getFormat());
@@ -2061,16 +2061,16 @@ public class TableImpl implements Table, PropertyMaps.Owner {
 
                     // before we actually write the row data, we verify all the database
                     // constraints.
-                    if (!_indexDatas.isEmpty()) {
+                    if (!indexDatas.isEmpty()) {
 
                         IndexData.PendingChange idxChange = null;
                         try {
 
                             // handle foreign keys before adding to table
-                            _fkEnforcer.addRow(row);
+                            fkEnforcer.addRow(row);
 
                             // prepare index updates
-                            for (IndexData indexData : _indexDatas) {
+                            for (IndexData indexData : indexDatas) {
                                 idxChange = indexData.prepareAddRow(row, rowId, idxChange);
                             }
 
@@ -2189,7 +2189,7 @@ public class TableImpl implements Table, PropertyMaps.Owner {
      * @throws IllegalStateException if the given row is not valid, or deleted.
      */
     public void updateValue(Column column, RowId rowId, Object value) throws IOException {
-        Object[] row = new Object[_columns.size()];
+        Object[] row = new Object[columns.size()];
         Arrays.fill(row, Column.KEEP_VALUE);
         column.setRowValue(row, value);
 
@@ -2198,7 +2198,7 @@ public class TableImpl implements Table, PropertyMaps.Owner {
 
     public <M extends Map<String, Object>> M updateRowFromMap(RowState rowState, RowIdImpl rowId, M row) throws IOException {
         Object[] rowValues = updateRow(rowState, rowId, asUpdateRow(row));
-        returnRowValues(row, rowValues, _columns);
+        returnRowValues(row, rowValues, columns);
         return row;
     }
 
@@ -2219,17 +2219,17 @@ public class TableImpl implements Table, PropertyMaps.Owner {
 
             // we need to make sure the row is the right length & type (fill with
             // null if too short).
-            if (row.length < _columns.size() || row.getClass() != Object[].class) {
-                row = dupeRow(row, _columns.size());
+            if (row.length < columns.size() || row.getClass() != Object[].class) {
+                row = dupeRow(row, columns.size());
             }
 
             // hang on to the raw values of var length columns we are "keeping". this
             // will allow us to re-use pre-written var length data, which can save
             // space for things like long value columns.
-            Map<ColumnImpl, byte[]> keepRawVarValues = !_varColumns.isEmpty() ? new HashMap<>() : null;
+            Map<ColumnImpl, byte[]> keepRawVarValues = !varColumns.isEmpty() ? new HashMap<>() : null;
 
             // handle various value massaging activities
-            for (ColumnImpl column : _columns) {
+            for (ColumnImpl column : columns) {
 
                 if (column.isAutoNumber()) {
                     // handle these separately (below)
@@ -2246,7 +2246,7 @@ public class TableImpl implements Table, PropertyMaps.Owner {
 
                     // set oldValue to something that could not possibly be a real value
                     Object oldValue = Column.KEEP_VALUE;
-                    if (_indexColumns.contains(column)) {
+                    if (indexColumns.contains(column)) {
                         // read (old) row value to help update indexes
                         oldValue = getRowColumn(getFormat(), rowBuffer, column, rowState, null);
                     } else {
@@ -2268,21 +2268,21 @@ public class TableImpl implements Table, PropertyMaps.Owner {
 
             // need to assign calculated values after all the other fields are
             // filled in but before final validation
-            _calcColEval.calculate(row);
+            calcColEval.calculate(row);
 
             // run row validation if enabled
-            if (_rowValidator != null) {
-                _rowValidator.validate(row);
+            if (rowValidator != null) {
+                rowValidator.validate(row);
             }
 
             // generate new row bytes
-            ByteBuffer newRowData = createRow(row, _writeRowBufferH.getPageBuffer(getPageChannel()), oldRowSize, keepRawVarValues);
+            ByteBuffer newRowData = createRow(row, writeRowBufferH.getPageBuffer(getPageChannel()), oldRowSize, keepRawVarValues);
 
             if (newRowData.limit() > getFormat().MAX_ROW_SIZE) {
                 throw new InvalidValueException(withErrorContext("Row size " + newRowData.limit() + " is too large (" + getFormat().MAX_ROW_SIZE + ")"));
             }
 
-            if (!_indexDatas.isEmpty()) {
+            if (!indexDatas.isEmpty()) {
 
                 IndexData.PendingChange idxChange = null;
                 try {
@@ -2290,10 +2290,10 @@ public class TableImpl implements Table, PropertyMaps.Owner {
                     Object[] oldRowValues = rowState.getRowCacheValues();
 
                     // check foreign keys before actually updating
-                    _fkEnforcer.updateRow(oldRowValues, row);
+                    fkEnforcer.updateRow(oldRowValues, row);
 
                     // prepare index updates
-                    for (IndexData indexData : _indexDatas) {
+                    for (IndexData indexData : indexDatas) {
                         idxChange = indexData.prepareUpdateRow(oldRowValues, rowId, row, idxChange);
                     }
 
@@ -2326,7 +2326,7 @@ public class TableImpl implements Table, PropertyMaps.Owner {
 
                 // bummer, need to find a new page for the data
                 dataPage = findFreeRowSpace(rowSize, null, PageChannel.INVALID_PAGE_NUMBER);
-                pageNumber = _addRowBufferH.getPageNumber();
+                pageNumber = addRowBufferH.getPageNumber();
 
                 RowIdImpl headerRowId = rowState.getHeaderRowId();
                 ByteBuffer headerPage = rowState.getHeaderPage();
@@ -2373,7 +2373,7 @@ public class TableImpl implements Table, PropertyMaps.Owner {
         if (dataPage == null) {
 
             // find owned page w/ free space
-            dataPage = findFreeRowSpace(_ownedPages, _freeSpacePages, _addRowBufferH);
+            dataPage = findFreeRowSpace(ownedPages, freeSpacePages, addRowBufferH);
 
             if (dataPage == null) {
                 // No data pages exist (with free space). Create a new one.
@@ -2381,7 +2381,7 @@ public class TableImpl implements Table, PropertyMaps.Owner {
             }
 
             // found a page, see if it will work
-            pageNumber = _addRowBufferH.getPageNumber();
+            pageNumber = addRowBufferH.getPageNumber();
             // since we just loaded this page, it is not yet modified
             modifiedPage = false;
         }
@@ -2392,7 +2392,7 @@ public class TableImpl implements Table, PropertyMaps.Owner {
             if (modifiedPage) {
                 writeDataPage(dataPage, pageNumber);
             }
-            _freeSpacePages.removePageNumber(pageNumber);
+            freeSpacePages.removePageNumber(pageNumber);
 
             dataPage = newDataPage();
         }
@@ -2429,19 +2429,19 @@ public class TableImpl implements Table, PropertyMaps.Owner {
      */
     private void updateTableDefinition(int rowCountInc) throws IOException {
         // load table definition
-        ByteBuffer tdefPage = _tableDefBufferH.withPage(getPageChannel(), _tableDefPageNumber);
+        ByteBuffer tdefPage = tableDefBufferH.withPage(getPageChannel(), tableDefPageNumber);
 
         // make sure rowcount and autonumber are up-to-date
-        _rowCount += rowCountInc;
-        tdefPage.putInt(getFormat().OFFSET_NUM_ROWS, _rowCount);
-        tdefPage.putInt(getFormat().OFFSET_NEXT_AUTO_NUMBER, _lastLongAutoNumber);
+        rowCount += rowCountInc;
+        tdefPage.putInt(getFormat().OFFSET_NUM_ROWS, rowCount);
+        tdefPage.putInt(getFormat().OFFSET_NEXT_AUTO_NUMBER, lastLongAutoNumber);
         int ctypeOff = getFormat().OFFSET_NEXT_COMPLEX_AUTO_NUMBER;
         if (ctypeOff >= 0) {
-            tdefPage.putInt(ctypeOff, _lastComplexTypeAutoNumber);
+            tdefPage.putInt(ctypeOff, lastComplexTypeAutoNumber);
         }
 
         // write any index changes
-        for (IndexData indexData : _indexDatas) {
+        for (IndexData indexData : indexDatas) {
             // write the unique entry count for the index to the table definition
             // page
             tdefPage.putInt(indexData.getUniqueEntryCountOffset(), indexData.getUniqueEntryCount());
@@ -2450,7 +2450,7 @@ public class TableImpl implements Table, PropertyMaps.Owner {
         }
 
         // write modified table definition
-        getPageChannel().writePage(tdefPage, _tableDefPageNumber);
+        getPageChannel().writePage(tdefPage, tableDefPageNumber);
     }
 
     /**
@@ -2459,17 +2459,17 @@ public class TableImpl implements Table, PropertyMaps.Owner {
      * @return Page number of the new page
      */
     private ByteBuffer newDataPage() throws IOException {
-        ByteBuffer dataPage = _addRowBufferH.withNewPage(getPageChannel());
+        ByteBuffer dataPage = addRowBufferH.withNewPage(getPageChannel());
         dataPage.put(PageTypes.DATA); // Page type
         dataPage.put((byte) 1); // Unknown
         dataPage.putShort((short) getFormat().DATA_PAGE_INITIAL_FREE_SPACE); // Free space in this page
-        dataPage.putInt(_tableDefPageNumber); // Page pointer to table definition
+        dataPage.putInt(tableDefPageNumber); // Page pointer to table definition
         dataPage.putInt(0); // Unknown
         dataPage.putShort((short) 0); // Number of rows on this page
-        int pageNumber = _addRowBufferH.getPageNumber();
+        int pageNumber = addRowBufferH.getPageNumber();
         getPageChannel().writePage(dataPage, pageNumber);
-        _ownedPages.addPageNumber(pageNumber);
-        _freeSpacePages.addPageNumber(pageNumber);
+        ownedPages.addPageNumber(pageNumber);
+        freeSpacePages.addPageNumber(pageNumber);
         return dataPage;
     }
 
@@ -2489,13 +2489,13 @@ public class TableImpl implements Table, PropertyMaps.Owner {
      * @return the given buffer, filled with the row data
      */
     private ByteBuffer createRow(Object[] rowArray, ByteBuffer buffer, int minRowSize, Map<ColumnImpl, byte[]> rawVarValues) throws IOException {
-        buffer.putShort(_maxColumnCount);
-        NullMask nullMask = new NullMask(_maxColumnCount);
+        buffer.putShort(maxColumnCount);
+        NullMask nullMask = new NullMask(maxColumnCount);
 
         // Fixed length column data comes first
         int fixedDataStart = buffer.position();
         int fixedDataEnd = fixedDataStart;
-        for (ColumnImpl col : _columns) {
+        for (ColumnImpl col : columns) {
 
             if (col.isVariableLength()) {
                 continue;
@@ -2537,7 +2537,7 @@ public class TableImpl implements Table, PropertyMaps.Owner {
         buffer.position(fixedDataEnd);
 
         // only need this info if this table contains any var length data
-        if (_maxVarColumnCount > 0) {
+        if (maxVarColumnCount > 0) {
 
             int maxRowSize = getFormat().MAX_ROW_SIZE;
 
@@ -2545,22 +2545,22 @@ public class TableImpl implements Table, PropertyMaps.Owner {
             // account for already written space
             maxRowSize -= buffer.position();
             // now, account for trailer space
-            int trailerSize = nullMask.byteSize() + 4 + _maxVarColumnCount * 2;
+            int trailerSize = nullMask.byteSize() + 4 + maxVarColumnCount * 2;
             maxRowSize -= trailerSize;
 
             // for each non-null long value column we need to reserve a small
             // amount of space so that we don't end up running out of row space
             // later by being too greedy
-            for (ColumnImpl varCol : _varColumns) {
+            for (ColumnImpl varCol : varColumns) {
                 if (varCol.getType().isLongValue() && varCol.getRowValue(rowArray) != null) {
                     maxRowSize -= getFormat().SIZE_LONG_VALUE_DEF;
                 }
             }
 
             // Now write out variable length column data
-            short[] varColumnOffsets = new short[_maxVarColumnCount];
+            short[] varColumnOffsets = new short[maxVarColumnCount];
             int varColumnOffsetsIndex = 0;
-            for (ColumnImpl varCol : _varColumns) {
+            for (ColumnImpl varCol : varColumns) {
                 if (varCol.getVarLenTableIndex() >= varColumnOffsets.length) {
                     // this indicates an inconsistency between the number of variable
                     // length columns recorded in the table definition and the actual
@@ -2625,10 +2625,10 @@ public class TableImpl implements Table, PropertyMaps.Owner {
             try {
                 // Now write out variable length offsets
                 // Offsets are stored in reverse order
-                for (int i = _maxVarColumnCount - 1; i >= 0; i--) {
+                for (int i = maxVarColumnCount - 1; i >= 0; i--) {
                     buffer.putShort(varColumnOffsets[i]);
                 }
-                buffer.putShort(_maxVarColumnCount); // Number of var length columns
+                buffer.putShort(maxVarColumnCount); // Number of var length columns
             } catch (BufferOverflowException _ex) {
                 // if the data is too big for the buffer, then we have gone over the max row size
                 throw new InvalidValueException(withErrorContext("Row size " + buffer.limit() + " is too large"));
@@ -2649,13 +2649,13 @@ public class TableImpl implements Table, PropertyMaps.Owner {
      * Fill in all autonumber column values for add.
      */
     private void handleAutoNumbersForAdd(Object[] row, WriteRowState writeRowState) throws IOException {
-        if (_autoNumColumns.isEmpty()) {
+        if (autoNumColumns.isEmpty()) {
             return;
         }
 
         boolean enableInsert = isAllowAutoNumberInsert();
         writeRowState.resetAutoNumber();
-        for (ColumnImpl col : _autoNumColumns) {
+        for (ColumnImpl col : autoNumColumns) {
 
             // ignore input row value, use original row value (unless explicitly
             // enabled)
@@ -2672,13 +2672,13 @@ public class TableImpl implements Table, PropertyMaps.Owner {
      * Fill in all autonumber column values for update.
      */
     private void handleAutoNumbersForUpdate(Object[] row, ByteBuffer rowBuffer, RowState rowState) throws IOException {
-        if (_autoNumColumns.isEmpty()) {
+        if (autoNumColumns.isEmpty()) {
             return;
         }
 
         boolean enableInsert = isAllowAutoNumberInsert();
         rowState.resetAutoNumber();
-        for (ColumnImpl col : _autoNumColumns) {
+        for (ColumnImpl col : autoNumColumns) {
 
             // ignore input row value, use original row value (unless explicitly
             // enabled)
@@ -2710,11 +2710,11 @@ public class TableImpl implements Table, PropertyMaps.Owner {
      * Restores all autonumber column values from a failed add row.
      */
     private void restoreAutoNumbersFromAdd(Object[] row) {
-        if (_autoNumColumns.isEmpty()) {
+        if (autoNumColumns.isEmpty()) {
             return;
         }
 
-        for (ColumnImpl col : _autoNumColumns) {
+        for (ColumnImpl col : autoNumColumns) {
             // restore the last value from the row
             col.getAutoNumberGenerator().restoreLast(col.getRowValue(row));
         }
@@ -2732,56 +2732,56 @@ public class TableImpl implements Table, PropertyMaps.Owner {
 
     @Override
     public int getRowCount() {
-        return _rowCount;
+        return rowCount;
     }
 
     int getNextLongAutoNumber() {
         // note, the saved value is the last one handed out, so pre-increment
-        return ++_lastLongAutoNumber;
+        return ++lastLongAutoNumber;
     }
 
     int getLastLongAutoNumber() {
         // gets the last used auto number (does not modify)
-        return _lastLongAutoNumber;
+        return lastLongAutoNumber;
     }
 
     void adjustLongAutoNumber(int inLongAutoNumber) {
-        if (inLongAutoNumber > _lastLongAutoNumber) {
-            _lastLongAutoNumber = inLongAutoNumber;
+        if (inLongAutoNumber > lastLongAutoNumber) {
+            lastLongAutoNumber = inLongAutoNumber;
         }
     }
 
-    void restoreLastLongAutoNumber(int lastLongAutoNumber) {
+    void restoreLastLongAutoNumber(int newLastLongAutoNumber) {
         // restores the last used auto number
-        _lastLongAutoNumber = lastLongAutoNumber - 1;
+        lastLongAutoNumber = newLastLongAutoNumber - 1;
     }
 
     int getNextComplexTypeAutoNumber() {
         // note, the saved value is the last one handed out, so pre-increment
-        return ++_lastComplexTypeAutoNumber;
+        return ++lastComplexTypeAutoNumber;
     }
 
     int getLastComplexTypeAutoNumber() {
         // gets the last used auto number (does not modify)
-        return _lastComplexTypeAutoNumber;
+        return lastComplexTypeAutoNumber;
     }
 
     void adjustComplexTypeAutoNumber(int inComplexTypeAutoNumber) {
-        if (inComplexTypeAutoNumber > _lastComplexTypeAutoNumber) {
-            _lastComplexTypeAutoNumber = inComplexTypeAutoNumber;
+        if (inComplexTypeAutoNumber > lastComplexTypeAutoNumber) {
+            lastComplexTypeAutoNumber = inComplexTypeAutoNumber;
         }
     }
 
-    void restoreLastComplexTypeAutoNumber(int lastComplexTypeAutoNumber) {
+    void restoreLastComplexTypeAutoNumber(int newLastComplexTypeAutoNumber) {
         // restores the last used auto number
-        _lastComplexTypeAutoNumber = lastComplexTypeAutoNumber - 1;
+        lastComplexTypeAutoNumber = newLastComplexTypeAutoNumber - 1;
     }
 
     @Override
     public String toString() {
-        return ToStringBuilder.builder(this).append("type", _tableType + (!isSystem() ? " (USER)" : " (SYSTEM)")).append("name", _name).append("rowCount", _rowCount)
-            .append("columnCount", _columns.size()).append("indexCount(data)", _indexCount).append("logicalIndexCount", _logicalIndexCount).appendIgnoreNull("validator", _rowValidator)
-            .append("columns", _columns).append("indexes", _indexes).append("ownedPages", _ownedPages).toString();
+        return ToStringBuilder.builder(this).append("type", tableType + (!isSystem() ? " (USER)" : " (SYSTEM)")).append("name", name).append("rowCount", rowCount)
+            .append("columnCount", columns.size()).append("indexCount(data)", indexCount).append("logicalIndexCount", logicalIndexCount).appendIgnoreNull("validator", rowValidator)
+            .append("columns", columns).append("indexes", indexes).append("ownedPages", ownedPages).toString();
     }
 
     /**
@@ -2898,17 +2898,17 @@ public class TableImpl implements Table, PropertyMaps.Owner {
     }
 
     private void initAutoNumberColumns() {
-        for (ColumnImpl c : _columns) {
+        for (ColumnImpl c : columns) {
             if (c.isAutoNumber()) {
-                _autoNumColumns.add(c);
+                autoNumColumns.add(c);
             }
         }
     }
 
     private void initCalculatedColumns() {
-        for (ColumnImpl c : _columns) {
+        for (ColumnImpl c : columns) {
             if (c.isCalculated()) {
-                _calcColEval.add(c);
+                calcColEval.add(c);
             }
         }
     }
@@ -2963,18 +2963,18 @@ public class TableImpl implements Table, PropertyMaps.Owner {
      * Maintains state for writing a new row of data.
      */
     protected static class WriteRowState {
-        private int _complexAutoNumber = ColumnImpl.INVALID_AUTO_NUMBER;
+        private int complexAutoNumber = ColumnImpl.INVALID_AUTO_NUMBER;
 
         public int getComplexAutoNumber() {
-            return _complexAutoNumber;
+            return complexAutoNumber;
         }
 
         public void setComplexAutoNumber(int complexAutoNumber) {
-            _complexAutoNumber = complexAutoNumber;
+            this.complexAutoNumber = complexAutoNumber;
         }
 
         public void resetAutoNumber() {
-            _complexAutoNumber = ColumnImpl.INVALID_AUTO_NUMBER;
+            complexAutoNumber = ColumnImpl.INVALID_AUTO_NUMBER;
         }
     }
 
@@ -2983,45 +2983,45 @@ public class TableImpl implements Table, PropertyMaps.Owner {
      */
     public final class RowState extends WriteRowState implements ErrorHandler.Location {
         /** Buffer used for reading the header row data pages */
-        private final TempPageHolder _headerRowBufferH;
+        private final TempPageHolder headerRowBufferH;
         /** the header rowId */
-        private RowIdImpl            _headerRowId        = RowIdImpl.FIRST_ROW_ID;
+        private RowIdImpl            headerRowId        = RowIdImpl.FIRST_ROW_ID;
         /** the number of rows on the header page */
-        private int                  _rowsOnHeaderPage;
+        private int                  rowsOnHeaderPage;
         /** the rowState status */
-        private RowStateStatus       _status             = RowStateStatus.INIT;
+        private RowStateStatus       status             = RowStateStatus.INIT;
         /** the row status */
-        private RowStatus            _rowStatus          = RowStatus.INIT;
+        private RowStatus            rowStatus          = RowStatus.INIT;
         /** buffer used for reading overflow pages */
-        private final TempPageHolder _overflowRowBufferH = TempPageHolder.newHolder(TempBufferHolder.Type.SOFT);
+        private final TempPageHolder overflowRowBufferH = TempPageHolder.newHolder(TempBufferHolder.Type.SOFT);
         /**
          * the row buffer which contains the final data (after following any overflow pointers)
          */
-        private ByteBuffer           _finalRowBuffer;
+        private ByteBuffer           finalRowBuffer;
         /**
          * the rowId which contains the final data (after following any overflow pointers)
          */
-        private RowIdImpl            _finalRowId         = null;
+        private RowIdImpl            finalRowId         = null;
         /** true if the row values array has data */
-        private boolean              _haveRowValues;
+        private boolean              haveRowValues;
         /** values read from the last row */
-        private Object[]             _rowValues;
+        private Object[]             rowValues;
         /** null mask for the last row */
-        private NullMask             _nullMask;
+        private NullMask             nullMask;
         /**
          * last modification count seen on the table we track this so that the rowState can detect updates to the table
          * and re-read any buffered data
          */
-        private int                  _lastModCount;
+        private int                  lastModCount;
         /** optional error handler to use when row errors are encountered */
-        private ErrorHandler         _errorHandler;
+        private ErrorHandler         errorHandler;
         /** cached variable column offsets for jump-table based rows */
-        private short[]              _varColOffsets;
+        private short[]              varColOffsets;
 
         private RowState(TempBufferHolder.Type headerType) {
-            _headerRowBufferH = TempPageHolder.newHolder(headerType);
-            _rowValues = new Object[getColumnCount()];
-            _lastModCount = _modCount;
+            headerRowBufferH = TempPageHolder.newHolder(headerType);
+            rowValues = new Object[getColumnCount()];
+            lastModCount = modCount;
         }
 
         @Override
@@ -3030,140 +3030,140 @@ public class TableImpl implements Table, PropertyMaps.Owner {
         }
 
         public ErrorHandler getErrorHandler() {
-            return _errorHandler != null ? _errorHandler : getTable().getErrorHandler();
+            return errorHandler != null ? errorHandler : getTable().getErrorHandler();
         }
 
         public void setErrorHandler(ErrorHandler newErrorHandler) {
-            _errorHandler = newErrorHandler;
+            errorHandler = newErrorHandler;
         }
 
         public void reset() {
             resetAutoNumber();
-            _finalRowId = null;
-            _finalRowBuffer = null;
-            _rowsOnHeaderPage = 0;
-            _status = RowStateStatus.INIT;
-            _rowStatus = RowStatus.INIT;
-            _varColOffsets = null;
-            _nullMask = null;
-            if (_haveRowValues) {
-                Arrays.fill(_rowValues, null);
-                _haveRowValues = false;
+            finalRowId = null;
+            finalRowBuffer = null;
+            rowsOnHeaderPage = 0;
+            status = RowStateStatus.INIT;
+            rowStatus = RowStatus.INIT;
+            varColOffsets = null;
+            nullMask = null;
+            if (haveRowValues) {
+                Arrays.fill(rowValues, null);
+                haveRowValues = false;
             }
         }
 
         public boolean isUpToDate() {
-            return _modCount == _lastModCount;
+            return modCount == lastModCount;
         }
 
         private void checkForModification() {
             if (!isUpToDate()) {
                 reset();
-                _headerRowBufferH.invalidate();
-                _overflowRowBufferH.invalidate();
+                headerRowBufferH.invalidate();
+                overflowRowBufferH.invalidate();
                 int colCount = getColumnCount();
-                if (colCount != _rowValues.length) {
+                if (colCount != rowValues.length) {
                     // columns added or removed from table
-                    _rowValues = new Object[colCount];
+                    rowValues = new Object[colCount];
                 }
-                _lastModCount = _modCount;
+                lastModCount = modCount;
             }
         }
 
         private ByteBuffer getFinalPage() throws IOException {
-            if (_finalRowBuffer == null) {
+            if (finalRowBuffer == null) {
                 // (re)load current page
-                _finalRowBuffer = getHeaderPage();
+                finalRowBuffer = getHeaderPage();
             }
-            return _finalRowBuffer;
+            return finalRowBuffer;
         }
 
         public RowIdImpl getFinalRowId() {
-            if (_finalRowId == null) {
-                _finalRowId = getHeaderRowId();
+            if (finalRowId == null) {
+                finalRowId = getHeaderRowId();
             }
-            return _finalRowId;
+            return finalRowId;
         }
 
         private void setRowStatus(RowStatus rowStatus) {
-            _rowStatus = rowStatus;
+            this.rowStatus = rowStatus;
         }
 
         public boolean isValid() {
-            return _rowStatus.ordinal() >= RowStatus.VALID.ordinal();
+            return rowStatus.ordinal() >= RowStatus.VALID.ordinal();
         }
 
         public boolean isDeleted() {
-            return _rowStatus == RowStatus.DELETED;
+            return rowStatus == RowStatus.DELETED;
         }
 
         public boolean isOverflow() {
-            return _rowStatus == RowStatus.OVERFLOW;
+            return rowStatus == RowStatus.OVERFLOW;
         }
 
         public boolean isHeaderPageNumberValid() {
-            return _rowStatus.ordinal() > RowStatus.INVALID_PAGE.ordinal();
+            return rowStatus.ordinal() > RowStatus.INVALID_PAGE.ordinal();
         }
 
         public boolean isHeaderRowNumberValid() {
-            return _rowStatus.ordinal() > RowStatus.INVALID_ROW.ordinal();
+            return rowStatus.ordinal() > RowStatus.INVALID_ROW.ordinal();
         }
 
         private void setStatus(RowStateStatus status) {
-            _status = status;
+            this.status = status;
         }
 
         public boolean isAtHeaderRow() {
-            return _status.ordinal() >= RowStateStatus.AT_HEADER.ordinal();
+            return status.ordinal() >= RowStateStatus.AT_HEADER.ordinal();
         }
 
         public boolean isAtFinalRow() {
-            return _status.ordinal() >= RowStateStatus.AT_FINAL.ordinal();
+            return status.ordinal() >= RowStateStatus.AT_FINAL.ordinal();
         }
 
         private Object withRowCacheValue(int idx, Object value) {
-            _haveRowValues = true;
-            _rowValues[idx] = value;
+            haveRowValues = true;
+            rowValues[idx] = value;
             return value;
         }
 
         private Object withRowCacheValue(int idx) {
-            Object value = _rowValues[idx];
+            Object value = rowValues[idx];
             // only return immutable values. mutable values could have been
             // modified externally and therefore could return an incorrect value
             return ColumnImpl.isImmutableValue(value) ? value : null;
         }
 
         public Object[] getRowCacheValues() {
-            return dupeRow(_rowValues, _rowValues.length);
+            return dupeRow(rowValues, rowValues.length);
         }
 
         public NullMask getNullMask(ByteBuffer rowBuffer) {
-            if (_nullMask == null) {
-                _nullMask = getRowNullMask(rowBuffer);
+            if (nullMask == null) {
+                nullMask = getRowNullMask(rowBuffer);
             }
-            return _nullMask;
+            return nullMask;
         }
 
         private short[] getVarColOffsets() {
-            return _varColOffsets;
+            return varColOffsets;
         }
 
         private void setVarColOffsets(short[] varColOffsets) {
-            _varColOffsets = varColOffsets;
+            this.varColOffsets = varColOffsets;
         }
 
         public RowIdImpl getHeaderRowId() {
-            return _headerRowId;
+            return headerRowId;
         }
 
         public int getRowsOnHeaderPage() {
-            return _rowsOnHeaderPage;
+            return rowsOnHeaderPage;
         }
 
         private ByteBuffer getHeaderPage() throws IOException {
             checkForModification();
-            return _headerRowBufferH.getPage(getPageChannel());
+            return headerRowBufferH.getPage(getPageChannel());
         }
 
         private ByteBuffer withHeaderRow(RowIdImpl rowId) throws IOException {
@@ -3176,26 +3176,26 @@ public class TableImpl implements Table, PropertyMaps.Owner {
 
             // rejigger everything
             reset();
-            _headerRowId = rowId;
-            _finalRowId = rowId;
+            headerRowId = rowId;
+            finalRowId = rowId;
 
             int pageNumber = rowId.getPageNumber();
             int rowNumber = rowId.getRowNumber();
-            if (pageNumber < 0 || !_ownedPages.containsPageNumber(pageNumber)) {
+            if (pageNumber < 0 || !ownedPages.containsPageNumber(pageNumber)) {
                 setRowStatus(RowStatus.INVALID_PAGE);
                 return null;
             }
 
-            _finalRowBuffer = _headerRowBufferH.withPage(getPageChannel(), pageNumber);
-            _rowsOnHeaderPage = getRowsOnDataPage(_finalRowBuffer, getFormat());
+            finalRowBuffer = headerRowBufferH.withPage(getPageChannel(), pageNumber);
+            rowsOnHeaderPage = getRowsOnDataPage(finalRowBuffer, getFormat());
 
-            if (rowNumber < 0 || rowNumber >= _rowsOnHeaderPage) {
+            if (rowNumber < 0 || rowNumber >= rowsOnHeaderPage) {
                 setRowStatus(RowStatus.INVALID_ROW);
                 return null;
             }
 
             setRowStatus(RowStatus.VALID);
-            return _finalRowBuffer;
+            return finalRowBuffer;
         }
 
         private ByteBuffer withOverflowRow(RowIdImpl rowId) throws IOException {
@@ -3204,12 +3204,12 @@ public class TableImpl implements Table, PropertyMaps.Owner {
             if (!isUpToDate()) {
                 throw new IllegalStateException(getTable().withErrorContext("Table modified while searching?"));
             }
-            if (_rowStatus != RowStatus.OVERFLOW) {
+            if (rowStatus != RowStatus.OVERFLOW) {
                 throw new IllegalStateException(getTable().withErrorContext("Row is not an overflow row?"));
             }
-            _finalRowId = rowId;
-            _finalRowBuffer = _overflowRowBufferH.withPage(getPageChannel(), rowId.getPageNumber());
-            return _finalRowBuffer;
+            finalRowId = rowId;
+            finalRowBuffer = overflowRowBufferH.withPage(getPageChannel(), rowId.getPageNumber());
+            return finalRowBuffer;
         }
 
         private Object handleRowError(ColumnImpl column, byte[] columnData, Exception error) throws IOException {
@@ -3218,7 +3218,7 @@ public class TableImpl implements Table, PropertyMaps.Owner {
 
         @Override
         public String toString() {
-            return ToStringBuilder.valueBuilder(this).append("headerRowId", _headerRowId).append("finalRowId", _finalRowId).toString();
+            return ToStringBuilder.valueBuilder(this).append("headerRowId", headerRowId).append("finalRowId", finalRowId).toString();
         }
     }
 
@@ -3229,30 +3229,30 @@ public class TableImpl implements Table, PropertyMaps.Owner {
         /**
          * List of calculated columns in this table, ordered by calculation dependency
          */
-        private final List<ColumnImpl> _calcColumns = new ArrayList<>(1);
-        private boolean                _sorted;
+        private final List<ColumnImpl> calcColumns = new ArrayList<>(1);
+        private boolean                sorted;
 
         public void add(ColumnImpl col) {
             if (!getDatabase().isEvaluateExpressions()) {
                 return;
             }
-            _calcColumns.add(col);
+            calcColumns.add(col);
             // whenever we add new columns, we need to re-sort
-            _sorted = false;
+            sorted = false;
         }
 
         public void reSort() {
             // mark columns for re-sort on next use
-            _sorted = false;
+            sorted = false;
         }
 
         public void calculate(Object[] row) throws IOException {
-            if (!_sorted) {
+            if (!sorted) {
                 sortColumnsByDeps();
-                _sorted = true;
+                sorted = true;
             }
 
-            for (ColumnImpl col : _calcColumns) {
+            for (ColumnImpl col : calcColumns) {
                 Object rowValue = col.getCalculationContext().eval(row);
                 col.setRowValue(row, rowValue);
             }
@@ -3267,7 +3267,7 @@ public class TableImpl implements Table, PropertyMaps.Owner {
             // correctly calculate Field1, we need to calculate Field2 first, and
             // hence essentially need the reverse topo sort (a list where Field2
             // comes before Field1).
-            new TopoSorter<>(_calcColumns, TopoSorter.REVERSE) {
+            new TopoSorter<>(calcColumns, TopoSorter.REVERSE) {
                 @Override
                 protected void fillDescendents(ColumnImpl from, List<ColumnImpl> descendents) {
 
@@ -3277,7 +3277,7 @@ public class TableImpl implements Table, PropertyMaps.Owner {
                     for (Identifier identifier : identifiers) {
                         if (isThisTable(identifier)) {
                             String colName = identifier.getObjectName();
-                            for (ColumnImpl calcCol : _calcColumns) {
+                            for (ColumnImpl calcCol : calcColumns) {
                                 // we only care if the identifier is another calc field
                                 if (calcCol.getName().equalsIgnoreCase(colName)) {
                                     descendents.add(calcCol);

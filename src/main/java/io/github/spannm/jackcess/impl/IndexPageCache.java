@@ -45,11 +45,11 @@ public class IndexPageCache {
     private static final int                 MAX_CACHE_SIZE = 25;
 
     /** the index whose pages this cache is managing */
-    private final IndexData                  _indexData;
+    private final IndexData                  indexData;
     /** the root page for the index */
-    private DataPageMain                     _rootPage;
+    private DataPageMain                     rootPage;
     /** the currently loaded pages for this index, pageNumber -> page */
-    private final Map<Integer, DataPageMain> _dataPages     = new LinkedHashMap<>(16, 0.75f, true) {
+    private final Map<Integer, DataPageMain> dataPages     = new LinkedHashMap<>(16, 0.75f, true) {
         private static final long serialVersionUID = 0L;
 
         @Override
@@ -67,14 +67,14 @@ public class IndexPageCache {
         }
     };
     /** the currently modified index pages */
-    private final List<CacheDataPage>        _modifiedPages = new ArrayList<>();
+    private final List<CacheDataPage>        modifiedPages = new ArrayList<>();
 
     public IndexPageCache(IndexData indexData) {
-        _indexData = indexData;
+        this.indexData = indexData;
     }
 
     public IndexData getIndexData() {
-        return _indexData;
+        return indexData;
     }
 
     public PageChannel getPageChannel() {
@@ -87,9 +87,9 @@ public class IndexPageCache {
      * @param pageNumber the root page number
      */
     public void setRootPageNumber(int pageNumber) throws IOException {
-        _rootPage = getDataPage(pageNumber);
+        rootPage = getDataPage(pageNumber);
         // root page has no parent
-        _rootPage.initParentPage(INVALID_INDEX_PAGE_NUMBER, false);
+        rootPage.initParentPage(INVALID_INDEX_PAGE_NUMBER, false);
     }
 
     /**
@@ -103,19 +103,19 @@ public class IndexPageCache {
         // finally, write all the modified pages (which are not being deleted)
         writeDataPages();
         // after we write everything, we can purge our cache if necessary
-        if (_dataPages.size() > MAX_CACHE_SIZE) {
+        if (dataPages.size() > MAX_CACHE_SIZE) {
             purgeOldPages();
         }
     }
 
     /**
-     * Handles any modified pages which are empty as the first pass during a {@link #write} call. All empty pages are removed from the _modifiedPages collection by this method.
+     * Handles any modified pages which are empty as the first pass during a {@link #write} call. All empty pages are removed from the modifiedPages collection by this method.
      */
     private void handleEmptyPages() throws IOException {
-        for (Iterator<CacheDataPage> iter = _modifiedPages.iterator(); iter.hasNext();) {
+        for (Iterator<CacheDataPage> iter = modifiedPages.iterator(); iter.hasNext();) {
             CacheDataPage cacheDataPage = iter.next();
-            if (cacheDataPage._extra._entryView.isEmpty()) {
-                if (!cacheDataPage._main.isRoot()) {
+            if (cacheDataPage.extra.entryView.isEmpty()) {
+                if (!cacheDataPage.main.isRoot()) {
                     deleteDataPage(cacheDataPage);
                 } else {
                     writeDataPage(cacheDataPage);
@@ -143,14 +143,14 @@ public class IndexPageCache {
 
             // we might be adding to this list while iterating, so we can't use an
             // iterator
-            for (int i = 0; i < _modifiedPages.size(); ++i) {
+            for (int i = 0; i < modifiedPages.size(); ++i) {
 
-                CacheDataPage cacheDataPage = _modifiedPages.get(i);
+                CacheDataPage cacheDataPage = modifiedPages.get(i);
 
                 if (!cacheDataPage.isLeaf()) {
                     // see if we need to update any child tail status
-                    DataPageMain dpMain = cacheDataPage._main;
-                    int size = cacheDataPage._extra._entryView.size();
+                    DataPageMain dpMain = cacheDataPage.main;
+                    int size = cacheDataPage.extra.entryView.size();
                     if (dpMain.hasChildTail()) {
                         if (size == 1) {
                             demoteTail(cacheDataPage);
@@ -158,8 +158,8 @@ public class IndexPageCache {
                     } else {
                         if (size > 1) {
                             // only a leaf page can become a tail page
-                            DataPageMain lastChild = dpMain.getChildPage(cacheDataPage._extra._entryView.getLast());
-                            if (lastChild._leaf) {
+                            DataPageMain lastChild = dpMain.getChildPage(cacheDataPage.extra.entryView.getLast());
+                            if (lastChild.leaf) {
                                 promoteTail(cacheDataPage, lastChild);
                             }
                         }
@@ -171,7 +171,7 @@ public class IndexPageCache {
 
                     // make sure the prefix is up-to-date (this may have gotten
                     // discarded by one of the update entry methods)
-                    cacheDataPage._extra.updateEntryPrefix();
+                    cacheDataPage.extra.updateEntryPrefix();
 
                     // now, see if the page will fit when compressed
                     if (cacheDataPage.getCompressedEntrySize() > maxPageEntrySize) {
@@ -186,16 +186,16 @@ public class IndexPageCache {
     }
 
     /**
-     * Writes any non-empty modified pages as the last pass during a {@link #write} call. Clears the _modifiedPages collection when finised.
+     * Writes any non-empty modified pages as the last pass during a {@link #write} call. Clears the modifiedPages collection when finised.
      */
     private void writeDataPages() throws IOException {
-        for (CacheDataPage cacheDataPage : _modifiedPages) {
-            if (cacheDataPage._extra._entryView.isEmpty()) {
+        for (CacheDataPage cacheDataPage : modifiedPages) {
+            if (cacheDataPage.extra.entryView.isEmpty()) {
                 throw new IllegalStateException(withErrorContext("Unexpected empty page " + cacheDataPage));
             }
             writeDataPage(cacheDataPage);
         }
-        _modifiedPages.clear();
+        modifiedPages.clear();
     }
 
     /**
@@ -210,10 +210,10 @@ public class IndexPageCache {
      * Returns a DataPageMain for the given page number, may be {@code null} if the given page number is invalid. Loads the given page if necessary.
      */
     private DataPageMain getDataPage(Integer pageNumber) throws IOException {
-        DataPageMain dataPage = _dataPages.get(pageNumber);
+        DataPageMain dataPage = dataPages.get(pageNumber);
         if (dataPage == null && pageNumber > INVALID_INDEX_PAGE_NUMBER) {
-            dataPage = readDataPage(pageNumber)._main;
-            _dataPages.put(pageNumber, dataPage);
+            dataPage = readDataPage(pageNumber).main;
+            dataPages.put(pageNumber, dataPage);
         }
         return dataPage;
     }
@@ -225,7 +225,7 @@ public class IndexPageCache {
         getIndexData().writeDataPage(cacheDataPage);
 
         // lastly, mark the page as no longer modified
-        cacheDataPage._extra._modified = false;
+        cacheDataPage.extra.modified = false;
     }
 
     /**
@@ -233,13 +233,13 @@ public class IndexPageCache {
      */
     private void deleteDataPage(CacheDataPage cacheDataPage) throws IOException {
         // free this database page
-        getPageChannel().deallocatePage(cacheDataPage._main._pageNumber);
+        getPageChannel().deallocatePage(cacheDataPage.main.pageNumber);
 
         // discard from our cache
-        _dataPages.remove(cacheDataPage._main._pageNumber);
+        dataPages.remove(cacheDataPage.main.pageNumber);
 
         // lastly, mark the page as no longer modified
-        cacheDataPage._extra._modified = false;
+        cacheDataPage.extra.modified = false;
     }
 
     /**
@@ -287,8 +287,8 @@ public class IndexPageCache {
      * @param upType the type of update to make
      */
     private Entry updateEntry(CacheDataPage cacheDataPage, int entryIdx, Entry newEntry, UpdateType upType) throws IOException {
-        DataPageMain dpMain = cacheDataPage._main;
-        DataPageExtra dpExtra = cacheDataPage._extra;
+        DataPageMain dpMain = cacheDataPage.main;
+        DataPageExtra dpExtra = cacheDataPage.extra;
 
         if (newEntry != null) {
             validateEntryForPage(dpMain, newEntry);
@@ -298,23 +298,23 @@ public class IndexPageCache {
         // start mucking with our entries because our parent may use our entries.
         CacheDataPage parentDataPage = !dpMain.isRoot() ? new CacheDataPage(dpMain.getParentPage()) : null;
 
-        Entry oldLastEntry = dpExtra._entryView.getLast();
+        Entry oldLastEntry = dpExtra.entryView.getLast();
         Entry oldEntry = null;
         int entrySizeDiff = 0;
 
         switch (upType) {
             case ADD:
-                dpExtra._entryView.add(entryIdx, newEntry);
+                dpExtra.entryView.add(entryIdx, newEntry);
                 entrySizeDiff += newEntry.size();
                 break;
 
             case REPLACE:
-                oldEntry = dpExtra._entryView.set(entryIdx, newEntry);
+                oldEntry = dpExtra.entryView.set(entryIdx, newEntry);
                 entrySizeDiff += newEntry.size() - oldEntry.size();
                 break;
 
             case REMOVE:
-                oldEntry = dpExtra._entryView.remove(entryIdx);
+                oldEntry = dpExtra.entryView.remove(entryIdx);
                 entrySizeDiff -= oldEntry.size();
                 break;
 
@@ -322,18 +322,18 @@ public class IndexPageCache {
                 throw new JackcessRuntimeException(withErrorContext("unknown update type " + upType));
         }
 
-        boolean updateLast = oldLastEntry != dpExtra._entryView.getLast();
+        boolean updateLast = oldLastEntry != dpExtra.entryView.getLast();
 
         // child tail entry updates do not modify the page
         if (!updateLast || !dpMain.hasChildTail()) {
-            dpExtra._totalEntrySize += entrySizeDiff;
+            dpExtra.totalEntrySize += entrySizeDiff;
             setModified(cacheDataPage);
 
             // for now, just clear the prefix, we'll fix it later
-            dpExtra._entryPrefix = EMPTY_PREFIX;
+            dpExtra.entryPrefix = EMPTY_PREFIX;
         }
 
-        if (dpExtra._entryView.isEmpty()) {
+        if (dpExtra.entryView.isEmpty()) {
             // this page is dead
             removeDataPage(parentDataPage, cacheDataPage, oldLastEntry);
             return oldEntry;
@@ -358,22 +358,22 @@ public class IndexPageCache {
      * @param oldLastEntry the last entry for this page (before it was removed)
      */
     private void removeDataPage(CacheDataPage parentDataPage, CacheDataPage cacheDataPage, Entry oldLastEntry) throws IOException {
-        DataPageMain dpMain = cacheDataPage._main;
-        DataPageExtra dpExtra = cacheDataPage._extra;
+        DataPageMain dpMain = cacheDataPage.main;
+        DataPageExtra dpExtra = cacheDataPage.extra;
 
         if (dpMain.hasChildTail()) {
             throw new IllegalStateException(withErrorContext("Still has child tail?"));
         }
 
-        if (dpExtra._totalEntrySize != 0) {
-            throw new IllegalStateException(withErrorContext("Empty page but size is not 0? " + dpExtra._totalEntrySize + ", " + cacheDataPage));
+        if (dpExtra.totalEntrySize != 0) {
+            throw new IllegalStateException(withErrorContext("Empty page but size is not 0? " + dpExtra.totalEntrySize + ", " + cacheDataPage));
         }
 
         if (dpMain.isRoot()) {
             // clear out this page (we don't actually remove it)
-            dpExtra._entryPrefix = EMPTY_PREFIX;
+            dpExtra.entryPrefix = EMPTY_PREFIX;
             // when the root page becomes empty, it becomes a leaf page again
-            dpMain._leaf = true;
+            dpMain.leaf = true;
             return;
         }
 
@@ -390,21 +390,21 @@ public class IndexPageCache {
      * @param cacheDataPage the page to remove
      */
     private void removeFromPeers(CacheDataPage cacheDataPage) throws IOException {
-        DataPageMain dpMain = cacheDataPage._main;
+        DataPageMain dpMain = cacheDataPage.main;
 
-        Integer prevPageNumber = dpMain._prevPageNumber;
-        Integer nextPageNumber = dpMain._nextPageNumber;
+        Integer prevPageNumber = dpMain.prevPageNumber;
+        Integer nextPageNumber = dpMain.nextPageNumber;
 
         DataPageMain prevMain = dpMain.getPrevPage();
         if (prevMain != null) {
             setModified(new CacheDataPage(prevMain));
-            prevMain._nextPageNumber = nextPageNumber;
+            prevMain.nextPageNumber = nextPageNumber;
         }
 
         DataPageMain nextMain = dpMain.getNextPage();
         if (nextMain != null) {
             setModified(new CacheDataPage(nextMain));
-            nextMain._prevPageNumber = prevPageNumber;
+            nextMain.prevPageNumber = prevPageNumber;
         }
     }
 
@@ -415,8 +415,8 @@ public class IndexPageCache {
      * @param childDataPage the child from which to get the entry to add
      */
     private void addParentEntry(CacheDataPage parentDataPage, CacheDataPage childDataPage) throws IOException {
-        DataPageExtra childExtra = childDataPage._extra;
-        updateParentEntry(parentDataPage, childDataPage, null, childExtra._entryView.getLast(), UpdateType.ADD);
+        DataPageExtra childExtra = childDataPage.extra;
+        updateParentEntry(parentDataPage, childDataPage, null, childExtra.entryView.getLast(), UpdateType.ADD);
     }
 
     /**
@@ -427,8 +427,8 @@ public class IndexPageCache {
      * @param oldEntry the old child entry for the child page
      */
     private void replaceParentEntry(CacheDataPage parentDataPage, CacheDataPage childDataPage, Entry oldEntry) throws IOException {
-        DataPageExtra childExtra = childDataPage._extra;
-        updateParentEntry(parentDataPage, childDataPage, oldEntry, childExtra._entryView.getLast(), UpdateType.REPLACE);
+        DataPageExtra childExtra = childDataPage.extra;
+        updateParentEntry(parentDataPage, childDataPage, oldEntry, childExtra.entryView.getLast(), UpdateType.REPLACE);
     }
 
     /**
@@ -441,8 +441,8 @@ public class IndexPageCache {
      * @param upType the type of update to make
      */
     private void updateParentEntry(CacheDataPage parentDataPage, CacheDataPage childDataPage, Entry oldEntry, Entry newEntry, UpdateType upType) throws IOException {
-        DataPageMain childMain = childDataPage._main;
-        DataPageExtra parentExtra = parentDataPage._extra;
+        DataPageMain childMain = childDataPage.main;
+        DataPageExtra parentExtra = parentDataPage.extra;
 
         if (childMain.isTail() && upType != UpdateType.REMOVE) {
             // for add or replace, update the child tail info before updating the
@@ -451,10 +451,10 @@ public class IndexPageCache {
         }
 
         if (oldEntry != null) {
-            oldEntry = oldEntry.asNodeEntry(childMain._pageNumber);
+            oldEntry = oldEntry.asNodeEntry(childMain.pageNumber);
         }
         if (newEntry != null) {
-            newEntry = newEntry.asNodeEntry(childMain._pageNumber);
+            newEntry = newEntry.asNodeEntry(childMain.pageNumber);
         }
 
         boolean expectFound = true;
@@ -463,12 +463,12 @@ public class IndexPageCache {
         switch (upType) {
             case ADD:
                 expectFound = false;
-                idx = parentExtra._entryView.find(newEntry);
+                idx = parentExtra.entryView.find(newEntry);
                 break;
 
             case REPLACE:
             case REMOVE:
-                idx = parentExtra._entryView.find(oldEntry);
+                idx = parentExtra.entryView.find(oldEntry);
                 break;
 
             default:
@@ -502,12 +502,12 @@ public class IndexPageCache {
      * @param upType the type of update to make
      */
     private void updateParentTail(CacheDataPage parentDataPage, CacheDataPage childDataPage, UpdateType upType) {
-        DataPageMain parentMain = parentDataPage._main;
+        DataPageMain parentMain = parentDataPage.main;
 
-        int newChildTailPageNumber = upType == UpdateType.REMOVE ? INVALID_INDEX_PAGE_NUMBER : childDataPage._main._pageNumber;
+        int newChildTailPageNumber = upType == UpdateType.REMOVE ? INVALID_INDEX_PAGE_NUMBER : childDataPage.main.pageNumber;
         if (!parentMain.isChildTailPageNumber(newChildTailPageNumber)) {
             setModified(parentDataPage);
-            parentMain._childTailPageNumber = newChildTailPageNumber;
+            parentMain.childTailPageNumber = newChildTailPageNumber;
         }
     }
 
@@ -519,8 +519,8 @@ public class IndexPageCache {
      * @throws IllegalStateException if the entry type does not match the page type
      */
     private void validateEntryForPage(DataPageMain dpMain, Entry entry) {
-        if (dpMain._leaf != entry.isLeafEntry()) {
-            throw new IllegalStateException(withErrorContext("Trying to update page with wrong entry type; pageLeaf " + dpMain._leaf + ", entryLeaf " + entry.isLeafEntry()));
+        if (dpMain.leaf != entry.isLeafEntry()) {
+            throw new IllegalStateException(withErrorContext("Trying to update page with wrong entry type; pageLeaf " + dpMain.leaf + ", entryLeaf " + entry.isLeafEntry()));
         }
     }
 
@@ -530,12 +530,12 @@ public class IndexPageCache {
      * @param origDataPage the page to split
      */
     private void splitDataPage(CacheDataPage origDataPage) throws IOException {
-        DataPageMain origMain = origDataPage._main;
-        DataPageExtra origExtra = origDataPage._extra;
+        DataPageMain origMain = origDataPage.main;
+        DataPageExtra origExtra = origDataPage.extra;
 
         setModified(origDataPage);
 
-        int numEntries = origExtra._entries.size();
+        int numEntries = origExtra.entries.size();
         if (numEntries < 2) {
             throw new IllegalStateException(withErrorContext("Cannot split page with less than 2 entries " + origDataPage));
         }
@@ -547,8 +547,8 @@ public class IndexPageCache {
 
             // now, split this new page instead
             origDataPage = newDataPage;
-            origMain = newDataPage._main;
-            origExtra = newDataPage._extra;
+            origMain = newDataPage.main;
+            origExtra = newDataPage.extra;
         }
 
         // note, it's slightly ucky, but we need to load the parent page before we
@@ -560,29 +560,29 @@ public class IndexPageCache {
         // now, we just want it to be functional...
         // so, we will naively move half the entries from one page to a new page.
 
-        CacheDataPage newDataPage = allocateNewCacheDataPage(parentMain._pageNumber, origMain._leaf);
-        DataPageMain newMain = newDataPage._main;
-        DataPageExtra newExtra = newDataPage._extra;
+        CacheDataPage newDataPage = allocateNewCacheDataPage(parentMain.pageNumber, origMain.leaf);
+        DataPageMain newMain = newDataPage.main;
+        DataPageExtra newExtra = newDataPage.extra;
 
-        List<Entry> headEntries = origExtra._entries.subList(0, (numEntries + 1) / 2);
+        List<Entry> headEntries = origExtra.entries.subList(0, (numEntries + 1) / 2);
 
         // move first half of the entries from old page to new page (so we do not
         // need to muck with any tail entries)
         for (Entry headEntry : headEntries) {
-            newExtra._totalEntrySize += headEntry.size();
-            newExtra._entries.add(headEntry);
+            newExtra.totalEntrySize += headEntry.size();
+            newExtra.entries.add(headEntry);
         }
         newExtra.setEntryView(newMain);
 
         // remove the moved entries from the old page
         headEntries.clear();
-        origExtra._entryPrefix = EMPTY_PREFIX;
-        origExtra._totalEntrySize -= newExtra._totalEntrySize;
+        origExtra.entryPrefix = EMPTY_PREFIX;
+        origExtra.totalEntrySize -= newExtra.totalEntrySize;
 
         // insert this new page between the old page and any previous page
         addToPeersBefore(newDataPage, origDataPage);
 
-        if (!newMain._leaf) {
+        if (!newMain.leaf) {
             // reparent the children pages of the new page
             reparentChildren(newDataPage);
 
@@ -590,8 +590,8 @@ public class IndexPageCache {
             // links should not cross parent boundaries (the leaf pages are linked
             // from beginning to end, but child node pages are only linked within
             // the same parent)
-            DataPageMain childMain = newMain.getChildPage(newExtra._entryView.getLast());
-            if (!childMain._leaf) {
+            DataPageMain childMain = newMain.getChildPage(newExtra.entryView.getLast());
+            if (!childMain.leaf) {
                 separateFromNextPeer(new CacheDataPage(childMain));
             }
         }
@@ -608,35 +608,35 @@ public class IndexPageCache {
      * @return the newly created page nested under the root page
      */
     private CacheDataPage nestRootDataPage(CacheDataPage rootDataPage) throws IOException {
-        DataPageMain rootMain = rootDataPage._main;
-        DataPageExtra rootExtra = rootDataPage._extra;
+        DataPageMain rootMain = rootDataPage.main;
+        DataPageExtra rootExtra = rootDataPage.extra;
 
         if (!rootMain.isRoot()) {
             throw new IllegalArgumentException(withErrorContext("should be called with root, duh"));
         }
 
-        CacheDataPage newDataPage = allocateNewCacheDataPage(rootMain._pageNumber, rootMain._leaf);
-        DataPageMain newMain = newDataPage._main;
-        DataPageExtra newExtra = newDataPage._extra;
+        CacheDataPage newDataPage = allocateNewCacheDataPage(rootMain.pageNumber, rootMain.leaf);
+        DataPageMain newMain = newDataPage.main;
+        DataPageExtra newExtra = newDataPage.extra;
 
         // move entries to new page
-        newMain._childTailPageNumber = rootMain._childTailPageNumber;
-        newExtra._entries = rootExtra._entries;
-        newExtra._entryPrefix = rootExtra._entryPrefix;
-        newExtra._totalEntrySize = rootExtra._totalEntrySize;
+        newMain.childTailPageNumber = rootMain.childTailPageNumber;
+        newExtra.entries = rootExtra.entries;
+        newExtra.entryPrefix = rootExtra.entryPrefix;
+        newExtra.totalEntrySize = rootExtra.totalEntrySize;
         newExtra.setEntryView(newMain);
 
-        if (!newMain._leaf) {
+        if (!newMain.leaf) {
             // we need to re-parent all the child pages
             reparentChildren(newDataPage);
         }
 
         // clear the root page
-        rootMain._leaf = false;
-        rootMain._childTailPageNumber = INVALID_INDEX_PAGE_NUMBER;
-        rootExtra._entries = new ArrayList<>();
-        rootExtra._entryPrefix = EMPTY_PREFIX;
-        rootExtra._totalEntrySize = 0;
+        rootMain.leaf = false;
+        rootMain.childTailPageNumber = INVALID_INDEX_PAGE_NUMBER;
+        rootExtra.entries = new ArrayList<>();
+        rootExtra.entryPrefix = EMPTY_PREFIX;
+        rootExtra.totalEntrySize = 0;
         rootExtra.setEntryView(rootMain);
 
         // add the new page as the first child of the root page
@@ -657,19 +657,19 @@ public class IndexPageCache {
         DataPageMain dpMain = new DataPageMain(getPageChannel().allocateNewPage());
         DataPageExtra dpExtra = new DataPageExtra();
         dpMain.initParentPage(parentPageNumber, false);
-        dpMain._leaf = isLeaf;
-        dpMain._prevPageNumber = INVALID_INDEX_PAGE_NUMBER;
-        dpMain._nextPageNumber = INVALID_INDEX_PAGE_NUMBER;
-        dpMain._childTailPageNumber = INVALID_INDEX_PAGE_NUMBER;
-        dpExtra._entries = new ArrayList<>();
-        dpExtra._entryPrefix = EMPTY_PREFIX;
+        dpMain.leaf = isLeaf;
+        dpMain.prevPageNumber = INVALID_INDEX_PAGE_NUMBER;
+        dpMain.nextPageNumber = INVALID_INDEX_PAGE_NUMBER;
+        dpMain.childTailPageNumber = INVALID_INDEX_PAGE_NUMBER;
+        dpExtra.entries = new ArrayList<>();
+        dpExtra.entryPrefix = EMPTY_PREFIX;
         dpMain.setExtra(dpExtra);
 
         // add to our page cache
-        _dataPages.put(dpMain._pageNumber, dpMain);
+        dataPages.put(dpMain.pageNumber, dpMain);
 
         // update owned pages cache
-        _indexData.addOwnedPage(dpMain._pageNumber);
+        indexData.addOwnedPage(dpMain.pageNumber);
 
         // needs to be written out
         CacheDataPage cacheDataPage = new CacheDataPage(dpMain, dpExtra);
@@ -685,18 +685,18 @@ public class IndexPageCache {
      * @param origDataPage the current index page
      */
     private void addToPeersBefore(CacheDataPage newDataPage, CacheDataPage origDataPage) throws IOException {
-        DataPageMain origMain = origDataPage._main;
-        DataPageMain newMain = newDataPage._main;
+        DataPageMain origMain = origDataPage.main;
+        DataPageMain newMain = newDataPage.main;
 
         DataPageMain prevMain = origMain.getPrevPage();
 
-        newMain._nextPageNumber = origMain._pageNumber;
-        newMain._prevPageNumber = origMain._prevPageNumber;
-        origMain._prevPageNumber = newMain._pageNumber;
+        newMain.nextPageNumber = origMain.pageNumber;
+        newMain.prevPageNumber = origMain.prevPageNumber;
+        origMain.prevPageNumber = newMain.pageNumber;
 
         if (prevMain != null) {
             setModified(new CacheDataPage(prevMain));
-            prevMain._nextPageNumber = newMain._pageNumber;
+            prevMain.nextPageNumber = newMain.pageNumber;
         }
     }
 
@@ -706,15 +706,15 @@ public class IndexPageCache {
      * @param cacheDataPage the index page to be separated
      */
     private void separateFromNextPeer(CacheDataPage cacheDataPage) throws IOException {
-        DataPageMain dpMain = cacheDataPage._main;
+        DataPageMain dpMain = cacheDataPage.main;
 
         setModified(cacheDataPage);
 
         DataPageMain nextMain = dpMain.getNextPage();
         setModified(new CacheDataPage(nextMain));
 
-        nextMain._prevPageNumber = INVALID_INDEX_PAGE_NUMBER;
-        dpMain._nextPageNumber = INVALID_INDEX_PAGE_NUMBER;
+        nextMain.prevPageNumber = INVALID_INDEX_PAGE_NUMBER;
+        dpMain.nextPageNumber = INVALID_INDEX_PAGE_NUMBER;
     }
 
     /**
@@ -723,17 +723,17 @@ public class IndexPageCache {
      * @param cacheDataPage the page whose children need to be updated
      */
     private void reparentChildren(CacheDataPage cacheDataPage) {
-        DataPageMain dpMain = cacheDataPage._main;
-        DataPageExtra dpExtra = cacheDataPage._extra;
+        DataPageMain dpMain = cacheDataPage.main;
+        DataPageExtra dpExtra = cacheDataPage.extra;
 
         // note, the "parent" page number is not actually persisted, so we do not
         // need to mark any updated pages as modified. for the same reason, we
         // don't need to load the pages if not already loaded
-        for (Entry entry : dpExtra._entryView) {
+        for (Entry entry : dpExtra.entryView) {
             Integer childPageNumber = entry.getSubPageNumber();
-            DataPageMain childMain = _dataPages.get(childPageNumber);
+            DataPageMain childMain = dataPages.get(childPageNumber);
             if (childMain != null) {
-                childMain.setParentPage(dpMain._pageNumber, dpMain.isChildTailPageNumber(childPageNumber));
+                childMain.setParentPage(dpMain.pageNumber, dpMain.isChildTailPageNumber(childPageNumber));
             }
         }
     }
@@ -746,8 +746,8 @@ public class IndexPageCache {
     private void demoteTail(CacheDataPage cacheDataPage) throws IOException {
         // there's only one entry on the page, and it's the tail. make it a
         // normal entry
-        DataPageMain dpMain = cacheDataPage._main;
-        DataPageExtra dpExtra = cacheDataPage._extra;
+        DataPageMain dpMain = cacheDataPage.main;
+        DataPageExtra dpExtra = cacheDataPage.extra;
 
         setModified(cacheDataPage);
 
@@ -756,11 +756,11 @@ public class IndexPageCache {
 
         // move the tail entry to the last normal entry
         updateParentTail(cacheDataPage, tailDataPage, UpdateType.REMOVE);
-        Entry tailEntry = dpExtra._entryView.demoteTail();
-        dpExtra._totalEntrySize += tailEntry.size();
-        dpExtra._entryPrefix = EMPTY_PREFIX;
+        Entry tailEntry = dpExtra.entryView.demoteTail();
+        dpExtra.totalEntrySize += tailEntry.size();
+        dpExtra.entryPrefix = EMPTY_PREFIX;
 
-        tailMain.setParentPage(dpMain._pageNumber, false);
+        tailMain.setParentPage(dpMain.pageNumber, false);
     }
 
     /**
@@ -776,8 +776,8 @@ public class IndexPageCache {
      */
     private void promoteTail(CacheDataPage cacheDataPage, DataPageMain lastMain) throws IOException {
         // there's not tail currently on this page, make last entry a tail
-        DataPageMain dpMain = cacheDataPage._main;
-        DataPageExtra dpExtra = cacheDataPage._extra;
+        DataPageMain dpMain = cacheDataPage.main;
+        DataPageExtra dpExtra = cacheDataPage.extra;
 
         setModified(cacheDataPage);
 
@@ -785,11 +785,11 @@ public class IndexPageCache {
 
         // move the "last" normal entry to the tail entry
         updateParentTail(cacheDataPage, lastDataPage, UpdateType.ADD);
-        Entry lastEntry = dpExtra._entryView.promoteTail();
-        dpExtra._totalEntrySize -= lastEntry.size();
-        dpExtra._entryPrefix = EMPTY_PREFIX;
+        Entry lastEntry = dpExtra.entryView.promoteTail();
+        dpExtra.totalEntrySize -= lastEntry.size();
+        dpExtra.entryPrefix = EMPTY_PREFIX;
 
-        lastMain.setParentPage(dpMain._pageNumber, true);
+        lastMain.setParentPage(dpMain.pageNumber, true);
     }
 
     /**
@@ -798,10 +798,10 @@ public class IndexPageCache {
      * @param e the entry to find
      */
     public CacheDataPage findCacheDataPage(Entry e) throws IOException {
-        DataPageMain curPage = _rootPage;
+        DataPageMain curPage = rootPage;
         while (true) {
 
-            if (curPage._leaf) {
+            if (curPage.leaf) {
                 // nowhere to go from here
                 return new CacheDataPage(curPage);
             }
@@ -809,16 +809,16 @@ public class IndexPageCache {
             DataPageExtra extra = curPage.getExtra();
 
             // need to descend
-            int idx = extra._entryView.find(e);
+            int idx = extra.entryView.find(e);
             if (idx < 0) {
                 idx = missingIndexToInsertionPoint(idx);
-                if (idx == extra._entryView.size()) {
+                if (idx == extra.entryView.size()) {
                     // just move to last child page
                     idx--;
                 }
             }
 
-            Entry nodeEntry = extra._entryView.get(idx);
+            Entry nodeEntry = extra.entryView.get(idx);
             curPage = curPage.getChildPage(nodeEntry);
         }
     }
@@ -829,9 +829,9 @@ public class IndexPageCache {
      * @param cacheDataPage the modified index page
      */
     private void setModified(CacheDataPage cacheDataPage) {
-        if (!cacheDataPage._extra._modified) {
-            _modifiedPages.add(cacheDataPage);
-            cacheDataPage._extra._modified = true;
+        if (!cacheDataPage.extra.modified) {
+            modifiedPages.add(cacheDataPage);
+            cacheDataPage.extra.modified = true;
         }
     }
 
@@ -888,29 +888,29 @@ public class IndexPageCache {
         try {
             CacheDataPage cacheDataPage = new CacheDataPage(dpMain);
             pages.add(cacheDataPage);
-            if (!dpMain._leaf) {
-                for (Entry e : cacheDataPage._extra._entryView) {
+            if (!dpMain.leaf) {
+                for (Entry e : cacheDataPage.extra.entryView) {
                     DataPageMain childMain = dpMain.getChildPage(e);
                     collectPages(pages, childMain);
                 }
             }
         } catch (IOException _ex) {
-            pages.add("DataPage[" + dpMain._pageNumber + "]: <" + _ex + ">");
+            pages.add("DataPage[" + dpMain.pageNumber + "]: <" + _ex + ">");
         }
         return pages;
     }
 
     /**
-     * Trims the size of the _dataPages cache appropriately (assuming caller has already verified that the cache needs trimming).
+     * Trims the size of the dataPages cache appropriately (assuming caller has already verified that the cache needs trimming).
      */
     private void purgeOldPages() {
-        Iterator<DataPageMain> iter = _dataPages.values().iterator();
+        Iterator<DataPageMain> iter = dataPages.values().iterator();
         while (iter.hasNext()) {
             DataPageMain dpMain = iter.next();
             // note, we never purge the root page
-            if (dpMain != _rootPage) {
+            if (dpMain != rootPage) {
                 iter.remove();
-                if (_dataPages.size() <= MAX_CACHE_SIZE) {
+                if (dataPages.size() <= MAX_CACHE_SIZE) {
                     break;
                 }
             }
@@ -919,28 +919,28 @@ public class IndexPageCache {
 
     @Override
     public String toString() {
-        return ToStringBuilder.builder(this).append("pages", _rootPage == null ? "(uninitialized)" : collectPages(new ArrayList<>(), _rootPage)).toString();
+        return ToStringBuilder.builder(this).append("pages", rootPage == null ? "(uninitialized)" : collectPages(new ArrayList<>(), rootPage)).toString();
     }
 
     private String withErrorContext(String msg) {
-        return _indexData.withErrorContext(msg);
+        return indexData.withErrorContext(msg);
     }
 
     /**
      * Keeps track of the main info for an index page.
      */
     private class DataPageMain {
-        public final int                 _pageNumber;
-        public Integer                   _prevPageNumber;
-        public Integer                   _nextPageNumber;
-        public Integer                   _childTailPageNumber;
-        public Integer                   _parentPageNumber;
-        public boolean                   _leaf;
-        public boolean                   _tail;
-        private Reference<DataPageExtra> _extra;
+        public final int                 pageNumber;
+        public Integer                   prevPageNumber;
+        public Integer                   nextPageNumber;
+        public Integer                   childTailPageNumber;
+        public Integer                   parentPageNumber;
+        public boolean                   leaf;
+        public boolean                   tail;
+        private Reference<DataPageExtra> extra;
 
         private DataPageMain(int pageNumber) {
-            _pageNumber = pageNumber;
+            this.pageNumber = pageNumber;
         }
 
         public IndexPageCache getCache() {
@@ -948,45 +948,45 @@ public class IndexPageCache {
         }
 
         public boolean isRoot() {
-            return this == _rootPage;
+            return this == rootPage;
         }
 
         public boolean isTail() throws IOException {
             resolveParent();
-            return _tail;
+            return tail;
         }
 
         public boolean hasChildTail() {
-            return _childTailPageNumber != INVALID_INDEX_PAGE_NUMBER;
+            return childTailPageNumber != INVALID_INDEX_PAGE_NUMBER;
         }
 
-        public boolean isChildTailPageNumber(int pageNumber) {
-            return _childTailPageNumber == pageNumber;
+        public boolean isChildTailPageNumber(int checkPageNumber) {
+            return childTailPageNumber == checkPageNumber;
         }
 
         public DataPageMain getParentPage() throws IOException {
             resolveParent();
-            return getDataPage(_parentPageNumber);
+            return getDataPage(parentPageNumber);
         }
 
-        public void initParentPage(Integer parentPageNumber, boolean isTail) {
+        public void initParentPage(Integer newParentPageNumber, boolean isTail) {
             // only set if not already set
-            if (_parentPageNumber == null) {
-                setParentPage(parentPageNumber, isTail);
+            if (parentPageNumber == null) {
+                setParentPage(newParentPageNumber, isTail);
             }
         }
 
-        public void setParentPage(Integer parentPageNumber, boolean isTail) {
-            _parentPageNumber = parentPageNumber;
-            _tail = isTail;
+        public void setParentPage(Integer newParentPageNumber, boolean isTail) {
+            parentPageNumber = newParentPageNumber;
+            tail = isTail;
         }
 
         public DataPageMain getPrevPage() throws IOException {
-            return getDataPage(_prevPageNumber);
+            return getDataPage(prevPageNumber);
         }
 
         public DataPageMain getNextPage() throws IOException {
-            return getDataPage(_nextPageNumber);
+            return getDataPage(nextPageNumber);
         }
 
         public DataPageMain getChildPage(Entry e) throws IOException {
@@ -995,7 +995,7 @@ public class IndexPageCache {
         }
 
         public DataPageMain getChildTailPage() throws IOException {
-            return getChildPage(_childTailPageNumber, true);
+            return getChildPage(childTailPageNumber, true);
         }
 
         /**
@@ -1005,32 +1005,32 @@ public class IndexPageCache {
             DataPageMain child = getDataPage(childPageNumber);
             if (child != null) {
                 // set the parent info for this child (if necessary)
-                child.initParentPage(_pageNumber, isTail);
+                child.initParentPage(pageNumber, isTail);
             }
             return child;
         }
 
         public DataPageExtra getExtra() throws IOException {
-            DataPageExtra extra = _extra.get();
-            if (extra == null) {
-                extra = readDataPage(_pageNumber)._extra;
-                setExtra(extra);
+            DataPageExtra curExtra = extra.get();
+            if (curExtra == null) {
+                curExtra = readDataPage(pageNumber).extra;
+                setExtra(curExtra);
             }
 
-            return extra;
+            return curExtra;
         }
 
         public void setExtra(DataPageExtra extra) throws IOException {
             extra.setEntryView(this);
-            _extra = new SoftReference<>(extra);
+            this.extra = new SoftReference<>(extra);
         }
 
         private void resolveParent() throws IOException {
-            if (_parentPageNumber == null) {
+            if (parentPageNumber == null) {
                 // the act of searching for the last entry should resolve any parent
                 // pages along the path
-                findCacheDataPage(getExtra()._entryView.getLast());
-                if (_parentPageNumber == null) {
+                findCacheDataPage(getExtra().entryView.getLast());
+                if (parentPageNumber == null) {
                     throw new IllegalStateException(withErrorContext("Parent was not resolved"));
                 }
             }
@@ -1038,7 +1038,7 @@ public class IndexPageCache {
 
         @Override
         public String toString() {
-            return (_leaf ? "Leaf" : "Node") + "DPMain[" + _pageNumber + "] " + _prevPageNumber + ", " + _nextPageNumber + ", (" + _childTailPageNumber + ")";
+            return (leaf ? "Leaf" : "Node") + "DPMain[" + pageNumber + "] " + prevPageNumber + ", " + nextPageNumber + ", (" + childTailPageNumber + ")";
         }
     }
 
@@ -1049,26 +1049,26 @@ public class IndexPageCache {
         /**
          * sorted collection of index entries. this is kept in a list instead of a SortedSet because the SortedSet has lame traversal utilities
          */
-        public List<Entry>   _entries;
-        public EntryListView _entryView;
-        public byte[]        _entryPrefix;
-        public int           _totalEntrySize;
-        public boolean       _modified;
+        public List<Entry>   entries;
+        public EntryListView entryView;
+        public byte[]        entryPrefix;
+        public int           totalEntrySize;
+        public boolean       modified;
 
         public void setEntryView(DataPageMain main) throws IOException {
-            _entryView = new EntryListView(main, this);
+            entryView = new EntryListView(main, this);
         }
 
         public void updateEntryPrefix() {
-            if (_entryPrefix.length == 0) {
+            if (entryPrefix.length == 0) {
                 // prefix is only related to *real* entries, tail not included
-                _entryPrefix = findCommonPrefix(_entries.get(0), _entries.get(_entries.size() - 1));
+                entryPrefix = findCommonPrefix(entries.get(0), entries.get(entries.size() - 1));
             }
         }
 
         @Override
         public String toString() {
-            return ToStringBuilder.builder("DPExtra").append(null, _entryView).toString();
+            return ToStringBuilder.builder("DPExtra").append(null, entryView).toString();
         }
     }
 
@@ -1076,101 +1076,101 @@ public class IndexPageCache {
      * IndexPageCache implementation of an Index {@link DataPage}.
      */
     private static final class CacheDataPage extends DataPage {
-        public final DataPageMain  _main;
-        public final DataPageExtra _extra;
+        public final DataPageMain  main;
+        public final DataPageExtra extra;
 
         private CacheDataPage(DataPageMain dataPage) throws IOException {
             this(dataPage, dataPage.getExtra());
         }
 
         private CacheDataPage(DataPageMain dataPage, DataPageExtra extra) {
-            _main = dataPage;
-            _extra = extra;
+            main = dataPage;
+            this.extra = extra;
         }
 
         @Override
         public int getPageNumber() {
-            return _main._pageNumber;
+            return main.pageNumber;
         }
 
         @Override
         public boolean isLeaf() {
-            return _main._leaf;
+            return main.leaf;
         }
 
         @Override
         public void setLeaf(boolean isLeaf) {
-            _main._leaf = isLeaf;
+            main.leaf = isLeaf;
         }
 
         @Override
         public int getPrevPageNumber() {
-            return _main._prevPageNumber;
+            return main.prevPageNumber;
         }
 
         @Override
         public void setPrevPageNumber(int pageNumber) {
-            _main._prevPageNumber = pageNumber;
+            main.prevPageNumber = pageNumber;
         }
 
         @Override
         public int getNextPageNumber() {
-            return _main._nextPageNumber;
+            return main.nextPageNumber;
         }
 
         @Override
         public void setNextPageNumber(int pageNumber) {
-            _main._nextPageNumber = pageNumber;
+            main.nextPageNumber = pageNumber;
         }
 
         @Override
         public int getChildTailPageNumber() {
-            return _main._childTailPageNumber;
+            return main.childTailPageNumber;
         }
 
         @Override
         public void setChildTailPageNumber(int pageNumber) {
-            _main._childTailPageNumber = pageNumber;
+            main.childTailPageNumber = pageNumber;
         }
 
         @Override
         public int getTotalEntrySize() {
-            return _extra._totalEntrySize;
+            return extra.totalEntrySize;
         }
 
         @Override
         public void setTotalEntrySize(int totalSize) {
-            _extra._totalEntrySize = totalSize;
+            extra.totalEntrySize = totalSize;
         }
 
         @Override
         public byte[] getEntryPrefix() {
-            return _extra._entryPrefix;
+            return extra.entryPrefix;
         }
 
         @Override
         public void setEntryPrefix(byte[] entryPrefix) {
-            _extra._entryPrefix = entryPrefix;
+            extra.entryPrefix = entryPrefix;
         }
 
         @Override
         public List<Entry> getEntries() {
-            return _extra._entries;
+            return extra.entries;
         }
 
         @Override
         public void setEntries(List<Entry> entries) {
-            _extra._entries = entries;
+            extra.entries = entries;
         }
 
         @Override
         public void addEntry(int idx, Entry entry) throws IOException {
-            _main.getCache().addEntry(this, idx, entry);
+            main.getCache().addEntry(this, idx, entry);
         }
 
         @Override
         public Entry removeEntry(int idx) throws IOException {
-            return _main.getCache().removeEntry(this, idx);
+            return main.getCache().removeEntry(this, idx);
         }
 
     }
@@ -1179,18 +1179,18 @@ public class IndexPageCache {
      * A view of an index page's entries which combines the normal entries and tail entry into one collection.
      */
     private static class EntryListView extends AbstractList<Entry> implements RandomAccess {
-        private final DataPageExtra _extra;
-        private Entry               _childTailEntry;
+        private final DataPageExtra extra;
+        private Entry               childTailEntry;
 
         private EntryListView(DataPageMain main, DataPageExtra extra) throws IOException {
             if (main.hasChildTail()) {
-                _childTailEntry = main.getChildTailPage().getExtra()._entryView.getLast().asNodeEntry(main._childTailPageNumber);
+                childTailEntry = main.getChildTailPage().getExtra().entryView.getLast().asNodeEntry(main.childTailPageNumber);
             }
-            _extra = extra;
+            this.extra = extra;
         }
 
         private List<Entry> getEntries() {
-            return _extra._entries;
+            return extra.entries;
         }
 
         @Override
@@ -1204,7 +1204,7 @@ public class IndexPageCache {
 
         @Override
         public Entry get(int idx) {
-            return isCurrentChildTailIndex(idx) ? _childTailEntry : getEntries().get(idx);
+            return isCurrentChildTailIndex(idx) ? childTailEntry : getEntries().get(idx);
         }
 
         @Override
@@ -1225,13 +1225,13 @@ public class IndexPageCache {
         }
 
         public Entry withChildTailEntry(Entry newEntry) {
-            Entry old = _childTailEntry;
-            _childTailEntry = newEntry;
+            Entry old = childTailEntry;
+            childTailEntry = newEntry;
             return old;
         }
 
         private boolean hasChildTail() {
-            return _childTailEntry != null;
+            return childTailEntry != null;
         }
 
         private boolean isCurrentChildTailIndex(int idx) {
@@ -1240,19 +1240,19 @@ public class IndexPageCache {
 
         @SuppressWarnings("PMD.MissingOverride")
         public Entry getLast() {
-            return hasChildTail() ? _childTailEntry : !getEntries().isEmpty() ? getEntries().get(getEntries().size() - 1) : null;
+            return hasChildTail() ? childTailEntry : !getEntries().isEmpty() ? getEntries().get(getEntries().size() - 1) : null;
         }
 
         public Entry demoteTail() {
-            Entry tail = _childTailEntry;
-            _childTailEntry = null;
+            Entry tail = childTailEntry;
+            childTailEntry = null;
             getEntries().add(tail);
             return tail;
         }
 
         public Entry promoteTail() {
             Entry last = getEntries().remove(getEntries().size() - 1);
-            _childTailEntry = last;
+            childTailEntry = last;
             return last;
         }
 
@@ -1266,19 +1266,19 @@ public class IndexPageCache {
      * Utility class for running index validation.
      */
     private final class Validator {
-        private final boolean                    _forceLoad;
-        private final Map<Integer, DataPageMain> _knownPages   = new HashMap<>();
-        private final Queue<DataPageMain>        _pendingPages = new LinkedList<>();
+        private final boolean                    forceLoad;
+        private final Map<Integer, DataPageMain> knownPages   = new HashMap<>();
+        private final Queue<DataPageMain>        pendingPages = new LinkedList<>();
 
         private Validator(boolean forceLoad) {
-            _forceLoad = forceLoad;
-            _knownPages.putAll(_dataPages);
-            _pendingPages.addAll(_knownPages.values());
+            this.forceLoad = forceLoad;
+            knownPages.putAll(dataPages);
+            pendingPages.addAll(knownPages.values());
         }
 
         void validate() throws IOException {
             DataPageMain dpMain = null;
-            while ((dpMain = _pendingPages.poll()) != null) {
+            while ((dpMain = pendingPages.poll()) != null) {
                 DataPageExtra dpExtra = dpMain.getExtra();
                 validateEntries(dpExtra);
                 validateChildren(dpMain, dpExtra);
@@ -1294,7 +1294,7 @@ public class IndexPageCache {
         private void validateEntries(DataPageExtra dpExtra) throws IOException {
             int entrySize = 0;
             Entry prevEntry = FIRST_ENTRY;
-            for (Entry e : dpExtra._entries) {
+            for (Entry e : dpExtra.entries) {
                 entrySize += e.size();
                 if (prevEntry.compareTo(e) >= 0) {
                     throw new IOException(withErrorContext("Unexpected order in index entries, " + prevEntry + " >= " + e));
@@ -1302,16 +1302,16 @@ public class IndexPageCache {
                 prevEntry = e;
             }
 
-            if (dpExtra._entryView.hasChildTail()) {
-                Entry tailE = dpExtra._entryView.getLast();
+            if (dpExtra.entryView.hasChildTail()) {
+                Entry tailE = dpExtra.entryView.getLast();
                 if (prevEntry.compareTo(tailE) >= 0) {
                     throw new IOException(
                         withErrorContext("Unexpected order in index entries, " + prevEntry + " >= " + tailE));
                 }
             }
 
-            if (entrySize != dpExtra._totalEntrySize) {
-                throw new IllegalStateException(withErrorContext("Expected size " + entrySize + " but was " + dpExtra._totalEntrySize));
+            if (entrySize != dpExtra.totalEntrySize) {
+                throw new IllegalStateException(withErrorContext("Expected size " + entrySize + " but was " + dpExtra.totalEntrySize));
             }
         }
 
@@ -1322,51 +1322,51 @@ public class IndexPageCache {
          * @param dpExtra the child entries to validate
          */
         private void validateChildren(DataPageMain dpMain, DataPageExtra dpExtra) throws IOException {
-            int childTailPageNumber = dpMain._childTailPageNumber;
-            if (dpMain._leaf) {
+            int childTailPageNumber = dpMain.childTailPageNumber;
+            if (dpMain.leaf) {
                 if (childTailPageNumber != INVALID_INDEX_PAGE_NUMBER) {
                     throw new IllegalStateException(withErrorContext("Leaf page has tail " + dpMain));
                 }
                 return;
             }
-            if (dpExtra._entryView.size() == 1 && dpMain.hasChildTail()) {
+            if (dpExtra.entryView.size() == 1 && dpMain.hasChildTail()) {
                 throw new IllegalStateException(withErrorContext("Single child is tail " + dpMain));
             }
             Integer prevPageNumber = null;
             Integer nextPageNumber = null;
             Entry prevLastEntry = FIRST_ENTRY;
-            for (Entry e : dpExtra._entryView) {
+            for (Entry e : dpExtra.entryView) {
                 validateEntryForPage(dpMain, e);
                 Integer subPageNumber = e.getSubPageNumber();
                 DataPageMain childMain = getPageForValidate(subPageNumber);
                 if (childMain != null) {
-                    if (prevPageNumber != null && !childMain._prevPageNumber.equals(prevPageNumber)) {
-                        throw new IllegalStateException(withErrorContext("Child's prevPageNumber is not the previous child for " + childMain + " " + dpExtra._entryView + " " + prevPageNumber));
+                    if (prevPageNumber != null && !childMain.prevPageNumber.equals(prevPageNumber)) {
+                        throw new IllegalStateException(withErrorContext("Child's prevPageNumber is not the previous child for " + childMain + " " + dpExtra.entryView + " " + prevPageNumber));
                     }
-                    if (nextPageNumber != null && childMain._pageNumber != nextPageNumber) {
+                    if (nextPageNumber != null && childMain.pageNumber != nextPageNumber) {
                         throw new IllegalStateException(withErrorContext("Child's pageNumber is not the expected next child for " + childMain));
                     }
-                    if (childMain._parentPageNumber != null) {
-                        if (childMain._parentPageNumber != dpMain._pageNumber) {
+                    if (childMain.parentPageNumber != null) {
+                        if (childMain.parentPageNumber != dpMain.pageNumber) {
                             throw new IllegalStateException(withErrorContext("Child's parent is incorrect " + childMain));
                         }
                         boolean expectTail = subPageNumber == childTailPageNumber;
-                        if (expectTail != childMain._tail) {
+                        if (expectTail != childMain.tail) {
                             throw new IllegalStateException(withErrorContext("Child tail status incorrect " + childMain));
                         }
                     }
                     DataPageExtra childExtra = childMain.getExtra();
-                    Entry lastEntry = childExtra._entryView.getLast();
+                    Entry lastEntry = childExtra.entryView.getLast();
                     if (e.compareTo(lastEntry) != 0) {
                         throw new IllegalStateException(withErrorContext("Invalid entry " + e + " but child is " + lastEntry));
                     }
-                    Entry firstEntry = childExtra._entries.get(0);
+                    Entry firstEntry = childExtra.entries.get(0);
                     if (prevLastEntry.compareTo(firstEntry) >= 0) {
                         throw new IllegalStateException(withErrorContext(
                             "Invalid first entry " + firstEntry + " but prev last is " + prevLastEntry));
                     }
-                    nextPageNumber = childMain._nextPageNumber;
-                    prevPageNumber = childMain._pageNumber;
+                    nextPageNumber = childMain.nextPageNumber;
+                    prevPageNumber = childMain.pageNumber;
                     prevLastEntry = lastEntry;
                 } else {
                     // if we aren't force loading, we may have gaps in the children so we
@@ -1384,18 +1384,18 @@ public class IndexPageCache {
          */
         private void validatePeers(DataPageMain dpMain) throws IOException {
 
-            DataPageMain prevMain = getPageForValidate(dpMain._prevPageNumber);
+            DataPageMain prevMain = getPageForValidate(dpMain.prevPageNumber);
             if (prevMain != null) {
-                if (prevMain._nextPageNumber != dpMain._pageNumber) {
+                if (prevMain.nextPageNumber != dpMain.pageNumber) {
                     throw new IllegalStateException(withErrorContext("Prev page " + prevMain + " does not ref " + dpMain));
                 }
                 validatePeerStatus(dpMain, prevMain);
                 validatePeerEntries(prevMain, dpMain);
             }
 
-            DataPageMain nextMain = getPageForValidate(dpMain._nextPageNumber);
+            DataPageMain nextMain = getPageForValidate(dpMain.nextPageNumber);
             if (nextMain != null) {
-                if (nextMain._prevPageNumber != dpMain._pageNumber) {
+                if (nextMain.prevPageNumber != dpMain.pageNumber) {
                     throw new IllegalStateException(withErrorContext("Next page " + nextMain + " does not ref " + dpMain));
                 }
                 validatePeerStatus(dpMain, nextMain);
@@ -1410,12 +1410,12 @@ public class IndexPageCache {
          * @param peerMain the peer index page
          */
         private void validatePeerStatus(DataPageMain dpMain, DataPageMain peerMain) {
-            if (dpMain._leaf != peerMain._leaf) {
-                throw new IllegalStateException(withErrorContext("Mismatched peer status " + dpMain._leaf + " " + peerMain._leaf));
+            if (dpMain.leaf != peerMain.leaf) {
+                throw new IllegalStateException(withErrorContext("Mismatched peer status " + dpMain.leaf + " " + peerMain.leaf));
             }
-            if (!dpMain._leaf) {
-                if (dpMain._parentPageNumber != null && peerMain._parentPageNumber != null && !dpMain._parentPageNumber.equals(peerMain._parentPageNumber)) {
-                    throw new IllegalStateException(withErrorContext("Mismatched node parents " + dpMain._parentPageNumber + " " + peerMain._parentPageNumber));
+            if (!dpMain.leaf) {
+                if (dpMain.parentPageNumber != null && peerMain.parentPageNumber != null && !dpMain.parentPageNumber.equals(peerMain.parentPageNumber)) {
+                    throw new IllegalStateException(withErrorContext("Mismatched node parents " + dpMain.parentPageNumber + " " + peerMain.parentPageNumber));
                 }
             }
         }
@@ -1424,8 +1424,8 @@ public class IndexPageCache {
          * Validates the order of the entries of the peers.
          */
         private void validatePeerEntries(DataPageMain prevMain, DataPageMain nextMain) throws IOException {
-            Entry lastE = prevMain.getExtra()._entryView.getLast();
-            Entry firstE = nextMain.getExtra()._entries.get(0);
+            Entry lastE = prevMain.getExtra().entryView.getLast();
+            Entry firstE = nextMain.getExtra().entries.get(0);
             if (lastE.compareTo(firstE) >= 0) {
                 throw new IOException(
                     withErrorContext("Unexpected peer order in index entries, " + lastE + " >= " + firstE));
@@ -1433,12 +1433,12 @@ public class IndexPageCache {
         }
 
         private DataPageMain getPageForValidate(Integer pageNumber) throws IOException {
-            DataPageMain dpMain = _knownPages.get(pageNumber);
-            if (dpMain == null && _forceLoad && pageNumber != INVALID_INDEX_PAGE_NUMBER) {
+            DataPageMain dpMain = knownPages.get(pageNumber);
+            if (dpMain == null && forceLoad && pageNumber != INVALID_INDEX_PAGE_NUMBER) {
                 dpMain = getDataPage(pageNumber);
                 if (dpMain != null) {
-                    _knownPages.put(pageNumber, dpMain);
-                    _pendingPages.add(dpMain);
+                    knownPages.put(pageNumber, dpMain);
+                    pendingPages.add(dpMain);
                 } else {
                     throw new IllegalStateException(withErrorContext("Could not find index page " + pageNumber));
                 }

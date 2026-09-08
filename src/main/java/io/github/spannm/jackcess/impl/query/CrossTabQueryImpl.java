@@ -53,17 +53,17 @@ public class CrossTabQueryImpl extends BaseSelectQueryImpl implements CrossTabQu
     @Override
     public String getTransformExpression() {
         Row row = getTransformRow();
-        if (row._expression == null) {
+        if (row.expression == null) {
             return null;
         }
         // note column expression are always quoted appropriately
-        StringBuilder builder = new StringBuilder(row._expression);
-        return toAlias(builder, row._name1).toString();
+        StringBuilder builder = new StringBuilder(row.expression);
+        return toAlias(builder, row.name1).toString();
     }
 
     @Override
     public String getPivotExpression() {
-        return getPivotRow()._expression;
+        return getPivotRow().expression;
     }
 
     @Override

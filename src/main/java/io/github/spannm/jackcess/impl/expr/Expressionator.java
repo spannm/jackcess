@@ -135,21 +135,21 @@ public class Expressionator {
             }
         };
 
-        private final String  _str;
-        private final boolean _needSpace;
+        private final String  str;
+        private final boolean needSpace;
 
         UnaryOp(String str, boolean needSpace) {
-            _str = str;
-            _needSpace = needSpace;
+            this.str = str;
+            this.needSpace = needSpace;
         }
 
         public boolean needsSpace() {
-            return _needSpace;
+            return needSpace;
         }
 
         @Override
         public String toString() {
-            return _str;
+            return str;
         }
 
         public UnaryOp getUnaryNumOp() {
@@ -209,15 +209,15 @@ public class Expressionator {
             }
         };
 
-        private final String _str;
+        private final String str;
 
         BinaryOp(String str) {
-            _str = str;
+            this.str = str;
         }
 
         @Override
         public String toString() {
-            return _str;
+            return str;
         }
 
         public abstract Value eval(EvalContext ctx, Value param1, Value param2);
@@ -261,15 +261,15 @@ public class Expressionator {
             }
         };
 
-        private final String _str;
+        private final String str;
 
         CompOp(String str) {
-            _str = str;
+            this.str = str;
         }
 
         @Override
         public String toString() {
-            return _str;
+            return str;
         }
 
         public abstract Value eval(EvalContext ctx, Value param1, Value param2);
@@ -307,15 +307,15 @@ public class Expressionator {
             }
         };
 
-        private final String _str;
+        private final String str;
 
         LogOp(String str) {
-            _str = str;
+            this.str = str;
         }
 
         @Override
         public String toString() {
-            return _str;
+            return str;
         }
 
         public abstract Value eval(EvalContext ctx, Value param1, Value param2);
@@ -379,15 +379,15 @@ public class Expressionator {
             }
         };
 
-        private final String _str;
+        private final String str;
 
         SpecOp(String str) {
-            _str = str;
+            this.str = str;
         }
 
         @Override
         public String toString() {
-            return _str;
+            return str;
         }
 
         public abstract Value eval(EvalContext ctx, Value param1, Object param2, Object param3);
@@ -1014,104 +1014,104 @@ public class Expressionator {
     }
 
     private static final class TokBuf {
-        private final Type         _exprType;
-        private final List<Token>  _tokens;
-        private final TokBuf       _parent;
-        private final int          _parentOff;
-        private final ParseContext _ctx;
-        private int                _pos;
-        private Expr               _pendingExpr;
+        private final Type         exprType;
+        private final List<Token>  tokens;
+        private final TokBuf       parent;
+        private final int          parentOff;
+        private final ParseContext ctx;
+        private int                pos;
+        private Expr               pendingExpr;
 
         private TokBuf(Type exprType, List<Token> tokens, ParseContext context) {
             this(exprType, tokens, null, 0, context);
         }
 
         private TokBuf(List<Token> tokens, TokBuf parent, int parentOff) {
-            this(parent._exprType, tokens, parent, parentOff, parent._ctx);
+            this(parent.exprType, tokens, parent, parentOff, parent.ctx);
         }
 
         private TokBuf(Type exprType, List<Token> tokens, TokBuf parent, int parentOff, ParseContext context) {
-            _exprType = exprType;
-            _tokens = tokens;
-            _parent = parent;
-            _parentOff = parentOff;
-            _ctx = context;
+            this.exprType = exprType;
+            this.tokens = tokens;
+            this.parent = parent;
+            this.parentOff = parentOff;
+            ctx = context;
         }
 
         public Type getExprType() {
-            return _exprType;
+            return exprType;
         }
 
         public int curPos() {
-            return _pos;
+            return pos;
         }
 
         public int prevPos() {
-            return _pos - 1;
+            return pos - 1;
         }
 
         public boolean hasNext() {
-            return _pos < _tokens.size();
+            return pos < tokens.size();
         }
 
         public Token peekNext() {
             if (!hasNext()) {
                 return null;
             }
-            return _tokens.get(_pos);
+            return tokens.get(pos);
         }
 
         public Token next() {
             if (!hasNext()) {
                 throw new ParseException("Unexpected end of expression " + this);
             }
-            return _tokens.get(_pos++);
+            return tokens.get(pos++);
         }
 
-        public void reset(int pos) {
-            _pos = pos;
+        public void reset(int newPos) {
+            pos = newPos;
         }
 
         public TokBuf subBuf(int start, int end) {
-            return new TokBuf(_tokens.subList(start, end), this, start);
+            return new TokBuf(tokens.subList(start, end), this, start);
         }
 
         public void setPendingExpr(Expr expr) {
-            if (_pendingExpr != null) {
+            if (pendingExpr != null) {
                 throw new ParseException("Found multiple expressions with no operator " + this);
             }
-            _pendingExpr = expr.resolveOrderOfOperations();
+            pendingExpr = expr.resolveOrderOfOperations();
         }
 
         public void restorePendingExpr(Expr expr) {
             // this is an expression which was previously set, so no need to re-resolve
-            _pendingExpr = expr;
+            pendingExpr = expr;
         }
 
         public Expr takePendingExpr() {
-            Expr expr = _pendingExpr;
-            _pendingExpr = null;
+            Expr expr = pendingExpr;
+            pendingExpr = null;
             return expr;
         }
 
         public boolean hasPendingExpr() {
-            return _pendingExpr != null;
+            return pendingExpr != null;
         }
 
         private Map.Entry<Integer, List<Token>> getTopPos() {
-            int pos = _pos;
-            List<Token> toks = _tokens;
+            int curPos = pos;
+            List<Token> toks = tokens;
             TokBuf cur = this;
-            while (cur._parent != null) {
-                pos += cur._parentOff;
-                cur = cur._parent;
-                toks = cur._tokens;
+            while (cur.parent != null) {
+                curPos += cur.parentOff;
+                cur = cur.parent;
+                toks = cur.tokens;
             }
-            return ExpressionTokenizer.newEntry(pos, toks);
+            return ExpressionTokenizer.newEntry(curPos, toks);
         }
 
         public Function getFunction(String funcName) {
-            return _ctx.getFunctionLookup().getFunction(funcName);
+            return ctx.getFunctionLookup().getFunction(funcName);
         }
 
         @Override
@@ -1132,8 +1132,8 @@ public class Expressionator {
 
             sb.append(')');
 
-            if (_pendingExpr != null) {
-                sb.append(" [pending '").append(_pendingExpr.toDebugString(_ctx)).append("']");
+            if (pendingExpr != null) {
+                sb.append(" [pending '").append(pendingExpr.toDebugString(ctx)).append("']");
             }
 
             return sb.toString();
@@ -1333,17 +1333,17 @@ public class Expressionator {
     }
 
     private static final class DelayedValue extends BaseDelayedValue {
-        private final Expr        _expr;
-        private final EvalContext _ctx;
+        private final Expr        expr;
+        private final EvalContext ctx;
 
         private DelayedValue(Expr expr, EvalContext ctx) {
-            _expr = expr;
-            _ctx = ctx;
+            this.expr = expr;
+            this.ctx = ctx;
         }
 
         @Override
         public Value eval() {
-            return _expr.eval(_ctx);
+            return expr.eval(ctx);
         }
     }
 
@@ -1437,12 +1437,12 @@ public class Expressionator {
     }
 
     private static final class EConstValue extends Expr {
-        private final Value  _val;
-        private final String _str;
+        private final Value  val;
+        private final String str;
 
         private EConstValue(Value val, String str) {
-            _val = val;
-            _str = str;
+            this.val = val;
+            this.str = str;
         }
 
         @Override
@@ -1452,7 +1452,7 @@ public class Expressionator {
 
         @Override
         public Value eval(EvalContext ctx) {
-            return _val;
+            return val;
         }
 
         @Override
@@ -1462,7 +1462,7 @@ public class Expressionator {
 
         @Override
         protected void toExprString(LocaleContext ctx, StringBuilder sb, boolean isDebug) {
-            sb.append(_str);
+            sb.append(str);
         }
     }
 
@@ -1491,10 +1491,10 @@ public class Expressionator {
     }
 
     private static final class ELiteralValue extends Expr {
-        private final Value _val;
+        private final Value val;
 
         private ELiteralValue(Value.Type valType, Object value) {
-            _val = toLiteralValue(valType, value);
+            val = toLiteralValue(valType, value);
         }
 
         @Override
@@ -1504,7 +1504,7 @@ public class Expressionator {
 
         @Override
         public Value eval(EvalContext ctx) {
-            return _val;
+            return val;
         }
 
         @Override
@@ -1514,21 +1514,21 @@ public class Expressionator {
 
         @Override
         protected void toExprString(LocaleContext ctx, StringBuilder sb, boolean isDebug) {
-            if (_val.getType() == Value.Type.STRING) {
-                literalStrToString((String) _val.get(), sb);
-            } else if (_val.getType().isTemporal()) {
-                sb.append('#').append(_val.getAsString(ctx)).append('#');
+            if (val.getType() == Value.Type.STRING) {
+                literalStrToString((String) val.get(), sb);
+            } else if (val.getType().isTemporal()) {
+                sb.append('#').append(val.getAsString(ctx)).append('#');
             } else {
-                sb.append(_val.get());
+                sb.append(val.get());
             }
         }
     }
 
     private static final class EObjValue extends Expr {
-        private final Identifier _identifier;
+        private final Identifier identifier;
 
         private EObjValue(Identifier identifier) {
-            _identifier = identifier;
+            this.identifier = identifier;
         }
 
         @Override
@@ -1538,87 +1538,87 @@ public class Expressionator {
 
         @Override
         public Value eval(EvalContext ctx) {
-            return ctx.getIdentifierValue(_identifier);
+            return ctx.getIdentifierValue(identifier);
         }
 
         @Override
         public void collectIdentifiers(Collection<Identifier> identifiers) {
-            identifiers.add(_identifier);
+            identifiers.add(identifier);
         }
 
         @Override
         protected void toExprString(LocaleContext ctx, StringBuilder sb, boolean isDebug) {
-            sb.append(_identifier);
+            sb.append(identifier);
         }
     }
 
     private static class EParen extends Expr {
-        private final Expr _expr;
+        private final Expr expr;
 
         private EParen(Expr expr) {
-            _expr = expr;
+            this.expr = expr;
         }
 
         @Override
         public boolean isConstant() {
-            return _expr.isConstant();
+            return expr.isConstant();
         }
 
         @Override
         protected boolean isValidationExpr() {
-            return _expr.isValidationExpr();
+            return expr.isValidationExpr();
         }
 
         @Override
         public Value eval(EvalContext ctx) {
-            return _expr.eval(ctx);
+            return expr.eval(ctx);
         }
 
         @Override
         public void collectIdentifiers(Collection<Identifier> identifiers) {
-            _expr.collectIdentifiers(identifiers);
+            expr.collectIdentifiers(identifiers);
         }
 
         @Override
         protected void toExprString(LocaleContext ctx, StringBuilder sb, boolean isDebug) {
             sb.append('(');
-            _expr.toString(ctx, sb, isDebug);
+            expr.toString(ctx, sb, isDebug);
             sb.append(')');
         }
     }
 
     private static class EFunc extends Expr {
-        private final Function   _func;
-        private final List<Expr> _params;
+        private final Function   func;
+        private final List<Expr> params;
 
         private EFunc(Function func, List<Expr> params) {
-            _func = func;
-            _params = params;
+            this.func = func;
+            this.params = params;
         }
 
         @Override
         public boolean isConstant() {
-            return _func.isPure() && areConstant(_params);
+            return func.isPure() && areConstant(params);
         }
 
         @Override
         public Value eval(EvalContext ctx) {
-            return _func.eval(ctx, exprListToValues(_params, ctx));
+            return func.eval(ctx, exprListToValues(params, ctx));
         }
 
         @Override
         public void collectIdentifiers(Collection<Identifier> identifiers) {
-            for (Expr param : _params) {
+            for (Expr param : params) {
                 param.collectIdentifiers(identifiers);
             }
         }
 
         @Override
         protected void toExprString(LocaleContext ctx, StringBuilder sb, boolean isDebug) {
-            sb.append(_func.getName()).append('(');
+            sb.append(func.getName()).append('(');
 
-            if (!_params.isEmpty()) {
-                exprListToString(_params, ",", ctx, sb, isDebug);
+            if (!params.isEmpty()) {
+                exprListToString(params, ",", ctx, sb, isDebug);
             }
 
             sb.append(')');
@@ -1626,56 +1626,56 @@ public class Expressionator {
     }
 
     private abstract static class EBaseBinaryOp extends Expr implements LeftAssocExpr, RightAssocExpr {
-        protected final OpType _op;
-        protected Expr         _left;
-        protected Expr         _right;
+        protected final OpType op;
+        protected Expr         left;
+        protected Expr         right;
 
         private EBaseBinaryOp(OpType op, Expr left, Expr right) {
-            _op = op;
-            _left = left;
-            _right = right;
+            this.op = op;
+            this.left = left;
+            this.right = right;
         }
 
         @Override
         public boolean isConstant() {
-            return areConstant(_left, _right);
+            return areConstant(left, right);
         }
 
         @Override
         public OpType getOp() {
-            return _op;
+            return op;
         }
 
         @Override
         public Expr getLeft() {
-            return _left;
+            return left;
         }
 
         @Override
         public void setLeft(Expr left) {
-            _left = left;
+            this.left = left;
         }
 
         @Override
         public Expr getRight() {
-            return _right;
+            return right;
         }
 
         @Override
         public void setRight(Expr right) {
-            _right = right;
+            this.right = right;
         }
 
         @Override
         public void collectIdentifiers(Collection<Identifier> identifiers) {
-            _left.collectIdentifiers(identifiers);
-            _right.collectIdentifiers(identifiers);
+            left.collectIdentifiers(identifiers);
+            right.collectIdentifiers(identifiers);
         }
 
         @Override
         protected void toExprString(LocaleContext ctx, StringBuilder sb, boolean isDebug) {
-            appendLeadingExpr(_left, ctx, sb, isDebug).append(_op).append(' ');
-            _right.toString(ctx, sb, isDebug);
+            appendLeadingExpr(left, ctx, sb, isDebug).append(op).append(' ');
+            right.toString(ctx, sb, isDebug);
         }
     }
 
@@ -1686,56 +1686,56 @@ public class Expressionator {
 
         @Override
         public Value eval(EvalContext ctx) {
-            return ((BinaryOp) _op).eval(ctx, _left.eval(ctx), _right.eval(ctx));
+            return ((BinaryOp) op).eval(ctx, left.eval(ctx), right.eval(ctx));
         }
     }
 
     private static class EUnaryOp extends Expr implements RightAssocExpr {
-        private final OpType _op;
-        private Expr         _expr;
+        private final OpType op;
+        private Expr         expr;
 
         private EUnaryOp(UnaryOp op, Expr expr) {
-            _op = op;
-            _expr = expr;
+            this.op = op;
+            this.expr = expr;
         }
 
         @Override
         public boolean isConstant() {
-            return _expr.isConstant();
+            return expr.isConstant();
         }
 
         @Override
         public OpType getOp() {
-            return _op;
+            return op;
         }
 
         @Override
         public Expr getRight() {
-            return _expr;
+            return expr;
         }
 
         @Override
         public void setRight(Expr right) {
-            _expr = right;
+            expr = right;
         }
 
         @Override
         public Value eval(EvalContext ctx) {
-            return ((UnaryOp) _op).eval(ctx, _expr.eval(ctx));
+            return ((UnaryOp) op).eval(ctx, expr.eval(ctx));
         }
 
         @Override
         public void collectIdentifiers(Collection<Identifier> identifiers) {
-            _expr.collectIdentifiers(identifiers);
+            expr.collectIdentifiers(identifiers);
         }
 
         @Override
         protected void toExprString(LocaleContext ctx, StringBuilder sb, boolean isDebug) {
-            sb.append(_op);
-            if (isDebug || ((UnaryOp) _op).needsSpace()) {
+            sb.append(op);
+            if (isDebug || ((UnaryOp) op).needsSpace()) {
                 sb.append(' ');
             }
-            _expr.toString(ctx, sb, isDebug);
+            expr.toString(ctx, sb, isDebug);
         }
     }
 
@@ -1751,7 +1751,7 @@ public class Expressionator {
 
         @Override
         public Value eval(EvalContext ctx) {
-            return ((CompOp) _op).eval(ctx, _left.eval(ctx), _right.eval(ctx));
+            return ((CompOp) op).eval(ctx, left.eval(ctx), right.eval(ctx));
         }
     }
 
@@ -1767,7 +1767,7 @@ public class Expressionator {
                 super.toExprString(ctx, sb, isDebug);
             } else {
                 // just output the explicit part of the expression
-                _right.toString(ctx, sb, isDebug);
+                right.toString(ctx, sb, isDebug);
             }
         }
     }
@@ -1787,42 +1787,42 @@ public class Expressionator {
 
             // logical operations do short circuit evaluation, so we need to delay
             // computing results until necessary
-            return ((LogOp) _op).eval(ctx, new DelayedValue(_left, ctx), new DelayedValue(_right, ctx));
+            return ((LogOp) op).eval(ctx, new DelayedValue(left, ctx), new DelayedValue(right, ctx));
         }
     }
 
     private abstract static class ESpecOp extends Expr implements LeftAssocExpr {
-        protected final SpecOp _op;
-        protected Expr         _expr;
+        protected final SpecOp op;
+        protected Expr         expr;
 
         private ESpecOp(SpecOp op, Expr expr) {
-            _op = op;
-            _expr = expr;
+            this.op = op;
+            this.expr = expr;
         }
 
         @Override
         public boolean isConstant() {
-            return _expr.isConstant();
+            return expr.isConstant();
         }
 
         @Override
         public OpType getOp() {
-            return _op;
+            return op;
         }
 
         @Override
         public Expr getLeft() {
-            return _expr;
+            return expr;
         }
 
         @Override
         public void setLeft(Expr left) {
-            _expr = left;
+            expr = left;
         }
 
         @Override
         public void collectIdentifiers(Collection<Identifier> identifiers) {
-            _expr.collectIdentifiers(identifiers);
+            expr.collectIdentifiers(identifiers);
         }
 
         @Override
@@ -1838,40 +1838,40 @@ public class Expressionator {
 
         @Override
         public Value eval(EvalContext ctx) {
-            return _op.eval(ctx, _expr.eval(ctx), null, null);
+            return op.eval(ctx, expr.eval(ctx), null, null);
         }
 
         @Override
         protected void toExprString(LocaleContext ctx, StringBuilder sb, boolean isDebug) {
-            appendLeadingExpr(_expr, ctx, sb, isDebug).append(_op);
+            appendLeadingExpr(expr, ctx, sb, isDebug).append(op);
         }
     }
 
     private static class ELikeOp extends ESpecOp {
-        private final String _patternStr;
-        private Pattern      _pattern;
+        private final String patternStr;
+        private Pattern      pattern;
 
         private ELikeOp(SpecOp op, Expr expr, String patternStr) {
             super(op, expr);
-            _patternStr = patternStr;
+            this.patternStr = patternStr;
         }
 
         private Pattern getPattern() {
-            if (_pattern == null) {
-                _pattern = likePatternToRegex(_patternStr);
+            if (pattern == null) {
+                pattern = likePatternToRegex(patternStr);
             }
-            return _pattern;
+            return pattern;
         }
 
         @Override
         public Value eval(EvalContext ctx) {
-            return _op.eval(ctx, _expr.eval(ctx), getPattern(), null);
+            return op.eval(ctx, expr.eval(ctx), getPattern(), null);
         }
 
         @Override
         protected void toExprString(LocaleContext ctx, StringBuilder sb, boolean isDebug) {
-            appendLeadingExpr(_expr, ctx, sb, isDebug).append(_op).append(' ');
-            literalStrToString(_patternStr, sb);
+            appendLeadingExpr(expr, ctx, sb, isDebug).append(op).append(' ');
+            literalStrToString(patternStr, sb);
             if (isDebug) {
                 sb.append('(').append(getPattern()).append(')');
             }
@@ -1879,81 +1879,81 @@ public class Expressionator {
     }
 
     private static class EInOp extends ESpecOp {
-        private final List<Expr> _exprs;
+        private final List<Expr> exprs;
 
         private EInOp(SpecOp op, Expr expr, List<Expr> exprs) {
             super(op, expr);
-            _exprs = exprs;
+            this.exprs = exprs;
         }
 
         @Override
         public boolean isConstant() {
-            return super.isConstant() && areConstant(_exprs);
+            return super.isConstant() && areConstant(exprs);
         }
 
         @Override
         public Value eval(EvalContext ctx) {
-            return _op.eval(ctx, _expr.eval(ctx), exprListToDelayedValues(_exprs, ctx), null);
+            return op.eval(ctx, expr.eval(ctx), exprListToDelayedValues(exprs, ctx), null);
         }
 
         @Override
         public void collectIdentifiers(Collection<Identifier> identifiers) {
-            for (Expr expr : _exprs) {
+            for (Expr expr : exprs) {
                 expr.collectIdentifiers(identifiers);
             }
         }
 
         @Override
         protected void toExprString(LocaleContext ctx, StringBuilder sb, boolean isDebug) {
-            appendLeadingExpr(_expr, ctx, sb, isDebug).append(_op).append(" (");
-            exprListToString(_exprs, ",", ctx, sb, isDebug);
+            appendLeadingExpr(expr, ctx, sb, isDebug).append(op).append(" (");
+            exprListToString(exprs, ",", ctx, sb, isDebug);
             sb.append(')');
         }
     }
 
     private static class EBetweenOp extends ESpecOp implements RightAssocExpr {
-        private final Expr _startRangeExpr;
-        private Expr       _endRangeExpr;
+        private final Expr startRangeExpr;
+        private Expr       endRangeExpr;
 
         private EBetweenOp(SpecOp op, Expr expr, Expr startRangeExpr, Expr endRangeExpr) {
             super(op, expr);
-            _startRangeExpr = startRangeExpr;
-            _endRangeExpr = endRangeExpr;
+            this.startRangeExpr = startRangeExpr;
+            this.endRangeExpr = endRangeExpr;
         }
 
         @Override
         public boolean isConstant() {
-            return _expr.isConstant() && areConstant(_startRangeExpr, _endRangeExpr);
+            return expr.isConstant() && areConstant(startRangeExpr, endRangeExpr);
         }
 
         @Override
         public Expr getRight() {
-            return _endRangeExpr;
+            return endRangeExpr;
         }
 
         @Override
         public void setRight(Expr right) {
-            _endRangeExpr = right;
+            endRangeExpr = right;
         }
 
         @Override
         public Value eval(EvalContext ctx) {
-            return _op.eval(ctx, _expr.eval(ctx), new DelayedValue(_startRangeExpr, ctx), new DelayedValue(_endRangeExpr, ctx));
+            return op.eval(ctx, expr.eval(ctx), new DelayedValue(startRangeExpr, ctx), new DelayedValue(endRangeExpr, ctx));
         }
 
         @Override
         public void collectIdentifiers(Collection<Identifier> identifiers) {
             super.collectIdentifiers(identifiers);
-            _startRangeExpr.collectIdentifiers(identifiers);
-            _endRangeExpr.collectIdentifiers(identifiers);
+            startRangeExpr.collectIdentifiers(identifiers);
+            endRangeExpr.collectIdentifiers(identifiers);
         }
 
         @Override
         protected void toExprString(LocaleContext ctx, StringBuilder sb, boolean isDebug) {
-            appendLeadingExpr(_expr, ctx, sb, isDebug).append(_op).append(' ');
-            _startRangeExpr.toString(ctx, sb, isDebug);
+            appendLeadingExpr(expr, ctx, sb, isDebug).append(op).append(' ');
+            startRangeExpr.toString(ctx, sb, isDebug);
             sb.append(" And ");
-            _endRangeExpr.toString(ctx, sb, isDebug);
+            endRangeExpr.toString(ctx, sb, isDebug);
         }
     }
 
@@ -1961,37 +1961,37 @@ public class Expressionator {
      * Base Expression wrapper for an Expr.
      */
     private abstract static class BaseExprWrapper implements Expression {
-        private final String _rawExprStr;
-        private final Expr   _expr;
+        private final String rawExprStr;
+        private final Expr   expr;
 
         private BaseExprWrapper(String rawExprStr, Expr expr) {
-            _rawExprStr = rawExprStr;
-            _expr = expr;
+            this.rawExprStr = rawExprStr;
+            this.expr = expr;
         }
 
         @Override
         public String toDebugString(LocaleContext ctx) {
-            return _expr.toDebugString(ctx);
+            return expr.toDebugString(ctx);
         }
 
         @Override
         public String toRawString() {
-            return _rawExprStr;
+            return rawExprStr;
         }
 
         @Override
         public String toCleanString(LocaleContext ctx) {
-            return _expr.toCleanString(ctx);
+            return expr.toCleanString(ctx);
         }
 
         @Override
         public boolean isConstant() {
-            return _expr.isConstant();
+            return expr.isConstant();
         }
 
         @Override
         public void collectIdentifiers(Collection<Identifier> identifiers) {
-            _expr.collectIdentifiers(identifiers);
+            expr.collectIdentifiers(identifiers);
         }
 
         @Override
@@ -2000,7 +2000,7 @@ public class Expressionator {
         }
 
         protected Object evalValue(Value.Type resultType, EvalContext ctx) {
-            Value val = _expr.eval(ctx);
+            Value val = expr.eval(ctx);
 
             if (val.isNull()) {
                 return null;
@@ -2032,7 +2032,7 @@ public class Expressionator {
         }
 
         protected Boolean evalCondition(EvalContext ctx) {
-            Value val = _expr.eval(ctx);
+            Value val = expr.eval(ctx);
 
             if (val.isNull()) {
                 // null can't be coerced to a boolean
@@ -2047,16 +2047,16 @@ public class Expressionator {
      * Expression wrapper for an Expr which returns a value.
      */
     private static class ExprWrapper extends BaseExprWrapper {
-        private final Value.Type _resultType;
+        private final Value.Type resultType;
 
         private ExprWrapper(String rawExprStr, Expr expr, Value.Type resultType) {
             super(rawExprStr, expr);
-            _resultType = resultType;
+            this.resultType = resultType;
         }
 
         @Override
         public Object eval(EvalContext ctx) {
-            return evalValue(_resultType, ctx);
+            return evalValue(resultType, ctx);
         }
     }
 
@@ -2078,7 +2078,7 @@ public class Expressionator {
      * Expression wrapper for a <i>pure</i> Expr which caches the result of evaluation.
      */
     private static final class MemoizedExprWrapper extends ExprWrapper {
-        private Object _val;
+        private Object val;
 
         private MemoizedExprWrapper(String rawExprStr, Expr expr, Value.Type resultType) {
             super(rawExprStr, expr, resultType);
@@ -2086,10 +2086,10 @@ public class Expressionator {
 
         @Override
         public Object eval(EvalContext ctx) {
-            if (_val == null) {
-                _val = super.eval(ctx);
+            if (val == null) {
+                val = super.eval(ctx);
             }
-            return _val;
+            return val;
         }
     }
 
@@ -2097,7 +2097,7 @@ public class Expressionator {
      * Expression wrapper for a <i>pure</i> conditional Expr which caches the result of evaluation.
      */
     private static final class MemoizedCondExprWrapper extends CondExprWrapper {
-        private Object _val;
+        private Object val;
 
         private MemoizedCondExprWrapper(String rawExprStr, Expr expr) {
             super(rawExprStr, expr);
@@ -2105,10 +2105,10 @@ public class Expressionator {
 
         @Override
         public Object eval(EvalContext ctx) {
-            if (_val == null) {
-                _val = super.eval(ctx);
+            if (val == null) {
+                val = super.eval(ctx);
             }
-            return _val;
+            return val;
         }
     }
 }
