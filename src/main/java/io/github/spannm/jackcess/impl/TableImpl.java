@@ -189,6 +189,7 @@ public class TableImpl implements Table, PropertyMaps.Owner {
      * @param pageNumber Page number of the table definition
      * @param name Table name
      */
+    @SuppressWarnings("this-escape")
     protected TableImpl(DatabaseImpl database, ByteBuffer tableBuffer, int pageNumber, String name, int flags) throws IOException {
         this.database = database;
         tableDefPageNumber = pageNumber;

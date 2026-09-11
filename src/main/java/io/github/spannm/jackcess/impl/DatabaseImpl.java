@@ -651,6 +651,7 @@ public class DatabaseImpl implements Database, DateTimeContext {
      * @param charset Charset to use, if {@code null}, uses default
      * @param timeZone TimeZone to use, if {@code null}, uses default
      */
+    @SuppressWarnings("this-escape")
     protected DatabaseImpl(Path file, FileChannel channel, boolean closeChannel, boolean autoSync, FileFormat fileFormat, Charset charset, TimeZone timeZone, CodecProvider provider, boolean readOnly,
         boolean ignoreSystemCatalogIndex) throws IOException {
         mfile = file;

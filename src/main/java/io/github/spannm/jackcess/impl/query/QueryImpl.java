@@ -63,7 +63,7 @@ public abstract class QueryImpl implements Query {
      * Returns the name of the query.
      */
     @Override
-    public String getName() {
+    public final String getName() {
         return name;
     }
 
