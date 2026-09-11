@@ -150,6 +150,7 @@ public class VersionHistoryColumnInfoImpl extends ComplexColumnInfoImpl<Version>
         }
 
         @Override
+        @SuppressWarnings("deprecation")
         public Date getModifiedDate() {
             return (Date) modifiedDate;
         }
