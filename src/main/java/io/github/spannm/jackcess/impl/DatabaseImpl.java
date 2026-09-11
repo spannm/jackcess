@@ -439,6 +439,10 @@ public class DatabaseImpl implements Database, DateTimeContext {
      */
     private boolean                         mevaluateExpressions;
     /**
+     * whether or not to allow writing indexes with unsupported sort orders
+     */
+    private boolean                         mwriteBrokenIndex;
+    /**
      * factory for ColumnValidators
      */
     private ColumnValidatorFactory          mvalidatorFactory                   = SimpleColumnValidatorFactory.INSTANCE;
@@ -658,6 +662,7 @@ public class DatabaseImpl implements Database, DateTimeContext {
         menforceForeignKeys = getDefaultEnforceForeignKeys();
         mallowAutoNumInsert = getDefaultAllowAutoNumberInsert();
         mevaluateExpressions = getDefaultEvaluateExpressions();
+        mwriteBrokenIndex = getDefaultWriteBrokenIndex();
         mfileFormat = fileFormat;
         setZoneInfo(timeZone, null);
         dtf = ColumnImpl.getDateTimeFactory(getDefaultDateTimeType());
@@ -890,6 +895,19 @@ public class DatabaseImpl implements Database, DateTimeContext {
     }
 
     @Override
+    public boolean isWriteBrokenIndex() {
+        return mwriteBrokenIndex;
+    }
+
+    @Override
+    public void setWriteBrokenIndex(Boolean writeBrokenIndex) {
+        if (writeBrokenIndex == null) {
+            writeBrokenIndex = getDefaultWriteBrokenIndex();
+        }
+        mwriteBrokenIndex = writeBrokenIndex;
+    }
+
+    @Override
     public ColumnValidatorFactory getColumnValidatorFactory() {
         return mvalidatorFactory;
     }
@@ -1075,7 +1093,7 @@ public class DatabaseImpl implements Database, DateTimeContext {
                 if (cols.size() == 2
                     && CAT_COL_PARENT_ID.equals(cols.get(0).getName())
                     && CAT_COL_NAME.equals(cols.get(1).getName())
-                    && idx.getIndexData().getUnsupportedReason() != null) {
+                    && !idx.getIndexData().isValid()) {
                     forceScan = true;
                     LOGGER.log(Level.DEBUG, () -> withErrorContext(
                         "System catalog index unsupported (" + idx.getIndexData().getUnsupportedReason() + "), forcing table scan"));
@@ -2111,6 +2129,14 @@ public class DatabaseImpl implements Database, DateTimeContext {
      */
     public static boolean getDefaultEvaluateExpressions() {
         return Optional.ofNullable(System.getProperty(ENABLE_EXPRESSION_EVALUATION_PROPERTY)).map(p -> Boolean.TRUE.toString().equalsIgnoreCase(p)).orElse(true);
+    }
+
+    /**
+     * Returns the default write broken index policy. This defaults to {@code false}, but can be overridden using the system property
+     * {@value io.github.spannm.jackcess.Database#WRITE_BROKEN_INDEX_PROPERTY}.
+     */
+    public static boolean getDefaultWriteBrokenIndex() {
+        return Boolean.TRUE.toString().equalsIgnoreCase(System.getProperty(WRITE_BROKEN_INDEX_PROPERTY));
     }
 
     /**

@@ -111,6 +111,14 @@ public interface Database extends Iterable<Table>, Closeable, Flushable {
      */
     String            DATE_TIME_TYPE_PROPERTY               = "jackcess.dateTimeType";
 
+    /**
+     * System property which can be used to allow writing indexes with unsupported text sort orders. Defaults to
+     * {@code false}. When enabled, instead of failing, an index with an unsupported text sort order will be written
+     * using the general legacy sort order. This allows the database to be created with all the structure necessary by
+     * Jackcess, and the index can then be fixed by using "compact and repair" in MS Access.
+     */
+    String            WRITE_BROKEN_INDEX_PROPERTY           = "jackcess.writeBrokenIndex";
+
     String            FILE_EXT_MDB                          = ".mdb";
     String            FILE_EXT_ACCDB                        = ".accdb";
 
@@ -387,6 +395,16 @@ public interface Database extends Iterable<Table>, Closeable, Flushable {
      * necessary. If {@code null}, resets to the default value.
      */
     void setEvaluateExpressions(Boolean evaluateExpressions);
+
+    /**
+     * Gets the current write broken index policy. See {@link #WRITE_BROKEN_INDEX_PROPERTY} for details.
+     */
+    boolean isWriteBrokenIndex();
+
+    /**
+     * Sets the current write broken index policy. If {@code null}, resets to the default value.
+     */
+    void setWriteBrokenIndex(Boolean writeBrokenIndex);
 
     /**
      * Gets currently configured ColumnValidatorFactory (always non-{@code null}).

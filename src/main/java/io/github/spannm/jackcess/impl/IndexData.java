@@ -145,6 +145,16 @@ public class IndexData {
         ALWAYS_LAST
     }
 
+    /** support status for an index */
+    private enum IndexStatus {
+        /** index is fully functional for both reads and writes */
+        VALID,
+        /** index was written with a fallback sort order; writes are allowed but the index is not suitable for lookups */
+        BROKEN_WRITE,
+        /** index cannot be written */
+        READ_ONLY
+    }
+
     public static final Comparator<byte[]> BYTE_CODE_COMPARATOR = (left, right) -> {
                                                                     if (left == right) {
                                                                         return 0;
@@ -203,7 +213,9 @@ public class IndexData {
     private final int                      maxPageEntrySize;
     /** whether or not this index data is backing a primary key logical index */
     private boolean                        primaryKey;
-    /** if non-null, the reason why we cannot create entries for this index */
+    /** current support status of this index */
+    private IndexStatus                    status              = IndexStatus.VALID;
+    /** if non-null, the reason why this index has a non-{@link IndexStatus#VALID} status */
     private String                         unsupportedReason;
     /** Cache which manages the index pages */
     private final IndexPageCache           pageCache;
@@ -379,25 +391,46 @@ public class IndexData {
      *
      * @param reason human-readable description of why the index cannot be written; will be enriched with
      *               database/table/index context via {@link #withErrorContext(String)}
+     * @param status the resulting support status; either {@link IndexStatus#BROKEN_WRITE} (writes still allowed but
+     *               the index is unsuitable for lookups) or {@link IndexStatus#READ_ONLY} (writes disabled entirely)
      * @param col    the column whose descriptor triggered the unsupported condition
      */
-    private void setUnsupportedReason(String reason, ColumnImpl col) {
+    private void setUnsupportedReason(String reason, IndexStatus status, ColumnImpl col) {
+        this.status = status;
         unsupportedReason = withErrorContext(reason);
-        LOGGER.log(col.getTable().isSystem() ? Level.DEBUG : Level.WARNING, "{0}, making read-only", unsupportedReason);
+        String suffix = status == IndexStatus.READ_ONLY ? "making read-only" : "index not suitable for lookups";
+        LOGGER.log(col.getTable().isSystem() ? Level.DEBUG : Level.WARNING, "{0}, {1}", unsupportedReason, suffix);
     }
 
     /**
-     * Returns the reason why write operations are disabled for this index, or {@code null} if the index is fully writable.
+     * Returns the reason why this index is not fully valid, or {@code null} if the index is fully writable and usable
+     * for lookups.
      * <p>
      * A non-{@code null} value means that {@link #setUnsupportedReason} was called during index initialisation
      * because Jackcess cannot encode entries for at least one of the index columns. Callers (e.g.
      * {@code DatabaseImpl.readSystemCatalog}) may inspect this value to decide whether to fall back to a table scan
      * instead of using an index cursor.
      *
-     * @return unsupported reason string, or {@code null} if the index is writable
+     * @return unsupported reason string, or {@code null} if the index is fully valid
      */
     String getUnsupportedReason() {
         return unsupportedReason;
+    }
+
+    /**
+     * Returns {@code true} if this index is fully functional for both reads and writes.
+     */
+    boolean isValid() {
+        return status == IndexStatus.VALID;
+    }
+
+    /**
+     * Returns {@code true} if write operations are disabled entirely for this index. Note that a non-valid index
+     * that is not read-only ({@link IndexStatus#BROKEN_WRITE}) still allows writes, using a fallback encoding, but is
+     * not suitable for lookups.
+     */
+    boolean isReadOnly() {
+        return status == IndexStatus.READ_ONLY;
     }
 
     protected int getMaxPageEntrySize() {
@@ -460,7 +493,7 @@ public class IndexData {
         // make sure we've parsed the entries
         initialize();
 
-        if (unsupportedReason != null) {
+        if (isReadOnly()) {
             throw new UnsupportedOperationException("Cannot write indexes of this type due to " + unsupportedReason);
         }
         pageCache.write();
@@ -1433,7 +1466,14 @@ public class IndexData {
                     return new UkrainianTextColumnDescriptor(col, flags);
                 }
                 // unsupported sort order
-                setUnsupportedReason("unsupported collating sort order " + sortOrder + " for text index", col);
+                if (col.getTable().getDatabase().isWriteBrokenIndex()) {
+                    // write using the general legacy sort order so the db can be created with the necessary
+                    // structure and later fixed via "compact and repair" in MS Access; the index is marked broken so
+                    // it is not used for lookups
+                    setUnsupportedReason("unsupported collating sort order " + sortOrder + " for text index", IndexStatus.BROKEN_WRITE, col);
+                    return new GenLegTextColumnDescriptor(col, flags);
+                }
+                setUnsupportedReason("unsupported collating sort order " + sortOrder + " for text index", IndexStatus.READ_ONLY, col);
                 return new ReadOnlyColumnDescriptor(col, flags);
             case INT:
             case LONG:
@@ -1460,7 +1500,7 @@ public class IndexData {
 
             default:
                 // we can't modify this index at this point in time
-                setUnsupportedReason("unsupported data type " + col.getType() + " for index", col);
+                setUnsupportedReason("unsupported data type " + col.getType() + " for index", IndexStatus.READ_ONLY, col);
                 return new ReadOnlyColumnDescriptor(col, flags);
         }
     }

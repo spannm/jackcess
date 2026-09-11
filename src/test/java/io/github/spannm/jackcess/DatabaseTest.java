@@ -961,6 +961,38 @@ class DatabaseTest extends AbstractBaseTest {
         }
     }
 
+    /**
+     * Fixture created with real MS Access, whose "New database sort order" was set to Icelandic (LCID 1039) before
+     * creating the file. Icelandic has no dedicated {@code ColumnDescriptor} (unlike e.g. Russian/Turkish/Ukrainian),
+     * so any text index in this database is unsupported by Jackcess and exercises the
+     * {@link Database#WRITE_BROKEN_INDEX_PROPERTY} fallback tested below.
+     */
+    private static final File UNSUPPORTED_SORT_ORDER_DB = new File(DIR_TEST_DATA, "other/unsupportedSortOrder.accdb");
+
+    @Test
+    void testAddTableUnsupportedSortOrderCatalogByDefaultThrows() throws Exception {
+        try (Database db = openCopy(FileFormat.V2007, UNSUPPORTED_SORT_ORDER_DB)) {
+            UnsupportedOperationException ex = assertThrows(UnsupportedOperationException.class,
+                () -> DatabaseBuilder.newTable("test2").addColumn(DatabaseBuilder.newColumn("A", DataType.TEXT)).toTable(db));
+            assertTrue(ex.getMessage().contains("unsupported collating sort order"));
+        }
+    }
+
+    @Test
+    void testAddTableWriteBrokenIndexAllowsUnsupportedSortOrder() throws Exception {
+        System.setProperty(Database.WRITE_BROKEN_INDEX_PROPERTY, "true");
+        try (Database db = openCopy(FileFormat.V2007, UNSUPPORTED_SORT_ORDER_DB)) {
+            DatabaseBuilder.newTable("test2").addColumn(DatabaseBuilder.newColumn("A", DataType.TEXT)).toTable(db);
+
+            Table existing = db.getTable("t_icelandic");
+            assertNotNull(existing);
+            Table added = db.getTable("test2");
+            assertNotNull(added);
+        } finally {
+            System.clearProperty(Database.WRITE_BROKEN_INDEX_PROPERTY);
+        }
+    }
+
     @ParameterizedTest(name = "[{index}] {0}")
     @TestDbSource(COMMON1)
     void testBrokenIndex(TestDb testDb) throws Exception {

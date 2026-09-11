@@ -72,7 +72,7 @@ public class IndexCursorImpl extends CursorImpl implements IndexCursor {
         if (_table != _index.getTable()) {
             throw new IllegalArgumentException("Given index is not for given table: " + _index + ", " + _table);
         }
-        if (_index.getIndexData().getUnsupportedReason() != null) {
+        if (!_index.getIndexData().isValid()) {
             throw new IllegalArgumentException("Given index " + _index + " is not usable for indexed lookups due to " + _index.getIndexData().getUnsupportedReason());
         }
         IndexCursorImpl cursor = new IndexCursorImpl(_table, _index, _index.cursor(_startRow, _startInclusive, _endRow, _endInclusive));
