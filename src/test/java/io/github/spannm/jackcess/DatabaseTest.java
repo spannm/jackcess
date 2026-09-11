@@ -265,7 +265,7 @@ class DatabaseTest extends AbstractBaseTest {
     }
 
     @Test
-    @SuppressWarnings("EmptyBlock")
+    @SuppressWarnings({"EmptyBlock", "try"})
     void testMissingFile() {
         File bogusFile = new File("fooby-dooby.mdb");
         assertFalse(bogusFile.exists());
