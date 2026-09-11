@@ -2821,7 +2821,7 @@ public class TableImpl implements Table, PropertyMaps.Owner {
 
         // determine row position
         short rowLocation = findRowEnd(dataPage, rowCount, format);
-        rowLocation -= rowSize;
+        rowLocation = (short) (rowLocation - rowSize);
 
         // write row position
         dataPage.putShort(getRowStartOffset(rowCount, format), (short) (rowLocation | rowFlags));

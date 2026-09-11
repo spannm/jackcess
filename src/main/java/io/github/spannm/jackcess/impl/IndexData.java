@@ -1097,7 +1097,7 @@ public class IndexData {
         for (Entry entry : dataPage.getEntries()) {
             totalSize += entry.size() - entryPrefix.length;
             int idx = totalSize / 8;
-            entryMask[idx] |= 1 << totalSize % 8;
+            entryMask[idx] = (byte) (entryMask[idx] | 1 << totalSize % 8);
         }
         buffer.put(entryMask);
 

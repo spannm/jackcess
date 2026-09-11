@@ -137,7 +137,7 @@ public abstract class TableMutator extends DBMutator {
                 return 0;
             }
             short offset = fixedOffset;
-            fixedOffset += col.getFixedDataSize();
+            fixedOffset = (short) (fixedOffset + col.getFixedDataSize());
             return offset;
         }
     }

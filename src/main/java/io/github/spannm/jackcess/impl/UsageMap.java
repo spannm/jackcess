@@ -312,10 +312,10 @@ public class UsageMap {
 
         // Apply the bitmask
         if (add) {
-            b |= bitmask;
+            b = (byte) (b | bitmask);
             pageNumbers.set(pageNumberOffset);
         } else {
-            b &= ~bitmask;
+            b = (byte) (b & ~bitmask);
             pageNumbers.clear(pageNumberOffset);
         }
         buffer.put(startOffset + offset, b);

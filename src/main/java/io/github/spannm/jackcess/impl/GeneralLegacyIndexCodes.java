@@ -866,7 +866,7 @@ public class GeneralLegacyIndexCodes {
             int idx = 0;
             for (int i = 0; i < crazyCodes.getLength(); ++i) {
                 byte nextByte = crazyCodes.get(i);
-                nextByte <<= (2 - idx) * 2;
+                nextByte = (byte) (nextByte << (2 - idx) * 2);
                 curByte |= nextByte;
 
                 idx++;
