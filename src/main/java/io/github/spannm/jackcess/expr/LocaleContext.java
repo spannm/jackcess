@@ -19,11 +19,19 @@ package io.github.spannm.jackcess.expr;
 import java.text.DecimalFormat;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
+import java.util.Locale;
 
 /**
  * LocaleContext encapsulates all shared localization state for expression parsing and evaluation.
  */
 public interface LocaleContext {
+    /**
+     * @return the currently configured Locale
+     */
+    default Locale getLocale() {
+        return getTemporalConfig().getLocale();
+    }
+
     /**
      * @return the currently configured TemporalConfig (from the {@link EvalConfig})
      */

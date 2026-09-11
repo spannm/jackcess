@@ -31,6 +31,7 @@ import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.Collection;
 import java.util.EnumMap;
+import java.util.Locale;
 import java.util.Map;
 
 import javax.script.Bindings;
@@ -65,6 +66,11 @@ public abstract class BaseEvalContext implements EvalContext {
 
     protected DatabaseImpl getDatabase() {
         return dbCtx.getDatabase();
+    }
+
+    @Override
+    public Locale getLocale() {
+        return dbCtx.getLocale();
     }
 
     @Override

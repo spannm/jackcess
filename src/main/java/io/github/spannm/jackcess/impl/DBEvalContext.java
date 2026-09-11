@@ -28,6 +28,7 @@ import io.github.spannm.jackcess.impl.expr.RandomContext;
 import java.text.DecimalFormat;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
+import java.util.Locale;
 import java.util.Map;
 
 import javax.script.Bindings;
@@ -40,6 +41,7 @@ public class DBEvalContext implements Expressionator.ParseContext, EvalConfig {
     private FunctionLookup                 funcs          = DefaultFunctions.LOOKUP;
     private Map<String, DateTimeFormatter> sdfs;
     private Map<String, DecimalFormat>     dfs;
+    private Locale                         locale         = Locale.US;
     private TemporalConfig                 temporal       = TemporalConfig.US_TEMPORAL_CONFIG;
     private NumericConfig                  numeric        = NumericConfig.US_NUMERIC_CONFIG;
     private final RandomContext            rndCtx         = new RandomContext();
@@ -51,6 +53,16 @@ public class DBEvalContext implements Expressionator.ParseContext, EvalConfig {
 
     protected DatabaseImpl getDatabase() {
         return db;
+    }
+
+    @Override
+    public Locale getLocale() {
+        return locale;
+    }
+
+    @Override
+    public void setLocale(Locale newLocale) {
+        locale = newLocale;
     }
 
     @Override

@@ -22,6 +22,7 @@ import io.github.spannm.jackcess.complex.ComplexValue;
 import io.github.spannm.jackcess.complex.ComplexValueForeignKey;
 import io.github.spannm.jackcess.expr.Identifier;
 import io.github.spannm.jackcess.impl.complex.ComplexValueForeignKeyImpl;
+import io.github.spannm.jackcess.impl.expr.LocaleUtil;
 import io.github.spannm.jackcess.impl.expr.NumberFormatter;
 import io.github.spannm.jackcess.util.ColumnValidator;
 import io.github.spannm.jackcess.util.SimpleColumnValidator;
@@ -2438,75 +2439,10 @@ public class ColumnImpl implements Column, Comparable<ColumnImpl>, DateTimeConte
 
         @Override
         public String toString() {
-            String name = LcidNames.VALUES.get(mvalue);
+            LocaleUtil.LcidInfo info = LocaleUtil.getInfo(mvalue);
             String valueStr = mvalue + "(" + mversion + ")";
-            return ToStringBuilder.valueBuilder(this).append(null, name != null ? valueStr + ", " + name : valueStr).toString();
+            return ToStringBuilder.valueBuilder(this).append(null, info != null ? valueStr + ", " + info : valueStr).toString();
         }
-
-        /**
-         * Lazily-loaded map from Windows LCID to the English display name used in MS Access.
-         * <p>
-         * Holding the map in a nested class defers initialisation until the first call to
-         * {@link SortOrder#toString()}, keeping class-loading cost minimal for callers that
-         * never need the human-readable name.
-         * <p>
-         * Contains only the LCIDs that are known to appear as database-level or column-level
-         * sort orders in MS Access databases.
-         */
-        private static final class LcidNames {
-            private static final Map<Short, String> VALUES = Map.ofEntries(
-                // General / English
-                entry(1033, "General"),
-                // Western European languages
-                entry(1031, "German"),
-                entry(1036, "French"),
-                entry(1034, "Spanish"),
-                entry(1040, "Italian"),
-                entry(1043, "Dutch"),
-                entry(1046, "Portuguese"),
-                entry(1053, "Swedish"),
-                entry(1030, "Danish"),
-                entry(1044, "Norwegian"),
-                entry(1035, "Finnish"),
-                // Central/Eastern European
-                entry(1045, "Polish"),
-                entry(1029, "Czech"),
-                entry(1038, "Hungarian"),
-                entry(1050, "Croatian"),
-                entry(1051, "Slovak"),
-                entry(1060, "Slovenian"),
-                entry(1048, "Romanian"),
-                entry(1026, "Bulgarian"),
-                // Cyrillic
-                entry(1049, "Russian"),
-                entry(1058, "Ukrainian"),
-                // Baltic
-                entry(1061, "Estonian"),
-                entry(1062, "Latvian"),
-                entry(1063, "Lithuanian"),
-                // Turkish and related
-                entry(1055, "Turkish"),
-                entry(1068, "Azerbaijani"),
-                // Greek
-                entry(1032, "Greek"),
-                // East Asian
-                entry(1041, "Japanese"),
-                entry(1042, "Korean"),
-                entry(2052, "Chinese Simplified"),
-                entry(1028, "Chinese Traditional"),
-                // Arabic / Hebrew
-                entry(1025, "Arabic"),
-                entry(1037, "Hebrew"),
-                // Nordic
-                entry(1069, "Basque"),
-                entry(1027, "Catalan")
-            );
-
-            private static Map.Entry<Short, String> entry(int lcid, String name) {
-                return Map.entry((short) lcid, name);
-            }
-        }
-
     }
 
     /**

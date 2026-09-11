@@ -165,6 +165,24 @@ class DefaultFunctionsTest extends AbstractBaseTest {
         assertEquals(" FOO \" BAR ", eval("UCase(\" foo \"\" bar \")"));
     }
 
+    @Test
+    void testUCaseLCaseTurkishLocale() {
+        // Turkish locale: dotted/dotless-i case conversion
+        Locale turkish = Locale.forLanguageTag("tr");
+        assertEquals("İSTANBUL", eval("UCase('istanbul')", turkish));
+        assertEquals("ıstanbul", eval("LCase('ISTANBUL')", turkish));
+    }
+
+    @Test
+    void testStrConvWithLocaleId() {
+        // Turkish LCID 1055: dotted/dotless-i case conversion
+        assertEquals("İSTANBUL", eval("StrConv('istanbul', 1, 1055)"));
+        assertEquals("ıstanbul", eval("StrConv('ISTANBUL', 2, 1055)"));
+
+        EvalException ex = assertThrows(EvalException.class, () -> eval("StrConv('foo', 1, 9999)"));
+        assertTrue(ex.getCause().getMessage().contains("Unsupported locale id"));
+    }
+
     @ParameterizedTest(name = "[{index}] {0} --> {1}")
     @CsvSource(delimiter = ';', value = {
         "Asc(\"foo\"); 102",
@@ -910,6 +928,12 @@ class DefaultFunctionsTest extends AbstractBaseTest {
 
     static Object eval(String _expr) {
         TestContext tc = new TestContext();
+        Expression expr = Expressionator.parse(Expressionator.Type.DEFAULT_VALUE, _expr, null, tc);
+        return expr.eval(tc);
+    }
+
+    static Object eval(String _expr, Locale _locale) {
+        TestContext tc = new TestContext(_locale);
         Expression expr = Expressionator.parse(Expressionator.Type.DEFAULT_VALUE, _expr, null, tc);
         return expr.eval(tc);
     }

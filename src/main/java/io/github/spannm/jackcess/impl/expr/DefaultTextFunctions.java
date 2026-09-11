@@ -29,6 +29,7 @@ import io.github.spannm.jackcess.util.StringUtil;
 
 import java.math.BigDecimal;
 import java.util.Arrays;
+import java.util.Locale;
 import java.util.stream.Collectors;
 
 @SuppressWarnings("checkstyle.HideUtilityClassConstructor")
@@ -189,7 +190,7 @@ public class DefaultTextFunctions {
         @Override
         protected Value eval1(EvalContext ctx, Value param1) {
             String str = param1.getAsString(ctx);
-            return ValueSupport.toValue(str.toLowerCase());
+            return ValueSupport.toValue(str.toLowerCase(ctx.getLocale()));
         }
     });
 
@@ -197,7 +198,7 @@ public class DefaultTextFunctions {
         @Override
         protected Value eval1(EvalContext ctx, Value param1) {
             String str = param1.getAsString(ctx);
-            return ValueSupport.toValue(str.toUpperCase());
+            return ValueSupport.toValue(str.toUpperCase(ctx.getLocale()));
         }
     });
 
@@ -359,8 +360,15 @@ public class DefaultTextFunctions {
 
             String str = param1.getAsString(ctx);
             int conversion = params[1].getAsLongInt(ctx);
-            // TODO, for now, ignore locale id...?
-            // int localeId = params[2];
+            Locale locale = ctx.getLocale();
+            if (params.length > 2) {
+                int localeId = params[2].getAsLongInt(ctx);
+                LocaleUtil.LcidInfo info = LocaleUtil.getInfo(localeId);
+                if (info == null) {
+                    throw new EvalException("Unsupported locale id " + localeId);
+                }
+                locale = info.getLocale();
+            }
 
             int caseConv = STR_CONV_MASK & conversion;
             int charConv = ~STR_CONV_MASK & conversion;
@@ -368,15 +376,15 @@ public class DefaultTextFunctions {
             switch (caseConv) {
                 case 1:
                     // vbUpperCase
-                    str = str.toUpperCase();
+                    str = str.toUpperCase(locale);
                     break;
                 case 2:
                     // vbLowerCase
-                    str = str.toLowerCase();
+                    str = str.toLowerCase(locale);
                     break;
                 case 3:
                     // vbProperCase
-                    str = Arrays.stream(str.toLowerCase().split(" ")).map(StringUtil::capitalize).collect(Collectors.joining(" "));
+                    str = Arrays.stream(str.toLowerCase(locale).split(" ")).map(StringUtil::capitalize).collect(Collectors.joining(" "));
                     break;
                 default:
                     // do nothing

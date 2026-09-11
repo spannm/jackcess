@@ -20,12 +20,25 @@ import io.github.spannm.jackcess.Database;
 
 import javax.script.Bindings;
 
+import java.util.Locale;
+
 /**
  * The EvalConfig allows for customization of the expression evaluation context for a given {@link Database} instance.
  *
  * @see io.github.spannm.jackcess.expr expression package docs
  */
 public interface EvalConfig {
+    /**
+     * @return the currently configured Locale
+     */
+    Locale getLocale();
+
+    /**
+     * Sets the Locale for use when evaluating expressions. The default locale is {@link Locale#US}, so this may need
+     * to be modified when interacting with {@link Database} instances from other locales.
+     */
+    void setLocale(Locale locale);
+
     /**
      * @return the currently configured TemporalConfig
      */

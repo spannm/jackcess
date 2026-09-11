@@ -35,6 +35,7 @@ import java.text.DecimalFormat;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
+import java.util.Locale;
 import java.util.Objects;
 import java.util.Optional;
 
@@ -557,7 +558,13 @@ class ExpressionatorTest extends AbstractBaseTest {
     }
 
     static Object eval(String exprStr) {
-        return eval(exprStr, null);
+        return eval(exprStr, (Value.Type) null);
+    }
+
+    static Object eval(String exprStr, Locale locale) {
+        TestContext tc = new TestContext(locale);
+        Expression expr = Expressionator.parse(Expressionator.Type.DEFAULT_VALUE, exprStr, null, tc);
+        return expr.eval(tc);
     }
 
     static Object eval(String exprStr, Value.Type resultType) {
@@ -592,15 +599,27 @@ class ExpressionatorTest extends AbstractBaseTest {
 
     static class TestContext implements Expressionator.ParseContext, EvalContext {
         private final Value         thisVal;
+        private final Locale        locale;
         private final RandomContext rndCtx   = new RandomContext();
         private final Bindings      bindings = new SimpleBindings();
 
         TestContext() {
-            this(null);
+            this((Value) null);
         }
 
         TestContext(Value _thisVal) {
             thisVal = _thisVal;
+            locale = Locale.US;
+        }
+
+        TestContext(Locale _locale) {
+            thisVal = null;
+            locale = _locale;
+        }
+
+        @Override
+        public Locale getLocale() {
+            return locale;
         }
 
         @Override
