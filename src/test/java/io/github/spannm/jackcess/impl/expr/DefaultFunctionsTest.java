@@ -183,6 +183,13 @@ class DefaultFunctionsTest extends AbstractBaseTest {
         assertTrue(ex.getCause().getMessage().contains("Unsupported locale id"));
     }
 
+    @Test
+    void testStrConvProperCaseWithLocaleId() {
+        // Turkish LCID 1055: dotted/dotless-i case conversion
+        assertEquals("İstanbul Ankara", eval("StrConv('İSTANBUL ANKARA', 3, 1055)"));
+        assertEquals("İstanbul Ankara", eval("StrConv('istanbul ankara', 3, 1055)"));
+    }
+
     @ParameterizedTest(name = "[{index}] {0} --> {1}")
     @CsvSource(delimiter = ';', value = {
         "Asc(\"foo\"); 102",

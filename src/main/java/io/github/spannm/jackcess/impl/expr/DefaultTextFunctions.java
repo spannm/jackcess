@@ -28,9 +28,7 @@ import io.github.spannm.jackcess.impl.expr.FunctionSupport.FuncVar;
 import io.github.spannm.jackcess.util.StringUtil;
 
 import java.math.BigDecimal;
-import java.util.Arrays;
 import java.util.Locale;
-import java.util.stream.Collectors;
 
 @SuppressWarnings("checkstyle.HideUtilityClassConstructor")
 public class DefaultTextFunctions {
@@ -384,7 +382,7 @@ public class DefaultTextFunctions {
                     break;
                 case 3:
                     // vbProperCase
-                    str = Arrays.stream(str.toLowerCase(locale).split(" ")).map(StringUtil::capitalize).collect(Collectors.joining(" "));
+                    str = StringUtil.capitalizeFully(str, locale);
                     break;
                 default:
                     // do nothing

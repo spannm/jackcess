@@ -16,6 +16,8 @@
 package io.github.spannm.jackcess.util;
 
 import java.nio.CharBuffer;
+import java.text.BreakIterator;
+import java.util.Locale;
 import java.util.stream.IntStream;
 
 /**
@@ -102,6 +104,41 @@ public final class StringUtil {
             } else {
                 sb.append(Character.toLowerCase(c));
             }
+        }
+
+        return sb.toString();
+    }
+
+    /**
+     * Converts every word in the given text to title case (first letter upper-cased via {@link Character#toTitleCase(int)},
+     * remainder lower-cased), using the given {@link Locale} for both case conversions and for locating word
+     * boundaries via {@link BreakIterator}. Unlike a naive single-space split, this correctly handles runs of
+     * whitespace, punctuation-adjacent words, and locale-specific word-boundary/case rules (e.g. Turkish dotted/dotless i).
+     */
+    public static String capitalizeFully(String text, Locale locale) {
+        if (isEmpty(text)) {
+            return text;
+        }
+
+        BreakIterator wordIterator = BreakIterator.getWordInstance(locale);
+        wordIterator.setText(text);
+
+        StringBuilder sb = new StringBuilder(text.length());
+        int start = wordIterator.first();
+
+        for (int end = wordIterator.next(); end != BreakIterator.DONE; start = end, end = wordIterator.next()) {
+            String word = text.substring(start, end);
+
+            if (!Character.isLetterOrDigit(word.charAt(0))) {
+                sb.append(word);
+                continue;
+            }
+
+            int cp = word.codePointAt(0);
+            String first = new String(Character.toChars(cp)).toUpperCase(locale);
+            first = new String(Character.toChars(Character.toTitleCase(first.codePointAt(0))));
+
+            sb.append(first).append(word.substring(Character.charCount(cp)).toLowerCase(locale));
         }
 
         return sb.toString();
