@@ -28,6 +28,7 @@ import java.io.StringWriter;
 import java.lang.System.Logger;
 import java.lang.System.Logger.Level;
 import java.nio.BufferOverflowException;
+import java.nio.BufferUnderflowException;
 import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
 import java.time.LocalDateTime;
@@ -765,7 +766,21 @@ public class TableImpl implements Table, PropertyMaps.Owner {
             // cache "raw" row value. see note about caching above
             rowState.withRowCacheValue(column.getColumnIndex(), ColumnImpl.rawDataWrapper(columnData));
 
-            return rowState.handleRowError(column, columnData, _ex);
+            Exception rowError = _ex;
+            if (_ex instanceof IndexOutOfBoundsException || _ex instanceof NegativeArraySizeException
+                || _ex instanceof BufferUnderflowException || _ex instanceof BufferOverflowException) {
+                // these particular runtime exceptions typically indicate corrupted or
+                // inconsistent table metadata (e.g. bad column offsets) rather than a
+                // normal, expected read failure. wrap them in a proper (checked)
+                // IOException so that callers relying on the declared "throws
+                // IOException" contract of the read methods do not have to also
+                // anticipate an arbitrary unchecked exception escaping
+                rowError = new JackcessException(
+                    "Likely data corruption encountered reading column " + column.getName()
+                        + " of table " + column.getTable().getName(), _ex);
+            }
+
+            return rowState.handleRowError(column, columnData, rowError);
         }
     }
 
@@ -1077,7 +1092,7 @@ public class TableImpl implements Table, PropertyMaps.Owner {
             // update various bits of the table def
             ByteUtil.forward(tableBuffer, 29);
             tableBuffer.putShort((short) (_maxColumnCount + 1));
-            short varColCount = (short) (_varColumns.size() + (isVarCol ? 1 : 0));
+            short varColCount = (short) (_maxVarColumnCount + (isVarCol ? 1 : 0));
             tableBuffer.putShort(varColCount);
             tableBuffer.putShort((short) (_columns.size() + 1));
 
@@ -2546,6 +2561,17 @@ public class TableImpl implements Table, PropertyMaps.Owner {
             short[] varColumnOffsets = new short[_maxVarColumnCount];
             int varColumnOffsetsIndex = 0;
             for (ColumnImpl varCol : _varColumns) {
+                if (varCol.getVarLenTableIndex() >= varColumnOffsets.length) {
+                    // this indicates an inconsistency between the number of variable
+                    // length columns recorded in the table definition and the actual
+                    // columns present (e.g. a corrupted table definition); fail with a
+                    // clear, checked exception instead of an opaque
+                    // ArrayIndexOutOfBoundsException
+                    throw new JackcessException(withErrorContext(
+                        "Table definition is inconsistent: variable length column " + varCol.getName()
+                            + " has an out of range column offset index; the table definition may be corrupted"));
+                }
+
                 short offset = (short) buffer.position();
                 Object rowValue = varCol.getRowValue(rowArray);
                 if (rowValue != null) {

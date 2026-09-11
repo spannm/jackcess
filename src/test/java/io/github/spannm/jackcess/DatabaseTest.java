@@ -305,6 +305,58 @@ class DatabaseTest extends AbstractBaseTest {
     }
 
     @ParameterizedTest(name = "[{index}] {0}")
+    @TestDbSource(DEL_COL)
+    void testAddColumnAfterDeletedVarLenColumns(TestDb testDb) throws IOException {
+        // regression test for GH issue #10: adding a column to a table which
+        // previously had variable length columns deleted from it must not corrupt
+        // the table definition's variable column count. the corruption is only
+        // persisted to (and later observable from) disk, so the db must be closed
+        // and reopened to actually exercise the bug
+        File dbFile;
+        try (Database db = testDb.openCopy()) {
+            dbFile = db.getFile();
+            Table table = db.getTable("Table1");
+            DatabaseBuilder.newColumn("newCol", DataType.BOOLEAN).addToTable(table);
+        }
+
+        Map<String, Object> newRow = new LinkedHashMap<>(Map.of(
+            "id", 9, "id2", 9, "data", "baz", "data2", "baz2", "newCol", Boolean.TRUE));
+
+        try (Database db = DatabaseBuilder.open(dbFile)) {
+            Table table = db.getTable("Table1");
+            table.addRow(newRow.get("id"), newRow.get("id2"), newRow.get("data"), newRow.get("data2"), newRow.get("newCol"));
+        }
+
+        Map<String, Object> expectedRow0 = new LinkedHashMap<>(Map.of(
+            "id", 0, "id2", 2, "data", "foo", "data2", "foo2"));
+        expectedRow0.put("newCol", Boolean.FALSE);
+
+        Map<String, Object> expectedRow1 = new LinkedHashMap<>(Map.of(
+            "id", 3, "id2", 5, "data", "bar", "data2", "bar2"));
+        expectedRow1.put("newCol", Boolean.FALSE);
+
+        try (Database db = DatabaseBuilder.open(dbFile)) {
+            Table table = db.getTable("Table1");
+
+            int rowNum = 0;
+            Map<String, Object> row = null;
+            while ((row = table.getNextRow()) != null) {
+                if (rowNum == 0) {
+                    assertEquals(expectedRow0, row);
+                } else if (rowNum == 1) {
+                    assertEquals(expectedRow1, row);
+                } else if (rowNum == 2) {
+                    assertEquals(newRow, row);
+                } else {
+                    fail("should only have 3 rows");
+                }
+                rowNum++;
+            }
+            assertEquals(3, rowNum);
+        }
+    }
+
+    @ParameterizedTest(name = "[{index}] {0}")
     @FileFormatSource
     void testCurrency(FileFormat fileFormat) throws IOException {
         try (Database db = createDbMem(fileFormat)) {
