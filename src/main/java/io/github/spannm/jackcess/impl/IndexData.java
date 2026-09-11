@@ -391,12 +391,13 @@ public final class IndexData {
      *
      * @param reason human-readable description of why the index cannot be written; will be enriched with
      *               database/table/index context via {@link #withErrorContext(String)}
-     * @param status the resulting support status; either {@link IndexStatus#BROKEN_WRITE} (writes still allowed but
-     *               the index is unsuitable for lookups) or {@link IndexStatus#READ_ONLY} (writes disabled entirely)
+     * @param newStatus the resulting support status; either {@link IndexStatus#BROKEN_WRITE} (writes still allowed
+     *               but the index is unsuitable for lookups) or {@link IndexStatus#READ_ONLY} (writes disabled
+     *               entirely)
      * @param col    the column whose descriptor triggered the unsupported condition
      */
-    private void setUnsupportedReason(String reason, IndexStatus status, ColumnImpl col) {
-        this.status = status;
+    private void setUnsupportedReason(String reason, IndexStatus newStatus, ColumnImpl col) {
+        status = newStatus;
         unsupportedReason = withErrorContext(reason);
         String suffix = status == IndexStatus.READ_ONLY ? "making read-only" : "index not suitable for lookups";
         LOGGER.log(col.getTable().isSystem() ? Level.DEBUG : Level.WARNING, "{0}, {1}", unsupportedReason, suffix);

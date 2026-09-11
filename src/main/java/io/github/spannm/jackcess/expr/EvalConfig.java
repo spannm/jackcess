@@ -18,9 +18,9 @@ package io.github.spannm.jackcess.expr;
 
 import io.github.spannm.jackcess.Database;
 
-import javax.script.Bindings;
-
 import java.util.Locale;
+
+import javax.script.Bindings;
 
 /**
  * The EvalConfig allows for customization of the expression evaluation context for a given {@link Database} instance.
