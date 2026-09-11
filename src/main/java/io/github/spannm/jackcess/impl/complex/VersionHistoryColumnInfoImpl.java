@@ -35,7 +35,7 @@ import java.util.List;
  * supposed to be immutable). That said, the "raw" update/delete methods are supported for those that <i>really</i> want
  * to muck with the version history data.
  */
-public class VersionHistoryColumnInfoImpl extends ComplexColumnInfoImpl<Version> implements VersionHistoryColumnInfo {
+public final class VersionHistoryColumnInfoImpl extends ComplexColumnInfoImpl<Version> implements VersionHistoryColumnInfo {
     private final Column mvalueCol;
     private final Column mmodifiedCol;
 

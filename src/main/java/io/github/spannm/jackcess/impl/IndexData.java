@@ -76,7 +76,7 @@ import java.util.*;
  * @see GeneralIndexCodes
  * @see General97IndexCodes
  */
-public class IndexData {
+public final class IndexData {
 
     protected static final Logger  LOGGER                    = System.getLogger(Index.class.getName());
 

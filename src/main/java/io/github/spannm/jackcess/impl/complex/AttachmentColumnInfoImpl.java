@@ -37,7 +37,7 @@ import java.util.zip.InflaterInputStream;
 /**
  * Complex column info for a column holding 0 or more attachments per row.
  */
-public class AttachmentColumnInfoImpl extends ComplexColumnInfoImpl<Attachment> implements AttachmentColumnInfo {
+public final class AttachmentColumnInfoImpl extends ComplexColumnInfoImpl<Attachment> implements AttachmentColumnInfo {
 
     /** some file formats which may not be worth re-compressing */
     private static final Set<String> COMPRESSED_FORMATS   = Set.of("jpg", "zip", "gz", "bz2", "z", "7z", "cab", "rar", "mp3", "mpg");

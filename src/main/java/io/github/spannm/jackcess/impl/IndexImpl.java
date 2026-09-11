@@ -34,7 +34,7 @@ import java.util.Map;
  *
  * @author Tim McCune
  */
-public class IndexImpl implements Index, Comparable<IndexImpl> {
+public final class IndexImpl implements Index, Comparable<IndexImpl> {
     protected static final Logger     LOGGER                  = System.getLogger(IndexImpl.class.getName());
 
     /** index type for primary key indexes */

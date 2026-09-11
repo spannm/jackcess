@@ -26,7 +26,7 @@ import java.io.IOException;
 /**
  * Complex column info for a column holding multiple simple values per row.
  */
-public class MultiValueColumnInfoImpl extends ComplexColumnInfoImpl<SingleValue> implements MultiValueColumnInfo {
+public final class MultiValueColumnInfoImpl extends ComplexColumnInfoImpl<SingleValue> implements MultiValueColumnInfo {
     private final Column valueCol;
 
     public MultiValueColumnInfoImpl(Column column, int complexId, Table typeObjTable, Table flatTable) throws IOException {
