@@ -41,30 +41,74 @@ public interface Column {
      */
     Object KEEP_VALUE  = "<KEEP_VALUE>";
 
+    /**
+     * @return the table to which this column belongs
+     */
     Table getTable();
 
+    /**
+     * @return the database to which this column's table belongs
+     */
     Database getDatabase();
 
+    /**
+     * @return the name of this column
+     */
     String getName();
 
+    /**
+     * @return {@code true} if this column's values are variable-length (e.g. TEXT, MEMO, BINARY), {@code false} if
+     *         fixed-length (e.g. LONG, DOUBLE)
+     */
     boolean isVariableLength();
 
+    /**
+     * @return {@code true} if this is an autonumber column, whose values are assigned automatically by the database
+     */
     boolean isAutoNumber();
 
+    /**
+     * Returns the position of this column within its table, i.e. the index at which this column's value is stored in
+     * the {@code Object[]} row arrays accepted/returned by {@link #getRowValue(Object[])} and
+     * {@link #setRowValue(Object[], Object)}.
+     */
     int getColumnIndex();
 
+    /**
+     * @return the data type of this column
+     */
     DataType getType();
 
+    /**
+     * @return the {@link java.sql.Types} constant corresponding to this column's {@link DataType}
+     */
     int getSQLType() throws IOException;
 
+    /**
+     * @return {@code true} if this text column uses compressed unicode storage, {@code false} otherwise (not
+     *         applicable to non-text columns)
+     */
     boolean isCompressedUnicode();
 
+    /**
+     * @return the numeric precision of this column (only meaningful for DataTypes NUMERIC and MONEY)
+     */
     byte getPrecision();
 
+    /**
+     * @return the numeric scale of this column (only meaningful for DataTypes NUMERIC and MONEY)
+     */
     byte getScale();
 
+    /**
+     * @return the length of this column in bytes, as stored in the database
+     */
     short getLength();
 
+    /**
+     * @return the length of this column in "units" appropriate for its type (e.g. characters for TEXT columns),
+     *         which may differ from {@link #getLength()} for columns whose storage unit is wider than one byte
+     */
     short getLengthInUnits();
 
     /**
@@ -113,13 +157,35 @@ public interface Column {
      */
     void setColumnValidator(ColumnValidator newValidator);
 
+    /**
+     * Sets this column's value at the position given by {@link #getColumnIndex()} within {@code rowArray}.
+     *
+     * @param rowArray a row value array, indexed by {@link #getColumnIndex()}
+     * @param value the new value for this column
+     * @return the previous value at that position
+     */
     @SuppressWarnings("PMD.LinguisticNaming")
     Object setRowValue(Object[] rowArray, Object value);
 
+    /**
+     * Sets this column's value, keyed by {@link #getName()}, within {@code rowMap}.
+     *
+     * @param rowMap a row value map, keyed by column name
+     * @param value the new value for this column
+     * @return the previous value for this column's name
+     */
     @SuppressWarnings("PMD.LinguisticNaming")
     Object setRowValue(Map<String, Object> rowMap, Object value);
 
+    /**
+     * @param rowArray a row value array, indexed by {@link #getColumnIndex()}
+     * @return this column's value at the position given by {@link #getColumnIndex()} within {@code rowArray}
+     */
     Object getRowValue(Object[] rowArray);
 
+    /**
+     * @param rowMap a row value map, keyed by column name
+     * @return this column's value, keyed by {@link #getName()}, within {@code rowMap}
+     */
     Object getRowValue(Map<String, ?> rowMap);
 }

@@ -25,14 +25,29 @@ import java.util.List;
  */
 public interface Index {
 
+    /**
+     * @return the table to which this index belongs
+     */
     Table getTable();
 
+    /**
+     * @return the name of this index
+     */
     String getName();
 
+    /**
+     * @return {@code true} if this index is the primary key index for its table
+     */
     boolean isPrimaryKey();
 
+    /**
+     * @return {@code true} if this index backs a foreign key relationship
+     */
     boolean isForeignKey();
 
+    /**
+     * @return the number of columns covered by this index
+     */
     int getColumnCount();
 
     /**
@@ -77,12 +92,25 @@ public interface Index {
      */
     interface Column {
 
+        /**
+         * @return the underlying table column referenced by this index column
+         */
         io.github.spannm.jackcess.Column getColumn();
 
+        /**
+         * @return {@code true} if this index column sorts in ascending order, {@code false} if descending
+         */
         boolean isAscending();
 
+        /**
+         * @return the position of this column within the index (not to be confused with the underlying table
+         *         column's own {@link io.github.spannm.jackcess.Column#getColumnIndex()})
+         */
         int getColumnIndex();
 
+        /**
+         * @return the name of the underlying table column, equivalent to {@code getColumn().getName()}
+         */
         String getName();
     }
 }

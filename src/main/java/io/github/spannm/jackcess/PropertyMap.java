@@ -50,10 +50,19 @@ public interface PropertyMap extends Iterable<PropertyMap.Property> {
     String IME_MODE_PROP          = "IMEMode";
     String IME_SENTENCE_MODE_PROP = "IMESentenceMode";
 
+    /**
+     * @return the name of the database object to which this property map belongs
+     */
     String getName();
 
+    /**
+     * @return the number of properties currently in this map
+     */
     int getSize();
 
+    /**
+     * @return {@code true} if this map has no properties
+     */
     boolean isEmpty();
 
     /**
@@ -131,8 +140,14 @@ public interface PropertyMap extends Iterable<PropertyMap.Property> {
      * Info about a property defined in a PropertyMap.
      */
     interface Property {
+        /**
+         * @return the name of this property
+         */
         String getName();
 
+        /**
+         * @return the data type of this property's value
+         */
         DataType getType();
 
         /**
@@ -142,6 +157,9 @@ public interface PropertyMap extends Iterable<PropertyMap.Property> {
          */
         boolean isDdl();
 
+        /**
+         * @return the current value of this property
+         */
         Object getValue();
 
         /**

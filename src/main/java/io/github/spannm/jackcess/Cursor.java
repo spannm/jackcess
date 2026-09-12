@@ -44,8 +44,14 @@ import java.util.stream.StreamSupport;
  */
 public interface Cursor extends Iterable<Row> {
 
+    /**
+     * @return the unique identifier of this cursor, usable for validating a {@link Savepoint}
+     */
     Id getId();
 
+    /**
+     * @return the table over which this cursor iterates
+     */
     Table getTable();
 
     /**
@@ -355,8 +361,15 @@ public interface Cursor extends Iterable<Row> {
      * the time the Savepoint was created.
      */
     interface Savepoint {
+        /**
+         * @return the id of the cursor this savepoint was created from, used by {@link Cursor#restoreSavepoint} to
+         *         validate that the savepoint is being restored on a compatible cursor
+         */
         Id getCursorId();
 
+        /**
+         * @return the cursor position captured by this savepoint
+         */
         Position getCurrentPosition();
     }
 

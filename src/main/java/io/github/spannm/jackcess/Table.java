@@ -173,6 +173,9 @@ public interface Table extends Iterable<Row>, TableDefinition {
      */
     Object[] asUpdateRow(Map<String, ?> rowMap);
 
+    /**
+     * @return the number of rows currently stored in this table
+     */
     int getRowCount();
 
     /**

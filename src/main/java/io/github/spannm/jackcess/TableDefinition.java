@@ -42,8 +42,14 @@ public interface TableDefinition {
      */
     boolean isSystem();
 
+    /**
+     * @return the number of columns in this table
+     */
     int getColumnCount();
 
+    /**
+     * @return the database to which this table belongs
+     */
     Database getDatabase();
 
     /**
