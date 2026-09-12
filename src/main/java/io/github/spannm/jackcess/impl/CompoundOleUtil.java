@@ -16,7 +16,6 @@
  */
 package io.github.spannm.jackcess.impl;
 
-import io.github.spannm.jackcess.JackcessRuntimeException;
 import io.github.spannm.jackcess.impl.OleUtil.CompoundPackageFactory;
 import io.github.spannm.jackcess.impl.OleUtil.ContentImpl;
 import io.github.spannm.jackcess.impl.OleUtil.EmbeddedPackageContentImpl;
@@ -34,6 +33,8 @@ import java.io.*;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
 import java.nio.ByteBuffer;
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -46,9 +47,9 @@ import java.util.List;
  * requiring POI.
  */
 public class CompoundOleUtil implements CompoundPackageFactory {
-    private static final String ENTRY_NAME_CHARSET = "UTF-8";
-    private static final String ENTRY_SEPARATOR    = "/";
-    private static final String CONTENTS_ENTRY     = "CONTENTS";
+    private static final Charset ENTRY_NAME_CHARSET = StandardCharsets.UTF_8;
+    private static final String  ENTRY_SEPARATOR    = "/";
+    private static final String  CONTENTS_ENTRY     = "CONTENTS";
 
     static {
         // force a poi class to be loaded to ensure that when this class is
@@ -105,19 +106,11 @@ public class CompoundOleUtil implements CompoundPackageFactory {
     }
 
     private static String encodeEntryName(String name) {
-        try {
-            return URLEncoder.encode(name, ENTRY_NAME_CHARSET);
-        } catch (UnsupportedEncodingException _ex) {
-            throw new JackcessRuntimeException(_ex);
-        }
+        return URLEncoder.encode(name, ENTRY_NAME_CHARSET);
     }
 
     private static String decodeEntryName(String name) {
-        try {
-            return URLDecoder.decode(name, ENTRY_NAME_CHARSET);
-        } catch (UnsupportedEncodingException _ex) {
-            throw new JackcessRuntimeException(_ex);
-        }
+        return URLDecoder.decode(name, ENTRY_NAME_CHARSET);
     }
 
     private static final class CompoundContentImpl extends EmbeddedPackageContentImpl implements CompoundContent {
