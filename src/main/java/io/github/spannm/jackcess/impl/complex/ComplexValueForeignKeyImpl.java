@@ -150,7 +150,7 @@ public class ComplexValueForeignKeyImpl extends ComplexValueForeignKey {
     }
 
     @Override
-    @SuppressWarnings("deprecation")
+    @Deprecated
     public Version addVersion(String value, Date modifiedDate) throws IOException {
         return addVersionImpl(value, modifiedDate);
     }
@@ -173,7 +173,7 @@ public class ComplexValueForeignKeyImpl extends ComplexValueForeignKey {
     }
 
     @Override
-    @SuppressWarnings("deprecation")
+    @Deprecated
     public Attachment addAttachment(String url, String name, String type, byte[] data, Date timeStamp, Integer flags) throws IOException {
         return addAttachmentImpl(url, name, type, data, timeStamp, flags);
     }
@@ -196,7 +196,7 @@ public class ComplexValueForeignKeyImpl extends ComplexValueForeignKey {
     }
 
     @Override
-    @SuppressWarnings("deprecation")
+    @Deprecated
     public Attachment addEncodedAttachment(String url, String name, String type, byte[] encodedData, Date timeStamp, Integer flags) throws IOException {
         return addEncodedAttachmentImpl(url, name, type, encodedData, timeStamp, flags);
     }

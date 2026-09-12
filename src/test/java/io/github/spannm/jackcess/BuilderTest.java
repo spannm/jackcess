@@ -176,7 +176,8 @@ class BuilderTest extends AbstractBaseTest {
     @Test
     void testDatabaseBuilderProperties() throws IOException {
         File file = TestUtil.createTempFile(getShortTestMethodName(), Database.FILE_EXT_MDB, false);
-        try (Database db = new DatabaseBuilder(file)
+        try (Database db = new DatabaseBuilder()
+            .withFile(file)
             .withFileFormat(FileFormat.V2000)
             .withTimeZone(TEST_TZ)
             .withAutoSync(getTestAutoSync())

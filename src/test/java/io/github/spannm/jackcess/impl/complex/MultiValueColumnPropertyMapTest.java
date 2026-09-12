@@ -17,11 +17,7 @@ package io.github.spannm.jackcess.impl.complex;
 
 import static io.github.spannm.jackcess.test.Basename.COMPLEX_DATA;
 
-import io.github.spannm.jackcess.Column;
-import io.github.spannm.jackcess.Database;
-import io.github.spannm.jackcess.DataType;
-import io.github.spannm.jackcess.PropertyMap;
-import io.github.spannm.jackcess.Table;
+import io.github.spannm.jackcess.*;
 import io.github.spannm.jackcess.test.AbstractBaseTest;
 import io.github.spannm.jackcess.test.TestDb;
 import io.github.spannm.jackcess.test.source.TestDbSource;

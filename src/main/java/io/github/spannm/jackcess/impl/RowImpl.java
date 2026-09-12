@@ -97,7 +97,7 @@ public class RowImpl extends LinkedHashMap<String, Object> implements Row {
     }
 
     @Override
-    @SuppressWarnings("deprecation")
+    @Deprecated
     public Date getDate(String name) {
         return (Date) get(name);
     }

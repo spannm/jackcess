@@ -15,26 +15,13 @@
  */
 package io.github.spannm.jackcess.util;
 
-import io.github.spannm.jackcess.Column;
-import io.github.spannm.jackcess.ColumnBuilder;
-import io.github.spannm.jackcess.Cursor;
-import io.github.spannm.jackcess.CursorBuilder;
-import io.github.spannm.jackcess.Database;
+import io.github.spannm.jackcess.*;
 import io.github.spannm.jackcess.Database.FileFormat;
-import io.github.spannm.jackcess.DataType;
-import io.github.spannm.jackcess.Table;
-import io.github.spannm.jackcess.TableBuilder;
 import io.github.spannm.jackcess.test.AbstractBaseTest;
 import io.github.spannm.jackcess.test.TestUtil;
 import org.junit.jupiter.api.Test;
 
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.EOFException;
-import java.io.File;
-import java.io.IOException;
-import java.io.StringReader;
-import java.io.StringWriter;
+import java.io.*;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;

@@ -2078,7 +2078,6 @@ public class ColumnImpl implements Column, Comparable<ColumnImpl>, DateTimeConte
      * Date subclass which stashes the original date bits, in case we attempt to re-write the value (will not lose
      * precision). Also, this implementation is immutable.
      */
-    @SuppressWarnings("deprecation")
     private static final class DateExt extends Date {
         private static final long    serialVersionUID = 0L;
 
@@ -2095,31 +2094,37 @@ public class ColumnImpl implements Column, Comparable<ColumnImpl>, DateTimeConte
         }
 
         @Override
+        @Deprecated
         public void setDate(int time) {
             throw new UnsupportedOperationException();
         }
 
         @Override
+        @Deprecated
         public void setHours(int time) {
             throw new UnsupportedOperationException();
         }
 
         @Override
+        @Deprecated
         public void setMinutes(int time) {
             throw new UnsupportedOperationException();
         }
 
         @Override
+        @Deprecated
         public void setMonth(int time) {
             throw new UnsupportedOperationException();
         }
 
         @Override
+        @Deprecated
         public void setSeconds(int time) {
             throw new UnsupportedOperationException();
         }
 
         @Override
+        @Deprecated
         public void setYear(int time) {
             throw new UnsupportedOperationException();
         }

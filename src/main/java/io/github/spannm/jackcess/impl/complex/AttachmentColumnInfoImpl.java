@@ -276,13 +276,13 @@ public final class AttachmentColumnInfoImpl extends ComplexColumnInfoImpl<Attach
         }
 
         @Override
-        @SuppressWarnings("deprecation")
+        @Deprecated
         public Date getFileTimeStamp() {
             return (Date) timeStamp;
         }
 
         @Override
-        @SuppressWarnings("deprecation")
+        @Deprecated
         public void setFileTimeStamp(Date fileTimeStamp) {
             timeStamp = fileTimeStamp;
         }

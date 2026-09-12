@@ -35,7 +35,6 @@ import java.lang.System.Logger.Level;
 import java.lang.reflect.Field;
 import java.nio.ByteBuffer;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.TreeMap;
 import java.util.regex.Matcher;
@@ -44,17 +43,15 @@ import java.util.regex.Pattern;
 @SuppressWarnings("checkstyle:MethodNameCheck")
 public class IndexCodesTest extends AbstractBaseTest {
 
-    @SuppressWarnings("serial")
-    private static final Map<Character, String> SPECIAL_CHARS = new HashMap<>() {{
-        put('\b', "\\b");
-        put('\t', "\\t");
-        put('\n', "\\n");
-        put('\f', "\\f");
-        put('\r', "\\r");
-        put('\"', "\\\"");
-        put('\'', "\\'");
-        put('\\', "\\\\");
-    }};
+    private static final Map<Character, String> SPECIAL_CHARS = Map.ofEntries(
+        Map.entry('\b', "\\b"),
+        Map.entry('\t', "\\t"),
+        Map.entry('\n', "\\n"),
+        Map.entry('\f', "\\f"),
+        Map.entry('\r', "\\r"),
+        Map.entry('\"', "\\\""),
+        Map.entry('\'', "\\'"),
+        Map.entry('\\', "\\\\"));
 
     @ParameterizedTest(name = "[{index}] {0}")
     @TestDbReadOnlySource({INDEX_CODES, EMOTICONS})

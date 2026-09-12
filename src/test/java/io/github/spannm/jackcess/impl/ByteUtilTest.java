@@ -137,12 +137,13 @@ class ByteUtilTest extends AbstractBaseTest {
 
     @Test
     void testByteStream() throws IOException {
-        ByteUtil.ByteStream bs = new ByteUtil.ByteStream();
-        bs.write("abc".getBytes(StandardCharsets.US_ASCII));
-        assertEquals(3, bs.getLength());
-        assertEquals(3, bs.toByteArray().length);
-        bs.reset();
-        assertEquals(0, bs.getLength());
+        try (ByteUtil.ByteStream bs = new ByteUtil.ByteStream()) {
+            bs.write("abc".getBytes(StandardCharsets.US_ASCII));
+            assertEquals(3, bs.getLength());
+            assertEquals(3, bs.toByteArray().length);
+            bs.reset();
+            assertEquals(0, bs.getLength());
+        }
     }
 
 }
