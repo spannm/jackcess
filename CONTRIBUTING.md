@@ -19,7 +19,7 @@ For security vulnerabilities, please follow [SECURITY.md](SECURITY.md) instead o
 
 ## Development Setup
 
-- Java 11 or higher (JDK 17/21 also supported)
+- Java 17 or higher to build (JDK 21 also supported); the produced bytecode still targets Java 11
 - Maven (a wrapper is included: `./mvnw`)
 
 ```bash

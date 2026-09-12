@@ -91,7 +91,7 @@
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 
         <!-- The minimum JDK version required to build. -->
-        <project.build.systemJdk>11</project.build.systemJdk>
+        <project.build.systemJdk>17</project.build.systemJdk>
         <!-- The default build target. -->
         <project.build.targetJdk>11</project.build.targetJdk>
 
