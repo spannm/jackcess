@@ -35,12 +35,12 @@ Jackcess is not an application. There is no GUI. It's a library, intended for ot
 
 * **Java Version**: 11 or higher (LTS versions like Java 17 and 21 are fully supported and tested).
 
-* **Main Dependency**:
-  * [Apache POI](https://poi.apache.org/) (for encryption support and internal file handling)
+* **Optional Dependency**:
+  * [Apache POI](https://poi.apache.org/) — only needed for compound OLE attachment data; everything else has zero runtime dependencies.
 
 * **Build Tool**: [Maven](https://maven.apache.org/)
 
-* **Code Quality**: Enforced via Checkstyle, PMD, and SpotBugs.
+* **Code Quality**: Enforced via Checkstyle and PMD.
 
 <p style="height: 20px;">&nbsp;</p>
 
@@ -86,6 +86,13 @@ try (Database db = DatabaseBuilder.open(new File("database.accdb"))) {
 
 This project is a modern fork of the original [Jackcess project on SourceForge](https://sourceforge.net/projects/jackcess/), originally created and maintained by [James Ahlborn](https://sourceforge.net/u/jahlborn/profile/),
 specifically created to ensure compatibility with modern Java versions, minimize dependencies and to serve as the foundation for [UCanAccess](https://github.com/spannm/ucanaccess).
+
+Beyond tracking the upstream project, this fork also offers:
+
+* Zero dependencies besides optional Apache POI
+* Ships with an **extensive test suite** (2,700+ tests, currently ~91% line coverage)
+* Complete Javadoc on the core public API
+* Has picked up a number of new smaller fixes since forking
 
 ### ⚖️ License
 
