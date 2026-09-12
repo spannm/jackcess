@@ -23,6 +23,7 @@ import io.github.spannm.jackcess.complex.*;
 import io.github.spannm.jackcess.impl.ByteUtil;
 import io.github.spannm.jackcess.impl.ColumnImpl;
 import io.github.spannm.jackcess.impl.PageChannel;
+import io.github.spannm.jackcess.impl.complex.ComplexValueForeignKeyImpl;
 import io.github.spannm.jackcess.test.AbstractBaseTest;
 import io.github.spannm.jackcess.test.TestDb;
 import io.github.spannm.jackcess.test.TestUtil;
@@ -32,6 +33,7 @@ import org.junit.jupiter.params.ParameterizedTest;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
+import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.List;
 
@@ -104,6 +106,39 @@ class ComplexColumnTest extends AbstractBaseTest {
             row8ValFk.addVersion("row8-memo", upTime);
             checkVersions(row8ValFk.get(), row8ValFk, "row8-memo",
                 "row8-memo", upTime);
+
+            assertEquals(1, row8ValFk.countValues());
+            assertEquals(1, ((ComplexValueForeignKeyImpl) row8ValFk).getRawValues().size());
+
+            ComplexValueForeignKey row8ValFkAgain = (ComplexValueForeignKey) verCol.getRowValue(row8);
+            assertEquals(row8ValFk, row8ValFkAgain);
+            assertEquals(row8ValFk.hashCode(), row8ValFkAgain.hashCode());
+            assertNotEquals(row8ValFk, null);
+            assertNotEquals(row8ValFk, "not a complex value fk");
+
+            assertThrows(UnsupportedOperationException.class, row8ValFk::getAttachments);
+            assertThrows(UnsupportedOperationException.class, row8ValFk::getMultiValues);
+            assertThrows(UnsupportedOperationException.class, row8ValFk::getUnsupportedValues);
+
+            Object[] row9 = {"row9", Column.AUTO_NUMBER, "some-data", "row9-memo", Column.AUTO_NUMBER, Column.AUTO_NUMBER};
+            t1.addRow(row9);
+            ComplexValueForeignKey row9ValFk = (ComplexValueForeignKey) verCol.getRowValue(row9);
+            LocalDateTime ldtUpTime = LocalDateTime.now();
+            row9ValFk.addVersion("row9-memo", ldtUpTime);
+            List<Version> row9Versions = row9ValFk.getVersions();
+            assertEquals(1, row9Versions.size());
+            assertEquals("row9-memo", row9Versions.get(0).getValue());
+            // db is configured for DateTimeType.DATE, so the value round-trips as a Date
+            // regardless of which addVersion overload was used to write it
+            assertNotNull(row9Versions.get(0).getModifiedDate());
+
+            Object[] row10 = {"row10", Column.AUTO_NUMBER, "some-data", "row10-memo", Column.AUTO_NUMBER, Column.AUTO_NUMBER};
+            t1.addRow(row10);
+            ComplexValueForeignKey row10ValFk = (ComplexValueForeignKey) verCol.getRowValue(row10);
+            row10ValFk.addVersion("row10-memo");
+            assertEquals(1, row10ValFk.countValues());
+            assertEquals("row10-memo", row10ValFk.getVersions().get(0).getValue());
+            assertNotNull(row10ValFk.getVersions().get(0).getModifiedDate());
 
             Cursor cursor = CursorBuilder.createCursor(t1);
             assertTrue(cursor.findFirstRow(t1.getColumn("id"), "row3"));
@@ -182,6 +217,24 @@ class ComplexColumnTest extends AbstractBaseTest {
             checkAttachments(row8ValFk.get(), row8ValFk, "test_data.txt",
                 "test_data2.txt");
 
+            assertThrows(UnsupportedOperationException.class, row8ValFk::getVersions);
+            assertThrows(UnsupportedOperationException.class, row8ValFk::getMultiValues);
+            assertThrows(UnsupportedOperationException.class, row8ValFk::getUnsupportedValues);
+
+            Object[] row10 = {"row10", Column.AUTO_NUMBER, "some-data", "row10-memo", Column.AUTO_NUMBER, Column.AUTO_NUMBER};
+            t1.addRow(row10);
+            ComplexValueForeignKey row10ValFk = (ComplexValueForeignKey) col.getRowValue(row10);
+            Attachment row10Attachment = row10ValFk.addAttachment(null, "row10.txt", "txt",
+                getFileBytes("test_data.txt"), LocalDateTime.now(), null);
+            assertEquals("row10.txt", row10Attachment.getFileName());
+            assertArrayEquals(getFileBytes("test_data.txt"), row10Attachment.getFileData());
+
+            Attachment row10Encoded = row10ValFk.addEncodedAttachment(null, "row10b.txt", "txt",
+                getEncodedFileBytes("test_data2.txt"), LocalDateTime.now(), null);
+            assertEquals("row10b.txt", row10Encoded.getFileName());
+            assertArrayEquals(getFileBytes("test_data2.txt"), row10Encoded.getFileData());
+            assertEquals(2, row10ValFk.countValues());
+
             Cursor cursor = CursorBuilder.createCursor(t1);
             assertTrue(cursor.findFirstRow(t1.getColumn("id"), "row4"));
             ComplexValueForeignKey row4ValFk = (ComplexValueForeignKey) cursor.getCurrentRowValue(col);
@@ -256,6 +309,10 @@ class ComplexColumnTest extends AbstractBaseTest {
             row8ValFk.addMultiValue("value2");
             checkMultiValues(row8ValFk.get(), row8ValFk, "value1", "value2");
 
+            assertThrows(UnsupportedOperationException.class, row8ValFk::getVersions);
+            assertThrows(UnsupportedOperationException.class, row8ValFk::getAttachments);
+            assertThrows(UnsupportedOperationException.class, row8ValFk::getUnsupportedValues);
+
             Cursor cursor = CursorBuilder.createCursor(t1);
             assertTrue(cursor.findFirstRow(t1.getColumn("id"), "row2"));
             ComplexValueForeignKey row2ValFk = (ComplexValueForeignKey) cursor.getCurrentRowValue(col);
@@ -315,6 +372,15 @@ class ComplexColumnTest extends AbstractBaseTest {
                     fail();
                 }
             }
+
+            Cursor cursor = CursorBuilder.createCursor(t1);
+            assertTrue(cursor.findFirstRow(t1.getColumn("ID"), 3));
+            ComplexValueForeignKey row3ValFk = (ComplexValueForeignKey) cursor.getCurrentRowValue(col);
+
+            assertThrows(UnsupportedOperationException.class, row3ValFk::getVersions);
+            assertThrows(UnsupportedOperationException.class, row3ValFk::getAttachments);
+            assertThrows(UnsupportedOperationException.class, row3ValFk::getMultiValues);
+            assertEquals(0, row3ValFk.countValues());
         }
     }
 

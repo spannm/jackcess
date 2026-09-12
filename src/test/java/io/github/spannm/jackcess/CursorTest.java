@@ -981,6 +981,26 @@ class CursorTest extends AbstractBaseTest {
 
             assertEquals(List.of("baz11", "baz11-2"), expectedData);
 
+            List<String> viaIterableNames = cursor.newEntryIterable(1)
+                .addColumnNames(List.of("data"))
+                .stream().map(r -> r.getString("data"))
+                .collect(Collectors.toList());
+            assertEquals(List.of("baz11", "baz11-2"), viaIterableNames);
+
+            List<String> viaColumns = cursor.newEntryIterable(1)
+                .addColumns(List.of(t1.getColumn("data")))
+                .stream().map(r -> r.getString("data"))
+                .collect(Collectors.toList());
+            assertEquals(List.of("baz11", "baz11-2"), viaColumns);
+
+            List<String> viaWithEntryValues = cursor.newEntryIterable(2)
+                .withEntryValues(1)
+                .withColumnMatcher(SimpleColumnMatcher.INSTANCE)
+                .addColumnNames("data")
+                .stream().map(r -> r.getString("data"))
+                .collect(Collectors.toList());
+            assertEquals(List.of("baz11", "baz11-2"), viaWithEntryValues);
+
             expectedData = new ArrayList<>();
             for (Iterator<? extends Row> iter =
                 cursor.newEntryIterable(1).iterator(); iter.hasNext();) {

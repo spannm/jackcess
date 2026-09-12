@@ -57,7 +57,7 @@ public class UsageMapTest extends AbstractBaseTest {
         } else {
             throw new IllegalAccessException("Unknown file format: " + expectedFileFormat);
         }
-        try (Database db = DatabaseBuilder.open(testDB.getFile())) {
+        try (Database db = testDB.openCopy()) {
             UsageMap usageMap = UsageMap.read((DatabaseImpl) db,
                 PageChannel.PAGE_GLOBAL_USAGE_MAP,
                 PageChannel.ROW_GLOBAL_USAGE_MAP,
