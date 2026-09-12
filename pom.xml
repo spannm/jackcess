@@ -124,7 +124,7 @@
 
         <basepom.check.skip-checkstyle>false</basepom.check.skip-checkstyle>
         <basepom.check.skip-pmd>false</basepom.check.skip-pmd>
-        <dep.checkstyle.version>10.26.1</dep.checkstyle.version>
+        <dep.checkstyle.version>12.3.1</dep.checkstyle.version>
         <check.checkstyle.ruleset>${project.rootDirectory}/build/checkstyle-rules.xml</check.checkstyle.ruleset>
         <check.pmd.ruleset>${project.rootDirectory}/build/pmd-rules.xml</check.pmd.ruleset>
         <basepom.check.skip-spotbugs>true</basepom.check.skip-spotbugs>
