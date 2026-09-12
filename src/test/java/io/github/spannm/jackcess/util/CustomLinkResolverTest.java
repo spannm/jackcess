@@ -16,6 +16,8 @@
  */
 package io.github.spannm.jackcess.util;
 
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.assertj.core.api.Assertions.assertThat;
 import io.github.spannm.jackcess.*;
 import io.github.spannm.jackcess.Database.FileFormat;
 import io.github.spannm.jackcess.test.AbstractBaseTest;
@@ -31,7 +33,7 @@ class CustomLinkResolverTest extends AbstractBaseTest {
 
     @ParameterizedTest(name = "[{index}] {0}")
     @FileFormatSource
-    void testCustomLinkResolver(FileFormat fileFormat) throws IOException {
+    void customLinkResolver(FileFormat fileFormat) throws Exception {
         try (Database db = createDbMem(fileFormat)) {
             db.setLinkResolver(new TestLinkResolver());
 
@@ -41,8 +43,8 @@ class CustomLinkResolverTest extends AbstractBaseTest {
             db.createLinkedTable("Table4", "testFile2.txt", "MissingTable4");
 
             Table t1 = db.getTable("Table1");
-            assertNotNull(t1);
-            assertNotSame(db, t1.getDatabase());
+            assertThat(t1).isNotNull();
+            assertThat(t1.getDatabase()).isNotSameAs(db);
 
             TestUtil.assertTable(TestUtil.createExpectedTable(
                 TestUtil.createExpectedRow("id", 0, "data1", "row0"),
@@ -51,8 +53,8 @@ class CustomLinkResolverTest extends AbstractBaseTest {
                 t1);
 
             Table t2 = db.getTable("Table2");
-            assertNotNull(t2);
-            assertNotSame(db, t2.getDatabase());
+            assertThat(t2).isNotNull();
+            assertThat(t2.getDatabase()).isNotSameAs(db);
 
             TestUtil.assertTable(TestUtil.createExpectedTable(
                 TestUtil.createExpectedRow("id", 3, "data2", "row3"),
@@ -60,7 +62,7 @@ class CustomLinkResolverTest extends AbstractBaseTest {
                 TestUtil.createExpectedRow("id", 5, "data2", "row5")),
                 t2);
 
-            assertNull(db.getTable("Table4"));
+            assertThat(db.getTable("Table4")).isNull();
 
             assertThrows(AccessDeniedException.class, () -> db.getTable("Table3"));
         }
@@ -84,7 +86,7 @@ class CustomLinkResolverTest extends AbstractBaseTest {
             throws IOException {
             if ("Table1".equals(tableName)) {
 
-                assertEquals("testFile1.txt", customFile);
+                assertThat(customFile).isEqualTo("testFile1.txt");
                 Table t = new TableBuilder(tableName)
                     .addColumn(new ColumnBuilder("id", DataType.LONG))
                     .addColumn(new ColumnBuilder("data1", DataType.TEXT))
@@ -98,7 +100,7 @@ class CustomLinkResolverTest extends AbstractBaseTest {
 
             } else if ("OtherTable2".equals(tableName)) {
 
-                assertEquals("testFile2.txt", customFile);
+                assertThat(customFile).isEqualTo("testFile2.txt");
                 Table t = new TableBuilder(tableName)
                     .addColumn(new ColumnBuilder("id", DataType.LONG))
                     .addColumn(new ColumnBuilder("data2", DataType.TEXT))
@@ -112,7 +114,7 @@ class CustomLinkResolverTest extends AbstractBaseTest {
 
             } else if ("Table4".equals(tableName)) {
 
-                assertEquals("testFile2.txt", customFile);
+                assertThat(customFile).isEqualTo("testFile2.txt");
                 return false;
             }
 

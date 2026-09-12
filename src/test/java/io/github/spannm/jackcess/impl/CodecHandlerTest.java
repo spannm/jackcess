@@ -16,6 +16,7 @@ limitations under the License.
 
 package io.github.spannm.jackcess.impl;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import io.github.spannm.jackcess.*;
 import io.github.spannm.jackcess.Database.FileFormat;
 import io.github.spannm.jackcess.test.AbstractBaseTest;
@@ -36,13 +37,13 @@ class CodecHandlerTest extends AbstractBaseTest {
 
     @ParameterizedTest(name = "[{index}] {0}")
     @FileFormatSource
-    void testCodecHandlerSimple(FileFormat fileFormat) throws IOException {
+    void codecHandlerSimple(FileFormat fileFormat) throws Exception {
         doTestCodecHandler(fileFormat, true);
     }
 
     @ParameterizedTest(name = "[{index}] {0}")
     @FileFormatSource
-    void testCodecHandlerNotSimple(FileFormat fileFormat) throws IOException {
+    void codecHandlerNotSimple(FileFormat fileFormat) throws Exception {
         doTestCodecHandler(fileFormat, false);
     }
 
@@ -122,16 +123,16 @@ class CodecHandlerTest extends AbstractBaseTest {
             ((DatabaseImpl) db).getPageChannel().finishWrite();
         }
 
-        assertEquals(100, t1rows);
-        assertEquals(100, t2rows);
+        assertThat(t1rows).isEqualTo(100);
+        assertThat(t2rows).isEqualTo(100);
     }
 
     private static void checkRow(Row row) {
         int id = row.getInt("id");
         String value = row.getString("data");
         String valuePrefix = "rowdata-" + id;
-        assertTrue(value.startsWith(valuePrefix));
-        assertEquals(valuePrefix.length() + 100, value.length());
+        assertThat(value.startsWith(valuePrefix)).isTrue();
+        assertThat(value.length()).isEqualTo(valuePrefix.length() + 100);
     }
 
     private static void encodeFile(File dbFile, int pageSize, boolean simple) throws IOException {
@@ -251,8 +252,8 @@ class CodecHandlerTest extends AbstractBaseTest {
         @Override
         public ByteBuffer encodePage(ByteBuffer page, int pageNumber,
             int pageOffset) {
-            assertEquals(0, pageOffset);
-            assertEquals(_channel.getFormat().PAGE_SIZE, page.limit());
+            assertThat(pageOffset).isEqualTo(0);
+            assertThat(page.limit()).isEqualTo(_channel.getFormat().PAGE_SIZE);
 
             ByteBuffer bb = _bufH.getPageBuffer(_channel);
             bb.clear();

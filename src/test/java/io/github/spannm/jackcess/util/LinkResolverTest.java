@@ -15,6 +15,8 @@
  */
 package io.github.spannm.jackcess.util;
 
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.assertj.core.api.Assertions.assertThat;
 import io.github.spannm.jackcess.Database;
 import io.github.spannm.jackcess.Database.FileFormat;
 import io.github.spannm.jackcess.test.AbstractBaseTest;
@@ -23,7 +25,6 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 
 import java.io.File;
-import java.io.IOException;
 import java.nio.file.AccessDeniedException;
 
 class LinkResolverTest extends AbstractBaseTest {
@@ -40,18 +41,18 @@ class LinkResolverTest extends AbstractBaseTest {
         "\\\\.\\linked.accdb",
         "\\/server/share/linked.accdb"
     })
-    void testDefaultRejectsAutomaticLinks(String linkedDbName) throws IOException {
+    void defaultRejectsAutomaticLinks(String linkedDbName) throws Exception {
         try (Database linkerDb = createDbMem(FileFormat.V2010)) {
             AccessDeniedException ex = assertThrows(AccessDeniedException.class,
                 () -> LinkResolver.DEFAULT.resolveLinkedDatabase(linkerDb, linkedDbName));
 
-            assertEquals(linkedDbName, ex.getFile());
-            assertTrue(ex.getReason().contains("LinkResolver.UNRESTRICTED"));
+            assertThat(ex.getFile()).isEqualTo(linkedDbName);
+            assertThat(ex.getReason().contains("LinkResolver.UNRESTRICTED")).isTrue();
         }
     }
 
     @Test
-    void testUnrestrictedAllowsLocalPath() throws IOException {
+    void unrestrictedAllowsLocalPath() throws Exception {
         File linkeeFile;
         try (Database linkeeDb = createDb(FileFormat.V2010, false, false)) {
             linkeeFile = linkeeDb.getFile();
@@ -59,20 +60,20 @@ class LinkResolverTest extends AbstractBaseTest {
 
         try (Database linkerDb = createDbMem(FileFormat.V2010);
              Database resolvedDb = LinkResolver.UNRESTRICTED.resolveLinkedDatabase(linkerDb, linkeeFile.getPath())) {
-            assertEquals(linkeeFile.getCanonicalFile(), resolvedDb.getFile().getCanonicalFile());
+            assertThat(resolvedDb.getFile().getCanonicalFile()).isEqualTo(linkeeFile.getCanonicalFile());
         }
     }
 
     @Test
-    void testLinkedTableDoesNotOpenNetworkPathByDefault() throws IOException {
+    void linkedTableDoesNotOpenNetworkPathByDefault() throws Exception {
         String linkedDbName = "\\\\server\\share\\linked.accdb";
 
         try (Database db = createDbMem(FileFormat.V2010)) {
             db.createLinkedTable("RemoteTable", linkedDbName, "Table1");
 
             AccessDeniedException ex = assertThrows(AccessDeniedException.class, () -> db.getTable("RemoteTable"));
-            assertEquals(linkedDbName, ex.getFile());
-            assertTrue(db.getLinkedDatabases().isEmpty());
+            assertThat(ex.getFile()).isEqualTo(linkedDbName);
+            assertThat(db.getLinkedDatabases().isEmpty()).isTrue();
         }
     }
 }

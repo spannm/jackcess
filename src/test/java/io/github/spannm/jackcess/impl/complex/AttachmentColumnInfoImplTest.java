@@ -15,11 +15,11 @@
  */
 package io.github.spannm.jackcess.impl.complex;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import io.github.spannm.jackcess.complex.Attachment;
 import io.github.spannm.jackcess.test.AbstractBaseTest;
 import org.junit.jupiter.api.Test;
 
-import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.Date;
 
@@ -29,95 +29,95 @@ class AttachmentColumnInfoImplTest extends AbstractBaseTest {
     private static final byte[] DATA = getAsciiBytes("standalone attachment test data");
 
     @Test
-    void testNewAttachmentPlain() throws IOException {
+    void newAttachmentPlain() throws Exception {
         Attachment a = AttachmentColumnInfoImpl.newAttachment(DATA);
-        assertArrayEquals(DATA, a.getFileData());
-        assertNull(a.getFileName());
-        assertNull(a.getFileUrl());
-        assertNull(a.getFileType());
+        assertThat(a.getFileData()).containsExactly(DATA);
+        assertThat(a.getFileName()).isNull();
+        assertThat(a.getFileUrl()).isNull();
+        assertThat(a.getFileType()).isNull();
     }
 
     @Test
-    void testNewAttachmentFull() throws IOException {
+    void newAttachmentFull() throws Exception {
         Date now = new Date();
         Attachment a = AttachmentColumnInfoImpl.newAttachment(
             "http://example.com", "some.txt", "txt", DATA, now, 42);
-        assertArrayEquals(DATA, a.getFileData());
-        assertEquals("http://example.com", a.getFileUrl());
-        assertEquals("some.txt", a.getFileName());
-        assertEquals("txt", a.getFileType());
-        assertEquals(now, a.getFileTimeStamp());
-        assertEquals(42, a.getFileFlags());
+        assertThat(a.getFileData()).containsExactly(DATA);
+        assertThat(a.getFileUrl()).isEqualTo("http://example.com");
+        assertThat(a.getFileName()).isEqualTo("some.txt");
+        assertThat(a.getFileType()).isEqualTo("txt");
+        assertThat(a.getFileTimeStamp()).isEqualTo(now);
+        assertThat(a.getFileFlags()).isEqualTo(42);
     }
 
     @Test
-    void testNewEncodedAttachmentPlain() throws IOException {
+    void newEncodedAttachmentPlain() throws Exception {
         byte[] encoded = AttachmentColumnInfoImpl.newAttachment("some.txt", "some.txt", "txt", DATA, null, null)
             .getEncodedFileData();
         Attachment a = AttachmentColumnInfoImpl.newEncodedAttachment(encoded);
-        assertArrayEquals(encoded, a.getEncodedFileData());
+        assertThat(a.getEncodedFileData()).containsExactly(encoded);
     }
 
     @Test
-    void testNewEncodedAttachmentFull() throws IOException {
+    void newEncodedAttachmentFull() throws Exception {
         byte[] encoded = AttachmentColumnInfoImpl.newAttachment("some.txt", "some.txt", "txt", DATA, null, null)
             .getEncodedFileData();
         Date now = new Date();
         Attachment a = AttachmentColumnInfoImpl.newEncodedAttachment(
             "http://example.com", "some.txt", "txt", encoded, now, 7);
-        assertEquals("some.txt", a.getFileName());
-        assertEquals(now, a.getFileTimeStamp());
-        assertEquals(7, a.getFileFlags());
-        assertArrayEquals(DATA, a.getFileData());
+        assertThat(a.getFileName()).isEqualTo("some.txt");
+        assertThat(a.getFileTimeStamp()).isEqualTo(now);
+        assertThat(a.getFileFlags()).isEqualTo(7);
+        assertThat(a.getFileData()).containsExactly(DATA);
     }
 
     @Test
-    void testUrlAccessor() {
+    void urlAccessor() {
         Attachment a = AttachmentColumnInfoImpl.newAttachment(DATA);
-        assertNull(a.getFileUrl());
+        assertThat(a.getFileUrl()).isNull();
         a.setFileUrl("http://example.com/file");
-        assertEquals("http://example.com/file", a.getFileUrl());
+        assertThat(a.getFileUrl()).isEqualTo("http://example.com/file");
     }
 
     @Test
-    void testDateTimeStampAccessors() {
+    void dateTimeStampAccessors() {
         Attachment a = AttachmentColumnInfoImpl.newAttachment(DATA);
-        assertNull(a.getFileTimeStamp());
+        assertThat(a.getFileTimeStamp()).isNull();
         Date now = new Date();
         a.setFileTimeStamp(now);
-        assertEquals(now, a.getFileTimeStamp());
+        assertThat(a.getFileTimeStamp()).isEqualTo(now);
     }
 
     @Test
-    void testLocalDateTimeStampAccessors() {
+    void localDateTimeStampAccessors() {
         Attachment a = AttachmentColumnInfoImpl.newAttachment(DATA);
-        assertNull(a.getFileLocalTimeStamp());
+        assertThat(a.getFileLocalTimeStamp()).isNull();
         LocalDateTime now = LocalDateTime.now();
         a.setFileLocalTimeStamp(now);
-        assertEquals(now, a.getFileLocalTimeStamp());
-        assertEquals(now, a.getFileTimeStampObject());
+        assertThat(a.getFileLocalTimeStamp()).isEqualTo(now);
+        assertThat(a.getFileTimeStampObject()).isEqualTo(now);
     }
 
     @Test
-    void testFlagsAccessor() {
+    void flagsAccessor() {
         Attachment a = AttachmentColumnInfoImpl.newAttachment(DATA);
-        assertNull(a.getFileFlags());
+        assertThat(a.getFileFlags()).isNull();
         a.setFileFlags(13);
-        assertEquals(13, a.getFileFlags());
+        assertThat(a.getFileFlags()).isEqualTo(13);
     }
 
     @Test
-    void testSetEncodedFileDataClearsPlainData() throws IOException {
+    void setEncodedFileDataClearsPlainData() throws Exception {
         Attachment a = AttachmentColumnInfoImpl.newAttachment(DATA);
         byte[] encoded = a.getEncodedFileData();
-        assertNotNull(encoded);
+        assertThat(encoded).isNotNull();
 
         Attachment other = AttachmentColumnInfoImpl.newAttachment(getAsciiBytes("other data"));
         byte[] otherEncoded = other.getEncodedFileData();
 
         a.setEncodedFileData(otherEncoded);
-        assertArrayEquals(otherEncoded, a.getEncodedFileData());
-        assertArrayEquals(getAsciiBytes("other data"), a.getFileData());
+        assertThat(a.getEncodedFileData()).containsExactly(otherEncoded);
+        assertThat(a.getFileData()).containsExactly(getAsciiBytes("other data"));
     }
 
     @Test
@@ -125,9 +125,9 @@ class AttachmentColumnInfoImplTest extends AbstractBaseTest {
         Attachment a = AttachmentColumnInfoImpl.newAttachment(
             "http://example.com", "some.txt", "txt", DATA, new Date(), 1);
         String str = a.toString();
-        assertTrue(str.contains("some.txt"));
-        assertTrue(str.contains("http://example.com"));
-        assertTrue(str.contains("txt"));
+        assertThat(str.contains("some.txt")).isTrue();
+        assertThat(str.contains("http://example.com")).isTrue();
+        assertThat(str.contains("txt")).isTrue();
     }
 
     private static byte[] getAsciiBytes(String str) {

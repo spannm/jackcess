@@ -15,6 +15,8 @@
  */
 package io.github.spannm.jackcess;
 
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.assertj.core.api.Assertions.assertThat;
 import io.github.spannm.jackcess.Database.FileFormat;
 import io.github.spannm.jackcess.impl.ColumnImpl;
 import io.github.spannm.jackcess.impl.JetFormat;
@@ -22,70 +24,68 @@ import io.github.spannm.jackcess.test.AbstractBaseTest;
 import io.github.spannm.jackcess.test.TestUtil;
 import org.junit.jupiter.api.Test;
 
-import java.io.IOException;
-
 /**
  * Tests for {@link ColumnBuilder}.
  */
 class ColumnBuilderTest extends AbstractBaseTest {
 
     @Test
-    void testMaxPrecisionAndScale() {
+    void maxPrecisionAndScale() {
         ColumnBuilder cb = new ColumnBuilder("num", DataType.NUMERIC)
             .withMaxPrecision().withMaxScale();
-        assertEquals((byte) DataType.NUMERIC.getMaxPrecision(), cb.getPrecision());
-        assertEquals((byte) DataType.NUMERIC.getMaxScale(), cb.getScale());
+        assertThat(cb.getPrecision()).isEqualTo((byte) DataType.NUMERIC.getMaxPrecision());
+        assertThat(cb.getScale()).isEqualTo((byte) DataType.NUMERIC.getMaxScale());
 
         // types without scale/precision are left untouched
         ColumnBuilder txt = new ColumnBuilder("txt", DataType.TEXT)
             .withMaxPrecision().withMaxScale();
-        assertEquals((byte) DataType.TEXT.getDefaultPrecision(), txt.getPrecision());
-        assertEquals((byte) DataType.TEXT.getDefaultScale(), txt.getScale());
+        assertThat(txt.getPrecision()).isEqualTo((byte) DataType.TEXT.getDefaultPrecision());
+        assertThat(txt.getScale()).isEqualTo((byte) DataType.TEXT.getDefaultScale());
     }
 
     @Test
-    void testMaxLength() {
+    void maxLength() {
         ColumnBuilder txt = new ColumnBuilder("txt", DataType.TEXT).withMaxLength();
-        assertEquals((short) DataType.TEXT.getMaxSize(), txt.getLength());
+        assertThat(txt.getLength()).isEqualTo((short) DataType.TEXT.getMaxSize());
 
         // fixed length types are left untouched
         ColumnBuilder lng = new ColumnBuilder("lng", DataType.LONG).withMaxLength();
-        assertEquals((short) DataType.LONG.getFixedSize(), lng.getLength());
-        assertEquals(DataType.LONG.getFixedSize(), lng.getFixedDataSize());
+        assertThat(lng.getLength()).isEqualTo((short) DataType.LONG.getFixedSize());
+        assertThat(lng.getFixedDataSize()).isEqualTo(DataType.LONG.getFixedSize());
     }
 
     @Test
-    void testFlags() {
+    void flags() {
         ColumnBuilder cb = new ColumnBuilder("memo", DataType.MEMO)
             .withCompressedUnicode(true)
             .withHyperlink(true)
             .withAutoNumber(false);
-        assertTrue(cb.isCompressedUnicode());
-        assertTrue(cb.isHyperlink());
-        assertFalse(cb.isAutoNumber());
-        assertTrue(cb.isVariableLength());
-        assertFalse(cb.storeInNullMask());
-        assertTrue(new ColumnBuilder("b", DataType.BOOLEAN).storeInNullMask());
+        assertThat(cb.isCompressedUnicode()).isTrue();
+        assertThat(cb.isHyperlink()).isTrue();
+        assertThat(cb.isAutoNumber()).isFalse();
+        assertThat(cb.isVariableLength()).isTrue();
+        assertThat(cb.storeInNullMask()).isFalse();
+        assertThat(new ColumnBuilder("b", DataType.BOOLEAN).storeInNullMask()).isTrue();
 
         cb.setColumnNumber((short) 3);
-        assertEquals((short) 3, cb.getColumnNumber());
+        assertThat(cb.getColumnNumber()).isEqualTo((short) 3);
         cb.setTextSortOrder(ColumnImpl.GENERAL_SORT_ORDER);
-        assertEquals(ColumnImpl.GENERAL_SORT_ORDER, cb.getTextSortOrder());
+        assertThat(cb.getTextSortOrder()).isEqualTo(ColumnImpl.GENERAL_SORT_ORDER);
     }
 
     @Test
-    void testProperties() {
+    void properties() {
         ColumnBuilder cb = new ColumnBuilder("c", DataType.TEXT);
-        assertNull(cb.getProperties());
+        assertThat(cb.getProperties()).isNull();
         cb.withProperty("myprop", "myval");
-        assertNotNull(cb.getProperties());
-        assertEquals("myval", cb.getProperties().get("myprop").getValue());
+        assertThat(cb.getProperties()).isNotNull();
+        assertThat(cb.getProperties().get("myprop").getValue()).isEqualTo("myval");
         cb.withProperty("intprop", DataType.LONG, 13);
-        assertEquals(13, cb.getProperties().get("intprop").getValue());
+        assertThat(cb.getProperties().get("intprop").getValue()).isEqualTo(13);
     }
 
     @Test
-    void testFromColumnBuilder() {
+    void fromColumnBuilder() {
         ColumnBuilder template = new ColumnBuilder("tmpl", DataType.NUMERIC)
             .withScale(3).withPrecision(10)
             .withAutoNumber(false)
@@ -96,44 +96,44 @@ class ColumnBuilderTest extends AbstractBaseTest {
         template.setTextSortOrder(ColumnImpl.GENERAL_SORT_ORDER);
 
         ColumnBuilder copy = new ColumnBuilder("copy").withFromColumn(template);
-        assertEquals(DataType.NUMERIC, copy.getType());
-        assertEquals((byte) 3, copy.getScale());
-        assertEquals((byte) 10, copy.getPrecision());
-        assertTrue(copy.isCompressedUnicode());
-        assertTrue(copy.isHyperlink());
-        assertFalse(copy.isCalculated());
-        assertEquals(ColumnImpl.GENERAL_SORT_ORDER, copy.getTextSortOrder());
-        assertEquals("aval", copy.getProperties().get("aprop").getValue());
-        assertEquals("copy", copy.getName());
+        assertThat(copy.getType()).isEqualTo(DataType.NUMERIC);
+        assertThat(copy.getScale()).isEqualTo((byte) 3);
+        assertThat(copy.getPrecision()).isEqualTo((byte) 10);
+        assertThat(copy.isCompressedUnicode()).isTrue();
+        assertThat(copy.isHyperlink()).isTrue();
+        assertThat(copy.isCalculated()).isFalse();
+        assertThat(copy.getTextSortOrder()).isEqualTo(ColumnImpl.GENERAL_SORT_ORDER);
+        assertThat(copy.getProperties().get("aprop").getValue()).isEqualTo("aval");
+        assertThat(copy.getName()).isEqualTo("copy");
     }
 
     @Test
-    void testFromColumn() throws IOException {
+    void fromColumn() throws Exception {
         try (Database db = createDbMem(FileFormat.V2000)) {
             TestUtil.createTestTable(db);
             Table table = db.getTable("test");
             Column src = table.getColumns().iterator().next();
 
             ColumnBuilder cb = new ColumnBuilder("copy").withFromColumn(src);
-            assertEquals(src.getType(), cb.getType());
-            assertEquals(src.isAutoNumber(), cb.isAutoNumber());
-            assertEquals(src.isCalculated(), cb.isCalculated());
-            assertEquals(src.isHyperlink(), cb.isHyperlink());
+            assertThat(cb.getType()).isEqualTo(src.getType());
+            assertThat(cb.isAutoNumber()).isEqualTo(src.isAutoNumber());
+            assertThat(cb.isCalculated()).isEqualTo(src.isCalculated());
+            assertThat(cb.isHyperlink()).isEqualTo(src.isHyperlink());
         }
     }
 
     @Test
-    void testSqlType() throws IOException {
+    void sqlType() throws Exception {
         ColumnBuilder cb = new ColumnBuilder("c").withSqlType(java.sql.Types.INTEGER);
-        assertEquals(DataType.LONG, cb.getType());
+        assertThat(cb.getType()).isEqualTo(DataType.LONG);
         cb = new ColumnBuilder("c").withSqlType(java.sql.Types.VARCHAR, 100);
-        assertEquals(DataType.TEXT, cb.getType());
+        assertThat(cb.getType()).isEqualTo(DataType.TEXT);
         cb = new ColumnBuilder("c").withSqlType(java.sql.Types.VARCHAR, 100, FileFormat.V2003);
-        assertEquals(DataType.TEXT, cb.getType());
+        assertThat(cb.getType()).isEqualTo(DataType.TEXT);
     }
 
     @Test
-    void testValidate() {
+    void validate() {
         JetFormat fmt = JetFormat.VERSION_4;
 
         assertThrows(IllegalArgumentException.class,
@@ -162,7 +162,7 @@ class ColumnBuilderTest extends AbstractBaseTest {
     }
 
     @Test
-    void testValidateCalculated() {
+    void validateCalculated() {
         JetFormat fmt14 = JetFormat.VERSION_14;
 
         // calculated not supported in older format
@@ -177,21 +177,21 @@ class ColumnBuilderTest extends AbstractBaseTest {
             .withCalculated(true)
             .withProperty(PropertyMap.EXPRESSION_PROP, "[a]+[b]");
         cb.validate(fmt14);
-        assertNotNull(cb.getProperties().get(PropertyMap.RESULT_TYPE_PROP));
+        assertThat(cb.getProperties().get(PropertyMap.RESULT_TYPE_PROP)).isNotNull();
 
         ColumnBuilder cb2 = new ColumnBuilder("c2", DataType.LONG).withCalculatedInfo("[a]+[b]");
-        assertTrue(cb2.isCalculated());
+        assertThat(cb2.isCalculated()).isTrue();
         cb2.validate(fmt14);
     }
 
     @Test
-    void testEscapeAndToString() {
+    void escapeAndToString() {
         ColumnBuilder cb = new ColumnBuilder("value", DataType.TEXT);
-        assertEquals("xvalue", cb.escapeName().getName());
-        assertSame(cb, cb.toColumn());
+        assertThat(cb.escapeName().getName()).isEqualTo("xvalue");
+        assertThat(cb.toColumn()).isSameAs(cb);
         String str = cb.toString();
-        assertTrue(str.startsWith("ColumnBuilder["));
-        assertTrue(str.contains("type=TEXT"));
+        assertThat(str.startsWith("ColumnBuilder[")).isTrue();
+        assertThat(str.contains("type=TEXT")).isTrue();
     }
 
 }

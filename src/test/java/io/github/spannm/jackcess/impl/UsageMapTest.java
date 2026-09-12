@@ -18,6 +18,7 @@ package io.github.spannm.jackcess.impl;
 
 import static io.github.spannm.jackcess.test.Basename.COMMON1;
 import static io.github.spannm.jackcess.test.Basename.REF_GLOBAL;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import io.github.spannm.jackcess.*;
 import io.github.spannm.jackcess.Database.FileFormat;
@@ -29,16 +30,15 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 
 import java.io.File;
-import java.io.IOException;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
 
-public class UsageMapTest extends AbstractBaseTest {
+class UsageMapTest extends AbstractBaseTest {
 
     @ParameterizedTest(name = "[{index}] {0}")
     @TestDbSource(COMMON1)
-    void testRead(TestDb testDB) throws Exception {
+    void read(TestDb testDB) throws Exception {
         int expectedFirstPage;
         int expectedLastPage;
         FileFormat expectedFileFormat = testDB.getExpectedFileFormat();
@@ -62,14 +62,14 @@ public class UsageMapTest extends AbstractBaseTest {
                 PageChannel.PAGE_GLOBAL_USAGE_MAP,
                 PageChannel.ROW_GLOBAL_USAGE_MAP,
                 true);
-            assertEquals(expectedFirstPage, usageMap.getFirstPageNumber(), "Unexpected FirstPageNumber");
-            assertEquals(expectedLastPage, usageMap.getLastPageNumber(), "Unexpected LastPageNumber");
+            assertThat(usageMap.getFirstPageNumber()).as("Unexpected FirstPageNumber").isEqualTo(expectedFirstPage);
+            assertThat(usageMap.getLastPageNumber()).as("Unexpected LastPageNumber").isEqualTo(expectedLastPage);
         }
     }
 
     @ParameterizedTest(name = "[{index}] {0}")
     @TestDbSource(REF_GLOBAL)
-    void testGobalReferenceUsageMap(TestDb testDb) throws IOException {
+    void gobalReferenceUsageMap(TestDb testDb) throws Exception {
         try (Database db = TestUtil.openCopy(FileFormat.V2000, testDb.getFile())) {
             Table t = new TableBuilder("Test2")
                 .addColumn(new ColumnBuilder("id", DataType.LONG))
@@ -98,7 +98,7 @@ public class UsageMapTest extends AbstractBaseTest {
     }
 
     @Test
-    void testPromoteGlobalUsageMapToReference() throws Exception {
+    void promoteGlobalUsageMapToReference() throws Exception {
         Database db = createDb(FileFormat.V2003, false, false);
         File dbFile = db.getFile();
 
@@ -131,15 +131,15 @@ public class UsageMapTest extends AbstractBaseTest {
         // from page 0), and that all the data is still readable
         try (Database db2 = DatabaseBuilder.open(dbFile)) {
             UsageMap gmap = UsageMap.read((DatabaseImpl) db2, PageChannel.PAGE_GLOBAL_USAGE_MAP, PageChannel.ROW_GLOBAL_USAGE_MAP, true);
-            assertEquals("GlobalReferenceHandler", getHandlerName(gmap), "global usage map should be promoted to a reference map");
-            assertEquals(0, gmap.getStartPage(), "global reference map should start at page 0");
+            assertThat(getHandlerName(gmap)).as("global usage map should be promoted to a reference map").isEqualTo("GlobalReferenceHandler");
+            assertThat(gmap.getStartPage()).as("global reference map should start at page 0").isEqualTo(0);
 
             int count = 0;
             for (@SuppressWarnings("unused")
             Row r : db2.getTable("Test")) {
                 count++;
             }
-            assertEquals(numRows, count);
+            assertThat(count).isEqualTo(numRows);
         }
     }
 

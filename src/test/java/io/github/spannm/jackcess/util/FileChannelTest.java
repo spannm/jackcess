@@ -15,6 +15,8 @@
  */
 package io.github.spannm.jackcess.util;
 
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.assertj.core.api.Assertions.assertThat;
 import io.github.spannm.jackcess.test.AbstractBaseTest;
 import io.github.spannm.jackcess.test.TestUtil;
 import org.junit.jupiter.api.Test;
@@ -43,32 +45,32 @@ class FileChannelTest extends AbstractBaseTest {
     }
 
     @Test
-    void testReadOnlyFileChannel() throws IOException {
+    void readOnlyFileChannel() throws Exception {
         File f = createDataFile();
         try (FileChannel delegate = FileChannel.open(f.toPath(), StandardOpenOption.READ);
              ReadOnlyFileChannel ch = new ReadOnlyFileChannel(delegate)) {
 
-            assertEquals(DATA.length, ch.size());
-            assertEquals(0L, ch.position());
+            assertThat(ch.size()).isEqualTo(DATA.length);
+            assertThat(ch.position()).isEqualTo(0L);
 
             ByteBuffer buf = ByteBuffer.allocate(4);
-            assertEquals(4, ch.read(buf));
-            assertEquals(4L, ch.position());
+            assertThat(ch.read(buf)).isEqualTo(4);
+            assertThat(ch.position()).isEqualTo(4L);
 
             ByteBuffer buf2 = ByteBuffer.allocate(2);
             ByteBuffer buf3 = ByteBuffer.allocate(2);
-            assertEquals(4L, ch.read(new ByteBuffer[] {buf2, buf3}, 0, 2));
+            assertThat(ch.read(new ByteBuffer[]{buf2, buf3}, 0, 2)).isEqualTo(4L);
 
             ByteBuffer posBuf = ByteBuffer.allocate(2);
-            assertEquals(2, ch.read(posBuf, 0L));
+            assertThat(ch.read(posBuf, 0L)).isEqualTo(2);
 
-            assertSame(ch, ch.position(0L));
-            assertEquals(0L, ch.position());
+            assertThat(ch.position(0L)).isSameAs(ch);
+            assertThat(ch.position()).isEqualTo(0L);
 
             ch.force(true);
 
             MemFileChannel target = MemFileChannel.newChannel();
-            assertEquals(DATA.length, ch.transferTo(0L, DATA.length, target));
+            assertThat(ch.transferTo(0L, DATA.length, target)).isEqualTo(DATA.length);
             target.close();
 
             ByteBuffer src = ByteBuffer.wrap(DATA);
@@ -84,49 +86,49 @@ class FileChannelTest extends AbstractBaseTest {
     }
 
     @Test
-    void testMemFileChannelFactories() throws IOException {
+    void memFileChannelFactories() throws Exception {
         File f = createDataFile();
 
         try (MemFileChannel ch = MemFileChannel.newChannel(f)) {
-            assertEquals(DATA.length, ch.size());
+            assertThat(ch.size()).isEqualTo(DATA.length);
         }
         try (MemFileChannel ch = MemFileChannel.newChannel(f.toPath())) {
-            assertEquals(DATA.length, ch.size());
+            assertThat(ch.size()).isEqualTo(DATA.length);
         }
         try (MemFileChannel ch = MemFileChannel.newChannel(f.toPath(), StandardOpenOption.READ)) {
-            assertEquals(DATA.length, ch.size());
+            assertThat(ch.size()).isEqualTo(DATA.length);
             assertThrows(NonWritableChannelException.class, () -> ch.write(ByteBuffer.wrap(DATA)));
         }
         try (MemFileChannel ch = MemFileChannel.newChannel(f.toPath(), StandardOpenOption.WRITE)) {
-            assertEquals(DATA.length, ch.write(ByteBuffer.wrap(DATA), 0L));
+            assertThat(ch.write(ByteBuffer.wrap(DATA), 0L)).isEqualTo(DATA.length);
         }
         try (MemFileChannel ch = MemFileChannel.newChannel(new ByteArrayInputStream(DATA))) {
-            assertEquals(DATA.length, ch.size());
+            assertThat(ch.size()).isEqualTo(DATA.length);
         }
         try (FileChannel in = FileChannel.open(f.toPath(), StandardOpenOption.READ);
              MemFileChannel ch = MemFileChannel.newChannel(in)) {
-            assertEquals(DATA.length, ch.size());
+            assertThat(ch.size()).isEqualTo(DATA.length);
         }
     }
 
     @Test
-    void testMemFileChannelScatterGather() throws IOException {
+    void memFileChannelScatterGather() throws Exception {
         try (MemFileChannel ch = MemFileChannel.newChannel()) {
             ByteBuffer b1 = ByteBuffer.wrap(DATA, 0, 8);
             ByteBuffer b2 = ByteBuffer.wrap(DATA, 8, 8);
-            assertEquals(DATA.length, ch.write(new ByteBuffer[] {b1, b2}, 0, 2));
+            assertThat(ch.write(new ByteBuffer[]{b1, b2}, 0, 2)).isEqualTo(DATA.length);
 
             ch.position(0L);
             ByteBuffer d1 = ByteBuffer.allocate(8);
             ByteBuffer d2 = ByteBuffer.allocate(8);
-            assertEquals(DATA.length, ch.read(new ByteBuffer[] {d1, d2}, 0, 2));
+            assertThat(ch.read(new ByteBuffer[]{d1, d2}, 0, 2)).isEqualTo(DATA.length);
 
             // reading past the end
-            assertEquals(-1L, ch.read(new ByteBuffer[] {ByteBuffer.allocate(4)}, 0, 1));
+            assertThat(ch.read(new ByteBuffer[]{ByteBuffer.allocate(4)}, 0, 1)).isEqualTo(-1L);
 
             // transfer from a position beyond the end yields nothing
             try (MemFileChannel target = MemFileChannel.newChannel()) {
-                assertEquals(0L, ch.transferTo(ch.size() + 10, 10L, target));
+                assertThat(ch.transferTo(ch.size() + 10, 10L, target)).isEqualTo(0L);
             }
 
             assertThrows(UnsupportedOperationException.class, () -> ch.map(FileChannel.MapMode.READ_ONLY, 0L, 1L));

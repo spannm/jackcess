@@ -17,7 +17,11 @@
 package io.github.spannm.jackcess;
 
 import static io.github.spannm.jackcess.DatabaseBuilder.*;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.assertj.core.api.Assertions.assertThat;
 
+import org.assertj.core.api.Assertions;
 import io.github.spannm.jackcess.Database.FileFormat;
 import io.github.spannm.jackcess.impl.DatabaseImpl;
 import io.github.spannm.jackcess.impl.TableImpl;
@@ -32,7 +36,7 @@ class TableUpdaterTest extends AbstractBaseTest {
 
     @ParameterizedTest(name = "[{index}] {0}")
     @FileFormatSource
-    void testTableUpdating(FileFormat fileFormat) throws IOException {
+    void tableUpdating(FileFormat fileFormat) throws Exception {
         try (Database db = createDbMem(fileFormat)) {
             doTestUpdating(db, false, true, null);
         }
@@ -40,7 +44,7 @@ class TableUpdaterTest extends AbstractBaseTest {
 
     @ParameterizedTest(name = "[{index}] {0}")
     @FileFormatSource
-    void testTableUpdatingOneToOne(FileFormat fileFormat) throws IOException {
+    void tableUpdatingOneToOne(FileFormat fileFormat) throws Exception {
         try (Database db = createDbMem(fileFormat)) {
             doTestUpdating(db, true, true, null);
         }
@@ -48,7 +52,7 @@ class TableUpdaterTest extends AbstractBaseTest {
 
     @ParameterizedTest(name = "[{index}] {0}")
     @FileFormatSource
-    void testTableUpdatingNoEnforce(FileFormat fileFormat) throws IOException {
+    void tableUpdatingNoEnforce(FileFormat fileFormat) throws Exception {
         try (Database db = createDbMem(fileFormat)) {
             doTestUpdating(db, false, false, null);
         }
@@ -56,7 +60,7 @@ class TableUpdaterTest extends AbstractBaseTest {
 
     @ParameterizedTest(name = "[{index}] {0}")
     @FileFormatSource
-    void testTableUpdatingNamedRelationship(FileFormat fileFormat) throws IOException {
+    void tableUpdatingNamedRelationship(FileFormat fileFormat) throws Exception {
         try (Database db = createDbMem(fileFormat)) {
             doTestUpdating(db, false, true, "FKnun3jvv47l9kyl74h85y8a0if");
         }
@@ -98,22 +102,22 @@ class TableUpdaterTest extends AbstractBaseTest {
 
         Relationship rel = rb.toRelationship(db);
 
-        assertEquals(Objects.requireNonNullElse(relationshipName, "TestTableTestTable2"), rel.getName());
-        assertSame(t1, rel.getFromTable());
-        assertEquals(List.of(t1.getColumn("id")), rel.getFromColumns());
-        assertSame(t2, rel.getToTable());
-        assertEquals(List.of(t2.getColumn("id2")), rel.getToColumns());
-        assertEquals(oneToOne, rel.isOneToOne());
-        assertEquals(enforce, rel.hasReferentialIntegrity());
-        assertEquals(enforce, rel.cascadeDeletes());
-        assertFalse(rel.cascadeUpdates());
-        assertEquals(Relationship.JoinType.INNER, rel.getJoinType());
+        assertThat(rel.getName()).isEqualTo(Objects.requireNonNullElse(relationshipName, "TestTableTestTable2"));
+        assertThat(rel.getFromTable()).isSameAs(t1);
+        assertThat(rel.getFromColumns()).isEqualTo(List.of(t1.getColumn("id")));
+        assertThat(rel.getToTable()).isSameAs(t2);
+        assertThat(rel.getToColumns()).isEqualTo(List.of(t2.getColumn("id2")));
+        assertThat(rel.isOneToOne()).isEqualTo(oneToOne);
+        assertThat(rel.hasReferentialIntegrity()).isEqualTo(enforce);
+        assertThat(rel.cascadeDeletes()).isEqualTo(enforce);
+        assertThat(rel.cascadeUpdates()).isFalse();
+        assertThat(rel.getJoinType()).isEqualTo(Relationship.JoinType.INNER);
 
-        assertEquals(t1idxs, t1.getIndexes().size());
-        assertEquals(1, ((TableImpl) t1).getIndexDatas().size());
+        assertThat(t1.getIndexes().size()).isEqualTo(t1idxs);
+        assertThat(((TableImpl) t1).getIndexDatas().size()).isEqualTo(1);
 
-        assertEquals(t2idxs, t2.getIndexes().size());
-        assertEquals(t2idxs > 0 ? 1 : 0, ((TableImpl) t2).getIndexDatas().size());
+        assertThat(t2.getIndexes().size()).isEqualTo(t2idxs);
+        assertThat(((TableImpl) t2).getIndexDatas().size()).isEqualTo(t2idxs > 0 ? 1 : 0);
 
         ((DatabaseImpl) db).getPageChannel().startWrite();
         try {
@@ -140,7 +144,7 @@ class TableUpdaterTest extends AbstractBaseTest {
 
         int id = 0;
         for (Row r : t1) {
-            assertEquals(id, r.get("id"));
+            assertThat(r.get("id")).isEqualTo(id);
             id++;
             if (id == 5) {
                 id++;
@@ -149,7 +153,7 @@ class TableUpdaterTest extends AbstractBaseTest {
 
         id = 0;
         for (Row r : t2) {
-            assertEquals(id, r.get("id2"));
+            assertThat(r.get("id2")).isEqualTo(id);
             id++;
             if (enforce && id == 5) {
                 id++;
@@ -159,7 +163,7 @@ class TableUpdaterTest extends AbstractBaseTest {
 
     @ParameterizedTest(name = "[{index}] {0}")
     @FileFormatSource
-    void testInvalidUpdate(FileFormat fileFormat) throws IOException {
+    void invalidUpdate(FileFormat fileFormat) throws Exception {
         try (Database db = createDbMem(fileFormat)) {
             Table t1 = newTable("TestTable")
                 .addColumn(newColumn("id", DataType.LONG))
@@ -168,7 +172,7 @@ class TableUpdaterTest extends AbstractBaseTest {
             try {
                 newColumn("ID", DataType.TEXT)
                     .addToTable(t1);
-                fail("created table with no columns?");
+                Assertions.fail("created table with no columns?");
             } catch (IllegalArgumentException _ex) {
                 // success
             }
@@ -180,7 +184,7 @@ class TableUpdaterTest extends AbstractBaseTest {
             try {
                 newRelationship(t1, t2)
                     .toRelationship(db);
-                fail("created rel with no columns?");
+                Assertions.fail("created rel with no columns?");
             } catch (IllegalArgumentException _ex) {
                 // success
             }
@@ -189,7 +193,7 @@ class TableUpdaterTest extends AbstractBaseTest {
                 newRelationship("TestTable", "TestTable2")
                     .addColumns("id", "id")
                     .toRelationship(db);
-                fail("created rel with wrong columns?");
+                Assertions.fail("created rel with wrong columns?");
             } catch (IllegalArgumentException _ex) {
                 // success
             }
@@ -198,7 +202,7 @@ class TableUpdaterTest extends AbstractBaseTest {
 
     @ParameterizedTest(name = "[{index}] {0}")
     @FileFormatSource
-    void testUpdateLargeTableDef(FileFormat fileFormat) throws IOException {
+    void updateLargeTableDef(FileFormat fileFormat) throws Exception {
         try (Database db = createDbMem(fileFormat)) {
             final int numColumns = 89;
 
@@ -227,7 +231,7 @@ class TableUpdaterTest extends AbstractBaseTest {
             t.addRow(row.toArray());
 
             t.reset();
-            assertEquals(expectedRowData, t.getNextRow());
+            assertThat(t.getNextRow()).isEqualTo(expectedRowData);
         }
     }
 }

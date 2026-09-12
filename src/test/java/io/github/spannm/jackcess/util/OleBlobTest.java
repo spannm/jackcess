@@ -17,6 +17,7 @@
 package io.github.spannm.jackcess.util;
 
 import static io.github.spannm.jackcess.test.Basename.BLOB;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import io.github.spannm.jackcess.*;
 import io.github.spannm.jackcess.Database.FileFormat;
@@ -40,7 +41,7 @@ class OleBlobTest extends AbstractBaseTest {
 
     @ParameterizedTest(name = "[{index}] {0}")
     @FileFormatSource
-    void testCreateBlob(FileFormat fileFormat) throws IOException {
+    void createBlob(FileFormat fileFormat) throws Exception {
         File sampleFile = new File(DIR_TEST_DATA, "sample-input.tab");
         String sampleFilePath = sampleFile.getAbsolutePath();
         String sampleFileName = sampleFile.getName();
@@ -73,42 +74,42 @@ class OleBlobTest extends AbstractBaseTest {
 
                 try (OleBlob blob = row.getBlob("ole")) {
                     OleBlob.Content content = blob.getContent();
-                    assertSame(blob, content.getBlob());
-                    assertSame(content, blob.getContent());
+                    assertThat(content.getBlob()).isSameAs(blob);
+                    assertThat(blob.getContent()).isSameAs(content);
 
                     switch (row.getInt("id")) {
                         case 1:
-                            assertEquals(OleBlob.ContentType.SIMPLE_PACKAGE, content.getType());
+                            assertThat(content.getType()).isEqualTo(OleBlob.ContentType.SIMPLE_PACKAGE);
                             OleBlob.SimplePackageContent spc = (OleBlob.SimplePackageContent) content;
-                            assertEquals(sampleFilePath, spc.getFilePath());
-                            assertEquals(sampleFilePath, spc.getLocalFilePath());
-                            assertEquals(sampleFileName, spc.getFileName());
-                            assertEquals(OleBlob.Builder.PACKAGE_PRETTY_NAME, spc.getPrettyName());
-                            assertEquals(OleBlob.Builder.PACKAGE_TYPE_NAME, spc.getTypeName());
-                            assertEquals(OleBlob.Builder.PACKAGE_TYPE_NAME, spc.getClassName());
-                            assertEquals(sampleFileBytes.length, spc.length());
-                            assertArrayEquals(sampleFileBytes, readToByteArray(spc.getStream(), spc.length()));
+                            assertThat(spc.getFilePath()).isEqualTo(sampleFilePath);
+                            assertThat(spc.getLocalFilePath()).isEqualTo(sampleFilePath);
+                            assertThat(spc.getFileName()).isEqualTo(sampleFileName);
+                            assertThat(spc.getPrettyName()).isEqualTo(OleBlob.Builder.PACKAGE_PRETTY_NAME);
+                            assertThat(spc.getTypeName()).isEqualTo(OleBlob.Builder.PACKAGE_TYPE_NAME);
+                            assertThat(spc.getClassName()).isEqualTo(OleBlob.Builder.PACKAGE_TYPE_NAME);
+                            assertThat(spc.length()).isEqualTo(sampleFileBytes.length);
+                            assertThat(readToByteArray(spc.getStream(), spc.length())).containsExactly(sampleFileBytes);
                             break;
 
                         case 2:
                             OleBlob.LinkContent lc = (OleBlob.LinkContent) content;
-                            assertEquals(OleBlob.ContentType.LINK, lc.getType());
-                            assertEquals(sampleFilePath, lc.getLinkPath());
-                            assertEquals(sampleFilePath, lc.getFilePath());
-                            assertEquals(sampleFileName, lc.getFileName());
-                            assertEquals(OleBlob.Builder.PACKAGE_PRETTY_NAME, lc.getPrettyName());
-                            assertEquals(OleBlob.Builder.PACKAGE_TYPE_NAME, lc.getTypeName());
-                            assertEquals(OleBlob.Builder.PACKAGE_TYPE_NAME, lc.getClassName());
+                            assertThat(lc.getType()).isEqualTo(OleBlob.ContentType.LINK);
+                            assertThat(lc.getLinkPath()).isEqualTo(sampleFilePath);
+                            assertThat(lc.getFilePath()).isEqualTo(sampleFilePath);
+                            assertThat(lc.getFileName()).isEqualTo(sampleFileName);
+                            assertThat(lc.getPrettyName()).isEqualTo(OleBlob.Builder.PACKAGE_PRETTY_NAME);
+                            assertThat(lc.getTypeName()).isEqualTo(OleBlob.Builder.PACKAGE_TYPE_NAME);
+                            assertThat(lc.getClassName()).isEqualTo(OleBlob.Builder.PACKAGE_TYPE_NAME);
                             break;
 
                         case 3:
                             OleBlob.OtherContent oc = (OleBlob.OtherContent) content;
-                            assertEquals(OleBlob.ContentType.OTHER, oc.getType());
-                            assertEquals("Text File", oc.getPrettyName());
-                            assertEquals("Text.File", oc.getClassName());
-                            assertEquals("TextFile", oc.getTypeName());
-                            assertEquals(sampleFileBytes.length, oc.length());
-                            assertArrayEquals(sampleFileBytes, readToByteArray(oc.getStream(), oc.length()));
+                            assertThat(oc.getType()).isEqualTo(OleBlob.ContentType.OTHER);
+                            assertThat(oc.getPrettyName()).isEqualTo("Text File");
+                            assertThat(oc.getClassName()).isEqualTo("Text.File");
+                            assertThat(oc.getTypeName()).isEqualTo("TextFile");
+                            assertThat(oc.length()).isEqualTo(sampleFileBytes.length);
+                            assertThat(readToByteArray(oc.getStream(), oc.length())).containsExactly(sampleFileBytes);
                             break;
                         default:
                             throw new JackcessRuntimeException("Unexpected id " + row);
@@ -120,7 +121,7 @@ class OleBlobTest extends AbstractBaseTest {
 
     @ParameterizedTest(name = "[{index}] {0}")
     @TestDbReadOnlySource(BLOB)
-    void testReadBlob(TestDb testDb) throws IOException {
+    void readBlob(TestDb testDb) throws Exception {
         try (Database db = testDb.open()) {
             Table t = db.getTable("Table1");
 
@@ -138,16 +139,16 @@ class OleBlobTest extends AbstractBaseTest {
                         case LINK:
                             OleBlob.LinkContent lc = (OleBlob.LinkContent) content;
                             if ("test_link".equals(name)) {
-                                assertEquals("Z:\\jackcess_test\\ole\\test_data.txt", lc.getLinkPath());
+                                assertThat(lc.getLinkPath()).isEqualTo("Z:\\jackcess_test\\ole\\test_data.txt");
                             } else {
-                                assertEquals("Z:\\jackcess_test\\ole\\test_datau2.txt", lc.getLinkPath());
+                                assertThat(lc.getLinkPath()).isEqualTo("Z:\\jackcess_test\\ole\\test_datau2.txt");
                             }
                             break;
 
                         case SIMPLE_PACKAGE:
                             OleBlob.SimplePackageContent spc = (OleBlob.SimplePackageContent) content;
                             byte[] packageBytes = readToByteArray(spc.getStream(), spc.length());
-                            assertArrayEquals(attach.getFileData(), packageBytes);
+                            assertThat(packageBytes).containsExactly(attach.getFileData());
                             break;
 
                         case COMPOUND_STORAGE:
@@ -155,7 +156,7 @@ class OleBlobTest extends AbstractBaseTest {
                             if (cc.hasContentsEntry()) {
                                 OleBlob.CompoundContent.Entry entry = cc.getContentsEntry();
                                 byte[] entryBytes = readToByteArray(entry.getStream(), entry.length());
-                                assertArrayEquals(attach.getFileData(), entryBytes);
+                                assertThat(entryBytes).containsExactly(attach.getFileData());
                             } else {
 
                                 if ("test_word.doc".equals(name)) {
@@ -191,7 +192,7 @@ class OleBlobTest extends AbstractBaseTest {
                         case OTHER:
                             OleBlob.OtherContent oc = (OleBlob.OtherContent) content;
                             byte[] otherBytes = readToByteArray(oc.getStream(), oc.length());
-                            assertArrayEquals(attach.getFileData(), otherBytes);
+                            assertThat(otherBytes).containsExactly(attach.getFileData());
                             break;
 
                         default:
@@ -218,8 +219,8 @@ class OleBlobTest extends AbstractBaseTest {
             String entryName = (String) entryInfo[idx];
             int entryLen = (Integer) entryInfo[idx + 1];
 
-            assertEquals(entryName, e.getName());
-            assertEquals(entryLen, e.length());
+            assertThat(e.getName()).isEqualTo(entryName);
+            assertThat(e.length()).isEqualTo(entryLen);
 
             idx += 2;
         }
@@ -245,7 +246,7 @@ class OleBlobTest extends AbstractBaseTest {
                 byte[] attachEBytes = readToByteArray(new DocumentInputStream(attachE), attachE.getSize());
                 byte[] entryBytes = readToByteArray(e.getStream(), e.length());
 
-                assertArrayEquals(attachEBytes, entryBytes);
+                assertThat(entryBytes).containsExactly(attachEBytes);
             }
 
             ByteUtil.closeQuietly(attachFs);

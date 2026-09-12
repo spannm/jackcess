@@ -15,13 +15,14 @@
  */
 package io.github.spannm.jackcess.util;
 
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.assertj.core.api.Assertions.assertThat;
 import io.github.spannm.jackcess.test.AbstractBaseTest;
 import org.junit.jupiter.api.Test;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.sql.SQLFeatureNotSupportedException;
@@ -34,120 +35,120 @@ class OleBlobBuilderTest extends AbstractBaseTest {
     private static final byte[] DATA = "some ole content".getBytes(StandardCharsets.US_ASCII);
 
     @Test
-    void testBuilderSimplePackageVariants() throws IOException {
+    void builderSimplePackageVariants() throws Exception {
         OleBlob.Builder b = new OleBlob.Builder().withSimplePackageBytes(DATA);
-        assertEquals(OleBlob.ContentType.SIMPLE_PACKAGE, b.getType());
-        assertArrayEquals(DATA, b.getBytes());
-        assertEquals(DATA.length, b.getContentLength());
-        assertEquals(OleBlob.Builder.PACKAGE_PRETTY_NAME, b.getPrettyName());
-        assertEquals(OleBlob.Builder.PACKAGE_TYPE_NAME, b.getClassName());
+        assertThat(b.getType()).isEqualTo(OleBlob.ContentType.SIMPLE_PACKAGE);
+        assertThat(b.getBytes()).containsExactly(DATA);
+        assertThat(b.getContentLength()).isEqualTo(DATA.length);
+        assertThat(b.getPrettyName()).isEqualTo(OleBlob.Builder.PACKAGE_PRETTY_NAME);
+        assertThat(b.getClassName()).isEqualTo(OleBlob.Builder.PACKAGE_TYPE_NAME);
 
         b.withSimplePackageFileName("myfile.txt").withSimplePackageFilePath("/tmp/myfile.txt");
-        assertEquals("myfile.txt", b.getFileName());
-        assertEquals("/tmp/myfile.txt", b.getFilePath());
+        assertThat(b.getFileName()).isEqualTo("myfile.txt");
+        assertThat(b.getFilePath()).isEqualTo("/tmp/myfile.txt");
 
         try (OleBlob blob = b.toBlob()) {
-            assertEquals(OleBlob.ContentType.SIMPLE_PACKAGE, blob.getContent().getType());
-            assertNotNull(blob.toString());
+            assertThat(blob.getContent().getType()).isEqualTo(OleBlob.ContentType.SIMPLE_PACKAGE);
+            assertThat(blob.toString()).isNotNull();
         }
     }
 
     @Test
-    void testBuilderLinkVariants() throws IOException {
+    void builderLinkVariants() throws Exception {
         OleBlob.Builder b = new OleBlob.Builder()
             .withLinkFileName("linked.txt")
             .withLinkPath("/tmp/linked.txt");
-        assertEquals(OleBlob.ContentType.LINK, b.getType());
-        assertEquals("linked.txt", b.getFileName());
-        assertEquals("/tmp/linked.txt", b.getFilePath());
+        assertThat(b.getType()).isEqualTo(OleBlob.ContentType.LINK);
+        assertThat(b.getFileName()).isEqualTo("linked.txt");
+        assertThat(b.getFilePath()).isEqualTo("/tmp/linked.txt");
 
         try (OleBlob blob = b.toBlob()) {
             OleBlob.LinkContent lc = (OleBlob.LinkContent) blob.getContent();
-            assertEquals("/tmp/linked.txt", lc.getLinkPath());
-            assertNotNull(lc.toString());
+            assertThat(lc.getLinkPath()).isEqualTo("/tmp/linked.txt");
+            assertThat(lc.toString()).isNotNull();
         }
     }
 
     @Test
-    void testBuilderOtherStream() throws IOException {
+    void builderOtherStream() throws Exception {
         OleBlob.Builder b = new OleBlob.Builder()
             .withPackagePrettyName("Text File")
             .withPackageClassName("Text.File")
             .withPackageTypeName("TextFile")
             .withOtherStream(new ByteArrayInputStream(DATA), DATA.length);
-        assertEquals(OleBlob.ContentType.OTHER, b.getType());
-        assertNotNull(b.getStream());
+        assertThat(b.getType()).isEqualTo(OleBlob.ContentType.OTHER);
+        assertThat(b.getStream()).isNotNull();
 
         try (OleBlob blob = b.toBlob()) {
             OleBlob.OtherContent oc = (OleBlob.OtherContent) blob.getContent();
-            assertEquals(DATA.length, oc.length());
+            assertThat(oc.length()).isEqualTo(DATA.length);
             ByteArrayOutputStream bout = new ByteArrayOutputStream();
             oc.writeTo(bout);
-            assertArrayEquals(DATA, bout.toByteArray());
-            assertNotNull(oc.toString());
+            assertThat(bout.toByteArray()).containsExactly(DATA);
+            assertThat(oc.toString()).isNotNull();
         }
     }
 
     @Test
-    void testBuilderFromFiles() throws IOException {
+    void builderFromFiles() throws Exception {
         File sampleFile = new File(DIR_TEST_DATA, "sample-input.tab");
         try (OleBlob blob = new OleBlob.Builder()
             .withPackagePrettyName("Text File")
             .withPackageClassName("Text.File")
             .withPackageTypeName("TextFile")
             .withOther(sampleFile).toBlob()) {
-            assertEquals(OleBlob.ContentType.OTHER, blob.getContent().getType());
+            assertThat(blob.getContent().getType()).isEqualTo(OleBlob.ContentType.OTHER);
         }
 
         OleBlob.Builder lb = new OleBlob.Builder().withLink(sampleFile);
-        assertEquals(sampleFile.getName(), lb.getFileName());
+        assertThat(lb.getFileName()).isEqualTo(sampleFile.getName());
         try (OleBlob blob = lb.toBlob()) {
             OleBlob.LinkContent lc = (OleBlob.LinkContent) blob.getContent();
             try (InputStream in = lc.getLinkStream()) {
-                assertTrue(in.read() >= 0);
+                assertThat(in.read() >= 0).isTrue();
             }
         }
     }
 
     @Test
-    void testUnsupportedContentType() {
+    void unsupportedContentType() {
         OleBlob.Builder b = new OleBlob.Builder();
         assertThrows(IllegalArgumentException.class, b::toBlob);
     }
 
     @Test
-    void testBlobSqlMethods() throws Exception {
+    void blobSqlMethods() throws Exception {
         try (OleBlob blob = new OleBlob.Builder()
             .withPackagePrettyName("Text File")
             .withPackageClassName("Text.File")
             .withPackageTypeName("TextFile")
             .withOtherBytes(DATA).toBlob()) {
             long len = blob.length();
-            assertTrue(len > DATA.length);
+            assertThat(len > DATA.length).isTrue();
 
             byte[] all = blob.getBytes(1L, (int) len);
-            assertEquals(len, all.length);
+            assertThat(all.length).isEqualTo(len);
 
             byte[] part = blob.getBytes(2L, 4);
-            assertEquals(4, part.length);
+            assertThat(part.length).isEqualTo(4);
 
             try (InputStream in = blob.getBinaryStream()) {
-                assertEquals(all[0], (byte) in.read());
+                assertThat((byte) in.read()).isEqualTo(all[0]);
             }
             try (InputStream in = blob.getBinaryStream(1L, len)) {
-                assertEquals(all[0], (byte) in.read());
+                assertThat((byte) in.read()).isEqualTo(all[0]);
             }
 
             byte[] pattern = new byte[] {all[3], all[4], all[5]};
-            assertEquals(4L, blob.position(pattern, 1L));
-            assertEquals(-1L, blob.position(new byte[] {(byte) 0xEE, (byte) 0xEF, (byte) 0xAB, (byte) 0xCD}, 1L));
+            assertThat(blob.position(pattern, 1L)).isEqualTo(4L);
+            assertThat(blob.position(new byte[]{(byte) 0xEE, (byte) 0xEF, (byte) 0xAB, (byte) 0xCD}, 1L)).isEqualTo(-1L);
 
             try (OleBlob other = new OleBlob.Builder()
                 .withPackagePrettyName("Text File")
                 .withPackageClassName("Text.File")
                 .withPackageTypeName("TextFile")
                 .withOtherBytes(part).toBlob()) {
-                assertTrue(blob.position(other, 1L) != 0L);
+                assertThat(blob.position(other, 1L) != 0L).isTrue();
             }
 
             assertThrows(SQLFeatureNotSupportedException.class, () -> blob.setBinaryStream(1L));
@@ -157,8 +158,8 @@ class OleBlobBuilderTest extends AbstractBaseTest {
 
             ByteArrayOutputStream bout = new ByteArrayOutputStream();
             blob.writeTo(bout);
-            assertEquals(len, bout.toByteArray().length);
-            assertNotNull(blob.toString());
+            assertThat(bout.toByteArray().length).isEqualTo(len);
+            assertThat(blob.toString()).isNotNull();
 
             blob.free();
             assertThrows(Exception.class, () -> blob.getBytes(1L, 1));

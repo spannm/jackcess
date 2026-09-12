@@ -16,6 +16,8 @@
  */
 package io.github.spannm.jackcess.impl.expr;
 
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.assertj.core.api.Assertions.assertThat;
 import io.github.spannm.jackcess.expr.EvalException;
 import io.github.spannm.jackcess.expr.Expression;
 import io.github.spannm.jackcess.impl.expr.DefaultFunctionsTest.CustomFormatSource.CustomFormatArgumentsProvider;
@@ -156,38 +158,38 @@ class DefaultFunctionsTest extends AbstractBaseTest {
         "FormatDateTime(#1/1/1973 1:37:25 PM#,3); 1:37:25 PM",
         "FormatDateTime(#1/1/1973 1:37:25 PM#,4); 13:37"
     })
-    void testFuncsString(String _exprStr, String _expected) {
-        assertEquals(_expected, eval(_exprStr));
+    void funcsString(String _exprStr, String _expected) {
+        assertThat(eval(_exprStr)).isEqualTo(_expected);
     }
 
     @Test
-    void testFuncsQuoting() {
-        assertEquals(" FOO \" BAR ", eval("UCase(\" foo \"\" bar \")"));
+    void funcsQuoting() {
+        assertThat(eval("UCase(\" foo \"\" bar \")")).isEqualTo(" FOO \" BAR ");
     }
 
     @Test
-    void testUCaseLCaseTurkishLocale() {
+    void uCaseLCaseTurkishLocale() {
         // Turkish locale: dotted/dotless-i case conversion
         Locale turkish = Locale.forLanguageTag("tr");
-        assertEquals("İSTANBUL", eval("UCase('istanbul')", turkish));
-        assertEquals("ıstanbul", eval("LCase('ISTANBUL')", turkish));
+        assertThat(eval("UCase('istanbul')", turkish)).isEqualTo("İSTANBUL");
+        assertThat(eval("LCase('ISTANBUL')", turkish)).isEqualTo("ıstanbul");
     }
 
     @Test
-    void testStrConvWithLocaleId() {
+    void strConvWithLocaleId() {
         // Turkish LCID 1055: dotted/dotless-i case conversion
-        assertEquals("İSTANBUL", eval("StrConv('istanbul', 1, 1055)"));
-        assertEquals("ıstanbul", eval("StrConv('ISTANBUL', 2, 1055)"));
+        assertThat(eval("StrConv('istanbul', 1, 1055)")).isEqualTo("İSTANBUL");
+        assertThat(eval("StrConv('ISTANBUL', 2, 1055)")).isEqualTo("ıstanbul");
 
         EvalException ex = assertThrows(EvalException.class, () -> eval("StrConv('foo', 1, 9999)"));
-        assertTrue(ex.getCause().getMessage().contains("Unsupported locale id"));
+        assertThat(ex.getCause().getMessage().contains("Unsupported locale id")).isTrue();
     }
 
     @Test
-    void testStrConvProperCaseWithLocaleId() {
+    void strConvProperCaseWithLocaleId() {
         // Turkish LCID 1055: dotted/dotless-i case conversion
-        assertEquals("İstanbul Ankara", eval("StrConv('İSTANBUL ANKARA', 3, 1055)"));
-        assertEquals("İstanbul Ankara", eval("StrConv('istanbul ankara', 3, 1055)"));
+        assertThat(eval("StrConv('İSTANBUL ANKARA', 3, 1055)")).isEqualTo("İstanbul Ankara");
+        assertThat(eval("StrConv('istanbul ankara', 3, 1055)")).isEqualTo("İstanbul Ankara");
     }
 
     @ParameterizedTest(name = "[{index}] {0} --> {1}")
@@ -258,8 +260,8 @@ class DefaultFunctionsTest extends AbstractBaseTest {
         "StrComp('bar', 'FOO', 0); 1",
         "StrComp('FOO', 'foo', 0); -1"
     })
-    void testFuncsInt(String _exprStr, int _expected) {
-        assertEquals(_expected, eval(_exprStr));
+    void funcsInt(String _exprStr, int _expected) {
+        assertThat(eval(_exprStr)).isEqualTo(_expected);
     }
 
     @ParameterizedTest(name = "[{index}] {0}")
@@ -270,8 +272,8 @@ class DefaultFunctionsTest extends AbstractBaseTest {
         "Choose(-1,'foo','bar','blah')",
         "Switch(False,'foo', False, 'bar', False, 'blah')"
     })
-    void testFuncsNull(String _exprStr) {
-        assertNull(eval(_exprStr));
+    void funcsNull(String _exprStr) {
+        assertThat(eval(_exprStr)).isNull();
     }
 
     @ParameterizedTest(name = "[{index}] {0} --> {1}")
@@ -287,8 +289,8 @@ class DefaultFunctionsTest extends AbstractBaseTest {
         "Val('  whatever123 '); 0d",
         "Val(''); 0d"
     })
-    void testFuncsDouble(String _exprStr, double _expected) {
-        assertEquals(_expected, eval(_exprStr));
+    void funcsDouble(String _exprStr, double _expected) {
+        assertThat(eval(_exprStr)).isEqualTo(_expected);
     }
 
     @ParameterizedTest(name = "[{index}] {0} --> {1}")
@@ -296,16 +298,16 @@ class DefaultFunctionsTest extends AbstractBaseTest {
         "CCur(\"57.12346\"); 57.1235",
         "CDec(\"57.123456789\"); 57.123456789"
     })
-    void testFuncsBigDecimal(String _exprStr, BigDecimal _expected) {
-        assertEquals(_expected, eval(_exprStr));
+    void funcsBigDecimal(String _exprStr, BigDecimal _expected) {
+        assertThat(eval(_exprStr)).isEqualTo(_expected);
     }
 
     @ParameterizedTest(name = "[{index}] {0} --> {1}")
     @CsvSource(delimiter = ';', value = {
         "CSng(\"57.12345\"); 57.12345"
     })
-    void testFuncsFloat(String _exprStr, String _expected) {
-        assertEquals(Float.valueOf(_expected).doubleValue(), eval(_exprStr));
+    void funcsFloat(String _exprStr, String _expected) {
+        assertThat(eval(_exprStr)).isEqualTo(Float.valueOf(_expected).doubleValue());
     }
 
     @ParameterizedTest(name = "[{index}] {0} --> {1}")
@@ -314,8 +316,8 @@ class DefaultFunctionsTest extends AbstractBaseTest {
         "2003, 1, 2, 7, 0; CDate('01/02/2003 7:00:00 AM')",
         "1908, 3, 31, 10, 48; CDate(3013.45)"
     })
-    void testFuncsLocalDateTime(@ConvertWith(CsvToLocalDateTime.class) LocalDateTime _expected, String _exprStr) {
-        assertEquals(_expected, eval(_exprStr));
+    void funcsLocalDateTime(@ConvertWith(CsvToLocalDateTime.class) LocalDateTime _expected, String _exprStr) {
+        assertThat(eval(_exprStr)).isEqualTo(_expected);
     }
 
     @ParameterizedTest(name = "[{index}] {0} --> {1}")
@@ -324,9 +326,9 @@ class DefaultFunctionsTest extends AbstractBaseTest {
         "StrReverse('blah', 1); Invalid function call",
         "StrReverse(); Invalid function call"
     })
-    void testFuncsException(String _exprStr, String _message) {
+    void funcsException(String _exprStr, String _message) {
         EvalException ex = assertThrows(EvalException.class, () -> eval(_exprStr));
-        assertTrue(ex.getMessage().contains(_message));
+        assertThat(ex.getMessage().contains(_message)).isTrue();
     }
 
     @ParameterizedTest(name = "[{index}] {0} --> {1}")
@@ -392,8 +394,8 @@ class DefaultFunctionsTest extends AbstractBaseTest {
         "Format(#01/02/2003 7:00:00 AM#, 'Short Time'); 07:00",
         "Format(#01/02/2003 7:00:00 PM#, 'Short Time'); 19:00"
     })
-    void testFormat(String _exprStr, String _expected) {
-        assertEquals(_expected, eval(_exprStr));
+    void format(String _exprStr, String _expected) {
+        assertThat(eval(_exprStr)).isEqualTo(_expected);
     }
 
     @ParameterizedTest(name = "[{index}] {0} --> {1}")
@@ -413,8 +415,8 @@ class DefaultFunctionsTest extends AbstractBaseTest {
         "Format(3.9, 'ttttt')| 9:36:00 PM",
         "Format('foo', 'dddd, yy mmm mm d, hh:nn:ss AMPM')| foo"
     })
-    void testCustomFormat1(String _exprStr, String _expected) {
-        assertEquals(_expected, eval(_exprStr));
+    void customFormat1(String _exprStr, String _expected) {
+        assertThat(eval(_exprStr)).isEqualTo(_expected);
     }
 
     @ParameterizedTest(name = "[{index}] Format({0}, {1}) --> {2}")
@@ -610,8 +612,8 @@ class DefaultFunctionsTest extends AbstractBaseTest {
         "xfooba y", "'fooba'",
         "xbarbazy", "'foobarbaz'"
     })
-    void testCustomFormat2(String value, String fmtStr, String _expected) {
-        assertEquals(_expected, eval("Format(" + value + ", " + fmtStr + ")"));
+    void customFormat2(String value, String fmtStr, String _expected) {
+        assertThat(eval("Format(" + value + ", " + fmtStr + ")")).isEqualTo(_expected);
     }
 
     @ParameterizedTest(name = "[{index}] {0} --> {1}")
@@ -620,9 +622,9 @@ class DefaultFunctionsTest extends AbstractBaseTest {
         "Abs(-1)  ; 1",
         "Abs(-1.1); 1.1"
     })
-    void testNumberFuncsInt(String _exprStr, double _expected) {
+    void numberFuncsInt(String _exprStr, double _expected) {
         Number result = (Number) eval(_exprStr);
-        assertEquals(_expected, result.doubleValue());
+        assertThat(result.doubleValue()).isEqualTo(_expected);
     }
 
     static Stream<Arguments> getMathTrigFuncsData() {
@@ -639,8 +641,8 @@ class DefaultFunctionsTest extends AbstractBaseTest {
 
     @ParameterizedTest(name = "[{index}] {0} --> {1}")
     @MethodSource("getMathTrigFuncsData")
-    void testMathTrigFuncs(String _exprStr, Object _expected) {
-        assertEquals(_expected, eval(_exprStr));
+    void mathTrigFuncs(String _exprStr, Object _expected) {
+        assertThat(eval(_exprStr)).isEqualTo(_expected);
     }
 
     @ParameterizedTest(name = "[{index}] {0} --> {1}")
@@ -660,8 +662,8 @@ class DefaultFunctionsTest extends AbstractBaseTest {
         "Int(-3.5); -4",
         "Int(-4)  ; -4 "
     })
-    void testNumberFuncsInt2(String _exprStr, int _expected) {
-        assertEquals(_expected, eval(_exprStr));
+    void numberFuncsInt2(String _exprStr, int _expected) {
+        assertThat(eval(_exprStr)).isEqualTo(_expected);
     }
 
     @ParameterizedTest(name = "[{index}] {0} --> {1}")
@@ -676,8 +678,8 @@ class DefaultFunctionsTest extends AbstractBaseTest {
         "Round(-3.7345, 2); -3.73; true",
         "Round(-4, 2)     ;    -4; false"
     })
-    void testNumberFuncsRound(String _exprStr, BigDecimal _expected, boolean isBigDecimal) {
-        assertEquals(isBigDecimal ? _expected : _expected.intValue(), eval(_exprStr));
+    void numberFuncsRound(String _exprStr, BigDecimal _expected, boolean isBigDecimal) {
+        assertThat(eval(_exprStr)).isEqualTo(isBigDecimal ? _expected : _expected.intValue());
     }
 
     static Stream<Arguments> getDateFuncsData() {
@@ -847,10 +849,10 @@ class DefaultFunctionsTest extends AbstractBaseTest {
 
     @ParameterizedTest(name = "[{index}] {0} --> {1}")
     @MethodSource("getDateFuncsData")
-    void testDateFuncs(String _exprStr, Object _expected) {
+    void dateFuncs(String _exprStr, Object _expected) {
         Object actual = eval(_exprStr);
         Object expected = _expected instanceof Supplier ? ((Supplier<?>) _expected).get() : _expected;
-        assertEquals(expected, actual);
+        assertThat(actual).isEqualTo(expected);
     }
 
     @ParameterizedTest(name = "[{index}] {0} --> {1}")
@@ -929,8 +931,8 @@ class DefaultFunctionsTest extends AbstractBaseTest {
         "Format(CStr(Rate(4*12,-200,8000)), '#.############E+00'); 7.701472488202E-03",
         "CStr(Rate(60,93.22,5000,0.1)); -1.09802980531205"
     })
-    void testFinancialFuncs(String _exprStr, String _expected) {
-        assertEquals(_expected, eval(_exprStr));
+    void financialFuncs(String _exprStr, String _expected) {
+        assertThat(eval(_exprStr)).isEqualTo(_expected);
     }
 
     static Object eval(String _expr) {

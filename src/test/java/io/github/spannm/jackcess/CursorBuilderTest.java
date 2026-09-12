@@ -17,6 +17,8 @@ limitations under the License.
 package io.github.spannm.jackcess;
 
 import static io.github.spannm.jackcess.test.Basename.INDEX_CURSOR;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import io.github.spannm.jackcess.impl.IndexImpl;
 import io.github.spannm.jackcess.test.AbstractBaseTest;
@@ -24,13 +26,11 @@ import io.github.spannm.jackcess.test.TestDb;
 import io.github.spannm.jackcess.test.source.TestDbSource;
 import org.junit.jupiter.params.ParameterizedTest;
 
-import java.io.IOException;
-
 class CursorBuilderTest extends AbstractBaseTest {
 
     @ParameterizedTest(name = "[{index}] {0}")
     @TestDbSource(INDEX_CURSOR)
-    void test(TestDb testDb) throws IOException {
+    void test(TestDb testDb) throws Exception {
         try (Database db = CursorTest.createTestIndexTable(testDb)) {
             Table table = db.getTable("test");
             IndexImpl idx = (IndexImpl) table.getIndexes().get(0);
@@ -120,14 +120,12 @@ class CursorBuilderTest extends AbstractBaseTest {
     }
 
     private static void assertCursor(Cursor expected, Cursor found) {
-        assertSame(expected.getTable(), found.getTable());
+        assertThat(found.getTable()).isSameAs(expected.getTable());
         if (expected instanceof IndexCursor) {
-            assertSame(((IndexCursor) expected).getIndex(),
-                ((IndexCursor) found).getIndex());
+            assertThat(((IndexCursor) found).getIndex()).isSameAs(((IndexCursor) expected).getIndex());
         }
 
-        assertEquals(expected.getSavepoint().getCurrentPosition(),
-            found.getSavepoint().getCurrentPosition());
+        assertThat(found.getSavepoint().getCurrentPosition()).isEqualTo(expected.getSavepoint().getCurrentPosition());
     }
 
 }

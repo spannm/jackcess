@@ -18,7 +18,10 @@ package io.github.spannm.jackcess;
 
 import static io.github.spannm.jackcess.test.Basename.*;
 import static io.github.spannm.jackcess.test.TestUtil.*;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.assertj.core.api.Assertions.assertThat;
 
+import org.assertj.core.api.Assertions;
 import io.github.spannm.jackcess.Database.FileFormat;
 import io.github.spannm.jackcess.impl.*;
 import io.github.spannm.jackcess.test.AbstractBaseTest;
@@ -45,11 +48,11 @@ class DatabaseTest extends AbstractBaseTest {
 
     @ParameterizedTest(name = "[{index}] {0}")
     @FileFormatSource
-    void testInvalidTableDefs(FileFormat fileFormat) throws IOException {
+    void invalidTableDefs(FileFormat fileFormat) throws Exception {
         try (Database db = createDbMem(fileFormat)) {
             try {
                 DatabaseBuilder.newTable("test").toTable(db);
-                fail("created table with no columns?");
+                Assertions.fail("created table with no columns?");
             } catch (IllegalArgumentException _ex) {
                 // success
             }
@@ -59,7 +62,7 @@ class DatabaseTest extends AbstractBaseTest {
                     .addColumn(DatabaseBuilder.newColumn("A", DataType.TEXT))
                     .addColumn(DatabaseBuilder.newColumn("a", DataType.MEMO))
                     .toTable(db);
-                fail("created table with duplicate column names?");
+                Assertions.fail("created table with duplicate column names?");
             } catch (IllegalArgumentException _ex) {
                 // success
             }
@@ -69,7 +72,7 @@ class DatabaseTest extends AbstractBaseTest {
                     .addColumn(DatabaseBuilder.newColumn("A", DataType.TEXT)
                         .withLengthInUnits(352))
                     .toTable(db);
-                fail("created table with invalid column length?");
+                Assertions.fail("created table with invalid column length?");
             } catch (IllegalArgumentException _ex) {
                 // success
             }
@@ -78,7 +81,7 @@ class DatabaseTest extends AbstractBaseTest {
                 DatabaseBuilder.newTable("test")
                     .addColumn(DatabaseBuilder.newColumn("A_" + createString(70), DataType.TEXT))
                     .toTable(db);
-                fail("created table with too long column name?");
+                Assertions.fail("created table with too long column name?");
             } catch (IllegalArgumentException _ex) {
                 // success
             }
@@ -91,7 +94,7 @@ class DatabaseTest extends AbstractBaseTest {
                 DatabaseBuilder.newTable("Test")
                     .addColumn(DatabaseBuilder.newColumn("A", DataType.TEXT))
                     .toTable(db);
-                fail("create duplicate tables?");
+                Assertions.fail("create duplicate tables?");
             } catch (IllegalArgumentException _ex) {
                 // success
             }
@@ -100,23 +103,23 @@ class DatabaseTest extends AbstractBaseTest {
 
     @ParameterizedTest(name = "[{index}] {0}")
     @TestDbReadOnlySource(DEL)
-    void testReadDeletedRows(TestDb testDb) throws IOException {
+    void readDeletedRows(TestDb testDb) throws Exception {
         try (Database db = testDb.open()) {
             Table table = db.getTable("Table");
             int rows = 0;
             while (table.getNextRow() != null) {
                 rows++;
             }
-            assertEquals(2, rows);
+            assertThat(rows).isEqualTo(2);
         }
     }
 
     @ParameterizedTest(name = "[{index}] {0}")
     @TestDbReadOnlySource(COMMON1)
-    void testGetColumns(TestDb testDb) throws IOException {
+    void getColumns(TestDb testDb) throws Exception {
         try (Database db = testDb.open()) {
             List<? extends Column> columns = db.getTable("Table1").getColumns();
-            assertEquals(9, columns.size());
+            assertThat(columns.size()).isEqualTo(9);
             checkColumn(columns, 0, "A", DataType.TEXT);
             checkColumn(columns, 1, "B", DataType.TEXT);
             checkColumn(columns, 2, "C", DataType.BYTE);
@@ -131,17 +134,17 @@ class DatabaseTest extends AbstractBaseTest {
 
     private static void checkColumn(List<? extends Column> columns, int columnNumber, String name, DataType dataType) {
         Column column = columns.get(columnNumber);
-        assertEquals(name, column.getName());
-        assertEquals(dataType, column.getType());
+        assertThat(column.getName()).isEqualTo(name);
+        assertThat(column.getType()).isEqualTo(dataType);
     }
 
     @ParameterizedTest(name = "[{index}] {0}")
     @TestDbReadOnlySource(COMMON1)
-    void testGetNextRow(TestDb testDb) throws IOException {
+    void getNextRow(TestDb testDb) throws Exception {
         try (Database db = testDb.open()) {
             db.setDateTimeType(DateTimeType.DATE);
 
-            assertEquals(4, db.getTableNames().size());
+            assertThat(db.getTableNames().size()).isEqualTo(4);
             final Table table = db.getTable("Table1");
 
             Row row1 = table.getNextRow();
@@ -160,15 +163,15 @@ class DatabaseTest extends AbstractBaseTest {
 
     @ParameterizedTest(name = "[{index}] {0}")
     @FileFormatSource
-    void testCreate(FileFormat fileFormat) throws IOException {
+    void create(FileFormat fileFormat) throws Exception {
         try (Database db = createDbMem(fileFormat)) {
-            assertEquals(0, db.getTableNames().size());
+            assertThat(db.getTableNames().size()).isEqualTo(0);
         }
     }
 
     @ParameterizedTest(name = "[{index}] {0}")
     @FileFormatSource
-    void testDeleteCurrentRow(FileFormat fileFormat) throws IOException {
+    void deleteCurrentRow(FileFormat fileFormat) throws Exception {
         // make sure correct row is deleted
         try (Database db = createDbMem(fileFormat)) {
             createTestTable(db);
@@ -188,9 +191,9 @@ class DatabaseTest extends AbstractBaseTest {
             table.reset();
 
             Map<String, Object> outRow = table.getNextRow();
-            assertEquals("Tim1", outRow.get("A"));
+            assertThat(outRow.get("A")).isEqualTo("Tim1");
             outRow = table.getNextRow();
-            assertEquals("Tim3", outRow.get("A"));
+            assertThat(outRow.get("A")).isEqualTo("Tim3");
             assertRowCount(2, table);
         }
 
@@ -227,13 +230,13 @@ class DatabaseTest extends AbstractBaseTest {
             table.getDefaultCursor().deleteCurrentRow();
             assertRowCount(7, table);
             table.reset();
-            assertEquals(2, table.getNextRow().get("D"));
+            assertThat(table.getNextRow().get("D")).isEqualTo(2);
         }
     }
 
     @ParameterizedTest(name = "[{index}] {0}")
     @FileFormatSource
-    void testDeleteRow(FileFormat fileFormat) throws IOException {
+    void deleteRow(FileFormat fileFormat) throws Exception {
         // make sure correct row is deleted
         try (
         Database db = createDbMem(fileFormat)) {
@@ -250,10 +253,10 @@ class DatabaseTest extends AbstractBaseTest {
 
             Row r1 = rows.remove(7);
             Row r2 = rows.remove(3);
-            assertEquals(8, rows.size());
+            assertThat(rows.size()).isEqualTo(8);
 
-            assertSame(r2, table.deleteRow(r2));
-            assertSame(r1, table.deleteRow(r1));
+            assertThat(table.deleteRow(r2)).isSameAs(r2);
+            assertThat(table.deleteRow(r1)).isSameAs(r1);
 
             assertTable(rows, table);
 
@@ -266,20 +269,20 @@ class DatabaseTest extends AbstractBaseTest {
 
     @Test
     @SuppressWarnings({"EmptyBlock", "try"})
-    void testMissingFile() {
+    void missingFile() {
         File bogusFile = new File("fooby-dooby.mdb");
-        assertFalse(bogusFile.exists());
+        assertThat(bogusFile.exists()).isFalse();
         DatabaseBuilder dbb = DatabaseBuilder.newDatabase(bogusFile).withReadOnly(true).withAutoSync(getTestAutoSync());
         assertThrows(FileNotFoundException.class, () -> {
             try (Database ignored = dbb.open()) {
             }
         });
-        assertFalse(bogusFile.exists());
+        assertThat(bogusFile.exists()).isFalse();
     }
 
     @ParameterizedTest(name = "[{index}] {0}")
     @TestDbReadOnlySource(DEL_COL)
-    void testReadWithDeletedCols(TestDb testDb) throws IOException {
+    void readWithDeletedCols(TestDb testDb) throws Exception {
         try (Database db = testDb.open()) {
             Table table = db.getTable("Table1");
 
@@ -293,11 +296,11 @@ class DatabaseTest extends AbstractBaseTest {
             Map<String, Object> row = null;
             while ((row = table.getNextRow()) != null) {
                 if (rowNum == 0) {
-                    assertEquals(expectedRow0, row);
+                    assertThat(row).isEqualTo(expectedRow0);
                 } else if (rowNum == 1) {
-                    assertEquals(expectedRow1, row);
+                    assertThat(row).isEqualTo(expectedRow1);
                 } else if (rowNum >= 2) {
-                    fail("should only have 2 rows");
+                    Assertions.fail("should only have 2 rows");
                 }
                 rowNum++;
             }
@@ -306,7 +309,7 @@ class DatabaseTest extends AbstractBaseTest {
 
     @ParameterizedTest(name = "[{index}] {0}")
     @TestDbSource(DEL_COL)
-    void testAddColumnAfterDeletedVarLenColumns(TestDb testDb) throws IOException {
+    void addColumnAfterDeletedVarLenColumns(TestDb testDb) throws Exception {
         // regression test for GH issue #10: adding a column to a table which
         // previously had variable length columns deleted from it must not corrupt
         // the table definition's variable column count. the corruption is only
@@ -342,23 +345,23 @@ class DatabaseTest extends AbstractBaseTest {
             Map<String, Object> row = null;
             while ((row = table.getNextRow()) != null) {
                 if (rowNum == 0) {
-                    assertEquals(expectedRow0, row);
+                    assertThat(row).isEqualTo(expectedRow0);
                 } else if (rowNum == 1) {
-                    assertEquals(expectedRow1, row);
+                    assertThat(row).isEqualTo(expectedRow1);
                 } else if (rowNum == 2) {
-                    assertEquals(newRow, row);
+                    assertThat(row).isEqualTo(newRow);
                 } else {
-                    fail("should only have 3 rows");
+                    Assertions.fail("should only have 3 rows");
                 }
                 rowNum++;
             }
-            assertEquals(3, rowNum);
+            assertThat(rowNum).isEqualTo(3);
         }
     }
 
     @ParameterizedTest(name = "[{index}] {0}")
     @FileFormatSource
-    void testCurrency(FileFormat fileFormat) throws IOException {
+    void currency(FileFormat fileFormat) throws Exception {
         try (Database db = createDbMem(fileFormat)) {
             Table table = DatabaseBuilder.newTable("test")
                 .addColumn(DatabaseBuilder.newColumn("A", DataType.MONEY))
@@ -376,11 +379,10 @@ class DatabaseTest extends AbstractBaseTest {
                 foundValues.add(row.get("A"));
             }
 
-            assertEquals(List.of(
-                new BigDecimal("-2341234.0345"),
-                new BigDecimal("37.0000"),
-                new BigDecimal("10000.4500")),
-                foundValues);
+            assertThat(foundValues).isEqualTo(List.of(
+                    new BigDecimal("-2341234.0345"),
+                    new BigDecimal("37.0000"),
+                    new BigDecimal("10000.4500")));
 
             assertThrows(IOException.class, () -> table.addRow(new BigDecimal("342523234145343543.3453")));
         }
@@ -388,7 +390,7 @@ class DatabaseTest extends AbstractBaseTest {
 
     @ParameterizedTest(name = "[{index}] {0}")
     @FileFormatSource
-    void testGUID(FileFormat fileFormat) throws IOException {
+    void guid(FileFormat fileFormat) throws Exception {
         Database db = createDbMem(fileFormat);
 
         Table table = DatabaseBuilder.newTable("test")
@@ -409,25 +411,24 @@ class DatabaseTest extends AbstractBaseTest {
             foundValues.add(row.get("A"));
         }
 
-        assertEquals(List.of(
-            "{32A59F01-AA34-3E29-453F-4523453CD2E6}",
-            "{32A59F01-AA34-3E29-453F-4523453CD2E6}",
-            "{11111111-1111-1111-1111-111111111111}",
-            "{FFFFFFFF-FFFF-FFFF-FFFF-FFFFFFFFFFFF}",
-            "{32A59F01-1234-3E29-4AAF-4523453CD2E6}"),
-            foundValues);
+        assertThat(foundValues).isEqualTo(List.of(
+                "{32A59F01-AA34-3E29-453F-4523453CD2E6}",
+                "{32A59F01-AA34-3E29-453F-4523453CD2E6}",
+                "{11111111-1111-1111-1111-111111111111}",
+                "{FFFFFFFF-FFFF-FFFF-FFFF-FFFFFFFFFFFF}",
+                "{32A59F01-1234-3E29-4AAF-4523453CD2E6}"));
 
         assertThrows(IOException.class, () -> table.addRow("3245234"));
     }
 
     @ParameterizedTest(name = "[{index}] {0}")
     @FileFormatSource
-    void testNumeric(FileFormat fileFormat) throws IOException {
+    void numeric(FileFormat fileFormat) throws Exception {
         Database db = createDbMem(fileFormat);
 
         ColumnBuilder col = DatabaseBuilder.newColumn("A", DataType.NUMERIC)
             .withScale(4).withPrecision(8).toColumn();
-        assertTrue(col.getType().isVariableLength());
+        assertThat(col.getType().isVariableLength()).isTrue();
 
         Table table = DatabaseBuilder.newTable("test")
             .addColumn(col)
@@ -450,16 +451,14 @@ class DatabaseTest extends AbstractBaseTest {
             foundBigValues.add(row.get("B"));
         }
 
-        assertEquals(List.of(
-            new BigDecimal("-1234.0345"),
-            new BigDecimal("37.0000"),
-            new BigDecimal("1000.4500")),
-            foundSmallValues);
-        assertEquals(List.of(
-            new BigDecimal("23923434453436.36234219"),
-            new BigDecimal("37.00000000"),
-            new BigDecimal("-3452345321000.00000000")),
-            foundBigValues);
+        assertThat(foundSmallValues).isEqualTo(List.of(
+                new BigDecimal("-1234.0345"),
+                new BigDecimal("37.0000"),
+                new BigDecimal("1000.4500")));
+        assertThat(foundBigValues).isEqualTo(List.of(
+                new BigDecimal("23923434453436.36234219"),
+                new BigDecimal("37.00000000"),
+                new BigDecimal("-3452345321000.00000000")));
 
         assertThrows(IOException.class, () -> table.addRow(new BigDecimal("3245234.234"),
             new BigDecimal("3245234.234")));
@@ -467,7 +466,7 @@ class DatabaseTest extends AbstractBaseTest {
 
     @ParameterizedTest(name = "[{index}] {0}")
     @TestDbSource(FIXED_NUMERIC)
-    void testFixedNumeric(TestDb testDb) throws IOException {
+    void fixedNumeric(TestDb testDb) throws Exception {
 
         try (Database db = testDb.openCopy()) {
             Table t = db.getTable("test");
@@ -475,23 +474,23 @@ class DatabaseTest extends AbstractBaseTest {
             boolean first = true;
             for (Column col : t.getColumns()) {
                 if (first) {
-                    assertTrue(col.isVariableLength());
-                    assertEquals(DataType.MEMO, col.getType());
+                    assertThat(col.isVariableLength()).isTrue();
+                    assertThat(col.getType()).isEqualTo(DataType.MEMO);
                     first = false;
                 } else {
-                    assertFalse(col.isVariableLength());
-                    assertEquals(DataType.NUMERIC, col.getType());
+                    assertThat(col.isVariableLength()).isFalse();
+                    assertThat(col.getType()).isEqualTo(DataType.NUMERIC);
                 }
             }
 
             Map<String, Object> row = t.getNextRow();
-            assertEquals("some data", row.get("col1"));
-            assertEquals(BigDecimal.ONE, row.get("col2"));
-            assertEquals(BigDecimal.ZERO, row.get("col3"));
-            assertEquals(BigDecimal.ZERO, row.get("col4"));
-            assertEquals(new BigDecimal("4"), row.get("col5"));
-            assertEquals(new BigDecimal("-1"), row.get("col6"));
-            assertEquals(BigDecimal.ONE, row.get("col7"));
+            assertThat(row.get("col1")).isEqualTo("some data");
+            assertThat(row.get("col2")).isEqualTo(BigDecimal.ONE);
+            assertThat(row.get("col3")).isEqualTo(BigDecimal.ZERO);
+            assertThat(row.get("col4")).isEqualTo(BigDecimal.ZERO);
+            assertThat(row.get("col5")).isEqualTo(new BigDecimal("4"));
+            assertThat(row.get("col6")).isEqualTo(new BigDecimal("-1"));
+            assertThat(row.get("col7")).isEqualTo(BigDecimal.ONE);
 
             Object[] tmpRow = {"foo", BigDecimal.ONE, new BigDecimal(3), new BigDecimal("13"), new BigDecimal("-17"), BigDecimal.ZERO, new BigDecimal("8734")};
             t.addRow(tmpRow);
@@ -499,28 +498,28 @@ class DatabaseTest extends AbstractBaseTest {
 
             t.getNextRow();
             row = t.getNextRow();
-            assertEquals(tmpRow[0], row.get("col1"));
-            assertEquals(tmpRow[1], row.get("col2"));
-            assertEquals(tmpRow[2], row.get("col3"));
-            assertEquals(tmpRow[3], row.get("col4"));
-            assertEquals(tmpRow[4], row.get("col5"));
-            assertEquals(tmpRow[5], row.get("col6"));
-            assertEquals(tmpRow[6], row.get("col7"));
+            assertThat(row.get("col1")).isEqualTo(tmpRow[0]);
+            assertThat(row.get("col2")).isEqualTo(tmpRow[1]);
+            assertThat(row.get("col3")).isEqualTo(tmpRow[2]);
+            assertThat(row.get("col4")).isEqualTo(tmpRow[3]);
+            assertThat(row.get("col5")).isEqualTo(tmpRow[4]);
+            assertThat(row.get("col6")).isEqualTo(tmpRow[5]);
+            assertThat(row.get("col7")).isEqualTo(tmpRow[6]);
         }
     }
 
     @ParameterizedTest(name = "[{index}] {0}")
     @TestDbReadOnlySource(COMMON1)
-    void testMultiPageTableDef(TestDb testDb) throws IOException {
+    void multiPageTableDef(TestDb testDb) throws Exception {
         try (Database db = testDb.open()) {
             List<? extends Column> columns = db.getTable("Table2").getColumns();
-            assertEquals(89, columns.size());
+            assertThat(columns.size()).isEqualTo(89);
         }
     }
 
     @ParameterizedTest(name = "[{index}] {0}")
     @TestDbReadOnlySource(OVERFLOW)
-    void testOverflow(TestDb testDb) throws IOException {
+    void overflow(TestDb testDb) throws Exception {
         try (Database db = testDb.open()) {
             Table table = db.getTable("Table1");
 
@@ -529,14 +528,12 @@ class DatabaseTest extends AbstractBaseTest {
             table.getNextRow();
 
             Map<String, Object> row = table.getNextRow();
-            assertEquals(Arrays.asList(null, "row3col3", null, null, null, null, null, "row3col9", null),
-                new ArrayList<>(row.values()));
+            assertThat(new ArrayList<>(row.values())).isEqualTo(Arrays.asList(null, "row3col3", null, null, null, null, null, "row3col9", null));
 
             table.getNextRow();
 
             row = table.getNextRow();
-            assertEquals(Arrays.asList(null, "row5col2", null, null, null, null, null, null, null),
-                new ArrayList<>(row.values()));
+            assertThat(new ArrayList<>(row.values())).isEqualTo(Arrays.asList(null, "row5col2", null, null, null, null, null, null, null));
 
             table.reset();
             assertRowCount(7, table);
@@ -545,13 +542,13 @@ class DatabaseTest extends AbstractBaseTest {
 
     @ParameterizedTest(name = "[{index}] {0}")
     @TestDbSource(PROMOTION)
-    void testUsageMapPromotion(TestDb testDb) throws IOException {
+    void usageMapPromotion(TestDb testDb) throws Exception {
 
         try (Database db = testDb.openMem()) {
             Table t = db.getTable("jobDB1");
 
-            assertTrue(((TableImpl) t).getOwnedPagesCursor().getUsageMap().toString()
-                .startsWith("InlineHandler"));
+            assertThat(((TableImpl) t).getOwnedPagesCursor().getUsageMap().toString()
+                    .startsWith("InlineHandler")).isTrue();
 
             String lval = createNonAsciiString(255); // "--255 chars long text--";
 
@@ -567,16 +564,16 @@ class DatabaseTest extends AbstractBaseTest {
             Set<Integer> ids = t.stream()
                 .map(r -> r.getInt("ID"))
                 .collect(Collectors.toSet());
-            assertEquals(1000, ids.size());
+            assertThat(ids.size()).isEqualTo(1000);
 
-            assertTrue(((TableImpl) t).getOwnedPagesCursor().getUsageMap().toString()
-                .startsWith("ReferenceHandler"));
+            assertThat(((TableImpl) t).getOwnedPagesCursor().getUsageMap().toString()
+                    .startsWith("ReferenceHandler")).isTrue();
         }
     }
 
     @ParameterizedTest(name = "[{index}] {0}")
     @FileFormatSource
-    void testLargeTableDef(FileFormat fileFormat) throws IOException {
+    void largeTableDef(FileFormat fileFormat) throws Exception {
         Database db = createDbMem(fileFormat);
 
         final int numColumns = 90;
@@ -604,12 +601,12 @@ class DatabaseTest extends AbstractBaseTest {
         t.addRow(row.toArray());
 
         t.reset();
-        assertEquals(expectedRowData, t.getNextRow());
+        assertThat(t.getNextRow()).isEqualTo(expectedRowData);
     }
 
     @ParameterizedTest(name = "[{index}] {0}")
     @FileFormatSource
-    void testWriteAndReadDate(FileFormat fileFormat) throws Exception {
+    void writeAndReadDate(FileFormat fileFormat) throws Exception {
         try (Database db = createDbMem(fileFormat)) {
             db.setDateTimeType(DateTimeType.DATE);
 
@@ -657,7 +654,7 @@ class DatabaseTest extends AbstractBaseTest {
                 .map(r -> r.getDate("date"))
                 .collect(Collectors.toList());
 
-            assertEquals(dates.size(), foundDates.size());
+            assertThat(foundDates.size()).isEqualTo(dates.size());
             for (int i = 0; i < dates.size(); i++) {
                 Date expected = dates.get(i);
                 Date found = foundDates.get(i);
@@ -668,7 +665,7 @@ class DatabaseTest extends AbstractBaseTest {
 
     @ParameterizedTest(name = "[{index}] {0}")
     @FileFormatSource
-    void testAncientDatesWrite(FileFormat fileFormat) throws IOException, ParseException {
+    void ancientDatesWrite(FileFormat fileFormat) throws Exception {
         SimpleDateFormat sdf = DatabaseBuilder.createDateFormat("yyyy-MM-dd");
 
         List<String> dates = List.of("1582-10-15", "1582-10-14", "1492-01-10", "1392-01-10");
@@ -690,7 +687,7 @@ class DatabaseTest extends AbstractBaseTest {
             .map(r -> sdf.format(r.getDate("date")))
             .collect(Collectors.toList());
 
-        assertEquals(dates, foundDates);
+        assertThat(foundDates).isEqualTo(dates);
     }
 
     /**
@@ -698,7 +695,7 @@ class DatabaseTest extends AbstractBaseTest {
      */
     @ParameterizedTest(name = "[{index}] {0}")
     @TestDbSource(OLD_DATES)
-    void testAncientDatesRead(TestDb testDb) throws IOException {
+    void ancientDatesRead(TestDb testDb) throws Exception {
         TimeZone tz = TimeZone.getTimeZone("America/New_York");
         SimpleDateFormat sdf = DatabaseBuilder.createDateFormat("yyyy-MM-dd");
         sdf.getCalendar().setTimeZone(tz);
@@ -716,27 +713,27 @@ class DatabaseTest extends AbstractBaseTest {
                 foundDates.add(sdf.format(row.getDate("DateField")));
             }
 
-            assertEquals(dates, foundDates);
+            assertThat(foundDates).isEqualTo(dates);
         }
 
     }
 
     @ParameterizedTest(name = "[{index}] {0}")
     @FileFormatSource
-    void testSystemTable(FileFormat fileFormat) throws IOException {
+    void systemTable(FileFormat fileFormat) throws Exception {
         Database db = createDbMem(fileFormat);
 
         Set<String> sysTables = new TreeSet<>(String.CASE_INSENSITIVE_ORDER);
         sysTables.addAll(List.of("MSysObjects", "MSysQueries", "MSysACES", "MSysRelationships"));
 
         if (fileFormat == FileFormat.GENERIC_JET4) {
-            assertNull(db.getSystemTable("MSysAccessObjects"), "file format: " + fileFormat);
+            assertThat(db.getSystemTable("MSysAccessObjects")).as("file format: " + fileFormat).isNull();
         } else if (fileFormat.ordinal() < FileFormat.V2003.ordinal()) {
-            assertNotNull(db.getSystemTable("MSysAccessObjects"), "file format: " + fileFormat);
+            assertThat(db.getSystemTable("MSysAccessObjects")).as("file format: " + fileFormat).isNotNull();
             sysTables.add("MSysAccessObjects");
         } else {
             // v2003+ template files have no "MSysAccessObjects" table
-            assertNull(db.getSystemTable("MSysAccessObjects"), "file format: " + fileFormat);
+            assertThat(db.getSystemTable("MSysAccessObjects")).as("file format: " + fileFormat).isNull();
             sysTables.addAll(List.of("MSysNavPaneGroupCategories", "MSysNavPaneGroups", "MSysNavPaneGroupToObjects", "MSysNavPaneObjectIDs", "MSysAccessStorage"));
             if (fileFormat.ordinal() >= FileFormat.V2007.ordinal()) {
                 sysTables.addAll(List.of("MSysComplexColumns", "MSysComplexType_Attachment", "MSysComplexType_Decimal", "MSysComplexType_GUID", "MSysComplexType_IEEEDouble",
@@ -755,63 +752,62 @@ class DatabaseTest extends AbstractBaseTest {
             }
         }
 
-        assertEquals(sysTables, db.getSystemTableNames());
+        assertThat(db.getSystemTableNames()).isEqualTo(sysTables);
 
-        assertNotNull(db.getSystemTable("MSysObjects"));
-        assertNotNull(db.getSystemTable("MSysQueries"));
-        assertNotNull(db.getSystemTable("MSysACES"));
-        assertNotNull(db.getSystemTable("MSysRelationships"));
+        assertThat(db.getSystemTable("MSysObjects")).isNotNull();
+        assertThat(db.getSystemTable("MSysQueries")).isNotNull();
+        assertThat(db.getSystemTable("MSysACES")).isNotNull();
+        assertThat(db.getSystemTable("MSysRelationships")).isNotNull();
 
-        assertNull(db.getSystemTable("MSysBogus"));
+        assertThat(db.getSystemTable("MSysBogus")).isNull();
 
         TableMetaData tmd = db.getTableMetaData("MSysObjects");
-        assertEquals("MSysObjects", tmd.getName());
-        assertFalse(tmd.isLinked());
-        assertTrue(tmd.isSystem());
+        assertThat(tmd.getName()).isEqualTo("MSysObjects");
+        assertThat(tmd.isLinked()).isFalse();
+        assertThat(tmd.isSystem()).isTrue();
     }
 
     @ParameterizedTest(name = "[{index}] {0}")
     @TestDbSource(FIXED_TEXT)
-    void testFixedText(TestDb testDb) throws IOException {
+    void fixedText(TestDb testDb) throws Exception {
 
         try (Database db = testDb.openCopy()) {
             Table t = db.getTable("users");
             Column c = t.getColumn("c_flag_");
-            assertEquals(DataType.TEXT, c.getType());
-            assertFalse(c.isVariableLength());
-            assertEquals(2, c.getLength());
+            assertThat(c.getType()).isEqualTo(DataType.TEXT);
+            assertThat(c.isVariableLength()).isFalse();
+            assertThat(c.getLength()).isEqualTo((short) 2);
 
             Map<String, Object> row = t.getNextRow();
-            assertEquals("N", row.get("c_flag_"));
+            assertThat(row.get("c_flag_")).isEqualTo("N");
 
             t.addRow(3, "testFixedText", "boo", "foo", "bob", 3, 5, 9, "Y",
                 new Date());
 
             t.getNextRow();
             row = t.getNextRow();
-            assertEquals("testFixedText", row.get("c_user_login"));
-            assertEquals("Y", row.get("c_flag_"));
+            assertThat(row.get("c_user_login")).isEqualTo("testFixedText");
+            assertThat(row.get("c_flag_")).isEqualTo("Y");
         }
     }
 
     @ParameterizedTest(name = "[{index}] {0}")
     @TestDbReadOnlySource(COMMON1)
-    void testDbSortOrder(TestDb testDb) throws IOException {
+    void dbSortOrder(TestDb testDb) throws Exception {
         try (Database db = testDb.open()) {
-            assertEquals(((DatabaseImpl) db).getFormat().DEFAULT_SORT_ORDER,
-                ((DatabaseImpl) db).getDefaultSortOrder());
+            assertThat(((DatabaseImpl) db).getDefaultSortOrder()).isEqualTo(((DatabaseImpl) db).getFormat().DEFAULT_SORT_ORDER);
         }
     }
 
     @ParameterizedTest(name = "[{index}] {0}")
     @TestDbSource(UNSUPPORTED_FIELDS)
-    void testUnsupportedColumns(TestDb testDb) throws IOException {
+    void unsupportedColumns(TestDb testDb) throws Exception {
         try (Database db = testDb.open()) {
             Table t = db.getTable("Test");
             Column varCol = t.getColumn("UnknownVar");
-            assertEquals(DataType.UNSUPPORTED_VARLEN, varCol.getType());
+            assertThat(varCol.getType()).isEqualTo(DataType.UNSUPPORTED_VARLEN);
             Column fixCol = t.getColumn("UnknownFix");
-            assertEquals(DataType.UNSUPPORTED_FIXEDLEN, fixCol.getType());
+            assertThat(fixCol.getType()).isEqualTo(DataType.UNSUPPORTED_FIXEDLEN);
 
             List<String> varVals = Arrays.asList(
                 "RawData[(10) FF FE 73 6F  6D 65 64 61  74 61]",
@@ -839,7 +835,7 @@ class DatabaseTest extends AbstractBaseTest {
     }
 
     @Test
-    void testTimeZone() throws IOException, ParseException {
+    void timeZone() throws Exception {
         TimeZone tz = TimeZone.getTimeZone("America/New_York");
         doTestTimeZone(tz);
 
@@ -881,7 +877,7 @@ class DatabaseTest extends AbstractBaseTest {
             Date curDate = curCal.getTime();
             Date newDate = new Date(col.fromDateDouble(col.toDateDouble(curDate)));
             if (curDate.getTime() != newDate.getTime()) {
-                assertEquals(sdf.format(curDate), sdf.format(newDate));
+                assertThat(sdf.format(newDate)).isEqualTo(sdf.format(curDate));
             }
             curCal.add(Calendar.MINUTE, 30);
         }
@@ -892,12 +888,12 @@ class DatabaseTest extends AbstractBaseTest {
         RowImpl row = new RowImpl(new RowIdImpl(1, 1));
         row.put("id", 37);
         row.put("data", null);
-        assertEquals("Row[1:1][{id=37,data=<null>}]", row.toString());
+        assertThat(row.toString()).isEqualTo("Row[1:1][{id=37,data=<null>}]");
     }
 
     @ParameterizedTest(name = "[{index}] {0}")
     @TestDbReadOnlySource(COMMON1)
-    void testIterateTableNames1(TestDb testDb) throws IOException {
+    void iterateTableNames1(TestDb testDb) throws Exception {
         try (Database db = testDb.open()) {
             Set<String> names = new HashSet<>();
             int sysCount = 0;
@@ -906,20 +902,20 @@ class DatabaseTest extends AbstractBaseTest {
                     sysCount++;
                     continue;
                 }
-                assertFalse(tmd.isLinked());
-                assertNull(tmd.getLinkedTableName());
-                assertNull(tmd.getLinkedDbName());
+                assertThat(tmd.isLinked()).isFalse();
+                assertThat(tmd.getLinkedTableName()).isNull();
+                assertThat(tmd.getLinkedDbName()).isNull();
                 names.add(tmd.getName());
             }
 
-            assertTrue(sysCount > 4);
-            assertEquals(Set.of("Table1", "Table2", "Table3", "Table4"), names);
+            assertThat(sysCount > 4).isTrue();
+            assertThat(names).isEqualTo(Set.of("Table1", "Table2", "Table3", "Table4"));
         }
     }
 
     @ParameterizedTest(name = "[{index}] {0}")
     @TestDbSource(LINKED)
-    void testIterateTableNames2(TestDb testDb) throws IOException {
+    void iterateTableNames2(TestDb testDb) throws Exception {
         try (Database db = testDb.open()) {
             Set<String> names = new HashSet<>();
             for (TableMetaData tmd : db.newTableMetaDataIterable()) {
@@ -927,24 +923,24 @@ class DatabaseTest extends AbstractBaseTest {
                     continue;
                 }
                 if ("Table1".equals(tmd.getName())) {
-                    assertFalse(tmd.isLinked());
-                    assertNull(tmd.getLinkedTableName());
-                    assertNull(tmd.getLinkedDbName());
+                    assertThat(tmd.isLinked()).isFalse();
+                    assertThat(tmd.getLinkedTableName()).isNull();
+                    assertThat(tmd.getLinkedDbName()).isNull();
                 } else {
-                    assertTrue(tmd.isLinked());
-                    assertEquals("Table1", tmd.getLinkedTableName());
-                    assertEquals("Z:\\jackcess_test\\linkeeTest.accdb", tmd.getLinkedDbName());
+                    assertThat(tmd.isLinked()).isTrue();
+                    assertThat(tmd.getLinkedTableName()).isEqualTo("Table1");
+                    assertThat(tmd.getLinkedDbName()).isEqualTo("Z:\\jackcess_test\\linkeeTest.accdb");
                 }
                 names.add(tmd.getName());
             }
 
-            assertEquals(Set.of("Table1", "Table2"), names);
+            assertThat(names).isEqualTo(Set.of("Table1", "Table2"));
         }
     }
 
     @ParameterizedTest(name = "[{index}] {0}")
     @TestDbReadOnlySource(COMMON1)
-    void testTableDates(TestDb testDb) throws IOException {
+    void tableDates(TestDb testDb) throws Exception {
         try (Database db = testDb.open()) {
             Table table = db.getTable("Table1");
             String expectedCreateDate = null;
@@ -956,8 +952,8 @@ class DatabaseTest extends AbstractBaseTest {
                 expectedCreateDate = "2004-05-28T17:51:48.701";
                 expectedUpdateDate = "2006-07-24T09:56:19.701";
             }
-            assertEquals(expectedCreateDate, table.getCreatedDate().toString());
-            assertEquals(expectedUpdateDate, table.getUpdatedDate().toString());
+            assertThat(table.getCreatedDate().toString()).isEqualTo(expectedCreateDate);
+            assertThat(table.getUpdatedDate().toString()).isEqualTo(expectedUpdateDate);
         }
     }
 
@@ -970,24 +966,24 @@ class DatabaseTest extends AbstractBaseTest {
     private static final File UNSUPPORTED_SORT_ORDER_DB = new File(DIR_TEST_DATA, "other/unsupportedSortOrder.accdb");
 
     @Test
-    void testAddTableUnsupportedSortOrderCatalogByDefaultThrows() throws Exception {
+    void addTableUnsupportedSortOrderCatalogByDefaultThrows() throws Exception {
         try (Database db = openCopy(FileFormat.V2007, UNSUPPORTED_SORT_ORDER_DB)) {
             UnsupportedOperationException ex = assertThrows(UnsupportedOperationException.class,
                 () -> DatabaseBuilder.newTable("test2").addColumn(DatabaseBuilder.newColumn("A", DataType.TEXT)).toTable(db));
-            assertTrue(ex.getMessage().contains("unsupported collating sort order"));
+            assertThat(ex.getMessage().contains("unsupported collating sort order")).isTrue();
         }
     }
 
     @Test
-    void testAddTableWriteBrokenIndexAllowsUnsupportedSortOrder() throws Exception {
+    void addTableWriteBrokenIndexAllowsUnsupportedSortOrder() throws Exception {
         System.setProperty(Database.WRITE_BROKEN_INDEX_PROPERTY, "true");
         try (Database db = openCopy(FileFormat.V2007, UNSUPPORTED_SORT_ORDER_DB)) {
             DatabaseBuilder.newTable("test2").addColumn(DatabaseBuilder.newColumn("A", DataType.TEXT)).toTable(db);
 
             Table existing = db.getTable("t_icelandic");
-            assertNotNull(existing);
+            assertThat(existing).isNotNull();
             Table added = db.getTable("test2");
-            assertNotNull(added);
+            assertThat(added).isNotNull();
         } finally {
             System.clearProperty(Database.WRITE_BROKEN_INDEX_PROPERTY);
         }
@@ -995,17 +991,17 @@ class DatabaseTest extends AbstractBaseTest {
 
     @ParameterizedTest(name = "[{index}] {0}")
     @TestDbSource(COMMON1)
-    void testBrokenIndex(TestDb testDb) throws Exception {
+    void brokenIndex(TestDb testDb) throws Exception {
         try (Database db = new DatabaseBuilder()
             .withFile(testDb.getFile())
             .withReadOnly(true).withIgnoreBrokenSystemCatalogIndex(true).open()) {
             Table test = db.getTable("Table1");
-            assertNotNull(test);
+            assertThat(test).isNotNull();
             verifyFinderType(db, "FallbackTableFinder");
         }
         try (Database db = testDb.openMem()) {
             Table test = db.getTable("Table1");
-            assertNotNull(test);
+            assertThat(test).isNotNull();
             verifyFinderType(db, "DefaultTableFinder");
         }
     }
@@ -1014,16 +1010,16 @@ class DatabaseTest extends AbstractBaseTest {
         java.lang.reflect.Field f = db.getClass().getDeclaredField("mtableFinder");
         f.setAccessible(true);
         Object finder = f.get(db);
-        assertNotNull(finder);
-        assertEquals(clazzName, finder.getClass().getSimpleName());
+        assertThat(finder).isNotNull();
+        assertThat(finder.getClass().getSimpleName()).isEqualTo(clazzName);
     }
 
     private static void checkRawValue(String expected, Object val) {
         if (expected != null) {
-            assertTrue(ColumnImpl.isRawData(val));
-            assertEquals(expected, val.toString());
+            assertThat(ColumnImpl.isRawData(val)).isTrue();
+            assertThat(val.toString()).isEqualTo(expected);
         } else {
-            assertNull(val);
+            assertThat(val).isNull();
         }
     }
 }

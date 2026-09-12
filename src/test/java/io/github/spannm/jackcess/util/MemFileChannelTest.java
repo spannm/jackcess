@@ -17,6 +17,8 @@
 package io.github.spannm.jackcess.util;
 
 import static io.github.spannm.jackcess.test.Basename.COMP_INDEX;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import io.github.spannm.jackcess.test.AbstractBaseTest;
 import io.github.spannm.jackcess.test.TestDb;
@@ -36,10 +38,10 @@ class MemFileChannelTest extends AbstractBaseTest {
 
     @ParameterizedTest(name = "[{index}] {0}")
     @TestDbReadOnlySource(COMP_INDEX)
-    void testReadOnlyChannel(TestDb testDb) throws IOException {
+    void readOnlyChannel(TestDb testDb) throws Exception {
         try (MemFileChannel ch = MemFileChannel.newChannel(testDb.getFile(), "r")) {
-            assertEquals(testDb.getFile().length(), ch.size());
-            assertEquals(0L, ch.position());
+            assertThat(ch.size()).isEqualTo(testDb.getFile().length());
+            assertThat(ch.position()).isEqualTo(0L);
 
             assertThrows(NonWritableChannelException.class, () -> {
                 ByteBuffer bb = ByteBuffer.allocate(1024);
@@ -50,42 +52,42 @@ class MemFileChannelTest extends AbstractBaseTest {
 
             assertThrows(NonWritableChannelException.class, () -> ch.transferFrom(null, 0L, 10L));
 
-            assertEquals(testDb.getFile().length(), ch.size());
-            assertEquals(0L, ch.position());
+            assertThat(ch.size()).isEqualTo(testDb.getFile().length());
+            assertThat(ch.position()).isEqualTo(0L);
         }
     }
 
     @ParameterizedTest(name = "[{index}] {0}")
     @TestDbReadOnlySource(COMP_INDEX)
-    void testChannel(TestDb testDb) throws IOException {
+    void channel(TestDb testDb) throws Exception {
         ByteBuffer bb = ByteBuffer.allocate(1024);
 
         try (MemFileChannel ch = MemFileChannel.newChannel()) {
-            assertTrue(ch.isOpen());
-            assertEquals(0L, ch.size());
-            assertEquals(0L, ch.position());
-            assertEquals(-1, ch.read(bb));
+            assertThat(ch.isOpen()).isTrue();
+            assertThat(ch.size()).isEqualTo(0L);
+            assertThat(ch.position()).isEqualTo(0L);
+            assertThat(ch.read(bb)).isEqualTo(-1);
         }
 
         try (MemFileChannel ch2 = MemFileChannel.newChannel(testDb.getFile(), "r");
             MemFileChannel ch3 = MemFileChannel.newChannel()) {
 
-            assertEquals(testDb.getFile().length(), ch2.size());
-            assertEquals(0L, ch2.position());
+            assertThat(ch2.size()).isEqualTo(testDb.getFile().length());
+            assertThat(ch2.position()).isEqualTo(0L);
 
             assertThrows(IllegalArgumentException.class, () -> ch2.position(-1));
 
             ch2.transferTo(ch3);
             ch3.force(true);
-            assertEquals(testDb.getFile().length(), ch3.size());
-            assertEquals(testDb.getFile().length(), ch3.position());
+            assertThat(ch3.size()).isEqualTo(testDb.getFile().length());
+            assertThat(ch3.position()).isEqualTo(testDb.getFile().length());
 
             assertThrows(IllegalArgumentException.class, () -> ch3.truncate(-1L));
 
             long trucSize = ch3.size() / 3;
             ch3.truncate(trucSize);
-            assertEquals(trucSize, ch3.size());
-            assertEquals(trucSize, ch3.position());
+            assertThat(ch3.size()).isEqualTo(trucSize);
+            assertThat(ch3.position()).isEqualTo(trucSize);
             ch3.position(0L);
             copy(ch2, ch3, bb);
 
@@ -95,15 +97,15 @@ class MemFileChannelTest extends AbstractBaseTest {
                 ch3.transferTo(fc);
             }
 
-            assertEquals(testDb.getFile().length(), tempFile.length());
+            assertThat(tempFile.length()).isEqualTo(testDb.getFile().length());
 
-            assertArrayEquals(Files.readAllBytes(testDb.getFile().toPath()), Files.readAllBytes(tempFile.toPath()));
+            assertThat(Files.readAllBytes(tempFile.toPath())).containsExactly(Files.readAllBytes(testDb.getFile().toPath()));
 
             ch3.truncate(0L);
-            assertTrue(ch3.isOpen());
-            assertEquals(0L, ch3.size());
-            assertEquals(0L, ch3.position());
-            assertEquals(-1, ch3.read(bb));
+            assertThat(ch3.isOpen()).isTrue();
+            assertThat(ch3.size()).isEqualTo(0L);
+            assertThat(ch3.position()).isEqualTo(0L);
+            assertThat(ch3.read(bb)).isEqualTo(-1);
         }
     }
 

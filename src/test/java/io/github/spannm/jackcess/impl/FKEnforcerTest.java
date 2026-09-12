@@ -18,6 +18,8 @@ package io.github.spannm.jackcess.impl;
 
 import static io.github.spannm.jackcess.test.Basename.INDEX;
 import static io.github.spannm.jackcess.test.TestUtil.*;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import io.github.spannm.jackcess.*;
 import io.github.spannm.jackcess.test.AbstractBaseTest;
@@ -35,7 +37,7 @@ class FKEnforcerTest extends AbstractBaseTest {
 
     @ParameterizedTest(name = "[{index}] {0}")
     @TestDbSource(INDEX)
-    void testNoEnforceForeignKeys(TestDb testDb) throws IOException {
+    void noEnforceForeignKeys(TestDb testDb) throws Exception {
         try (Database db = testDb.openCopy()) {
             db.setEnforceForeignKeys(false);
             Table t1 = db.getTable("Table1");
@@ -56,7 +58,7 @@ class FKEnforcerTest extends AbstractBaseTest {
 
     @ParameterizedTest(name = "[{index}] {0}")
     @TestDbSource(INDEX)
-    void testEnforceForeignKeys(TestDb testDb) throws IOException {
+    void enforceForeignKeys(TestDb testDb) throws Exception {
         try (Database db = testDb.openCopy()) {
             db.setEvaluateExpressions(false);
             Table t1 = db.getTable("Table1");
@@ -77,7 +79,7 @@ class FKEnforcerTest extends AbstractBaseTest {
                 }, "Table3[id]");
             tests.forEach((key, value) -> {
                 IOException ex = assertThrows(IOException.class, key);
-                assertTrue(ex.getMessage().contains(value));
+                assertThat(ex.getMessage().contains(value)).isTrue();
 
             });
 
@@ -107,7 +109,7 @@ class FKEnforcerTest extends AbstractBaseTest {
                 iter.remove();
             }
 
-            assertEquals(1, t1.getRowCount());
+            assertThat(t1.getRowCount()).isEqualTo(1);
         }
     }
 

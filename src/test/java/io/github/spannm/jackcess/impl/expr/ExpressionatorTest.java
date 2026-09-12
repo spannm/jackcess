@@ -16,6 +16,9 @@
  */
 package io.github.spannm.jackcess.impl.expr;
 
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.assertj.core.api.Assertions.assertThat;
 import io.github.spannm.jackcess.DataType;
 import io.github.spannm.jackcess.expr.*;
 import io.github.spannm.jackcess.impl.BaseEvalContext;
@@ -55,7 +58,7 @@ class ExpressionatorTest extends AbstractBaseTest {
     @ValueSource(strings = {
         "+", "-", "*", "/", "\\", "^", "&", "Mod"
     })
-    void testParseEBinaryOp(String op) {
+    void parseEBinaryOp(String op) {
         String opName = "EBinaryOp";
         validateExpr("\"A\" " + op + " \"B\"", "<" + opName + ">{<ELiteralValue>{\"A\"} " + op + " <ELiteralValue>{\"B\"}}");
     }
@@ -64,7 +67,7 @@ class ExpressionatorTest extends AbstractBaseTest {
     @ValueSource(strings = {
         "<", "<=", ">", ">=", "=", "<>"
     })
-    void testParseECompOp(String op) {
+    void parseECompOp(String op) {
         String opName = "ECompOp";
         validateExpr("\"A\" " + op + " \"B\"", "<" + opName + ">{<ELiteralValue>{\"A\"} " + op + " <ELiteralValue>{\"B\"}}");
     }
@@ -73,14 +76,14 @@ class ExpressionatorTest extends AbstractBaseTest {
     @ValueSource(strings = {
         "And", "Or", "Eqv", "Xor", "Imp"
     })
-    void testParseELogicalOp(String op) {
+    void parseELogicalOp(String op) {
         String opName = "ELogicalOp";
         validateExpr("\"A\" " + op + " \"B\"", "<" + opName + ">{<ELiteralValue>{\"A\"} " + op + " <ELiteralValue>{\"B\"}}");
     }
 
     @ParameterizedTest(name = "[{index}] {0}")
     @ValueSource(strings = {"True", "False", "Null"})
-    void testParseEConstValue(String constStr) {
+    void parseEConstValue(String constStr) {
         validateExpr(constStr, "<EConstValue>{" + constStr + "}");
     }
 
@@ -91,7 +94,7 @@ class ExpressionatorTest extends AbstractBaseTest {
         "-42; <EUnaryOp>{- <ELiteralValue>{42}}",
         "(+37); <EParen>{(<EUnaryOp>{+ <ELiteralValue>{37}})}"
     })
-    void testParseSimpleExpr1(String exprStr, String debugStr) {
+    void parseSimpleExpr1(String exprStr, String debugStr) {
         validateExpr(exprStr, debugStr);
     }
 
@@ -112,7 +115,7 @@ class ExpressionatorTest extends AbstractBaseTest {
         "' \"A\" '; <ELiteralValue>{\" \"\"A\"\" \"}; \" \"\"A\"\" \"",
         "<=1 And >=0; <ELogicalOp>{<ECompOp>{<EThisValue>{<THIS_COL>} <= <ELiteralValue>{1}} And <ECompOp>{<EThisValue>{<THIS_COL>} >= <ELiteralValue>{0}}}; <= 1 And >= 0",
     })
-    void testParseSimpleExpr2(String exprStr, String debugStr, String cleanStr) {
+    void parseSimpleExpr2(String exprStr, String debugStr, String cleanStr) {
         validateExpr(exprStr, debugStr, Objects.requireNonNullElse(cleanStr, exprStr));
     }
 
@@ -131,79 +134,79 @@ class ExpressionatorTest extends AbstractBaseTest {
         "\"A\" + \"B\" Not Between 37 - 15 And 52 / 4; <EBetweenOp>{<EBinaryOp>{<ELiteralValue>{\"A\"} + <ELiteralValue>{\"B\"}} Not Between <EBinaryOp>{<ELiteralValue>{37} - <ELiteralValue>{15}} And <EBinaryOp>{<ELiteralValue>{52} / <ELiteralValue>{4}}}",
         "\"A\" + (\"B\" Not Between 37 - 15 And 52) / 4; <EBinaryOp>{<ELiteralValue>{\"A\"} + <EBinaryOp>{<EParen>{(<EBetweenOp>{<ELiteralValue>{\"B\"} Not Between <EBinaryOp>{<ELiteralValue>{37} - <ELiteralValue>{15}} And <ELiteralValue>{52}})} / <ELiteralValue>{4}}}",
     })
-    void testOrderOfOperation(String exprStr, String debugStr) {
+    void orderOfOperation(String exprStr, String debugStr) {
         validateExpr(exprStr, debugStr, exprStr);
     }
 
     @ParameterizedTest(name = "[{index}] {0}")
     @IntRangeSource(start = -10, end = 10, endInclusive = true)
-    void testSimpleMathExpressions1(int i) {
+    void simpleMathExpressions1(int i) {
         assertAll("math1",
-            () -> assertEquals(-i, eval("-(" + i + ")")),
-            () -> assertEquals(i, eval("+(" + i + ")"))
+            () -> assertThat(eval("-(" + i + ")")).isEqualTo(-i),
+            () -> assertThat(eval("+(" + i + ")")).isEqualTo(i)
         );
     }
 
     @ParameterizedTest(name = "[{index}] {0}")
     @MethodSource("getDoublesTestData")
-    void testPositiveDouble(double d) {
-        assertEquals(toBD(d), eval("+(" + d + ")"));
+    void positiveDouble(double d) {
+        assertThat(eval("+(" + d + ")")).isEqualTo(toBD(d));
     }
 
     @ParameterizedTest(name = "[{index}] {0}")
     @MethodSource("getDoublesTestData")
-    void testNegativeDouble(double d) {
-        assertEquals(toBD(d).negate(), eval("-(" + d + ")"));
+    void negativeDouble(double d) {
+        assertThat(eval("-(" + d + ")")).isEqualTo(toBD(d).negate());
     }
 
     @ParameterizedTest(name = "[{index}] {0}, {1}")
     @IntMatrixSource(start = -10, end = 10, endInclusive = true)
-    void testSimpleMathExpressions3(int i, int j) {
-        assertEquals(i + j, eval(i + " + " + j));
+    void simpleMathExpressions3(int i, int j) {
+        assertThat(eval(i + " + " + j)).isEqualTo(i + j);
     }
 
     @ParameterizedTest(name = "[{index}] {0}")
     @MethodSource("getDoublesTestData")
-    void testSimpleMathExpressions4(double d1) {
+    void simpleMathExpressions4(double d1) {
         BigDecimal bd1 = toBD(d1);
         for (double d : getDoublesTestData()) {
             BigDecimal bd2 = toBD(d);
-            assertEquals(toBD(bd1.add(bd2)), eval(d1 + " + " + d));
-            assertEquals(toBD(bd1.subtract(bd2)), eval(d1 + " - " + d));
-            assertEquals(toBD(bd1.multiply(bd2)), eval(d1 + " * " + d));
+            assertThat(eval(d1 + " + " + d)).isEqualTo(toBD(bd1.add(bd2)));
+            assertThat(eval(d1 + " - " + d)).isEqualTo(toBD(bd1.subtract(bd2)));
+            assertThat(eval(d1 + " * " + d)).isEqualTo(toBD(bd1.multiply(bd2)));
             if (roundToLongInt(d) == 0) {
                 evalFail(d1 + " \\ " + d, ArithmeticException.class);
             } else {
-                assertEquals(roundToLongInt(d1) / roundToLongInt(d), eval(d1 + " \\ " + d));
+                assertThat(eval(d1 + " \\ " + d)).isEqualTo(roundToLongInt(d1) / roundToLongInt(d));
             }
             if (roundToLongInt(d) == 0) {
                 evalFail(d1 + " Mod " + d, ArithmeticException.class);
             } else {
-                assertEquals(roundToLongInt(d1) % roundToLongInt(d), eval(d1 + " Mod " + d));
+                assertThat(eval(d1 + " Mod " + d)).isEqualTo(roundToLongInt(d1) % roundToLongInt(d));
             }
             if (d == 0.0d) {
                 evalFail(d1 + " / " + d, ArithmeticException.class);
             } else {
-                assertEquals(toBD(BuiltinOperators.divide(bd1, bd2)), eval(d1 + " / " + d));
+                assertThat(eval(d1 + " / " + d)).isEqualTo(toBD(BuiltinOperators.divide(bd1, bd2)));
             }
         }
     }
 
     @ParameterizedTest(name = "[{index}] {0}, {1}")
     @IntMatrixSource(start = -10, end = 10, endInclusive = true)
-    void testSimpleMathExpressions5(int i, int j) {
-        assertEquals(i - j, eval(i + " - " + j));
-        assertEquals(i * j, eval(i + " * " + j));
+    void simpleMathExpressions5(int i, int j) {
+        assertThat(eval(i + " - " + j)).isEqualTo(i - j);
+        assertThat(eval(i + " * " + j)).isEqualTo(i * j);
         if (j == 0L) {
             evalFail(i + " \\ " + j, ArithmeticException.class);
         } else {
-            assertEquals(i / j, eval(i + " \\ " + j));
+            assertThat(eval(i + " \\ " + j)).isEqualTo(i / j);
         }
 
         if (j == 0) {
             evalFail(i + " Mod " + j, ArithmeticException.class);
         } else {
-            assertEquals(i % j, eval(i + " Mod " + j));
+            assertThat(eval(i + " Mod " + j)).isEqualTo(i % j);
         }
 
         if (j == 0) {
@@ -211,17 +214,17 @@ class ExpressionatorTest extends AbstractBaseTest {
         } else {
             double result = (double) i / j;
             if ((int) result == result) {
-                assertEquals((int) result, eval(i + " / " + j));
+                assertThat(eval(i + " / " + j)).isEqualTo((int) result);
             } else {
-                assertEquals(result, eval(i + " / " + j));
+                assertThat(eval(i + " / " + j)).isEqualTo(result);
             }
         }
 
         double result = Math.pow(i, j);
         if ((int) result == result) {
-            assertEquals((int) result, eval(i + " ^ " + j));
+            assertThat(eval(i + " ^ " + j)).isEqualTo((int) result);
         } else {
-            assertEquals(result, eval(i + " ^ " + j));
+            assertThat(eval(i + " ^ " + j)).isEqualTo(result);
         }
     }
 
@@ -250,10 +253,10 @@ class ExpressionatorTest extends AbstractBaseTest {
         "0; =True Eqv False",
         "-1; =Not(True Eqv False)"
     })
-    void testComparison(int expected, String exprStr) {
+    void comparison(int expected, String exprStr) {
         TestContext tc = new TestContext();
         Expression expr = Expressionator.parse(Expressionator.Type.DEFAULT_VALUE, exprStr, null, tc);
-        assertEquals(expected, expr.eval(tc));
+        assertThat(expr.eval(tc)).isEqualTo(expected);
     }
 
     @ParameterizedTest(name = "[{index}] {0} --> {1}")
@@ -264,8 +267,8 @@ class ExpressionatorTest extends AbstractBaseTest {
         "2003, 2, 8, 0, 0; ='37' + #01/02/2003#",
         "2003, 1, 2, 7, 0; =#01/02/2003 7:00:00 AM#"
     })
-    void testDateArith1(@ConvertWith(CsvToLocalDateTime.class) LocalDateTime expected, String exprStr) {
-        assertEquals(expected, eval(exprStr));
+    void dateArith1(@ConvertWith(CsvToLocalDateTime.class) LocalDateTime expected, String exprStr) {
+        assertThat(eval(exprStr)).isEqualTo(expected);
     }
 
     @ParameterizedTest(name = "[{index}] {0} --> {1}")
@@ -274,8 +277,8 @@ class ExpressionatorTest extends AbstractBaseTest {
         "9:24:00 AM; =CStr(#7:00:00 AM# + 0.1)",
         "1/2/2003 1:10:00 PM; =CStr(#01/02/2003# + #13:10:00#)"
     })
-    void testDateArith2(String expected, String exprStr) {
-        assertEquals(expected, eval(exprStr));
+    void dateArith2(String expected, String exprStr) {
+        assertThat(eval(exprStr)).isEqualTo(expected);
     }
 
     @ParameterizedTest(name = "[{index}] {0}")
@@ -306,8 +309,8 @@ class ExpressionatorTest extends AbstractBaseTest {
         "37 Between Null And 54",
         "Null In (23, Null, 45)"
     })
-    void testNull1(String exprStr) {
-        assertNull(eval(exprStr));
+    void null1(String exprStr) {
+        assertThat(eval(exprStr)).isNull();
     }
 
     @ParameterizedTest(name = "[{index}] {0} --> {1}")
@@ -315,8 +318,8 @@ class ExpressionatorTest extends AbstractBaseTest {
         "37; =37 & Null",
         "37; =Null & 37",
     })
-    void testNull2(String expected, String exprStr) {
-        assertEquals(expected, eval(exprStr));
+    void null2(String expected, String exprStr) {
+        assertThat(eval(exprStr)).isEqualTo(expected);
     }
 
     @ParameterizedTest(name = "[{index}] {0} --> {1}")
@@ -325,8 +328,8 @@ class ExpressionatorTest extends AbstractBaseTest {
         "-1; =Null Imp 37",
         "0; =37 In (23, Null, 45)"
     })
-    void testNull3(int expected, String exprStr) {
-        assertEquals(expected, eval(exprStr));
+    void null3(int expected, String exprStr) {
+        assertThat(eval(exprStr)).isEqualTo(expected);
     }
 
     @ParameterizedTest(name = "[{index}] {0} --> {1}")
@@ -341,9 +344,10 @@ class ExpressionatorTest extends AbstractBaseTest {
         "-100; =-(10)^2",
         "-100d; =-\"10\"^2"
     })
-    void testTrickyMathExpressions(double expected, String exprStr) {
-        Number result = assertInstanceOf(Number.class, eval(exprStr));
-        assertEquals(expected, result.doubleValue());
+    void trickyMathExpressions(double expected, String exprStr) {
+        Object evaluated = eval(exprStr);
+        assertThat(evaluated).isInstanceOf(Number.class);
+        assertThat(((Number) evaluated).doubleValue()).isEqualTo(expected);
     }
 
     @ParameterizedTest(name = "[{index}] {0} --> {1}")
@@ -352,57 +356,57 @@ class ExpressionatorTest extends AbstractBaseTest {
         "99; =-10E-1+10e+1",
         "-101; =-10E-1-10e+1"
     })
-    void testTrickyMathExpressionsBd(BigDecimal expected, String exprStr) {
-        assertEquals(expected, eval(exprStr));
+    void trickyMathExpressionsBd(BigDecimal expected, String exprStr) {
+        assertThat(eval(exprStr)).isEqualTo(expected);
     }
 
     @Test
-    void testTypeCoercion() {
-        assertEquals("foobar", eval("\"foo\" + \"bar\""));
+    void typeCoercion() {
+        assertThat(eval("\"foo\" + \"bar\"")).isEqualTo("foobar");
 
-        assertEquals("12foo", eval("12 + \"foo\""));
-        assertEquals("foo12", eval("\"foo\" + 12"));
+        assertThat(eval("12 + \"foo\"")).isEqualTo("12foo");
+        assertThat(eval("\"foo\" + 12")).isEqualTo("foo12");
 
-        assertEquals(37d, eval("\"25\" + 12"));
-        assertEquals(37d, eval("12 + \"25\""));
-        assertEquals(37d, eval("\" 25 \" + 12"));
-        assertEquals(37d, eval("\" &h1A \" + 11"));
-        assertEquals(37d, eval("\" &h1a \" + 11"));
-        assertEquals(37d, eval("\" &O32 \" + 11"));
-        assertEquals(1037d, eval("\"1,025\" + 12"));
+        assertThat(eval("\"25\" + 12")).isEqualTo(37d);
+        assertThat(eval("12 + \"25\"")).isEqualTo(37d);
+        assertThat(eval("\" 25 \" + 12")).isEqualTo(37d);
+        assertThat(eval("\" &h1A \" + 11")).isEqualTo(37d);
+        assertThat(eval("\" &h1a \" + 11")).isEqualTo(37d);
+        assertThat(eval("\" &O32 \" + 11")).isEqualTo(37d);
+        assertThat(eval("\"1,025\" + 12")).isEqualTo(1037d);
 
         evalFail("=12 - \"foo\"", RuntimeException.class);
         evalFail("=\"foo\" - 12", RuntimeException.class);
 
-        assertEquals("foo1225", eval("\"foo\" + 12 + 25"));
-        assertEquals("37foo", eval("12 + 25 + \"foo\""));
-        assertEquals("foo37", eval("\"foo\" + (12 + 25)"));
-        assertEquals("25foo12", eval("\"25foo\" + 12"));
+        assertThat(eval("\"foo\" + 12 + 25")).isEqualTo("foo1225");
+        assertThat(eval("12 + 25 + \"foo\"")).isEqualTo("37foo");
+        assertThat(eval("\"foo\" + (12 + 25)")).isEqualTo("foo37");
+        assertThat(eval("\"25foo\" + 12")).isEqualTo("25foo12");
 
-        assertEquals(LocalDateTime.of(2017, 1, 28, 0, 0), eval("#1/1/2017# + 27"));
-        assertEquals(128208, eval("#1/1/2017# * 3"));
+        assertThat(eval("#1/1/2017# + 27")).isEqualTo(LocalDateTime.of(2017, 1, 28, 0, 0));
+        assertThat(eval("#1/1/2017# * 3")).isEqualTo(128208);
     }
 
     @Test
-    void testLikeExpression() {
+    void likeExpression() {
         validateExpr("Like \"[abc]*\"", "<ELikeOp>{<EThisValue>{<THIS_COL>} Like \"[abc]*\"([abc].*)}", "Like \"[abc]*\"");
-        assertTrue(evalCondition("Like \"[abc]*\"", "afcd"));
-        assertFalse(evalCondition("Like \"[abc]*\"", "fcd"));
+        assertThat(evalCondition("Like \"[abc]*\"", "afcd")).isTrue();
+        assertThat(evalCondition("Like \"[abc]*\"", "fcd")).isFalse();
 
         validateExpr("Like  \"[abc*\"", "<ELikeOp>{<EThisValue>{<THIS_COL>} Like \"[abc*\"((?!))}", "Like \"[abc*\"");
-        assertFalse(evalCondition("Like \"[abc*\"", "afcd"));
-        assertFalse(evalCondition("Like \"[abc*\"", "fcd"));
-        assertTrue(evalCondition("Not Like \"[abc*\"", "fcd"));
-        assertFalse(evalCondition("Like \"[abc*\"", ""));
+        assertThat(evalCondition("Like \"[abc*\"", "afcd")).isFalse();
+        assertThat(evalCondition("Like \"[abc*\"", "fcd")).isFalse();
+        assertThat(evalCondition("Not Like \"[abc*\"", "fcd")).isTrue();
+        assertThat(evalCondition("Like \"[abc*\"", "")).isFalse();
     }
 
     @Test
-    void testLiteralDefaultValue() {
-        assertEquals("-28 blah ", eval("=CDbl(9)-37 & \" blah \"", Value.Type.STRING));
-        assertEquals("CDbl(9)-37 & \" blah \"", eval("CDbl(9)-37 & \" blah \"", Value.Type.STRING));
+    void literalDefaultValue() {
+        assertThat(eval("=CDbl(9)-37 & \" blah \"", Value.Type.STRING)).isEqualTo("-28 blah ");
+        assertThat(eval("CDbl(9)-37 & \" blah \"", Value.Type.STRING)).isEqualTo("CDbl(9)-37 & \" blah \"");
 
-        assertEquals(-28d, eval("CDbl(9)-37", Value.Type.DOUBLE));
-        assertEquals(-28d, eval("CDbl(9)-37", Value.Type.DOUBLE));
+        assertThat(eval("CDbl(9)-37", Value.Type.DOUBLE)).isEqualTo(-28d);
+        assertThat(eval("CDbl(9)-37", Value.Type.DOUBLE)).isEqualTo(-28d);
     }
 
     @ParameterizedTest(name = "[{index}] {0}, {1}, \"{2}\"")
@@ -499,7 +503,7 @@ class ExpressionatorTest extends AbstractBaseTest {
         "DEFAULT_VALUE; TEXT; '+P-E'",
         "FIELD_VALIDATOR; TEXT; Is Not Null"
     })
-    void testParseSomeExprs(Expressionator.Type _type, DataType _dType, String _exprStr) {
+    void parseSomeExprs(Expressionator.Type _type, DataType _dType, String _exprStr) {
         TestContext tc = new TestContext() {
             @Override
             public Value getThisColumnValue() {
@@ -535,9 +539,9 @@ class ExpressionatorTest extends AbstractBaseTest {
         "=37 Between 42; 'Between' expression",
         "=(3 + 5) Rnd(); multiple expressions"
     })
-    void testInvalidExpression(String exprStr, String msgStr) {
+    void invalidExpression(String exprStr, String msgStr) {
         ParseException ex = assertThrows(ParseException.class, () -> eval(exprStr));
-        assertTrue(ex.getMessage().contains(msgStr));
+        assertThat(ex.getMessage().contains(msgStr)).isTrue();
     }
 
     private static void validateExpr(String exprStr, String debugStr) {
@@ -549,12 +553,12 @@ class ExpressionatorTest extends AbstractBaseTest {
         Expression expr = Expressionator.parse(Expressionator.Type.FIELD_VALIDATOR, exprStr, null, tc);
         String foundDebugStr = expr.toDebugString(tc);
         if (foundDebugStr.startsWith("<EImplicitCompOp>")) {
-            assertEquals("<EImplicitCompOp>{<EThisValue>{<THIS_COL>} = " + debugStr + "}", foundDebugStr);
+            assertThat(foundDebugStr).isEqualTo("<EImplicitCompOp>{<EThisValue>{<THIS_COL>} = " + debugStr + "}");
         } else {
-            assertEquals(debugStr, foundDebugStr);
+            assertThat(foundDebugStr).isEqualTo(debugStr);
         }
-        assertEquals(cleanStr, expr.toCleanString(tc));
-        assertEquals(exprStr, expr.toRawString());
+        assertThat(expr.toCleanString(tc)).isEqualTo(cleanStr);
+        assertThat(expr.toRawString()).isEqualTo(exprStr);
     }
 
     static Object eval(String exprStr) {

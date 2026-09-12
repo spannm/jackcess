@@ -18,6 +18,7 @@ package io.github.spannm.jackcess;
 
 import static io.github.spannm.jackcess.test.Basename.BIG_INDEX;
 import static io.github.spannm.jackcess.test.Basename.COMP_INDEX;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import io.github.spannm.jackcess.impl.IndexImpl;
 import io.github.spannm.jackcess.impl.TableImpl;
@@ -28,7 +29,6 @@ import io.github.spannm.jackcess.test.source.TestDbReadOnlySource;
 import io.github.spannm.jackcess.test.source.TestDbSource;
 import org.junit.jupiter.params.ParameterizedTest;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
@@ -37,28 +37,28 @@ class BigIndexTest extends AbstractBaseTest {
 
     @ParameterizedTest(name = "[{index}] {0}")
     @TestDbReadOnlySource(COMP_INDEX)
-    void testComplexIndex(TestDb testDb) throws IOException {
+    void complexIndex(TestDb testDb) throws Exception {
         try (// this file has an index with "compressed" entries and node pages
         Database db = testDb.openMem()) {
             TableImpl t = (TableImpl) db.getTable("Table1");
             IndexImpl index = t.getIndex("CD_AGENTE");
-            assertFalse(index.isInitialized());
-            assertEquals(512, TestUtil.countRows(t));
-            assertEquals(512, index.getIndexData().getEntryCount());
+            assertThat(index.isInitialized()).isFalse();
+            assertThat(TestUtil.countRows(t)).isEqualTo(512);
+            assertThat(index.getIndexData().getEntryCount()).isEqualTo(512);
         }
     }
 
     @ParameterizedTest(name = "[{index}] {0}")
     @TestDbSource(BIG_INDEX)
     @SuppressWarnings("PMD.JumbledIncrementer")
-    void testBigIndex(TestDb testDb) throws IOException {
+    void bigIndex(TestDb testDb) throws Exception {
         // this file has an index with "compressed" entries and node pages
         try (Database db = testDb.openMem()) {
             TableImpl t = (TableImpl) db.getTable("Table1");
             IndexImpl i = t.getIndex("col1");
-            assertFalse(i.isInitialized());
-            assertEquals(0, TestUtil.countRows(t));
-            assertEquals(0, i.getIndexData().getEntryCount());
+            assertThat(i.isInitialized()).isFalse();
+            assertThat(TestUtil.countRows(t)).isEqualTo(0);
+            assertThat(i.getIndexData().getEntryCount()).isEqualTo(0);
         }
 
         setTestAutoSync(false);
@@ -118,7 +118,7 @@ class BigIndexTest extends AbstractBaseTest {
                 if (val == null) {
                     val = firstValue;
                 }
-                assertTrue(prevValue.compareTo(val) <= 0, prevValue + " <= " + val + " " + rowCount);
+                assertThat(prevValue.compareTo(val) <= 0).as(prevValue + " <= " + val + " " + rowCount).isTrue();
                 if (firstTwo.size() < 2) {
                     firstTwo.add(origVal);
                 }
@@ -126,14 +126,14 @@ class BigIndexTest extends AbstractBaseTest {
                 rowCount++;
             }
 
-            assertEquals(2000, rowCount);
+            assertThat(rowCount).isEqualTo(2000);
 
             idx2.getIndexData().validate(false);
 
             // delete an entry in the middle
             Cursor cursor = CursorBuilder.createCursor(idx2);
             for (int i = 0; i < rowCount / 2; i++) {
-                assertTrue(cursor.moveToNextRow());
+                assertThat(cursor.moveToNextRow()).isTrue();
             }
             cursor.deleteCurrentRow();
             rowCount--;
@@ -141,7 +141,7 @@ class BigIndexTest extends AbstractBaseTest {
             // remove all but the first two entries (from the end)
             cursor.afterLast();
             for (int i = 0; i < rowCount - 2; i++) {
-                assertTrue(cursor.moveToPreviousRow());
+                assertThat(cursor.moveToPreviousRow()).isTrue();
                 cursor.deleteCurrentRow();
             }
 
@@ -152,17 +152,17 @@ class BigIndexTest extends AbstractBaseTest {
                 found.add(row.getString("col1"));
             }
 
-            assertEquals(firstTwo, found);
+            assertThat(found).isEqualTo(firstTwo);
 
             // remove remaining entries
             cursor = CursorBuilder.createCursor(t2);
             for (int i = 0; i < 2; i++) {
-                assertTrue(cursor.moveToNextRow());
+                assertThat(cursor.moveToNextRow()).isTrue();
                 cursor.deleteCurrentRow();
             }
 
-            assertFalse(cursor.moveToNextRow());
-            assertFalse(cursor.moveToPreviousRow());
+            assertThat(cursor.moveToNextRow()).isFalse();
+            assertThat(cursor.moveToPreviousRow()).isFalse();
 
             idx2.getIndexData().validate(false);
 

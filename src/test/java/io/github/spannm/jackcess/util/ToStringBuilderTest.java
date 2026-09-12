@@ -18,7 +18,9 @@
  */
 package io.github.spannm.jackcess.util;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -50,9 +52,9 @@ class ToStringBuilderTest {
                 .toString();
 
             assertAll(
-                () -> assertTrue(result.startsWith("SampleObject["), "Should start with class name + '['"),
-                () -> assertFalse(result.contains("@"), "No identity hash code for valueBuilder"),
-                () -> assertTrue(result.contains("field=value"), "Field name and value must be present")
+                () -> assertThat(result.startsWith("SampleObject[")).as("Should start with class name + '['").isTrue(),
+                () -> assertThat(result.contains("@")).as("No identity hash code for valueBuilder").isFalse(),
+                () -> assertThat(result.contains("field=value")).as("Field name and value must be present").isTrue()
             );
         }
 
@@ -60,7 +62,7 @@ class ToStringBuilderTest {
         @DisplayName("Null object returns '<null>'")
         void nullObject_returnsNullText() {
             String result = ToStringBuilder.valueBuilder(null).toString();
-            assertEquals("<null>", result);
+            assertThat(result).isEqualTo("<null>");
         }
 
         @Test
@@ -69,7 +71,7 @@ class ToStringBuilderTest {
             String result = ToStringBuilder.valueBuilder("MyLabel")
                 .append(null, 42)
                 .toString();
-            assertTrue(result.startsWith("MyLabel["), "String object should be used directly as prefix");
+            assertThat(result.startsWith("MyLabel[")).as("String object should be used directly as prefix").isTrue();
         }
     }
 
@@ -85,7 +87,7 @@ class ToStringBuilderTest {
                 .append("x", 1)
                 .toString();
 
-            assertTrue(result.matches("(?s)SampleObject@[0-9a-f]+\\[.*"), "Should contain '@<hex>'");
+            assertThat(result.matches("(?s)SampleObject@[0-9a-f]+\\[.*")).as("Should contain '@<hex>'").isTrue();
         }
 
         @Test
@@ -94,7 +96,7 @@ class ToStringBuilderTest {
             String result = ToStringBuilder.builder(new SampleObjectImpl())
                 .append("a", "b")
                 .toString();
-            assertTrue(result.startsWith("SampleObject@"), "'Impl' suffix should be removed");
+            assertThat(result.startsWith("SampleObject@")).as("'Impl' suffix should be removed").isTrue();
         }
 
         @Test
@@ -106,8 +108,8 @@ class ToStringBuilderTest {
                 .toString();
 
             assertAll(
-                () -> assertTrue(result.contains("foo: bar"), "First field"),
-                () -> assertTrue(result.contains("num: 42"), "Second field")
+                () -> assertThat(result.contains("foo: bar")).as("First field").isTrue(),
+                () -> assertThat(result.contains("num: 42")).as("Second field").isTrue()
             );
         }
 
@@ -117,7 +119,7 @@ class ToStringBuilderTest {
             String result = ToStringBuilder.builder(new SampleObject())
                 .append("key", null)
                 .toString();
-            assertTrue(result.contains("<null>"), "null should appear as '<null>'");
+            assertThat(result.contains("<null>")).as("null should appear as '<null>'").isTrue();
         }
 
         @Test
@@ -126,10 +128,8 @@ class ToStringBuilderTest {
             String result = ToStringBuilder.builder(new SampleObject())
                 .append("only", "field")
                 .toString();
-            assertFalse(result.endsWith("," + System.lineSeparator() + "]"),
-                "No trailing separator expected");
-            assertTrue(result.endsWith(System.lineSeparator() + "]"),
-                "Should end with newline + ']'");
+            assertThat(result.endsWith("," + System.lineSeparator() + "]")).as("No trailing separator expected").isFalse();
+            assertThat(result.endsWith(System.lineSeparator() + "]")).as("Should end with newline + ']'").isTrue();
         }
     }
 
@@ -141,14 +141,14 @@ class ToStringBuilderTest {
         @DisplayName("int value")
         void appendInt() {
             String result = ToStringBuilder.valueBuilder("T").append("n", 7).toString();
-            assertTrue(result.contains("n=7"));
+            assertThat(result.contains("n=7")).isTrue();
         }
 
         @Test
         @DisplayName("boolean value")
         void appendBoolean() {
             String result = ToStringBuilder.valueBuilder("T").append("flag", true).toString();
-            assertTrue(result.contains("flag=true"));
+            assertThat(result.contains("flag=true")).isTrue();
         }
 
         @Test
@@ -158,10 +158,10 @@ class ToStringBuilderTest {
                 .append("arr", new String[]{"a", "b", "c"})
                 .toString();
             assertAll(
-                () -> assertTrue(result.contains("{"), "Array opening '{'"),
-                () -> assertTrue(result.contains("a"), "First element"),
-                () -> assertTrue(result.contains("c"), "Last element"),
-                () -> assertTrue(result.contains("}"), "Array closing '}'")
+                () -> assertThat(result.contains("{")).as("Array opening '{'").isTrue(),
+                () -> assertThat(result.contains("a")).as("First element").isTrue(),
+                () -> assertThat(result.contains("c")).as("Last element").isTrue(),
+                () -> assertThat(result.contains("}")).as("Array closing '}'").isTrue()
             );
         }
 
@@ -171,7 +171,7 @@ class ToStringBuilderTest {
             String result = ToStringBuilder.valueBuilder("T")
                 .append("arr", new String[]{"x", null, "z"})
                 .toString();
-            assertTrue(result.contains("<null>"), "Null element should appear as '<null>'");
+            assertThat(result.contains("<null>")).as("Null element should appear as '<null>'").isTrue();
         }
 
         @Test
@@ -180,7 +180,7 @@ class ToStringBuilderTest {
             String result = ToStringBuilder.valueBuilder("T")
                 .append("arr", new String[]{})
                 .toString();
-            assertTrue(result.contains("{}"), "Empty array should appear as '{}'");
+            assertThat(result.contains("{}")).as("Empty array should appear as '{}'").isTrue();
         }
 
         @Test
@@ -189,9 +189,9 @@ class ToStringBuilderTest {
             List<String> list = Arrays.asList("x", "y");
             String result = ToStringBuilder.valueBuilder("T").append("list", list).toString();
             assertAll(
-                () -> assertTrue(result.contains("["), "Collection wrapped in '['"),
-                () -> assertTrue(result.contains("x"), "Element x"),
-                () -> assertTrue(result.contains("y"), "Element y")
+                () -> assertThat(result.contains("[")).as("Collection wrapped in '['").isTrue(),
+                () -> assertThat(result.contains("x")).as("Element x").isTrue(),
+                () -> assertThat(result.contains("y")).as("Element y").isTrue()
             );
         }
 
@@ -202,7 +202,7 @@ class ToStringBuilderTest {
             list.add("a");
             list.add(null);
             String result = ToStringBuilder.valueBuilder("T").append("list", list).toString();
-            assertTrue(result.contains("<null>"), "null in Collection rendered as '<null>'");
+            assertThat(result.contains("<null>")).as("null in Collection rendered as '<null>'").isTrue();
         }
 
         @Test
@@ -213,8 +213,8 @@ class ToStringBuilderTest {
             map.put("k2", "v2");
             String result = ToStringBuilder.valueBuilder("T").append("map", map).toString();
             assertAll(
-                () -> assertTrue(result.contains("k1=v1")),
-                () -> assertTrue(result.contains("k2=v2"))
+                () -> assertThat(result.contains("k1=v1")).isTrue(),
+                () -> assertThat(result.contains("k2=v2")).isTrue()
             );
         }
 
@@ -224,7 +224,7 @@ class ToStringBuilderTest {
             Map<String, String> map = new HashMap<>();
             map.put("key", null);
             String result = ToStringBuilder.valueBuilder("T").append("map", map).toString();
-            assertTrue(result.contains("key=<null>"), "null value in Map rendered as '<null>'");
+            assertThat(result.contains("key=<null>")).as("null value in Map rendered as '<null>'").isTrue();
         }
 
         @Test
@@ -234,9 +234,9 @@ class ToStringBuilderTest {
                 .append("nums", new int[]{1, 2, 3})
                 .toString();
             assertAll(
-                () -> assertTrue(result.contains("{"), "Array braces present"),
-                () -> assertTrue(result.contains("1")),
-                () -> assertTrue(result.contains("3"))
+                () -> assertThat(result.contains("{")).as("Array braces present").isTrue(),
+                () -> assertThat(result.contains("1")).isTrue(),
+                () -> assertThat(result.contains("3")).isTrue()
             );
         }
     }
@@ -251,7 +251,7 @@ class ToStringBuilderTest {
             String result = ToStringBuilder.valueBuilder("T")
                 .appendIgnoreNull("field", "hello")
                 .toString();
-            assertTrue(result.contains("field=hello"));
+            assertThat(result.contains("field=hello")).isTrue();
         }
 
         @Test
@@ -262,9 +262,9 @@ class ToStringBuilderTest {
                 .append("keep", "yes")
                 .toString();
             assertAll(
-                () -> assertFalse(result.contains("skip"), "Null field must not appear"),
-                () -> assertTrue(result.contains("keep=yes"), "Non-null field must appear"),
-                () -> assertFalse(result.contains("<null>"), "No '<null>' for appendIgnoreNull")
+                () -> assertThat(result.contains("skip")).as("Null field must not appear").isFalse(),
+                () -> assertThat(result.contains("keep=yes")).as("Non-null field must appear").isTrue(),
+                () -> assertThat(result.contains("<null>")).as("No '<null>' for appendIgnoreNull").isFalse()
             );
         }
 
@@ -275,8 +275,8 @@ class ToStringBuilderTest {
                 .appendIgnoreNull("a", null)
                 .appendIgnoreNull("b", null)
                 .toString();
-            assertTrue(result.startsWith("T["), "Prefix correct");
-            assertFalse(result.contains("="), "No fields in output");
+            assertThat(result.startsWith("T[")).as("Prefix correct").isTrue();
+            assertThat(result.contains("=")).as("No fields in output").isFalse();
         }
     }
 
@@ -306,19 +306,19 @@ class ToStringBuilderTest {
         @Test
         @DisplayName("'Impl' suffix is removed")
         void implSuffix_removed() {
-            assertEquals("Foo", ToStringBuilder.getShortClassName(FooImpl.class, "Impl"));
+            assertThat(ToStringBuilder.getShortClassName(FooImpl.class, "Impl")).isEqualTo("Foo");
         }
 
         @Test
         @DisplayName("No 'Impl' suffix – name is unchanged")
         void noImplSuffix_unchanged() {
-            assertEquals("SampleObject", ToStringBuilder.getShortClassName(SampleObject.class, "Impl"));
+            assertThat(ToStringBuilder.getShortClassName(SampleObject.class, "Impl")).isEqualTo("SampleObject");
         }
 
         @Test
         @DisplayName("Empty suffix – nothing is stripped")
         void emptySuffix_noChange() {
-            assertEquals("SampleObjectImpl", ToStringBuilder.getShortClassName(SampleObjectImpl.class, ""));
+            assertThat(ToStringBuilder.getShortClassName(SampleObjectImpl.class, "")).isEqualTo("SampleObjectImpl");
         }
     }
 
@@ -331,7 +331,7 @@ class ToStringBuilderTest {
         void separatorAtEnd_removed() {
             StringBuilder sb = new StringBuilder("hello,");
             ToStringBuilder.removeLastFieldSeparator(sb, ",");
-            assertEquals("hello", sb.toString());
+            assertThat(sb.toString()).isEqualTo("hello");
         }
 
         @Test
@@ -339,7 +339,7 @@ class ToStringBuilderTest {
         void noSeparatorAtEnd_unchanged() {
             StringBuilder sb = new StringBuilder("hello");
             ToStringBuilder.removeLastFieldSeparator(sb, ",");
-            assertEquals("hello", sb.toString());
+            assertThat(sb.toString()).isEqualTo("hello");
         }
 
         @Test
@@ -347,7 +347,7 @@ class ToStringBuilderTest {
         void multiCharSeparator_removed() {
             StringBuilder sb = new StringBuilder("abc\n  ");
             ToStringBuilder.removeLastFieldSeparator(sb, "\n  ");
-            assertEquals("abc", sb.toString());
+            assertThat(sb.toString()).isEqualTo("abc");
         }
 
         @Test
@@ -355,7 +355,7 @@ class ToStringBuilderTest {
         void emptySeparator_noChange() {
             StringBuilder sb = new StringBuilder("data");
             ToStringBuilder.removeLastFieldSeparator(sb, "");
-            assertEquals("data", sb.toString());
+            assertThat(sb.toString()).isEqualTo("data");
         }
 
         @Test
@@ -363,7 +363,7 @@ class ToStringBuilderTest {
         void emptyBuffer_noException() {
             StringBuilder sb = new StringBuilder();
             assertDoesNotThrow(() -> ToStringBuilder.removeLastFieldSeparator(sb, ","));
-            assertEquals("", sb.toString());
+            assertThat(sb.toString()).isEqualTo("");
         }
 
         @Test
@@ -371,7 +371,7 @@ class ToStringBuilderTest {
         void separatorLongerThanBuffer_noChange() {
             StringBuilder sb = new StringBuilder("ab");
             ToStringBuilder.removeLastFieldSeparator(sb, "abc");
-            assertEquals("ab", sb.toString());
+            assertThat(sb.toString()).isEqualTo("ab");
         }
     }
 
@@ -383,22 +383,22 @@ class ToStringBuilderTest {
         @DisplayName("append() returns same builder instance (chaining)")
         void append_returnsSameBuilder() {
             ToStringBuilder builder = ToStringBuilder.valueBuilder("T");
-            assertSame(builder, builder.append("a", 1), "Method should return 'this'");
+            assertThat(builder.append("a", 1)).as("Method should return 'this'").isSameAs(builder);
         }
 
         @Test
         @DisplayName("appendIgnoreNull() returns same builder instance")
         void appendIgnoreNull_returnsSameBuilder() {
             ToStringBuilder builder = ToStringBuilder.valueBuilder("T");
-            assertSame(builder, builder.appendIgnoreNull("a", null));
+            assertThat(builder.appendIgnoreNull("a", null)).isSameAs(builder);
         }
 
         @Test
         @DisplayName("Null field name – only value is appended, no '=' prefix")
         void nullFieldName_onlyValueAppended() {
             String result = ToStringBuilder.valueBuilder("T").append(null, "justValue").toString();
-            assertTrue(result.contains("justValue"), "Value must be present");
-            assertFalse(result.contains("=justValue"), "No '=' without field name");
+            assertThat(result.contains("justValue")).as("Value must be present").isTrue();
+            assertThat(result.contains("=justValue")).as("No '=' without field name").isFalse();
         }
     }
 

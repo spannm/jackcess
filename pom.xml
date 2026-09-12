@@ -108,6 +108,7 @@
 
         <!-- test dependencies -->
         <dep.junit.version>5.14.4</dep.junit.version>
+        <dep.assertj.version>3.27.7</dep.assertj.version>
 
         <dep.plugin.maven-fluido-skin.version>2.1.0</dep.plugin.maven-fluido-skin.version>
 
@@ -170,6 +171,13 @@
             <groupId>org.junit.jupiter</groupId>
             <artifactId>junit-jupiter</artifactId>
             <version>${dep.junit.version}</version>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.assertj</groupId>
+            <artifactId>assertj-core</artifactId>
+            <version>${dep.assertj.version}</version>
             <scope>test</scope>
         </dependency>
 

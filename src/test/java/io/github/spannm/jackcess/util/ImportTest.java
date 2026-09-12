@@ -16,6 +16,7 @@ limitations under the License.
 
 package io.github.spannm.jackcess.util;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import io.github.spannm.jackcess.*;
 import io.github.spannm.jackcess.Database.FileFormat;
 import io.github.spannm.jackcess.test.AbstractBaseTest;
@@ -24,13 +25,11 @@ import io.github.spannm.jackcess.test.source.FileFormatSource;
 import org.junit.jupiter.params.ParameterizedTest;
 
 import java.io.File;
-import java.io.IOException;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
-import java.sql.SQLException;
 import java.sql.Types;
 import java.util.ArrayList;
 import java.util.List;
@@ -40,7 +39,7 @@ class ImportTest extends AbstractBaseTest {
 
     @ParameterizedTest(name = "[{index}] {0}")
     @FileFormatSource
-    void testImportFromFile(FileFormat fileFormat) throws IOException {
+    void importFromFile(FileFormat fileFormat) throws Exception {
         try (Database db = createDbMem(fileFormat)) {
             String tableName = new ImportUtil.Builder(db, "test")
                 .withDelimiter("\\t")
@@ -51,7 +50,7 @@ class ImportTest extends AbstractBaseTest {
             for (Column c : t.getColumns()) {
                 colNames.add(c.getName());
             }
-            assertEquals(List.of("Test1", "Test2", "Test3"), colNames);
+            assertThat(colNames).isEqualTo(List.of("Test1", "Test2", "Test3"));
 
             List<? extends Map<String, Object>> expectedRows =
                 TestUtil.createExpectedTable(
@@ -140,7 +139,7 @@ class ImportTest extends AbstractBaseTest {
             for (Column c : t.getColumns()) {
                 colNames.add(c.getName());
             }
-            assertEquals(List.of("Test1", "Test2", "Test3"), colNames);
+            assertThat(colNames).isEqualTo(List.of("Test1", "Test2", "Test3"));
 
             expectedRows =
                 TestUtil.createExpectedTable(
@@ -162,7 +161,7 @@ class ImportTest extends AbstractBaseTest {
 
     @ParameterizedTest(name = "[{index}] {0}")
     @FileFormatSource
-    void testImportFromFileWithOnlyHeaders(FileFormat fileFormat) throws IOException {
+    void importFromFileWithOnlyHeaders(FileFormat fileFormat) throws Exception {
         try (Database db = createDbMem(fileFormat)) {
             String tableName = new ImportUtil.Builder(db, "test")
                 .withDelimiter("\\t")
@@ -174,17 +173,16 @@ class ImportTest extends AbstractBaseTest {
             for (Column c : t.getColumns()) {
                 colNames.add(c.getName());
             }
-            assertEquals(List.of(
-                "RESULT_PHYS_ID", "FIRST", "MIDDLE", "LAST", "OUTLIER",
-                "RANK", "CLAIM_COUNT", "PROCEDURE_COUNT",
-                "WEIGHTED_CLAIM_COUNT", "WEIGHTED_PROCEDURE_COUNT"),
-                colNames);
+            assertThat(colNames).isEqualTo(List.of(
+                    "RESULT_PHYS_ID", "FIRST", "MIDDLE", "LAST", "OUTLIER",
+                    "RANK", "CLAIM_COUNT", "PROCEDURE_COUNT",
+                    "WEIGHTED_CLAIM_COUNT", "WEIGHTED_PROCEDURE_COUNT"));
         }
     }
 
     @ParameterizedTest(name = "[{index}] {0}")
     @FileFormatSource
-    void testCopySqlHeaders(FileFormat fileFormat) throws IOException, SQLException {
+    void copySqlHeaders(FileFormat fileFormat) throws Exception {
         TestResultSet rs = new TestResultSet();
 
         rs.addColumn(Types.INTEGER, "col1");
@@ -203,43 +201,43 @@ class ImportTest extends AbstractBaseTest {
 
         Table t = db.getTable("Test1");
         List<? extends Column> columns = t.getColumns();
-        assertEquals(7, columns.size());
+        assertThat(columns.size()).isEqualTo(7);
 
         Column c = columns.get(0);
-        assertEquals("col1", c.getName());
-        assertEquals(DataType.LONG, c.getType());
+        assertThat(c.getName()).isEqualTo("col1");
+        assertThat(c.getType()).isEqualTo(DataType.LONG);
 
         c = columns.get(1);
-        assertEquals("col2", c.getName());
-        assertEquals(DataType.TEXT, c.getType());
-        assertEquals(120, c.getLength());
+        assertThat(c.getName()).isEqualTo("col2");
+        assertThat(c.getType()).isEqualTo(DataType.TEXT);
+        assertThat(c.getLength()).isEqualTo((short) 120);
 
         c = columns.get(2);
-        assertEquals("col3", c.getName());
-        assertEquals(DataType.MEMO, c.getType());
-        assertEquals(0, c.getLength());
+        assertThat(c.getName()).isEqualTo("col3");
+        assertThat(c.getType()).isEqualTo(DataType.MEMO);
+        assertThat(c.getLength()).isEqualTo((short) 0);
 
         c = columns.get(3);
-        assertEquals("col4", c.getName());
-        assertEquals(DataType.BINARY, c.getType());
-        assertEquals(128, c.getLength());
+        assertThat(c.getName()).isEqualTo("col4");
+        assertThat(c.getType()).isEqualTo(DataType.BINARY);
+        assertThat(c.getLength()).isEqualTo((short) 128);
 
         c = columns.get(4);
-        assertEquals("col5", c.getName());
-        assertEquals(DataType.OLE, c.getType());
-        assertEquals(0, c.getLength());
+        assertThat(c.getName()).isEqualTo("col5");
+        assertThat(c.getType()).isEqualTo(DataType.OLE);
+        assertThat(c.getLength()).isEqualTo((short) 0);
 
         c = columns.get(5);
-        assertEquals("col6", c.getName());
-        assertEquals(DataType.NUMERIC, c.getType());
-        assertEquals(17, c.getLength());
-        assertEquals(7, c.getScale());
-        assertEquals(15, c.getPrecision());
+        assertThat(c.getName()).isEqualTo("col6");
+        assertThat(c.getType()).isEqualTo(DataType.NUMERIC);
+        assertThat(c.getLength()).isEqualTo((short) 17);
+        assertThat(c.getScale()).isEqualTo((byte) 7);
+        assertThat(c.getPrecision()).isEqualTo((byte) 15);
 
         c = columns.get(6);
-        assertEquals("col7", c.getName());
-        assertEquals(DataType.MEMO, c.getType());
-        assertEquals(0, c.getLength());
+        assertThat(c.getName()).isEqualTo("col7");
+        assertThat(c.getType()).isEqualTo(DataType.MEMO);
+        assertThat(c.getLength()).isEqualTo((short) 0);
     }
 
     private static class TestResultSet implements InvocationHandler {

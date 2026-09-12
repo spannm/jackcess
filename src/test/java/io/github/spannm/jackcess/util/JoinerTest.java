@@ -18,6 +18,7 @@ package io.github.spannm.jackcess.util;
 
 import static io.github.spannm.jackcess.test.Basename.INDEX;
 import static io.github.spannm.jackcess.test.TestUtil.*;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import io.github.spannm.jackcess.Database;
 import io.github.spannm.jackcess.Index;
@@ -37,7 +38,7 @@ class JoinerTest extends AbstractBaseTest {
 
     @ParameterizedTest(name = "[{index}] {0}")
     @TestDbSource(INDEX)
-    void testJoiner(TestDb testDb) throws IOException {
+    void joiner(TestDb testDb) throws Exception {
         try (Database db = testDb.openCopy()) {
             Table t1 = db.getTable("Table1");
             Table t2 = db.getTable("Table2");
@@ -47,24 +48,24 @@ class JoinerTest extends AbstractBaseTest {
             Index t1t3 = t1.getIndex("Table3Table1");
 
             Index t2t1 = t1t2.getReferencedIndex();
-            assertSame(t2, t2t1.getTable());
+            assertThat(t2t1.getTable()).isSameAs(t2);
             Joiner t2t1Join = Joiner.create(t2t1);
 
-            assertSame(t2, t2t1Join.getFromTable());
-            assertSame(t2t1, t2t1Join.getFromIndex());
-            assertSame(t1, t2t1Join.getToTable());
-            assertSame(t1t2, t2t1Join.getToIndex());
+            assertThat(t2t1Join.getFromTable()).isSameAs(t2);
+            assertThat(t2t1Join.getFromIndex()).isSameAs(t2t1);
+            assertThat(t2t1Join.getToTable()).isSameAs(t1);
+            assertThat(t2t1Join.getToIndex()).isSameAs(t1t2);
 
             doTestJoiner(t2t1Join, createT2T1Data());
 
             Index t3t1 = t1t3.getReferencedIndex();
-            assertSame(t3, t3t1.getTable());
+            assertThat(t3t1.getTable()).isSameAs(t3);
             Joiner t3t1Join = Joiner.create(t3t1);
 
-            assertSame(t3, t3t1Join.getFromTable());
-            assertSame(t3t1, t3t1Join.getFromIndex());
-            assertSame(t1, t3t1Join.getToTable());
-            assertSame(t1t3, t3t1Join.getToIndex());
+            assertThat(t3t1Join.getFromTable()).isSameAs(t3);
+            assertThat(t3t1Join.getFromIndex()).isSameAs(t3t1);
+            assertThat(t3t1Join.getToTable()).isSameAs(t1);
+            assertThat(t3t1Join.getToIndex()).isSameAs(t1t3);
 
             doTestJoiner(t3t1Join, createT3T1Data());
 
@@ -84,16 +85,16 @@ class JoinerTest extends AbstractBaseTest {
                 .collect(Collectors.toList());
 
             List<Row> expectedRows = expectedData.get(id);
-            assertEquals(expectedData.get(id), joinedRows);
+            assertThat(joinedRows).isEqualTo(expectedData.get(id));
 
             if (!expectedRows.isEmpty()) {
-                assertTrue(join.hasRows(row));
-                assertEquals(expectedRows.get(0), join.findFirstRow(row));
+                assertThat(join.hasRows(row)).isTrue();
+                assertThat(join.findFirstRow(row)).isEqualTo(expectedRows.get(0));
 
-                assertEquals(row, revJoin.findFirstRow(expectedRows.get(0)));
+                assertThat(revJoin.findFirstRow(expectedRows.get(0))).isEqualTo(row);
             } else {
-                assertFalse(join.hasRows(row));
-                assertNull(join.findFirstRow(row));
+                assertThat(join.hasRows(row)).isFalse();
+                assertThat(join.findFirstRow(row)).isNull();
             }
 
             List<Row> expectedRows2 = new ArrayList<>();
@@ -106,30 +107,30 @@ class JoinerTest extends AbstractBaseTest {
             joinedRows = join.findRows(row).withColumnNames(colNames)
                 .stream().collect(Collectors.toList());
 
-            assertEquals(expectedRows2, joinedRows);
+            assertThat(joinedRows).isEqualTo(expectedRows2);
 
             if (!expectedRows2.isEmpty()) {
-                assertEquals(expectedRows2.get(0), join.findFirstRow(row, colNames));
+                assertThat(join.findFirstRow(row, colNames)).isEqualTo(expectedRows2.get(0));
             } else {
-                assertNull(join.findFirstRow(row, colNames));
+                assertThat(join.findFirstRow(row, colNames)).isNull();
             }
         }
     }
 
     private static void doTestJoinerDelete(Joiner t2t1Join) throws IOException {
-        assertEquals(4, countRows(t2t1Join.getToTable()));
+        assertThat(countRows(t2t1Join.getToTable())).isEqualTo(4);
 
         Row row = createExpectedRow("id", 1);
-        assertTrue(t2t1Join.hasRows(row));
+        assertThat(t2t1Join.hasRows(row)).isTrue();
 
-        assertTrue(t2t1Join.deleteRows(row));
+        assertThat(t2t1Join.deleteRows(row)).isTrue();
 
-        assertFalse(t2t1Join.hasRows(row));
-        assertFalse(t2t1Join.deleteRows(row));
+        assertThat(t2t1Join.hasRows(row)).isFalse();
+        assertThat(t2t1Join.deleteRows(row)).isFalse();
 
-        assertEquals(2, countRows(t2t1Join.getToTable()));
+        assertThat(countRows(t2t1Join.getToTable())).isEqualTo(2);
         for (Row t1Row : t2t1Join.getToTable()) {
-            assertNotEquals(1, t1Row.get("otherfk1"));
+            assertThat(t1Row.get("otherfk1")).isNotEqualTo(1);
         }
     }
 

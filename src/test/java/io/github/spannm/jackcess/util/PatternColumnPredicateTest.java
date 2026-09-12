@@ -16,6 +16,7 @@
  */
 package io.github.spannm.jackcess.util;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import io.github.spannm.jackcess.*;
 import io.github.spannm.jackcess.Database.FileFormat;
 import io.github.spannm.jackcess.test.AbstractBaseTest;
@@ -31,28 +32,27 @@ class PatternColumnPredicateTest extends AbstractBaseTest {
 
     @ParameterizedTest(name = "[{index}] {0}")
     @FileFormatSource
-    void testRegexPredicate(FileFormat fileFormat) throws IOException {
+    void regexPredicate(FileFormat fileFormat) throws Exception {
         try (Database db = createTestDb(fileFormat)) {
             Table t = db.getTable("Test");
 
-            assertEquals(List.of("Foo", "some row", "aNoThEr row", "nonsense"), findRowsByPattern(t, PatternColumnPredicate.forJavaRegex(".*o.*")));
+            assertThat(findRowsByPattern(t, PatternColumnPredicate.forJavaRegex(".*o.*"))).isEqualTo(List.of("Foo", "some row", "aNoThEr row", "nonsense"));
 
-            assertEquals(List.of("Bar", "0102", "FOO", "BAR", "67", "bunch_13_data", "42 is the ANSWER", "[try] matching t.h+i}s"),
-                findRowsByPattern(t, PatternColumnPredicate.forJavaRegex(".*o.*").negate()));
+            assertThat(findRowsByPattern(t, PatternColumnPredicate.forJavaRegex(".*o.*").negate())).isEqualTo(List.of("Bar", "0102", "FOO", "BAR", "67", "bunch_13_data", "42 is the ANSWER", "[try] matching t.h+i}s"));
 
-            assertEquals(List.of("Foo", "some row", "FOO", "aNoThEr row", "nonsense"), findRowsByPattern(t, PatternColumnPredicate.forAccessLike("*o*")));
+            assertThat(findRowsByPattern(t, PatternColumnPredicate.forAccessLike("*o*"))).isEqualTo(List.of("Foo", "some row", "FOO", "aNoThEr row", "nonsense"));
 
-            assertEquals(List.of("0102", "67", "bunch_13_data", "42 is the ANSWER"), findRowsByPattern(t, PatternColumnPredicate.forAccessLike("*##*")));
+            assertThat(findRowsByPattern(t, PatternColumnPredicate.forAccessLike("*##*"))).isEqualTo(List.of("0102", "67", "bunch_13_data", "42 is the ANSWER"));
 
-            assertEquals(List.of("42 is the ANSWER"), findRowsByPattern(t, PatternColumnPredicate.forAccessLike("## *")));
+            assertThat(findRowsByPattern(t, PatternColumnPredicate.forAccessLike("## *"))).isEqualTo(List.of("42 is the ANSWER"));
 
-            assertEquals(List.of("Foo"), findRowsByPattern(t, PatternColumnPredicate.forSqlLike("F_o")));
+            assertThat(findRowsByPattern(t, PatternColumnPredicate.forSqlLike("F_o"))).isEqualTo(List.of("Foo"));
 
-            assertEquals(List.of("Foo", "FOO"), findRowsByPattern(t, PatternColumnPredicate.forSqlLike("F_o", true)));
+            assertThat(findRowsByPattern(t, PatternColumnPredicate.forSqlLike("F_o", true))).isEqualTo(List.of("Foo", "FOO"));
 
-            assertEquals(List.of("[try] matching t.h+i}s"), findRowsByPattern(t, PatternColumnPredicate.forSqlLike("[try] % t.h+i}s")));
+            assertThat(findRowsByPattern(t, PatternColumnPredicate.forSqlLike("[try] % t.h+i}s"))).isEqualTo(List.of("[try] matching t.h+i}s"));
 
-            assertEquals(List.of("bunch_13_data"), findRowsByPattern(t, PatternColumnPredicate.forSqlLike("bunch\\_%\\_data")));
+            assertThat(findRowsByPattern(t, PatternColumnPredicate.forSqlLike("bunch\\_%\\_data"))).isEqualTo(List.of("bunch_13_data"));
         }
     }
 

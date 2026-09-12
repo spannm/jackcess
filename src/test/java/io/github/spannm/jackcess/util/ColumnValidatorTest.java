@@ -17,6 +17,8 @@
 package io.github.spannm.jackcess.util;
 
 import static io.github.spannm.jackcess.test.TestUtil.*;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import io.github.spannm.jackcess.*;
 import io.github.spannm.jackcess.Database.FileFormat;
@@ -25,7 +27,6 @@ import io.github.spannm.jackcess.test.AbstractBaseTest;
 import io.github.spannm.jackcess.test.source.FileFormatSource;
 import org.junit.jupiter.params.ParameterizedTest;
 
-import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 
@@ -33,10 +34,10 @@ class ColumnValidatorTest extends AbstractBaseTest {
 
     @ParameterizedTest(name = "[{index}] {0}")
     @FileFormatSource
-    void testValidate(FileFormat fileFormat) throws IOException {
+    void validate(FileFormat fileFormat) throws Exception {
         try (Database db = createDbMem(fileFormat)) {
             ColumnValidatorFactory initFact = db.getColumnValidatorFactory();
-            assertNotNull(initFact);
+            assertThat(initFact).isNotNull();
 
             Table table1 = new TableBuilder("Test")
                 .addColumn(new ColumnBuilder("id", DataType.LONG).withAutoNumber(true))
@@ -46,7 +47,7 @@ class ColumnValidatorTest extends AbstractBaseTest {
                 .toTable(db);
 
             for (Column col : table1.getColumns()) {
-                assertSame(SimpleColumnValidator.INSTANCE, col.getColumnValidator());
+                assertThat(col.getColumnValidator()).isSameAs(SimpleColumnValidator.INSTANCE);
             }
 
             int val = -1;
@@ -67,7 +68,7 @@ class ColumnValidatorTest extends AbstractBaseTest {
 
             ColumnValidatorFactory fact = col -> {
                 Table t = col.getTable();
-                assertFalse(t.isSystem());
+                assertThat(t.isSystem()).isFalse();
                 if (!"Test".equals(t.getName())) {
                     return null;
                 }
@@ -85,11 +86,11 @@ class ColumnValidatorTest extends AbstractBaseTest {
 
             for (Column col : table2.getColumns()) {
                 ColumnValidator cur = col.getColumnValidator();
-                assertNotNull(cur);
+                assertThat(cur).isNotNull();
                 if ("num".equals(col.getName())) {
-                    assertSame(cv, cur);
+                    assertThat(cur).isSameAs(cv);
                 } else {
-                    assertSame(SimpleColumnValidator.INSTANCE, cur);
+                    assertThat(cur).isSameAs(SimpleColumnValidator.INSTANCE);
                 }
             }
 
@@ -99,7 +100,7 @@ class ColumnValidatorTest extends AbstractBaseTest {
 
             assertThrows(IllegalArgumentException.class, () -> idCol.setColumnValidator(cv));
 
-            assertSame(SimpleColumnValidator.INSTANCE, idCol.getColumnValidator());
+            assertThat(idCol.getColumnValidator()).isSameAs(SimpleColumnValidator.INSTANCE);
 
             assertThrows(IllegalArgumentException.class, () -> table2.addRow(Column.AUTO_NUMBER, "row4", -3));
 
@@ -115,17 +116,15 @@ class ColumnValidatorTest extends AbstractBaseTest {
             assertTable(expectedRows, table2);
 
             IndexCursor pkCursor = CursorBuilder.createPrimaryKeyCursor(table2);
-            assertNotNull(pkCursor.findRowByEntry(1));
+            assertThat(pkCursor.findRowByEntry(1)).isNotNull();
 
             pkCursor.setCurrentRowValue(dataCol, "row1_mod");
 
-            assertEquals(createExpectedRow("id", 1, "data", "row1_mod", "num", -1),
-                pkCursor.getCurrentRow());
+            assertThat(pkCursor.getCurrentRow()).isEqualTo(createExpectedRow("id", 1, "data", "row1_mod", "num", -1));
 
             assertThrows(IllegalArgumentException.class, () -> pkCursor.setCurrentRowValue(numCol, -2));
 
-            assertEquals(createExpectedRow("id", 1, "data", "row1_mod", "num", -1),
-                pkCursor.getCurrentRow());
+            assertThat(pkCursor.getCurrentRow()).isEqualTo(createExpectedRow("id", 1, "data", "row1_mod", "num", -1));
 
             Row row3 = CursorBuilder.findRowByPrimaryKey(table2, 3);
 
@@ -133,8 +132,7 @@ class ColumnValidatorTest extends AbstractBaseTest {
 
             assertThrows(IllegalArgumentException.class, () -> table2.updateRow(row3));
 
-            assertEquals(createExpectedRow("id", 3, "data", "row3", "num", 1),
-                CursorBuilder.findRowByPrimaryKey(table2, 3));
+            assertThat(CursorBuilder.findRowByPrimaryKey(table2, 3)).isEqualTo(createExpectedRow("id", 3, "data", "row3", "num", 1));
 
             final ColumnValidator cv2 = (col, v1) -> {
                 Number num = (Number) v1;
@@ -158,11 +156,10 @@ class ColumnValidatorTest extends AbstractBaseTest {
 
             assertTable(expectedRows, table2);
 
-            assertNotNull(pkCursor.findRowByEntry(3));
+            assertThat(pkCursor.findRowByEntry(3)).isNotNull();
             pkCursor.setCurrentRowValue(numCol, -10);
 
-            assertEquals(createExpectedRow("id", 3, "data", "row3", "num", 0),
-                pkCursor.getCurrentRow());
+            assertThat(pkCursor.getCurrentRow()).isEqualTo(createExpectedRow("id", 3, "data", "row3", "num", 0));
         }
     }
 }

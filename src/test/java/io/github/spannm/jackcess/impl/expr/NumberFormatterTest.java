@@ -16,6 +16,7 @@
  */
 package io.github.spannm.jackcess.impl.expr;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import io.github.spannm.jackcess.expr.NumericConfig;
 import io.github.spannm.jackcess.test.AbstractBaseTest;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -57,8 +58,8 @@ class NumberFormatterTest extends AbstractBaseTest {
     }
     @ParameterizedTest(name = "[{index}] {1} --> {0}")
     @MethodSource("getDoubleFormatData")
-    void testDoubleFormat(String _expected, Double _input) {
-        assertEquals(_expected, numFmt.format(_input));
+    void doubleFormat(String _expected, Double _input) {
+        assertThat(numFmt.format(_input)).isEqualTo(_expected);
     }
 
     static Stream<Arguments> getFloatFormatData() {
@@ -90,8 +91,8 @@ class NumberFormatterTest extends AbstractBaseTest {
     }
     @ParameterizedTest(name = "[{index}] {1} --> {0}")
     @MethodSource("getFloatFormatData")
-    void testFloatFormat(String _expected, Float _input) {
-        assertEquals(_expected, numFmt.format(_input));
+    void floatFormat(String _expected, Float _input) {
+        assertThat(numFmt.format(_input)).isEqualTo(_expected);
     }
 
     static Stream<Arguments> getBigDecimalFormatData() {
@@ -113,8 +114,8 @@ class NumberFormatterTest extends AbstractBaseTest {
     }
     @ParameterizedTest(name = "[{index}] {1} --> {0}")
     @MethodSource("getBigDecimalFormatData")
-    void testDecimalFormat(String _expected, String _input) {
-        assertEquals(_expected, numFmt.format(new BigDecimal(_input)));
+    void decimalFormat(String _expected, String _input) {
+        assertThat(numFmt.format(new BigDecimal(_input))).isEqualTo(_expected);
     }
 
 }

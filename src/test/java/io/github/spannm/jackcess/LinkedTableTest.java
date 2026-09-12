@@ -18,6 +18,8 @@ package io.github.spannm.jackcess;
 
 import static io.github.spannm.jackcess.test.Basename.LINKED;
 import static io.github.spannm.jackcess.test.Basename.LINKED_ODBC;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import io.github.spannm.jackcess.impl.DatabaseImpl;
 import io.github.spannm.jackcess.test.AbstractBaseTest;
@@ -27,7 +29,6 @@ import io.github.spannm.jackcess.test.source.TestDbSource;
 import org.junit.jupiter.params.ParameterizedTest;
 
 import java.io.File;
-import java.io.IOException;
 import java.nio.file.AccessDeniedException;
 import java.util.List;
 import java.util.Map;
@@ -36,40 +37,40 @@ class LinkedTableTest extends AbstractBaseTest {
 
     @ParameterizedTest(name = "[{index}] {0}")
     @TestDbSource(LINKED)
-    void testLinkedTables(TestDb testDb) throws IOException {
+    void linkedTables(TestDb testDb) throws Exception {
 
         try (Database db = testDb.openCopy()) {
             assertThrows(AccessDeniedException.class, () -> db.getTable("Table2"));
 
             TableMetaData tmd = db.getTableMetaData("Table2");
-            assertEquals("Table2", tmd.getName());
-            assertTrue(tmd.isLinked());
-            assertFalse(tmd.isSystem());
-            assertEquals("Table1", tmd.getLinkedTableName());
-            assertNull(tmd.getConnectionName());
-            assertEquals(TableMetaData.Type.LINKED, tmd.getType());
-            assertEquals("Z:\\jackcess_test\\linkeeTest.accdb", tmd.getLinkedDbName());
-            assertNull(tmd.getTableDefinition(db));
+            assertThat(tmd.getName()).isEqualTo("Table2");
+            assertThat(tmd.isLinked()).isTrue();
+            assertThat(tmd.isSystem()).isFalse();
+            assertThat(tmd.getLinkedTableName()).isEqualTo("Table1");
+            assertThat(tmd.getConnectionName()).isNull();
+            assertThat(tmd.getType()).isEqualTo(TableMetaData.Type.LINKED);
+            assertThat(tmd.getLinkedDbName()).isEqualTo("Z:\\jackcess_test\\linkeeTest.accdb");
+            assertThat(tmd.getTableDefinition(db)).isNull();
 
             tmd = db.getTableMetaData("FooTable");
-            assertNull(tmd);
+            assertThat(tmd).isNull();
 
-            assertTrue(db.getLinkedDatabases().isEmpty());
+            assertThat(db.getLinkedDatabases().isEmpty()).isTrue();
 
             String linkeeDbName = "Z:\\jackcess_test\\linkeeTest.accdb";
             File linkeeFile = new File(DIR_TEST_DATA, "linkeeTest.accdb");
             db.setLinkResolver((linkerdb, dbName) -> {
-                assertEquals(linkeeDbName, dbName);
+                assertThat(dbName).isEqualTo(linkeeDbName);
                 return DatabaseBuilder.open(linkeeFile);
             });
 
             Table t2 = db.getTable("Table2");
 
-            assertEquals(1, db.getLinkedDatabases().size());
+            assertThat(db.getLinkedDatabases().size()).isEqualTo(1);
             Database linkeeDb = db.getLinkedDatabases().get(linkeeDbName);
-            assertNotNull(linkeeDb);
-            assertEquals(linkeeFile, linkeeDb.getFile());
-            assertEquals("linkeeTest.accdb", ((DatabaseImpl) linkeeDb).getName());
+            assertThat(linkeeDb).isNotNull();
+            assertThat(linkeeDb.getFile()).isEqualTo(linkeeFile);
+            assertThat(((DatabaseImpl) linkeeDb).getName()).isEqualTo("linkeeTest.accdb");
 
             List<? extends Map<String, Object>> expectedRows =
                 TestUtil.createExpectedTable(
@@ -82,15 +83,15 @@ class LinkedTableTest extends AbstractBaseTest {
             db.createLinkedTable("FooTable", linkeeDbName, "Table2");
 
             tmd = db.getTableMetaData("FooTable");
-            assertEquals("FooTable", tmd.getName());
-            assertTrue(tmd.isLinked());
-            assertFalse(tmd.isSystem());
-            assertEquals("Table2", tmd.getLinkedTableName());
-            assertEquals("Z:\\jackcess_test\\linkeeTest.accdb", tmd.getLinkedDbName());
+            assertThat(tmd.getName()).isEqualTo("FooTable");
+            assertThat(tmd.isLinked()).isTrue();
+            assertThat(tmd.isSystem()).isFalse();
+            assertThat(tmd.getLinkedTableName()).isEqualTo("Table2");
+            assertThat(tmd.getLinkedDbName()).isEqualTo("Z:\\jackcess_test\\linkeeTest.accdb");
 
             Table t3 = db.getTable("FooTable");
 
-            assertEquals(1, db.getLinkedDatabases().size());
+            assertThat(db.getLinkedDatabases().size()).isEqualTo(1);
 
             expectedRows =
                 TestUtil.createExpectedTable(
@@ -101,68 +102,68 @@ class LinkedTableTest extends AbstractBaseTest {
             TestUtil.assertTable(expectedRows, t3);
 
             tmd = db.getTableMetaData("Table1");
-            assertEquals("Table1", tmd.getName());
-            assertFalse(tmd.isLinked());
-            assertFalse(tmd.isSystem());
-            assertNull(tmd.getLinkedTableName());
-            assertNull(tmd.getLinkedDbName());
+            assertThat(tmd.getName()).isEqualTo("Table1");
+            assertThat(tmd.isLinked()).isFalse();
+            assertThat(tmd.isSystem()).isFalse();
+            assertThat(tmd.getLinkedTableName()).isNull();
+            assertThat(tmd.getLinkedDbName()).isNull();
 
             Table t1 = tmd.open(db);
 
-            assertFalse(db.isLinkedTable(null));
-            assertTrue(db.isLinkedTable(t2));
-            assertTrue(db.isLinkedTable(t3));
-            assertFalse(db.isLinkedTable(t1));
+            assertThat(db.isLinkedTable(null)).isFalse();
+            assertThat(db.isLinkedTable(t2)).isTrue();
+            assertThat(db.isLinkedTable(t3)).isTrue();
+            assertThat(db.isLinkedTable(t1)).isFalse();
 
             List<Table> tables = DatabaseTest.getTables(db.newIterable());
-            assertEquals(3, tables.size());
-            assertTrue(tables.contains(t1));
-            assertTrue(tables.contains(t2));
-            assertTrue(tables.contains(t3));
-            assertFalse(tables.contains(((DatabaseImpl) db).getSystemCatalog()));
+            assertThat(tables.size()).isEqualTo(3);
+            assertThat(tables.contains(t1)).isTrue();
+            assertThat(tables.contains(t2)).isTrue();
+            assertThat(tables.contains(t3)).isTrue();
+            assertThat(tables.contains(((DatabaseImpl) db).getSystemCatalog())).isFalse();
 
             tables = DatabaseTest.getTables(db.newIterable().withIncludeNormalTables(false));
-            assertEquals(2, tables.size());
-            assertFalse(tables.contains(t1));
-            assertTrue(tables.contains(t2));
-            assertTrue(tables.contains(t3));
-            assertFalse(tables.contains(((DatabaseImpl) db).getSystemCatalog()));
+            assertThat(tables.size()).isEqualTo(2);
+            assertThat(tables.contains(t1)).isFalse();
+            assertThat(tables.contains(t2)).isTrue();
+            assertThat(tables.contains(t3)).isTrue();
+            assertThat(tables.contains(((DatabaseImpl) db).getSystemCatalog())).isFalse();
 
             tables = DatabaseTest.getTables(db.newIterable().withLocalUserTablesOnly());
-            assertEquals(1, tables.size());
-            assertTrue(tables.contains(t1));
-            assertFalse(tables.contains(t2));
-            assertFalse(tables.contains(t3));
-            assertFalse(tables.contains(((DatabaseImpl) db).getSystemCatalog()));
+            assertThat(tables.size()).isEqualTo(1);
+            assertThat(tables.contains(t1)).isTrue();
+            assertThat(tables.contains(t2)).isFalse();
+            assertThat(tables.contains(t3)).isFalse();
+            assertThat(tables.contains(((DatabaseImpl) db).getSystemCatalog())).isFalse();
 
             tables = DatabaseTest.getTables(db.newIterable().withSystemTablesOnly());
-            assertTrue(tables.size() > 5);
-            assertFalse(tables.contains(t1));
-            assertFalse(tables.contains(t2));
-            assertFalse(tables.contains(t3));
-            assertTrue(tables.contains(((DatabaseImpl) db).getSystemCatalog()));
+            assertThat(tables.size() > 5).isTrue();
+            assertThat(tables.contains(t1)).isFalse();
+            assertThat(tables.contains(t2)).isFalse();
+            assertThat(tables.contains(t3)).isFalse();
+            assertThat(tables.contains(((DatabaseImpl) db).getSystemCatalog())).isTrue();
         }
     }
 
     @ParameterizedTest(name = "[{index}] {0}")
     @TestDbSource(LINKED_ODBC)
-    void testOdbcLinkedTables(TestDb testDb) throws IOException {
+    void odbcLinkedTables(TestDb testDb) throws Exception {
 
         try (Database db = testDb.openCopy()) {
             TableMetaData tmd = db.getTableMetaData("Ordrar");
-            assertEquals(TableMetaData.Type.LINKED_ODBC, tmd.getType());
-            assertEquals("dbo.Ordrar", tmd.getLinkedTableName());
-            assertNull(tmd.getLinkedDbName());
-            assertEquals("DSN=Magnapinna;Description=Safexit;UID=safexit;PWD=DummyPassword;APP=Microsoft Office;DATABASE=safexit", tmd.getConnectionName());
-            assertFalse(tmd.toString().contains("DummyPassword"));
+            assertThat(tmd.getType()).isEqualTo(TableMetaData.Type.LINKED_ODBC);
+            assertThat(tmd.getLinkedTableName()).isEqualTo("dbo.Ordrar");
+            assertThat(tmd.getLinkedDbName()).isNull();
+            assertThat(tmd.getConnectionName()).isEqualTo("DSN=Magnapinna;Description=Safexit;UID=safexit;PWD=DummyPassword;APP=Microsoft Office;DATABASE=safexit");
+            assertThat(tmd.toString().contains("DummyPassword")).isFalse();
 
             TableDefinition t = tmd.getTableDefinition(db);
 
             List<? extends Column> cols = t.getColumns();
-            assertEquals(20, cols.size());
+            assertThat(cols.size()).isEqualTo(20);
 
             List<? extends Index> idxs = t.getIndexes();
-            assertEquals(5, idxs.size());
+            assertThat(idxs.size()).isEqualTo(5);
 
             Table tbl = db.getTable("Ordrar");
 

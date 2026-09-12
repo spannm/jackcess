@@ -20,6 +20,7 @@ import static io.github.spannm.jackcess.test.Basename.COMMON2;
 import static io.github.spannm.jackcess.test.Basename.UNICODE_COMP;
 import static io.github.spannm.jackcess.test.TestUtil.createString;
 import static io.github.spannm.jackcess.test.TestUtil.openDb;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import io.github.spannm.jackcess.*;
 import io.github.spannm.jackcess.Database.FileFormat;
@@ -30,7 +31,6 @@ import io.github.spannm.jackcess.test.source.TestDbReadOnlySource;
 import org.junit.jupiter.params.ParameterizedTest;
 
 import java.io.File;
-import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.file.Files;
 import java.sql.Types;
@@ -40,27 +40,26 @@ class LongValueTest extends AbstractBaseTest {
 
     @ParameterizedTest(name = "[{index}] {0}")
     @TestDbReadOnlySource(COMMON2)
-    void testReadLongValue(TestDb testDb) throws IOException {
+    void readLongValue(TestDb testDb) throws Exception {
         try (Database db = testDb.openMem()) {
             Table table = db.getTable("MSP_PROJECTS");
             Row row = table.getNextRow();
-            assertEquals("Jon Iles this is a a vawesrasoih aksdkl fas dlkjflkasjd flkjaslkdjflkajlksj dfl lkasjdf lkjaskldfj "
-                + "lkas dlk lkjsjdfkl; aslkdf lkasjkldjf lka skldf lka sdkjfl;kasjd falksjdfljaslkdjf laskjdfk jalskjd "
-                + "flkj aslkdjflkjkjasljdflkjas jf;lkasjd fjkas dasdf asd fasdf asdf asdmhf lksaiyudfoi jasodfj902384jsdf9 "
-                + "aw90se fisajldkfj lkasj dlkfslkd jflksjadf as",
-                row.get("PROJ_PROP_AUTHOR"));
-            assertEquals("T", row.get("PROJ_PROP_COMPANY"));
-            assertEquals("Standard", row.get("PROJ_INFO_CAL_NAME"));
-            assertEquals("Project1", row.get("PROJ_PROP_TITLE"));
+            assertThat(row.get("PROJ_PROP_AUTHOR")).isEqualTo("Jon Iles this is a a vawesrasoih aksdkl fas dlkjflkasjd flkjaslkdjflkajlksj dfl lkasjdf lkjaskldfj "
+                    + "lkas dlk lkjsjdfkl; aslkdf lkasjkldjf lka skldf lka sdkjfl;kasjd falksjdfljaslkdjf laskjdfk jalskjd "
+                    + "flkj aslkdjflkjkjasljdflkjas jf;lkasjd fjkas dasdf asd fasdf asdf asdmhf lksaiyudfoi jasodfj902384jsdf9 "
+                    + "aw90se fisajldkfj lkasj dlkfslkd jflksjadf as");
+            assertThat(row.get("PROJ_PROP_COMPANY")).isEqualTo("T");
+            assertThat(row.get("PROJ_INFO_CAL_NAME")).isEqualTo("Standard");
+            assertThat(row.get("PROJ_PROP_TITLE")).isEqualTo("Project1");
             byte[] foundBinaryData = row.getBytes("RESERVED_BINARY_DATA");
             byte[] expectedBinaryData = Files.readAllBytes(new File(DIR_TEST_DATA, "test2BinData.dat").toPath());
-            assertArrayEquals(expectedBinaryData, foundBinaryData);
+            assertThat(foundBinaryData).containsExactly(expectedBinaryData);
         }
     }
 
     @ParameterizedTest(name = "[{index}] {0}")
     @FileFormatSource
-    void testWriteLongValue(FileFormat fileFormat) throws IOException {
+    void writeLongValue(FileFormat fileFormat) throws Exception {
 
         try (Database db = createDbMem(fileFormat)) {
             Table table =
@@ -83,33 +82,33 @@ class LongValueTest extends AbstractBaseTest {
 
             Row row = table.getNextRow();
 
-            assertEquals(testStr, row.get("A"));
-            assertEquals(testStr, row.get("B"));
-            assertNull(row.get("C"));
+            assertThat(row.get("A")).isEqualTo(testStr);
+            assertThat(row.get("B")).isEqualTo(testStr);
+            assertThat(row.get("C")).isNull();
 
             row = table.getNextRow();
 
-            assertEquals(testStr, row.get("A"));
-            assertEquals(longMemo, row.get("B"));
-            assertArrayEquals(oleValue, row.getBytes("C"));
+            assertThat(row.get("A")).isEqualTo(testStr);
+            assertThat(row.get("B")).isEqualTo(longMemo);
+            assertThat(row.getBytes("C")).containsExactly(oleValue);
 
             row = table.getNextRow();
 
-            assertEquals("", row.get("A"));
-            assertEquals("", row.get("B"));
-            assertArrayEquals(new byte[0], row.getBytes("C"));
+            assertThat(row.get("A")).isEqualTo("");
+            assertThat(row.get("B")).isEqualTo("");
+            assertThat(row.getBytes("C")).containsExactly(new byte[0]);
 
             row = table.getNextRow();
 
-            assertNull(row.get("A"));
-            assertNull(row.get("B"));
-            assertNull(row.getBytes("C"));
+            assertThat(row.get("A")).isNull();
+            assertThat(row.get("B")).isNull();
+            assertThat(row.getBytes("C")).isNull();
         }
     }
 
     @ParameterizedTest(name = "[{index}] {0}")
     @FileFormatSource
-    void testManyMemos(FileFormat fileFormat) throws IOException {
+    void manyMemos(FileFormat fileFormat) throws Exception {
         try (Database db = createDbMem(fileFormat)) {
             final int numColumns = 126;
             TableBuilder bigTableBuilder = new TableBuilder("test");
@@ -162,14 +161,14 @@ class LongValueTest extends AbstractBaseTest {
             Iterator<Object[]> expIter = expectedRows.iterator();
             for (Map<?, ?> row : bigTable) {
                 Object[] expectedRow = expIter.next();
-                assertEquals(Arrays.asList(expectedRow), new ArrayList<>(row.values()));
+                assertThat(new ArrayList<>(row.values())).isEqualTo(Arrays.asList(expectedRow));
             }
         }
     }
 
     @ParameterizedTest(name = "[{index}] {0}")
     @FileFormatSource
-    void testLongValueAsMiddleColumn(FileFormat fileFormat) throws IOException {
+    void longValueAsMiddleColumn(FileFormat fileFormat) throws Exception {
         try (Database db = createDbMem(fileFormat)) {
             Table newTable = new TableBuilder("NewTable")
                 .addColumn(new ColumnBuilder("a").withSqlType(Types.INTEGER))
@@ -183,15 +182,15 @@ class LongValueTest extends AbstractBaseTest {
 
             newTable = db.getTable("NewTable");
             Map<String, Object> readRow = newTable.getNextRow();
-            assertEquals(1, readRow.get("a"));
-            assertEquals(lval, readRow.get("b"));
-            assertEquals(tval, readRow.get("c"));
+            assertThat(readRow.get("a")).isEqualTo(1);
+            assertThat(readRow.get("b")).isEqualTo(lval);
+            assertThat(readRow.get("c")).isEqualTo(tval);
         }
     }
 
     @ParameterizedTest(name = "[{index}] {0}")
     @TestDbReadOnlySource(UNICODE_COMP)
-    void testUnicodeCompression(TestDb testDb) throws IOException {
+    void unicodeCompression(TestDb testDb) throws Exception {
         try (Database db = openDb(FileFormat.V2003, testDb.getFile(), true)) {
             StringBuilder sb = new StringBuilder(127);
             for (int i = 1; i <= 0xFF; i++) {
@@ -213,28 +212,28 @@ class LongValueTest extends AbstractBaseTest {
             for (Row row : t) {
                 int id = (Integer) row.get("ID");
                 String str = (String) row.get("Unicode");
-                assertEquals(expectedStrs[id - 1], str);
+                assertThat(str).isEqualTo(expectedStrs[id - 1]);
             }
 
             ColumnImpl col = (ColumnImpl) t.getColumn("Unicode");
 
             ByteBuffer bb = col.write(longStr, 1000);
 
-            assertEquals(longStr.length() + 2, bb.remaining());
+            assertThat(bb.remaining()).isEqualTo(longStr.length() + 2);
 
             byte[] bytes = new byte[bb.remaining()];
             bb.get(bytes);
-            assertEquals(longStr, col.read(bytes));
+            assertThat(col.read(bytes)).isEqualTo(longStr);
 
             longStr = longStr.replace('a', '\u0440');
 
             bb = col.write(longStr, 1000);
 
-            assertEquals(longStr.length() * 2, bb.remaining());
+            assertThat(bb.remaining()).isEqualTo(longStr.length() * 2);
 
             bytes = new byte[bb.remaining()];
             bb.get(bytes);
-            assertEquals(longStr, col.read(bytes));
+            assertThat(col.read(bytes)).isEqualTo(longStr);
         }
     }
 }

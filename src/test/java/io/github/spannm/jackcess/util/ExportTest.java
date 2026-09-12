@@ -16,6 +16,7 @@ limitations under the License.
 
 package io.github.spannm.jackcess.util;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import io.github.spannm.jackcess.*;
 import io.github.spannm.jackcess.Database.FileFormat;
 import io.github.spannm.jackcess.test.AbstractBaseTest;
@@ -24,10 +25,8 @@ import io.github.spannm.jackcess.test.source.FileFormatSource;
 import org.junit.jupiter.params.ParameterizedTest;
 
 import java.io.BufferedWriter;
-import java.io.IOException;
 import java.io.StringWriter;
 import java.text.DateFormat;
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
@@ -36,7 +35,7 @@ class ExportTest extends AbstractBaseTest {
 
     @ParameterizedTest(name = "[{index}] {0}")
     @FileFormatSource
-    void testExportToFile(FileFormat fileFormat) throws IOException, ParseException {
+    void exportToFile(FileFormat fileFormat) throws Exception {
         DateFormat df = new SimpleDateFormat("yyyyMMdd HH:mm:ss");
         df.setTimeZone(TEST_TZ);
 
@@ -73,7 +72,7 @@ class ExportTest extends AbstractBaseTest {
             + "\"crazy'data\"\"here\",-345,-3.45E-4,61 62 63 64  65 66 67,true," + NL
             + "C:\\temp\\some_file.txt,25,0.0,,false," + NL;
 
-        assertEquals(expected, out.toString());
+        assertThat(out.toString()).isEqualTo(expected);
 
         out = new StringWriter();
 
@@ -88,7 +87,7 @@ class ExportTest extends AbstractBaseTest {
             + "'some text||some more'||13||13.25||'61 62 63 64  65 66 67 68  69 6A 6B 6C  6D 6E 6F 70  71 72 73 74  75 76 77 78\n79 7A 61 62  63 64'||true||" + testDate + NL
             + "'crazy''data\"here'||-345||-3.45E-4||61 62 63 64  65 66 67||true||" + NL
             + "C:\\temp\\some_file.txt||25||0.0||||false||" + NL;
-        assertEquals(expected, out.toString());
+        assertThat(out.toString()).isEqualTo(expected);
 
         ExportFilter oddFilter = new SimpleExportFilter() {
             private int _num;
@@ -113,7 +112,7 @@ class ExportTest extends AbstractBaseTest {
             + "79 7A 61 62  63 64\",true," + testDate + NL
             + "C:\\temp\\some_file.txt,25,0.0,,false," + NL;
 
-        assertEquals(expected, out.toString());
+        assertThat(out.toString()).isEqualTo(expected);
     }
 
 }

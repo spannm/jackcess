@@ -18,6 +18,7 @@ package io.github.spannm.jackcess.impl;
 
 import static io.github.spannm.jackcess.DatabaseBuilder.*;
 import static io.github.spannm.jackcess.test.Basename.EXT_DATE;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import io.github.spannm.jackcess.*;
 import io.github.spannm.jackcess.Database.FileFormat;
@@ -28,7 +29,6 @@ import io.github.spannm.jackcess.test.source.FileFormatSource;
 import io.github.spannm.jackcess.test.source.TestDbSource;
 import org.junit.jupiter.params.ParameterizedTest;
 
-import java.io.IOException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
@@ -39,7 +39,7 @@ class ExtendedDateTest extends AbstractBaseTest {
 
     @ParameterizedTest(name = "[{index}] {0}")
     @TestDbSource(EXT_DATE)
-    void testReadExtendedDate(TestDb testDb) throws Exception {
+    void readExtendedDate(TestDb testDb) throws Exception {
         ZoneId zoneId = ZoneId.of("America/New_York");
         DateTimeFormatter dtfNoTime = DateTimeFormatter.ofPattern("M/d/yyy", Locale.US);
         DateTimeFormatter dtfFull = DateTimeFormatter.ofPattern("M/d/yyy h:mm:ss.SSSSSSS a", Locale.US);
@@ -56,9 +56,9 @@ class ExtendedDateTest extends AbstractBaseTest {
                     String str1 = dtfNoTime.format(ldt);
                     String str2 = dtfFull.format(ldt);
 
-                    assertTrue(str1.equals(str) || str2.equals(str));
+                    assertThat(str1.equals(str) || str2.equals(str)).isTrue();
                 } else {
-                    assertNull(str);
+                    assertThat(str).isNull();
                 }
 
             }
@@ -72,7 +72,7 @@ class ExtendedDateTest extends AbstractBaseTest {
 
     @ParameterizedTest(name = "[{index}] {0}")
     @FileFormatSource
-    void testWriteExtendedDate(FileFormat fileFormat) throws IOException {
+    void writeExtendedDate(FileFormat fileFormat) throws Exception {
         JetFormat format = DatabaseImpl.getFileFormatDetails(fileFormat).getFormat();
 
         if (!format.isSupportedDataType(DataType.EXT_DATE_TIME)) {

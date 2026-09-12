@@ -17,6 +17,7 @@
 package io.github.spannm.jackcess.impl;
 
 import static io.github.spannm.jackcess.DatabaseBuilder.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 import io.github.spannm.jackcess.*;
 import io.github.spannm.jackcess.Database.FileFormat;
@@ -25,7 +26,6 @@ import io.github.spannm.jackcess.test.TestUtil;
 import io.github.spannm.jackcess.test.source.FileFormatSource;
 import org.junit.jupiter.params.ParameterizedTest;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
@@ -35,7 +35,7 @@ class BigIntTest extends AbstractBaseTest {
 
     @ParameterizedTest(name = "[{index}] {0}")
     @FileFormatSource
-    void testBigInt(FileFormat fileFormat) throws IOException {
+    void bigInt(FileFormat fileFormat) throws Exception {
         JetFormat format = DatabaseImpl.getFileFormatDetails(fileFormat)
             .getFormat();
 

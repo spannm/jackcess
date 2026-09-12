@@ -16,6 +16,8 @@
  */
 package io.github.spannm.jackcess.impl;
 
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.assertj.core.api.Assertions.assertThat;
 import io.github.spannm.jackcess.test.AbstractBaseTest;
 import org.junit.jupiter.api.Test;
 
@@ -24,7 +26,7 @@ import java.util.*;
 class TopoSorterTest extends AbstractBaseTest {
 
     @Test
-    void testTopoSort() {
+    void topoSort() {
         doTopoTest(List.of("A", "B", "C"),
             List.of("A", "B", "C"));
 
@@ -34,13 +36,13 @@ class TopoSorterTest extends AbstractBaseTest {
             "A", "B");
 
         IllegalStateException ex1 = assertThrows(IllegalStateException.class, () -> doTopoTest(List.of("B", "A", "C"), List.of("C", "B", "A"), "B", "C", "A", "B", "C", "A"));
-        assertTrue(ex1.getMessage().startsWith("Cycle"));
+        assertThat(ex1.getMessage().startsWith("Cycle")).isTrue();
 
         IllegalStateException ex2 = assertThrows(IllegalStateException.class, () -> doTopoTest(
             List.of("B", "A", "C"),
             List.of("C", "B", "A"),
             "B", "D"));
-        assertTrue(ex2.getMessage().startsWith("Unknown descendent"));
+        assertThat(ex2.getMessage().startsWith("Unknown descendent")).isTrue();
 
         doTopoTest(List.of("B", "D", "A", "C"),
             List.of("D", "A", "B", "C"),
@@ -90,7 +92,7 @@ class TopoSorterTest extends AbstractBaseTest {
 
         tsorter.sort();
 
-        assertEquals(expected, values);
+        assertThat(values).isEqualTo(expected);
 
         values = new ArrayList<>(original);
 
@@ -104,7 +106,7 @@ class TopoSorterTest extends AbstractBaseTest {
         List<String> expectedReverse = new ArrayList<>(expected);
         Collections.reverse(expectedReverse);
 
-        assertEquals(expectedReverse, values);
+        assertThat(values).isEqualTo(expectedReverse);
     }
 
     private static class TestTopoSorter extends TopoSorter<String> {

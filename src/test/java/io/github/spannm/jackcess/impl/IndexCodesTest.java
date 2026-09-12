@@ -18,7 +18,9 @@ package io.github.spannm.jackcess.impl;
 
 import static io.github.spannm.jackcess.test.Basename.EMOTICONS;
 import static io.github.spannm.jackcess.test.Basename.INDEX_CODES;
+import static org.assertj.core.api.Assertions.assertThat;
 
+import org.assertj.core.api.Assertions;
 import io.github.spannm.jackcess.*;
 import io.github.spannm.jackcess.Database.FileFormat;
 import io.github.spannm.jackcess.test.AbstractBaseTest;
@@ -55,7 +57,7 @@ public class IndexCodesTest extends AbstractBaseTest {
 
     @ParameterizedTest(name = "[{index}] {0}")
     @TestDbReadOnlySource({INDEX_CODES, EMOTICONS})
-    void testIndexCodes(TestDb testDb) throws Exception {
+    void indexCodes(TestDb testDb) throws Exception {
         try (Database db = testDb.openMem()) {
             db.setDateTimeType(DateTimeType.DATE);
 
@@ -110,7 +112,7 @@ public class IndexCodesTest extends AbstractBaseTest {
             if (expectedRow.equals(row)) {
                 // verify that the entries are indeed equal
                 Cursor.Position curPos = cursor.getSavepoint().getCurrentPosition();
-                assertEquals(entryToString(expectedPos), entryToString(curPos));
+                assertThat(entryToString(curPos)).isEqualTo(entryToString(expectedPos));
                 return;
             }
         }
@@ -126,7 +128,7 @@ public class IndexCodesTest extends AbstractBaseTest {
             }
         }
 
-        fail("testDB: " + testDB + ": Could not find expected row " + expectedRow + " starting at " + entryToString(startPos));
+        Assertions.fail("testDB: " + testDB + ": Could not find expected row " + expectedRow + " starting at " + entryToString(startPos));
     }
 
     //////
@@ -136,7 +138,7 @@ public class IndexCodesTest extends AbstractBaseTest {
     //////
 
     @Test @Disabled
-    void testCreateIsoFile() throws IOException {
+    void createIsoFile() throws Exception {
         try (Database db = createDbMem(FileFormat.V2000, true)) {
             Table t = new TableBuilder("test").addColumn(new ColumnBuilder("row", DataType.TEXT)).addColumn(new ColumnBuilder("data", DataType.TEXT)).toTable(db);
 
@@ -148,7 +150,7 @@ public class IndexCodesTest extends AbstractBaseTest {
     }
 
     @Test @Disabled
-    void testCreateAltIsoFile() throws IOException {
+    void createAltIsoFile() throws Exception {
         try (Database db = TestUtil.openCopy(FileFormat.V2000, new File("/tmp/test_ind.mdb"), true)) {
             Table t = db.getTable("Table1");
 
@@ -161,7 +163,7 @@ public class IndexCodesTest extends AbstractBaseTest {
 
     @SuppressWarnings("unused")
     @Test @Disabled
-    void testWriteAllCodesMdb() throws IOException {
+    void writeAllCodesMdb() throws Exception {
         try (Database db = createDbMem(FileFormat.V2000, true)) {
             Table t = new TableBuilder("Table5").addColumn(new ColumnBuilder("name", DataType.TEXT)).addColumn(new ColumnBuilder("data", DataType.TEXT)).toTable(db);
 
@@ -225,7 +227,7 @@ public class IndexCodesTest extends AbstractBaseTest {
 
     @Test
     @Disabled
-    void testReadAllCodesMdb() throws Exception {
+    void readAllCodesMdb() throws Exception {
         try (Database db = TestUtil.openCopy(FileFormat.V2000, new File("/data2/jackcess_test/testStillMoreCodes.mdb"))) {
             Table t = db.getTable("Table5");
 
@@ -270,7 +272,7 @@ public class IndexCodesTest extends AbstractBaseTest {
 
     @Test
     @Disabled
-    void testReadIsoMdb() throws IOException {
+    void readIsoMdb() throws Exception {
         try (Database db = TestUtil.openDb(FileFormat.V2000, new File("/tmp/test_ind3.mdb"))) {
             Table t = db.getTable("Table1");
             Index index = t.getIndex("B");
@@ -288,7 +290,7 @@ public class IndexCodesTest extends AbstractBaseTest {
     }
 
     @Test @Disabled
-    void testReverseIsoMdb2010() throws Exception {
+    void reverseIsoMdb2010() throws Exception {
         try (Database db = TestUtil.openDb(FileFormat.V2010, new File("/data2/jackcess_test/testAllIndexCodes3_2010.accdb"))) {
             Table t = db.getTable("Table1");
             Index index = t.getIndexes().iterator().next();
@@ -455,7 +457,7 @@ public class IndexCodesTest extends AbstractBaseTest {
     }
 
     @Test @Disabled
-    void testReverseIsoMdb() throws Exception {
+    void reverseIsoMdb() throws Exception {
         try (Database db = TestUtil.openDb(FileFormat.V2000, new File("/data2/jackcess_test/testAllIndexCodes3.mdb"))) {
             Table t = db.getTable("Table1");
             Index index = t.getIndexes().iterator().next();

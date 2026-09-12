@@ -15,6 +15,8 @@
  */
 package io.github.spannm.jackcess;
 
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.assertj.core.api.Assertions.assertThat;
 import io.github.spannm.jackcess.Database.FileFormat;
 import io.github.spannm.jackcess.Relationship.JoinType;
 import io.github.spannm.jackcess.impl.JetFormat;
@@ -24,7 +26,6 @@ import io.github.spannm.jackcess.test.TestUtil;
 import org.junit.jupiter.api.Test;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
@@ -35,76 +36,76 @@ import java.util.Set;
 class BuilderTest extends AbstractBaseTest {
 
     @Test
-    void testTableBuilderEscaping() {
+    void tableBuilderEscaping() {
         TableBuilder tb = new TableBuilder("Table", true);
-        assertEquals("xTable", tb.getName());
+        assertThat(tb.getName()).isEqualTo("xTable");
         tb.addColumn(new ColumnBuilder("value", DataType.TEXT));
-        assertEquals("xvalue", tb.getColumns().get(0).getName());
+        assertThat(tb.getColumns().get(0).getName()).isEqualTo("xvalue");
 
         tb.addIndex(new IndexBuilder("index").withColumns("value"));
-        assertEquals("xindex", tb.getIndexes().get(0).getName());
-        assertEquals("xvalue", tb.getIndexes().get(0).getColumns().get(0).getName());
+        assertThat(tb.getIndexes().get(0).getName()).isEqualTo("xindex");
+        assertThat(tb.getIndexes().get(0).getColumns().get(0).getName()).isEqualTo("xvalue");
 
         TableBuilder tb2 = new TableBuilder("Table").escapeName();
-        assertEquals("xTable", tb2.getName());
-        assertTrue(TableBuilder.isReservedWord("select"));
-        assertFalse(TableBuilder.isReservedWord("notareservedword"));
+        assertThat(tb2.getName()).isEqualTo("xTable");
+        assertThat(TableBuilder.isReservedWord("select")).isTrue();
+        assertThat(TableBuilder.isReservedWord("notareservedword")).isFalse();
     }
 
     @Test
-    void testTableBuilderCollections() {
+    void tableBuilderCollections() {
         TableBuilder tb = new TableBuilder("t")
             .withEscapeIdentifiers(false)
             .addColumns(null)
             .addColumns(List.of(new ColumnBuilder("a", DataType.LONG), new ColumnBuilder("b", DataType.TEXT)))
             .addIndexes(null)
             .addIndexes(List.of(new IndexBuilder("idx").withColumns("a")));
-        assertEquals(2, tb.getColumns().size());
-        assertEquals(1, tb.getIndexes().size());
+        assertThat(tb.getColumns().size()).isEqualTo(2);
+        assertThat(tb.getIndexes().size()).isEqualTo(1);
 
-        assertNull(tb.getProperties());
+        assertThat(tb.getProperties()).isNull();
         tb.putProperty("p1", "v1").putProperty("p2", DataType.LONG, 7);
-        assertEquals("v1", tb.getProperties().get("p1").getValue());
-        assertEquals(7, tb.getProperties().get("p2").getValue());
+        assertThat(tb.getProperties().get("p1").getValue()).isEqualTo("v1");
+        assertThat(tb.getProperties().get("p2").getValue()).isEqualTo(7);
 
         String str = tb.toString();
-        assertTrue(str.startsWith("TableBuilder["));
-        assertTrue(str.contains("name=t"));
+        assertThat(str.startsWith("TableBuilder[")).isTrue();
+        assertThat(str.contains("name=t")).isTrue();
     }
 
     @Test
-    void testIndexBuilder() {
+    void indexBuilder() {
         IndexBuilder ib = new IndexBuilder("idx");
-        assertFalse(ib.isUnique());
-        assertFalse(ib.isIgnoreNulls());
-        assertFalse(ib.isPrimaryKey());
+        assertThat(ib.isUnique()).isFalse();
+        assertThat(ib.isIgnoreNulls()).isFalse();
+        assertThat(ib.isPrimaryKey()).isFalse();
 
         ib.withName("idx2").withColumns("a", "b").withIgnoreNulls().withUnique();
-        assertEquals("idx2", ib.getName());
-        assertTrue(ib.isUnique());
-        assertTrue(ib.isIgnoreNulls());
-        assertEquals(2, ib.getColumns().size());
-        assertTrue(ib.getColumns().get(0).isAscending());
+        assertThat(ib.getName()).isEqualTo("idx2");
+        assertThat(ib.isUnique()).isTrue();
+        assertThat(ib.isIgnoreNulls()).isTrue();
+        assertThat(ib.getColumns().size()).isEqualTo(2);
+        assertThat(ib.getColumns().get(0).isAscending()).isTrue();
 
         IndexBuilder.Column col = ib.getColumns().get(0);
-        assertEquals("a", col.getName());
+        assertThat(col.getName()).isEqualTo("a");
         col.withName("a2");
-        assertEquals("a2", col.getName());
+        assertThat(col.getName()).isEqualTo("a2");
 
         IndexBuilder desc = new IndexBuilder("d").withColumns(false, "x");
-        assertFalse(desc.getColumns().get(0).isAscending());
+        assertThat(desc.getColumns().get(0).isAscending()).isFalse();
 
-        assertEquals(0, new IndexBuilder("n").withColumns((String[]) null).getColumns().size());
-        assertEquals(1, new IndexBuilder("n").withColumns(List.of("q")).getColumns().size());
+        assertThat(new IndexBuilder("n").withColumns((String[]) null).getColumns().size()).isEqualTo(0);
+        assertThat(new IndexBuilder("n").withColumns(List.of("q")).getColumns().size()).isEqualTo(1);
 
         IndexBuilder pk = new IndexBuilder(IndexBuilder.PRIMARY_KEY_NAME).withColumns("a").withPrimaryKey();
-        assertTrue(pk.isPrimaryKey());
+        assertThat(pk.isPrimaryKey()).isTrue();
         pk.setIndexNumber(4);
-        assertEquals(4, pk.getIndexNumber());
+        assertThat(pk.getIndexNumber()).isEqualTo(4);
     }
 
     @Test
-    void testIndexBuilderValidate() {
+    void indexBuilderValidate() {
         JetFormat fmt = JetFormat.VERSION_4;
         Set<String> colNames = Set.of("A", "B");
 
@@ -126,55 +127,55 @@ class BuilderTest extends AbstractBaseTest {
     }
 
     @Test
-    void testRelationshipBuilder() throws IOException {
+    void relationshipBuilder() throws Exception {
         RelationshipBuilder rb = new RelationshipBuilder("from", "to")
             .withName("rel")
             .withCascadeDeletes()
             .withCascadeUpdates()
             .withCascadeNullOnDelete()
             .withReferentialIntegrity();
-        assertTrue(rb.hasReferentialIntegrity());
-        assertEquals("rel", rb.getName());
-        assertEquals("from", rb.getFromTable());
-        assertEquals("to", rb.getToTable());
-        assertNotEquals(0, rb.getFlags() & RelationshipImpl.CASCADE_UPDATES_FLAG);
-        assertNotEquals(0, rb.getFlags() & RelationshipImpl.CASCADE_NULL_FLAG);
+        assertThat(rb.hasReferentialIntegrity()).isTrue();
+        assertThat(rb.getName()).isEqualTo("rel");
+        assertThat(rb.getFromTable()).isEqualTo("from");
+        assertThat(rb.getToTable()).isEqualTo("to");
+        assertThat(rb.getFlags() & RelationshipImpl.CASCADE_UPDATES_FLAG).isNotEqualTo(0);
+        assertThat(rb.getFlags() & RelationshipImpl.CASCADE_NULL_FLAG).isNotEqualTo(0);
 
         rb.withJoinType(JoinType.LEFT_OUTER);
-        assertNotEquals(0, rb.getFlags() & RelationshipImpl.LEFT_OUTER_JOIN_FLAG);
+        assertThat(rb.getFlags() & RelationshipImpl.LEFT_OUTER_JOIN_FLAG).isNotEqualTo(0);
         rb.withJoinType(JoinType.RIGHT_OUTER);
-        assertNotEquals(0, rb.getFlags() & RelationshipImpl.RIGHT_OUTER_JOIN_FLAG);
-        assertEquals(0, rb.getFlags() & RelationshipImpl.LEFT_OUTER_JOIN_FLAG);
+        assertThat(rb.getFlags() & RelationshipImpl.RIGHT_OUTER_JOIN_FLAG).isNotEqualTo(0);
+        assertThat(rb.getFlags() & RelationshipImpl.LEFT_OUTER_JOIN_FLAG).isEqualTo(0);
         rb.withJoinType(JoinType.INNER);
-        assertEquals(0, rb.getFlags() & RelationshipImpl.RIGHT_OUTER_JOIN_FLAG);
+        assertThat(rb.getFlags() & RelationshipImpl.RIGHT_OUTER_JOIN_FLAG).isEqualTo(0);
 
         try (Database db = createDbMem(FileFormat.V2000)) {
             TestUtil.createTestTable(db);
             Table table = db.getTable("test");
             Column col = table.getColumns().iterator().next();
             RelationshipBuilder rb2 = new RelationshipBuilder(table, table).addColumns(col, col);
-            assertEquals(table.getName(), rb2.getFromTable());
-            assertEquals(List.of(col.getName()), rb2.getFromColumns());
-            assertEquals(List.of(col.getName()), rb2.getToColumns());
+            assertThat(rb2.getFromTable()).isEqualTo(table.getName());
+            assertThat(rb2.getFromColumns()).isEqualTo(List.of(col.getName()));
+            assertThat(rb2.getToColumns()).isEqualTo(List.of(col.getName()));
         }
     }
 
     @Test
-    void testDatabaseBuilderConvenience() {
-        assertNotNull(DatabaseBuilder.newDatabase());
-        assertNotNull(DatabaseBuilder.newDatabase(new File("x.mdb").toPath()));
-        assertNotNull(DatabaseBuilder.newDatabase(new File("x.mdb")));
-        assertEquals("t", DatabaseBuilder.newTable("t").getName());
-        assertEquals("xvalue", DatabaseBuilder.newTable("value", true).getName());
-        assertEquals("c", DatabaseBuilder.newColumn("c").getName());
-        assertEquals(DataType.LONG, DatabaseBuilder.newColumn("c", DataType.LONG).getType());
-        assertEquals("i", DatabaseBuilder.newIndex("i").getName());
-        assertTrue(DatabaseBuilder.newPrimaryKey("a").isPrimaryKey());
-        assertNotNull(DatabaseBuilder.newRelationship("a", "b"));
+    void databaseBuilderConvenience() {
+        assertThat(DatabaseBuilder.newDatabase()).isNotNull();
+        assertThat(DatabaseBuilder.newDatabase(new File("x.mdb").toPath())).isNotNull();
+        assertThat(DatabaseBuilder.newDatabase(new File("x.mdb"))).isNotNull();
+        assertThat(DatabaseBuilder.newTable("t").getName()).isEqualTo("t");
+        assertThat(DatabaseBuilder.newTable("value", true).getName()).isEqualTo("xvalue");
+        assertThat(DatabaseBuilder.newColumn("c").getName()).isEqualTo("c");
+        assertThat(DatabaseBuilder.newColumn("c", DataType.LONG).getType()).isEqualTo(DataType.LONG);
+        assertThat(DatabaseBuilder.newIndex("i").getName()).isEqualTo("i");
+        assertThat(DatabaseBuilder.newPrimaryKey("a").isPrimaryKey()).isTrue();
+        assertThat(DatabaseBuilder.newRelationship("a", "b")).isNotNull();
     }
 
     @Test
-    void testDatabaseBuilderProperties() throws IOException {
+    void databaseBuilderProperties() throws Exception {
         File file = TestUtil.createTempFile(getShortTestMethodName(), Database.FILE_EXT_MDB, false);
         try (Database db = new DatabaseBuilder()
             .withFile(file)
@@ -186,24 +187,24 @@ class BuilderTest extends AbstractBaseTest {
             .putUserDefinedProperty("userProp", DataType.TEXT, "userVal")
             .create()) {
 
-            assertEquals("dbVal", db.getDatabaseProperties().getValue("dbProp"));
-            assertEquals("myTitle", db.getSummaryProperties().getValue(PropertyMap.TITLE_PROP));
-            assertEquals("userVal", db.getUserDefinedProperties().getValue("userProp"));
+            assertThat(db.getDatabaseProperties().getValue("dbProp")).isEqualTo("dbVal");
+            assertThat(db.getSummaryProperties().getValue(PropertyMap.TITLE_PROP)).isEqualTo("myTitle");
+            assertThat(db.getUserDefinedProperties().getValue("userProp")).isEqualTo("userVal");
         }
 
         try (Database db = DatabaseBuilder.open(file.toPath())) {
-            assertEquals("dbVal", db.getDatabaseProperties().getValue("dbProp"));
+            assertThat(db.getDatabaseProperties().getValue("dbProp")).isEqualTo("dbVal");
         }
         try (Database db = DatabaseBuilder.open(file)) {
-            assertNotNull(db.getFile());
+            assertThat(db.getFile()).isNotNull();
         }
     }
 
     @Test
-    void testDatabaseBuilderCreateStatic() throws IOException {
+    void databaseBuilderCreateStatic() throws Exception {
         File file = TestUtil.createTempFile(getShortTestMethodName(), Database.FILE_EXT_MDB, false);
         try (Database db = DatabaseBuilder.create(FileFormat.V2000, file)) {
-            assertTrue(Arrays.asList(FileFormat.values()).contains(db.getFileFormat()));
+            assertThat(Arrays.asList(FileFormat.values()).contains(db.getFileFormat())).isTrue();
         }
     }
 

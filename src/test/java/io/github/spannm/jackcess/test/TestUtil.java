@@ -15,8 +15,9 @@
  */
 package io.github.spannm.jackcess.test;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
 
+import org.assertj.core.api.Assertions;
 import io.github.spannm.jackcess.*;
 import io.github.spannm.jackcess.Database.FileFormat;
 import io.github.spannm.jackcess.complex.ComplexValueForeignKey;
@@ -95,8 +96,8 @@ public final class TestUtil {
             .withCharset(charset)
             .open();
         if (fileFormat != null) {
-            assertEquals(DatabaseImpl.getFileFormatDetails(fileFormat).getFormat(), ((DatabaseImpl) db).getFormat(), "Wrong JetFormat");
-            assertEquals(fileFormat, db.getFileFormat(), "Wrong file format");
+            assertThat(((DatabaseImpl) db).getFormat()).as("Wrong JetFormat").isEqualTo(DatabaseImpl.getFileFormatDetails(fileFormat).getFormat());
+            assertThat(db.getFileFormat()).as("Wrong file format").isEqualTo(fileFormat);
         }
         return db;
     }
@@ -146,8 +147,8 @@ public final class TestUtil {
     }
 
     public static void assertRowCount(int expectedRowCount, Table table) throws IOException {
-        assertEquals(expectedRowCount, countRows(table));
-        assertEquals(expectedRowCount, table.getRowCount());
+        assertThat(countRows(table)).isEqualTo(expectedRowCount);
+        assertThat(table.getRowCount()).isEqualTo(expectedRowCount);
     }
 
     public static int countRows(Table table) throws IOException {
@@ -164,9 +165,9 @@ public final class TestUtil {
         for (Map<String, Object> row : cursor) {
             foundTable.add(row);
         }
-        assertEquals(expectedTable.size(), foundTable.size());
+        assertThat(foundTable.size()).isEqualTo(expectedTable.size());
         for (int i = 0; i < expectedTable.size(); i++) {
-            assertEquals(expectedTable.get(i), foundTable.get(i));
+            assertThat(foundTable.get(i)).isEqualTo(expectedTable.get(i));
         }
     }
 
@@ -273,66 +274,65 @@ public final class TestUtil {
         if (expected == found) {
             return;
         } else if (expected == null || found == null) {
-            fail("Expected " + expected + ", found " + found);
+            Assertions.fail("Expected " + expected + ", found " + found);
         }
         long expTime = expected.getTime();
         long foundTime = found.getTime();
         // there are some rounding issues due to dates being stored as doubles,
         // but it results in a 1 millisecond difference, so i'm not going to worry
         // about it
-        assertFalse(expTime != foundTime && Math.abs(expTime - foundTime) > 1,
-            "Expected " + expTime + " (" + expected + "), found " + foundTime + " (" + found + ")");
+        assertThat(expTime != foundTime && Math.abs(expTime - foundTime) > 1).as("Expected " + expTime + " (" + expected + "), found " + foundTime + " (" + found + ")").isFalse();
     }
 
     public static void assertSameDate(Date expected, LocalDateTime found) {
         if (expected == null && found == null) {
             return;
         }
-        assertFalse(expected == null || found == null, "Expected " + expected + ", found " + found);
+        assertThat(expected == null || found == null).as("Expected " + expected + ", found " + found).isFalse();
 
         LocalDateTime expectedLdt = LocalDateTime.ofInstant(
             Instant.ofEpochMilli(expected.getTime()),
             ZoneId.systemDefault());
 
-        assertEquals(expectedLdt, found);
+        assertThat(found).isEqualTo(expectedLdt);
     }
 
     public static void checkTestDBTable1RowABCDEFG(TestDb testDB, Table table, Row row) {
-        assertEquals("abcdefg", row.get("A"), "testDB: " + testDB + "; table: " + table);
-        assertEquals("hijklmnop", row.get("B"));
-        assertEquals((byte) 2, row.get("C"));
-        assertEquals((short) 222, row.get("D"));
-        assertEquals(333333333, row.get("E"));
-        assertEquals(444.555d, row.get("F"));
+        assertThat(row.get("A")).as("testDB: " + testDB + "; table: " + table).isEqualTo("abcdefg");
+        assertThat(row.get("B")).isEqualTo("hijklmnop");
+        assertThat(row.get("C")).isEqualTo((byte) 2);
+        assertThat(row.get("D")).isEqualTo((short) 222);
+        assertThat(row.get("E")).isEqualTo(333333333);
+        assertThat(row.get("F")).isEqualTo(444.555d);
         Calendar cal = Calendar.getInstance();
         cal.setTime(row.getDate("G"));
-        assertEquals(Calendar.SEPTEMBER, cal.get(Calendar.MONTH));
-        assertEquals(21, cal.get(Calendar.DAY_OF_MONTH));
-        assertEquals(1974, cal.get(Calendar.YEAR));
-        assertEquals(0, cal.get(Calendar.HOUR_OF_DAY));
-        assertEquals(0, cal.get(Calendar.MINUTE));
-        assertEquals(0, cal.get(Calendar.SECOND));
-        assertEquals(0, cal.get(Calendar.MILLISECOND));
-        assertEquals(Boolean.TRUE, row.get("I"));
+        assertThat(cal.get(Calendar.MONTH)).isEqualTo(Calendar.SEPTEMBER);
+        assertThat(cal.get(Calendar.DAY_OF_MONTH)).isEqualTo(21);
+        assertThat(cal.get(Calendar.YEAR)).isEqualTo(1974);
+        assertThat(cal.get(Calendar.HOUR_OF_DAY)).isEqualTo(0);
+        assertThat(cal.get(Calendar.MINUTE)).isEqualTo(0);
+        assertThat(cal.get(Calendar.SECOND)).isEqualTo(0);
+        assertThat(cal.get(Calendar.MILLISECOND)).isEqualTo(0);
+        assertThat(row.get("I")).isEqualTo(Boolean.TRUE);
     }
 
     public static void checkTestDBTable1RowA(TestDb testDB, Table table, Row row) {
-        assertEquals("a", row.get("A"), "testDB: " + testDB + "; table: " + table);
-        assertEquals("b", row.get("B"));
-        assertEquals((byte) 0, row.get("C"));
-        assertEquals((short) 0, row.get("D"));
-        assertEquals(0, row.get("E"));
-        assertEquals(0d, row.get("F"));
+        assertThat(row.get("A")).as("testDB: " + testDB + "; table: " + table).isEqualTo("a");
+        assertThat(row.get("B")).isEqualTo("b");
+        assertThat(row.get("C")).isEqualTo((byte) 0);
+        assertThat(row.get("D")).isEqualTo((short) 0);
+        assertThat(row.get("E")).isEqualTo(0);
+        assertThat(row.get("F")).isEqualTo(0d);
         Calendar cal = Calendar.getInstance();
         cal.setTime(row.getDate("G"));
-        assertEquals(Calendar.DECEMBER, cal.get(Calendar.MONTH));
-        assertEquals(12, cal.get(Calendar.DAY_OF_MONTH));
-        assertEquals(1981, cal.get(Calendar.YEAR));
-        assertEquals(0, cal.get(Calendar.HOUR_OF_DAY));
-        assertEquals(0, cal.get(Calendar.MINUTE));
-        assertEquals(0, cal.get(Calendar.SECOND));
-        assertEquals(0, cal.get(Calendar.MILLISECOND));
-        assertEquals(Boolean.FALSE, row.get("I"));
+        assertThat(cal.get(Calendar.MONTH)).isEqualTo(Calendar.DECEMBER);
+        assertThat(cal.get(Calendar.DAY_OF_MONTH)).isEqualTo(12);
+        assertThat(cal.get(Calendar.YEAR)).isEqualTo(1981);
+        assertThat(cal.get(Calendar.HOUR_OF_DAY)).isEqualTo(0);
+        assertThat(cal.get(Calendar.MINUTE)).isEqualTo(0);
+        assertThat(cal.get(Calendar.SECOND)).isEqualTo(0);
+        assertThat(cal.get(Calendar.MILLISECOND)).isEqualTo(0);
+        assertThat(row.get("I")).isEqualTo(Boolean.FALSE);
     }
 
     /**

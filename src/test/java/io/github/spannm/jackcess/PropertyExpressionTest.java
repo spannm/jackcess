@@ -19,6 +19,8 @@ package io.github.spannm.jackcess;
 import static io.github.spannm.jackcess.DatabaseBuilder.newColumn;
 import static io.github.spannm.jackcess.DatabaseBuilder.newTable;
 import static io.github.spannm.jackcess.test.TestUtil.*;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import io.github.spannm.jackcess.Database.FileFormat;
 import io.github.spannm.jackcess.expr.*;
@@ -42,7 +44,7 @@ class PropertyExpressionTest extends AbstractBaseTest {
 
     @ParameterizedTest(name = "[{index}] {0}")
     @FileFormatSource
-    void testDefaultValue(FileFormat fileFormat) throws IOException {
+    void defaultValue(FileFormat fileFormat) throws Exception {
         try (Database db = createDbMem(fileFormat)) {
             db.setEvaluateExpressions(true);
 
@@ -103,7 +105,7 @@ class PropertyExpressionTest extends AbstractBaseTest {
     }
 
     @Test
-    void testCalculatedValue() throws IOException {
+    void calculatedValue() throws Exception {
         try (Database db = createDbMem(FileFormat.V2016)) {
             db.setEvaluateExpressions(true);
 
@@ -147,7 +149,7 @@ class PropertyExpressionTest extends AbstractBaseTest {
 
     @ParameterizedTest(name = "[{index}] {0}")
     @FileFormatSource
-    void testColumnValidator(FileFormat fileFormat) throws IOException {
+    void columnValidator(FileFormat fileFormat) throws Exception {
         try (Database db = createDbMem(fileFormat)) {
             db.setEvaluateExpressions(true);
 
@@ -176,7 +178,7 @@ class PropertyExpressionTest extends AbstractBaseTest {
             setProp(t, "data2", PropertyMap.VALIDATION_TEXT_PROP, "Too big");
 
             InvalidValueException ex = assertThrows(InvalidValueException.class, () -> t.addRow(Column.AUTO_NUMBER, 42, 200));
-            assertTrue(ex.getMessage().contains("Too big"));
+            assertThat(ex.getMessage().contains("Too big")).isTrue();
 
             t.addRow(Column.AUTO_NUMBER, 1, 9);
 
@@ -201,7 +203,7 @@ class PropertyExpressionTest extends AbstractBaseTest {
 
     @ParameterizedTest(name = "[{index}] {0}")
     @FileFormatSource
-    void testRowValidator(FileFormat fileFormat) throws IOException {
+    void rowValidator(FileFormat fileFormat) throws Exception {
         try (Database db = createDbMem(fileFormat)) {
             db.setEvaluateExpressions(true);
 
@@ -249,7 +251,7 @@ class PropertyExpressionTest extends AbstractBaseTest {
 
     @ParameterizedTest(name = "[{index}] {0}")
     @FileFormatSource
-    void testCustomEvalConfig(FileFormat fileFormat) throws IOException {
+    void customEvalConfig(FileFormat fileFormat) throws Exception {
         TemporalConfig tempConf = new TemporalConfig("[uuuu/]M/d",
             "uuuu-MMM-d",
             "hh.mm.ss a",
@@ -291,12 +293,12 @@ class PropertyExpressionTest extends AbstractBaseTest {
 
             Row row = t.iterator().next();
 
-            assertEquals(1, row.get("id"));
-            assertEquals("FOO_someVal", row.get("data1"));
-            assertTrue(((String) row.get("data2"))
-                .matches("\\d{4}/\\d{1,2}/\\d{1,2}"));
-            assertTrue(((String) row.get("data3"))
-                .matches("\\d{2}.\\d{2}.\\d{2} (AM|PM)"));
+            assertThat(row.get("id")).isEqualTo(1);
+            assertThat(row.get("data1")).isEqualTo("FOO_someVal");
+            assertThat(((String) row.get("data2"))
+                    .matches("\\d{4}/\\d{1,2}/\\d{1,2}")).isTrue();
+            assertThat(((String) row.get("data3"))
+                    .matches("\\d{2}.\\d{2}.\\d{2} (AM|PM)")).isTrue();
         }
     }
 

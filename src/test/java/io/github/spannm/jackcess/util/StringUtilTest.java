@@ -15,72 +15,73 @@
  */
 package io.github.spannm.jackcess.util;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import io.github.spannm.jackcess.test.AbstractBaseTest;
 import org.junit.jupiter.api.Test;
 
-public class StringUtilTest extends AbstractBaseTest {
+class StringUtilTest extends AbstractBaseTest {
 
     @Test
-    void testLength() {
-        assertEquals(0, StringUtil.length(null));
-        assertEquals(0, StringUtil.length(""));
-        assertEquals(1, StringUtil.length("A"));
-        assertEquals(1, StringUtil.length(" "));
-        assertEquals(4, StringUtil.length("sman"));
+    void length() {
+        assertThat(StringUtil.length(null)).isEqualTo(0);
+        assertThat(StringUtil.length("")).isEqualTo(0);
+        assertThat(StringUtil.length("A")).isEqualTo(1);
+        assertThat(StringUtil.length(" ")).isEqualTo(1);
+        assertThat(StringUtil.length("sman")).isEqualTo(4);
     }
 
     @Test
-    void testIsEmpty() {
-        assertTrue(StringUtil.isEmpty(null));
-        assertTrue(StringUtil.isEmpty(""));
-        assertFalse(StringUtil.isEmpty(" "));
-        assertFalse(StringUtil.isEmpty("not Empty"));
+    void isEmpty() {
+        assertThat(StringUtil.isEmpty(null)).isTrue();
+        assertThat(StringUtil.isEmpty("")).isTrue();
+        assertThat(StringUtil.isEmpty(" ")).isFalse();
+        assertThat(StringUtil.isEmpty("not Empty")).isFalse();
     }
 
     @Test
-    void testIsBlank() {
-        assertTrue(StringUtil.isBlank(null));
-        assertTrue(StringUtil.isBlank(""));
-        assertTrue(StringUtil.isBlank("   "));
-        assertTrue(StringUtil.isBlank(System.lineSeparator()));
+    void isBlank() {
+        assertThat(StringUtil.isBlank(null)).isTrue();
+        assertThat(StringUtil.isBlank("")).isTrue();
+        assertThat(StringUtil.isBlank("   ")).isTrue();
+        assertThat(StringUtil.isBlank(System.lineSeparator())).isTrue();
     }
 
     @Test
-    void testTrimToNull() {
-        assertNull(StringUtil.trimToNull(null));
-        assertNull(StringUtil.trimToNull(""));
-        assertNull(StringUtil.trimToNull("   "));
-        assertEquals("sman", StringUtil.trimToNull("sman"));
-        assertEquals("81", StringUtil.trimToNull(" 81 "));
+    void trimToNull() {
+        assertThat(StringUtil.trimToNull(null)).isNull();
+        assertThat(StringUtil.trimToNull("")).isNull();
+        assertThat(StringUtil.trimToNull("   ")).isNull();
+        assertThat(StringUtil.trimToNull("sman")).isEqualTo("sman");
+        assertThat(StringUtil.trimToNull(" 81 ")).isEqualTo("81");
     }
 
     @Test
-    void testCapitalize() {
-        assertNull(StringUtil.capitalize(null));
-        assertEquals("", StringUtil.capitalize(""));
-        assertEquals("Hello", StringUtil.capitalize("hello"));
-        assertEquals("Foo bar", StringUtil.capitalize("foo bar"));
-        assertEquals("Boo far", StringUtil.capitalize("Boo far"));
+    void capitalize() {
+        assertThat(StringUtil.capitalize(null)).isNull();
+        assertThat(StringUtil.capitalize("")).isEqualTo("");
+        assertThat(StringUtil.capitalize("hello")).isEqualTo("Hello");
+        assertThat(StringUtil.capitalize("foo bar")).isEqualTo("Foo bar");
+        assertThat(StringUtil.capitalize("Boo far")).isEqualTo("Boo far");
     }
 
     @Test
-    void testReplace() {
-        assertNull(StringUtil.replace(null, null, null));
-        assertEquals(" ", StringUtil.replace(" ", " ", " "));
-        assertEquals("text", StringUtil.replace("text", "", "newText"));
-        assertEquals(" txt txt ", StringUtil.replace(" text text ", "text", "txt"));
+    void replace() {
+        assertThat(StringUtil.replace(null, null, null)).isNull();
+        assertThat(StringUtil.replace(" ", " ", " ")).isEqualTo(" ");
+        assertThat(StringUtil.replace("text", "", "newText")).isEqualTo("text");
+        assertThat(StringUtil.replace(" text text ", "text", "txt")).isEqualTo(" txt txt ");
     }
 
     @Test
-    void testRemove() {
-        assertNull(StringUtil.remove(null, null));
-        assertNull(StringUtil.remove(null, ""));
-        assertNull(StringUtil.remove(null, "remove"));
-        assertEquals("", StringUtil.remove("", "remove"));
-        assertEquals("input", StringUtil.remove("input", "remove"));
-        assertEquals("Removed", StringUtil.remove("Removed", "remove"));
-        assertEquals("", StringUtil.remove("remove", "remove"));
-        assertEquals("long", StringUtil.remove("long", "longer"));
+    void remove() {
+        assertThat(StringUtil.remove(null, null)).isNull();
+        assertThat(StringUtil.remove(null, "")).isNull();
+        assertThat(StringUtil.remove(null, "remove")).isNull();
+        assertThat(StringUtil.remove("", "remove")).isEqualTo("");
+        assertThat(StringUtil.remove("input", "remove")).isEqualTo("input");
+        assertThat(StringUtil.remove("Removed", "remove")).isEqualTo("Removed");
+        assertThat(StringUtil.remove("remove", "remove")).isEqualTo("");
+        assertThat(StringUtil.remove("long", "longer")).isEqualTo("long");
     }
 
 }

@@ -15,6 +15,7 @@
  */
 package io.github.spannm.jackcess;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import io.github.spannm.jackcess.PropertyMap.EnumValue;
 import io.github.spannm.jackcess.test.AbstractBaseTest;
 import org.junit.jupiter.api.Test;
@@ -27,7 +28,7 @@ import java.util.List;
 class PropertyMapEnumTest extends AbstractBaseTest {
 
     @Test
-    void testEnumValues() {
+    void enumValues() {
         List<EnumValue[]> allValues = List.of(
             PropertyMap.DisplayControl.values(),
             PropertyMap.TextFormat.values(),
@@ -35,23 +36,23 @@ class PropertyMapEnumTest extends AbstractBaseTest {
             PropertyMap.IMESentenceMode.values());
 
         for (EnumValue[] values : allValues) {
-            assertTrue(values.length > 0);
+            assertThat(values.length > 0).isTrue();
             for (EnumValue ev : values) {
-                assertNotNull(ev.getValue());
+                assertThat(ev.getValue()).isNotNull();
                 String name = ((Enum<?>) ev).name();
-                assertEquals(name + "[" + ev.getValue() + "]", ev.toString());
+                assertThat(ev.toString()).isEqualTo(name + "[" + ev.getValue() + "]");
             }
         }
     }
 
     @Test
-    void testSpecificEnumValues() {
-        assertEquals(Byte.valueOf((byte) 1), PropertyMap.TextFormat.HTMLRICHTEXT.getValue());
-        assertEquals(Byte.valueOf((byte) 0), PropertyMap.TextFormat.PLAIN.getValue());
-        assertEquals(Byte.valueOf((byte) 0), PropertyMap.IMEMode.NOCONTROL.getValue());
-        assertEquals(Byte.valueOf((byte) 10), PropertyMap.IMEMode.HANGUL.getValue());
-        assertEquals(Byte.valueOf((byte) 3), PropertyMap.IMESentenceMode.NONE.getValue());
-        assertEquals(Short.valueOf((short) 101), PropertyMap.DisplayControl.RECTANGLE.getValue());
+    void specificEnumValues() {
+        assertThat(PropertyMap.TextFormat.HTMLRICHTEXT.getValue()).isEqualTo(Byte.valueOf((byte) 1));
+        assertThat(PropertyMap.TextFormat.PLAIN.getValue()).isEqualTo(Byte.valueOf((byte) 0));
+        assertThat(PropertyMap.IMEMode.NOCONTROL.getValue()).isEqualTo(Byte.valueOf((byte) 0));
+        assertThat(PropertyMap.IMEMode.HANGUL.getValue()).isEqualTo(Byte.valueOf((byte) 10));
+        assertThat(PropertyMap.IMESentenceMode.NONE.getValue()).isEqualTo(Byte.valueOf((byte) 3));
+        assertThat(PropertyMap.DisplayControl.RECTANGLE.getValue()).isEqualTo(Short.valueOf((short) 101));
     }
 
 }

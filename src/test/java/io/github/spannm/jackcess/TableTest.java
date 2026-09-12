@@ -16,6 +16,7 @@ limitations under the License.
 
 package io.github.spannm.jackcess;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import io.github.spannm.jackcess.impl.ColumnImpl;
 import io.github.spannm.jackcess.impl.JetFormat;
 import io.github.spannm.jackcess.impl.PageChannel;
@@ -48,7 +49,7 @@ class TableTest extends AbstractBaseTest {
     }
 
     @Test
-    void testCreateRow() throws IOException {
+    void testCreateRow() throws Exception {
         reset();
         newTestColumn(DataType.INT, false);
         newTestColumn(DataType.TEXT, false);
@@ -58,18 +59,18 @@ class TableTest extends AbstractBaseTest {
         int colCount = columns.size();
         ByteBuffer buffer = createRow(9, "Tim", "McCune");
 
-        assertEquals((short) colCount, buffer.getShort());
-        assertEquals((short) 9, buffer.getShort());
-        assertEquals((byte) 'T', buffer.get());
-        assertEquals((short) 22, buffer.getShort(22));
-        assertEquals((short) 10, buffer.getShort(24));
-        assertEquals((short) 4, buffer.getShort(26));
-        assertEquals((short) 2, buffer.getShort(28));
-        assertEquals((byte) 7, buffer.get(30));
+        assertThat(buffer.getShort()).isEqualTo((short) colCount);
+        assertThat(buffer.getShort()).isEqualTo((short) 9);
+        assertThat(buffer.get()).isEqualTo((byte) 'T');
+        assertThat(buffer.getShort(22)).isEqualTo((short) 22);
+        assertThat(buffer.getShort(24)).isEqualTo((short) 10);
+        assertThat(buffer.getShort(26)).isEqualTo((short) 4);
+        assertThat(buffer.getShort(28)).isEqualTo((short) 2);
+        assertThat(buffer.get(30)).isEqualTo((byte) 7);
     }
 
     @Test
-    void testUnicodeCompression() throws IOException {
+    void unicodeCompression() throws Exception {
         reset();
         newTestColumn(DataType.TEXT, false);
         newTestColumn(DataType.TEXT, false);
@@ -91,19 +92,15 @@ class TableTest extends AbstractBaseTest {
         ByteBuffer[] bufCmp1 = encodeColumns(small, large);
         ByteBuffer[] bufCmp2 = encodeColumns(smallNotAscii, largeNotAscii);
 
-        assertEquals(buf1[0].remaining(),
-            bufCmp1[0].remaining() + small.length() - 2);
-        assertEquals(buf1[1].remaining(),
-            bufCmp1[1].remaining() + large.length() - 2);
+        assertThat(bufCmp1[0].remaining() + small.length() - 2).isEqualTo(buf1[0].remaining());
+        assertThat(bufCmp1[1].remaining() + large.length() - 2).isEqualTo(buf1[1].remaining());
 
         for (int i = 0; i < buf2.length; i++) {
-            assertArrayEquals(toBytes(buf2[i]), toBytes(bufCmp2[i]));
+            assertThat(toBytes(bufCmp2[i])).containsExactly(toBytes(buf2[i]));
         }
 
-        assertEquals(List.of(small, large),
-            List.of(decodeColumns(bufCmp1)));
-        assertEquals(List.of(smallNotAscii, largeNotAscii),
-            List.of(decodeColumns(bufCmp2)));
+        assertThat(List.of(decodeColumns(bufCmp1))).isEqualTo(List.of(small, large));
+        assertThat(List.of(decodeColumns(bufCmp2))).isEqualTo(List.of(smallNotAscii, largeNotAscii));
 
     }
 

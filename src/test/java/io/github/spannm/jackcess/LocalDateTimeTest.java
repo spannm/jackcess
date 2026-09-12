@@ -19,6 +19,7 @@ package io.github.spannm.jackcess;
 import static io.github.spannm.jackcess.DatabaseBuilder.newColumn;
 import static io.github.spannm.jackcess.DatabaseBuilder.newTable;
 import static io.github.spannm.jackcess.test.Basename.OLD_DATES;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import io.github.spannm.jackcess.Database.FileFormat;
 import io.github.spannm.jackcess.impl.ColumnImpl;
@@ -43,7 +44,7 @@ class LocalDateTimeTest extends AbstractBaseTest {
 
     @ParameterizedTest(name = "[{index}] {0}")
     @FileFormatSource
-    void testWriteAndReadLocalDate(FileFormat fileFormat) throws IOException, ParseException {
+    void writeAndReadLocalDate(FileFormat fileFormat) throws Exception {
         try (Database db = createDbMem(fileFormat)) {
             db.setDateTimeType(DateTimeType.LOCAL_DATE_TIME);
 
@@ -92,7 +93,7 @@ class LocalDateTimeTest extends AbstractBaseTest {
                 foundDates.add(row.getLocalDateTime("date"));
             }
 
-            assertEquals(dates.size(), foundDates.size());
+            assertThat(foundDates.size()).isEqualTo(dates.size());
             for (int i = 0; i < dates.size(); i++) {
                 Date expected = dates.get(i);
                 LocalDateTime found = foundDates.get(i);
@@ -103,7 +104,7 @@ class LocalDateTimeTest extends AbstractBaseTest {
 
     @ParameterizedTest(name = "[{index}] {0}")
     @FileFormatSource
-    void testAncientLocalDates1(FileFormat fileFormat) throws IOException {
+    void ancientLocalDates1(FileFormat fileFormat) throws Exception {
         DateTimeFormatter sdf = DateTimeFormatter.ofPattern("uuuu-MM-dd");
         List<String> dates = List.of("1582-10-15", "1582-10-14", "1492-01-10", "1392-01-10");
 
@@ -126,13 +127,13 @@ class LocalDateTimeTest extends AbstractBaseTest {
                 foundDates.add(sdf.format(row.getLocalDateTime("date")));
             }
 
-            assertEquals(dates, foundDates);
+            assertThat(foundDates).isEqualTo(dates);
         }
     }
 
     @ParameterizedTest(name = "[{index}] {0}")
     @TestDbSource(OLD_DATES)
-    void testAncientLocalDates2(TestDb testDb) throws IOException {
+    void ancientLocalDates2(TestDb testDb) throws Exception {
         DateTimeFormatter sdf = DateTimeFormatter.ofPattern("uuuu-MM-dd");
         List<String> dates = List.of("1582-10-15", "1582-10-14", "1492-01-10", "1392-01-10");
 
@@ -146,12 +147,12 @@ class LocalDateTimeTest extends AbstractBaseTest {
                 foundDates.add(sdf.format(row.getLocalDateTime("DateField")));
             }
 
-            assertEquals(dates, foundDates);
+            assertThat(foundDates).isEqualTo(dates);
         }
     }
 
     @Test
-    void testZoneId() throws IOException, ParseException {
+    void zoneId() throws Exception {
         ZoneId zoneId = ZoneId.of("America/New_York");
         doTestZoneId(zoneId);
 
@@ -196,7 +197,7 @@ class LocalDateTimeTest extends AbstractBaseTest {
             LocalDateTime newLdt = ColumnImpl.ldtFromLocalDateDouble(
                 col.toDateDouble(curDate));
             if (!curLdt.equals(newLdt)) {
-                assertEquals(sdf.format(curLdt), sdf.format(newLdt));
+                assertThat(sdf.format(newLdt)).isEqualTo(sdf.format(curLdt));
             }
             curCal.add(Calendar.MINUTE, 30);
         }
@@ -204,7 +205,7 @@ class LocalDateTimeTest extends AbstractBaseTest {
 
     @ParameterizedTest(name = "[{index}] {0}")
     @FileFormatSource
-    void testWriteAndReadTemporals(FileFormat fileFormat) throws IOException, ParseException {
+    void writeAndReadTemporals(FileFormat fileFormat) throws Exception {
         ZoneId zoneId = ZoneId.of("America/New_York");
 
         try (Database db = createDbMem(fileFormat)) {
@@ -257,7 +258,7 @@ class LocalDateTimeTest extends AbstractBaseTest {
                 foundDates.add(row.getLocalDateTime("date"));
             }
 
-            assertEquals(expected, foundDates);
+            assertThat(foundDates).isEqualTo(expected);
         }
     }
 

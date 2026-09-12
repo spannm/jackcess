@@ -18,6 +18,8 @@ package io.github.spannm.jackcess.query;
 
 import static io.github.spannm.jackcess.impl.query.QueryFormat.*;
 import static io.github.spannm.jackcess.test.Basename.QUERY;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import io.github.spannm.jackcess.DataType;
 import io.github.spannm.jackcess.Database;
@@ -29,14 +31,13 @@ import io.github.spannm.jackcess.test.source.TestDbReadOnlySource;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 
-import java.io.IOException;
 import java.util.*;
 
 @SuppressWarnings("checkstyle:LineLengthCheck")
 class QueryTest extends AbstractBaseTest {
 
     @Test
-    void testUnionQuery() {
+    void unionQuery() {
         String expr1 = "Select * from Table1";
         String expr2 = "Select * from Table2";
 
@@ -46,23 +47,20 @@ class QueryTest extends AbstractBaseTest {
             newRow(TABLE_ATTRIBUTE, expr2, null, UNION_PART2));
         setFlag(query, 3);
 
-        assertEquals(multiline("Select * from Table1",
-            "UNION Select * from Table2;"),
-            query.toSQLString());
+        assertThat(query.toSQLString()).isEqualTo(multiline("Select * from Table1",
+                "UNION Select * from Table2;"));
 
         setFlag(query, 1);
 
-        assertEquals(multiline("Select * from Table1",
-            "UNION ALL Select * from Table2;"),
-            query.toSQLString());
+        assertThat(query.toSQLString()).isEqualTo(multiline("Select * from Table1",
+                "UNION ALL Select * from Table2;"));
 
         addRows(query, newRow(ORDERBY_ATTRIBUTE, "Table1.id",
             null, null));
 
-        assertEquals(multiline("Select * from Table1",
-            "UNION ALL Select * from Table2",
-            "ORDER BY Table1.id;"),
-            query.toSQLString());
+        assertThat(query.toSQLString()).isEqualTo(multiline("Select * from Table1",
+                "UNION ALL Select * from Table2",
+                "ORDER BY Table1.id;"));
 
         removeRows(query, TABLE_ATTRIBUTE);
 
@@ -70,60 +68,55 @@ class QueryTest extends AbstractBaseTest {
     }
 
     @Test
-    void testPassthroughQuery() {
+    void passthroughQuery() {
         String expr = "Select * from Table1";
         String constr = "ODBC;";
 
         PassthroughQuery query = (PassthroughQuery) newQuery(
             Query.Type.PASSTHROUGH, expr, constr);
 
-        assertEquals(expr, query.toSQLString());
-        assertEquals(constr, query.getConnectionString());
+        assertThat(query.toSQLString()).isEqualTo(expr);
+        assertThat(query.getConnectionString()).isEqualTo(constr);
     }
 
     @Test
-    void testDataDefinitionQuery() {
+    void dataDefinitionQuery() {
         String expr = "Drop table Table1";
 
         DataDefinitionQuery query = (DataDefinitionQuery) newQuery(
             Query.Type.DATA_DEFINITION, expr, null);
 
-        assertEquals(expr, query.toSQLString());
+        assertThat(query.toSQLString()).isEqualTo(expr);
     }
 
     @Test
-    void testUpdateQuery() {
+    void updateQuery() {
         UpdateQuery query = (UpdateQuery) newQuery(
             Query.Type.UPDATE,
             newRow(TABLE_ATTRIBUTE, null, "Table1", null),
             newRow(COLUMN_ATTRIBUTE, "\"some string\"", null, "Table1.id"),
             newRow(COLUMN_ATTRIBUTE, "42", null, "Table1.col1"));
 
-        assertEquals(
-            multiline("UPDATE Table1",
-                "SET Table1.id = \"some string\", Table1.col1 = 42;"),
-            query.toSQLString());
+        assertThat(query.toSQLString()).isEqualTo(multiline("UPDATE Table1",
+                "SET Table1.id = \"some string\", Table1.col1 = 42;"));
 
         addRows(query, newRow(WHERE_ATTRIBUTE, "(Table1.col2 < 13)",
             null, null));
 
-        assertEquals(
-            multiline("UPDATE Table1",
+        assertThat(query.toSQLString()).isEqualTo(multiline("UPDATE Table1",
                 "SET Table1.id = \"some string\", Table1.col1 = 42",
-                "WHERE (Table1.col2 < 13);"),
-            query.toSQLString());
+                "WHERE (Table1.col2 < 13);"));
     }
 
     @Test
-    void testSelectQuery() {
+    void selectQuery() {
         SelectQuery query = (SelectQuery) newQuery(
             Query.Type.SELECT,
             newRow(TABLE_ATTRIBUTE, null, "Table1", null));
         setFlag(query, 1);
 
-        assertEquals(multiline("SELECT *",
-            "FROM Table1;"),
-            query.toSQLString());
+        assertThat(query.toSQLString()).isEqualTo(multiline("SELECT *",
+                "FROM Table1;"));
 
         doTestColumns(query);
         doTestSelectFlags(query);
@@ -138,7 +131,7 @@ class QueryTest extends AbstractBaseTest {
     }
 
     @Test
-    void testBadQueries() {
+    void badQueries() {
         List<Row> rowList = new ArrayList<>();
         rowList.add(newRow(TYPE_ATTRIBUTE, null, -1, null, null));
         QueryImpl query = QueryImpl.create(-1, "TestQuery", rowList, 13);
@@ -159,7 +152,7 @@ class QueryTest extends AbstractBaseTest {
 
     @ParameterizedTest(name = "[{index}] {0}")
     @TestDbReadOnlySource(QUERY)
-    void testReadQueries(TestDb testDb) throws IOException {
+    void readQueries(TestDb testDb) throws Exception {
 
         Map<String, String> expectedQueries = new HashMap<>(Map.of(
             "SelectQuery", multiline(
@@ -205,23 +198,23 @@ class QueryTest extends AbstractBaseTest {
 
         try (Database db = testDb.open()) {
             for (Query q : db.getQueries()) {
-                assertEquals(expectedQueries.remove(q.getName()), q.toSQLString());
+                assertThat(q.toSQLString()).isEqualTo(expectedQueries.remove(q.getName()));
             }
 
-            assertTrue(expectedQueries.isEmpty());
+            assertThat(expectedQueries.isEmpty()).isTrue();
         }
     }
 
     @Test
-    void testAppendQuery() {
+    void appendQuery() {
         AppendQuery query = (AppendQuery) newQuery(
             Query.Type.APPEND, null, "Table2",
             // newRow(TABLE_ATTRIBUTE, null, "Table1", null),
             newRow(COLUMN_ATTRIBUTE, "54", APPEND_VALUE_FLAG, null, null),
             newRow(COLUMN_ATTRIBUTE, "'hello'", APPEND_VALUE_FLAG, null, null));
 
-        assertEquals(multiline("INSERT INTO Table2",
-            "VALUES (54, 'hello');"), query.toSQLString());
+        assertThat(query.toSQLString()).isEqualTo(multiline("INSERT INTO Table2",
+                "VALUES (54, 'hello');"));
 
         query = (AppendQuery) newQuery(
             Query.Type.APPEND, null, "Table2",
@@ -229,45 +222,40 @@ class QueryTest extends AbstractBaseTest {
             newRow(COLUMN_ATTRIBUTE, "54", APPEND_VALUE_FLAG, null, "ID"),
             newRow(COLUMN_ATTRIBUTE, "'hello'", APPEND_VALUE_FLAG, null, "Field 3"));
 
-        assertEquals(multiline("INSERT INTO Table2 (ID, [Field 3])",
-            "VALUES (54, 'hello');"), query.toSQLString());
+        assertThat(query.toSQLString()).isEqualTo(multiline("INSERT INTO Table2 (ID, [Field 3])",
+                "VALUES (54, 'hello');"));
     }
 
     private void doTestColumns(SelectQuery query) {
         addRows(query, newRow(COLUMN_ATTRIBUTE, "Table1.id", null, null));
         addRows(query, newRow(COLUMN_ATTRIBUTE, "Table1.col", "Some.Alias", null));
 
-        assertEquals(multiline("SELECT Table1.id, Table1.col AS [Some.Alias], *",
-            "FROM Table1;"),
-            query.toSQLString());
+        assertThat(query.toSQLString()).isEqualTo(multiline("SELECT Table1.id, Table1.col AS [Some.Alias], *",
+                "FROM Table1;"));
     }
 
     private void doTestSelectFlags(SelectQuery query) {
         setFlag(query, 3);
 
-        assertEquals(multiline("SELECT DISTINCT Table1.id, Table1.col AS [Some.Alias], *",
-            "FROM Table1;"),
-            query.toSQLString());
+        assertThat(query.toSQLString()).isEqualTo(multiline("SELECT DISTINCT Table1.id, Table1.col AS [Some.Alias], *",
+                "FROM Table1;"));
 
         setFlag(query, 9);
 
-        assertEquals(multiline("SELECT DISTINCTROW Table1.id, Table1.col AS [Some.Alias], *",
-            "FROM Table1;"),
-            query.toSQLString());
+        assertThat(query.toSQLString()).isEqualTo(multiline("SELECT DISTINCTROW Table1.id, Table1.col AS [Some.Alias], *",
+                "FROM Table1;"));
 
         setFlag(query, 7);
 
-        assertEquals(multiline("SELECT DISTINCT Table1.id, Table1.col AS [Some.Alias], *",
-            "FROM Table1",
-            "WITH OWNERACCESS OPTION;"),
-            query.toSQLString());
+        assertThat(query.toSQLString()).isEqualTo(multiline("SELECT DISTINCT Table1.id, Table1.col AS [Some.Alias], *",
+                "FROM Table1",
+                "WITH OWNERACCESS OPTION;"));
 
         replaceRows(query,
             newRow(FLAG_ATTRIBUTE, null, 49, null, "5", null));
 
-        assertEquals(multiline("SELECT TOP 5 PERCENT Table1.id, Table1.col AS [Some.Alias], *",
-            "FROM Table1;"),
-            query.toSQLString());
+        assertThat(query.toSQLString()).isEqualTo(multiline("SELECT TOP 5 PERCENT Table1.id, Table1.col AS [Some.Alias], *",
+                "FROM Table1;"));
 
         setFlag(query, 0);
     }
@@ -275,16 +263,14 @@ class QueryTest extends AbstractBaseTest {
     private void doTestParameters(SelectQuery query) {
         addRows(query, newRow(PARAMETER_ATTRIBUTE, null, DataType.INT.getValue(), "INT_VAL", null));
 
-        assertEquals(multiline("PARAMETERS INT_VAL Short;",
-            "SELECT Table1.id, Table1.col AS [Some.Alias]", "FROM Table1;"),
-            query.toSQLString());
+        assertThat(query.toSQLString()).isEqualTo(multiline("PARAMETERS INT_VAL Short;",
+                "SELECT Table1.id, Table1.col AS [Some.Alias]", "FROM Table1;"));
 
         addRows(query, newRow(PARAMETER_ATTRIBUTE, null, DataType.TEXT.getValue(), 50, "TextVal", null),
             newRow(PARAMETER_ATTRIBUTE, null, 0, 50, "[Some Value]", null));
 
-        assertEquals(multiline("PARAMETERS INT_VAL Short, TextVal Text(50), [Some Value] Value;",
-            "SELECT Table1.id, Table1.col AS [Some.Alias]", "FROM Table1;"),
-            query.toSQLString());
+        assertThat(query.toSQLString()).isEqualTo(multiline("PARAMETERS INT_VAL Short, TextVal Text(50), [Some Value] Value;",
+                "SELECT Table1.id, Table1.col AS [Some.Alias]", "FROM Table1;"));
 
         addRows(query, newRow(PARAMETER_ATTRIBUTE, null, -1, "BadVal", null));
 
@@ -297,29 +283,25 @@ class QueryTest extends AbstractBaseTest {
         addRows(query, newRow(TABLE_ATTRIBUTE, null, "Table2", "Another Table"));
         addRows(query, newRow(TABLE_ATTRIBUTE, "Select val from Table3", "val", "Table3Val"));
 
-        assertEquals(multiline("SELECT Table1.id, Table1.col AS [Some.Alias]",
-            "FROM Table1, Table2 AS [Another Table], [Select val from Table3].val AS Table3Val;"),
-            query.toSQLString());
+        assertThat(query.toSQLString()).isEqualTo(multiline("SELECT Table1.id, Table1.col AS [Some.Alias]",
+                "FROM Table1, Table2 AS [Another Table], [Select val from Table3].val AS Table3Val;"));
     }
 
     private void doTestRemoteDb(SelectQuery query) {
         addRows(query, newRow(REMOTEDB_ATTRIBUTE, null, 2, "other_db.mdb", null));
 
-        assertEquals(multiline("SELECT Table1.id, Table1.col AS [Some.Alias]",
-            "FROM Table1, Table2 AS [Another Table], [Select val from Table3].val AS Table3Val IN 'other_db.mdb';"),
-            query.toSQLString());
+        assertThat(query.toSQLString()).isEqualTo(multiline("SELECT Table1.id, Table1.col AS [Some.Alias]",
+                "FROM Table1, Table2 AS [Another Table], [Select val from Table3].val AS Table3Val IN 'other_db.mdb';"));
 
         replaceRows(query, newRow(REMOTEDB_ATTRIBUTE, "MDB_FILE;", 2, "other_db.mdb", null));
 
-        assertEquals(multiline("SELECT Table1.id, Table1.col AS [Some.Alias]",
-            "FROM Table1, Table2 AS [Another Table], [Select val from Table3].val AS Table3Val IN 'other_db.mdb' [MDB_FILE;];"),
-            query.toSQLString());
+        assertThat(query.toSQLString()).isEqualTo(multiline("SELECT Table1.id, Table1.col AS [Some.Alias]",
+                "FROM Table1, Table2 AS [Another Table], [Select val from Table3].val AS Table3Val IN 'other_db.mdb' [MDB_FILE;];"));
 
         replaceRows(query, newRow(REMOTEDB_ATTRIBUTE, "MDB_FILE;", 2, null, null));
 
-        assertEquals(multiline("SELECT Table1.id, Table1.col AS [Some.Alias]",
-            "FROM Table1, Table2 AS [Another Table], [Select val from Table3].val AS Table3Val IN '' [MDB_FILE;];"),
-            query.toSQLString());
+        assertThat(query.toSQLString()).isEqualTo(multiline("SELECT Table1.id, Table1.col AS [Some.Alias]",
+                "FROM Table1, Table2 AS [Another Table], [Select val from Table3].val AS Table3Val IN '' [MDB_FILE;];"));
 
         removeRows(query, REMOTEDB_ATTRIBUTE);
     }
@@ -327,15 +309,13 @@ class QueryTest extends AbstractBaseTest {
     private void doTestJoins(SelectQuery query) {
         addRows(query, newRow(JOIN_ATTRIBUTE, "(Table1.id = [Another Table].id)", 1, "Table1", "Another Table"));
 
-        assertEquals(multiline("SELECT Table1.id, Table1.col AS [Some.Alias]",
-            "FROM [Select val from Table3].val AS Table3Val, Table1 INNER JOIN Table2 AS [Another Table] ON (Table1.id = [Another Table].id);"),
-            query.toSQLString());
+        assertThat(query.toSQLString()).isEqualTo(multiline("SELECT Table1.id, Table1.col AS [Some.Alias]",
+                "FROM [Select val from Table3].val AS Table3Val, Table1 INNER JOIN Table2 AS [Another Table] ON (Table1.id = [Another Table].id);"));
 
         addRows(query, newRow(JOIN_ATTRIBUTE, "(Table1.id = Table3Val.id)", 2, "Table1", "Table3Val"));
 
-        assertEquals(multiline("SELECT Table1.id, Table1.col AS [Some.Alias]",
-            "FROM (Table1 INNER JOIN Table2 AS [Another Table] ON (Table1.id = [Another Table].id)) LEFT JOIN [Select val from Table3].val AS Table3Val ON (Table1.id = Table3Val.id);"),
-            query.toSQLString());
+        assertThat(query.toSQLString()).isEqualTo(multiline("SELECT Table1.id, Table1.col AS [Some.Alias]",
+                "FROM (Table1 INNER JOIN Table2 AS [Another Table] ON (Table1.id = [Another Table].id)) LEFT JOIN [Select val from Table3].val AS Table3Val ON (Table1.id = Table3Val.id);"));
 
         addRows(query, newRow(JOIN_ATTRIBUTE, "(Table1.id = Table3Val.id)", 5, "Table1", "Table3Val"));
 
@@ -346,9 +326,8 @@ class QueryTest extends AbstractBaseTest {
 
         addRows(query, newRow(JOIN_ATTRIBUTE, "(Table1.id = Table3Val.id)", 1, "BogusTable", "Table3Val"));
 
-        assertEquals(multiline("SELECT Table1.id, Table1.col AS [Some.Alias]",
-            "FROM BogusTable INNER JOIN ((Table1 INNER JOIN Table2 AS [Another Table] ON (Table1.id = [Another Table].id)) LEFT JOIN [Select val from Table3].val AS Table3Val ON (Table1.id = Table3Val.id)) ON (Table1.id = Table3Val.id);"),
-            query.toSQLString());
+        assertThat(query.toSQLString()).isEqualTo(multiline("SELECT Table1.id, Table1.col AS [Some.Alias]",
+                "FROM BogusTable INNER JOIN ((Table1 INNER JOIN Table2 AS [Another Table] ON (Table1.id = [Another Table].id)) LEFT JOIN [Select val from Table3].val AS Table3Val ON (Table1.id = Table3Val.id)) ON (Table1.id = Table3Val.id);"));
 
         removeRows(query, JOIN_ATTRIBUTE);
     }
@@ -357,49 +336,45 @@ class QueryTest extends AbstractBaseTest {
         addRows(query, newRow(WHERE_ATTRIBUTE, "(Table1.col2 < 13)",
             null, null));
 
-        assertEquals(multiline("SELECT Table1.id, Table1.col AS [Some.Alias]",
-            "FROM Table1, Table2 AS [Another Table], [Select val from Table3].val AS Table3Val",
-            "WHERE (Table1.col2 < 13);"),
-            query.toSQLString());
+        assertThat(query.toSQLString()).isEqualTo(multiline("SELECT Table1.id, Table1.col AS [Some.Alias]",
+                "FROM Table1, Table2 AS [Another Table], [Select val from Table3].val AS Table3Val",
+                "WHERE (Table1.col2 < 13);"));
     }
 
     private void doTestGroupings(SelectQuery query) {
         addRows(query, newRow(GROUPBY_ATTRIBUTE, "Table1.id", null, null),
             newRow(GROUPBY_ATTRIBUTE, "SUM(Table1.val)", null, null));
 
-        assertEquals(multiline("SELECT Table1.id, Table1.col AS [Some.Alias]",
-            "FROM Table1, Table2 AS [Another Table], [Select val from Table3].val AS Table3Val",
-            "WHERE (Table1.col2 < 13)",
-            "GROUP BY Table1.id, SUM(Table1.val);"),
-            query.toSQLString());
+        assertThat(query.toSQLString()).isEqualTo(multiline("SELECT Table1.id, Table1.col AS [Some.Alias]",
+                "FROM Table1, Table2 AS [Another Table], [Select val from Table3].val AS Table3Val",
+                "WHERE (Table1.col2 < 13)",
+                "GROUP BY Table1.id, SUM(Table1.val);"));
     }
 
     private void doTestHavingExpression(SelectQuery query) {
         addRows(query, newRow(HAVING_ATTRIBUTE, "(SUM(Table1.val) = 500)", null, null));
 
-        assertEquals(multiline("SELECT Table1.id, Table1.col AS [Some.Alias]",
-            "FROM Table1, Table2 AS [Another Table], [Select val from Table3].val AS Table3Val",
-            "WHERE (Table1.col2 < 13)",
-            "GROUP BY Table1.id, SUM(Table1.val)",
-            "HAVING (SUM(Table1.val) = 500);"),
-            query.toSQLString());
+        assertThat(query.toSQLString()).isEqualTo(multiline("SELECT Table1.id, Table1.col AS [Some.Alias]",
+                "FROM Table1, Table2 AS [Another Table], [Select val from Table3].val AS Table3Val",
+                "WHERE (Table1.col2 < 13)",
+                "GROUP BY Table1.id, SUM(Table1.val)",
+                "HAVING (SUM(Table1.val) = 500);"));
     }
 
     private void doTestOrderings(SelectQuery query) {
         addRows(query, newRow(ORDERBY_ATTRIBUTE, "Table1.id", null, null),
             newRow(ORDERBY_ATTRIBUTE, "Table2.val", "D", null));
 
-        assertEquals(multiline("SELECT Table1.id, Table1.col AS [Some.Alias]",
-            "FROM Table1, Table2 AS [Another Table], [Select val from Table3].val AS Table3Val",
-            "WHERE (Table1.col2 < 13)",
-            "GROUP BY Table1.id, SUM(Table1.val)",
-            "HAVING (SUM(Table1.val) = 500)",
-            "ORDER BY Table1.id, Table2.val DESC;"),
-            query.toSQLString());
+        assertThat(query.toSQLString()).isEqualTo(multiline("SELECT Table1.id, Table1.col AS [Some.Alias]",
+                "FROM Table1, Table2 AS [Another Table], [Select val from Table3].val AS Table3Val",
+                "WHERE (Table1.col2 < 13)",
+                "GROUP BY Table1.id, SUM(Table1.val)",
+                "HAVING (SUM(Table1.val) = 500)",
+                "ORDER BY Table1.id, Table2.val DESC;"));
     }
 
     @Test
-    void testComplexJoins() {
+    void complexJoins() {
         SelectQuery query = (SelectQuery) newQuery(
             Query.Type.SELECT);
         setFlag(query, 1);
@@ -410,15 +385,13 @@ class QueryTest extends AbstractBaseTest {
 
         addJoinRows(query, 1, 2, 1, 2, 3, 1, 3, 4, 1);
 
-        assertEquals(multiline("SELECT *",
-            "FROM Table5, Table6, Table7, Table8, Table9, Table10, ((Table1 INNER JOIN Table2 ON Table1.f0 = Table2.f0) INNER JOIN Table3 ON Table2.f3 = Table3.f3) INNER JOIN Table4 ON Table3.f6 = Table4.f6;"),
-            query.toSQLString());
+        assertThat(query.toSQLString()).isEqualTo(multiline("SELECT *",
+                "FROM Table5, Table6, Table7, Table8, Table9, Table10, ((Table1 INNER JOIN Table2 ON Table1.f0 = Table2.f0) INNER JOIN Table3 ON Table2.f3 = Table3.f3) INNER JOIN Table4 ON Table3.f6 = Table4.f6;"));
 
         addJoinRows(query, 1, 2, 1, 2, 1, 1);
 
-        assertEquals(multiline("SELECT *",
-            "FROM Table3, Table4, Table5, Table6, Table7, Table8, Table9, Table10, Table1 INNER JOIN Table2 ON (Table2.f3 = Table1.f3) AND (Table1.f0 = Table2.f0);"),
-            query.toSQLString());
+        assertThat(query.toSQLString()).isEqualTo(multiline("SELECT *",
+                "FROM Table3, Table4, Table5, Table6, Table7, Table8, Table9, Table10, Table1 INNER JOIN Table2 ON (Table2.f3 = Table1.f3) AND (Table1.f0 = Table2.f0);"));
 
         addJoinRows(query, 1, 2, 1, 2, 1, 2);
 
@@ -430,9 +403,8 @@ class QueryTest extends AbstractBaseTest {
             7, 8, 1,
             2, 3, 1);
 
-        assertEquals(multiline("SELECT *",
-            "FROM Table9, Table10, Table5 INNER JOIN Table6 ON Table5.f6 = Table6.f6, Table7 INNER JOIN Table8 ON Table7.f9 = Table8.f9, (Table1 INNER JOIN Table2 ON Table1.f0 = Table2.f0) INNER JOIN (Table3 INNER JOIN Table4 ON Table3.f3 = Table4.f3) ON Table2.f12 = Table3.f12;"),
-            query.toSQLString());
+        assertThat(query.toSQLString()).isEqualTo(multiline("SELECT *",
+                "FROM Table9, Table10, Table5 INNER JOIN Table6 ON Table5.f6 = Table6.f6, Table7 INNER JOIN Table8 ON Table7.f9 = Table8.f9, (Table1 INNER JOIN Table2 ON Table1.f0 = Table2.f0) INNER JOIN (Table3 INNER JOIN Table4 ON Table3.f3 = Table4.f3) ON Table2.f12 = Table3.f12;"));
 
         addJoinRows(query, 1, 2, 1,
             3, 4, 1,
@@ -441,9 +413,8 @@ class QueryTest extends AbstractBaseTest {
             2, 3, 1,
             5, 8, 1);
 
-        assertEquals(multiline("SELECT *",
-            "FROM Table9, Table10, (Table1 INNER JOIN Table2 ON Table1.f0 = Table2.f0) INNER JOIN (Table3 INNER JOIN Table4 ON Table3.f3 = Table4.f3) ON Table2.f12 = Table3.f12, (Table5 INNER JOIN Table6 ON Table5.f6 = Table6.f6) INNER JOIN (Table7 INNER JOIN Table8 ON Table7.f9 = Table8.f9) ON Table5.f15 = Table8.f15;"),
-            query.toSQLString());
+        assertThat(query.toSQLString()).isEqualTo(multiline("SELECT *",
+                "FROM Table9, Table10, (Table1 INNER JOIN Table2 ON Table1.f0 = Table2.f0) INNER JOIN (Table3 INNER JOIN Table4 ON Table3.f3 = Table4.f3) ON Table2.f12 = Table3.f12, (Table5 INNER JOIN Table6 ON Table5.f6 = Table6.f6) INNER JOIN (Table7 INNER JOIN Table8 ON Table7.f9 = Table8.f9) ON Table5.f15 = Table8.f15;"));
 
         addJoinRows(query, 1, 2, 1,
             1, 3, 1,
@@ -455,9 +426,8 @@ class QueryTest extends AbstractBaseTest {
             1, 4, 2,
             5, 4, 3);
 
-        assertEquals(multiline("SELECT *",
-            "FROM Table5 RIGHT JOIN (((Table10 RIGHT JOIN ((Table6 INNER JOIN ((Table1 INNER JOIN Table2 ON Table1.f0 = Table2.f0) INNER JOIN Table3 ON Table1.f3 = Table3.f3) ON Table6.f6 = Table3.f6) LEFT JOIN Table9 ON Table1.f9 = Table9.f9) ON Table10.f12 = Table9.f12) LEFT JOIN (Table7 RIGHT JOIN Table8 ON Table7.f15 = Table8.f15) ON Table1.f18 = Table8.f18) LEFT JOIN Table4 ON Table1.f21 = Table4.f21) ON Table5.f24 = Table4.f24;"),
-            query.toSQLString());
+        assertThat(query.toSQLString()).isEqualTo(multiline("SELECT *",
+                "FROM Table5 RIGHT JOIN (((Table10 RIGHT JOIN ((Table6 INNER JOIN ((Table1 INNER JOIN Table2 ON Table1.f0 = Table2.f0) INNER JOIN Table3 ON Table1.f3 = Table3.f3) ON Table6.f6 = Table3.f6) LEFT JOIN Table9 ON Table1.f9 = Table9.f9) ON Table10.f12 = Table9.f12) LEFT JOIN (Table7 RIGHT JOIN Table8 ON Table7.f15 = Table8.f15) ON Table1.f18 = Table8.f18) LEFT JOIN Table4 ON Table1.f21 = Table4.f21) ON Table5.f24 = Table4.f24;"));
 
         addJoinRows(query, 1, 2, 1,
             1, 3, 1,
@@ -469,9 +439,8 @@ class QueryTest extends AbstractBaseTest {
             7, 8, 3,
             10, 9, 3);
 
-        assertEquals(multiline("SELECT *",
-            "FROM Table10 RIGHT JOIN (Table7 RIGHT JOIN (Table5 RIGHT JOIN (Table6 INNER JOIN (((((Table1 INNER JOIN Table2 ON Table1.f0 = Table2.f0) INNER JOIN Table3 ON Table1.f3 = Table3.f3) LEFT JOIN Table9 ON Table1.f6 = Table9.f6) LEFT JOIN Table8 ON Table1.f9 = Table8.f9) LEFT JOIN Table4 ON Table1.f12 = Table4.f12) ON Table6.f15 = Table3.f15) ON Table5.f18 = Table4.f18) ON Table7.f21 = Table8.f21) ON Table10.f24 = Table9.f24;"),
-            query.toSQLString());
+        assertThat(query.toSQLString()).isEqualTo(multiline("SELECT *",
+                "FROM Table10 RIGHT JOIN (Table7 RIGHT JOIN (Table5 RIGHT JOIN (Table6 INNER JOIN (((((Table1 INNER JOIN Table2 ON Table1.f0 = Table2.f0) INNER JOIN Table3 ON Table1.f3 = Table3.f3) LEFT JOIN Table9 ON Table1.f6 = Table9.f6) LEFT JOIN Table8 ON Table1.f9 = Table8.f9) LEFT JOIN Table4 ON Table1.f12 = Table4.f12) ON Table6.f15 = Table3.f15) ON Table5.f18 = Table4.f18) ON Table7.f21 = Table8.f21) ON Table10.f24 = Table9.f24;"));
 
         removeRows(query, TABLE_ATTRIBUTE);
 
@@ -481,9 +450,8 @@ class QueryTest extends AbstractBaseTest {
             1, 4, 1,
             5, 3, 1);
 
-        assertEquals(multiline("SELECT *",
-            "FROM Table5 INNER JOIN (((Table1 INNER JOIN Table2 ON Table1.f0 = Table2.f0) INNER JOIN Table3 ON Table2.f3 = Table3.f3) INNER JOIN Table4 ON (Table1.f9 = Table4.f9) AND (Table2.f6 = Table4.f6)) ON Table5.f12 = Table3.f12;"),
-            query.toSQLString());
+        assertThat(query.toSQLString()).isEqualTo(multiline("SELECT *",
+                "FROM Table5 INNER JOIN (((Table1 INNER JOIN Table2 ON Table1.f0 = Table2.f0) INNER JOIN Table3 ON Table2.f3 = Table3.f3) INNER JOIN Table4 ON (Table1.f9 = Table4.f9) AND (Table2.f6 = Table4.f6)) ON Table5.f12 = Table3.f12;"));
     }
 
     private static void addJoinRows(SelectQuery query, int... joins) {

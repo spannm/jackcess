@@ -15,6 +15,8 @@
  */
 package io.github.spannm.jackcess.util;
 
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.assertj.core.api.Assertions.assertThat;
 import io.github.spannm.jackcess.*;
 import io.github.spannm.jackcess.Database.FileFormat;
 import io.github.spannm.jackcess.test.AbstractBaseTest;
@@ -27,7 +29,6 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
-import java.sql.SQLException;
 import java.sql.Types;
 import java.util.ArrayList;
 import java.util.List;
@@ -49,20 +50,20 @@ class ImportExportUtilTest extends AbstractBaseTest {
     }
 
     @Test
-    void testExportAllVariants() throws IOException {
+    void exportAllVariants() throws Exception {
         try (Database db = createTestDb()) {
             File dir = TestUtil.createTempDir("export1");
             ExportUtil.exportAll(db, dir);
-            assertTrue(new File(dir, "test.csv").isFile());
+            assertThat(new File(dir, "test.csv").isFile()).isTrue();
 
             File dir2 = TestUtil.createTempDir("export2");
             ExportUtil.exportAll(db, dir2, "txt", true);
             File exported = new File(dir2, "test.txt");
-            assertTrue(exported.isFile());
+            assertThat(exported.isFile()).isTrue();
 
             File dir3 = TestUtil.createTempDir("export3");
             ExportUtil.exportAll(db, dir3, "dat", true, ";", '\'', SimpleExportFilter.INSTANCE);
-            assertTrue(new File(dir3, "test.dat").isFile());
+            assertThat(new File(dir3, "test.dat").isFile()).isTrue();
 
             File dir4 = TestUtil.createTempDir("export4");
             new ExportUtil.Builder(db)
@@ -72,34 +73,34 @@ class ImportExportUtilTest extends AbstractBaseTest {
                 .withQuote('"')
                 .withFilter(SimpleExportFilter.INSTANCE)
                 .exportAll(dir4);
-            assertTrue(new File(dir4, "test.out").isFile());
+            assertThat(new File(dir4, "test.out").isFile()).isTrue();
         }
     }
 
     @Test
-    void testExportFileAndWriterVariants() throws IOException {
+    void exportFileAndWriterVariants() throws Exception {
         try (Database db = createTestDb()) {
             File f = TestUtil.createTempFile(getShortTestMethodName(), ".csv", false);
             ExportUtil.exportFile(db, "test", f);
-            assertTrue(f.length() > 0);
+            assertThat(f.length() > 0).isTrue();
 
             File f2 = TestUtil.createTempFile(getShortTestMethodName(), ".csv", false);
             ExportUtil.exportFile(db, "test", f2, true, ";", '"', SimpleExportFilter.INSTANCE);
-            assertTrue(f2.length() > 0);
+            assertThat(f2.length() > 0).isTrue();
 
             File f3 = TestUtil.createTempFile(getShortTestMethodName(), ".csv", false);
             new ExportUtil.Builder(db).withTableName("test").exportFile(f3);
-            assertTrue(f3.length() > 0);
+            assertThat(f3.length() > 0).isTrue();
 
             StringWriter sw = new StringWriter();
             ExportUtil.exportWriter(db, "test", new BufferedWriter(sw));
-            assertTrue(sw.toString().contains("a"));
+            assertThat(sw.toString().contains("a")).isTrue();
 
             // export from an explicit cursor via builder
             StringWriter sw2 = new StringWriter();
             Cursor cursor = CursorBuilder.createCursor(db.getTable("test"));
             new ExportUtil.Builder(cursor).withHeader(true).exportWriter(new BufferedWriter(sw2));
-            assertTrue(sw2.toString().contains("col1"));
+            assertThat(sw2.toString().contains("col1")).isTrue();
 
             // builder using the "no-arg-ish" constructors
             StringWriter sw3 = new StringWriter();
@@ -108,12 +109,12 @@ class ImportExportUtilTest extends AbstractBaseTest {
                 .withTableName("test")
                 .withCursor(null)
                 .exportWriter(new BufferedWriter(sw3));
-            assertTrue(sw3.toString().contains("b"));
+            assertThat(sw3.toString().contains("b")).isTrue();
         }
     }
 
     @Test
-    void testExportWithColumnFilter() throws IOException {
+    void exportWithColumnFilter() throws Exception {
         try (Database db = createTestDb()) {
             ExportFilter filter = new SimpleExportFilter() {
                 @Override
@@ -128,59 +129,59 @@ class ImportExportUtilTest extends AbstractBaseTest {
             ExportUtil.exportWriter(CursorBuilder.createCursor(db.getTable("test")),
                 new BufferedWriter(sw), true, null, '"', filter);
             String out = sw.toString();
-            assertTrue(out.contains("col1"));
-            assertFalse(out.contains("col2"));
+            assertThat(out.contains("col1")).isTrue();
+            assertThat(out.contains("col2")).isFalse();
         }
     }
 
     @Test
-    void testImportFileVariants() throws IOException {
+    void importFileVariants() throws Exception {
         File sample = new File(DIR_TEST_DATA, "sample-input.tab");
         try (Database db = createDbMem(FileFormat.V2000)) {
             String n1 = ImportUtil.importFile(sample, db, "imp1", "\\t");
-            assertNotNull(db.getTable(n1));
+            assertThat(db.getTable(n1)).isNotNull();
 
             String n2 = ImportUtil.importFile(sample, db, "imp2", "\\t", SimpleImportFilter.INSTANCE);
-            assertNotNull(db.getTable(n2));
+            assertThat(db.getTable(n2)).isNotNull();
 
             String n3 = ImportUtil.importFile(sample, db, "imp3", "\\t", '"',
                 SimpleImportFilter.INSTANCE, false);
-            assertNotNull(db.getTable(n3));
+            assertThat(db.getTable(n3)).isNotNull();
 
             // importing again under an existing name creates a uniquely named table
             String n4 = ImportUtil.importFile(sample, db, "imp1", "\\t");
-            assertNotEquals(n1, n4);
-            assertNotNull(db.getTable(n4));
+            assertThat(n4).isNotEqualTo(n1);
+            assertThat(db.getTable(n4)).isNotNull();
         }
     }
 
     @Test
-    void testImportReaderVariants() throws IOException {
+    void importReaderVariants() throws Exception {
         String data = "c1\tc2\nv1\tv2\n";
         try (Database db = createDbMem(FileFormat.V2000)) {
             String n1 = ImportUtil.importReader(new BufferedReader(new StringReader(data)), db, "r1", "\\t");
-            assertEquals(1, TestUtil.countRows(db.getTable(n1)));
+            assertThat(TestUtil.countRows(db.getTable(n1))).isEqualTo(1);
 
             String n2 = ImportUtil.importReader(new BufferedReader(new StringReader(data)), db, "r2", "\\t",
                 SimpleImportFilter.INSTANCE);
-            assertNotNull(db.getTable(n2));
+            assertThat(db.getTable(n2)).isNotNull();
 
             String n3 = ImportUtil.importReader(new BufferedReader(new StringReader(data)), db, "r3", "\\t",
                 SimpleImportFilter.INSTANCE, false);
-            assertNotNull(db.getTable(n3));
+            assertThat(db.getTable(n3)).isNotNull();
 
             String n4 = ImportUtil.importReader(new BufferedReader(new StringReader(data)), db, "r4", "\\t", '"',
                 SimpleImportFilter.INSTANCE, false);
-            assertNotNull(db.getTable(n4));
+            assertThat(db.getTable(n4)).isNotNull();
 
             // append to an existing table without a header line
             String n5 = ImportUtil.importReader(new BufferedReader(new StringReader("v3\tv4\n")), db, n1, "\\t", '"',
                 SimpleImportFilter.INSTANCE, true, false);
-            assertEquals(n1, n5);
-            assertEquals(2, TestUtil.countRows(db.getTable(n1)));
+            assertThat(n5).isEqualTo(n1);
+            assertThat(TestUtil.countRows(db.getTable(n1))).isEqualTo(2);
 
             // empty input
-            assertNull(ImportUtil.importReader(new BufferedReader(new StringReader("")), db, "rx", "\\t"));
+            assertThat(ImportUtil.importReader(new BufferedReader(new StringReader("")), db, "rx", "\\t")).isNull();
 
             // unterminated quoted value
             assertThrows(EOFException.class, () -> ImportUtil.importReader(
@@ -189,7 +190,7 @@ class ImportExportUtilTest extends AbstractBaseTest {
     }
 
     @Test
-    void testImportBuilder() throws IOException, SQLException {
+    void importBuilder() throws Exception {
         String data = "c1;c2\n'v1';v2\n";
         try (Database db = createDbMem(FileFormat.V2000)) {
             String name = new ImportUtil.Builder(db)
@@ -201,7 +202,7 @@ class ImportExportUtilTest extends AbstractBaseTest {
                 .withUseExistingTable(false)
                 .withHeader(true)
                 .importReader(new BufferedReader(new StringReader(data)));
-            assertEquals("b1", name);
+            assertThat(name).isEqualTo("b1");
 
             TestResultSet rs = new TestResultSet();
             rs.addColumn(Types.INTEGER, "num");
@@ -222,15 +223,15 @@ class ImportExportUtilTest extends AbstractBaseTest {
             String rsName = new ImportUtil.Builder(db, "fromRs")
                 .withFilter(oddFilter)
                 .importResultSet(rs.toResultSet());
-            assertEquals(2, TestUtil.countRows(db.getTable(rsName)));
+            assertThat(TestUtil.countRows(db.getTable(rsName))).isEqualTo(2);
 
             // re-import into the existing table
             rs.reset();
             String rsName2 = new ImportUtil.Builder(db, "fromRs")
                 .withUseExistingTable(true)
                 .importResultSet(rs.toResultSet());
-            assertEquals(rsName, rsName2);
-            assertEquals(5, TestUtil.countRows(db.getTable(rsName)));
+            assertThat(rsName2).isEqualTo(rsName);
+            assertThat(TestUtil.countRows(db.getTable(rsName))).isEqualTo(5);
         }
     }
 

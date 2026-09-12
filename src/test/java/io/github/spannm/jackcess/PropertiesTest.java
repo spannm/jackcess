@@ -17,6 +17,8 @@
 package io.github.spannm.jackcess;
 
 import static io.github.spannm.jackcess.test.Basename.COMMON1;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import io.github.spannm.jackcess.Database.FileFormat;
 import io.github.spannm.jackcess.impl.DatabaseImpl;
@@ -34,58 +36,57 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.*;
 
 class PropertiesTest extends AbstractBaseTest {
 
     @Test
-    void testPropertyMaps() {
+    void propertyMaps() {
         PropertyMaps maps = new PropertyMaps(10, null, null, null);
-        assertTrue(maps.isEmpty());
-        assertEquals(0, maps.getSize());
-        assertFalse(maps.iterator().hasNext());
-        assertEquals(10, maps.getObjectId());
+        assertThat(maps.isEmpty()).isTrue();
+        assertThat(maps.getSize()).isEqualTo(0);
+        assertThat(maps.iterator().hasNext()).isFalse();
+        assertThat(maps.getObjectId()).isEqualTo(10);
 
         PropertyMapImpl defMap = maps.getDefault();
-        assertTrue(defMap.isEmpty());
-        assertEquals(0, defMap.getSize());
-        assertFalse(defMap.iterator().hasNext());
+        assertThat(defMap.isEmpty()).isTrue();
+        assertThat(defMap.getSize()).isEqualTo(0);
+        assertThat(defMap.iterator().hasNext()).isFalse();
 
         PropertyMapImpl colMap = maps.get("testcol");
-        assertTrue(colMap.isEmpty());
-        assertEquals(0, colMap.getSize());
-        assertFalse(colMap.iterator().hasNext());
+        assertThat(colMap.isEmpty()).isTrue();
+        assertThat(colMap.getSize()).isEqualTo(0);
+        assertThat(colMap.iterator().hasNext()).isFalse();
 
-        assertFalse(maps.isEmpty());
-        assertEquals(2, maps.getSize());
+        assertThat(maps.isEmpty()).isFalse();
+        assertThat(maps.getSize()).isEqualTo(2);
 
-        assertSame(defMap, maps.get(PropertyMaps.DEFAULT_NAME));
-        assertEquals(PropertyMaps.DEFAULT_NAME, defMap.getName());
-        assertSame(colMap, maps.get("TESTCOL"));
-        assertEquals("testcol", colMap.getName());
+        assertThat(maps.get(PropertyMaps.DEFAULT_NAME)).isSameAs(defMap);
+        assertThat(defMap.getName()).isEqualTo(PropertyMaps.DEFAULT_NAME);
+        assertThat(maps.get("TESTCOL")).isSameAs(colMap);
+        assertThat(colMap.getName()).isEqualTo("testcol");
 
         defMap.put("foo", DataType.TEXT, "bar", false);
         defMap.put("baz", DataType.LONG, 13, true);
 
-        assertFalse(defMap.isEmpty());
-        assertEquals(2, defMap.getSize());
-        assertFalse(defMap.get("foo").isDdl());
-        assertTrue(defMap.get("baz").isDdl());
+        assertThat(defMap.isEmpty()).isFalse();
+        assertThat(defMap.getSize()).isEqualTo(2);
+        assertThat(defMap.get("foo").isDdl()).isFalse();
+        assertThat(defMap.get("baz").isDdl()).isTrue();
 
         colMap.put("buzz", DataType.BOOLEAN, Boolean.TRUE, true);
 
-        assertFalse(colMap.isEmpty());
-        assertEquals(1, colMap.getSize());
+        assertThat(colMap.isEmpty()).isFalse();
+        assertThat(colMap.getSize()).isEqualTo(1);
 
-        assertEquals("bar", defMap.getValue("foo"));
-        assertEquals("bar", defMap.getValue("FOO"));
-        assertNull(colMap.getValue("foo"));
-        assertEquals(13, defMap.get("baz").getValue());
-        assertEquals(Boolean.TRUE, colMap.getValue("Buzz"));
+        assertThat(defMap.getValue("foo")).isEqualTo("bar");
+        assertThat(defMap.getValue("FOO")).isEqualTo("bar");
+        assertThat(colMap.getValue("foo")).isNull();
+        assertThat(defMap.get("baz").getValue()).isEqualTo(13);
+        assertThat(colMap.getValue("Buzz")).isEqualTo(Boolean.TRUE);
 
-        assertEquals("bar", defMap.getValue("foo", "blah"));
-        assertEquals("blah", defMap.getValue("bogus", "blah"));
+        assertThat(defMap.getValue("foo", "blah")).isEqualTo("bar");
+        assertThat(defMap.getValue("bogus", "blah")).isEqualTo("blah");
 
         List<PropertyMap.Property> props = new ArrayList<>();
         for (PropertyMap map : maps) {
@@ -94,82 +95,77 @@ class PropertiesTest extends AbstractBaseTest {
             }
         }
 
-        assertEquals(List.of(defMap.get("foo"), defMap.get("baz"),
-            colMap.get("buzz")), props);
+        assertThat(props).isEqualTo(List.of(defMap.get("foo"), defMap.get("baz"),
+                colMap.get("buzz")));
     }
 
     @Test
-    void testInferTypes() {
+    void inferTypes() {
         PropertyMaps maps = new PropertyMaps(10, null, null, null);
         PropertyMap defMap = maps.getDefault();
 
-        assertEquals(DataType.TEXT,
-            defMap.put(PropertyMap.FORMAT_PROP, null).getType());
-        assertEquals(DataType.BOOLEAN,
-            defMap.put(PropertyMap.REQUIRED_PROP, null).getType());
+        assertThat(defMap.put(PropertyMap.FORMAT_PROP, null).getType()).isEqualTo(DataType.TEXT);
+        assertThat(defMap.put(PropertyMap.REQUIRED_PROP, null).getType()).isEqualTo(DataType.BOOLEAN);
 
-        assertEquals(DataType.TEXT,
-            defMap.put("strprop", "this is a string").getType());
-        assertEquals(DataType.BOOLEAN,
-            defMap.put("boolprop", true).getType());
-        assertEquals(DataType.LONG,
-            defMap.put("intprop", 37).getType());
+        assertThat(defMap.put("strprop", "this is a string").getType()).isEqualTo(DataType.TEXT);
+        assertThat(defMap.put("boolprop", true).getType()).isEqualTo(DataType.BOOLEAN);
+        assertThat(defMap.put("intprop", 37).getType()).isEqualTo(DataType.LONG);
     }
 
     @ParameterizedTest(name = "[{index}] {0}")
     @TestDbReadOnlySource(COMMON1)
-    void testReadProperties(TestDb testDb) throws IOException {
+    void readProperties(TestDb testDb) throws Exception {
         try (Database db = testDb.open()) {
             TableImpl t = (TableImpl) db.getTable("Table1");
-            assertEquals(t.getTableDefPageNumber(), t.getPropertyMaps().getObjectId());
+            assertThat(t.getPropertyMaps().getObjectId()).isEqualTo(t.getTableDefPageNumber());
             PropertyMap tProps = t.getProperties();
-            assertEquals(PropertyMaps.DEFAULT_NAME, tProps.getName());
+            assertThat(tProps.getName()).isEqualTo(PropertyMaps.DEFAULT_NAME);
             int expectedNumProps = 3;
             if (db.getFileFormat() != FileFormat.V1997) {
-                assertEquals("{5A29A676-1145-4D1A-AE47-9F5415CDF2F1}", tProps.getValue(PropertyMap.GUID_PROP));
+                assertThat(tProps.getValue(PropertyMap.GUID_PROP)).isEqualTo("{5A29A676-1145-4D1A-AE47-9F5415CDF2F1}");
                 expectedNumProps += 2;
             }
-            assertEquals(expectedNumProps, tProps.getSize());
-            assertEquals((byte) 0, tProps.getValue("Orientation"));
-            assertEquals(Boolean.FALSE, tProps.getValue("OrderByOn"));
-            assertEquals((byte) 2, tProps.getValue("DefaultView"));
+            assertThat(tProps.getSize()).isEqualTo(expectedNumProps);
+            assertThat(tProps.getValue("Orientation")).isEqualTo((byte) 0);
+            assertThat(tProps.getValue("OrderByOn")).isEqualTo(Boolean.FALSE);
+            assertThat(tProps.getValue("DefaultView")).isEqualTo((byte) 2);
 
             PropertyMap colProps = t.getColumn("A").getProperties();
-            assertEquals("A", colProps.getName());
+            assertThat(colProps.getName()).isEqualTo("A");
             expectedNumProps = 9;
             if (db.getFileFormat() != FileFormat.V1997) {
-                assertEquals("{E9EDD90C-CE55-4151-ABE1-A1ACE1007515}", colProps.getValue(PropertyMap.GUID_PROP));
+                assertThat(colProps.getValue(PropertyMap.GUID_PROP)).isEqualTo("{E9EDD90C-CE55-4151-ABE1-A1ACE1007515}");
                 expectedNumProps++;
             }
-            assertEquals(expectedNumProps, colProps.getSize());
-            assertEquals((short) -1, colProps.getValue("ColumnWidth"));
-            assertEquals((short) 0, colProps.getValue("ColumnOrder"));
-            assertEquals(Boolean.FALSE, colProps.getValue("ColumnHidden"));
-            assertEquals(Boolean.FALSE, colProps.getValue(PropertyMap.REQUIRED_PROP));
-            assertEquals(Boolean.FALSE, colProps.getValue(PropertyMap.ALLOW_ZERO_LEN_PROP));
-            assertEquals((short) 109, colProps.getValue("DisplayControl"));
-            assertEquals(Boolean.TRUE, colProps.getValue("UnicodeCompression"));
-            assertEquals((byte) 0, colProps.getValue("IMEMode"));
-            assertEquals((byte) 3, colProps.getValue("IMESentenceMode"));
+            assertThat(colProps.getSize()).isEqualTo(expectedNumProps);
+            assertThat(colProps.getValue("ColumnWidth")).isEqualTo((short) -1);
+            assertThat(colProps.getValue("ColumnOrder")).isEqualTo((short) 0);
+            assertThat(colProps.getValue("ColumnHidden")).isEqualTo(Boolean.FALSE);
+            assertThat(colProps.getValue(PropertyMap.REQUIRED_PROP)).isEqualTo(Boolean.FALSE);
+            assertThat(colProps.getValue(PropertyMap.ALLOW_ZERO_LEN_PROP)).isEqualTo(Boolean.FALSE);
+            assertThat(colProps.getValue("DisplayControl")).isEqualTo((short) 109);
+            assertThat(colProps.getValue("UnicodeCompression")).isEqualTo(Boolean.TRUE);
+            assertThat(colProps.getValue("IMEMode")).isEqualTo((byte) 0);
+            assertThat(colProps.getValue("IMESentenceMode")).isEqualTo((byte) 3);
 
             PropertyMap dbProps = db.getDatabaseProperties();
-            assertTrue(((String) dbProps.getValue(PropertyMap.ACCESS_VERSION_PROP)).matches("[0-9]{2}[.][0-9]{2}"));
+            assertThat(((String) dbProps.getValue(PropertyMap.ACCESS_VERSION_PROP)).matches("[0-9]{2}[.][0-9]{2}")).isTrue();
 
             PropertyMap sumProps = db.getSummaryProperties();
-            assertEquals(3, sumProps.getSize());
-            assertEquals("test", sumProps.getValue(PropertyMap.TITLE_PROP));
-            assertEquals("tmccune", sumProps.getValue(PropertyMap.AUTHOR_PROP));
-            assertEquals("Health Market Science", sumProps.getValue(PropertyMap.COMPANY_PROP));
+            assertThat(sumProps.getSize()).isEqualTo(3);
+            assertThat(sumProps.getValue(PropertyMap.TITLE_PROP)).isEqualTo("test");
+            assertThat(sumProps.getValue(PropertyMap.AUTHOR_PROP)).isEqualTo("tmccune");
+            assertThat(sumProps.getValue(PropertyMap.COMPANY_PROP)).isEqualTo("Health Market Science");
 
             PropertyMap userProps = db.getUserDefinedProperties();
-            assertEquals(1, userProps.getSize());
-            assertEquals(Boolean.TRUE, userProps.getValue("ReplicateProject"));
+            assertThat(userProps.getSize()).isEqualTo(1);
+            assertThat(userProps.getValue("ReplicateProject")).isEqualTo(Boolean.TRUE);
         }
     }
 
     @ParameterizedTest
     @EnumSource(value = FileFormat.class)
-    void testParseProperties(FileFormat ff) throws IOException {
+    void parseProperties(FileFormat ff) throws Exception {
         File[] dbFiles = Optional.ofNullable(new File(DIR_TEST_DATA, ff.name()).listFiles()).orElse(new File[0]);
         for (File f : dbFiles) {
 
@@ -179,8 +175,8 @@ class PropertiesTest extends AbstractBaseTest {
 
             try (Database db = TestUtil.openDb(ff, f)) {
                 PropertyMap dbProps = db.getDatabaseProperties();
-                assertFalse(dbProps.isEmpty());
-                assertTrue(((String) dbProps.getValue(PropertyMap.ACCESS_VERSION_PROP)).matches("[0-9]{2}[.][0-9]{2}"));
+                assertThat(dbProps.isEmpty()).isFalse();
+                assertThat(((String) dbProps.getValue(PropertyMap.ACCESS_VERSION_PROP)).matches("[0-9]{2}[.][0-9]{2}")).isTrue();
 
                 for (Row row : ((DatabaseImpl) db).getSystemCatalog()) {
                     int id = row.getInt("Id");
@@ -188,11 +184,11 @@ class PropertiesTest extends AbstractBaseTest {
                     PropertyMaps propMaps = ((DatabaseImpl) db).getPropertiesForObject(id, null);
                     int byteLen = propBytes != null ? propBytes.length : 0;
                     if (byteLen == 0) {
-                        assertTrue(propMaps.isEmpty());
+                        assertThat(propMaps.isEmpty()).isTrue();
                     } else if (propMaps.isEmpty()) {
-                        assertTrue(byteLen < 80);
+                        assertThat(byteLen < 80).isTrue();
                     } else {
-                        assertTrue(byteLen > 0);
+                        assertThat(byteLen > 0).isTrue();
                     }
                 }
             }
@@ -201,7 +197,7 @@ class PropertiesTest extends AbstractBaseTest {
 
     @ParameterizedTest(name = "[{index}] {0}")
     @TestDbSource(COMMON1)
-    void testWriteProperties(TestDb testDb) throws IOException {
+    void writeProperties(TestDb testDb) throws Exception {
         try (Database db = testDb.open()) {
             TableImpl t = (TableImpl) db.getTable("Table1");
 
@@ -224,14 +220,14 @@ class PropertiesTest extends AbstractBaseTest {
                 checkProperties(propMap, propMap2);
             }
 
-            assertFalse(iter.hasNext());
-            assertFalse(iter2.hasNext());
+            assertThat(iter.hasNext()).isFalse();
+            assertThat(iter2.hasNext()).isFalse();
         }
     }
 
     @ParameterizedTest(name = "[{index}] {0}")
     @TestDbSource(COMMON1)
-    void testModifyProperties(TestDb testDb) throws IOException {
+    void modifyProperties(TestDb testDb) throws Exception {
         File dbFile;
         PropertyMap origCProps;
         PropertyMap origFProps;
@@ -255,9 +251,9 @@ class PropertiesTest extends AbstractBaseTest {
             PropertyMap fProps = t.getColumn("F").getProperties();
             PropertyMap dProps = t.getColumn("D").getProperties();
 
-            assertFalse((Boolean) cProps.getValue(PropertyMap.REQUIRED_PROP));
-            assertEquals("0", fProps.getValue(PropertyMap.DEFAULT_VALUE_PROP));
-            assertEquals((short) 109, dProps.getValue("DisplayControl"));
+            assertThat((Boolean) cProps.getValue(PropertyMap.REQUIRED_PROP)).isFalse();
+            assertThat(fProps.getValue(PropertyMap.DEFAULT_VALUE_PROP)).isEqualTo("0");
+            assertThat(dProps.getValue("DisplayControl")).isEqualTo((short) 109);
 
             cProps.put(PropertyMap.REQUIRED_PROP, DataType.BOOLEAN, true);
             fProps.get(PropertyMap.DEFAULT_VALUE_PROP).setValue("42");
@@ -272,9 +268,9 @@ class PropertiesTest extends AbstractBaseTest {
             PropertyMap fProps = t.getColumn("F").getProperties();
             PropertyMap dProps = t.getColumn("D").getProperties();
 
-            assertFalse((Boolean) cProps.getValue(PropertyMap.REQUIRED_PROP));
-            assertEquals("0", fProps.getValue(PropertyMap.DEFAULT_VALUE_PROP));
-            assertEquals((short) 109, dProps.getValue("DisplayControl"));
+            assertThat((Boolean) cProps.getValue(PropertyMap.REQUIRED_PROP)).isFalse();
+            assertThat(fProps.getValue(PropertyMap.DEFAULT_VALUE_PROP)).isEqualTo("0");
+            assertThat(dProps.getValue("DisplayControl")).isEqualTo((short) 109);
 
             checkProperties(origCProps, cProps);
             checkProperties(origFProps, fProps);
@@ -296,9 +292,9 @@ class PropertiesTest extends AbstractBaseTest {
             PropertyMap fProps = t.getColumn("F").getProperties();
             PropertyMap dProps = t.getColumn("D").getProperties();
 
-            assertTrue((Boolean) cProps.getValue(PropertyMap.REQUIRED_PROP));
-            assertEquals("42", fProps.getValue(PropertyMap.DEFAULT_VALUE_PROP));
-            assertNull(dProps.getValue("DisplayControl"));
+            assertThat((Boolean) cProps.getValue(PropertyMap.REQUIRED_PROP)).isTrue();
+            assertThat(fProps.getValue(PropertyMap.DEFAULT_VALUE_PROP)).isEqualTo("42");
+            assertThat(dProps.getValue("DisplayControl")).isNull();
 
             cProps.put(PropertyMap.REQUIRED_PROP, DataType.BOOLEAN, false);
             fProps.get(PropertyMap.DEFAULT_VALUE_PROP).setValue("0");
@@ -312,7 +308,7 @@ class PropertiesTest extends AbstractBaseTest {
 
     @ParameterizedTest(name = "[{index}] {0}")
     @FileFormatSource(exclude = "GENERIC_JET4")
-    void testCreateDbProperties(FileFormat fileFormat) throws IOException {
+    void createDbProperties(FileFormat fileFormat) throws Exception {
         UUID u1 = UUID.randomUUID();
         UUID u2 = UUID.randomUUID();
 
@@ -337,25 +333,25 @@ class PropertiesTest extends AbstractBaseTest {
         }
 
         try (Database db = DatabaseBuilder.open(file)) {
-            assertEquals("123", db.getUserDefinedProperties().getValue("testing"));
+            assertThat(db.getUserDefinedProperties().getValue("testing")).isEqualTo("123");
 
             Table t = db.getTable("Test");
 
-            assertEquals(Boolean.TRUE, t.getProperties().getValue("awesome_table"));
+            assertThat(t.getProperties().getValue("awesome_table")).isEqualTo(Boolean.TRUE);
 
             Column c = t.getColumn("id");
-            assertEquals(Boolean.TRUE, c.getProperties().getValue(PropertyMap.REQUIRED_PROP));
-            assertEquals("{" + u1.toString().toUpperCase() + "}", c.getProperties().getValue(PropertyMap.GUID_PROP));
+            assertThat(c.getProperties().getValue(PropertyMap.REQUIRED_PROP)).isEqualTo(Boolean.TRUE);
+            assertThat(c.getProperties().getValue(PropertyMap.GUID_PROP)).isEqualTo("{" + u1.toString().toUpperCase() + "}");
 
             c = t.getColumn("data");
-            assertEquals(Boolean.FALSE, c.getProperties().getValue(PropertyMap.ALLOW_ZERO_LEN_PROP));
-            assertEquals("{" + u2.toString().toUpperCase() + "}", c.getProperties().getValue(PropertyMap.GUID_PROP));
+            assertThat(c.getProperties().getValue(PropertyMap.ALLOW_ZERO_LEN_PROP)).isEqualTo(Boolean.FALSE);
+            assertThat(c.getProperties().getValue(PropertyMap.GUID_PROP)).isEqualTo("{" + u2.toString().toUpperCase() + "}");
         }
     }
 
     @ParameterizedTest(name = "[{index}] {0}")
     @FileFormatSource
-    void testEnforceProperties(FileFormat fileFormat) throws IOException {
+    void enforceProperties(FileFormat fileFormat) throws Exception {
         try (Database db = createDbMem(fileFormat)) {
             Table t = DatabaseBuilder.newTable("testReq")
                 .addColumn(DatabaseBuilder.newColumn("id", DataType.LONG)
@@ -422,7 +418,7 @@ class PropertiesTest extends AbstractBaseTest {
     }
 
     @Test
-    void testEnumValues() {
+    void enumValues() {
         PropertyMaps maps = new PropertyMaps(10, null, null, null);
 
         PropertyMapImpl colMap = maps.get("testcol");
@@ -430,26 +426,25 @@ class PropertiesTest extends AbstractBaseTest {
         colMap.put(PropertyMap.DISPLAY_CONTROL_PROP,
             PropertyMap.DisplayControl.TEXT_BOX);
 
-        assertEquals(PropertyMap.DisplayControl.TEXT_BOX.getValue(),
-            colMap.getValue(PropertyMap.DISPLAY_CONTROL_PROP));
+        assertThat(colMap.getValue(PropertyMap.DISPLAY_CONTROL_PROP)).isEqualTo(PropertyMap.DisplayControl.TEXT_BOX.getValue());
     }
 
     private static void checkProperties(PropertyMap propMap1,
         PropertyMap propMap2) {
-        assertEquals(propMap1.getSize(), propMap2.getSize());
+        assertThat(propMap2.getSize()).isEqualTo(propMap1.getSize());
         for (PropertyMap.Property prop : propMap1) {
             PropertyMap.Property prop2 = propMap2.get(prop.getName());
 
-            assertEquals(prop.getName(), prop2.getName());
-            assertEquals(prop.getType(), prop2.getType());
+            assertThat(prop2.getName()).isEqualTo(prop.getName());
+            assertThat(prop2.getType()).isEqualTo(prop.getType());
 
             Object v1 = prop.getValue();
             Object v2 = prop2.getValue();
 
             if (v1 instanceof byte[]) {
-                assertArrayEquals((byte[]) v1, (byte[]) v2);
+                assertThat((byte[]) v2).containsExactly((byte[]) v1);
             } else {
-                assertEquals(v1, v2);
+                assertThat(v2).isEqualTo(v1);
             }
         }
     }

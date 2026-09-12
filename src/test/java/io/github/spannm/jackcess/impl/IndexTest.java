@@ -17,6 +17,8 @@ limitations under the License.
 package io.github.spannm.jackcess.impl;
 
 import static io.github.spannm.jackcess.test.Basename.*;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import io.github.spannm.jackcess.*;
 import io.github.spannm.jackcess.Database.FileFormat;
@@ -47,21 +49,21 @@ class IndexTest extends AbstractBaseTest {
     }
 
     @Test
-    void testByteOrder() {
+    void byteOrder() {
         byte b1 = (byte) 0x00;
         byte b2 = (byte) 0x01;
         byte b3 = (byte) 0x7F;
         byte b4 = (byte) 0x80;
         byte b5 = (byte) 0xFF;
 
-        assertTrue(ByteUtil.asUnsignedByte(b1) < ByteUtil.asUnsignedByte(b2));
-        assertTrue(ByteUtil.asUnsignedByte(b2) < ByteUtil.asUnsignedByte(b3));
-        assertTrue(ByteUtil.asUnsignedByte(b3) < ByteUtil.asUnsignedByte(b4));
-        assertTrue(ByteUtil.asUnsignedByte(b4) < ByteUtil.asUnsignedByte(b5));
+        assertThat(ByteUtil.asUnsignedByte(b1) < ByteUtil.asUnsignedByte(b2)).isTrue();
+        assertThat(ByteUtil.asUnsignedByte(b2) < ByteUtil.asUnsignedByte(b3)).isTrue();
+        assertThat(ByteUtil.asUnsignedByte(b3) < ByteUtil.asUnsignedByte(b4)).isTrue();
+        assertThat(ByteUtil.asUnsignedByte(b4) < ByteUtil.asUnsignedByte(b5)).isTrue();
     }
 
     @Test
-    void testByteCodeComparator() {
+    void byteCodeComparator() {
         byte[] b0 = null;
         byte[] b1 = new byte[] {(byte) 0x00};
         byte[] b2 = new byte[] {(byte) 0x00, (byte) 0x00};
@@ -75,13 +77,13 @@ class IndexTest extends AbstractBaseTest {
         List<byte[]> expectedList = Arrays.asList(b0, b1, b2, b3, b4, b5, b6, b7, b8);
         SortedSet<byte[]> sortedSet = new TreeSet<>(IndexData.BYTE_CODE_COMPARATOR);
         sortedSet.addAll(expectedList);
-        assertEquals(expectedList, new ArrayList<>(sortedSet));
+        assertThat(new ArrayList<>(sortedSet)).isEqualTo(expectedList);
 
     }
 
     @ParameterizedTest(name = "[{index}] {0}")
     @TestDbReadOnlySource(COMMON1)
-    void testPrimaryKey(TestDb testDb) throws IOException {
+    void primaryKey(TestDb testDb) throws Exception {
         try (Database db = testDb.open()) {
             Table table = db.getTable("Table1");
             Map<String, Boolean> foundPKs = new HashMap<>();
@@ -97,22 +99,22 @@ class IndexTest extends AbstractBaseTest {
             Map<String, Boolean> expectedPKs = new HashMap<>();
             expectedPKs.put("A", Boolean.TRUE);
             expectedPKs.put("B", Boolean.FALSE);
-            assertEquals(expectedPKs, foundPKs);
-            assertSame(pkIndex, table.getPrimaryKeyIndex());
+            assertThat(foundPKs).isEqualTo(expectedPKs);
+            assertThat(table.getPrimaryKeyIndex()).isSameAs(pkIndex);
         }
     }
 
     @ParameterizedTest(name = "[{index}] {0}")
     @TestDbReadOnlySource(INDEX)
-    void testLogicalIndexes(TestDb testDb) throws IOException {
+    void logicalIndexes(TestDb testDb) throws Exception {
 
         try (Database db = testDb.open()) {
             TableImpl table = (TableImpl) db.getTable("Table1");
             for (IndexImpl idx : table.getIndexes()) {
                 idx.initialize();
             }
-            assertEquals(4, table.getIndexes().size());
-            assertEquals(4, table.getLogicalIndexCount());
+            assertThat(table.getIndexes().size()).isEqualTo(4);
+            assertThat(table.getLogicalIndexCount()).isEqualTo(4);
             checkIndexColumns(table,
                 "id", "id",
                 "PrimaryKey", "id",
@@ -123,9 +125,9 @@ class IndexTest extends AbstractBaseTest {
             for (IndexImpl idx : table.getIndexes()) {
                 idx.initialize();
             }
-            assertEquals(3, table.getIndexes().size());
-            assertEquals(2, table.getIndexDatas().size());
-            assertEquals(3, table.getLogicalIndexCount());
+            assertThat(table.getIndexes().size()).isEqualTo(3);
+            assertThat(table.getIndexDatas().size()).isEqualTo(2);
+            assertThat(table.getLogicalIndexCount()).isEqualTo(3);
             checkIndexColumns(table,
                 "id", "id",
                 "PrimaryKey", "id",
@@ -133,20 +135,20 @@ class IndexTest extends AbstractBaseTest {
 
             IndexImpl pkIdx = table.getIndex("PrimaryKey");
             IndexImpl fkIdx = table.getIndex(".rC");
-            assertNotSame(pkIdx, fkIdx);
-            assertTrue(fkIdx.isForeignKey());
-            assertSame(pkIdx.getIndexData(), fkIdx.getIndexData());
+            assertThat(fkIdx).isNotSameAs(pkIdx);
+            assertThat(fkIdx.isForeignKey()).isTrue();
+            assertThat(fkIdx.getIndexData()).isSameAs(pkIdx.getIndexData());
             IndexData indexData = pkIdx.getIndexData();
-            assertEquals(List.of(pkIdx, fkIdx), indexData.getIndexes());
-            assertSame(pkIdx, indexData.getPrimaryIndex());
+            assertThat(indexData.getIndexes()).isEqualTo(List.of(pkIdx, fkIdx));
+            assertThat(indexData.getPrimaryIndex()).isSameAs(pkIdx);
 
             table = (TableImpl) db.getTable("Table3");
             for (IndexImpl idx : table.getIndexes()) {
                 idx.initialize();
             }
-            assertEquals(3, table.getIndexes().size());
-            assertEquals(2, table.getIndexDatas().size());
-            assertEquals(3, table.getLogicalIndexCount());
+            assertThat(table.getIndexes().size()).isEqualTo(3);
+            assertThat(table.getIndexDatas().size()).isEqualTo(2);
+            assertThat(table.getLogicalIndexCount()).isEqualTo(3);
             checkIndexColumns(table,
                 "id", "id",
                 "PrimaryKey", "id",
@@ -154,25 +156,25 @@ class IndexTest extends AbstractBaseTest {
 
             pkIdx = table.getIndex("PrimaryKey");
             fkIdx = table.getIndex(".rC");
-            assertNotSame(pkIdx, fkIdx);
-            assertTrue(fkIdx.isForeignKey());
-            assertSame(pkIdx.getIndexData(), fkIdx.getIndexData());
+            assertThat(fkIdx).isNotSameAs(pkIdx);
+            assertThat(fkIdx.isForeignKey()).isTrue();
+            assertThat(fkIdx.getIndexData()).isSameAs(pkIdx.getIndexData());
             indexData = pkIdx.getIndexData();
-            assertEquals(List.of(pkIdx, fkIdx), indexData.getIndexes());
-            assertSame(pkIdx, indexData.getPrimaryIndex());
+            assertThat(indexData.getIndexes()).isEqualTo(List.of(pkIdx, fkIdx));
+            assertThat(indexData.getPrimaryIndex()).isSameAs(pkIdx);
         }
     }
 
     @ParameterizedTest(name = "[{index}] {0}")
     @TestDbSource(COMP_INDEX)
-    void testComplexIndex(TestDb testDb) throws IOException {
+    void complexIndex(TestDb testDb) throws Exception {
         try (// this file has an index with "compressed" entries and node pages
         Database db1 = testDb.open()) {
             TableImpl t1 = (TableImpl) db1.getTable("Table1");
             IndexImpl idx1 = t1.getIndexes().get(0);
-            assertFalse(idx1.isInitialized());
-            assertEquals(512, TestUtil.countRows(t1));
-            assertEquals(512, idx1.getIndexData().getEntryCount());
+            assertThat(idx1.isInitialized()).isFalse();
+            assertThat(TestUtil.countRows(t1)).isEqualTo(512);
+            assertThat(idx1.getIndexData().getEntryCount()).isEqualTo(512);
         }
 
         try (// copy to temp file and attempt to edit
@@ -184,7 +186,7 @@ class IndexTest extends AbstractBaseTest {
 
     @ParameterizedTest(name = "[{index}] {0}")
     @TestDbSource(COMMON1)
-    void testEntryDeletion(TestDb testDb) throws IOException {
+    void entryDeletion(TestDb testDb) throws Exception {
         try (Database db = testDb.openCopy()) {
             Table table = db.getTable("Table1");
 
@@ -196,7 +198,7 @@ class IndexTest extends AbstractBaseTest {
             TestUtil.assertRowCount(12, table);
 
             for (Index index : table.getIndexes()) {
-                assertEquals(12, ((IndexImpl) index).getIndexData().getEntryCount());
+                assertThat(((IndexImpl) index).getIndexData().getEntryCount()).isEqualTo(12);
             }
 
             table.reset();
@@ -217,14 +219,14 @@ class IndexTest extends AbstractBaseTest {
             TestUtil.assertRowCount(8, table);
 
             for (Index index : table.getIndexes()) {
-                assertEquals(8, ((IndexImpl) index).getIndexData().getEntryCount());
+                assertThat(((IndexImpl) index).getIndexData().getEntryCount()).isEqualTo(8);
             }
         }
     }
 
     @ParameterizedTest(name = "[{index}] {0}")
     @TestDbSource(INDEX_PROPERTIES)
-    void testIgnoreNulls(TestDb testDb) throws Exception {
+    void ignoreNulls(TestDb testDb) throws Exception {
         try (Database db = testDb.openCopy()) {
             db.setEvaluateExpressions(false);
 
@@ -244,8 +246,7 @@ class IndexTest extends AbstractBaseTest {
             temp.addRow(orig.asRow(row));
         }
 
-        assertEquals(origI.getIndexData().getEntryCount(),
-            tempI.getIndexData().getEntryCount());
+        assertThat(tempI.getIndexData().getEntryCount()).isEqualTo(origI.getIndexData().getEntryCount());
 
         Cursor origC = origI.newCursor().toCursor();
         Cursor tempC = tempI.newCursor().toCursor();
@@ -253,7 +254,7 @@ class IndexTest extends AbstractBaseTest {
         while (true) {
             boolean origHasNext = origC.moveToNextRow();
             boolean tempHasNext = tempC.moveToNextRow();
-            assertEquals(origHasNext, tempHasNext);
+            assertThat(tempHasNext).isEqualTo(origHasNext);
             if (!origHasNext) {
                 break;
             }
@@ -263,14 +264,14 @@ class IndexTest extends AbstractBaseTest {
             Map<String, Object> tempRow = tempC.getCurrentRow();
             Cursor.Position tempCurPos = tempC.getSavepoint().getCurrentPosition();
 
-            assertEquals(origRow, tempRow);
-            assertEquals(IndexCodesTest.entryToString(origCurPos), IndexCodesTest.entryToString(tempCurPos));
+            assertThat(tempRow).isEqualTo(origRow);
+            assertThat(IndexCodesTest.entryToString(tempCurPos)).isEqualTo(IndexCodesTest.entryToString(origCurPos));
         }
     }
 
     @ParameterizedTest(name = "[{index}] {0}")
     @TestDbSource(INDEX_PROPERTIES)
-    void testUnique(TestDb testDb) throws IOException {
+    void unique(TestDb testDb) throws Exception {
         try (Database db = testDb.openCopy()) {
             Table t = db.getTable("TableUnique1_temp");
             Index index = t.getIndex("DataIndex");
@@ -320,25 +321,25 @@ class IndexTest extends AbstractBaseTest {
                 failure = _ex;
             }
             if (expectedSuccess) {
-                assertNull(failure);
+                assertThat(failure).isNull();
             } else {
-                assertNotNull(failure);
-                assertTrue(failure.getMessage().contains("uniqueness"));
+                assertThat(failure).isNotNull();
+                assertThat(failure.getMessage().contains("uniqueness")).isTrue();
             }
         }
     }
 
     @ParameterizedTest(name = "[{index}] {0}")
     @TestDbSource(COMMON1)
-    void testUniqueEntryCount(TestDb testDb) throws IOException {
+    void uniqueEntryCount(TestDb testDb) throws Exception {
         try (Database db = testDb.openCopy()) {
             db.setDateTimeType(DateTimeType.DATE);
             Table table = db.getTable("Table1");
             IndexImpl indA = (IndexImpl) table.getIndex("PrimaryKey");
             IndexImpl indB = (IndexImpl) table.getIndex("B");
 
-            assertEquals(2, indA.getUniqueEntryCount());
-            assertEquals(2, indB.getUniqueEntryCount());
+            assertThat(indA.getUniqueEntryCount()).isEqualTo(2);
+            assertThat(indB.getUniqueEntryCount()).isEqualTo(2);
 
             List<String> bElems = Arrays.asList("bar", null, "baz", "argle", null, "bazzle", "37", "bar", "bar", "BAZ");
 
@@ -346,11 +347,11 @@ class IndexTest extends AbstractBaseTest {
                 table.addRow("foo" + i, bElems.get(i), (byte) 42 + i, (short) 53 + i, 13 * i, 6.7d / i, null, null, true);
             }
 
-            assertEquals(12, indA.getIndexData().getEntryCount());
-            assertEquals(12, indB.getIndexData().getEntryCount());
+            assertThat(indA.getIndexData().getEntryCount()).isEqualTo(12);
+            assertThat(indB.getIndexData().getEntryCount()).isEqualTo(12);
 
-            assertEquals(12, indA.getUniqueEntryCount());
-            assertEquals(8, indB.getUniqueEntryCount());
+            assertThat(indA.getUniqueEntryCount()).isEqualTo(12);
+            assertThat(indB.getUniqueEntryCount()).isEqualTo(8);
 
             table = null;
             indA = null;
@@ -360,14 +361,14 @@ class IndexTest extends AbstractBaseTest {
             indA = (IndexImpl) table.getIndex("PrimaryKey");
             indB = (IndexImpl) table.getIndex("B");
 
-            assertEquals(12, indA.getIndexData().getEntryCount());
-            assertEquals(12, indB.getIndexData().getEntryCount());
+            assertThat(indA.getIndexData().getEntryCount()).isEqualTo(12);
+            assertThat(indB.getIndexData().getEntryCount()).isEqualTo(12);
 
-            assertEquals(12, indA.getUniqueEntryCount());
-            assertEquals(8, indB.getUniqueEntryCount());
+            assertThat(indA.getUniqueEntryCount()).isEqualTo(12);
+            assertThat(indB.getUniqueEntryCount()).isEqualTo(8);
 
             Cursor c = CursorBuilder.createCursor(table);
-            assertTrue(c.moveToNextRow());
+            assertThat(c.moveToNextRow()).isTrue();
 
             final Row row = c.getCurrentRow();
             // Row order is arbitrary, so v2007 row order difference is valid
@@ -378,17 +379,17 @@ class IndexTest extends AbstractBaseTest {
             }
             c.deleteCurrentRow();
 
-            assertEquals(11, indA.getIndexData().getEntryCount());
-            assertEquals(11, indB.getIndexData().getEntryCount());
+            assertThat(indA.getIndexData().getEntryCount()).isEqualTo(11);
+            assertThat(indB.getIndexData().getEntryCount()).isEqualTo(11);
 
-            assertEquals(12, indA.getUniqueEntryCount());
-            assertEquals(8, indB.getUniqueEntryCount());
+            assertThat(indA.getUniqueEntryCount()).isEqualTo(12);
+            assertThat(indB.getUniqueEntryCount()).isEqualTo(8);
         }
     }
 
     @ParameterizedTest(name = "[{index}] {0}")
     @TestDbSource(COMMON1)
-    void testReplId(TestDb testDb) throws IOException {
+    void replId(TestDb testDb) throws Exception {
         try (Database db = testDb.openCopy()) {
             Table table = db.getTable("Table4");
 
@@ -396,13 +397,13 @@ class IndexTest extends AbstractBaseTest {
                 table.addRow("row" + i, Column.AUTO_NUMBER);
             }
 
-            assertEquals(20, table.getRowCount());
+            assertThat(table.getRowCount()).isEqualTo(20);
         }
     }
 
     @ParameterizedTest(name = "[{index}] {0}")
     @FileFormatSource
-    void testIndexCreation(FileFormat fileFormat) throws IOException {
+    void indexCreation(FileFormat fileFormat) throws Exception {
         try (Database db = createDbMem(fileFormat)) {
             Table t = DatabaseBuilder.newTable("TestTable")
                 .addColumn(DatabaseBuilder.newColumn("id", DataType.LONG))
@@ -410,17 +411,17 @@ class IndexTest extends AbstractBaseTest {
                 .withPrimaryKey("id")
                 .toTable(db);
 
-            assertEquals(1, t.getIndexes().size());
+            assertThat(t.getIndexes().size()).isEqualTo(1);
             IndexImpl idx = (IndexImpl) t.getIndexes().get(0);
 
-            assertEquals(IndexBuilder.PRIMARY_KEY_NAME, idx.getName());
-            assertEquals(1, idx.getColumns().size());
-            assertEquals("id", idx.getColumns().get(0).getName());
-            assertTrue(idx.getColumns().get(0).isAscending());
-            assertTrue(idx.isPrimaryKey());
-            assertTrue(idx.isUnique());
-            assertFalse(idx.shouldIgnoreNulls());
-            assertNull(idx.getReference());
+            assertThat(idx.getName()).isEqualTo(IndexBuilder.PRIMARY_KEY_NAME);
+            assertThat(idx.getColumns().size()).isEqualTo(1);
+            assertThat(idx.getColumns().get(0).getName()).isEqualTo("id");
+            assertThat(idx.getColumns().get(0).isAscending()).isTrue();
+            assertThat(idx.isPrimaryKey()).isTrue();
+            assertThat(idx.isUnique()).isTrue();
+            assertThat(idx.shouldIgnoreNulls()).isFalse();
+            assertThat(idx.getReference()).isNull();
 
             t.addRow(2, "row2");
             t.addRow(1, "row1");
@@ -431,16 +432,16 @@ class IndexTest extends AbstractBaseTest {
 
             for (int i = 1; i <= 3; i++) {
                 Map<String, Object> row = c.getNextRow();
-                assertEquals(i, row.get("id"));
-                assertEquals("row" + i, row.get("data"));
+                assertThat(row.get("id")).isEqualTo(i);
+                assertThat(row.get("data")).isEqualTo("row" + i);
             }
-            assertFalse(c.moveToNextRow());
+            assertThat(c.moveToNextRow()).isFalse();
         }
     }
 
     @ParameterizedTest(name = "[{index}] {0}")
     @FileFormatSource
-    void testIndexCreationSharedData(FileFormat fileFormat) throws IOException {
+    void indexCreationSharedData(FileFormat fileFormat) throws Exception {
         try (Database db = createDbMem(fileFormat)) {
             Table t = DatabaseBuilder.newTable("TestTable")
                 .addColumn(DatabaseBuilder.newColumn("id", DataType.LONG))
@@ -451,25 +452,25 @@ class IndexTest extends AbstractBaseTest {
                 .addIndex(DatabaseBuilder.newIndex("Index3").withColumns(false, "id"))
                 .toTable(db);
 
-            assertEquals(4, t.getIndexes().size());
+            assertThat(t.getIndexes().size()).isEqualTo(4);
             IndexImpl idx = (IndexImpl) t.getIndexes().get(0);
 
-            assertEquals(IndexBuilder.PRIMARY_KEY_NAME, idx.getName());
-            assertEquals(1, idx.getColumns().size());
-            assertEquals("id", idx.getColumns().get(0).getName());
-            assertTrue(idx.getColumns().get(0).isAscending());
-            assertTrue(idx.isPrimaryKey());
-            assertTrue(idx.isUnique());
-            assertFalse(idx.shouldIgnoreNulls());
-            assertNull(idx.getReference());
+            assertThat(idx.getName()).isEqualTo(IndexBuilder.PRIMARY_KEY_NAME);
+            assertThat(idx.getColumns().size()).isEqualTo(1);
+            assertThat(idx.getColumns().get(0).getName()).isEqualTo("id");
+            assertThat(idx.getColumns().get(0).isAscending()).isTrue();
+            assertThat(idx.isPrimaryKey()).isTrue();
+            assertThat(idx.isUnique()).isTrue();
+            assertThat(idx.shouldIgnoreNulls()).isFalse();
+            assertThat(idx.getReference()).isNull();
 
             IndexImpl idx1 = (IndexImpl) t.getIndexes().get(1);
             IndexImpl idx2 = (IndexImpl) t.getIndexes().get(2);
             IndexImpl idx3 = (IndexImpl) t.getIndexes().get(3);
 
-            assertNotSame(idx.getIndexData(), idx1.getIndexData());
-            assertSame(idx1.getIndexData(), idx2.getIndexData());
-            assertNotSame(idx2.getIndexData(), idx3.getIndexData());
+            assertThat(idx1.getIndexData()).isNotSameAs(idx.getIndexData());
+            assertThat(idx2.getIndexData()).isSameAs(idx1.getIndexData());
+            assertThat(idx3.getIndexData()).isNotSameAs(idx2.getIndexData());
 
             t.addRow(2, "row2");
             t.addRow(1, "row1");
@@ -480,16 +481,16 @@ class IndexTest extends AbstractBaseTest {
 
             for (int i = 1; i <= 3; i++) {
                 Map<String, Object> row = c.getNextRow();
-                assertEquals(i, row.get("id"));
-                assertEquals("row" + i, row.get("data"));
+                assertThat(row.get("id")).isEqualTo(i);
+                assertThat(row.get("data")).isEqualTo("row" + i);
             }
-            assertFalse(c.moveToNextRow());
+            assertThat(c.moveToNextRow()).isFalse();
         }
     }
 
     @ParameterizedTest(name = "[{index}] {0}")
     @TestDbReadOnlySource(INDEX)
-    void testGetForeignKeyIndex(TestDb testDb) throws IOException {
+    void getForeignKeyIndex(TestDb testDb) throws Exception {
 
         try (Database db = testDb.open()) {
             Table t1 = db.getTable("Table1");
@@ -499,30 +500,30 @@ class IndexTest extends AbstractBaseTest {
             IndexImpl t2t1 = (IndexImpl) t1.getIndex("Table2Table1");
             IndexImpl t3t1 = (IndexImpl) t1.getIndex("Table3Table1");
 
-            assertTrue(t2t1.isForeignKey());
-            assertNotNull(t2t1.getReference());
-            assertFalse(t2t1.getReference().isPrimaryTable());
-            assertFalse(t2t1.getReference().isCascadeUpdates());
-            assertTrue(t2t1.getReference().isCascadeDeletes());
+            assertThat(t2t1.isForeignKey()).isTrue();
+            assertThat(t2t1.getReference()).isNotNull();
+            assertThat(t2t1.getReference().isPrimaryTable()).isFalse();
+            assertThat(t2t1.getReference().isCascadeUpdates()).isFalse();
+            assertThat(t2t1.getReference().isCascadeDeletes()).isTrue();
             doCheckForeignKeyIndex(t2t1, t2);
 
-            assertTrue(t3t1.isForeignKey());
-            assertNotNull(t3t1.getReference());
-            assertFalse(t3t1.getReference().isPrimaryTable());
-            assertTrue(t3t1.getReference().isCascadeUpdates());
-            assertFalse(t3t1.getReference().isCascadeDeletes());
+            assertThat(t3t1.isForeignKey()).isTrue();
+            assertThat(t3t1.getReference()).isNotNull();
+            assertThat(t3t1.getReference().isPrimaryTable()).isFalse();
+            assertThat(t3t1.getReference().isCascadeUpdates()).isTrue();
+            assertThat(t3t1.getReference().isCascadeDeletes()).isFalse();
             doCheckForeignKeyIndex(t3t1, t3);
 
             Index t1pk = t1.getIndex(IndexBuilder.PRIMARY_KEY_NAME);
-            assertNotNull(t1pk);
-            assertNull(((IndexImpl) t1pk).getReference());
-            assertNull(t1pk.getReferencedIndex());
+            assertThat(t1pk).isNotNull();
+            assertThat(((IndexImpl) t1pk).getReference()).isNull();
+            assertThat(t1pk.getReferencedIndex()).isNull();
         }
     }
 
     @ParameterizedTest(name = "[{index}] {0}")
     @FileFormatSource
-    void testConstraintViolation(FileFormat fileFormat) throws IOException {
+    void constraintViolation(FileFormat fileFormat) throws Exception {
 
         try (Database db = createDbMem(fileFormat)) {
             Table t = DatabaseBuilder.newTable("TestTable")
@@ -539,7 +540,7 @@ class IndexTest extends AbstractBaseTest {
 
             assertThrows(ConstraintViolationException.class, () -> t.addRow(3, "badrow"));
 
-            assertEquals(5, t.getRowCount());
+            assertThat(t.getRowCount()).isEqualTo(5);
 
             List<Row> expectedRows = TestUtil.createExpectedTable(TestUtil.createExpectedRow("id", 0, "data", "row0"),
                     TestUtil.createExpectedRow("id", 1, "data", "row1"),
@@ -561,8 +562,8 @@ class IndexTest extends AbstractBaseTest {
             batch.add(new Object[] {8, "row8"});
 
             BatchUpdateException buex = assertThrows(BatchUpdateException.class, () -> t.addRows(batch));
-            assertInstanceOf(ConstraintViolationException.class, buex.getCause());
-            assertEquals(2, buex.getUpdateCount());
+            assertThat(buex.getCause()).isInstanceOf(ConstraintViolationException.class);
+            assertThat(buex.getUpdateCount()).isEqualTo(2);
 
             expectedRows = new ArrayList<>(expectedRows);
             expectedRows.add(TestUtil.createExpectedRow("id", 5, "data", "row5"));
@@ -591,7 +592,7 @@ class IndexTest extends AbstractBaseTest {
 
     @ParameterizedTest(name = "[{index}] {0}")
     @FileFormatSource
-    void testAutoNumberRecover(FileFormat fileFormat) throws IOException {
+    void autoNumberRecover(FileFormat fileFormat) throws Exception {
         try (Database db = createDbMem(fileFormat)) {
             Table t = DatabaseBuilder.newTable("TestTable")
                 .addColumn(DatabaseBuilder.newColumn("id", DataType.LONG).withAutoNumber(true))
@@ -609,7 +610,7 @@ class IndexTest extends AbstractBaseTest {
 
             t.addRow(null, "row3");
 
-            assertEquals(3, t.getRowCount());
+            assertThat(t.getRowCount()).isEqualTo(3);
 
             List<Row> expectedRows = TestUtil.createExpectedTable(
                     TestUtil.createExpectedRow("id", 1, "data", "row1"),
@@ -629,8 +630,8 @@ class IndexTest extends AbstractBaseTest {
             batch.add(new Object[] {null, "row3"});
 
             BatchUpdateException buex = assertThrows(BatchUpdateException.class, () -> t.addRows(batch));
-            assertInstanceOf(ConstraintViolationException.class, buex.getCause());
-            assertEquals(2, buex.getUpdateCount());
+            assertThat(buex.getCause()).isInstanceOf(ConstraintViolationException.class);
+            assertThat(buex.getUpdateCount()).isEqualTo(2);
 
             expectedRows = new ArrayList<>(expectedRows);
             expectedRows.add(TestUtil.createExpectedRow("id", 4, "data", "row4"));
@@ -647,7 +648,7 @@ class IndexTest extends AbstractBaseTest {
 
     @ParameterizedTest(name = "[{index}] {0}")
     @TestDbSource(BINARY_INDEX)
-    void testBinaryIndex(TestDb testDb) throws IOException {
+    void binaryIndex(TestDb testDb) throws Exception {
         try (Database db = testDb.open()) {
             Table table = db.getTable("Test");
 
@@ -669,24 +670,24 @@ class IndexTest extends AbstractBaseTest {
             boolean found = false;
             for (Row idxRow : ic.newEntryIterable(data)) {
 
-                assertArrayEquals(data, idxRow.getBytes(colName));
+                assertThat(idxRow.getBytes(colName)).containsExactly(data);
                 if (id == idxRow.getInt("ID")) {
                     found = true;
                 }
             }
 
-            assertTrue(found);
+            assertThat(found).isTrue();
         }
     }
 
     private void doCheckForeignKeyIndex(Index ia, Table tb) throws IOException {
         IndexImpl ib = (IndexImpl) ia.getReferencedIndex();
-        assertNotNull(ib);
-        assertSame(tb, ib.getTable());
+        assertThat(ib).isNotNull();
+        assertThat(ib.getTable()).isSameAs(tb);
 
-        assertNotNull(ib.getReference());
-        assertSame(ia, ib.getReferencedIndex());
-        assertTrue(ib.getReference().isPrimaryTable());
+        assertThat(ib.getReference()).isNotNull();
+        assertThat(ib.getReferencedIndex()).isSameAs(ia);
+        assertThat(ib.getReference().isPrimaryTable()).isTrue();
     }
 
     private void checkIndexColumns(Table table, String... idxInfo) {
@@ -697,12 +698,12 @@ class IndexTest extends AbstractBaseTest {
 
         for (Index idx : table.getIndexes()) {
             String colName = expectedIndexes.get(idx.getName());
-            assertEquals(1, idx.getColumns().size());
-            assertEquals(colName, idx.getColumns().get(0).getName());
+            assertThat(idx.getColumns().size()).isEqualTo(1);
+            assertThat(idx.getColumns().get(0).getName()).isEqualTo(colName);
             if ("PrimaryKey".equals(idx.getName())) {
-                assertTrue(idx.isPrimaryKey());
+                assertThat(idx.isPrimaryKey()).isTrue();
             } else {
-                assertFalse(idx.isPrimaryKey());
+                assertThat(idx.isPrimaryKey()).isFalse();
             }
         }
     }

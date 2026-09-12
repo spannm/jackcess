@@ -16,6 +16,8 @@
 package io.github.spannm.jackcess.impl.complex;
 
 import static io.github.spannm.jackcess.test.Basename.COMPLEX_DATA;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import io.github.spannm.jackcess.*;
 import io.github.spannm.jackcess.test.AbstractBaseTest;
@@ -23,7 +25,6 @@ import io.github.spannm.jackcess.test.TestDb;
 import io.github.spannm.jackcess.test.source.TestDbSource;
 import org.junit.jupiter.params.ParameterizedTest;
 
-import java.io.IOException;
 import java.util.Iterator;
 import java.util.List;
 import java.util.NoSuchElementException;
@@ -35,63 +36,63 @@ class MultiValueColumnPropertyMapTest extends AbstractBaseTest {
 
     @ParameterizedTest(name = "[{index}] {0}")
     @TestDbSource(COMPLEX_DATA)
-    void testMultiValuePropertyMap(TestDb testDb) throws IOException {
+    void multiValuePropertyMap(TestDb testDb) throws Exception {
         try (Database db = testDb.openCopy()) {
             Table t1 = db.getTable("Table1");
             Column col = t1.getColumn("multi-value-data");
             PropertyMap props = col.getProperties();
-            assertInstanceOf(MultiValueColumnPropertyMap.class, props);
+            assertThat(props).isInstanceOf(MultiValueColumnPropertyMap.class);
 
-            assertNotNull(props.getName());
-            assertFalse(props.isEmpty());
-            assertTrue(props.getSize() > 1);
+            assertThat(props.getName()).isNotNull();
+            assertThat(props.isEmpty()).isFalse();
+            assertThat(props.getSize() > 1).isTrue();
 
-            assertEquals(Boolean.TRUE, props.getValue(PropertyMap.ALLOW_MULTI_VALUE_PROP));
-            assertNotNull(props.get(PropertyMap.ROW_SOURCE_TYPE_PROP));
-            assertNull(props.get("bogusProperty"));
-            assertNull(props.getValue("bogusProperty"));
-            assertEquals("dflt", props.getValue("bogusProperty", "dflt"));
+            assertThat(props.getValue(PropertyMap.ALLOW_MULTI_VALUE_PROP)).isEqualTo(Boolean.TRUE);
+            assertThat(props.get(PropertyMap.ROW_SOURCE_TYPE_PROP)).isNotNull();
+            assertThat(props.get("bogusProperty")).isNull();
+            assertThat(props.getValue("bogusProperty")).isNull();
+            assertThat(props.getValue("bogusProperty", "dflt")).isEqualTo("dflt");
 
             int size = props.getSize();
-            assertEquals(size, props.stream().count());
+            assertThat(props.stream().count()).isEqualTo(size);
 
             // "put" of the multi-value property goes to the primary map, everything else to the complex map
             props.put(PropertyMap.ALLOW_MULTI_VALUE_PROP, Boolean.TRUE);
             props.put("newTextProp", "newVal");
             props.put("newLongProp", DataType.LONG, 42);
-            assertEquals("newVal", props.getValue("newTextProp"));
-            assertEquals(42, props.getValue("newLongProp"));
+            assertThat(props.getValue("newTextProp")).isEqualTo("newVal");
+            assertThat(props.getValue("newLongProp")).isEqualTo(42);
 
             props.putAll(null);
             props.putAll(List.of(props.get(PropertyMap.ALLOW_MULTI_VALUE_PROP), props.get("newTextProp")));
-            assertEquals(Boolean.TRUE, props.getValue(PropertyMap.ALLOW_MULTI_VALUE_PROP));
+            assertThat(props.getValue(PropertyMap.ALLOW_MULTI_VALUE_PROP)).isEqualTo(Boolean.TRUE);
 
             props.save();
 
-            assertNotNull(props.toString());
+            assertThat(props.toString()).isNotNull();
 
             // iterate the combined view
             int count = 0;
             Iterator<PropertyMap.Property> iter = props.iterator();
             while (iter.hasNext()) {
-                assertNotNull(iter.next());
+                assertThat(iter.next()).isNotNull();
                 count++;
             }
-            assertEquals(props.getSize(), count);
+            assertThat(count).isEqualTo(props.getSize());
             assertThrows(NoSuchElementException.class, iter::next);
 
             // remove via iterator
             Iterator<PropertyMap.Property> iter2 = props.iterator();
-            assertTrue(iter2.hasNext());
+            assertThat(iter2.hasNext()).isTrue();
             iter2.next();
             iter2.remove();
             iter2.remove();
-            assertEquals(count - 1, props.getSize());
+            assertThat(props.getSize()).isEqualTo(count - 1);
 
-            assertNotNull(props.remove("newTextProp"));
-            assertNull(props.remove("bogusProperty"));
-            assertNotNull(props.remove(PropertyMap.ALLOW_MULTI_VALUE_PROP));
-            assertNull(props.getValue(PropertyMap.ALLOW_MULTI_VALUE_PROP));
+            assertThat(props.remove("newTextProp")).isNotNull();
+            assertThat(props.remove("bogusProperty")).isNull();
+            assertThat(props.remove(PropertyMap.ALLOW_MULTI_VALUE_PROP)).isNotNull();
+            assertThat(props.getValue(PropertyMap.ALLOW_MULTI_VALUE_PROP)).isNull();
         }
     }
 

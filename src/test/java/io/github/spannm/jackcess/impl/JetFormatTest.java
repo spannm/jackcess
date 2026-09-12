@@ -17,6 +17,8 @@
 package io.github.spannm.jackcess.impl;
 
 import static io.github.spannm.jackcess.test.Basename.COMMON1;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import io.github.spannm.jackcess.DataType;
 import io.github.spannm.jackcess.Database;
@@ -33,7 +35,6 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
 
 import java.io.File;
-import java.io.IOException;
 import java.nio.channels.FileChannel;
 import java.nio.channels.NonWritableChannelException;
 
@@ -41,23 +42,23 @@ import java.nio.channels.NonWritableChannelException;
 class JetFormatTest extends AbstractBaseTest {
 
     @Test
-    void testGetFormatNull() {
+    void getFormatNull() {
         assertThrows(NullPointerException.class, () -> JetFormat.getFormat(null));
     }
 
     @ParameterizedTest(name = "[{index}] {0}")
     @TestDbReadOnlySource(COMMON1)
-    void testGetFormat(TestDb testDb) throws IOException {
+    void getFormat(TestDb testDb) throws Exception {
         try (FileChannel channel = DatabaseImpl.openChannel(testDb.getFile().toPath(), false, false)) {
 
             JetFormat fmtActual = JetFormat.getFormat(channel);
-            assertEquals(testDb.getExpectedJetFormat(), fmtActual, "Unexpected JetFormat for dbFile: " + testDb.getFile().getAbsolutePath());
+            assertThat(fmtActual).as("Unexpected JetFormat for dbFile: " + testDb.getFile().getAbsolutePath()).isEqualTo(testDb.getExpectedJetFormat());
         }
     }
 
     @ParameterizedTest(name = "[{index}] {0}")
     @TestDbReadOnlySource(COMMON1)
-    void testReadOnlyFormat(TestDb testDb) {
+    void readOnlyFormat(TestDb testDb) {
         Exception failure = null;
         try (Database db = testDb.openCopy()) {
             if (testDb.getExpectedJetFormat().READ_ONLY) {
@@ -71,31 +72,31 @@ class JetFormatTest extends AbstractBaseTest {
         }
 
         if (!testDb.getExpectedJetFormat().READ_ONLY) {
-            assertNull(failure);
+            assertThat(failure).isNull();
         } else {
-            assertInstanceOf(NonWritableChannelException.class, failure);
+            assertThat(failure).isInstanceOf(NonWritableChannelException.class);
         }
     }
 
     @ParameterizedTest(name = "[{index}] {0}")
     @TestDbReadOnlySource(COMMON1)
-    void testFileFormat1(TestDb testDb) throws IOException {
+    void fileFormat1(TestDb testDb) throws Exception {
         try (Database db = testDb.open()) {
-            assertEquals(testDb.getExpectedFileFormat(), db.getFileFormat());
+            assertThat(db.getFileFormat()).isEqualTo(testDb.getExpectedFileFormat());
         }
     }
 
     @ParameterizedTest(name = "[{index}] {0}")
     @FileFormatSource(include = "GENERIC_JET4")
-    void testFileFormat2(FileFormat ff) throws IOException {
+    void fileFormat2(FileFormat ff) throws Exception {
         try (Database db = TestUtil.openDb(ff, new File(DIR_TEST_DATA, "adox_jet4.mdb"))) {
-            assertEquals(ff, db.getFileFormat());
+            assertThat(db.getFileFormat()).isEqualTo(ff);
         }
     }
 
     @ParameterizedTest(name = "[{index}] {0}")
     @EnumSource(DataType.class)
-    void testJet4SqlTypes(DataType dt) throws IOException {
+    void jet4SqlTypes(DataType dt) throws Exception {
         if (JetFormat.VERSION_4.isSupportedDataType(dt)) {
             Integer sqlType = null;
             try {
@@ -103,17 +104,17 @@ class JetFormatTest extends AbstractBaseTest {
             } catch (JackcessException ignored) {}
 
             if (sqlType != null) {
-                assertEquals(dt, DataType.fromSQLType(sqlType));
+                assertThat(DataType.fromSQLType(sqlType)).isEqualTo(dt);
             }
         }
     }
 
     @Test
-    void testSqlTypes() throws IOException {
-        assertEquals(DataType.LONG, DataType.fromSQLType(java.sql.Types.BIGINT));
-        assertEquals(DataType.BIG_INT, DataType.fromSQLType(java.sql.Types.BIGINT, 0, FileFormat.V2016));
-        assertEquals(java.sql.Types.BIGINT, DataType.BIG_INT.getSQLType());
-        assertEquals(DataType.MEMO, DataType.fromSQLType(java.sql.Types.VARCHAR, 1000));
+    void sqlTypes() throws Exception {
+        assertThat(DataType.fromSQLType(java.sql.Types.BIGINT)).isEqualTo(DataType.LONG);
+        assertThat(DataType.fromSQLType(java.sql.Types.BIGINT, 0, FileFormat.V2016)).isEqualTo(DataType.BIG_INT);
+        assertThat(DataType.BIG_INT.getSQLType()).isEqualTo(java.sql.Types.BIGINT);
+        assertThat(DataType.fromSQLType(java.sql.Types.VARCHAR, 1000)).isEqualTo(DataType.MEMO);
     }
 
 }

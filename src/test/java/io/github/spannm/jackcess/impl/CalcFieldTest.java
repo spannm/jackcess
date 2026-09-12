@@ -17,6 +17,8 @@
 package io.github.spannm.jackcess.impl;
 
 import static io.github.spannm.jackcess.test.Basename.CALC_FIELD;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import io.github.spannm.jackcess.*;
 import io.github.spannm.jackcess.Database.FileFormat;
@@ -28,7 +30,6 @@ import io.github.spannm.jackcess.test.source.TestDbSource;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 
-import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
@@ -37,7 +38,7 @@ import java.util.stream.Collectors;
 class CalcFieldTest extends AbstractBaseTest {
 
     @Test
-    void testColumnBuilder() {
+    void columnBuilder() {
         ColumnBuilder cb = new ColumnBuilder("calc_data", DataType.TEXT)
             .withCalculatedInfo("[id] & \"_\" & [data]");
 
@@ -48,7 +49,7 @@ class CalcFieldTest extends AbstractBaseTest {
 
     @ParameterizedTest(name = "[{index}] {0}")
     @FileFormatSource
-    void testCreateCalcField(FileFormat fileFormat) throws IOException {
+    void createCalcField(FileFormat fileFormat) throws Exception {
         JetFormat format = DatabaseImpl.getFileFormatDetails(fileFormat).getFormat();
         if (!format.isSupportedCalculatedDataType(DataType.TEXT)) {
             return;
@@ -69,12 +70,11 @@ class CalcFieldTest extends AbstractBaseTest {
                 .toTable(db);
 
             Column col = t.getColumn("calc_text");
-            assertTrue(col.isCalculated());
-            assertEquals("[id] & \"_\" & [data]", col.getProperties().getValue(
-                PropertyMap.EXPRESSION_PROP));
-            assertEquals(DataType.TEXT.getValue(),
-                col.getProperties().getValue(
-                    PropertyMap.RESULT_TYPE_PROP));
+            assertThat(col.isCalculated()).isTrue();
+            assertThat(col.getProperties().getValue(
+                    PropertyMap.EXPRESSION_PROP)).isEqualTo("[id] & \"_\" & [data]");
+            assertThat(col.getProperties().getValue(
+                    PropertyMap.RESULT_TYPE_PROP)).isEqualTo(DataType.TEXT.getValue());
 
             String longStr = TestUtil.createString(1000);
             BigDecimal bd1 = new BigDecimal("-1234.5678");
@@ -126,7 +126,7 @@ class CalcFieldTest extends AbstractBaseTest {
     @SuppressWarnings("checkstyle:LineLengthCheck")
     @ParameterizedTest(name = "[{index}] {0}")
     @TestDbSource(CALC_FIELD)
-    void testReadCalcFields(TestDb testDb) throws IOException {
+    void readCalcFields(TestDb testDb) throws Exception {
         try (Database db = testDb.open()) {
             List<String> actual = db.getTable("Table1").stream().map(r -> r.entrySet().toString()).collect(Collectors.toList());
 
@@ -136,7 +136,7 @@ class CalcFieldTest extends AbstractBaseTest {
                 "[ID=3, FirstName=John, LastName=Doe, LastFirst=Doe, John, City=Nowhere, LastFirstLen=9, Salary=0.0000, MonthlySalary=0.0000, IsRich=false, AllNames=Doe, John=Doe, John, WeeklySalary=0, SalaryTest=0.0000, BoolTest=true, Popularity=0.012300, DecimalTest=0.012300, FloatTest=0.0, BigNumTest=0E-8]",
                 "[ID=4, FirstName=Test, LastName=User, LastFirst=User, Test, City=Hockessin, LastFirstLen=10, Salary=100.0000, MonthlySalary=8.3333, IsRich=false, AllNames=User, Test=User, Test, WeeklySalary=1.92307692307692, SalaryTest=100.0000, BoolTest=true, Popularity=102030405060.654321, DecimalTest=102030405060.654321, FloatTest=1.27413E-10, BigNumTest=2.787019289824216980830E-7]");
 
-            assertEquals(expected, actual);
+            assertThat(actual).isEqualTo(expected);
         }
     }
 

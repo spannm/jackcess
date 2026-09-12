@@ -17,6 +17,7 @@
 package io.github.spannm.jackcess.impl;
 
 import static io.github.spannm.jackcess.test.TestUtil.*;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import io.github.spannm.jackcess.*;
 import io.github.spannm.jackcess.Database.FileFormat;
@@ -37,7 +38,7 @@ class DatabaseReadWriteTest extends AbstractBaseTest {
 
     @ParameterizedTest(name = "[{index}] {0}")
     @FileFormatSource
-    void testWriteAndRead(FileFormat fileFormat) throws IOException {
+    void writeAndRead(FileFormat fileFormat) throws Exception {
         try (Database db = createDbMem(fileFormat)) {
             doTestWriteAndRead(db);
         }
@@ -45,7 +46,7 @@ class DatabaseReadWriteTest extends AbstractBaseTest {
 
     @ParameterizedTest(name = "[{index}] {0}")
     @FileFormatSource
-    void testWriteAndReadInMem(FileFormat fileFormat) throws IOException {
+    void writeAndReadInMem(FileFormat fileFormat) throws Exception {
         try (Database db = createDbMem(fileFormat)) {
             doTestWriteAndRead(db);
         }
@@ -67,20 +68,20 @@ class DatabaseReadWriteTest extends AbstractBaseTest {
         }
         for (int i = 0; i < count; i++) {
             Map<String, Object> readRow = table.getNextRow();
-            assertEquals(row[0], readRow.get("A"));
-            assertEquals(row[1], readRow.get("B"));
-            assertEquals(row[2], readRow.get("C"));
-            assertEquals(row[3], readRow.get("D"));
-            assertEquals(row[4], readRow.get("E"));
-            assertEquals(row[5], readRow.get("F"));
-            assertEquals(row[6], readRow.get("G"));
-            assertEquals(row[7], readRow.get("H"));
+            assertThat(readRow.get("A")).isEqualTo(row[0]);
+            assertThat(readRow.get("B")).isEqualTo(row[1]);
+            assertThat(readRow.get("C")).isEqualTo(row[2]);
+            assertThat(readRow.get("D")).isEqualTo(row[3]);
+            assertThat(readRow.get("E")).isEqualTo(row[4]);
+            assertThat(readRow.get("F")).isEqualTo(row[5]);
+            assertThat(readRow.get("G")).isEqualTo(row[6]);
+            assertThat(readRow.get("H")).isEqualTo(row[7]);
         }
     }
 
     @ParameterizedTest(name = "[{index}] {0}")
     @FileFormatSource
-    void testWriteAndReadInBatch(FileFormat fileFormat) throws IOException {
+    void writeAndReadInBatch(FileFormat fileFormat) throws Exception {
         try (Database db = createDbMem(fileFormat)) {
             createTestTable(db);
             int count = 1000;
@@ -93,21 +94,21 @@ class DatabaseReadWriteTest extends AbstractBaseTest {
             table.addRows(rows);
             for (int i = 0; i < count; i++) {
                 Map<String, Object> readRow = table.getNextRow();
-                assertEquals(row[0], readRow.get("A"));
-                assertEquals(row[1], readRow.get("B"));
-                assertEquals(row[2], readRow.get("C"));
-                assertEquals(row[3], readRow.get("D"));
-                assertEquals(row[4], readRow.get("E"));
-                assertEquals(row[5], readRow.get("F"));
-                assertEquals(row[6], readRow.get("G"));
-                assertEquals(row[7], readRow.get("H"));
+                assertThat(readRow.get("A")).isEqualTo(row[0]);
+                assertThat(readRow.get("B")).isEqualTo(row[1]);
+                assertThat(readRow.get("C")).isEqualTo(row[2]);
+                assertThat(readRow.get("D")).isEqualTo(row[3]);
+                assertThat(readRow.get("E")).isEqualTo(row[4]);
+                assertThat(readRow.get("F")).isEqualTo(row[5]);
+                assertThat(readRow.get("G")).isEqualTo(row[6]);
+                assertThat(readRow.get("H")).isEqualTo(row[7]);
             }
         }
     }
 
     @ParameterizedTest(name = "[{index}] {0}")
     @FileFormatSource
-    void testUpdateRow(FileFormat fileFormat) throws IOException {
+    void updateRow(FileFormat fileFormat) throws Exception {
         try (Database db = createDbMem(fileFormat)) {
             Table t = new TableBuilder("test")
                 .addColumn(new ColumnBuilder("name", DataType.TEXT))
@@ -126,28 +127,25 @@ class DatabaseReadWriteTest extends AbstractBaseTest {
             c.moveNextRows(2);
             Map<String, Object> row = c.getCurrentRow();
 
-            assertEquals(createExpectedRow("name", "row1",
-                "id", 2,
-                "data", "initial data"),
-                row);
+            assertThat(row).isEqualTo(createExpectedRow("name", "row1",
+                    "id", 2,
+                    "data", "initial data"));
 
             Map<String, Object> newRow = createExpectedRow(
                 "name", Column.KEEP_VALUE,
                 "id", Column.AUTO_NUMBER,
                 "data", "new data");
-            assertSame(newRow, c.updateCurrentRowFromMap(newRow));
-            assertEquals(createExpectedRow("name", "row1",
-                "id", 2,
-                "data", "new data"),
-                newRow);
+            assertThat(c.updateCurrentRowFromMap(newRow)).isSameAs(newRow);
+            assertThat(newRow).isEqualTo(createExpectedRow("name", "row1",
+                    "id", 2,
+                    "data", "new data"));
 
             c.moveNextRows(3);
             row = c.getCurrentRow();
 
-            assertEquals(createExpectedRow("name", "row4",
-                "id", 5,
-                "data", "initial data"),
-                row);
+            assertThat(row).isEqualTo(createExpectedRow("name", "row4",
+                    "id", 5,
+                    "data", "initial data"));
 
             c.updateCurrentRow(Column.KEEP_VALUE, Column.AUTO_NUMBER, "a larger amount of new data");
 
@@ -155,18 +153,16 @@ class DatabaseReadWriteTest extends AbstractBaseTest {
             c.moveNextRows(2);
             row = c.getCurrentRow();
 
-            assertEquals(createExpectedRow("name", "row1",
-                "id", 2,
-                "data", "new data"),
-                row);
+            assertThat(row).isEqualTo(createExpectedRow("name", "row1",
+                    "id", 2,
+                    "data", "new data"));
 
             c.moveNextRows(3);
             row = c.getCurrentRow();
 
-            assertEquals(createExpectedRow("name", "row4",
-                "id", 5,
-                "data", "a larger amount of new data"),
-                row);
+            assertThat(row).isEqualTo(createExpectedRow("name", "row4",
+                    "id", 5,
+                    "data", "a larger amount of new data"));
 
             t.reset();
 
@@ -179,10 +175,9 @@ class DatabaseReadWriteTest extends AbstractBaseTest {
             c.moveNextRows(9);
             row = c.getCurrentRow();
 
-            assertEquals(createExpectedRow("name", "row8",
-                "id", 9,
-                "data", "initial data"),
-                row);
+            assertThat(row).isEqualTo(createExpectedRow("name", "row8",
+                    "id", 9,
+                    "data", "initial data"));
 
             String newText = "updated big data_" + createString(200);
 
@@ -192,33 +187,32 @@ class DatabaseReadWriteTest extends AbstractBaseTest {
             c.moveNextRows(9);
             row = c.getCurrentRow();
 
-            assertEquals(createExpectedRow("name", "row8",
-                "id", 9,
-                "data", newText),
-                row);
+            assertThat(row).isEqualTo(createExpectedRow("name", "row8",
+                    "id", 9,
+                    "data", newText));
 
             List<Row> rows = toList(t);
-            assertEquals(50, rows.size());
+            assertThat(rows.size()).isEqualTo(50);
 
             for (Row r : rows) {
                 r.put("data", "final data " + r.get("id"));
             }
 
             for (Row r : rows) {
-                assertSame(r, t.updateRow(r));
+                assertThat(t.updateRow(r)).isSameAs(r);
             }
 
             t.reset();
 
             for (Row r : t) {
-                assertEquals("final data " + r.get("id"), r.get("data"));
+                assertThat(r.get("data")).isEqualTo("final data " + r.get("id"));
             }
         }
 
     }
 
     @Test
-    void testDateMath() {
+    void dateMath() {
         long now = System.currentTimeMillis();
 
         // test around current time
@@ -238,14 +232,14 @@ class DatabaseReadWriteTest extends AbstractBaseTest {
         for (long time = testTime - timeRange; time < testTime + timeRange; time += timeStep) {
             double accTime = ColumnImpl.toLocalDateDouble(time);
             long newTime = ColumnImpl.fromLocalDateDouble(accTime);
-            assertEquals(time, newTime);
+            assertThat(newTime).isEqualTo(time);
 
             Instant inst = Instant.ofEpochMilli(time);
             LocalDateTime ldt = LocalDateTime.ofInstant(inst, ZoneOffset.UTC);
 
             accTime = ColumnImpl.toDateDouble(ldt);
             LocalDateTime newLdt = ColumnImpl.ldtFromLocalDateDouble(accTime);
-            assertEquals(ldt, newLdt);
+            assertThat(newLdt).isEqualTo(ldt);
         }
     }
 }

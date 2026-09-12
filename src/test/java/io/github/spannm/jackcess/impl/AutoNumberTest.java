@@ -20,6 +20,8 @@ import static io.github.spannm.jackcess.DatabaseBuilder.newColumn;
 import static io.github.spannm.jackcess.DatabaseBuilder.newTable;
 import static io.github.spannm.jackcess.test.Basename.COMMON1;
 import static io.github.spannm.jackcess.test.Basename.COMPLEX_DATA;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import io.github.spannm.jackcess.*;
 import io.github.spannm.jackcess.Database.FileFormat;
@@ -41,7 +43,7 @@ class AutoNumberTest extends AbstractBaseTest {
 
     @ParameterizedTest(name = "[{index}] {0}")
     @FileFormatSource
-    void testAutoNumber(FileFormat fileFormat) throws IOException {
+    void autoNumber(FileFormat fileFormat) throws Exception {
         try (Database db = createDbMem(fileFormat)) {
             Table table = newTable("test")
                 .addColumn(newColumn("a", DataType.LONG)
@@ -55,7 +57,7 @@ class AutoNumberTest extends AbstractBaseTest {
 
     @ParameterizedTest(name = "[{index}] {0}")
     @TestDbSource(COMMON1)
-    void testAutoNumberPK(TestDb testDB) throws IOException {
+    void autoNumberPK(TestDb testDB) throws Exception {
         try (Database db = testDB.openMem()) {
             Table table = db.getTable("Table3");
 
@@ -65,24 +67,24 @@ class AutoNumberTest extends AbstractBaseTest {
 
     private static void doTestAutoNumber(Table table) throws IOException {
         Object[] row = {null, "row1"};
-        assertSame(row, table.addRow(row));
-        assertEquals(1, ((Integer) row[0]).intValue());
+        assertThat(table.addRow(row)).isSameAs(row);
+        assertThat(((Integer) row[0]).intValue()).isEqualTo(1);
         row = table.addRow(13, "row2");
-        assertEquals(2, ((Integer) row[0]).intValue());
+        assertThat(((Integer) row[0]).intValue()).isEqualTo(2);
         row = table.addRow("flubber", "row3");
-        assertEquals(3, ((Integer) row[0]).intValue());
+        assertThat(((Integer) row[0]).intValue()).isEqualTo(3);
 
         table.reset();
 
         row = table.addRow(Column.AUTO_NUMBER, "row4");
-        assertEquals(4, ((Integer) row[0]).intValue());
+        assertThat(((Integer) row[0]).intValue()).isEqualTo(4);
         row = table.addRow(Column.AUTO_NUMBER, "row5");
-        assertEquals(5, ((Integer) row[0]).intValue());
+        assertThat(((Integer) row[0]).intValue()).isEqualTo(5);
 
         Object[] smallRow = {Column.AUTO_NUMBER};
         row = table.addRow(smallRow);
-        assertNotSame(row, smallRow);
-        assertEquals(6, ((Integer) row[0]).intValue());
+        assertThat(smallRow).isNotSameAs(row);
+        assertThat(((Integer) row[0]).intValue()).isEqualTo(6);
 
         table.reset();
 
@@ -111,7 +113,7 @@ class AutoNumberTest extends AbstractBaseTest {
 
     @ParameterizedTest(name = "[{index}] {0}")
     @FileFormatSource
-    void testAutoNumberGuid(FileFormat fileFormat) throws IOException {
+    void autoNumberGuid(FileFormat fileFormat) throws Exception {
         try (Database db = createDbMem(fileFormat)) {
             Table table = newTable("test")
                 .addColumn(newColumn("a", DataType.GUID)
@@ -120,23 +122,23 @@ class AutoNumberTest extends AbstractBaseTest {
                 .toTable(db);
 
             Object[] row = {null, "row1"};
-            assertSame(row, table.addRow(row));
-            assertTrue(ColumnImpl.isGUIDValue(row[0]));
+            assertThat(table.addRow(row)).isSameAs(row);
+            assertThat(ColumnImpl.isGUIDValue(row[0])).isTrue();
             row = table.addRow(13, "row2");
-            assertTrue(ColumnImpl.isGUIDValue(row[0]));
+            assertThat(ColumnImpl.isGUIDValue(row[0])).isTrue();
             row = table.addRow("flubber", "row3");
-            assertTrue(ColumnImpl.isGUIDValue(row[0]));
+            assertThat(ColumnImpl.isGUIDValue(row[0])).isTrue();
 
             Object[] smallRow = {Column.AUTO_NUMBER};
             row = table.addRow(smallRow);
-            assertNotSame(row, smallRow);
-            assertTrue(ColumnImpl.isGUIDValue(row[0]));
+            assertThat(smallRow).isNotSameAs(row);
+            assertThat(ColumnImpl.isGUIDValue(row[0])).isTrue();
         }
     }
 
     @ParameterizedTest(name = "[{index}] {0}")
     @FileFormatSource
-    void testInsertLongAutoNumber(FileFormat fileFormat) throws IOException {
+    void insertLongAutoNumber(FileFormat fileFormat) throws Exception {
         try (Database db = createDbMem(fileFormat)) {
             Table table = newTable("test")
                 .addColumn(newColumn("a", DataType.LONG)
@@ -150,7 +152,7 @@ class AutoNumberTest extends AbstractBaseTest {
 
     @ParameterizedTest(name = "[{index}] {0}")
     @FileFormatSource
-    void testInsertLongAutoNumberPK(FileFormat fileFormat) throws IOException {
+    void insertLongAutoNumberPK(FileFormat fileFormat) throws Exception {
         try (Database db = createDbMem(fileFormat)) {
             Table table = newTable("test")
                 .addColumn(newColumn("a", DataType.LONG)
@@ -164,71 +166,71 @@ class AutoNumberTest extends AbstractBaseTest {
     }
 
     private static void doTestInsertLongAutoNumber(Table table) throws IOException {
-        assertFalse(table.getDatabase().isAllowAutoNumberInsert());
-        assertFalse(table.isAllowAutoNumberInsert());
+        assertThat(table.getDatabase().isAllowAutoNumberInsert()).isFalse();
+        assertThat(table.isAllowAutoNumberInsert()).isFalse();
 
         Object[] row = {null, "row1"};
-        assertSame(row, table.addRow(row));
-        assertEquals(1, ((Integer) row[0]).intValue());
+        assertThat(table.addRow(row)).isSameAs(row);
+        assertThat(((Integer) row[0]).intValue()).isEqualTo(1);
         row = table.addRow(13, "row2");
-        assertEquals(2, ((Integer) row[0]).intValue());
+        assertThat(((Integer) row[0]).intValue()).isEqualTo(2);
         row = table.addRow("flubber", "row3");
-        assertEquals(3, ((Integer) row[0]).intValue());
+        assertThat(((Integer) row[0]).intValue()).isEqualTo(3);
 
         table.reset();
 
         table.setAllowAutoNumberInsert(true);
-        assertFalse(table.getDatabase().isAllowAutoNumberInsert());
-        assertTrue(table.isAllowAutoNumberInsert());
+        assertThat(table.getDatabase().isAllowAutoNumberInsert()).isFalse();
+        assertThat(table.isAllowAutoNumberInsert()).isTrue();
 
         Row row2 = CursorBuilder.findRow(
             table, Collections.singletonMap("a", 2));
-        assertEquals("row2", row2.getString("b"));
+        assertThat(row2.getString("b")).isEqualTo("row2");
 
         table.deleteRow(row2);
 
         row = table.addRow(Column.AUTO_NUMBER, "row4");
-        assertEquals(4, ((Integer) row[0]).intValue());
+        assertThat(((Integer) row[0]).intValue()).isEqualTo(4);
 
-        assertEquals(4, ((TableImpl) table).getLastLongAutoNumber());
+        assertThat(((TableImpl) table).getLastLongAutoNumber()).isEqualTo(4);
 
         row = table.addRow(2, "row2-redux");
-        assertEquals(2, ((Integer) row[0]).intValue());
+        assertThat(((Integer) row[0]).intValue()).isEqualTo(2);
 
-        assertEquals(4, ((TableImpl) table).getLastLongAutoNumber());
+        assertThat(((TableImpl) table).getLastLongAutoNumber()).isEqualTo(4);
 
         row2 = CursorBuilder.findRow(
             table, Collections.singletonMap("a", 2));
-        assertEquals("row2-redux", row2.getString("b"));
+        assertThat(row2.getString("b")).isEqualTo("row2-redux");
 
         row = table.addRow(13, "row13-mindthegap");
-        assertEquals(13, ((Integer) row[0]).intValue());
+        assertThat(((Integer) row[0]).intValue()).isEqualTo(13);
 
-        assertEquals(13, ((TableImpl) table).getLastLongAutoNumber());
+        assertThat(((TableImpl) table).getLastLongAutoNumber()).isEqualTo(13);
 
         assertThrows(NumberFormatException.class, () -> table.addRow("not a number", "nope"));
 
-        assertEquals(13, ((TableImpl) table).getLastLongAutoNumber());
+        assertThat(((TableImpl) table).getLastLongAutoNumber()).isEqualTo(13);
 
         table.addRow(-10, "non-positives are now allowed");
 
         row = table.addRow(Column.AUTO_NUMBER, "row14");
-        assertEquals(14, ((Integer) row[0]).intValue());
+        assertThat(((Integer) row[0]).intValue()).isEqualTo(14);
 
         Row row13 = CursorBuilder.findRow(
             table, Collections.singletonMap("a", 13));
-        assertEquals("row13-mindthegap", row13.getString("b"));
+        assertThat(row13.getString("b")).isEqualTo("row13-mindthegap");
 
         row13.put("a", "45");
         row13 = table.updateRow(row13);
-        assertEquals(45, row13.get("a"));
+        assertThat(row13.get("a")).isEqualTo(45);
 
-        assertEquals(45, ((TableImpl) table).getLastLongAutoNumber());
+        assertThat(((TableImpl) table).getLastLongAutoNumber()).isEqualTo(45);
 
         row13.put("a", -1); // non-positives are now allowed
         table.updateRow(row13);
 
-        assertEquals(45, ((TableImpl) table).getLastLongAutoNumber());
+        assertThat(((TableImpl) table).getLastLongAutoNumber()).isEqualTo(45);
 
         row13.put("a", 55);
 
@@ -236,20 +238,20 @@ class AutoNumberTest extends AbstractBaseTest {
         table.setAllowAutoNumberInsert(null);
 
         row13 = table.updateRow(row13); // no change, as confirmed by...
-        assertEquals(-1, row13.get("a"));
+        assertThat(row13.get("a")).isEqualTo(-1);
 
-        assertEquals(45, ((TableImpl) table).getLastLongAutoNumber());
+        assertThat(((TableImpl) table).getLastLongAutoNumber()).isEqualTo(45);
 
     }
 
     @ParameterizedTest(name = "[{index}] {0}")
     @TestDbSource(COMPLEX_DATA)
-    void testInsertComplexAutoNumber(TestDb testDb) throws IOException {
+    void insertComplexAutoNumber(TestDb testDb) throws Exception {
 
         try (Database db = testDb.openMem()) {
             Table t1 = db.getTable("Table1");
 
-            assertFalse(t1.isAllowAutoNumberInsert());
+            assertThat(t1.isAllowAutoNumberInsert()).isFalse();
 
             int lastAutoNum = ((TableImpl) t1).getLastComplexTypeAutoNumber();
 
@@ -257,37 +259,37 @@ class AutoNumberTest extends AbstractBaseTest {
             lastAutoNum++;
             checkAllComplexAutoNums(lastAutoNum, row);
 
-            assertEquals(lastAutoNum, ((TableImpl) t1).getLastComplexTypeAutoNumber());
+            assertThat(((TableImpl) t1).getLastComplexTypeAutoNumber()).isEqualTo(lastAutoNum);
 
             db.setAllowAutoNumberInsert(true);
-            assertTrue(db.isAllowAutoNumberInsert());
-            assertTrue(t1.isAllowAutoNumberInsert());
+            assertThat(db.isAllowAutoNumberInsert()).isTrue();
+            assertThat(t1.isAllowAutoNumberInsert()).isTrue();
 
             row = t1.addRow("anotherrow");
             lastAutoNum++;
             checkAllComplexAutoNums(lastAutoNum, row);
 
-            assertEquals(lastAutoNum, ((TableImpl) t1).getLastComplexTypeAutoNumber());
+            assertThat(((TableImpl) t1).getLastComplexTypeAutoNumber()).isEqualTo(lastAutoNum);
 
             row = t1.addRow("row5", 5, null, null, 5, 5);
             checkAllComplexAutoNums(5, row);
 
-            assertEquals(lastAutoNum, ((TableImpl) t1).getLastComplexTypeAutoNumber());
+            assertThat(((TableImpl) t1).getLastComplexTypeAutoNumber()).isEqualTo(lastAutoNum);
 
             row = t1.addRow("row13", 13, null, null, 13, 13);
             checkAllComplexAutoNums(13, row);
 
-            assertEquals(13, ((TableImpl) t1).getLastComplexTypeAutoNumber());
+            assertThat(((TableImpl) t1).getLastComplexTypeAutoNumber()).isEqualTo(13);
 
             assertThrows(NumberFormatException.class, () ->
                 t1.addRow("nope", "not a number"));
 
-            assertEquals(13, ((TableImpl) t1).getLastComplexTypeAutoNumber());
+            assertThat(((TableImpl) t1).getLastComplexTypeAutoNumber()).isEqualTo(13);
 
             assertThrows(IOException.class, () ->
                 t1.addRow("uh-uh", -10));
 
-            assertEquals(13, ((TableImpl) t1).getLastComplexTypeAutoNumber());
+            assertThat(((TableImpl) t1).getLastComplexTypeAutoNumber()).isEqualTo(13);
 
             assertThrows(IOException.class, () ->
                 t1.addRow("wut", 6, null, null, 40, 42));
@@ -295,7 +297,7 @@ class AutoNumberTest extends AbstractBaseTest {
             row = t1.addRow("morerows");
             checkAllComplexAutoNums(14, row);
 
-            assertEquals(14, ((TableImpl) t1).getLastComplexTypeAutoNumber());
+            assertThat(((TableImpl) t1).getLastComplexTypeAutoNumber()).isEqualTo(14);
 
             Row row13 = CursorBuilder.findRow(t1, Collections.singletonMap("id", "row13"));
 
@@ -306,19 +308,19 @@ class AutoNumberTest extends AbstractBaseTest {
             final Row row13b = t1.updateRow(row13);
             checkAllComplexAutoNums(45, row13b);
 
-            assertEquals(45, ((TableImpl) t1).getLastComplexTypeAutoNumber());
+            assertThat(((TableImpl) t1).getLastComplexTypeAutoNumber()).isEqualTo(45);
 
             row13b.put("attach-data", -1);
 
             assertThrows(IOException.class, () -> t1.updateRow(row13b));
 
-            assertEquals(45, ((TableImpl) t1).getLastComplexTypeAutoNumber());
+            assertThat(((TableImpl) t1).getLastComplexTypeAutoNumber()).isEqualTo(45);
 
             row13b.put("attach-data", 55);
 
             assertThrows(IOException.class, () -> t1.updateRow(row13b));
 
-            assertEquals(45, ((TableImpl) t1).getLastComplexTypeAutoNumber());
+            assertThat(((TableImpl) t1).getLastComplexTypeAutoNumber()).isEqualTo(45);
 
             row13b.put("VersionHistory_F5F8918F-0A3F-4DA9-AE71-184EE5012880", 55);
             row13b.put("multi-value-data", 55);
@@ -328,73 +330,73 @@ class AutoNumberTest extends AbstractBaseTest {
             Row row13c = t1.updateRow(row13b);
             checkAllComplexAutoNums(45, row13c);
 
-            assertEquals(45, ((TableImpl) t1).getLastComplexTypeAutoNumber());
+            assertThat(((TableImpl) t1).getLastComplexTypeAutoNumber()).isEqualTo(45);
         }
     }
 
     private static void checkAllComplexAutoNums(int expected, Object[] row) {
-        assertEquals(expected, ((ComplexValueForeignKey) row[1]).get());
-        assertEquals(expected, ((ComplexValueForeignKey) row[4]).get());
-        assertEquals(expected, ((ComplexValueForeignKey) row[5]).get());
+        assertThat(((ComplexValueForeignKey) row[1]).get()).isEqualTo(expected);
+        assertThat(((ComplexValueForeignKey) row[4]).get()).isEqualTo(expected);
+        assertThat(((ComplexValueForeignKey) row[5]).get()).isEqualTo(expected);
     }
 
     private static void checkAllComplexAutoNums(int expected, Row row) {
-        assertEquals(expected, ((Number) row.get("VersionHistory_F5F8918F-0A3F-4DA9-AE71-184EE5012880")).intValue());
-        assertEquals(expected, ((Number) row.get("multi-value-data")).intValue());
-        assertEquals(expected, ((Number) row.get("attach-data")).intValue());
+        assertThat(((Number) row.get("VersionHistory_F5F8918F-0A3F-4DA9-AE71-184EE5012880")).intValue()).isEqualTo(expected);
+        assertThat(((Number) row.get("multi-value-data")).intValue()).isEqualTo(expected);
+        assertThat(((Number) row.get("attach-data")).intValue()).isEqualTo(expected);
     }
 
     @ParameterizedTest(name = "[{index}] {0}")
     @FileFormatSource
-    void testInsertGuidAutoNumber(FileFormat fileFormat) throws IOException {
+    void insertGuidAutoNumber(FileFormat fileFormat) throws Exception {
         try (Database db = createDbMem(fileFormat)) {
             Table table = newTable("test").addColumn(newColumn("a", DataType.GUID).withAutoNumber(true)).addColumn(newColumn("b", DataType.TEXT)).toTable(db);
 
             db.setAllowAutoNumberInsert(true);
             table.setAllowAutoNumberInsert(false);
-            assertFalse(table.isAllowAutoNumberInsert());
+            assertThat(table.isAllowAutoNumberInsert()).isFalse();
 
             Object[] row = {null, "row1"};
-            assertSame(row, table.addRow(row));
-            assertTrue(ColumnImpl.isGUIDValue(row[0]));
+            assertThat(table.addRow(row)).isSameAs(row);
+            assertThat(ColumnImpl.isGUIDValue(row[0])).isTrue();
             row = table.addRow(13, "row2");
-            assertTrue(ColumnImpl.isGUIDValue(row[0]));
+            assertThat(ColumnImpl.isGUIDValue(row[0])).isTrue();
             row = table.addRow("flubber", "row3");
-            assertTrue(ColumnImpl.isGUIDValue(row[0]));
+            assertThat(ColumnImpl.isGUIDValue(row[0])).isTrue();
 
             Object[] smallRow = {Column.AUTO_NUMBER};
             row = table.addRow(smallRow);
-            assertNotSame(row, smallRow);
-            assertTrue(ColumnImpl.isGUIDValue(row[0]));
+            assertThat(smallRow).isNotSameAs(row);
+            assertThat(ColumnImpl.isGUIDValue(row[0])).isTrue();
 
             table.setAllowAutoNumberInsert(null);
-            assertTrue(table.isAllowAutoNumberInsert());
+            assertThat(table.isAllowAutoNumberInsert()).isTrue();
 
             Row row2 = CursorBuilder.findRow(table, Collections.singletonMap("b", "row2"));
-            assertEquals("row2", row2.getString("b"));
+            assertThat(row2.getString("b")).isEqualTo("row2");
 
             String row2Guid = row2.getString("a");
             table.deleteRow(row2);
 
             row = table.addRow(Column.AUTO_NUMBER, "row4");
-            assertTrue(ColumnImpl.isGUIDValue(row[0]));
+            assertThat(ColumnImpl.isGUIDValue(row[0])).isTrue();
 
             row = table.addRow(row2Guid, "row2-redux");
-            assertEquals(row2Guid, row[0]);
+            assertThat(row[0]).isEqualTo(row2Guid);
 
             row2 = CursorBuilder.findRow(table, Collections.singletonMap("a", row2Guid));
-            assertEquals("row2-redux", row2.getString("b"));
+            assertThat(row2.getString("b")).isEqualTo("row2-redux");
 
             assertThrows(IOException.class, () -> table.addRow("not a guid", "nope"));
 
             row = table.addRow(Column.AUTO_NUMBER, "row5");
-            assertTrue(ColumnImpl.isGUIDValue(row[0]));
+            assertThat(ColumnImpl.isGUIDValue(row[0])).isTrue();
 
             row2Guid = UUID.randomUUID().toString();
             row2.put("a", row2Guid);
 
             Row row2b = table.updateRow(row2);
-            assertEquals(row2Guid, row2b.get("a"));
+            assertThat(row2b.get("a")).isEqualTo(row2Guid);
 
             row2b.put("a", "not a guid");
 
@@ -403,8 +405,8 @@ class AutoNumberTest extends AbstractBaseTest {
             table.setAllowAutoNumberInsert(false);
 
             Row row2c = table.updateRow(row2b);
-            assertTrue(ColumnImpl.isGUIDValue(row2c.get("a")));
-            assertNotEquals(row2Guid, row2c.get("a"));
+            assertThat(ColumnImpl.isGUIDValue(row2c.get("a"))).isTrue();
+            assertThat(row2c.get("a")).isNotEqualTo(row2Guid);
         }
     }
 
