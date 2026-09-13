@@ -289,6 +289,13 @@
                     <groupId>org.cyclonedx</groupId>
                     <artifactId>cyclonedx-maven-plugin</artifactId>
                     <version>${dep.plugin.cyclonedx.version}</version>
+                    <configuration>
+                        <projectType>library</projectType>
+                        <skipNotDeployed>false</skipNotDeployed>
+                        <outputFormat>xml</outputFormat>
+                        <outputName>sbom</outputName>
+                        <verbose>false</verbose>
+                    </configuration>
                     <executions>
                         <execution>
                             <id>cyclonedx-makebom</id>
@@ -298,13 +305,6 @@
                             <phase>package</phase>
                         </execution>
                     </executions>
-                    <configuration>
-                        <projectType>library</projectType>
-                        <skipNotDeployed>false</skipNotDeployed>
-                        <outputFormat>xml</outputFormat>
-                        <outputName>sbom</outputName>
-                        <verbose>false</verbose>
-                    </configuration>
                 </plugin>
 
                 <plugin>
@@ -336,6 +336,13 @@
                 <groupId>io.github.spannm</groupId>
                 <artifactId>figlet-maven-plugin</artifactId>
                 <version>${dep.plugin.figlet.version}</version>
+                <configuration>
+                    <content><![CDATA[
+                         <lineBreak/><lineBreak/>
+                         <figletFont name="slant">${project.name}</figletFont>
+                         <preserveWhitespace>    v${project.version}</preserveWhitespace><lineBreak/>
+                     ]]></content>
+                </configuration>
                 <executions>
                     <execution>
                         <goals>
@@ -343,13 +350,6 @@
                         </goals>
                     </execution>
                 </executions>
-                <configuration>
-                     <content><![CDATA[
-                         <lineBreak/><lineBreak/>
-                         <figletFont name="slant">${project.name}</figletFont>
-                         <preserveWhitespace>    v${project.version}</preserveWhitespace><lineBreak/>
-                     ]]></content>
-                </configuration>
             </plugin>
 
             <plugin>
@@ -505,10 +505,10 @@
                         <executions>
                             <execution>
                                 <id>add-jmh-source</id>
-                                <phase>generate-sources</phase>
                                 <goals>
                                     <goal>add-source</goal>
                                 </goals>
+                                <phase>generate-sources</phase>
                                 <configuration>
                                     <sources>
                                         <source>src/jmh/java</source>
@@ -523,10 +523,10 @@
                         <artifactId>maven-shade-plugin</artifactId>
                         <executions>
                             <execution>
-                                <phase>package</phase>
                                 <goals>
                                     <goal>shade</goal>
                                 </goals>
+                                <phase>package</phase>
                                 <configuration>
                                     <finalName>benchmarks</finalName>
                                     <transformers>
