@@ -82,6 +82,29 @@ try (Database db = DatabaseBuilder.open(new File("database.accdb"))) {
 
 ```
 
+## ⚡ Performance Tips
+
+Jackcess flushes every write to disk immediately by default (`autoSync=true`), so the database file is left in a consistent state after each call to `addRow`, `updateRow`, or `deleteRow`. This safety comes at a real cost: each of these calls ends with an `fsync`-style flush, which on typical hardware can dominate the call's runtime (roughly two to three orders of magnitude slower than a flush-free write in local benchmarking).
+
+If your workload issues many individual row mutations, consider:
+
+* **Batching writes** — `Table.addRows(List<Object[]>)` wraps the whole batch in a single flush instead of one per row.
+* **Disabling auto-sync** for bulk operations, then flushing explicitly once you are done:
+
+  ```java
+  try (Database db = DatabaseBuilder.newDatabase(file).withAutoSync(false).create()) {
+      Table table = ...;
+      for (Object[] row : manyRows) {
+          table.addRow(row);
+      }
+      db.flush(); // flush once, after all writes
+  }
+  ```
+
+  Note that disabling auto-sync trades write durability for speed: if the JVM crashes before the next flush, recently written data may be lost or the file left in an inconsistent state.
+
+A small [JMH](https://github.com/openjdk/jmh) benchmark suite (`src/jmh`) is included to measure this and other operations; it is not part of the regular build and can be run on demand via `mvn -Pjmh clean package && java -jar target/benchmarks.jar`.
+
 ## ❤️ Origin & Maintenance
 
 This project is a modern fork of the original [Jackcess project on SourceForge](https://sourceforge.net/projects/jackcess/), originally created and maintained by [James Ahlborn](https://sourceforge.net/u/jahlborn/profile/),

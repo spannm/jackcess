@@ -2226,8 +2226,12 @@ public class TableImpl implements Table, PropertyMaps.Owner {
 
             // hang on to the raw values of var length columns we are "keeping". this
             // will allow us to re-use pre-written var length data, which can save
-            // space for things like long value columns.
-            Map<ColumnImpl, byte[]> keepRawVarValues = !varColumns.isEmpty() ? new HashMap<>() : null;
+            // space for things like long value columns. starts out as the shared empty
+            // map (createRow() always expects a non-null map) and is only swapped for a
+            // real, mutable HashMap on the first KEEP_VALUE column, since most callers
+            // (e.g. read-modify-write via a fully populated Row) never hit one.
+            Map<ColumnImpl, byte[]> keepRawVarValues = Map.of();
+            boolean keepRawVarValuesInitialized = false;
 
             // handle various value massaging activities
             for (ColumnImpl column : columns) {
@@ -2239,6 +2243,11 @@ public class TableImpl implements Table, PropertyMaps.Owner {
 
                 Object rowValue = column.getRowValue(row);
                 if (rowValue == Column.KEEP_VALUE) {
+
+                    if (!keepRawVarValuesInitialized && !varColumns.isEmpty()) {
+                        keepRawVarValues = new HashMap<>();
+                        keepRawVarValuesInitialized = true;
+                    }
 
                     // fill in any "keep value" fields (restore old value)
                     rowValue = getRowColumn(getFormat(), rowBuffer, column, rowState, keepRawVarValues);

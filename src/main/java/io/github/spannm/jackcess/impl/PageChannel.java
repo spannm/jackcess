@@ -71,6 +71,12 @@ public class PageChannel implements Channel, Flushable {
     private TempPageHolder        fullPageEncodeBufferH;
     private TempBufferHolder      tempDecodeBufferH;
     private int                   writeCount;
+    /**
+     * Cached size of the channel, in bytes. The file only ever grows, and only via {@link #allocateNewPage}, so this
+     * is tracked locally to avoid an OS-level size query (e.g. {@code fstat}) on every single page read/write.
+     * Negative until lazily initialized.
+     */
+    private long                  knownFileSize            = -1L;
 
     /**
      * Only used by unit tests
@@ -182,10 +188,20 @@ public class PageChannel implements Channel, Flushable {
     }
 
     /**
+     * @return the current channel size, in bytes, tracked locally instead of queried from the OS on every call
+     */
+    private long getFileSize() throws IOException {
+        if (knownFileSize < 0) {
+            knownFileSize = channel.size();
+        }
+        return knownFileSize;
+    }
+
+    /**
      * Validates that the given pageNumber is valid for this database.
      */
     private void validatePageNumber(int pageNumber) throws IOException {
-        int nextPageNumber = getNextPageNumber(channel.size());
+        int nextPageNumber = getNextPageNumber(getFileSize());
         if (pageNumber <= INVALID_PAGE_NUMBER || pageNumber >= nextPageNumber) {
             throw new IllegalStateException("invalid page number " + pageNumber);
         }
@@ -319,7 +335,7 @@ public class PageChannel implements Channel, Flushable {
         assertWriting();
 
         // this will force the file to be extended with mostly undefined bytes
-        long size = channel.size();
+        long size = getFileSize();
         if (size >= getFormat().MAX_DATABASE_SIZE) {
             throw new IOException("Database is at maximum size " + getFormat().MAX_DATABASE_SIZE);
         }
@@ -338,6 +354,7 @@ public class PageChannel implements Channel, Flushable {
         // since we are just allocating page space at this point and not writing
         // meaningful data, we do _not_ encode the page.
         channel.write(forceBytes, offset);
+        knownFileSize = size + getFormat().PAGE_SIZE;
 
         globalUsageMap.removePageNumber(pageNumber);
         return pageNumber;
