@@ -20,9 +20,11 @@ import static io.github.spannm.jackcess.DatabaseBuilder.*;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import org.assertj.core.api.Assertions;
 import io.github.spannm.jackcess.Database.FileFormat;
+import io.github.spannm.jackcess.impl.ColumnImpl;
 import io.github.spannm.jackcess.impl.DatabaseImpl;
 import io.github.spannm.jackcess.impl.TableImpl;
 import io.github.spannm.jackcess.test.AbstractBaseTest;
@@ -30,6 +32,8 @@ import io.github.spannm.jackcess.test.source.FileFormatSource;
 import org.junit.jupiter.params.ParameterizedTest;
 
 import java.io.IOException;
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 import java.util.*;
 
 class TableUpdaterTest extends AbstractBaseTest {
@@ -233,5 +237,91 @@ class TableUpdaterTest extends AbstractBaseTest {
             t.reset();
             assertThat(t.getNextRow()).isEqualTo(expectedRowData);
         }
+    }
+
+    @ParameterizedTest(name = "[{index}] {0}")
+    @FileFormatSource
+    void createRow_corruptTableDef_rejectsWrite(FileFormat fileFormat) throws Exception {
+        // variable length column count which does not cover all the variable length columns. Writing a row would run
+        // off the end of the offset table. An older version of jackcess could write this count when adding a column
+        checkCorruptTableDef(fileFormat, t -> setTableField(t, "maxVarColumnCount", (short) 1), "data2");
+
+        // column count which does not cover all the columns. Writing a row would run off the end of the null mask
+        checkCorruptTableDef(fileFormat, t -> setTableField(t, "maxColumnCount", (short) 1), "data1");
+
+        // fixed length column which ends beyond the maximum row size. Writing a row would run off the end of the row
+        // buffer
+        checkCorruptTableDef(fileFormat, t -> setColumnField(t, "id", "mfixedDataOffset", 5000), "id");
+    }
+
+    /** Damages part of a table definition which has already been loaded. */
+    @FunctionalInterface
+    private interface TableDefDamager {
+        /**
+         * Damages the definition of the given table.
+         *
+         * @param t table to damage
+         * @throws Exception if the table cannot be modified
+         */
+        void damage(Table t) throws Exception;
+    }
+
+    /**
+     * Creates a table, damages its definition and verifies that rows can still be read but no longer written.
+     *
+     * @param fileFormat      file format of the database to create
+     * @param damager         damages the loaded table definition
+     * @param expectedColName name of the column the error message must mention
+     */
+    private void checkCorruptTableDef(FileFormat fileFormat, TableDefDamager damager, String expectedColName) throws Exception {
+        try (Database db = createDbMem(fileFormat)) {
+            Table t = newTable("test")
+                .addColumn(newColumn("id", DataType.LONG))
+                .addColumn(newColumn("data1", DataType.TEXT))
+                .addColumn(newColumn("data2", DataType.TEXT))
+                .toTable(db);
+
+            damager.damage(t);
+
+            // the table def is validated when the table is loaded, so re-run the validation now that the def has
+            // been damaged
+            Method m = TableImpl.class.getDeclaredMethod("validateColumnDefs");
+            m.setAccessible(true);
+            m.invoke(t);
+
+            assertThat(t.getNextRow()).isNull();
+
+            assertThatThrownBy(() -> t.addRow(1, "foo", "bar"))
+                .isInstanceOf(JackcessException.class)
+                .hasMessageContaining("Table definition is corrupt")
+                .hasMessageContaining(expectedColName);
+        }
+    }
+
+    /**
+     * Sets a short field of the given table via reflection.
+     *
+     * @param t         table to modify
+     * @param fieldName name of the field
+     * @param value     new value
+     */
+    private static void setTableField(Table t, String fieldName, short value) throws ReflectiveOperationException {
+        Field f = TableImpl.class.getDeclaredField(fieldName);
+        f.setAccessible(true);
+        f.setShort(t, value);
+    }
+
+    /**
+     * Sets an int field of a column of the given table via reflection.
+     *
+     * @param t         table containing the column
+     * @param colName   name of the column
+     * @param fieldName name of the field
+     * @param value     new value
+     */
+    private static void setColumnField(Table t, String colName, String fieldName, int value) throws ReflectiveOperationException {
+        Field f = ColumnImpl.class.getDeclaredField(fieldName);
+        f.setAccessible(true);
+        f.setInt(t.getColumn(colName), value);
     }
 }

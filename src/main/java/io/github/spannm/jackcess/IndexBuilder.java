@@ -17,6 +17,7 @@
 package io.github.spannm.jackcess;
 
 import io.github.spannm.jackcess.impl.*;
+import io.github.spannm.jackcess.util.ToStringBuilder;
 
 import java.io.IOException;
 import java.util.*;
@@ -207,6 +208,15 @@ public class IndexBuilder {
         return msg + "(Index=" + getName() + ")";
     }
 
+    @Override
+    public String toString() {
+        return ToStringBuilder.valueBuilder(this)
+            .append("name", name).append("number", indexNumber).append("type", type)
+            .append("isPrimaryKey", isPrimaryKey()).append("isUnique", isUnique()).append("ignoreNulls", isIgnoreNulls())
+            .append("columns", columns)
+            .toString();
+    }
+
     /**
      * Information about a column in this index (name and ordering).
      */
@@ -236,6 +246,13 @@ public class IndexBuilder {
 
         public byte getFlags() {
             return flags;
+        }
+
+        @Override
+        public String toString() {
+            return ToStringBuilder.valueBuilder(this)
+                .append("name", name).append("flags", String.format("%d (%s)", getFlags(), isAscending() ? "ASC" : "DSC"))
+                .toString();
         }
     }
 
