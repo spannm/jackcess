@@ -20,8 +20,8 @@ import io.github.spannm.jackcess.Column;
 import io.github.spannm.jackcess.impl.ByteUtil;
 
 import java.io.IOException;
-import java.lang.System.Logger;
-import java.lang.System.Logger.Level;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * Implementation of ErrorHandler which is useful for generating debug information about bad row data (great for bug
@@ -29,7 +29,7 @@ import java.lang.System.Logger.Level;
  * {@link ReplacementErrorHandler}.
  */
 public class DebugErrorHandler extends ReplacementErrorHandler {
-    private static final Logger LOGGER = System.getLogger(DebugErrorHandler.class.getName());
+    private static final Logger LOGGER = Logger.getLogger(DebugErrorHandler.class.getName());
 
     /**
      * Constructs a DebugErrorHandler which replaces all errored values with {@code null}.
@@ -46,8 +46,8 @@ public class DebugErrorHandler extends ReplacementErrorHandler {
 
     @Override
     public Object handleRowError(Column column, byte[] columnData, Location location, Exception error) throws IOException {
-        LOGGER.log(Level.DEBUG, () -> "Failed reading column " + column + ", row " + location + ", bytes "
-            + (columnData != null ? ByteUtil.toHexString(columnData) : "null"), error);
+        LOGGER.log(Level.FINE, error, () -> "Failed reading column " + column + ", row " + location + ", bytes "
+            + (columnData != null ? ByteUtil.toHexString(columnData) : "null"));
 
         return super.handleRowError(column, columnData, location, error);
     }

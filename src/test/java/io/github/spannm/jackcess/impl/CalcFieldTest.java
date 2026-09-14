@@ -31,6 +31,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 
 import java.math.BigDecimal;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -130,7 +131,7 @@ class CalcFieldTest extends AbstractBaseTest {
         try (Database db = testDb.open()) {
             List<String> actual = db.getTable("Table1").stream().map(r -> r.entrySet().toString()).collect(Collectors.toList());
 
-            List<String> expected = List.of(
+            List<String> expected = Arrays.asList(
                 "[ID=1, FirstName=Bruce, LastName=Wayne, LastFirst=Wayne, Bruce, City=Gotham, LastFirstLen=12, Salary=1000000.0000, MonthlySalary=83333.3333, IsRich=true, AllNames=Wayne, Bruce=Wayne, Bruce, WeeklySalary=19230.7692307692, SalaryTest=1000000.0000, BoolTest=true, Popularity=50.325000, DecimalTest=50.325000, FloatTest=2583.2092, BigNumTest=56505085819.424791296572280180]",
                 "[ID=2, FirstName=Bart, LastName=Simpson, LastFirst=Simpson, Bart, City=Springfield, LastFirstLen=13, Salary=-1.0000, MonthlySalary=-0.0833, IsRich=false, AllNames=Simpson, Bart=Simpson, Bart, WeeklySalary=-0.0192307692307692, SalaryTest=-1.0000, BoolTest=true, Popularity=-36.222200, DecimalTest=-36.222200, FloatTest=0.0035889593, BigNumTest=-0.0784734499180612994241100748]",
                 "[ID=3, FirstName=John, LastName=Doe, LastFirst=Doe, John, City=Nowhere, LastFirstLen=9, Salary=0.0000, MonthlySalary=0.0000, IsRich=false, AllNames=Doe, John=Doe, John, WeeklySalary=0, SalaryTest=0.0000, BoolTest=true, Popularity=0.012300, DecimalTest=0.012300, FloatTest=0.0, BigNumTest=0E-8]",

@@ -20,6 +20,7 @@ import io.github.spannm.jackcess.PropertyMap.EnumValue;
 import io.github.spannm.jackcess.test.AbstractBaseTest;
 import org.junit.jupiter.api.Test;
 
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -29,7 +30,7 @@ class PropertyMapEnumTest extends AbstractBaseTest {
 
     @Test
     void enumValues() {
-        List<EnumValue[]> allValues = List.of(
+        List<EnumValue[]> allValues = Arrays.asList(
             PropertyMap.DisplayControl.values(),
             PropertyMap.TextFormat.values(),
             PropertyMap.IMEMode.values(),

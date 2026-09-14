@@ -39,6 +39,7 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeFormatterBuilder;
 import java.util.Calendar;
+import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 import java.util.function.Supplier;
@@ -959,7 +960,7 @@ class DefaultFunctionsTest extends AbstractBaseTest {
         class CustomFormatArgumentsProvider implements ArgumentsProvider {
             @Override
             public Stream<Arguments> provideArguments(ParameterDeclarations _parameters, ExtensionContext _context) {
-                return _context.getElement().map(elem -> AnnotationSupport.findRepeatableAnnotations(elem, CustomFormatSource.class)).orElse(List.of()).stream()
+                return _context.getElement().map(elem -> AnnotationSupport.findRepeatableAnnotations(elem, CustomFormatSource.class)).orElse(Collections.emptyList()).stream()
                     .flatMap(src -> IntStream.range(0, src.testValues().length).filter(i -> i % 2 == 0).mapToObj(i -> {
                         String expected = src.testValues()[i];
                         String val = src.testValues()[i + 1];

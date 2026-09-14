@@ -33,27 +33,30 @@ import org.junit.jupiter.params.ParameterizedTest;
 
 import java.io.File;
 import java.io.IOException;
-import java.lang.System.Logger.Level;
 import java.lang.reflect.Field;
 import java.nio.ByteBuffer;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.TreeMap;
+import java.util.logging.Level;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 @SuppressWarnings("checkstyle:MethodNameCheck")
 public class IndexCodesTest extends AbstractBaseTest {
 
-    private static final Map<Character, String> SPECIAL_CHARS = Map.ofEntries(
-        Map.entry('\b', "\\b"),
-        Map.entry('\t', "\\t"),
-        Map.entry('\n', "\\n"),
-        Map.entry('\f', "\\f"),
-        Map.entry('\r', "\\r"),
-        Map.entry('\"', "\\\""),
-        Map.entry('\'', "\\'"),
-        Map.entry('\\', "\\\\"));
+    private static final Map<Character, String> SPECIAL_CHARS = new HashMap<>();
+    static {
+        SPECIAL_CHARS.put('\b', "\\b");
+        SPECIAL_CHARS.put('\t', "\\t");
+        SPECIAL_CHARS.put('\n', "\\n");
+        SPECIAL_CHARS.put('\f', "\\f");
+        SPECIAL_CHARS.put('\r', "\\r");
+        SPECIAL_CHARS.put('\"', "\\\"");
+        SPECIAL_CHARS.put('\'', "\\'");
+        SPECIAL_CHARS.put('\\', "\\\\");
+    }
 
     @ParameterizedTest(name = "[{index}] {0}")
     @TestDbReadOnlySource({INDEX_CODES, EMOTICONS})
@@ -63,7 +66,7 @@ public class IndexCodesTest extends AbstractBaseTest {
 
             for (Table t : db) {
                 for (Index index : t.getIndexes()) {
-                    // getLogger().log(Level.DEBUG, "Checking {0}.{1}", t.getName(), index.getName());
+                    // getLogger().log(Level.FINE, "Checking {0}.{1}", new Object[] {t.getName(), index.getName()});
                     checkIndexEntries(testDb, t, index);
                 }
             }
@@ -72,7 +75,7 @@ public class IndexCodesTest extends AbstractBaseTest {
 
     static void checkIndexEntries(TestDb testDB, Table t, Index index) throws Exception {
         // index.initialize();
-        // getStaticLogger().log(Level.DEBUG, "Ind {0}", index);
+        // getStaticLogger().log(Level.FINE, "Ind {0}", index);
 
         Cursor cursor = CursorBuilder.createCursor(index);
         while (cursor.moveToNextRow()) {
@@ -92,8 +95,8 @@ public class IndexCodesTest extends AbstractBaseTest {
                 success = true;
             } finally {
                 if (!success) {
-                    getStaticLogger().log(Level.DEBUG, "CurPos: {0}", curPos);
-                    getStaticLogger().log(Level.DEBUG, "Value: {0}: {1}", row, toUnicodeStr(row.get("data")));
+                    getStaticLogger().log(Level.FINE, "CurPos: {0}", curPos);
+                    getStaticLogger().log(Level.FINE, "Value: {0}: {1}", new Object[] {row, toUnicodeStr(row.get("data"))});
                 }
             }
         }
@@ -123,7 +126,7 @@ public class IndexCodesTest extends AbstractBaseTest {
             String rowId = expectedRow.getString("name");
             String tName = t.getName();
             if (("Table11".equals(tName) || "Table11_desc".equals(tName)) && ("row10".equals(rowId) || "row11".equals(rowId) || "row12".equals(rowId))) {
-                getStaticLogger().log(Level.WARNING, "TODO long rows not handled completely yet in V2010: {0}, {1}", tName, rowId);
+                getStaticLogger().log(Level.WARNING, "TODO long rows not handled completely yet in V2010: {0}, {1}", new Object[] {tName, rowId});
                 return;
             }
         }
@@ -234,14 +237,14 @@ public class IndexCodesTest extends AbstractBaseTest {
             Index ind = t.getIndexes().iterator().next();
             ((IndexImpl) ind).initialize();
 
-            getLogger().log(Level.DEBUG, "Ind {0}", ind);
+            getLogger().log(Level.FINE, "Ind {0}", ind);
 
             Cursor cursor = CursorBuilder.createCursor(ind);
             while (cursor.moveToNextRow()) {
                 String entryStr = entryToString(cursor.getSavepoint().getCurrentPosition());
-                getLogger().log(Level.DEBUG, "=======");
-                getLogger().log(Level.DEBUG, "Entry Bytes: {0}", entryStr);
-                getLogger().log(Level.DEBUG, "Value: {0}; {1}", cursor.getCurrentRow(), toUnicodeStr(cursor.getCurrentRow().get("data")));
+                getLogger().log(Level.FINE, "=======");
+                getLogger().log(Level.FINE, "Entry Bytes: {0}", entryStr);
+                getLogger().log(Level.FINE, "Value: {0}; {1}", new Object[] {cursor.getCurrentRow(), toUnicodeStr(cursor.getCurrentRow().get("data"))});
             }
         }
     }
@@ -278,13 +281,13 @@ public class IndexCodesTest extends AbstractBaseTest {
             Index index = t.getIndex("B");
             ((IndexImpl) index).initialize();
 
-            getLogger().log(Level.DEBUG, "Ind {0}", index);
+            getLogger().log(Level.FINE, "Ind {0}", index);
 
             Cursor cursor = CursorBuilder.createCursor(index);
             while (cursor.moveToNextRow()) {
-                getLogger().log(Level.DEBUG, "=======");
-                getLogger().log(Level.DEBUG, "Savepoint: {0}", cursor.getSavepoint());
-                getLogger().log(Level.DEBUG, "Value: {0}", cursor.getCurrentRow());
+                getLogger().log(Level.FINE, "=======");
+                getLogger().log(Level.FINE, "Savepoint: {0}", cursor.getSavepoint());
+                getLogger().log(Level.FINE, "Value: {0}", cursor.getCurrentRow());
             }
         }
     }
@@ -295,7 +298,7 @@ public class IndexCodesTest extends AbstractBaseTest {
             Table t = db.getTable("Table1");
             Index index = t.getIndexes().iterator().next();
             ((IndexImpl) index).initialize();
-            getLogger().log(Level.DEBUG, "Index {0}", index);
+            getLogger().log(Level.FINE, "Index {0}", index);
 
             Pattern inlinePat = Pattern.compile("7F 0E 02 0E 02 (.*)0E 02 0E 02 01 00");
             Pattern unprintPat = Pattern.compile("01 01 01 80 (.+) 06 (.+) 00");
@@ -314,9 +317,9 @@ public class IndexCodesTest extends AbstractBaseTest {
 
             Cursor cursor = CursorBuilder.createCursor(index);
             while (cursor.moveToNextRow()) {
-                // getLogger().log(Level.DEBUG, "=======");
-                // getLogger().log(Level.DEBUG, "Savepoint: {0}", cursor.getSavepoint());
-                // getLogger().log(Level.DEBUG, "Value: {0}", cursor.getCurrentRow());
+                // getLogger().log(Level.FINE, "=======");
+                // getLogger().log(Level.FINE, "Savepoint: {0}", cursor.getSavepoint());
+                // getLogger().log(Level.FINE, "Value: {0}", cursor.getCurrentRow());
                 Cursor.Savepoint savepoint = cursor.getSavepoint();
                 String entryStr = entryToString(savepoint.getCurrentPosition());
 
@@ -325,11 +328,11 @@ public class IndexCodesTest extends AbstractBaseTest {
                 String key = row.getString("key");
                 char c = value.charAt(2);
 
-                getLogger().log(Level.DEBUG, "=======");
-                getLogger().log(Level.DEBUG, "RowId: {0}", savepoint.getCurrentPosition().getRowId());
-                getLogger().log(Level.DEBUG, "Entry: {0}", entryStr);
-                getLogger().log(Level.DEBUG, "Value: ({0}) {1}", key, value);
-                getLogger().log(Level.DEBUG, "Char: {0}, {1}, {2}", c, (int) c, toUnicodeStr(c));
+                getLogger().log(Level.FINE, "=======");
+                getLogger().log(Level.FINE, "RowId: {0}", savepoint.getCurrentPosition().getRowId());
+                getLogger().log(Level.FINE, "Entry: {0}", entryStr);
+                getLogger().log(Level.FINE, "Value: ({0}) {1}", new Object[] {key, value});
+                getLogger().log(Level.FINE, "Char: {0}, {1}, {2}", new Object[] {c, (int) c, toUnicodeStr(c)});
 
                 String type = null;
                 if (entryStr.endsWith("01 00")) {
@@ -377,14 +380,14 @@ public class IndexCodesTest extends AbstractBaseTest {
                     getLogger().log(Level.WARNING, "unhandled {0}", entryStr);
                 }
 
-                getLogger().log(Level.DEBUG, "Type {0}", type);
+                getLogger().log(Level.FINE, "Type {0}", type);
             }
 
-            getLogger().log(Level.DEBUG, "\n*** CODES");
+            getLogger().log(Level.FINE, "\n*** CODES");
             for (int i = 0; i <= 0xFFFF; i++) {
 
                 if (i == 256) {
-                    getLogger().log(Level.DEBUG, "\n*** EXTENDED CODES");
+                    getLogger().log(Level.FINE, "\n*** EXTENDED CODES");
                 }
 
                 // skip non-char chars
@@ -402,9 +405,9 @@ public class IndexCodesTest extends AbstractBaseTest {
                 String[] chars = inlineCodes.get(cc);
                 if (chars != null) {
                     if (chars.length == 1 && chars[0].isEmpty()) {
-                        getLogger().log(Level.DEBUG, "X");
+                        getLogger().log(Level.FINE, "X");
                     } else {
-                        getLogger().log(Level.DEBUG, "S{0}", toByteString(chars));
+                        getLogger().log(Level.FINE, "S{0}", toByteString(chars));
                     }
                     continue;
                 }
@@ -412,13 +415,13 @@ public class IndexCodesTest extends AbstractBaseTest {
                 chars = inatInlineCodes.get(cc);
                 if (chars != null) {
                     String[] extra = inatExtraCodes.get(cc);
-                    getLogger().log(Level.DEBUG, "I{0}, {1}", toByteString(chars), toByteString(extra));
+                    getLogger().log(Level.FINE, "I{0}, {1}", new Object[] {toByteString(chars), toByteString(extra)});
                     continue;
                 }
 
                 chars = unprintCodes.get(cc);
                 if (chars != null) {
-                    getLogger().log(Level.DEBUG, "U{0}", toByteString(chars));
+                    getLogger().log(Level.FINE, "U{0}", toByteString(chars));
                     continue;
                 }
 
@@ -430,7 +433,7 @@ public class IndexCodesTest extends AbstractBaseTest {
                     int val = Integer.parseInt(chars[0], 16) - 2;
                     String valStr = ByteUtil.toHexString(new byte[] {
                         (byte) val}).trim();
-                    getLogger().log(Level.DEBUG, "P{0}", valStr);
+                    getLogger().log(Level.FINE, "P{0}", valStr);
                     continue;
                 }
 
@@ -446,13 +449,13 @@ public class IndexCodesTest extends AbstractBaseTest {
                     }
 
                     String[] extra = inat2ExtraCodes.get(cc);
-                    getLogger().log(Level.DEBUG, "Z{0}, {1}, {2}", toByteString(chars), toByteString(extra), crazyCode);
+                    getLogger().log(Level.FINE, "Z{0}, {1}, {2}", new Object[] {toByteString(chars), toByteString(extra), crazyCode});
                     continue;
                 }
 
                 throw new JackcessRuntimeException("Unhandled char " + toUnicodeStr(c));
             }
-            getLogger().log(Level.DEBUG, "\n*** END CODES");
+            getLogger().log(Level.FINE, "\n*** END CODES");
         }
     }
 
@@ -462,7 +465,7 @@ public class IndexCodesTest extends AbstractBaseTest {
             Table t = db.getTable("Table1");
             Index index = t.getIndexes().iterator().next();
             ((IndexImpl) index).initialize();
-            getLogger().log(Level.DEBUG, "Index {0}", index);
+            getLogger().log(Level.FINE, "Index {0}", index);
 
             Pattern inlinePat = Pattern.compile("7F 4A 4A (.*)4A 4A 01 00");
             Pattern unprintPat = Pattern.compile("01 01 01 80 (.+) 06 (.+) 00");
@@ -481,9 +484,9 @@ public class IndexCodesTest extends AbstractBaseTest {
 
             Cursor cursor = CursorBuilder.createCursor(index);
             while (cursor.moveToNextRow()) {
-                getLogger().log(Level.DEBUG, "=======");
-                getLogger().log(Level.DEBUG, "Savepoint: {0}", cursor.getSavepoint());
-                getLogger().log(Level.DEBUG, "Value: {0}", cursor.getCurrentRow());
+                getLogger().log(Level.FINE, "=======");
+                getLogger().log(Level.FINE, "Savepoint: {0}", cursor.getSavepoint());
+                getLogger().log(Level.FINE, "Value: {0}", cursor.getCurrentRow());
                 Cursor.Savepoint savepoint = cursor.getSavepoint();
                 String entryStr = entryToString(savepoint.getCurrentPosition());
 
@@ -491,12 +494,12 @@ public class IndexCodesTest extends AbstractBaseTest {
                 String value = row.getString("data");
                 String key = row.getString("key");
                 char c = value.charAt(2);
-                getLogger().log(Level.DEBUG, "=======");
-                getLogger().log(Level.DEBUG, "RowId: {0}", savepoint.getCurrentPosition().getRowId());
-                getLogger().log(Level.DEBUG, "Entry: {0}", entryStr);
-                // getLogger().log(Level.DEBUG, "Row: {0}", row);
-                getLogger().log(Level.DEBUG, "Value: ({0}) {1}", key, value);
-                getLogger().log(Level.DEBUG, "Char: {0}, {1}, {2}", c, (int) c, toUnicodeStr(c));
+                getLogger().log(Level.FINE, "=======");
+                getLogger().log(Level.FINE, "RowId: {0}", savepoint.getCurrentPosition().getRowId());
+                getLogger().log(Level.FINE, "Entry: {0}", entryStr);
+                // getLogger().log(Level.FINE, "Row: {0}", row);
+                getLogger().log(Level.FINE, "Value: ({0}) {1}", new Object[] {key, value});
+                getLogger().log(Level.FINE, "Char: {0}, {1}, {2}", new Object[] {c, (int) c, toUnicodeStr(c)});
 
                 String type = null;
                 if (entryStr.endsWith("01 00")) {
@@ -543,14 +546,14 @@ public class IndexCodesTest extends AbstractBaseTest {
                     throw new JackcessRuntimeException("Unhandled " + entryStr);
                 }
 
-                getLogger().log(Level.DEBUG, "Type: {0}", type);
+                getLogger().log(Level.FINE, "Type: {0}", type);
             }
 
-            getLogger().log(Level.DEBUG, "\n*** CODES");
+            getLogger().log(Level.FINE, "\n*** CODES");
             for (int i = 0; i <= 0xFFFF; i++) {
 
                 if (i == 256) {
-                    getLogger().log(Level.DEBUG, "\n*** EXTENDED CODES");
+                    getLogger().log(Level.FINE, "\n*** EXTENDED CODES");
                 }
 
                 // skip non-char chars
@@ -568,9 +571,9 @@ public class IndexCodesTest extends AbstractBaseTest {
                 String[] chars = inlineCodes.get(cc);
                 if (chars != null) {
                     if (chars.length == 1 && chars[0].isEmpty()) {
-                        getLogger().log(Level.DEBUG, "X");
+                        getLogger().log(Level.FINE, "X");
                     } else {
-                        getLogger().log(Level.DEBUG, "S{0}", toByteString(chars));
+                        getLogger().log(Level.FINE, "S{0}", toByteString(chars));
                     }
                     continue;
                 }
@@ -578,13 +581,13 @@ public class IndexCodesTest extends AbstractBaseTest {
                 chars = inatInlineCodes.get(cc);
                 if (chars != null) {
                     String[] extra = inatExtraCodes.get(cc);
-                    getLogger().log(Level.DEBUG, "I{0}, {1}", toByteString(chars), toByteString(extra));
+                    getLogger().log(Level.FINE, "I{0}, {1}", new Object[] {toByteString(chars), toByteString(extra)});
                     continue;
                 }
 
                 chars = unprintCodes.get(cc);
                 if (chars != null) {
-                    getLogger().log(Level.DEBUG, "U{0}", toByteString(chars));
+                    getLogger().log(Level.FINE, "U{0}", toByteString(chars));
                     continue;
                 }
 
@@ -595,7 +598,7 @@ public class IndexCodesTest extends AbstractBaseTest {
                     }
                     int val = Integer.parseInt(chars[0], 16) - 2;
                     String valStr = ByteUtil.toHexString(new byte[] {(byte) val}).trim();
-                    getLogger().log(Level.DEBUG, "P{0}", valStr);
+                    getLogger().log(Level.FINE, "P{0}", valStr);
                     continue;
                 }
 
@@ -611,13 +614,13 @@ public class IndexCodesTest extends AbstractBaseTest {
                     }
 
                     String[] extra = inat2ExtraCodes.get(cc);
-                    getLogger().log(Level.DEBUG, "Z{0}, {1}, {2}", toByteString(chars), toByteString(extra), crazyCode);
+                    getLogger().log(Level.FINE, "Z{0}, {1}, {2}", new Object[] {toByteString(chars), toByteString(extra), crazyCode});
                     continue;
                 }
 
                 throw new JackcessRuntimeException("Unhandled char " + toUnicodeStr(c));
             }
-            getLogger().log(Level.DEBUG, "\n*** END CODES");
+            getLogger().log(Level.FINE, "\n*** END CODES");
         }
     }
 

@@ -30,6 +30,7 @@ import org.junit.jupiter.params.ParameterizedTest;
 
 import java.io.IOException;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -65,18 +66,18 @@ class FKEnforcerTest extends AbstractBaseTest {
             Table t2 = db.getTable("Table2");
             Table t3 = db.getTable("Table3");
 
-            Map<Executable, String> tests = Map.of(
-                () -> t1.addRow(20, 0, 20, "some data", 20), "Table1[otherfk2]",
-                () -> {
-                    Cursor c = CursorBuilder.createCursor(t2);
-                    c.moveToNextRow();
-                    c.updateCurrentRow(30, "foo30");
-                }, "Table2[id]",
-                () -> {
-                    Cursor c = CursorBuilder.createCursor(t3);
-                    c.moveToNextRow();
-                    c.deleteCurrentRow();
-                }, "Table3[id]");
+            Map<Executable, String> tests = new LinkedHashMap<>();
+            tests.put(() -> t1.addRow(20, 0, 20, "some data", 20), "Table1[otherfk2]");
+            tests.put(() -> {
+                Cursor c = CursorBuilder.createCursor(t2);
+                c.moveToNextRow();
+                c.updateCurrentRow(30, "foo30");
+            }, "Table2[id]");
+            tests.put(() -> {
+                Cursor c = CursorBuilder.createCursor(t3);
+                c.moveToNextRow();
+                c.deleteCurrentRow();
+            }, "Table3[id]");
             tests.forEach((key, value) -> {
                 IOException ex = assertThrows(IOException.class, key);
                 assertThat(ex.getMessage().contains(value)).isTrue();

@@ -168,9 +168,9 @@ class CursorTest extends AbstractBaseTest {
 
         List<RowIdImpl> sortedRowIds =
             new ArrayList<>(new TreeSet<>(
-                List.of(rowId1, rowId2, rowId3, RowIdImpl.FIRST_ROW_ID, RowIdImpl.LAST_ROW_ID)));
+                Arrays.asList(rowId1, rowId2, rowId3, RowIdImpl.FIRST_ROW_ID, RowIdImpl.LAST_ROW_ID)));
 
-        assertThat(sortedRowIds).isEqualTo(List.of(RowIdImpl.FIRST_ROW_ID, rowId1, rowId2, rowId3, RowIdImpl.LAST_ROW_ID));
+        assertThat(sortedRowIds).isEqualTo(Arrays.asList(RowIdImpl.FIRST_ROW_ID, rowId1, rowId2, rowId3, RowIdImpl.LAST_ROW_ID));
     }
 
     @ParameterizedTest(name = "[{index}] {0}")
@@ -907,20 +907,20 @@ class CursorTest extends AbstractBaseTest {
         assertThat(toList(
                 cursor.newIterable()
                         .withMatchPattern("value", "data4")
-                        .withColumnMatcher(SimpleColumnMatcher.INSTANCE))).isEqualTo(List.of(createExpectedRow("id", 4,
+                        .withColumnMatcher(SimpleColumnMatcher.INSTANCE))).isEqualTo(Arrays.asList(createExpectedRow("id", 4,
                 "value", "data" + 4)));
 
         assertThat(toList(
                 cursor.newIterable()
                         .withMatchPattern("value", "DaTa3")
-                        .withColumnMatcher(CaseInsensitiveColumnMatcher.INSTANCE))).isEqualTo(List.of(createExpectedRow("id", 3,
+                        .withColumnMatcher(CaseInsensitiveColumnMatcher.INSTANCE))).isEqualTo(Arrays.asList(createExpectedRow("id", 3,
                 "value", "data" + 3)));
 
         assertThat(toList(
                 cursor.newIterable()
                         .addMatchPattern("value", "DaTa2")
                         .addMatchPattern("id", 2)
-                        .withColumnMatcher(CaseInsensitiveColumnMatcher.INSTANCE))).isEqualTo(List.of(createExpectedRow("id", 2,
+                        .withColumnMatcher(CaseInsensitiveColumnMatcher.INSTANCE))).isEqualTo(Arrays.asList(createExpectedRow("id", 2,
                 "value", "data" + 2)));
     }
 
@@ -961,19 +961,19 @@ class CursorTest extends AbstractBaseTest {
                 .stream().map(r -> r.getString("data"))
                 .collect(Collectors.toList());
 
-            assertThat(expectedData).isEqualTo(List.of("baz11", "baz11-2"));
+            assertThat(expectedData).isEqualTo(Arrays.asList("baz11", "baz11-2"));
 
             List<String> viaIterableNames = cursor.newEntryIterable(1)
-                .addColumnNames(List.of("data"))
+                .addColumnNames(Arrays.asList("data"))
                 .stream().map(r -> r.getString("data"))
                 .collect(Collectors.toList());
-            assertThat(viaIterableNames).isEqualTo(List.of("baz11", "baz11-2"));
+            assertThat(viaIterableNames).isEqualTo(Arrays.asList("baz11", "baz11-2"));
 
             List<String> viaColumns = cursor.newEntryIterable(1)
-                .addColumns(List.of(t1.getColumn("data")))
+                .addColumns(Arrays.asList(t1.getColumn("data")))
                 .stream().map(r -> r.getString("data"))
                 .collect(Collectors.toList());
-            assertThat(viaColumns).isEqualTo(List.of("baz11", "baz11-2"));
+            assertThat(viaColumns).isEqualTo(Arrays.asList("baz11", "baz11-2"));
 
             List<String> viaWithEntryValues = cursor.newEntryIterable(2)
                 .withEntryValues(1)
@@ -981,7 +981,7 @@ class CursorTest extends AbstractBaseTest {
                 .addColumnNames("data")
                 .stream().map(r -> r.getString("data"))
                 .collect(Collectors.toList());
-            assertThat(viaWithEntryValues).isEqualTo(List.of("baz11", "baz11-2"));
+            assertThat(viaWithEntryValues).isEqualTo(Arrays.asList("baz11", "baz11-2"));
 
             expectedData = new ArrayList<>();
             for (Iterator<? extends Row> iter =
@@ -995,7 +995,7 @@ class CursorTest extends AbstractBaseTest {
                 }
             }
 
-            assertThat(expectedData).isEqualTo(List.of("baz11", "baz11-2"));
+            assertThat(expectedData).isEqualTo(Arrays.asList("baz11", "baz11-2"));
 
             expectedData = new ArrayList<>();
             for (Row row : cursor.newEntryIterable(1).addColumnNames("data")) {
@@ -1014,12 +1014,12 @@ class CursorTest extends AbstractBaseTest {
             Cursor cursor = CursorBuilder.createCursor(t1);
 
             List<String> expectedData = cursor.newIterable().withColumnNames(
-                List.of("otherfk1", "data")).stream()
+                Arrays.asList("otherfk1", "data")).stream()
                 .filter(r -> r.get("otherfk1").equals(1))
                 .map(r -> r.getString("data"))
                 .collect(Collectors.toList());
 
-            assertThat(expectedData).isEqualTo(List.of("baz11", "baz11-2"));
+            assertThat(expectedData).isEqualTo(Arrays.asList("baz11", "baz11-2"));
 
             expectedData = new ArrayList<>();
             for (Iterator<? extends Row> iter = cursor.iterator(); iter.hasNext();) {
@@ -1035,11 +1035,11 @@ class CursorTest extends AbstractBaseTest {
                 }
             }
 
-            assertThat(expectedData).isEqualTo(List.of("baz11", "baz11-2"));
+            assertThat(expectedData).isEqualTo(Arrays.asList("baz11", "baz11-2"));
 
             expectedData = new ArrayList<>();
             for (Row row : cursor.newIterable().withColumnNames(
-                List.of("otherfk1", "data"))) {
+                Arrays.asList("otherfk1", "data"))) {
                 if (row.get("otherfk1").equals(1)) {
                     expectedData.add(row.getString("data"));
                 }
@@ -1168,47 +1168,47 @@ class CursorTest extends AbstractBaseTest {
                 .addColumn(DatabaseBuilder.newColumn("num2", DataType.LONG)).addColumn(DatabaseBuilder.newColumn("key3", DataType.TEXT)).addColumn(DatabaseBuilder.newColumn("value", DataType.TEXT))
                 .addIndex(DatabaseBuilder.newIndex("idx3").withColumns("data1", "num2", "key3")).toTable(db);
 
-            Index idx = t.findIndexForColumns(List.of("data1"), TableImpl.IndexFeature.ANY_MATCH);
+            Index idx = t.findIndexForColumns(Arrays.asList("data1"), TableImpl.IndexFeature.ANY_MATCH);
             assertThat(idx.getName()).isEqualTo("idx3");
 
-            idx = t.findIndexForColumns(List.of("data1", "num2"), TableImpl.IndexFeature.ANY_MATCH);
+            idx = t.findIndexForColumns(Arrays.asList("data1", "num2"), TableImpl.IndexFeature.ANY_MATCH);
             assertThat(idx.getName()).isEqualTo("idx3");
 
-            idx = t.findIndexForColumns(List.of("data1", "num2", "key3"), TableImpl.IndexFeature.ANY_MATCH);
+            idx = t.findIndexForColumns(Arrays.asList("data1", "num2", "key3"), TableImpl.IndexFeature.ANY_MATCH);
             assertThat(idx.getName()).isEqualTo("idx3");
 
-            assertThat(t.findIndexForColumns(List.of("num2"), TableImpl.IndexFeature.ANY_MATCH)).isNull();
-            assertThat(t.findIndexForColumns(List.of("data1", "key3"), TableImpl.IndexFeature.ANY_MATCH)).isNull();
-            assertThat(t.findIndexForColumns(List.of("data1"), TableImpl.IndexFeature.EXACT_MATCH)).isNull();
+            assertThat(t.findIndexForColumns(Arrays.asList("num2"), TableImpl.IndexFeature.ANY_MATCH)).isNull();
+            assertThat(t.findIndexForColumns(Arrays.asList("data1", "key3"), TableImpl.IndexFeature.ANY_MATCH)).isNull();
+            assertThat(t.findIndexForColumns(Arrays.asList("data1"), TableImpl.IndexFeature.EXACT_MATCH)).isNull();
 
             DatabaseBuilder.newIndex("idx2").withColumns("data1", "num2").addToTable(t);
 
-            idx = t.findIndexForColumns(List.of("data1"), TableImpl.IndexFeature.ANY_MATCH);
+            idx = t.findIndexForColumns(Arrays.asList("data1"), TableImpl.IndexFeature.ANY_MATCH);
             assertThat(idx.getName()).isEqualTo("idx2");
 
-            idx = t.findIndexForColumns(List.of("data1", "num2"), TableImpl.IndexFeature.ANY_MATCH);
+            idx = t.findIndexForColumns(Arrays.asList("data1", "num2"), TableImpl.IndexFeature.ANY_MATCH);
             assertThat(idx.getName()).isEqualTo("idx2");
 
-            idx = t.findIndexForColumns(List.of("data1", "num2", "key3"), TableImpl.IndexFeature.ANY_MATCH);
+            idx = t.findIndexForColumns(Arrays.asList("data1", "num2", "key3"), TableImpl.IndexFeature.ANY_MATCH);
             assertThat(idx.getName()).isEqualTo("idx3");
 
-            assertThat(t.findIndexForColumns(List.of("num2"), TableImpl.IndexFeature.ANY_MATCH)).isNull();
-            assertThat(t.findIndexForColumns(List.of("data1", "key3"), TableImpl.IndexFeature.ANY_MATCH)).isNull();
-            assertThat(t.findIndexForColumns(List.of("data1"), TableImpl.IndexFeature.EXACT_MATCH)).isNull();
+            assertThat(t.findIndexForColumns(Arrays.asList("num2"), TableImpl.IndexFeature.ANY_MATCH)).isNull();
+            assertThat(t.findIndexForColumns(Arrays.asList("data1", "key3"), TableImpl.IndexFeature.ANY_MATCH)).isNull();
+            assertThat(t.findIndexForColumns(Arrays.asList("data1"), TableImpl.IndexFeature.EXACT_MATCH)).isNull();
 
             DatabaseBuilder.newIndex("idx1").withColumns("data1").addToTable(t);
 
-            idx = t.findIndexForColumns(List.of("data1"), TableImpl.IndexFeature.ANY_MATCH);
+            idx = t.findIndexForColumns(Arrays.asList("data1"), TableImpl.IndexFeature.ANY_MATCH);
             assertThat(idx.getName()).isEqualTo("idx1");
 
-            idx = t.findIndexForColumns(List.of("data1", "num2"), TableImpl.IndexFeature.ANY_MATCH);
+            idx = t.findIndexForColumns(Arrays.asList("data1", "num2"), TableImpl.IndexFeature.ANY_MATCH);
             assertThat(idx.getName()).isEqualTo("idx2");
 
-            idx = t.findIndexForColumns(List.of("data1", "num2", "key3"), TableImpl.IndexFeature.ANY_MATCH);
+            idx = t.findIndexForColumns(Arrays.asList("data1", "num2", "key3"), TableImpl.IndexFeature.ANY_MATCH);
             assertThat(idx.getName()).isEqualTo("idx3");
 
-            assertThat(t.findIndexForColumns(List.of("num2"), TableImpl.IndexFeature.ANY_MATCH)).isNull();
-            assertThat(t.findIndexForColumns(List.of("data1", "key3"), TableImpl.IndexFeature.ANY_MATCH)).isNull();
+            assertThat(t.findIndexForColumns(Arrays.asList("num2"), TableImpl.IndexFeature.ANY_MATCH)).isNull();
+            assertThat(t.findIndexForColumns(Arrays.asList("data1", "key3"), TableImpl.IndexFeature.ANY_MATCH)).isNull();
         }
     }
 
@@ -1229,7 +1229,7 @@ class CursorTest extends AbstractBaseTest {
                 .toTable(db);
 
             int id = 1;
-            for (String str : List.of("A", "B", "C", "D")) {
+            for (String str : Arrays.asList("A", "B", "C", "D")) {
                 for (int i = 4; i >= 0; --i) {
                     // for(int i = 0; i < 5; i++) {
                     for (int j = 1; j < 3; j++) {

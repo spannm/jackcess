@@ -24,6 +24,7 @@ import io.github.spannm.jackcess.test.AbstractBaseTest;
 import io.github.spannm.jackcess.test.TestUtil;
 import org.junit.jupiter.api.Test;
 
+import java.util.Arrays;
 import java.util.List;
 
 class RowFilterTest extends AbstractBaseTest {
@@ -41,21 +42,21 @@ class RowFilterTest extends AbstractBaseTest {
         Row row4 = TestUtil.createExpectedRow(ID_COL, 4, COL1, "foo", COL2, 13, COL3, null);
         Row row5 = TestUtil.createExpectedRow(ID_COL, 5, COL1, "bla", COL2, 13, COL3, "bar");
 
-        List<Row> rows = List.of(row0, row1, row2, row3, row4, row5);
+        List<Row> rows = Arrays.asList(row0, row1, row2, row3, row4, row5);
 
         ColumnImpl testCol = new ColumnImpl(null, COL1, DataType.TEXT, 0, 0, 0) {
         };
-        assertThat(toList(RowFilter.matchPattern(testCol, "foo").apply(rows))).isEqualTo(List.of(row0, row2, row4));
-        assertThat(toList(RowFilter.invert(RowFilter.matchPattern(testCol, "foo")).apply(rows))).isEqualTo(List.of(row1, row3, row5));
+        assertThat(toList(RowFilter.matchPattern(testCol, "foo").apply(rows))).isEqualTo(Arrays.asList(row0, row2, row4));
+        assertThat(toList(RowFilter.invert(RowFilter.matchPattern(testCol, "foo")).apply(rows))).isEqualTo(Arrays.asList(row1, row3, row5));
 
-        assertThat(toList(RowFilter.matchPattern(TestUtil.createExpectedRow(COL1, "foo")).apply(rows))).isEqualTo(List.of(row0, row2, row4));
-        assertThat(toList(RowFilter.matchPattern(TestUtil.createExpectedRow(COL1, "foo", COL3, "bar")).apply(rows))).isEqualTo(List.of(row0, row2));
-        assertThat(toList(RowFilter.matchPattern(TestUtil.createExpectedRow(COL1, "foo", COL3, null)).apply(rows))).isEqualTo(List.of(row4));
-        assertThat(toList(RowFilter.matchPattern(TestUtil.createExpectedRow(COL2, 13)).apply(rows))).isEqualTo(List.of(row0, row4, row5));
-        assertThat(toList(RowFilter.matchPattern(row1).apply(rows))).isEqualTo(List.of(row1));
+        assertThat(toList(RowFilter.matchPattern(TestUtil.createExpectedRow(COL1, "foo")).apply(rows))).isEqualTo(Arrays.asList(row0, row2, row4));
+        assertThat(toList(RowFilter.matchPattern(TestUtil.createExpectedRow(COL1, "foo", COL3, "bar")).apply(rows))).isEqualTo(Arrays.asList(row0, row2));
+        assertThat(toList(RowFilter.matchPattern(TestUtil.createExpectedRow(COL1, "foo", COL3, null)).apply(rows))).isEqualTo(Arrays.asList(row4));
+        assertThat(toList(RowFilter.matchPattern(TestUtil.createExpectedRow(COL2, 13)).apply(rows))).isEqualTo(Arrays.asList(row0, row4, row5));
+        assertThat(toList(RowFilter.matchPattern(row1).apply(rows))).isEqualTo(Arrays.asList(row1));
 
         assertThat(toList(RowFilter.apply(null, rows))).isEqualTo(rows);
-        assertThat(toList(RowFilter.apply(RowFilter.matchPattern(row1), rows))).isEqualTo(List.of(row1));
+        assertThat(toList(RowFilter.apply(RowFilter.matchPattern(row1), rows))).isEqualTo(Arrays.asList(row1));
     }
 
 }

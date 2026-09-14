@@ -23,13 +23,12 @@ import io.github.spannm.jackcess.Database.FileFormat;
 import io.github.spannm.jackcess.complex.ComplexValueForeignKey;
 import io.github.spannm.jackcess.impl.*;
 import io.github.spannm.jackcess.util.MemFileChannel;
+import io.github.spannm.jackcess.util.StringUtil;
 
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.UncheckedIOException;
-import java.lang.System.Logger;
-import java.lang.System.Logger.Level;
 import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
 import java.nio.charset.Charset;
@@ -41,6 +40,8 @@ import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
@@ -57,7 +58,7 @@ public final class TestUtil {
     }
 
     private static Logger getLogger() {
-        return System.getLogger(TestUtil.class.getName());
+        return Logger.getLogger(TestUtil.class.getName());
     }
 
     public static Database openDb(FileFormat fileFormat, File file) throws IOException {
@@ -196,9 +197,9 @@ public final class TestUtil {
     }
 
     public static void dumpProperties(Table table) throws IOException {
-        getLogger().log(Level.DEBUG, "TABLE_PROPS: {0}: {1}", table.getName(), table.getProperties());
+        getLogger().log(Level.FINE, "TABLE_PROPS: {0}: {1}", new Object[] {table.getName(), table.getProperties()});
         for (Column c : table.getColumns()) {
-            getLogger().log(Level.DEBUG, "COL_PROPS: {0}: {1}", c.getName(), c.getProperties());
+            getLogger().log(Level.FINE, "COL_PROPS: {0}: {1}", new Object[] {c.getName(), c.getProperties()});
         }
     }
 
@@ -343,7 +344,7 @@ public final class TestUtil {
     static String getCurrentUser() {
         return Stream.of("user.name", "USER", "USERNAME")
             .map(System::getProperty)
-            .filter(s -> !s.isBlank())
+            .filter(s -> !StringUtil.isBlank(s))
             .findFirst().orElse(null);
     }
 
@@ -399,11 +400,11 @@ public final class TestUtil {
      */
     static File createTempFileName(String _prefix, String _suffix) {
         String name = Optional.ofNullable(_prefix).map(p -> p.replace(File.separatorChar, '_')).orElse("");
-        if (!name.isBlank() && !name.endsWith("-")) {
+        if (!StringUtil.isBlank(name) && !name.endsWith("-")) {
             name += "-";
         }
         String suffix = _suffix;
-        if (suffix == null || suffix.isBlank()) {
+        if (StringUtil.isBlank(suffix)) {
             int idxLastDot = _prefix.lastIndexOf('.');
             if (idxLastDot > -1) {
                 suffix = _prefix.substring(idxLastDot);

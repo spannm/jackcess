@@ -27,6 +27,7 @@ import io.github.spannm.jackcess.test.source.TestDbReadOnlySource;
 import org.junit.jupiter.params.ParameterizedTest;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
 
@@ -48,9 +49,9 @@ class RelationshipTest extends AbstractBaseTest {
             Relationship rel = rels.get(0);
             assertThat(rel.getName()).isEqualTo("Table2Table1");
             assertThat(rel.getFromTable()).isEqualTo(t2);
-            assertThat(rel.getFromColumns()).isEqualTo(List.of(t2.getColumn("id")));
+            assertThat(rel.getFromColumns()).isEqualTo(Arrays.asList(t2.getColumn("id")));
             assertThat(rel.getToTable()).isEqualTo(t1);
-            assertThat(rel.getToColumns()).isEqualTo(List.of(t1.getColumn("otherfk1")));
+            assertThat(rel.getToColumns()).isEqualTo(Arrays.asList(t1.getColumn("otherfk1")));
             assertThat(rel.hasReferentialIntegrity()).isTrue();
             assertThat(((RelationshipImpl) rel).getFlags()).isEqualTo(4096);
             assertThat(rel.cascadeDeletes()).isTrue();
@@ -65,9 +66,9 @@ class RelationshipTest extends AbstractBaseTest {
             rel = rels.get(0);
             assertThat(rel.getName()).isEqualTo("Table3Table1");
             assertThat(rel.getFromTable()).isEqualTo(t3);
-            assertThat(rel.getFromColumns()).isEqualTo(List.of(t3.getColumn("id")));
+            assertThat(rel.getFromColumns()).isEqualTo(Arrays.asList(t3.getColumn("id")));
             assertThat(rel.getToTable()).isEqualTo(t1);
-            assertThat(rel.getToColumns()).isEqualTo(List.of(t1.getColumn("otherfk2")));
+            assertThat(rel.getToColumns()).isEqualTo(Arrays.asList(t1.getColumn("otherfk2")));
             assertThat(rel.hasReferentialIntegrity()).isTrue();
             assertThat(((RelationshipImpl) rel).getFlags()).isEqualTo(256);
             assertThat(rel.cascadeUpdates()).isTrue();

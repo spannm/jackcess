@@ -432,7 +432,12 @@ public class PageChannel implements Channel, Flushable {
      * @return a duplicate of the current buffer narrowed to the given position and limit. mark will be set at the current position.
      */
     public static ByteBuffer narrowBuffer(ByteBuffer buffer, int position, int limit) {
-        return buffer.duplicate().order(buffer.order()).clear().limit(limit).position(position).mark();
+        ByteBuffer dup = buffer.duplicate().order(buffer.order());
+        dup.clear();
+        dup.limit(limit);
+        dup.position(position);
+        dup.mark();
+        return dup;
     }
 
     /**

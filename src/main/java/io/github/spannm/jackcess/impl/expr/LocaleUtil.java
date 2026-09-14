@@ -16,6 +16,8 @@
  */
 package io.github.spannm.jackcess.impl.expr;
 
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 
@@ -28,52 +30,56 @@ import java.util.Map;
  */
 public final class LocaleUtil {
 
-    private static final Map<Integer, LcidInfo> LCID_TO_INFO = Map.ofEntries(
+    private static final Map<Integer, LcidInfo> LCID_TO_INFO;
+    static {
+        Map<Integer, LcidInfo> m = new HashMap<>();
         // General / English
-        entry(1033, "General", Locale.US),
+        entry(m, 1033, "General", Locale.US);
         // Western European languages
-        entry(1031, "German", Locale.GERMAN),
-        entry(1036, "French", Locale.FRENCH),
-        entry(1034, "Spanish", lc("es")),
-        entry(1040, "Italian", Locale.ITALIAN),
-        entry(1043, "Dutch", lc("nl")),
-        entry(1046, "Portuguese", lc("pt")),
-        entry(1053, "Swedish", lc("sv")),
-        entry(1030, "Danish", lc("da")),
-        entry(1044, "Norwegian", lc("no")),
-        entry(1035, "Finnish", lc("fi")),
+        entry(m, 1031, "German", Locale.GERMAN);
+        entry(m, 1036, "French", Locale.FRENCH);
+        entry(m, 1034, "Spanish", lc("es"));
+        entry(m, 1040, "Italian", Locale.ITALIAN);
+        entry(m, 1043, "Dutch", lc("nl"));
+        entry(m, 1046, "Portuguese", lc("pt"));
+        entry(m, 1053, "Swedish", lc("sv"));
+        entry(m, 1030, "Danish", lc("da"));
+        entry(m, 1044, "Norwegian", lc("no"));
+        entry(m, 1035, "Finnish", lc("fi"));
         // Central/Eastern European
-        entry(1045, "Polish", lc("pl")),
-        entry(1029, "Czech", lc("cs")),
-        entry(1038, "Hungarian", lc("hu")),
-        entry(1050, "Croatian", lc("hr")),
-        entry(1051, "Slovak", lc("sk")),
-        entry(1060, "Slovenian", lc("sl")),
-        entry(1048, "Romanian", lc("ro")),
-        entry(1026, "Bulgarian", lc("bg")),
+        entry(m, 1045, "Polish", lc("pl"));
+        entry(m, 1029, "Czech", lc("cs"));
+        entry(m, 1038, "Hungarian", lc("hu"));
+        entry(m, 1050, "Croatian", lc("hr"));
+        entry(m, 1051, "Slovak", lc("sk"));
+        entry(m, 1060, "Slovenian", lc("sl"));
+        entry(m, 1048, "Romanian", lc("ro"));
+        entry(m, 1026, "Bulgarian", lc("bg"));
         // Cyrillic
-        entry(1049, "Russian", lc("ru")),
-        entry(1058, "Ukrainian", lc("uk")),
+        entry(m, 1049, "Russian", lc("ru"));
+        entry(m, 1058, "Ukrainian", lc("uk"));
         // Baltic
-        entry(1061, "Estonian", lc("et")),
-        entry(1062, "Latvian", lc("lv")),
-        entry(1063, "Lithuanian", lc("lt")),
+        entry(m, 1061, "Estonian", lc("et"));
+        entry(m, 1062, "Latvian", lc("lv"));
+        entry(m, 1063, "Lithuanian", lc("lt"));
         // Turkish and related
-        entry(1055, "Turkish", lc("tr")),
-        entry(1068, "Azerbaijani", lc("az")),
+        entry(m, 1055, "Turkish", lc("tr"));
+        entry(m, 1068, "Azerbaijani", lc("az"));
         // Greek
-        entry(1032, "Greek", lc("el")),
+        entry(m, 1032, "Greek", lc("el"));
         // East Asian
-        entry(1041, "Japanese", Locale.JAPANESE),
-        entry(1042, "Korean", Locale.KOREAN),
-        entry(2052, "Chinese Simplified", Locale.SIMPLIFIED_CHINESE),
-        entry(1028, "Chinese Traditional", Locale.TRADITIONAL_CHINESE),
+        entry(m, 1041, "Japanese", Locale.JAPANESE);
+        entry(m, 1042, "Korean", Locale.KOREAN);
+        entry(m, 2052, "Chinese Simplified", Locale.SIMPLIFIED_CHINESE);
+        entry(m, 1028, "Chinese Traditional", Locale.TRADITIONAL_CHINESE);
         // Arabic / Hebrew
-        entry(1025, "Arabic", lc("ar")),
-        entry(1037, "Hebrew", lc("he")),
+        entry(m, 1025, "Arabic", lc("ar"));
+        entry(m, 1037, "Hebrew", lc("he"));
         // Nordic/Romance
-        entry(1069, "Basque", lc("eu")),
-        entry(1027, "Catalan", lc("ca")));
+        entry(m, 1069, "Basque", lc("eu"));
+        entry(m, 1027, "Catalan", lc("ca"));
+        LCID_TO_INFO = Collections.unmodifiableMap(m);
+    }
 
     private LocaleUtil() {
     }
@@ -90,8 +96,8 @@ public final class LocaleUtil {
         return Locale.forLanguageTag(languageTag);
     }
 
-    private static Map.Entry<Integer, LcidInfo> entry(int lcid, String name, Locale locale) {
-        return Map.entry(lcid, new LcidInfo(name, locale));
+    private static void entry(Map<Integer, LcidInfo> m, int lcid, String name, Locale locale) {
+        m.put(lcid, new LcidInfo(name, locale));
     }
 
     /**

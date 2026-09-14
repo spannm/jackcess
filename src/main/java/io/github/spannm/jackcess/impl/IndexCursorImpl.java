@@ -27,15 +27,15 @@ import io.github.spannm.jackcess.util.SimpleColumnMatcher;
 
 import java.io.IOException;
 import java.io.UncheckedIOException;
-import java.lang.System.Logger;
-import java.lang.System.Logger.Level;
 import java.util.*;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * Cursor backed by an index with extended traversal options.
  */
 public class IndexCursorImpl extends CursorImpl implements IndexCursor {
-    private static final Logger         LOGGER             = System.getLogger(IndexCursorImpl.class.getName());
+    private static final Logger         LOGGER             = Logger.getLogger(IndexCursorImpl.class.getName());
 
     /** IndexDirHandler for forward traversal */
     private final IndexDirHandler       mforwardDirHandler = new ForwardIndexDirHandler();
@@ -118,7 +118,7 @@ public class IndexCursorImpl extends CursorImpl implements IndexCursor {
                 try {
                     restorePosition(curPos, prevPos);
                 } catch (IOException _ex) {
-                    LOGGER.log(Level.ERROR, "Failed to restore position", _ex);
+                    LOGGER.log(Level.SEVERE, "Failed to restore position", _ex);
                 }
             }
         }
@@ -137,7 +137,7 @@ public class IndexCursorImpl extends CursorImpl implements IndexCursor {
                 try {
                     restorePosition(curPos, prevPos);
                 } catch (IOException _ex) {
-                    LOGGER.log(Level.ERROR, "Failed to restore position", _ex);
+                    LOGGER.log(Level.SEVERE, "Failed to restore position", _ex);
                 }
             }
         }

@@ -59,7 +59,7 @@ final class FKEnforcer {
                 }
             }
         }
-        cols = !foundCols.isEmpty() ? List.copyOf(foundCols) : List.of();
+        cols = !foundCols.isEmpty() ? Collections.unmodifiableList(new ArrayList<>(foundCols)) : Collections.emptyList();
     }
 
     /**
@@ -239,7 +239,7 @@ final class FKEnforcer {
         List<? extends Index.Column> toCols = joiner.getToIndex().getColumns();
         Object[] toRow = new Object[joiner.getToTable().getColumnCount()];
 
-        for (Iterator<Row> iter = joiner.findRows(oldFromRow).withColumnNames(Set.of()).iterator(); iter.hasNext();) {
+        for (Iterator<Row> iter = joiner.findRows(oldFromRow).withColumnNames(Collections.emptySet()).iterator(); iter.hasNext();) {
             iter.next();
 
             // create update row for "to" table
@@ -259,7 +259,7 @@ final class FKEnforcer {
         List<? extends Index.Column> toCols = joiner.getToIndex().getColumns();
         Object[] toRow = new Object[joiner.getToTable().getColumnCount()];
 
-        for (Iterator<Row> iter = joiner.findRows(oldFromRow).withColumnNames(Set.of()).iterator(); iter.hasNext();) {
+        for (Iterator<Row> iter = joiner.findRows(oldFromRow).withColumnNames(Collections.emptySet()).iterator(); iter.hasNext();) {
             iter.next();
 
             // create update row for "to" table

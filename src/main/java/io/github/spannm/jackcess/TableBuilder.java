@@ -52,7 +52,7 @@ public class TableBuilder {
         /**
          * All of the reserved words in Access that should be escaped when creating table or column names
          */
-        private static final Set<String> VALUES = Set.of(
+        private static final Set<String> VALUES = Collections.unmodifiableSet(new HashSet<>(Arrays.asList(
             "add", "all", "alphanumeric", "alter", "and", "any", "application", "as",
             "asc", "assistant", "autoincrement", "avg", "between", "binary", "bit",
             "boolean", "by", "byte", "char", "character", "column", "compactdatabase",
@@ -82,7 +82,7 @@ public class TableBuilder {
             "tableid", "text", "time", "timestamp", "top", "transform", "true", "type",
             "union", "unique", "update", "user", "value", "values", "var", "varp",
             "varbinary", "varchar", "where", "with", "workspace", "xor", "year", "yes",
-            "yesno");
+            "yesno")));
     }
 
     /** name of the new table */

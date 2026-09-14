@@ -20,10 +20,10 @@ import io.github.spannm.jackcess.InvalidValueException;
 import io.github.spannm.jackcess.JackcessRuntimeException;
 
 import java.io.IOException;
-import java.lang.System.Logger.Level;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.util.Collection;
+import java.util.logging.Level;
 
 /**
  * ColumnImpl subclass which is used for long value data types.

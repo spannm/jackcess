@@ -25,10 +25,10 @@ import io.github.spannm.jackcess.util.SimpleColumnMatcher;
 
 import java.io.IOException;
 import java.io.UncheckedIOException;
-import java.lang.System.Logger;
-import java.lang.System.Logger.Level;
 import java.util.*;
 import java.util.function.Predicate;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * Manages iteration for a Table. Different cursors provide different methods of traversing a table. Cursors should be
@@ -41,7 +41,7 @@ import java.util.function.Predicate;
  * Is not thread-safe.
  */
 public abstract class CursorImpl implements Cursor {
-    private static final Logger LOGGER         = System.getLogger(CursorImpl.class.getName());
+    private static final Logger LOGGER         = Logger.getLogger(CursorImpl.class.getName());
 
     /** boolean value indicating forward movement */
     public static final boolean MOVE_FORWARD   = true;
@@ -391,7 +391,7 @@ public abstract class CursorImpl implements Cursor {
                 try {
                     restorePosition(curPos, prevPos);
                 } catch (IOException _ex) {
-                    LOGGER.log(Level.ERROR, "Failed restoring position", _ex);
+                    LOGGER.log(Level.SEVERE, "Failed restoring position", _ex);
                 }
             }
         }
@@ -430,7 +430,7 @@ public abstract class CursorImpl implements Cursor {
                 try {
                     restorePosition(curPos, prevPos);
                 } catch (IOException _ex) {
-                    LOGGER.log(Level.ERROR, "Failed restoring position", _ex);
+                    LOGGER.log(Level.SEVERE, "Failed restoring position", _ex);
                 }
             }
         }
@@ -461,7 +461,7 @@ public abstract class CursorImpl implements Cursor {
                 try {
                     restorePosition(curPos, prevPos);
                 } catch (IOException _ex) {
-                    LOGGER.log(Level.ERROR, "Failed restoring position", _ex);
+                    LOGGER.log(Level.SEVERE, "Failed restoring position", _ex);
                 }
             }
         }

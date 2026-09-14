@@ -75,7 +75,7 @@ class JoinerTest extends AbstractBaseTest {
 
     private static void doTestJoiner(
         Joiner join, Map<Integer, List<Row>> expectedData) throws IOException {
-        final Set<String> colNames = Set.of("id", "data");
+        final Set<String> colNames = new HashSet<>(Arrays.asList("id", "data"));
 
         Joiner revJoin = join.createReverse();
         for (Row row : join.getFromTable()) {

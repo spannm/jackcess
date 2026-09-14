@@ -93,7 +93,7 @@
         <!-- The minimum JDK version required to build. -->
         <project.build.systemJdk>17</project.build.systemJdk>
         <!-- The default build target. -->
-        <project.build.targetJdk>11</project.build.targetJdk>
+        <project.build.targetJdk>8</project.build.targetJdk>
 
         <project.rootDirectory>${maven.multiModuleProjectDirectory}</project.rootDirectory>
 
@@ -198,7 +198,7 @@
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-compiler-plugin</artifactId>
                     <configuration>
-                        <compilerArgument>-Xlint:all</compilerArgument>
+                        <compilerArgument>-Xlint:all,-options</compilerArgument>
                     </configuration>
                 </plugin>
 
@@ -326,11 +326,7 @@
                         <detectJavaApiLink>false</detectJavaApiLink>
                         <detectLinks>false</detectLinks>
                         <doclint>all,-missing</doclint>
-                        <!-- add all modules of module-path so javadoc generation will
-                             not fail on modularized projects (includes use of automatic module names) -->
                         <additionalOptions>
-                            <option>--add-modules</option>
-                            <option>ALL-MODULE-PATH</option>
                             <option>-Xmaxwarns 500</option>
                         </additionalOptions>
                     </configuration>
@@ -434,6 +430,20 @@
                             <Automatic-Module-Name>${module.name}</Automatic-Module-Name>
                         </manifestEntries>
                     </archive>
+                </configuration>
+            </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-dependency-plugin</artifactId>
+                <configuration>
+                    <!-- these are transitive children of the org.junit.jupiter:junit-jupiter aggregator we depend on;
+                         the analyzer cannot see through the aggregator to know they are already covered -->
+                    <ignoredUsedUndeclaredDependencies>
+                        <ignoredUsedUndeclaredDependency>org.junit.jupiter:junit-jupiter-api</ignoredUsedUndeclaredDependency>
+                        <ignoredUsedUndeclaredDependency>org.junit.jupiter:junit-jupiter-params</ignoredUsedUndeclaredDependency>
+                        <ignoredUsedUndeclaredDependency>org.junit.platform:junit-platform-commons</ignoredUsedUndeclaredDependency>
+                    </ignoredUsedUndeclaredDependencies>
                 </configuration>
             </plugin>
 

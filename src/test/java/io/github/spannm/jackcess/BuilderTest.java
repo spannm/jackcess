@@ -27,6 +27,7 @@ import org.junit.jupiter.api.Test;
 
 import java.io.File;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -57,9 +58,9 @@ class BuilderTest extends AbstractBaseTest {
         TableBuilder tb = new TableBuilder("t")
             .withEscapeIdentifiers(false)
             .addColumns(null)
-            .addColumns(List.of(new ColumnBuilder("a", DataType.LONG), new ColumnBuilder("b", DataType.TEXT)))
+            .addColumns(Arrays.asList(new ColumnBuilder("a", DataType.LONG), new ColumnBuilder("b", DataType.TEXT)))
             .addIndexes(null)
-            .addIndexes(List.of(new IndexBuilder("idx").withColumns("a")));
+            .addIndexes(Arrays.asList(new IndexBuilder("idx").withColumns("a")));
         assertThat(tb.getColumns().size()).isEqualTo(2);
         assertThat(tb.getIndexes().size()).isEqualTo(1);
 
@@ -96,7 +97,7 @@ class BuilderTest extends AbstractBaseTest {
         assertThat(desc.getColumns().get(0).isAscending()).isFalse();
 
         assertThat(new IndexBuilder("n").withColumns((String[]) null).getColumns().size()).isEqualTo(0);
-        assertThat(new IndexBuilder("n").withColumns(List.of("q")).getColumns().size()).isEqualTo(1);
+        assertThat(new IndexBuilder("n").withColumns(Arrays.asList("q")).getColumns().size()).isEqualTo(1);
 
         IndexBuilder pk = new IndexBuilder(IndexBuilder.PRIMARY_KEY_NAME).withColumns("a").withPrimaryKey();
         assertThat(pk.isPrimaryKey()).isTrue();
@@ -107,7 +108,7 @@ class BuilderTest extends AbstractBaseTest {
     @Test
     void indexBuilderValidate() {
         JetFormat fmt = JetFormat.VERSION_4;
-        Set<String> colNames = Set.of("A", "B");
+        Set<String> colNames = new HashSet<>(Arrays.asList("A", "B"));
 
         assertThrows(IllegalArgumentException.class,
             () -> new IndexBuilder("idx").validate(colNames, fmt));
@@ -155,8 +156,8 @@ class BuilderTest extends AbstractBaseTest {
             Column col = table.getColumns().iterator().next();
             RelationshipBuilder rb2 = new RelationshipBuilder(table, table).addColumns(col, col);
             assertThat(rb2.getFromTable()).isEqualTo(table.getName());
-            assertThat(rb2.getFromColumns()).isEqualTo(List.of(col.getName()));
-            assertThat(rb2.getToColumns()).isEqualTo(List.of(col.getName()));
+            assertThat(rb2.getFromColumns()).isEqualTo(Arrays.asList(col.getName()));
+            assertThat(rb2.getToColumns()).isEqualTo(Arrays.asList(col.getName()));
         }
     }
 

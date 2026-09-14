@@ -15,6 +15,7 @@
  */
 package io.github.spannm.jackcess.test.converter;
 
+import io.github.spannm.jackcess.util.StringUtil;
 import org.junit.jupiter.params.converter.TypedArgumentConverter;
 
 import java.time.LocalDate;
@@ -31,7 +32,7 @@ public class CsvToLocalDateTime extends TypedArgumentConverter<String, LocalDate
 
     @Override
     public LocalDateTime convert(String _source) {
-        if (_source == null || _source.isBlank()) {
+        if (StringUtil.isBlank(_source)) {
             return LocalDateTime.now();
         }
         List<Integer> list = Arrays.stream(_source.split("\\s*,\\s*")).map(Integer::parseInt).collect(Collectors.toList());

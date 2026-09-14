@@ -25,18 +25,18 @@ import io.github.spannm.jackcess.impl.complex.UnsupportedColumnInfoImpl;
 import io.github.spannm.jackcess.impl.complex.VersionHistoryColumnInfoImpl;
 
 import java.io.IOException;
-import java.lang.System.Logger;
-import java.lang.System.Logger.Level;
 import java.nio.ByteBuffer;
 import java.util.EnumSet;
 import java.util.List;
 import java.util.Set;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * Utility code for loading complex columns.
  */
 public class ComplexColumnSupport {
-    private static final Logger        LOGGER                     = System.getLogger(ComplexColumnSupport.class.getName());
+    private static final Logger        LOGGER                     = Logger.getLogger(ComplexColumnSupport.class.getName());
 
     private static final String        COL_COMPLEX_TYPE_OBJECT_ID = "ComplexTypeObjectID";
     private static final String        COL_TABLE_ID               = "ConceptualTableID";

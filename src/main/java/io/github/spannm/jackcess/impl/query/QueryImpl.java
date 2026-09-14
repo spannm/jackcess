@@ -25,16 +25,16 @@ import io.github.spannm.jackcess.impl.RowIdImpl;
 import io.github.spannm.jackcess.impl.RowImpl;
 import io.github.spannm.jackcess.query.Query;
 
-import java.lang.System.Logger;
-import java.lang.System.Logger.Level;
 import java.util.*;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * Base class for classes which encapsulate information about an Access query. The {@link #toSQLString()} method can be
  * used to convert this object into the actual SQL string which this query data represents.
  */
 public abstract class QueryImpl implements Query {
-    protected static final Logger LOGGER    = System.getLogger(QueryImpl.class.getName());
+    protected static final Logger LOGGER    = Logger.getLogger(QueryImpl.class.getName());
 
     private static final Row      EMPTY_ROW = new Row();
 
@@ -378,7 +378,7 @@ public abstract class QueryImpl implements Query {
                     throw new IllegalStateException(withErrorContext("unknown query object flag " + objTypeFlag, name));
             }
         } catch (IllegalStateException _ex) {
-            LOGGER.log(Level.WARNING, withErrorContext("Failed parsing query", name), _ex);
+            LOGGER.log(Level.WARNING, "Failed parsing query: " + _ex.getMessage());
         }
 
         // return unknown query
@@ -697,7 +697,7 @@ public abstract class QueryImpl implements Query {
         private final TableSource  to;
         private final short        jType;
         // combine all the join expressions with "AND"
-        private final List<String> on = new AppendableList<>() {
+        private final List<String> on = new AppendableList<String>() {
                                            private static final long serialVersionUID = 0L;
 
                                            @Override

@@ -85,7 +85,7 @@ public final class StringUtil {
      * underscores are removed, and the rest of the letters are lower-case.
      */
     public static String toTitleCase(String str) {
-        if (str == null || str.isBlank()) {
+        if (str == null || isBlank(str)) {
             return str;
         }
         StringBuilder sb = new StringBuilder();
@@ -166,6 +166,20 @@ public final class StringUtil {
             return cs.toString();
         }
         return cs.toString().replace(remove, "");
+    }
+
+    /**
+     * Returns a string whose value is the concatenation of the given string repeated {@code count} times.
+     */
+    public static String repeat(String str, int count) {
+        if (isEmpty(str) || count <= 0) {
+            return "";
+        }
+        StringBuilder sb = new StringBuilder(str.length() * count);
+        for (int i = 0; i < count; i++) {
+            sb.append(str);
+        }
+        return sb.toString();
     }
 
 }

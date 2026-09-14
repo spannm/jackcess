@@ -135,7 +135,7 @@ public class TableCreator extends TableMutator {
         columns = table.getColumns();
         indexes = table.getIndexes();
         if (indexes == null) {
-            indexes = List.of();
+            indexes = Collections.emptyList();
         }
 
         validate();

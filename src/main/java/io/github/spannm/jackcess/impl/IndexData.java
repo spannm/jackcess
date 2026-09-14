@@ -26,11 +26,11 @@ import io.github.spannm.jackcess.util.ToStringBuilder;
 
 import java.io.IOException;
 import java.io.UncheckedIOException;
-import java.lang.System.Logger;
-import java.lang.System.Logger.Level;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.util.*;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * Low-level representation of an MS Access table index.
@@ -78,7 +78,7 @@ import java.util.*;
  */
 public final class IndexData {
 
-    protected static final Logger  LOGGER                    = System.getLogger(Index.class.getName());
+    protected static final Logger  LOGGER                    = Logger.getLogger(Index.class.getName());
 
     /** special entry which is less than any other entry */
     public static final Entry      FIRST_ENTRY               = createSpecialEntry(RowIdImpl.FIRST_ROW_ID);
@@ -400,7 +400,7 @@ public final class IndexData {
         status = newStatus;
         unsupportedReason = withErrorContext(reason);
         String suffix = status == IndexStatus.READ_ONLY ? "making read-only" : "index not suitable for lookups";
-        LOGGER.log(col.getTable().isSystem() ? Level.DEBUG : Level.WARNING, "{0}, {1}", unsupportedReason, suffix);
+        LOGGER.log(col.getTable().isSystem() ? Level.FINE : Level.WARNING, "{0}, {1}", new Object[] {unsupportedReason, suffix});
     }
 
     /**
@@ -2846,7 +2846,7 @@ public final class IndexData {
 
         @Override
         public List<Entry> getEntries() {
-            return List.of();
+            return Collections.emptyList();
         }
 
         @Override

@@ -205,8 +205,8 @@ class OleBlobTest extends AbstractBaseTest {
     }
 
     private static byte[] readToByteArray(InputStream in, long length) throws IOException {
-        try (in) {
-            DataInputStream din = new DataInputStream(in);
+        try (InputStream inRes = in) {
+            DataInputStream din = new DataInputStream(inRes);
             byte[] bytes = new byte[(int) length];
             din.readFully(bytes);
             return bytes;

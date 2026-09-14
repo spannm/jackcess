@@ -32,6 +32,7 @@ import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.Types;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
@@ -50,7 +51,7 @@ class ImportTest extends AbstractBaseTest {
             for (Column c : t.getColumns()) {
                 colNames.add(c.getName());
             }
-            assertThat(colNames).isEqualTo(List.of("Test1", "Test2", "Test3"));
+            assertThat(colNames).isEqualTo(Arrays.asList("Test1", "Test2", "Test3"));
 
             List<? extends Map<String, Object>> expectedRows =
                 TestUtil.createExpectedTable(
@@ -139,7 +140,7 @@ class ImportTest extends AbstractBaseTest {
             for (Column c : t.getColumns()) {
                 colNames.add(c.getName());
             }
-            assertThat(colNames).isEqualTo(List.of("Test1", "Test2", "Test3"));
+            assertThat(colNames).isEqualTo(Arrays.asList("Test1", "Test2", "Test3"));
 
             expectedRows =
                 TestUtil.createExpectedTable(
@@ -173,7 +174,7 @@ class ImportTest extends AbstractBaseTest {
             for (Column c : t.getColumns()) {
                 colNames.add(c.getName());
             }
-            assertThat(colNames).isEqualTo(List.of(
+            assertThat(colNames).isEqualTo(Arrays.asList(
                     "RESULT_PHYS_ID", "FIRST", "MIDDLE", "LAST", "OUTLIER",
                     "RANK", "CLAIM_COUNT", "PROCEDURE_COUNT",
                     "WEIGHTED_CLAIM_COUNT", "WEIGHTED_PROCEDURE_COUNT"));

@@ -155,7 +155,7 @@ public abstract class RowFilter implements Predicate<Row> {
          */
         @Override
         public Iterator<Row> iterator() {
-            return new Iterator<>() {
+            return new Iterator<Row>() {
                 private final Iterator<? extends Row> iter = iterable.iterator();
                 private Row                            next;
 

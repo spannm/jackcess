@@ -106,7 +106,7 @@ class LocalDateTimeTest extends AbstractBaseTest {
     @FileFormatSource
     void ancientLocalDates1(FileFormat fileFormat) throws Exception {
         DateTimeFormatter sdf = DateTimeFormatter.ofPattern("uuuu-MM-dd");
-        List<String> dates = List.of("1582-10-15", "1582-10-14", "1492-01-10", "1392-01-10");
+        List<String> dates = Arrays.asList("1582-10-15", "1582-10-14", "1492-01-10", "1392-01-10");
 
         try (Database db = createDbMem(fileFormat)) {
             db.setZoneId(ZoneId.of("America/New_York"));
@@ -135,7 +135,7 @@ class LocalDateTimeTest extends AbstractBaseTest {
     @TestDbSource(OLD_DATES)
     void ancientLocalDates2(TestDb testDb) throws Exception {
         DateTimeFormatter sdf = DateTimeFormatter.ofPattern("uuuu-MM-dd");
-        List<String> dates = List.of("1582-10-15", "1582-10-14", "1492-01-10", "1392-01-10");
+        List<String> dates = Arrays.asList("1582-10-15", "1582-10-14", "1492-01-10", "1392-01-10");
 
         try (Database db = testDb.openCopy()) {
             db.setDateTimeType(DateTimeType.LOCAL_DATE_TIME);
@@ -223,7 +223,7 @@ class LocalDateTimeTest extends AbstractBaseTest {
             curTimeNoMillis *= 1000L;
 
             DateFormat df = new SimpleDateFormat("yyyyMMdd HH:mm:ss");
-            List<Date> tmpDates = new ArrayList<>(List.of(
+            List<Date> tmpDates = new ArrayList<>(Arrays.asList(
                 df.parse("19801231 00:00:00"),
                 df.parse("19930513 14:43:27"),
                 df.parse("20210102 02:37:00"),

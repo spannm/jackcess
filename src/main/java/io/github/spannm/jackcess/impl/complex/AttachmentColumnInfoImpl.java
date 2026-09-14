@@ -28,7 +28,10 @@ import io.github.spannm.jackcess.impl.PageChannel;
 import java.io.*;
 import java.nio.ByteBuffer;
 import java.time.LocalDateTime;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.Set;
 import java.util.zip.Deflater;
 import java.util.zip.DeflaterOutputStream;
@@ -40,7 +43,7 @@ import java.util.zip.InflaterInputStream;
 public final class AttachmentColumnInfoImpl extends ComplexColumnInfoImpl<Attachment> implements AttachmentColumnInfo {
 
     /** some file formats which may not be worth re-compressing */
-    private static final Set<String> COMPRESSED_FORMATS   = Set.of("jpg", "zip", "gz", "bz2", "z", "7z", "cab", "rar", "mp3", "mpg");
+    private static final Set<String> COMPRESSED_FORMATS   = Collections.unmodifiableSet(new HashSet<>(Arrays.asList("jpg", "zip", "gz", "bz2", "z", "7z", "cab", "rar", "mp3", "mpg")));
 
     private static final String      FILE_NAME_COL_NAME   = "FileName";
     private static final String      FILE_TYPE_COL_NAME   = "FileType";

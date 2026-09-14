@@ -106,11 +106,21 @@ public class CompoundOleUtil implements CompoundPackageFactory {
     }
 
     private static String encodeEntryName(String name) {
-        return URLEncoder.encode(name, ENTRY_NAME_CHARSET);
+        try {
+            return URLEncoder.encode(name, ENTRY_NAME_CHARSET.name());
+        } catch (UnsupportedEncodingException _ex) {
+            // ENTRY_NAME_CHARSET is UTF-8, always supported
+            throw new AssertionError(_ex);
+        }
     }
 
     private static String decodeEntryName(String name) {
-        return URLDecoder.decode(name, ENTRY_NAME_CHARSET);
+        try {
+            return URLDecoder.decode(name, ENTRY_NAME_CHARSET.name());
+        } catch (UnsupportedEncodingException _ex) {
+            // ENTRY_NAME_CHARSET is UTF-8, always supported
+            throw new AssertionError(_ex);
+        }
     }
 
     private static final class CompoundContentImpl extends EmbeddedPackageContentImpl implements CompoundContent {

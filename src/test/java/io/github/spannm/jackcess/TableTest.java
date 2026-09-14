@@ -29,6 +29,7 @@ import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.TimeZone;
 
@@ -99,8 +100,8 @@ class TableTest extends AbstractBaseTest {
             assertThat(toBytes(bufCmp2[i])).containsExactly(toBytes(buf2[i]));
         }
 
-        assertThat(List.of(decodeColumns(bufCmp1))).isEqualTo(List.of(small, large));
-        assertThat(List.of(decodeColumns(bufCmp2))).isEqualTo(List.of(smallNotAscii, largeNotAscii));
+        assertThat(Arrays.asList(decodeColumns(bufCmp1))).isEqualTo(Arrays.asList(small, large));
+        assertThat(Arrays.asList(decodeColumns(bufCmp2))).isEqualTo(Arrays.asList(smallNotAscii, largeNotAscii));
 
     }
 

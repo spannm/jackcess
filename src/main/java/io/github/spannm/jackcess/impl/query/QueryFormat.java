@@ -21,6 +21,8 @@ import io.github.spannm.jackcess.query.Query;
 import io.github.spannm.jackcess.query.Query.Type;
 
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -104,7 +106,14 @@ public class QueryFormat {
 
     public static final String                 NEWLINE                       = System.lineSeparator();
 
-    public static final Map<Short, String>     JOIN_TYPE_MAP                 = Map.of((short) 1, " INNER JOIN ", (short) 2, " LEFT JOIN ", (short) 3, " RIGHT JOIN ");
+    public static final Map<Short, String>     JOIN_TYPE_MAP;
+    static {
+        Map<Short, String> joinTypeMap = new HashMap<>();
+        joinTypeMap.put((short) 1, " INNER JOIN ");
+        joinTypeMap.put((short) 2, " LEFT JOIN ");
+        joinTypeMap.put((short) 3, " RIGHT JOIN ");
+        JOIN_TYPE_MAP = Collections.unmodifiableMap(joinTypeMap);
+    }
 
     public static final Map<Short, Query.Type> TYPE_MAP                      = Arrays.stream(Query.Type.values()).filter(Type::isUnknown).collect(Collectors.toMap(Type::getValue, v -> v));
 

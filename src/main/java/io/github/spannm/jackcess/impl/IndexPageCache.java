@@ -49,7 +49,7 @@ public class IndexPageCache {
     /** the root page for the index */
     private DataPageMain                     rootPage;
     /** the currently loaded pages for this index, pageNumber -> page */
-    private final Map<Integer, DataPageMain> dataPages     = new LinkedHashMap<>(16, 0.75f, true) {
+    private final Map<Integer, DataPageMain> dataPages     = new LinkedHashMap<Integer, DataPageMain>(16, 0.75f, true) {
         private static final long serialVersionUID = 0L;
 
         @Override

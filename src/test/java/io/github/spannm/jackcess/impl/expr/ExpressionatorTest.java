@@ -39,7 +39,6 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.Locale;
-import java.util.Objects;
 import java.util.Optional;
 
 import javax.script.Bindings;
@@ -116,7 +115,7 @@ class ExpressionatorTest extends AbstractBaseTest {
         "<=1 And >=0; <ELogicalOp>{<ECompOp>{<EThisValue>{<THIS_COL>} <= <ELiteralValue>{1}} And <ECompOp>{<EThisValue>{<THIS_COL>} >= <ELiteralValue>{0}}}; <= 1 And >= 0",
     })
     void parseSimpleExpr2(String exprStr, String debugStr, String cleanStr) {
-        validateExpr(exprStr, debugStr, Objects.requireNonNullElse(cleanStr, exprStr));
+        validateExpr(exprStr, debugStr, cleanStr != null ? cleanStr : exprStr);
     }
 
     @SuppressWarnings("checkstyle:LineLengthCheck")

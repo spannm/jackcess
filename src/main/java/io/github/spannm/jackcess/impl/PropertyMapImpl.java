@@ -29,27 +29,25 @@ import java.util.*;
 public class PropertyMapImpl implements PropertyMap {
     private static final Map<String, PropDef> DEFAULT_TYPES = new HashMap<>();
     static {
-        DEFAULT_TYPES.putAll(Map.of(
-            ACCESS_VERSION_PROP, new PropDef(DataType.TEXT, false),
-            TITLE_PROP, new PropDef(DataType.TEXT, false),
-            AUTHOR_PROP, new PropDef(DataType.TEXT, false),
-            COMPANY_PROP, new PropDef(DataType.TEXT, false),
-            DEFAULT_VALUE_PROP, new PropDef(DataType.MEMO, true),
-            REQUIRED_PROP, new PropDef(DataType.BOOLEAN, true),
-            ALLOW_ZERO_LEN_PROP, new PropDef(DataType.BOOLEAN, true),
-            DECIMAL_PLACES_PROP, new PropDef(DataType.BYTE, true),
-            FORMAT_PROP, new PropDef(DataType.TEXT, true),
-            INPUT_MASK_PROP, new PropDef(DataType.TEXT, true)));
-        DEFAULT_TYPES.putAll(Map.of(
-            CAPTION_PROP, new PropDef(DataType.MEMO, false),
-            VALIDATION_RULE_PROP, new PropDef(DataType.TEXT, true),
-            VALIDATION_TEXT_PROP, new PropDef(DataType.TEXT, true),
-            GUID_PROP, new PropDef(DataType.BINARY, true),
-            DESCRIPTION_PROP, new PropDef(DataType.MEMO, false),
-            RESULT_TYPE_PROP, new PropDef(DataType.BYTE, true),
-            EXPRESSION_PROP, new PropDef(DataType.MEMO, true),
-            DISPLAY_CONTROL_PROP, new PropDef(DataType.INT, false),
-            TEXT_FORMAT_PROP, new PropDef(DataType.BYTE, false)));
+        DEFAULT_TYPES.put(ACCESS_VERSION_PROP, new PropDef(DataType.TEXT, false));
+        DEFAULT_TYPES.put(TITLE_PROP, new PropDef(DataType.TEXT, false));
+        DEFAULT_TYPES.put(AUTHOR_PROP, new PropDef(DataType.TEXT, false));
+        DEFAULT_TYPES.put(COMPANY_PROP, new PropDef(DataType.TEXT, false));
+        DEFAULT_TYPES.put(DEFAULT_VALUE_PROP, new PropDef(DataType.MEMO, true));
+        DEFAULT_TYPES.put(REQUIRED_PROP, new PropDef(DataType.BOOLEAN, true));
+        DEFAULT_TYPES.put(ALLOW_ZERO_LEN_PROP, new PropDef(DataType.BOOLEAN, true));
+        DEFAULT_TYPES.put(DECIMAL_PLACES_PROP, new PropDef(DataType.BYTE, true));
+        DEFAULT_TYPES.put(FORMAT_PROP, new PropDef(DataType.TEXT, true));
+        DEFAULT_TYPES.put(INPUT_MASK_PROP, new PropDef(DataType.TEXT, true));
+        DEFAULT_TYPES.put(CAPTION_PROP, new PropDef(DataType.MEMO, false));
+        DEFAULT_TYPES.put(VALIDATION_RULE_PROP, new PropDef(DataType.TEXT, true));
+        DEFAULT_TYPES.put(VALIDATION_TEXT_PROP, new PropDef(DataType.TEXT, true));
+        DEFAULT_TYPES.put(GUID_PROP, new PropDef(DataType.BINARY, true));
+        DEFAULT_TYPES.put(DESCRIPTION_PROP, new PropDef(DataType.MEMO, false));
+        DEFAULT_TYPES.put(RESULT_TYPE_PROP, new PropDef(DataType.BYTE, true));
+        DEFAULT_TYPES.put(EXPRESSION_PROP, new PropDef(DataType.MEMO, true));
+        DEFAULT_TYPES.put(DISPLAY_CONTROL_PROP, new PropDef(DataType.INT, false));
+        DEFAULT_TYPES.put(TEXT_FORMAT_PROP, new PropDef(DataType.BYTE, false));
         DEFAULT_TYPES.put(IME_MODE_PROP, new PropDef(DataType.BYTE, false));
         DEFAULT_TYPES.put(IME_SENTENCE_MODE_PROP, new PropDef(DataType.BYTE, false));
     }

@@ -25,14 +25,14 @@ import io.github.spannm.jackcess.util.ToStringBuilder;
 import java.io.BufferedWriter;
 import java.io.IOException;
 import java.io.StringWriter;
-import java.lang.System.Logger;
-import java.lang.System.Logger.Level;
 import java.nio.BufferOverflowException;
 import java.nio.BufferUnderflowException;
 import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
 import java.time.LocalDateTime;
 import java.util.*;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * A single database table
@@ -42,7 +42,7 @@ import java.util.*;
  * @author Tim McCune
  */
 public class TableImpl implements Table, PropertyMaps.Owner {
-    private static final Logger LOGGER             = System.getLogger(TableImpl.class.getName());
+    private static final Logger LOGGER             = Logger.getLogger(TableImpl.class.getName());
 
     private static final short  OFFSET_MASK        = (short) 0x1FFF;
 
@@ -989,7 +989,7 @@ public class TableImpl implements Table, PropertyMaps.Owner {
         buffer.flip();
 
         // write table buffer to database
-        writeTableDefinitionBuffer(buffer, creator.getTdefPageNumber(), creator, List.of());
+        writeTableDefinitionBuffer(buffer, creator.getTdefPageNumber(), creator, Collections.emptyList());
     }
 
     private static void writeTableDefinitionBuffer(ByteBuffer buffer, int tdefPageNumber, TableMutator mutator, List<Integer> reservedPages) throws IOException {
@@ -2230,7 +2230,7 @@ public class TableImpl implements Table, PropertyMaps.Owner {
             // map (createRow() always expects a non-null map) and is only swapped for a
             // real, mutable HashMap on the first KEEP_VALUE column, since most callers
             // (e.g. read-modify-write via a fully populated Row) never hit one.
-            Map<ColumnImpl, byte[]> keepRawVarValues = Map.of();
+            Map<ColumnImpl, byte[]> keepRawVarValues = Collections.emptyMap();
             boolean keepRawVarValuesInitialized = false;
 
             // handle various value massaging activities
@@ -2485,7 +2485,7 @@ public class TableImpl implements Table, PropertyMaps.Owner {
 
     // exposed for unit tests
     protected ByteBuffer createRow(Object[] rowArray, ByteBuffer buffer) throws IOException {
-        return createRow(rowArray, buffer, 0, Map.of());
+        return createRow(rowArray, buffer, 0, Collections.emptyMap());
     }
 
     /**
@@ -3277,7 +3277,7 @@ public class TableImpl implements Table, PropertyMaps.Owner {
             // correctly calculate Field1, we need to calculate Field2 first, and
             // hence essentially need the reverse topo sort (a list where Field2
             // comes before Field1).
-            new TopoSorter<>(calcColumns, TopoSorter.REVERSE) {
+            new TopoSorter<ColumnImpl>(calcColumns, TopoSorter.REVERSE) {
                 @Override
                 protected void fillDescendents(ColumnImpl from, List<ColumnImpl> descendents) {
 

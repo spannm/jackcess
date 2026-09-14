@@ -133,7 +133,7 @@ public class MultiValueColumnPropertyMap implements PropertyMap {
         iters.add(primary.iterator());
         iters.add(complex.iterator());
 
-        return new Iterator<>() {
+        return new Iterator<Property>() {
             private Iterator<Property> cur;
             private Property           next = findNext();
 

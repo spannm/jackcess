@@ -121,7 +121,7 @@ public abstract class ComplexColumnInfoImpl<V extends ComplexValue> implements C
     public List<Row> getRawValues(int complexValueFk, Collection<String> columnNames) throws IOException {
         Iterator<Row> entryIter = getComplexValFkIter(complexValueFk, columnNames);
         if (!entryIter.hasNext()) {
-            return List.of();
+            return Collections.emptyList();
         }
 
         List<Row> values = new ArrayList<>();
@@ -136,7 +136,7 @@ public abstract class ComplexColumnInfoImpl<V extends ComplexValue> implements C
     public List<V> getValues(ComplexValueForeignKey complexValueFk) throws IOException {
         List<Row> rawValues = getRawValues(complexValueFk.get());
         if (rawValues.isEmpty()) {
-            return List.of();
+            return Collections.emptyList();
         }
 
         return toValues(complexValueFk, rawValues);
@@ -213,7 +213,7 @@ public abstract class ComplexColumnInfoImpl<V extends ComplexValue> implements C
 
     @Override
     public void deleteAllValues(int complexValueFk) throws IOException {
-        Iterator<Row> entryIter = getComplexValFkIter(complexValueFk, Set.of());
+        Iterator<Row> entryIter = getComplexValFkIter(complexValueFk, Collections.emptySet());
         while (entryIter.hasNext()) {
             entryIter.next();
             entryIter.remove();

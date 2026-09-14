@@ -95,7 +95,7 @@ class PropertiesTest extends AbstractBaseTest {
             }
         }
 
-        assertThat(props).isEqualTo(List.of(defMap.get("foo"), defMap.get("baz"),
+        assertThat(props).isEqualTo(Arrays.asList(defMap.get("foo"), defMap.get("baz"),
                 colMap.get("buzz")));
     }
 

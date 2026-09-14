@@ -102,11 +102,11 @@ class TableUpdaterTest extends AbstractBaseTest {
 
         Relationship rel = rb.toRelationship(db);
 
-        assertThat(rel.getName()).isEqualTo(Objects.requireNonNullElse(relationshipName, "TestTableTestTable2"));
+        assertThat(rel.getName()).isEqualTo(relationshipName != null ? relationshipName : "TestTableTestTable2");
         assertThat(rel.getFromTable()).isSameAs(t1);
-        assertThat(rel.getFromColumns()).isEqualTo(List.of(t1.getColumn("id")));
+        assertThat(rel.getFromColumns()).isEqualTo(Arrays.asList(t1.getColumn("id")));
         assertThat(rel.getToTable()).isSameAs(t2);
-        assertThat(rel.getToColumns()).isEqualTo(List.of(t2.getColumn("id2")));
+        assertThat(rel.getToColumns()).isEqualTo(Arrays.asList(t2.getColumn("id2")));
         assertThat(rel.isOneToOne()).isEqualTo(oneToOne);
         assertThat(rel.hasReferentialIntegrity()).isEqualTo(enforce);
         assertThat(rel.cascadeDeletes()).isEqualTo(enforce);

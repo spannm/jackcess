@@ -327,7 +327,7 @@ public class DefaultTextFunctions {
         @Override
         protected Value eval1(EvalContext ctx, Value param1) {
             int lv = param1.getAsLongInt(ctx);
-            return ValueSupport.toValue(" ".repeat(lv));
+            return ValueSupport.toValue(StringUtil.repeat(" ", lv));
         }
     });
 
@@ -407,7 +407,7 @@ public class DefaultTextFunctions {
             }
             int lv = param1.getAsLongInt(ctx);
             char c = (char) (param2.getAsString(ctx).charAt(0) % 256);
-            return ValueSupport.toValue(String.valueOf(c).repeat(lv));
+            return ValueSupport.toValue(StringUtil.repeat(String.valueOf(c), lv));
         }
     });
 

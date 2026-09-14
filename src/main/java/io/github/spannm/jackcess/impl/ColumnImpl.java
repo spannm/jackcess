@@ -29,8 +29,6 @@ import io.github.spannm.jackcess.util.SimpleColumnValidator;
 import io.github.spannm.jackcess.util.ToStringBuilder;
 
 import java.io.*;
-import java.lang.System.Logger;
-import java.lang.System.Logger.Level;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.nio.ByteBuffer;
@@ -42,6 +40,8 @@ import java.time.temporal.ChronoUnit;
 import java.time.temporal.TemporalAccessor;
 import java.time.temporal.TemporalQueries;
 import java.util.*;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -52,7 +52,7 @@ import java.util.regex.Pattern;
  */
 public class ColumnImpl implements Column, Comparable<ColumnImpl>, DateTimeContext {
 
-    protected static final Logger        LOGGER                           = System.getLogger(ColumnImpl.class.getName());
+    protected static final Logger        LOGGER                           = Logger.getLogger(ColumnImpl.class.getName());
 
     /**
      * Placeholder object for adding rows which indicates that the caller wants the RowId of the new row. Must be added

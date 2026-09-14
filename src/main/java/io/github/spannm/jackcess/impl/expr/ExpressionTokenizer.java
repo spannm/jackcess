@@ -60,7 +60,7 @@ class ExpressionTokenizer {
     }
 
     private static final byte[]      CHAR_FLAGS        = new byte[128];
-    private static final Set<String> TWO_CHAR_COMP_OPS = Set.of("<=", ">=", "<>");
+    private static final Set<String> TWO_CHAR_COMP_OPS = Collections.unmodifiableSet(new HashSet<>(Arrays.asList("<=", ">=", "<>")));
 
     static {
         setCharFlag(IS_OP_FLAG, '+', '-', '*', '/', '\\', '^', '&');

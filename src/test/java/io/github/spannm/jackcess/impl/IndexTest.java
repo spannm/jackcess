@@ -139,7 +139,7 @@ class IndexTest extends AbstractBaseTest {
             assertThat(fkIdx.isForeignKey()).isTrue();
             assertThat(fkIdx.getIndexData()).isSameAs(pkIdx.getIndexData());
             IndexData indexData = pkIdx.getIndexData();
-            assertThat(indexData.getIndexes()).isEqualTo(List.of(pkIdx, fkIdx));
+            assertThat(indexData.getIndexes()).isEqualTo(Arrays.asList(pkIdx, fkIdx));
             assertThat(indexData.getPrimaryIndex()).isSameAs(pkIdx);
 
             table = (TableImpl) db.getTable("Table3");
@@ -160,7 +160,7 @@ class IndexTest extends AbstractBaseTest {
             assertThat(fkIdx.isForeignKey()).isTrue();
             assertThat(fkIdx.getIndexData()).isSameAs(pkIdx.getIndexData());
             indexData = pkIdx.getIndexData();
-            assertThat(indexData.getIndexes()).isEqualTo(List.of(pkIdx, fkIdx));
+            assertThat(indexData.getIndexes()).isEqualTo(Arrays.asList(pkIdx, fkIdx));
             assertThat(indexData.getPrimaryIndex()).isSameAs(pkIdx);
         }
     }

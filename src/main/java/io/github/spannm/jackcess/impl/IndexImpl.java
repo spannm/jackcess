@@ -22,11 +22,11 @@ import io.github.spannm.jackcess.IndexBuilder;
 import io.github.spannm.jackcess.util.ToStringBuilder;
 
 import java.io.IOException;
-import java.lang.System.Logger;
 import java.nio.ByteBuffer;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Logger;
 
 /**
  * Access table (logical) index. Logical indexes are backed for IndexData, where one or more logical indexes could be
@@ -35,7 +35,7 @@ import java.util.Map;
  * @author Tim McCune
  */
 public final class IndexImpl implements Index, Comparable<IndexImpl> {
-    protected static final Logger     LOGGER                  = System.getLogger(IndexImpl.class.getName());
+    protected static final Logger     LOGGER                  = Logger.getLogger(IndexImpl.class.getName());
 
     /** index type for primary key indexes */
     public static final byte          PRIMARY_KEY_INDEX_TYPE  = (byte) 1;

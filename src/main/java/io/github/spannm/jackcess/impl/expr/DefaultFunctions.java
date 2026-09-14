@@ -22,16 +22,17 @@ import io.github.spannm.jackcess.expr.*;
 import io.github.spannm.jackcess.impl.DatabaseImpl;
 import io.github.spannm.jackcess.impl.expr.FunctionSupport.*; // NOPMD
 
-import java.lang.System.Logger;
-import java.lang.System.Logger.Level;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.text.DecimalFormat;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.util.regex.Matcher;
 
 public class DefaultFunctions {
@@ -39,13 +40,13 @@ public class DefaultFunctions {
 
     static {
         // load all default functions
-        Logger logger = System.getLogger(DefaultFunctions.class.getName());
-        for (Object obj : List.of(
+        Logger logger = Logger.getLogger(DefaultFunctions.class.getName());
+        for (Object obj : Collections.unmodifiableList(Arrays.asList(
             new DefaultTextFunctions(),
             new DefaultNumberFunctions(),
             new DefaultDateFunctions(),
-            new DefaultFinancialFunctions())) {
-            logger.log(Level.DEBUG, "Loaded functions from " + obj.getClass().getName());
+            new DefaultFinancialFunctions()))) {
+            logger.log(Level.FINE, "Loaded functions from " + obj.getClass().getName());
         }
     }
 
@@ -548,7 +549,7 @@ public class DefaultFunctions {
     }
 
     private static Function registerFunc(String _fname, Function _func) {
-        System.getLogger(DefaultFunctions.class.getName()).log(Level.TRACE, "Registering function {0}", _fname);
+        Logger.getLogger(DefaultFunctions.class.getName()).log(Level.FINEST, "Registering function {0}", _fname);
         String lookupFname = DatabaseImpl.toLookupName(_fname);
         if (FUNCS.put(lookupFname, _func) != null) {
             throw new IllegalStateException("Duplicate function " + _fname);

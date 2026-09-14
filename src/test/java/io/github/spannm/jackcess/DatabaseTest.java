@@ -46,6 +46,14 @@ import java.util.stream.Collectors;
 @SuppressWarnings("deprecation")
 class DatabaseTest extends AbstractBaseTest {
 
+    private static Map<String, Object> mapOf(Object... kv) {
+        Map<String, Object> map = new LinkedHashMap<>();
+        for (int i = 0; i < kv.length; i += 2) {
+            map.put((String) kv[i], kv[i + 1]);
+        }
+        return map;
+    }
+
     @ParameterizedTest(name = "[{index}] {0}")
     @FileFormatSource
     void invalidTableDefs(FileFormat fileFormat) throws Exception {
@@ -179,7 +187,7 @@ class DatabaseTest extends AbstractBaseTest {
             Map<String, Object> row2 = createTestRowMap("Tim2");
             Map<String, Object> row3 = createTestRowMap("Tim3");
             Table table = db.getTable("Test");
-            List<Map<String, Object>> rows = List.of(row1, row2, row3);
+            List<Map<String, Object>> rows = Arrays.asList(row1, row2, row3);
             table.addRowsFromMaps(rows);
             assertRowCount(3, table);
 
@@ -286,11 +294,11 @@ class DatabaseTest extends AbstractBaseTest {
         try (Database db = testDb.open()) {
             Table table = db.getTable("Table1");
 
-            Map<String, Object> expectedRow0 = new LinkedHashMap<>(Map.of(
-                "id", 0, "id2", 2, "data", "foo", "data2", "foo2"));
+            Map<String, Object> expectedRow0 = mapOf(
+                "id", 0, "id2", 2, "data", "foo", "data2", "foo2");
 
-            Map<String, Object> expectedRow1 = new LinkedHashMap<>(Map.of(
-                "id", 3, "id2", 5, "data", "bar", "data2", "bar2"));
+            Map<String, Object> expectedRow1 = mapOf(
+                "id", 3, "id2", 5, "data", "bar", "data2", "bar2");
 
             int rowNum = 0;
             Map<String, Object> row = null;
@@ -322,20 +330,20 @@ class DatabaseTest extends AbstractBaseTest {
             DatabaseBuilder.newColumn("newCol", DataType.BOOLEAN).addToTable(table);
         }
 
-        Map<String, Object> newRow = new LinkedHashMap<>(Map.of(
-            "id", 9, "id2", 9, "data", "baz", "data2", "baz2", "newCol", Boolean.TRUE));
+        Map<String, Object> newRow = mapOf(
+            "id", 9, "id2", 9, "data", "baz", "data2", "baz2", "newCol", Boolean.TRUE);
 
         try (Database db = DatabaseBuilder.open(dbFile)) {
             Table table = db.getTable("Table1");
             table.addRow(newRow.get("id"), newRow.get("id2"), newRow.get("data"), newRow.get("data2"), newRow.get("newCol"));
         }
 
-        Map<String, Object> expectedRow0 = new LinkedHashMap<>(Map.of(
-            "id", 0, "id2", 2, "data", "foo", "data2", "foo2"));
+        Map<String, Object> expectedRow0 = mapOf(
+            "id", 0, "id2", 2, "data", "foo", "data2", "foo2");
         expectedRow0.put("newCol", Boolean.FALSE);
 
-        Map<String, Object> expectedRow1 = new LinkedHashMap<>(Map.of(
-            "id", 3, "id2", 5, "data", "bar", "data2", "bar2"));
+        Map<String, Object> expectedRow1 = mapOf(
+            "id", 3, "id2", 5, "data", "bar", "data2", "bar2");
         expectedRow1.put("newCol", Boolean.FALSE);
 
         try (Database db = DatabaseBuilder.open(dbFile)) {
@@ -379,7 +387,7 @@ class DatabaseTest extends AbstractBaseTest {
                 foundValues.add(row.get("A"));
             }
 
-            assertThat(foundValues).isEqualTo(List.of(
+            assertThat(foundValues).isEqualTo(Arrays.asList(
                     new BigDecimal("-2341234.0345"),
                     new BigDecimal("37.0000"),
                     new BigDecimal("10000.4500")));
@@ -411,7 +419,7 @@ class DatabaseTest extends AbstractBaseTest {
             foundValues.add(row.get("A"));
         }
 
-        assertThat(foundValues).isEqualTo(List.of(
+        assertThat(foundValues).isEqualTo(Arrays.asList(
                 "{32A59F01-AA34-3E29-453F-4523453CD2E6}",
                 "{32A59F01-AA34-3E29-453F-4523453CD2E6}",
                 "{11111111-1111-1111-1111-111111111111}",
@@ -451,11 +459,11 @@ class DatabaseTest extends AbstractBaseTest {
             foundBigValues.add(row.get("B"));
         }
 
-        assertThat(foundSmallValues).isEqualTo(List.of(
+        assertThat(foundSmallValues).isEqualTo(Arrays.asList(
                 new BigDecimal("-1234.0345"),
                 new BigDecimal("37.0000"),
                 new BigDecimal("1000.4500")));
-        assertThat(foundBigValues).isEqualTo(List.of(
+        assertThat(foundBigValues).isEqualTo(Arrays.asList(
                 new BigDecimal("23923434453436.36234219"),
                 new BigDecimal("37.00000000"),
                 new BigDecimal("-3452345321000.00000000")));
@@ -668,7 +676,7 @@ class DatabaseTest extends AbstractBaseTest {
     void ancientDatesWrite(FileFormat fileFormat) throws Exception {
         SimpleDateFormat sdf = DatabaseBuilder.createDateFormat("yyyy-MM-dd");
 
-        List<String> dates = List.of("1582-10-15", "1582-10-14", "1492-01-10", "1392-01-10");
+        List<String> dates = Arrays.asList("1582-10-15", "1582-10-14", "1492-01-10", "1392-01-10");
 
         Database db = createDbMem(fileFormat);
         db.setDateTimeType(DateTimeType.DATE);
@@ -700,7 +708,7 @@ class DatabaseTest extends AbstractBaseTest {
         SimpleDateFormat sdf = DatabaseBuilder.createDateFormat("yyyy-MM-dd");
         sdf.getCalendar().setTimeZone(tz);
 
-        List<String> dates = List.of("1582-10-15", "1582-10-14", "1492-01-10", "1392-01-10");
+        List<String> dates = Arrays.asList("1582-10-15", "1582-10-14", "1492-01-10", "1392-01-10");
 
         try (Database db = testDb.openCopy()) {
             db.setTimeZone(tz); // explicitly set database time zone
@@ -724,7 +732,7 @@ class DatabaseTest extends AbstractBaseTest {
         Database db = createDbMem(fileFormat);
 
         Set<String> sysTables = new TreeSet<>(String.CASE_INSENSITIVE_ORDER);
-        sysTables.addAll(List.of("MSysObjects", "MSysQueries", "MSysACES", "MSysRelationships"));
+        sysTables.addAll(Arrays.asList("MSysObjects", "MSysQueries", "MSysACES", "MSysRelationships"));
 
         if (fileFormat == FileFormat.GENERIC_JET4) {
             assertThat(db.getSystemTable("MSysAccessObjects")).as("file format: " + fileFormat).isNull();
@@ -734,9 +742,9 @@ class DatabaseTest extends AbstractBaseTest {
         } else {
             // v2003+ template files have no "MSysAccessObjects" table
             assertThat(db.getSystemTable("MSysAccessObjects")).as("file format: " + fileFormat).isNull();
-            sysTables.addAll(List.of("MSysNavPaneGroupCategories", "MSysNavPaneGroups", "MSysNavPaneGroupToObjects", "MSysNavPaneObjectIDs", "MSysAccessStorage"));
+            sysTables.addAll(Arrays.asList("MSysNavPaneGroupCategories", "MSysNavPaneGroups", "MSysNavPaneGroupToObjects", "MSysNavPaneObjectIDs", "MSysAccessStorage"));
             if (fileFormat.ordinal() >= FileFormat.V2007.ordinal()) {
-                sysTables.addAll(List.of("MSysComplexColumns", "MSysComplexType_Attachment", "MSysComplexType_Decimal", "MSysComplexType_GUID", "MSysComplexType_IEEEDouble",
+                sysTables.addAll(Arrays.asList("MSysComplexColumns", "MSysComplexType_Attachment", "MSysComplexType_Decimal", "MSysComplexType_GUID", "MSysComplexType_IEEEDouble",
                     "MSysComplexType_IEEESingle", "MSysComplexType_Long", "MSysComplexType_Short", "MSysComplexType_Text", "MSysComplexType_UnsignedByte"));
             }
             if (fileFormat.ordinal() >= FileFormat.V2010.ordinal()) {
@@ -909,7 +917,7 @@ class DatabaseTest extends AbstractBaseTest {
             }
 
             assertThat(sysCount > 4).isTrue();
-            assertThat(names).isEqualTo(Set.of("Table1", "Table2", "Table3", "Table4"));
+            assertThat(names).isEqualTo(new HashSet<>(Arrays.asList("Table1", "Table2", "Table3", "Table4")));
         }
     }
 
@@ -934,7 +942,7 @@ class DatabaseTest extends AbstractBaseTest {
                 names.add(tmd.getName());
             }
 
-            assertThat(names).isEqualTo(Set.of("Table1", "Table2"));
+            assertThat(names).isEqualTo(new HashSet<>(Arrays.asList("Table1", "Table2")));
         }
     }
 

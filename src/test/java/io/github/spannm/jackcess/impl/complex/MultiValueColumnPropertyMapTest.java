@@ -25,6 +25,7 @@ import io.github.spannm.jackcess.test.TestDb;
 import io.github.spannm.jackcess.test.source.TestDbSource;
 import org.junit.jupiter.params.ParameterizedTest;
 
+import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 import java.util.NoSuchElementException;
@@ -64,7 +65,7 @@ class MultiValueColumnPropertyMapTest extends AbstractBaseTest {
             assertThat(props.getValue("newLongProp")).isEqualTo(42);
 
             props.putAll(null);
-            props.putAll(List.of(props.get(PropertyMap.ALLOW_MULTI_VALUE_PROP), props.get("newTextProp")));
+            props.putAll(Arrays.asList(props.get(PropertyMap.ALLOW_MULTI_VALUE_PROP), props.get("newTextProp")));
             assertThat(props.getValue(PropertyMap.ALLOW_MULTI_VALUE_PROP)).isEqualTo(Boolean.TRUE);
 
             props.save();

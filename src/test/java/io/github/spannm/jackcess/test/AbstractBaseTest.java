@@ -27,13 +27,13 @@ import org.junit.jupiter.api.TestInfo;
 import org.junit.jupiter.params.provider.Arguments;
 
 import java.io.*;
-import java.lang.System.Logger;
-import java.lang.System.Logger.Level;
 import java.lang.reflect.Method;
 import java.nio.channels.FileChannel;
 import java.util.List;
 import java.util.Optional;
 import java.util.TimeZone;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
@@ -61,13 +61,13 @@ public abstract class AbstractBaseTest extends Assertions {
 
     protected final Logger getLogger() {
         if (null == logger) {
-            logger = System.getLogger(getClass().getName());
+            logger = Logger.getLogger(getClass().getName());
         }
         return logger;
     }
 
     protected static final Logger getStaticLogger() {
-        return System.getLogger(AbstractBaseTest.class.getName());
+        return Logger.getLogger(AbstractBaseTest.class.getName());
     }
 
     @BeforeEach
@@ -89,11 +89,10 @@ public abstract class AbstractBaseTest extends Assertions {
 
     @BeforeEach
     public final void logTestBegin(TestInfo _testInfo) {
-        if (_testInfo.getTestMethod().isEmpty() || _testInfo.getDisplayName().startsWith(_testInfo.getTestMethod().get().getName())) {
-            getLogger().log(Level.DEBUG, ">>>> TEST: {0} <<<<", _testInfo.getDisplayName());
+        if (!_testInfo.getTestMethod().isPresent() || _testInfo.getDisplayName().startsWith(_testInfo.getTestMethod().get().getName())) {
+            getLogger().log(Level.FINE, ">>>> TEST: {0} <<<<", _testInfo.getDisplayName());
         } else {
-            getLogger().log(Level.DEBUG, ">>>> TEST: {0} ({1}) <<<<",
-                _testInfo.getTestMethod().get().getName(), _testInfo.getDisplayName());
+            getLogger().log(Level.FINE, ">>>> TEST: {0} ({1}) <<<<", new Object[] {_testInfo.getTestMethod().get().getName(), _testInfo.getDisplayName()});
         }
     }
 

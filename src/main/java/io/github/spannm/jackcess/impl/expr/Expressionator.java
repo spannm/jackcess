@@ -56,8 +56,8 @@ public class Expressionator {
         Stream.of(".", "!", ",", "(", ")").forEach(w -> WORD_TYPES.put(w, WordType.DELIM));
     }
 
-    private static final Collection<String> TRUE_STRS  = List.of("true", "yes", "on");
-    private static final Collection<String> FALSE_STRS = List.of("false", "no", "off");
+    private static final Collection<String> TRUE_STRS  = Collections.unmodifiableList(Arrays.asList("true", "yes", "on"));
+    private static final Collection<String> FALSE_STRS = Collections.unmodifiableList(Arrays.asList("false", "no", "off"));
 
     // Useful links:
     // - syntax:
@@ -412,8 +412,8 @@ public class Expressionator {
             new OpType[] {LogOp.IMP},
             new OpType[] {SpecOp.IN, SpecOp.NOT_IN, SpecOp.BETWEEN, SpecOp.NOT_BETWEEN});
 
-    private static final Set<Character>       REGEX_SPEC_CHARS  = Set.of(
-        '\\', '.', '%', '=', '+', '$', '^', '|', '(', ')', '{', '}', '&', '[', ']', '*', '?');
+    private static final Set<Character>       REGEX_SPEC_CHARS  = Collections.unmodifiableSet(new HashSet<>(Arrays.asList(
+        '\\', '.', '%', '=', '+', '$', '^', '|', '(', ')', '{', '}', '&', '[', ']', '*', '?')));
     // this is a regular expression which will never match any string
     private static final Pattern              UNMATCHABLE_REGEX = Pattern.compile("(?!)");
 
@@ -713,7 +713,7 @@ public class Expressionator {
             Token t = buf.peekNext();
             if (isDelim(t, CLOSE_PAREN)) {
                 buf.next();
-                return List.of();
+                return Collections.emptyList();
             }
         }
 

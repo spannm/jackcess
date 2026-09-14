@@ -1064,13 +1064,13 @@ public class FormatUtil {
 
         if (numGroupDigits > 0) {
             fmt.append("#,");
-            fmt.append("#".repeat(Math.max(0, numGroupDigits - 1)));
+            fmt.append(StringUtil.repeat("#", Math.max(0, numGroupDigits - 1)));
         }
 
         fmt.append(incLeadDigit ? "0" : "#");
         if (numDecDigits > 0) {
             fmt.append('.');
-            fmt.append("0".repeat(Math.max(0, numDecDigits)));
+            fmt.append(StringUtil.repeat("0", Math.max(0, numDecDigits)));
         }
 
         numPatType.appendSuffix(fmt);
@@ -1269,7 +1269,7 @@ public class FormatUtil {
 
         @Override
         public Set<Map.Entry<Long, String>> entrySet() {
-            return new AbstractSet<>() {
+            return new AbstractSet<Map.Entry<Long, String>>() {
                 @Override
                 public int size() {
                     return 2;
@@ -1277,7 +1277,7 @@ public class FormatUtil {
 
                 @Override
                 public Iterator<Map.Entry<Long, String>> iterator() {
-                    List<Entry<Long, String>> list = List.of(new AbstractMap.SimpleImmutableEntry<>(0L, am), new AbstractMap.SimpleImmutableEntry<>(1L, pm));
+                    List<Entry<Long, String>> list = Collections.unmodifiableList(Arrays.asList(new AbstractMap.SimpleImmutableEntry<>(0L, am), new AbstractMap.SimpleImmutableEntry<>(1L, pm)));
                     return list.iterator();
                 }
             };

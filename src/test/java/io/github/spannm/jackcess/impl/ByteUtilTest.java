@@ -117,7 +117,7 @@ class ByteUtilTest extends AbstractBaseTest {
 
         File out = TestUtil.createTempFile(getShortTestMethodName(), ".hex", false);
         ByteUtil.toHexFile(out.getAbsolutePath(), bb, 0, 4);
-        assertThat(Files.readString(out.toPath()).contains("01")).isTrue();
+        assertThat(new String(Files.readAllBytes(out.toPath()), StandardCharsets.UTF_8).contains("01")).isTrue();
     }
 
     @Test
