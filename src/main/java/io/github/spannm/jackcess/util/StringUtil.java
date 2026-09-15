@@ -52,6 +52,17 @@ public final class StringUtil {
     }
 
     /**
+     * Checks case-insensitively whether the given string starts with the given prefix.
+     *
+     * @param str    string to test, may be {@code null}
+     * @param prefix prefix to look for, may be {@code null}
+     * @return {@code true} if neither argument is {@code null} and {@code str} starts with {@code prefix} ignoring case
+     */
+    public static boolean startsWithIgnoreCase(String str, String prefix) {
+        return str != null && prefix != null && str.regionMatches(true, 0, prefix, 0, prefix.length());
+    }
+
+    /**
      * Returns {@code true} if the given char sequence is {@code null} or all blank space, {@code false} otherwise.
      */
     public static boolean isBlank(CharSequence cs) {
