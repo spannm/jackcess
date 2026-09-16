@@ -21,6 +21,7 @@ import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static io.github.spannm.jackcess.test.Basename.DEL_COL;
 
 import org.assertj.core.api.Assertions;
 import io.github.spannm.jackcess.Database.FileFormat;
@@ -28,9 +29,12 @@ import io.github.spannm.jackcess.impl.ColumnImpl;
 import io.github.spannm.jackcess.impl.DatabaseImpl;
 import io.github.spannm.jackcess.impl.TableImpl;
 import io.github.spannm.jackcess.test.AbstractBaseTest;
+import io.github.spannm.jackcess.test.TestDb;
 import io.github.spannm.jackcess.test.source.FileFormatSource;
+import io.github.spannm.jackcess.test.source.TestDbSource;
 import org.junit.jupiter.params.ParameterizedTest;
 
+import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
@@ -236,6 +240,36 @@ class TableUpdaterTest extends AbstractBaseTest {
 
             t.reset();
             assertThat(t.getNextRow()).isEqualTo(expectedRowData);
+        }
+    }
+
+    @ParameterizedTest(name = "[{index}] {0}")
+    @TestDbSource(DEL_COL)
+    void addColumn_tableWithDeletedColumns_getsUnusedId(TestDb testDb) throws Exception {
+        // a new column takes an id above every id in use, rather than the physical column number, which in these
+        // tables is below the highest id
+        File dbFile;
+        short maxId;
+        try (Database db = testDb.openCopy()) {
+            dbFile = db.getFile();
+            TableImpl t = (TableImpl) db.getTable("Table1");
+
+            maxId = (short) t.getColumns().stream().mapToInt(ColumnImpl::getColumnId).max().orElse(-1);
+            // the deleted columns left the highest id past the last column
+            assertThat(maxId).isGreaterThan((short) (t.getColumnCount() - 1));
+
+            newColumn("newCol", DataType.TEXT).addToTable(t);
+        }
+
+        try (Database db = DatabaseBuilder.open(dbFile)) {
+            TableImpl t = (TableImpl) db.getTable("Table1");
+
+            assertThat(((ColumnImpl) t.getColumn("newCol")).getColumnId()).isEqualTo((short) (maxId + 1));
+
+            Set<Short> ids = new HashSet<>();
+            for (ColumnImpl col : t.getColumns()) {
+                assertThat(ids.add(col.getColumnId())).as("duplicate column id %d", col.getColumnId()).isTrue();
+            }
         }
     }
 
