@@ -61,7 +61,7 @@ class PropertiesTest extends AbstractBaseTest {
         assertThat(maps.isEmpty()).isFalse();
         assertThat(maps.getSize()).isEqualTo(2);
 
-        assertThat(maps.get(PropertyMaps.DEFAULT_NAME)).isSameAs(defMap);
+        assertThat(maps.getDefault()).isSameAs(defMap);
         assertThat(defMap.getName()).isEqualTo(PropertyMaps.DEFAULT_NAME);
         assertThat(maps.get("TESTCOL")).isSameAs(colMap);
         assertThat(colMap.getName()).isEqualTo("testcol");
