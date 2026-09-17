@@ -374,6 +374,7 @@ public class IndexPageCache {
             dpExtra.entryPrefix = EMPTY_PREFIX;
             // when the root page becomes empty, it becomes a leaf page again
             dpMain.leaf = true;
+            dpMain.level = 0;
             return;
         }
 
@@ -560,7 +561,7 @@ public class IndexPageCache {
         // now, we just want it to be functional...
         // so, we will naively move half the entries from one page to a new page.
 
-        CacheDataPage newDataPage = allocateNewCacheDataPage(parentMain.pageNumber, origMain.leaf);
+        CacheDataPage newDataPage = allocateNewCacheDataPage(parentMain.pageNumber, origMain.leaf, origMain.getLevel());
         DataPageMain newMain = newDataPage.main;
         DataPageExtra newExtra = newDataPage.extra;
 
@@ -615,7 +616,7 @@ public class IndexPageCache {
             throw new IllegalArgumentException(withErrorContext("should be called with root, duh"));
         }
 
-        CacheDataPage newDataPage = allocateNewCacheDataPage(rootMain.pageNumber, rootMain.leaf);
+        CacheDataPage newDataPage = allocateNewCacheDataPage(rootMain.pageNumber, rootMain.leaf, rootMain.getLevel());
         DataPageMain newMain = newDataPage.main;
         DataPageExtra newExtra = newDataPage.extra;
 
@@ -631,8 +632,9 @@ public class IndexPageCache {
             reparentChildren(newDataPage);
         }
 
-        // clear the root page
+        // clear the root page, which now sits one level above the new page holding its entries
         rootMain.leaf = false;
+        rootMain.level = newMain.level + 1;
         rootMain.childTailPageNumber = INVALID_INDEX_PAGE_NUMBER;
         rootExtra.entries = new ArrayList<>();
         rootExtra.entryPrefix = EMPTY_PREFIX;
@@ -650,14 +652,16 @@ public class IndexPageCache {
      *
      * @param parentPageNumber the parent page for the new page
      * @param isLeaf whether or not the new page is a leaf page
+     * @param level the level of the new page in the index tree
      *
      * @return the newly created page
      */
-    private CacheDataPage allocateNewCacheDataPage(Integer parentPageNumber, boolean isLeaf) throws IOException {
+    private CacheDataPage allocateNewCacheDataPage(Integer parentPageNumber, boolean isLeaf, int level) throws IOException {
         DataPageMain dpMain = new DataPageMain(getPageChannel().allocateNewPage());
         DataPageExtra dpExtra = new DataPageExtra();
         dpMain.initParentPage(parentPageNumber, false);
         dpMain.leaf = isLeaf;
+        dpMain.level = level;
         dpMain.prevPageNumber = INVALID_INDEX_PAGE_NUMBER;
         dpMain.nextPageNumber = INVALID_INDEX_PAGE_NUMBER;
         dpMain.childTailPageNumber = INVALID_INDEX_PAGE_NUMBER;
@@ -936,6 +940,8 @@ public class IndexPageCache {
         public Integer                   childTailPageNumber;
         public Integer                   parentPageNumber;
         public boolean                   leaf;
+        /** depth below the leaves of the index tree, 0 for a leaf page */
+        public int                       level;
         public boolean                   tail;
         private Reference<DataPageExtra> extra;
 
@@ -1008,6 +1014,21 @@ public class IndexPageCache {
                 child.initParentPage(pageNumber, isTail);
             }
             return child;
+        }
+
+        /**
+         * Returns the depth of this page below the leaves of the index tree, 0 for a leaf page.
+         *
+         * @return the level of this page
+         * @throws IOException if a child page has to be read
+         */
+        public int getLevel() throws IOException {
+            if (!leaf && level == 0) {
+                // a node page is never at level 0, so this one has a level which was never filled in. Take it from a
+                // child instead
+                level = getChildPage(getExtra().entries.get(0)).getLevel() + 1;
+            }
+            return level;
         }
 
         public DataPageExtra getExtra() throws IOException {
@@ -1101,6 +1122,16 @@ public class IndexPageCache {
         @Override
         public void setLeaf(boolean isLeaf) {
             main.leaf = isLeaf;
+        }
+
+        @Override
+        public int getLevel() throws IOException {
+            return main.getLevel();
+        }
+
+        @Override
+        public void setLevel(int level) {
+            main.level = level;
         }
 
         @Override
@@ -1346,6 +1377,10 @@ public class IndexPageCache {
                     if (nextPageNumber != null && childMain.pageNumber != nextPageNumber) {
                         throw new IllegalStateException(withErrorContext("Child's pageNumber is not the expected next child for " + childMain));
                     }
+                    if (childMain.getLevel() != dpMain.getLevel() - 1) {
+                        throw new IllegalStateException(withErrorContext(String.format("Child's level %d is not one below its parent's %d for %s",
+                            childMain.getLevel(), dpMain.getLevel(), childMain)));
+                    }
                     if (childMain.parentPageNumber != null) {
                         if (childMain.parentPageNumber != dpMain.pageNumber) {
                             throw new IllegalStateException(withErrorContext("Child's parent is incorrect " + childMain));
@@ -1409,9 +1444,12 @@ public class IndexPageCache {
          * @param dpMain the index page
          * @param peerMain the peer index page
          */
-        private void validatePeerStatus(DataPageMain dpMain, DataPageMain peerMain) {
+        private void validatePeerStatus(DataPageMain dpMain, DataPageMain peerMain) throws IOException {
             if (dpMain.leaf != peerMain.leaf) {
                 throw new IllegalStateException(withErrorContext("Mismatched peer status " + dpMain.leaf + " " + peerMain.leaf));
+            }
+            if (dpMain.getLevel() != peerMain.getLevel()) {
+                throw new IllegalStateException(withErrorContext(String.format("Mismatched peer level %d %d", dpMain.getLevel(), peerMain.getLevel())));
             }
             if (!dpMain.leaf) {
                 if (dpMain.parentPageNumber != null && peerMain.parentPageNumber != null && !dpMain.parentPageNumber.equals(peerMain.parentPageNumber)) {

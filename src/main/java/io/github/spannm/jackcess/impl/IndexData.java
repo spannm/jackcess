@@ -1096,7 +1096,7 @@ public final class IndexData {
 
         byte[] entryPrefix = dataPage.getEntryPrefix();
         buffer.putShort((short) entryPrefix.length); // entry prefix byte count
-        buffer.put((byte) 0); // Unknown
+        buffer.put((byte) dataPage.getLevel()); // level in the index tree
 
         byte[] entryMask = new byte[format.SIZE_INDEX_ENTRY_MASK];
         // first entry includes the prefix
@@ -1128,6 +1128,7 @@ public final class IndexData {
 
         boolean isLeaf = isLeafPage(buffer);
         dataPage.setLeaf(isLeaf);
+        dataPage.setLevel(readLevel(buffer, getFormat()));
 
         // note, "header" data is in LITTLE_ENDIAN format, entry data is in
         // BIG_ENDIAN format
@@ -1215,6 +1216,18 @@ public final class IndexData {
         tmpEntryBuffer.flip();
 
         return tmpEntryBuffer;
+    }
+
+    /**
+     * Reads the level of an index page, 0 if the format does not record one.
+     *
+     * @param buffer the index page
+     * @param format format of the database
+     * @return the level of the page in the index tree
+     */
+    private static int readLevel(ByteBuffer buffer, JetFormat format) {
+        int levelOffset = format.OFFSET_INDEX_LEVEL;
+        return levelOffset >= 0 ? ByteUtil.getUnsignedByte(buffer, levelOffset) : 0;
     }
 
     /**
@@ -2717,6 +2730,16 @@ public final class IndexData {
 
         public abstract void setLeaf(boolean isLeaf);
 
+        /**
+         * Returns the depth of this page below the leaves of the index tree, 0 for a leaf page.
+         *
+         * @return the level of this page
+         * @throws IOException if a child page has to be read to determine the level
+         */
+        public abstract int getLevel() throws IOException;
+
+        public abstract void setLevel(int level);
+
         public abstract int getPrevPageNumber();
 
         public abstract void setPrevPageNumber(int pageNumber);
@@ -2803,6 +2826,16 @@ public final class IndexData {
 
         @Override
         public void setLeaf(boolean isLeaf) {
+        }
+
+        @Override
+        public int getLevel() {
+            return 0;
+        }
+
+        @Override
+        public void setLevel(int level) {
+            // no-op: RootDataPage is an immutable sentinel for page 0
         }
 
         @Override
