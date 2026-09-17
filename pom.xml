@@ -395,42 +395,16 @@
                 <artifactId>maven-jar-plugin</artifactId>
                 <configuration>
                     <archive>
-                        <addMavenDescriptor>true</addMavenDescriptor>
-                        <compress>true</compress>
                         <index>false</index>
                         <manifest>
                             <mainClass>io.github.spannm.jackcess.about.ThisLib</mainClass>
-                            <addClasspath>false</addClasspath>
-                            <addDefaultEntries>true</addDefaultEntries>
-                            <addDefaultImplementationEntries>true</addDefaultImplementationEntries>
-                            <addDefaultSpecificationEntries>false</addDefaultSpecificationEntries>
-                            <addBuildEnvironmentEntries>true</addBuildEnvironmentEntries>
                         </manifest>
                         <manifestEntries combine.children="append">
-                            <Build-Time>${maven.build.timestamp}</Build-Time>
-                            <Project-Java-Version>${project.build.targetJdk}</Project-Java-Version>
-
-                            <Creation-Java-Vendor>${java.vendor}</Creation-Java-Vendor>
-                            <Creation-Java-Version>${java.version}</Creation-Java-Version>
-                            <Creation-Java-Runtime-Name>${java.runtime.name}</Creation-Java-Runtime-Name>
-                            <Creation-Java-Runtime-Version>${java.runtime.version}</Creation-Java-Runtime-Version>
-
-                            <Creation-Os-Name>${os.name}</Creation-Os-Name>
-                            <Creation-Os-Arch>${os.arch}</Creation-Os-Arch>
-                            <Creation-Os-Version>${os.version}</Creation-Os-Version>
-                            <Creation-User>${user.name}</Creation-User>
-                            <Creation-Time>${maven.build.timestamp}</Creation-Time>
-
+                            <Automatic-Module-Name>${module.name}</Automatic-Module-Name>
                             <Project-Description>${project.description}</Project-Description>
                             <Project-Url>${project.url}</Project-Url>
-                            <Project-Inception-Year>${project.inceptionYear}</Project-Inception-Year>
                             <Issue-Management-Url>${project.issueManagement.url}</Issue-Management-Url>
                             <Scm-Url>${project.scm.url}</Scm-Url>
-
-                            <Organization-Name>${project.organization.name}</Organization-Name>
-                            <Organization-Url>${project.organization.url}</Organization-Url>
-
-                            <Automatic-Module-Name>${module.name}</Automatic-Module-Name>
                         </manifestEntries>
                     </archive>
                 </configuration>
