@@ -399,6 +399,7 @@
                         <compress>true</compress>
                         <index>false</index>
                         <manifest>
+                            <mainClass>io.github.spannm.jackcess.about.ThisLib</mainClass>
                             <addClasspath>false</addClasspath>
                             <addDefaultEntries>true</addDefaultEntries>
                             <addDefaultImplementationEntries>true</addDefaultImplementationEntries>
@@ -423,6 +424,8 @@
                             <Project-Description>${project.description}</Project-Description>
                             <Project-Url>${project.url}</Project-Url>
                             <Project-Inception-Year>${project.inceptionYear}</Project-Inception-Year>
+                            <Issue-Management-Url>${project.issueManagement.url}</Issue-Management-Url>
+                            <Scm-Url>${project.scm.url}</Scm-Url>
 
                             <Organization-Name>${project.organization.name}</Organization-Name>
                             <Organization-Url>${project.organization.url}</Organization-Url>
