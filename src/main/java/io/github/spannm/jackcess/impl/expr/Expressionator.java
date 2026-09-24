@@ -550,17 +550,11 @@ public class Expressionator {
                         // is it a function call?
                         if (!maybeParseFuncCallExpression(t, buf)) {
 
-                            // is it an object name?
-                            Token next = buf.peekNext();
-                            if (next != null && isObjNameSep(next)) {
-
-                                parseObjectRefExpression(t, buf);
-
-                            } else {
-
-                                // FIXME maybe bare obj name, maybe string literal?
-                                throw new UnsupportedOperationException("FIXME");
-                            }
+                            // treat it as an object name, whether or not it is followed
+                            // by an obj name separator ('!' or '.') introducing further
+                            // levels (e.g. a bare field reference like "Foo" instead of
+                            // "[Foo]")
+                            parseObjectRefExpression(t, buf);
                         }
 
                     } else {
