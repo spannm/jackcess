@@ -749,8 +749,7 @@ public class ColumnImpl implements Column, Comparable<ColumnImpl>, DateTimeConte
                 return readGUIDValue(buffer, order);
             case EXT_DATE_TIME:
                 return readExtendedDateValue(buffer);
-            case UNKNOWN_0D:
-            case UNKNOWN_11:
+            case BIG_BINARY:
                 // treat like "binary" data
                 return data;
             case COMPLEX_TYPE:
@@ -1332,7 +1331,6 @@ public class ColumnImpl implements Column, Comparable<ColumnImpl>, DateTimeConte
                 return encodeTextValue(obj, 0, getLengthInUnits(), false).order(order);
 
             case BINARY:
-            case UNKNOWN_0D:
             case UNSUPPORTED_VARLEN:
                 // should already be "encoded"
                 break;
@@ -1404,8 +1402,7 @@ public class ColumnImpl implements Column, Comparable<ColumnImpl>, DateTimeConte
                 writeNumericValue(buffer, obj);
                 break;
             case BINARY:
-            case UNKNOWN_0D:
-            case UNKNOWN_11:
+            case BIG_BINARY:
             case COMPLEX_TYPE:
                 buffer.putInt(toNumber(obj).intValue());
                 break;
