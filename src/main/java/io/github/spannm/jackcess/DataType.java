@@ -200,7 +200,7 @@ public enum DataType {
     private final boolean                    hasScalePrecision;
     /** Internal Access value */
     private final byte                       value;
-    /** TODO */
+    /** display name of this type */
     private final String                     typeName;
     /** Size in bytes of fixed length columns */
     private final Integer                    fixedSize;
