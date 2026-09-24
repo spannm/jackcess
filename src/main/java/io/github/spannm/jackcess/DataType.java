@@ -109,10 +109,6 @@ public enum DataType {
      */
     MEMO((byte) 0x0C, null, Types.LONGVARCHAR, null, true, true, 0, 0, 0x3FFFFFFF, JetFormat.TEXT_FIELD_UNIT_SIZE),
     /**
-     * Unknown data. Handled like {@link #BINARY}.
-     */
-    UNKNOWN_0D((byte) 0x0D, null, null, null, true, false, 0, 255, 255, 1),
-    /**
      * Corresponds to a java {@link String} with the pattern {@code "{xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx}"}, also
      * known as a "Replication ID" in Access. Accepts any Object converted to a String matching this pattern
      * (surrounding "{}" are optional, so {@link java.util.UUID}s are supported), or {@code null}.
@@ -126,10 +122,12 @@ public enum DataType {
     // for some reason numeric is "var len" even though it has a fixed size...
     NUMERIC((byte) 0x10, null, Types.NUMERIC, 17, true, false, 17, 17, 17, true, 0, 0, 28, 1, 18, 28, 1),
     /**
-     * Unknown data (seems to be an alternative {@link #OLE} type, used by MSysAccessObjects table). Handled like a
-     * fixed length BINARY/OLE.
+     * A fixed length binary column longer than the 255 byte {@link #BINARY}, which the engine calls "BigBinary".
+     * Only the {@code Data} column of {@code MSysAccessObjects} uses it, which holds the forms, reports and VBA of
+     * the database. Jet4 only, since Jet3 used {@link #BINARY} for that column and the ACE engine dropped the table.
+     * Handled like a fixed length BINARY/OLE.
      */
-    UNKNOWN_11((byte) 0x11, "TYPENAME", null, 3992),
+    BIG_BINARY((byte) 0x11, "TYPENAME", null, 3992),
     /**
      * Complex type corresponds to a special {@link #LONG} autonumber field which is the key for a secondary table which
      * holds the "real" data.
