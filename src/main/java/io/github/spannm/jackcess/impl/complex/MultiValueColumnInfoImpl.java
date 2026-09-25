@@ -20,6 +20,7 @@ import io.github.spannm.jackcess.Column;
 import io.github.spannm.jackcess.Row;
 import io.github.spannm.jackcess.Table;
 import io.github.spannm.jackcess.complex.*;
+import io.github.spannm.jackcess.util.ToStringBuilder;
 
 import java.io.IOException;
 
@@ -97,7 +98,7 @@ public final class MultiValueColumnInfoImpl extends ComplexColumnInfoImpl<Single
 
         @Override
         public String toString() {
-            return "SingleValue(" + getComplexValueForeignKey() + "," + getId() + ") " + get();
+            return ToStringBuilder.valueBuilder(this).append("complexValueForeignKey", getComplexValueForeignKey()).append("id", getId()).append("value", get()).toString();
         }
 
     }

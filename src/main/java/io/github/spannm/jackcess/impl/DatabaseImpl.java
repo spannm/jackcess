@@ -1977,17 +1977,18 @@ public class DatabaseImpl implements Database, DateTimeContext {
 
     @Override
     public String toString() {
-        return String.format(
-            "%s[file=%s, name=%s, readOnly=%s, tableParentId=%s, format=%s, tableNames=%s, pageChannel=%s, "
-                + "systemCatalog=%s, tableFinder=%s, accessControlEntries=%s, relParentId=%s, relationships=%s, queries=%s, "
-                + "complexCols=%s, newTableSIDs=%s, dbErrorHandler=%s, fileFormat=%s, charset=%s, timeZone=%s, zoneId=%s, defaultSortOrder=%s, "
-                + "defaultCodePage=%s, columnOrder=%s, enforceForeignKeys=%s, allowAutoNumInsert=%s, evaluateExpressions=%s, validatorFactory=%s, "
-                + "tableCache=%s, propsHandler=%s, dbParentId=%s, newObjOwner=%s, dbPropMaps=%s, summaryPropMaps=%s, userDefPropMaps=%s, "
-                + "linkResolver=%s, linkedDbs=%s, fkEnforcerSharedState=%s, evalCtx=%s, dtf=%s]",
-            getClass().getSimpleName(), mfile, mname, mreadOnly, mtableParentId, mformat, mtableNames, mpageChannel, msystemCatalog, mtableFinder, maccessControlEntries, mrelParentId, mrelationships,
-            mqueries, mcomplexCols, mnewTableSIDs, mdbErrorHandler, mfileFormat, mcharset, mtimeZone, mzoneId, mdefaultSortOrder, mdefaultCodePage, mcolumnOrder, menforceForeignKeys,
-            mallowAutoNumInsert, mevaluateExpressions, mvalidatorFactory, mtableCache, mpropsHandler, mdbParentId, Arrays.toString(mnewObjOwner), mdbPropMaps, msummaryPropMaps, muserDefPropMaps,
-            mlinkResolver, mlinkedDbs, mfkEnforcerSharedState, mevalCtx, dtf);
+        return ToStringBuilder.valueBuilder(this)
+            .append("file", mfile).append("name", mname).append("readOnly", mreadOnly).append("tableParentId", mtableParentId).append("format", mformat)
+            .append("tableNames", mtableNames).append("pageChannel", mpageChannel).append("systemCatalog", msystemCatalog).append("tableFinder", mtableFinder)
+            .append("accessControlEntries", maccessControlEntries).append("relParentId", mrelParentId).append("relationships", mrelationships).append("queries", mqueries)
+            .append("complexCols", mcomplexCols).append("newTableSIDs", mnewTableSIDs).append("dbErrorHandler", mdbErrorHandler).append("fileFormat", mfileFormat)
+            .append("charset", mcharset).append("timeZone", mtimeZone).append("zoneId", mzoneId).append("defaultSortOrder", mdefaultSortOrder)
+            .append("defaultCodePage", mdefaultCodePage).append("columnOrder", mcolumnOrder).append("enforceForeignKeys", menforceForeignKeys)
+            .append("allowAutoNumInsert", mallowAutoNumInsert).append("evaluateExpressions", mevaluateExpressions).append("validatorFactory", mvalidatorFactory)
+            .append("tableCache", mtableCache).append("propsHandler", mpropsHandler).append("dbParentId", mdbParentId).append("newObjOwner", mnewObjOwner)
+            .append("dbPropMaps", mdbPropMaps).append("summaryPropMaps", msummaryPropMaps).append("userDefPropMaps", muserDefPropMaps)
+            .append("linkResolver", mlinkResolver).append("linkedDbs", mlinkedDbs).append("fkEnforcerSharedState", mfkEnforcerSharedState).append("evalCtx", mevalCtx).append("dtf", dtf)
+            .toString();
     }
 
     /**

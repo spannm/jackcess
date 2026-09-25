@@ -21,6 +21,7 @@ import io.github.spannm.jackcess.Row;
 import io.github.spannm.jackcess.Table;
 import io.github.spannm.jackcess.complex.*;
 import io.github.spannm.jackcess.impl.ColumnImpl;
+import io.github.spannm.jackcess.util.ToStringBuilder;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
@@ -209,7 +210,9 @@ public final class VersionHistoryColumnInfoImpl extends ComplexColumnInfoImpl<Ve
 
         @Override
         public String toString() {
-            return "Version(" + getComplexValueForeignKey() + "," + getId() + ") " + getModifiedDateObject() + ", " + getValue();
+            return ToStringBuilder.valueBuilder(this)
+                .append("complexValueForeignKey", getComplexValueForeignKey()).append("id", getId()).append("modifiedDate", getModifiedDateObject()).append("value", getValue())
+                .toString();
         }
     }
 

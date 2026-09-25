@@ -22,6 +22,7 @@ import io.github.spannm.jackcess.util.ColumnMatcher;
 import io.github.spannm.jackcess.util.ErrorHandler;
 import io.github.spannm.jackcess.util.IterableBuilder;
 import io.github.spannm.jackcess.util.SimpleColumnMatcher;
+import io.github.spannm.jackcess.util.ToStringBuilder;
 
 import java.io.IOException;
 import java.io.UncheckedIOException;
@@ -650,7 +651,7 @@ public abstract class CursorImpl implements Cursor {
 
     @Override
     public String toString() {
-        return String.format("%s[id=%s, table=%s, prevPos=%s, curPos=%s]", getClass().getSimpleName(), mid, mtable, mprevPos, mcurPos);
+        return ToStringBuilder.valueBuilder(this).append("id", mid).append("table", mtable).append("prevPos", mprevPos).append("curPos", mcurPos).toString();
     }
 
     /**
@@ -891,7 +892,7 @@ public abstract class CursorImpl implements Cursor {
 
         @Override
         public String toString() {
-            return String.format("%s[cursorId=%s, curPos=%s, prevPos=%s]", getClass().getSimpleName(), cursorId, curPos, prevPos);
+            return ToStringBuilder.valueBuilder(this).append("cursorId", cursorId).append("curPos", curPos).append("prevPos", prevPos).toString();
         }
     }
 

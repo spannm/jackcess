@@ -19,6 +19,7 @@ package io.github.spannm.jackcess;
 import io.github.spannm.jackcess.impl.DatabaseImpl;
 import io.github.spannm.jackcess.impl.PropertyMapImpl;
 import io.github.spannm.jackcess.impl.TableCreator;
+import io.github.spannm.jackcess.util.ToStringBuilder;
 
 import java.io.IOException;
 import java.util.*;
@@ -227,12 +228,7 @@ public class TableBuilder {
 
     @Override
     public String toString() {
-        return new StringJoiner(", ", getClass().getSimpleName() + "[", "]")
-            .add("name=" + name)
-            .add("columns=" + columns)
-            .add("indexes=" + indexes)
-            .add("props=" + props)
-            .toString();
+        return ToStringBuilder.valueBuilder(this).append("name", name).append("columns", columns).append("indexes", indexes).append("props", props).toString();
     }
 
     /**

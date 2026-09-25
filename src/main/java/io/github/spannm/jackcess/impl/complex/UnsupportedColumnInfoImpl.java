@@ -20,6 +20,7 @@ import io.github.spannm.jackcess.Column;
 import io.github.spannm.jackcess.Row;
 import io.github.spannm.jackcess.Table;
 import io.github.spannm.jackcess.complex.*;
+import io.github.spannm.jackcess.util.ToStringBuilder;
 
 import java.io.IOException;
 import java.util.LinkedHashMap;
@@ -111,7 +112,7 @@ public class UnsupportedColumnInfoImpl extends ComplexColumnInfoImpl<Unsupported
 
         @Override
         public String toString() {
-            return "UnsupportedValue(" + getComplexValueForeignKey() + "," + getId() + ") " + getValues();
+            return ToStringBuilder.valueBuilder(this).append("complexValueForeignKey", getComplexValueForeignKey()).append("id", getId()).append("values", getValues()).toString();
         }
     }
 }
