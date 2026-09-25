@@ -73,6 +73,92 @@ public class IndexCodesTest extends AbstractBaseTest {
         }
     }
 
+    /**
+     * Tests the "international ext" characters, whose codes end with a suffix whose length grows with the number of characters which took that path. The
+     * expected keys were read back out of the index pages Access built for U+3041 (crazy flag set) and U+3042 (crazy flag clear).
+     */
+    @Test
+    void internationalExtCodes() throws Exception {
+        try (Database db = createDbMem(FileFormat.V2010, true)) {
+            IndexData.ColumnDescriptor col = getTextIndexColumn(db);
+
+            // one suffix repeat covers up to 7 chars, so these are the two boundaries either side of the first extra repeat
+            assertIndexKey("7f7f02010101a0ff0280ff8000", col, repeatChar('ぁ', 1));
+            assertIndexKey("7f7f02010101ff0280ff8000", col, repeatChar('あ', 1));
+            assertIndexKey("7f7f027f027f027f027f027f027f027f02010101aaaaa8ff028080ff808000", col, repeatChar('ぁ', 8));
+            assertIndexKey("7f7f027f027f027f027f027f027f027f02010101ff028080ff808000", col, repeatChar('あ', 8));
+            assertIndexKey("7f7f027f027f027f027f027f027f027f027f027f027f027f027f027f027f027f02"
+                + "010101aaaaaaaaaaa0ff02808080ff80808000", col, repeatChar('ぁ', 16));
+        }
+    }
+
+    /**
+     * Tests that a key longer than the maximum is truncated the way Access truncates it, with a digest of the discarded bytes. The expected key was read
+     * back out of the index page Access built.
+     */
+    @Test
+    void truncatedKey() throws Exception {
+        try (Database db = createDbMem(FileFormat.V2010, true)) {
+            IndexData.ColumnDescriptor col = getTextIndexColumn(db);
+
+            // 200 chars of U+3041 encode to more than the maximum key length, so Access keeps the leading 508 bytes and ends the key with a digest of
+            // everything it discarded
+            byte[] fullKey = encodeIndexKey(col, repeatChar('ぁ', 200));
+            assertThat(fullKey).hasSize(533);
+
+            // the truncated form is what Access actually stores
+            String expected = "7f7f027f027f027f027f027f027f027f027f027f027f027f027f027f027f027f02"
+                + "7f027f027f027f027f027f027f027f027f027f027f027f027f027f027f027f027f"
+                + "027f027f027f027f027f027f027f027f027f027f027f027f027f027f027f027f02"
+                + "7f027f027f027f027f027f027f027f027f027f027f027f027f027f027f027f027f"
+                + "027f027f027f027f027f027f027f027f027f027f027f027f027f027f027f027f02"
+                + "7f027f027f027f027f027f027f027f027f027f027f027f027f027f027f027f027f"
+                + "027f027f027f027f027f027f027f027f027f027f027f027f027f027f027f027f02"
+                + "7f027f027f027f027f027f027f027f027f027f027f027f027f027f027f027f027f"
+                + "027f027f027f027f027f027f027f027f027f027f027f027f027f027f027f027f02"
+                + "7f027f027f027f027f027f027f027f027f027f027f027f027f027f027f027f027f"
+                + "027f027f027f027f027f027f027f027f027f027f027f027f027f027f027f027f02"
+                + "7f027f027f027f027f027f027f027f027f027f027f027f027f027f027f027f027f"
+                + "027f027f02010101aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+                + "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+                + "aaaaaaaaaaaaaaaaa8ff0280808080808080808080808080808080808080808080"
+                + "80808080808080ff8080808080d06b";
+            assertThat(toCompactHex(IndexData.truncateEntryBytes(fullKey))).isEqualTo(expected);
+        }
+    }
+
+    private static IndexData.ColumnDescriptor getTextIndexColumn(Database db) throws Exception {
+        Table t = new TableBuilder("test").addColumn(new ColumnBuilder("data", DataType.MEMO)).addIndex(new IndexBuilder("dataidx").withColumns("data")).toTable(db);
+        IndexImpl idx = (IndexImpl) t.getIndex("dataidx");
+        return idx.getIndexData().getColumns().get(0);
+    }
+
+    private static void assertIndexKey(String expected, IndexData.ColumnDescriptor col, String value) throws Exception {
+        assertThat(toCompactHex(encodeIndexKey(col, value))).as("key for %s", toUnicodeStr(value)).isEqualTo(expected);
+    }
+
+    private static byte[] encodeIndexKey(IndexData.ColumnDescriptor col, String value) throws Exception {
+        ByteUtil.ByteStream bout = new ByteUtil.ByteStream();
+        col.writeValue(value, bout);
+        return bout.toByteArray();
+    }
+
+    private static String repeatChar(char c, int num) {
+        StringBuilder sb = new StringBuilder(num);
+        for (int i = 0; i < num; ++i) {
+            sb.append(c);
+        }
+        return sb.toString();
+    }
+
+    private static String toCompactHex(byte[] bytes) {
+        StringBuilder sb = new StringBuilder(bytes.length * 2);
+        for (byte b : bytes) {
+            sb.append(String.format("%02x", b));
+        }
+        return sb.toString();
+    }
+
     static void checkIndexEntries(TestDb testDB, Table t, Index index) throws Exception {
         // index.initialize();
         // getStaticLogger().log(Level.FINE, "Ind {0}", index);
@@ -116,17 +202,6 @@ public class IndexCodesTest extends AbstractBaseTest {
                 // verify that the entries are indeed equal
                 Cursor.Position curPos = cursor.getSavepoint().getCurrentPosition();
                 assertThat(entryToString(curPos)).isEqualTo(entryToString(expectedPos));
-                return;
-            }
-        }
-
-        // TODO long rows not handled completely yet in V2010
-        // seems to truncate entry at 508 bytes with some trailing 2 byte seq
-        if (testDB != null && testDB.getExpectedFileFormat() == FileFormat.V2010) {
-            String rowId = expectedRow.getString("name");
-            String tName = t.getName();
-            if (("Table11".equals(tName) || "Table11_desc".equals(tName)) && ("row10".equals(rowId) || "row11".equals(rowId) || "row12".equals(rowId))) {
-                getStaticLogger().log(Level.WARNING, "TODO long rows not handled completely yet in V2010: {0}, {1}", new Object[] {tName, rowId});
                 return;
             }
         }
