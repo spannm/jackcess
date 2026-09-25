@@ -186,7 +186,11 @@ public class RelationshipCreator extends DBMutator {
             throw new IllegalArgumentException(withErrorContext("Cannot have duplicate columns in an integrity enforced relationship"));
         }
 
-        // TODO: future, check for enforce cycles?
+        // cascading updates/deletes are executed transitively by the access
+        // engine, so a chain of cascading relationships which loops back to the
+        // primary table would cause an infinite cascade; reject such cycles
+        // up front (this includes a table cascading to itself)
+        checkForCascadeCycle();
 
         // check referential integrity
         IndexCursor primaryCursor = primaryIdx.newCursor().toIndexCursor();
@@ -210,6 +214,56 @@ public class RelationshipCreator extends DBMutator {
             }
         }
 
+    }
+
+    /**
+     * Verifies that enabling cascading updates/deletes for the relationship currently being created would not
+     * introduce a cascade cycle, i.e. a chain of cascading relationships (including this new one) that loops back
+     * to the primary table. Following such a cycle would cause an infinite cascade when the relationship is
+     * enforced.
+     */
+    private void checkForCascadeCycle() throws IOException {
+        // note, the "flags" field is not populated until after validate() completes, so we must consult the
+        // relationship builder directly here
+        if ((relationship.getFlags() & CASCADE_FLAGS) == 0) {
+            // this relationship does not cascade, so it cannot participate in a cascade cycle
+            return;
+        }
+
+        String fromName = DatabaseImpl.toLookupName(primaryTable.getName());
+        String toName = DatabaseImpl.toLookupName(secondaryTable.getName());
+
+        // build the graph of existing cascading relationships (fromTable -> toTable), then add the edge for the
+        // relationship currently being created
+        Map<String, List<String>> cascadeEdges = new HashMap<>();
+        for (Relationship rel : getDatabase().getRelationships()) {
+            if (!rel.cascadeUpdates() && !rel.cascadeDeletes()) {
+                continue;
+            }
+            String relFrom = DatabaseImpl.toLookupName(rel.getFromTable().getName());
+            String relTo = DatabaseImpl.toLookupName(rel.getToTable().getName());
+            cascadeEdges.computeIfAbsent(relFrom, k -> new ArrayList<>()).add(relTo);
+        }
+        cascadeEdges.computeIfAbsent(fromName, k -> new ArrayList<>()).add(toName);
+
+        // starting from the secondary table, follow cascade edges and see if we can get back to the primary table
+        Set<String> visited = new HashSet<>();
+        Deque<String> toVisit = new ArrayDeque<>();
+        toVisit.add(toName);
+
+        while (!toVisit.isEmpty()) {
+            String cur = toVisit.remove();
+            if (cur.equals(fromName)) {
+                throw new IllegalArgumentException(withErrorContext("Relationship would create a cascading relationship cycle"));
+            }
+            if (!visited.add(cur)) {
+                continue;
+            }
+            List<String> next = cascadeEdges.get(cur);
+            if (next != null) {
+                toVisit.addAll(next);
+            }
+        }
     }
 
     private IndexBuilder createPrimaryIndex() {

@@ -202,6 +202,73 @@ class TableUpdaterTest extends AbstractBaseTest {
 
     @ParameterizedTest(name = "[{index}] {0}")
     @FileFormatSource
+    void cascadeRelationshipCycleRejected(FileFormat fileFormat) throws Exception {
+        try (Database db = createDbMem(fileFormat)) {
+            Table t1 = newTable("TestTable1")
+                .addColumn(newColumn("id", DataType.LONG))
+                .toTable(db);
+            newPrimaryKey("id").addToTable(t1);
+
+            Table t2 = newTable("TestTable2")
+                .addColumn(newColumn("id", DataType.LONG))
+                .toTable(db);
+            newPrimaryKey("id").addToTable(t2);
+
+            Table t3 = newTable("TestTable3")
+                .addColumn(newColumn("id", DataType.LONG))
+                .toTable(db);
+            newPrimaryKey("id").addToTable(t3);
+
+            // TestTable1 -(cascade delete)-> TestTable2
+            newRelationship(t1, t2).addColumns("id", "id")
+                .withReferentialIntegrity().withCascadeDeletes()
+                .toRelationship(db);
+
+            // TestTable2 -(cascade update)-> TestTable3
+            newRelationship(t2, t3).addColumns("id", "id")
+                .withReferentialIntegrity().withCascadeUpdates()
+                .toRelationship(db);
+
+            // closing the loop, TestTable3 -(cascade delete)-> TestTable1, would create an infinite cascade cycle
+            assertThrows(IllegalArgumentException.class,
+                () -> newRelationship(t3, t1).addColumns("id", "id")
+                    .withReferentialIntegrity().withCascadeDeletes()
+                    .toRelationship(db));
+
+            // a non-cascading relationship closing the same loop is fine, since it does not participate in cascading
+            assertDoesNotThrow(
+                () -> newRelationship(t3, t1).addColumns("id", "id")
+                    .withReferentialIntegrity()
+                    .toRelationship(db));
+        }
+    }
+
+    @ParameterizedTest(name = "[{index}] {0}")
+    @FileFormatSource
+    void cascadeRelationshipSelfCycleRejected(FileFormat fileFormat) throws Exception {
+        try (Database db = createDbMem(fileFormat)) {
+            Table t1 = newTable("TestTable1")
+                .addColumn(newColumn("id", DataType.LONG))
+                .addColumn(newColumn("parentId", DataType.LONG))
+                .toTable(db);
+            newPrimaryKey("id").addToTable(t1);
+
+            // a table cascading to itself is a (degenerate) cascade cycle
+            assertThrows(IllegalArgumentException.class,
+                () -> newRelationship(t1, t1).addColumns("id", "parentId")
+                    .withReferentialIntegrity().withCascadeDeletes()
+                    .toRelationship(db));
+
+            // without cascading, a self-referencing relationship is fine
+            assertDoesNotThrow(
+                () -> newRelationship(t1, t1).addColumns("id", "parentId")
+                    .withReferentialIntegrity()
+                    .toRelationship(db));
+        }
+    }
+
+    @ParameterizedTest(name = "[{index}] {0}")
+    @FileFormatSource
     void updateLargeTableDef(FileFormat fileFormat) throws Exception {
         try (Database db = createDbMem(fileFormat)) {
             final int numColumns = 89;
