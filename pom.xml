@@ -550,6 +550,30 @@
         </profile>
 
         <profile>
+            <id>jdk8-tests</id>
+            <!-- opt-in profile: fork the test JVM onto a real Java 8 toolchain, to verify the targetJdk=8
+                 bytecode actually behaves correctly at runtime, without running the whole build (and its
+                 Java-11+-only plugins, e.g. git-commit-id) under JDK 8 itself. Requires a JDK 8 toolchain
+                 registered in ~/.m2/toolchains.xml (see ci.yml). Usage: mvn -Pjdk8-tests clean verify -->
+            <activation>
+                <activeByDefault>false</activeByDefault>
+            </activation>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-surefire-plugin</artifactId>
+                        <configuration>
+                            <jdkToolchain>
+                                <version>8</version>
+                            </jdkToolchain>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+
+        <profile>
             <id>github-deploy-snapshot-package</id>
             <distributionManagement>
                 <snapshotRepository>

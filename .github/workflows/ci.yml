@@ -24,22 +24,27 @@ jobs:
             fail-fast: false
             matrix:
                 os: [ubuntu-latest, windows-latest]
-                java: ['8', '17', '21']
+                java: ['17', '21']
         runs-on: ${{ matrix.os }}
         steps:
         -   uses: actions/checkout@v7
 
-        -   name: Set up JDK ${{ matrix.java }}
+        -   name: Set up JDK ${{ matrix.java }} (build) and JDK 8 (test toolchain)
+            # installing 8 alongside matrix.java registers both in ~/.m2/toolchains.xml; the
+            # last version listed becomes JAVA_HOME/the JDK that runs Maven itself.
             uses: actions/setup-java@v6
             with:
-                java-version: ${{ matrix.java }}
+                java-version: |
+                    8
+                    ${{ matrix.java }}
                 distribution: temurin
                 cache: maven
 
-        -   name: Build with Maven/JDK ${{ matrix.java }} on ${{ matrix.os }}
-            # checkstyle/pmd need a newer JDK to run than our Java 8 compile target,
-            # so static analysis is skipped on JDK 8 and left to the 17/21 runs.
-            run: mvn --batch-mode --file pom.xml clean verify ${{ matrix.java == '8' && '-Dbasepom.check.skip-checkstyle=true -Dbasepom.check.skip-pmd=true' || '' }}
+        -   name: Build with Maven/JDK ${{ matrix.java }} on ${{ matrix.os }}, tests forked onto JDK 8
+            # the jdk8-tests profile forks the test JVM onto the JDK 8 toolchain (see pom.xml) so we
+            # verify the targetJdk=8 bytecode actually runs on Java 8, without running the whole build
+            # (and its Java-11+-only plugins, e.g. git-commit-id) under JDK 8 itself.
+            run: mvn --batch-mode --file pom.xml --activate-profiles jdk8-tests clean verify
 
     deploy:
         needs: build
