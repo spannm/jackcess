@@ -17,6 +17,7 @@
 package io.github.spannm.jackcess.impl.expr;
 
 import io.github.spannm.jackcess.expr.*;
+import io.github.spannm.jackcess.impl.SimpleCache;
 import io.github.spannm.jackcess.impl.expr.ExpressionTokenizer.ExprBuf;
 import io.github.spannm.jackcess.util.StringUtil;
 
@@ -404,6 +405,13 @@ public class FormatUtil {
         return new StandaloneFormatter(fmt, args);
     }
 
+    /**
+     * Key under which the custom format cache is stored in the current {@link EvalContext}'s {@code Bindings}. Namespaced to avoid colliding with bindings set by custom
+     * {@link Function} implementations.
+     */
+    private static final String CUSTOM_FMT_CACHE_KEY  = "io.github.spannm.jackcess.impl.expr.FormatUtil#customFmtCache";
+    private static final int    CUSTOM_FMT_CACHE_SIZE = 50;
+
     private static Fmt createFormat(Args args, String fmtStr) {
         Fmt predefFmt = PREDEF_FMTS.get(fmtStr);
         if (predefFmt != null) {
@@ -414,11 +422,57 @@ public class FormatUtil {
             return DUMMY_FMT;
         }
 
-        // TODO implement caching for custom formats? put into Bindings. use
-        // special "cache" prefix to know which caches to clear when evalconfig
-        // is altered (could also cache other Format* functions)
+        // custom formats bake locale-specific state (date/number symbols) into
+        // the parsed Fmt, so cache entries are keyed on the format string plus
+        // the identity of the temporal/numeric config that was active at parse
+        // time; a context whose config is swapped out (see EvalConfig
+        // setTemporalConfig/setNumericConfig) simply misses the cache instead
+        // of returning a stale, mis-formatted result
+        FmtCacheKey cacheKey = new FmtCacheKey(fmtStr, args.ctx.getTemporalConfig(), args.ctx.getNumericConfig());
 
-        return parseCustomFormat(fmtStr, args);
+        @SuppressWarnings("unchecked")
+        Map<FmtCacheKey, Fmt> cache = (Map<FmtCacheKey, Fmt>) args.ctx.get(CUSTOM_FMT_CACHE_KEY);
+        if (cache == null) {
+            cache = new SimpleCache<>(CUSTOM_FMT_CACHE_SIZE);
+            args.ctx.put(CUSTOM_FMT_CACHE_KEY, cache);
+        }
+
+        Fmt fmt = cache.get(cacheKey);
+        if (fmt == null) {
+            fmt = parseCustomFormat(fmtStr, args);
+            cache.put(cacheKey, fmt);
+        }
+        return fmt;
+    }
+
+    /**
+     * Cache key for parsed custom {@link Fmt} instances. Equality is based on the format string and the identity (not value equality) of the temporal/numeric config in effect
+     * at parse time, since those config instances are swapped out wholesale (not mutated) when changed.
+     */
+    private static final class FmtCacheKey {
+        private final String         fmtStr;
+        private final TemporalConfig temporalConfig;
+        private final NumericConfig  numericConfig;
+
+        private FmtCacheKey(String fmtStr, TemporalConfig temporalConfig, NumericConfig numericConfig) {
+            this.fmtStr = fmtStr;
+            this.temporalConfig = temporalConfig;
+            this.numericConfig = numericConfig;
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (!(o instanceof FmtCacheKey)) {
+                return false;
+            }
+            FmtCacheKey other = (FmtCacheKey) o;
+            return fmtStr.equals(other.fmtStr) && temporalConfig == other.temporalConfig && numericConfig == other.numericConfig;
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(fmtStr, System.identityHashCode(temporalConfig), System.identityHashCode(numericConfig));
+        }
     }
 
     private static Fmt parseCustomFormat(String fmtStr, Args args) {
