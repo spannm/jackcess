@@ -18,11 +18,11 @@ package io.github.spannm.jackcess;
 
 import io.github.spannm.jackcess.Database.FileFormat;
 import io.github.spannm.jackcess.impl.*;
+import io.github.spannm.jackcess.util.ToStringBuilder;
 
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.StringJoiner;
 
 /**
  * Builder style class for constructing a {@link Column}. See {@link TableBuilder} for example usage. Additionally, a
@@ -473,17 +473,10 @@ public class ColumnBuilder {
 
     @Override
     public String toString() {
-        return new StringJoiner(", ", getClass().getSimpleName() + "[", "]")
-            .add("name=" + name)
-            .add("type=" + type)
-            .add("length=" + length)
-            .add("precision=" + precision)
-            .add("scale=" + scale)
-            .add("autoNumber=" + autoNumber)
-            .add("compressedUnicode=" + compressedUnicode)
-            .add("calculated=" + calculated)
-            .add("hyperlink=" + hyperlink)
-            .add("props=" + props)
+        return ToStringBuilder.valueBuilder(this)
+            .append("name", name).append("type", type).append("length", length).append("precision", precision).append("scale", scale)
+            .append("autoNumber", autoNumber).append("compressedUnicode", compressedUnicode).append("calculated", calculated).append("hyperlink", hyperlink)
+            .append("props", props)
             .toString();
     }
 

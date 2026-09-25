@@ -20,6 +20,7 @@ import io.github.spannm.jackcess.expr.*;
 import io.github.spannm.jackcess.impl.expr.ExpressionTokenizer.Token;
 import io.github.spannm.jackcess.impl.expr.ExpressionTokenizer.TokenType;
 import io.github.spannm.jackcess.util.StringUtil;
+import io.github.spannm.jackcess.util.ToStringBuilder;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -1110,27 +1111,11 @@ public class Expressionator {
 
         @Override
         public String toString() {
-
             Map.Entry<Integer, List<Token>> e = getTopPos();
-
-            // TODO actually format expression?
-            StringBuilder sb = new StringBuilder("[token ").append(e.getKey()).append("] (");
-
-            for (Iterator<Token> iter = e.getValue().iterator(); iter.hasNext();) {
-                Token t = iter.next();
-                sb.append('\'').append(t.getValueStr()).append('\'');
-                if (iter.hasNext()) {
-                    sb.append(',');
-                }
-            }
-
-            sb.append(')');
-
-            if (pendingExpr != null) {
-                sb.append(" [pending '").append(pendingExpr.toDebugString(ctx)).append("']");
-            }
-
-            return sb.toString();
+            return ToStringBuilder.valueBuilder(this)
+                .append("pos", e.getKey()).append("tokens", e.getValue())
+                .appendIgnoreNull("pending", pendingExpr != null ? pendingExpr.toDebugString(ctx) : null)
+                .toString();
         }
     }
 

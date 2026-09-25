@@ -24,6 +24,7 @@ import io.github.spannm.jackcess.impl.ByteUtil;
 import io.github.spannm.jackcess.impl.ColumnImpl;
 import io.github.spannm.jackcess.impl.JetFormat;
 import io.github.spannm.jackcess.impl.PageChannel;
+import io.github.spannm.jackcess.util.ToStringBuilder;
 
 import java.io.*;
 import java.nio.ByteBuffer;
@@ -327,16 +328,17 @@ public final class AttachmentColumnInfoImpl extends ComplexColumnInfoImpl<Attach
 
         @Override
         public String toString() {
-            String dataStr = null;
+            Object dataStr;
             try {
                 dataStr = ByteUtil.toHexString(getFileData());
             } catch (IOException _ex) {
-                dataStr = _ex.toString();
+                dataStr = _ex;
             }
 
-            return "Attachment(" + getComplexValueForeignKey() + "," + getId() + ") "
-                + getFileUrl() + ", " + getFileName() + ", " + getFileType()
-                + ", " + getFileTimeStampObject() + ", " + getFileFlags() + ", " + dataStr;
+            return ToStringBuilder.valueBuilder(this)
+                .append("complexValueForeignKey", getComplexValueForeignKey()).append("id", getId()).append("fileUrl", getFileUrl()).append("fileName", getFileName())
+                .append("fileType", getFileType()).append("fileTimeStamp", getFileTimeStampObject()).append("fileFlags", getFileFlags()).append("data", dataStr)
+                .toString();
         }
 
         /**

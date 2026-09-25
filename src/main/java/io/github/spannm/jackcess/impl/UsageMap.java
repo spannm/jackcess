@@ -923,7 +923,7 @@ public class UsageMap {
 
         @Override
         public String toString() {
-            return String.format("%s[curPageNumber=%s, prevPageNumber=%s]", getClass().getSimpleName(), curPageNumber, prevPageNumber);
+            return ToStringBuilder.valueBuilder(this).append("curPageNumber", curPageNumber).append("prevPageNumber", prevPageNumber).toString();
         }
 
         /**

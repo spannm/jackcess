@@ -24,6 +24,7 @@ import io.github.spannm.jackcess.impl.DatabaseImpl;
 import io.github.spannm.jackcess.impl.RowIdImpl;
 import io.github.spannm.jackcess.impl.RowImpl;
 import io.github.spannm.jackcess.query.Query;
+import io.github.spannm.jackcess.util.ToStringBuilder;
 
 import java.util.*;
 import java.util.logging.Level;
@@ -326,7 +327,7 @@ public abstract class QueryImpl implements Query {
 
     @Override
     public String toString() {
-        return String.format("%s[name=%s, rows=%d, objectId=%s, type=%s, objectFlag=%s]", getClass().getSimpleName(), name, rows.size(), objectId, type, objectFlag);
+        return ToStringBuilder.valueBuilder(this).append("name", name).append("rows", rows.size()).append("objectId", objectId).append("type", type).append("objectFlag", objectFlag).toString();
     }
 
     /**
@@ -573,8 +574,10 @@ public abstract class QueryImpl implements Query {
 
         @Override
         public String toString() {
-            return String.format("%s[id=%s, attribute=%s, expression=%s, flag=%s, extra=%s, name1=%s, name2=%s, objectId=%s, order=%s]", getClass().getSimpleName(), id, attribute, expression,
-                flag, extra, name1, name2, objectId, Arrays.toString(order));
+            return ToStringBuilder.valueBuilder(this)
+                .append("id", id).append("attribute", attribute).append("expression", expression).append("flag", flag).append("extra", extra)
+                .append("name1", name1).append("name2", name2).append("objectId", objectId).append("order", order)
+                .toString();
         }
     }
 
