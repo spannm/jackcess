@@ -2198,8 +2198,11 @@ public final class IndexData {
 
                 // since the row number would never be the same if the page number is
                 // the same, nothing past the page number should ever be included in
-                // the prefix.
-                // FIXME, this could happen if page has only one row...
+                // the prefix. this branch is unreachable in practice: the prefix is
+                // derived solely from entryBytes (see IndexPageCache.findCommonPrefix),
+                // never from the rowId bytes, so prefix.length can never exceed
+                // entryBytes.length (this holds even for single-entry pages, where the
+                // prefix is computed from an entry and itself).
                 throw new IllegalStateException("prefix should never be this long");
             }
 
