@@ -1162,7 +1162,7 @@ public final class IndexData {
         for (int i = 0; i < entryMaskLength; i++) {
             byte entryMask = buffer.get(entryMaskPos + i);
             for (int j = 0; j < 8; j++) {
-                if ((entryMask & 1 << j) != 0) {
+                if ((entryMask & 0xFF & 1 << j) != 0) {
                     int length = i * 8 + j - lastStart;
                     buffer.position(entryPos + lastStart);
 

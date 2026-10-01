@@ -309,7 +309,14 @@ public class IndexPageCache {
 
         // note, it's slightly ucky, but we need to load the parent page before we
         // start mucking with our entries because our parent may use our entries.
-        CacheDataPage parentDataPage = !dpMain.isRoot() ? new CacheDataPage(dpMain.getParentPage()) : null;
+        CacheDataPage parentDataPage = null;
+        if (!dpMain.isRoot()) {
+            DataPageMain parentMain = dpMain.getParentPage();
+            if (parentMain == null) {
+                throw new IllegalStateException(withErrorContext("Could not find parent of non-root index page " + dpMain.pageNumber));
+            }
+            parentDataPage = new CacheDataPage(parentMain);
+        }
 
         Entry oldLastEntry = dpExtra.entryView.getLast();
         Entry oldEntry = null;
