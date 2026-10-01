@@ -29,7 +29,7 @@ import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.regex.Pattern;
 
-public class ValueSupport {
+public final class ValueSupport {
     public static final Value NULL_VAL           = new BaseValue() {
                                                      @Override
                                                      public boolean isNull() {
@@ -101,13 +101,6 @@ public class ValueSupport {
         return new BigDecimalValue(normalize(s));
     }
 
-    static Value toDateValueIfPossible(Value.Type dateType, double dd) {
-        if (DefaultDateFunctions.isValidDateDouble(dd)) {
-            return toValue(dateType, ColumnImpl.ldtFromLocalDateDouble(dd));
-        }
-        return toValue(dd);
-    }
-
     public static Value toValue(LocalDate ld) {
         return new DateTimeValue(Value.Type.DATE, LocalDateTime.of(ld, ColumnImpl.BASE_LT));
     }
@@ -120,15 +113,22 @@ public class ValueSupport {
         return new DateTimeValue(getDateTimeType(ldt), ldt);
     }
 
+    public static Value toValue(Value.Type type, LocalDateTime ldt) {
+        return new DateTimeValue(type, ldt);
+    }
+
+    static Value toDateValueIfPossible(Value.Type dateType, double dd) {
+        if (DefaultDateFunctions.isValidDateDouble(dd)) {
+            return toValue(dateType, ColumnImpl.ldtFromLocalDateDouble(dd));
+        }
+        return toValue(dd);
+    }
+
     public static Value.Type getDateTimeType(LocalDateTime ldt) {
         boolean hasDate = !ColumnImpl.BASE_LD.equals(ldt.toLocalDate());
         boolean hasTime = !ColumnImpl.BASE_LT.equals(ldt.toLocalTime());
 
         return hasDate ? hasTime ? Value.Type.DATE_TIME : Value.Type.DATE : Value.Type.TIME;
-    }
-
-    public static Value toValue(Value.Type type, LocalDateTime ldt) {
-        return new DateTimeValue(type, ldt);
     }
 
     public static DateTimeFormatter getDateFormatForType(LocaleContext ctx, Value.Type type) {

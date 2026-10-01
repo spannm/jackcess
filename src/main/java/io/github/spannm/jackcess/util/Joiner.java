@@ -16,17 +16,25 @@
  */
 package io.github.spannm.jackcess.util;
 
-import io.github.spannm.jackcess.*;
+import io.github.spannm.jackcess.CursorBuilder;
+import io.github.spannm.jackcess.Index;
+import io.github.spannm.jackcess.IndexCursor;
+import io.github.spannm.jackcess.Row;
+import io.github.spannm.jackcess.Table;
 import io.github.spannm.jackcess.impl.DatabaseImpl;
 import io.github.spannm.jackcess.impl.IndexImpl;
 
 import java.io.IOException;
-import java.util.*;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Utility for finding rows based on pre-defined, foreign-key table relationships.
  */
-public class Joiner {
+public final class Joiner {
     private final Index                        fromIndex;
     private final List<? extends Index.Column> fromCols;
     private final IndexCursor                  toCursor;

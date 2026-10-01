@@ -19,7 +19,11 @@ package io.github.spannm.jackcess.impl.expr;
 import java.math.BigDecimal;
 import java.math.MathContext;
 import java.math.RoundingMode;
-import java.text.*;
+import java.text.DecimalFormat;
+import java.text.DecimalFormatSymbols;
+import java.text.FieldPosition;
+import java.text.NumberFormat;
+import java.text.ParsePosition;
 
 public class NumberFormatter {
     public static final RoundingMode ROUND_MODE = RoundingMode.HALF_EVEN;
@@ -184,12 +188,12 @@ public class NumberFormatter {
         }
 
         @Override
-        public Number parse(String source, ParsePosition parsePosition) {
+        public StringBuffer format(long number, StringBuffer toAppendTo, FieldPosition pos) {
             throw new UnsupportedOperationException();
         }
 
         @Override
-        public StringBuffer format(long number, StringBuffer toAppendTo, FieldPosition pos) {
+        public Number parse(String source, ParsePosition parsePosition) {
             throw new UnsupportedOperationException();
         }
 

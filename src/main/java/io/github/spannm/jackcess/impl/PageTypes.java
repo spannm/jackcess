@@ -21,19 +21,22 @@ package io.github.spannm.jackcess.impl;
  *
  * @author Tim McCune
  */
-public interface PageTypes {
+public final class PageTypes {
 
     /** invalid page type */
-    byte INVALID    = (byte) 0x00;
+    public static final byte INVALID    = (byte) 0x00;
     /** Data page */
-    byte DATA       = (byte) 0x01;
+    public static final byte DATA       = (byte) 0x01;
     /** Table definition page */
-    byte TABLE_DEF  = (byte) 0x02;
+    public static final byte TABLE_DEF  = (byte) 0x02;
     /** intermediate index page pointing to other index pages */
-    byte INDEX_NODE = (byte) 0x03;
+    public static final byte INDEX_NODE = (byte) 0x03;
     /** leaf index page containing actual entries */
-    byte INDEX_LEAF = (byte) 0x04;
+    public static final byte INDEX_LEAF = (byte) 0x04;
     /** Table usage map page */
-    byte USAGE_MAP  = (byte) 0x05;
+    public static final byte USAGE_MAP  = (byte) 0x05;
+
+    private PageTypes() {
+    }
 
 }

@@ -16,7 +16,15 @@
  */
 package io.github.spannm.jackcess.query;
 
-import static io.github.spannm.jackcess.impl.query.QueryFormat.*;
+import static io.github.spannm.jackcess.impl.query.QueryFormat.APPEND_QUERY_OBJECT_FLAG;
+import static io.github.spannm.jackcess.impl.query.QueryFormat.CROSS_TAB_QUERY_OBJECT_FLAG;
+import static io.github.spannm.jackcess.impl.query.QueryFormat.DATA_DEF_QUERY_OBJECT_FLAG;
+import static io.github.spannm.jackcess.impl.query.QueryFormat.DELETE_QUERY_OBJECT_FLAG;
+import static io.github.spannm.jackcess.impl.query.QueryFormat.MAKE_TABLE_QUERY_OBJECT_FLAG;
+import static io.github.spannm.jackcess.impl.query.QueryFormat.PASSTHROUGH_QUERY_OBJECT_FLAG;
+import static io.github.spannm.jackcess.impl.query.QueryFormat.SELECT_QUERY_OBJECT_FLAG;
+import static io.github.spannm.jackcess.impl.query.QueryFormat.UNION_QUERY_OBJECT_FLAG;
+import static io.github.spannm.jackcess.impl.query.QueryFormat.UPDATE_QUERY_OBJECT_FLAG;
 
 import java.util.List;
 

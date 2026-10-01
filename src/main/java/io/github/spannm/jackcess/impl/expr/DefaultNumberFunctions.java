@@ -141,7 +141,7 @@ public class DefaultNumberFunctions {
     public static final Function SGN   = registerFunc(new Func1NullIsNull("Sgn") {
         @Override
         protected Value eval1(EvalContext ctx, Value param1) {
-            int val = 0;
+            int val;
             if (param1.getType().isIntegral()) {
                 val = param1.getAsLongInt(ctx);
             } else {

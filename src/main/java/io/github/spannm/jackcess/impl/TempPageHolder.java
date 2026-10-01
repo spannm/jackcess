@@ -109,7 +109,7 @@ public final class TempPageHolder {
      * necessarily release any memory.
      */
     public void possiblyInvalidate(int modifiedPageNumber, ByteBuffer modifiedBuffer) {
-        if (modifiedBuffer == buffer.getExistingBuffer()) {
+        if (modifiedBuffer == buffer.getExistingBuffer()) { // NOPMD CompareObjectsWithEquals - intentional identity check, same ByteBuffer instance
             // no worries, our buffer was the one modified (or is null, either way
             // we'll need to reload)
             return;

@@ -16,7 +16,12 @@ limitations under the License.
 
 package io.github.spannm.jackcess.impl;
 
-import io.github.spannm.jackcess.*;
+import io.github.spannm.jackcess.Column;
+import io.github.spannm.jackcess.Cursor;
+import io.github.spannm.jackcess.CursorBuilder;
+import io.github.spannm.jackcess.JackcessRuntimeException;
+import io.github.spannm.jackcess.Row;
+import io.github.spannm.jackcess.RowId;
 import io.github.spannm.jackcess.impl.TableImpl.RowState;
 import io.github.spannm.jackcess.util.ColumnMatcher;
 import io.github.spannm.jackcess.util.ErrorHandler;
@@ -26,7 +31,11 @@ import io.github.spannm.jackcess.util.ToStringBuilder;
 
 import java.io.IOException;
 import java.io.UncheckedIOException;
-import java.util.*;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.NoSuchElementException;
 import java.util.function.Predicate;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -173,6 +182,15 @@ public abstract class CursorImpl implements Cursor {
         beforeFirst();
     }
 
+    /**
+     * Resets this cursor for traversing the given direction.
+     */
+    protected void reset(boolean moveForward) {
+        mcurPos = getDirHandler(moveForward).getBeginningPosition();
+        mprevPos = mcurPos;
+        mrowState.reset();
+    }
+
     @Override
     public void beforeFirst() {
         reset(MOVE_FORWARD);
@@ -205,23 +223,9 @@ public abstract class CursorImpl implements Cursor {
         return mrowState.isDeleted();
     }
 
-    /**
-     * Resets this cursor for traversing the given direction.
-     */
-    protected void reset(boolean moveForward) {
-        mcurPos = getDirHandler(moveForward).getBeginningPosition();
-        mprevPos = mcurPos;
-        mrowState.reset();
-    }
-
     @Override
     public Iterator<Row> iterator() {
         return new RowIterator(null, true, MOVE_FORWARD);
-    }
-
-    @Override
-    public IterableBuilder newIterable() {
-        return new IterableBuilder(this);
     }
 
     public Iterator<Row> iterator(IterableBuilder iterBuilder) {
@@ -241,6 +245,11 @@ public abstract class CursorImpl implements Cursor {
             default:
                 throw new JackcessRuntimeException("Unknown match type " + iterBuilder.getType());
         }
+    }
+
+    @Override
+    public IterableBuilder newIterable() {
+        return new IterableBuilder(this);
     }
 
     @Override
@@ -408,12 +417,22 @@ public abstract class CursorImpl implements Cursor {
     }
 
     @Override
+    public boolean findFirstRow(Map<String, ?> rowPattern) throws IOException {
+        return findAnotherRow(rowPattern, true, MOVE_FORWARD, mcolumnMatcher, prepareSearchInfo(rowPattern));
+    }
+
+    @Override
     public boolean findNextRow(Column columnPattern, Object valuePattern) throws IOException {
         return findNextRow((ColumnImpl) columnPattern, valuePattern);
     }
 
     public boolean findNextRow(ColumnImpl columnPattern, Object valuePattern) throws IOException {
         return findAnotherRow(columnPattern, valuePattern, false, MOVE_FORWARD, mcolumnMatcher, prepareSearchInfo(columnPattern, valuePattern));
+    }
+
+    @Override
+    public boolean findNextRow(Map<String, ?> rowPattern) throws IOException {
+        return findAnotherRow(rowPattern, false, MOVE_FORWARD, mcolumnMatcher, prepareSearchInfo(rowPattern));
     }
 
     protected boolean findAnotherRow(ColumnImpl columnPattern, Object valuePattern, boolean reset, boolean moveForward, ColumnMatcher columnMatcher, Object searchInfo) throws IOException {
@@ -435,16 +454,6 @@ public abstract class CursorImpl implements Cursor {
                 }
             }
         }
-    }
-
-    @Override
-    public boolean findFirstRow(Map<String, ?> rowPattern) throws IOException {
-        return findAnotherRow(rowPattern, true, MOVE_FORWARD, mcolumnMatcher, prepareSearchInfo(rowPattern));
-    }
-
-    @Override
-    public boolean findNextRow(Map<String, ?> rowPattern) throws IOException {
-        return findAnotherRow(rowPattern, false, MOVE_FORWARD, mcolumnMatcher, prepareSearchInfo(rowPattern));
     }
 
     protected boolean findAnotherRow(Map<String, ?> rowPattern, boolean reset, boolean moveForward, ColumnMatcher columnMatcher, Object searchInfo) throws IOException {
@@ -477,13 +486,13 @@ public abstract class CursorImpl implements Cursor {
         return currentRowMatchesImpl(columnPattern, valuePattern, mcolumnMatcher);
     }
 
-    protected boolean currentRowMatchesImpl(ColumnImpl columnPattern, Object valuePattern, ColumnMatcher columnMatcher) throws IOException {
-        return currentRowMatchesPattern(columnPattern.getName(), valuePattern, columnMatcher, getCurrentRowValue(columnPattern));
-    }
-
     @Override
     public boolean currentRowMatches(Map<String, ?> rowPattern) throws IOException {
         return currentRowMatchesImpl(rowPattern, mcolumnMatcher);
+    }
+
+    protected boolean currentRowMatchesImpl(ColumnImpl columnPattern, Object valuePattern, ColumnMatcher columnMatcher) throws IOException {
+        return currentRowMatchesPattern(columnPattern.getName(), valuePattern, columnMatcher, getCurrentRowValue(columnPattern));
     }
 
     protected boolean currentRowMatchesImpl(Map<String, ?> rowPattern, ColumnMatcher columnMatcher) throws IOException {
@@ -690,7 +699,8 @@ public abstract class CursorImpl implements Cursor {
                 if (reset) {
                     reset(moveForward);
                 } else if (isCurrentRowValid()) {
-                    cachedHasNext = validRow = true;
+                    validRow = true;
+                    cachedHasNext = true;
                 }
             } catch (IOException _ex) {
                 throw new UncheckedIOException(_ex);

@@ -19,7 +19,14 @@ package io.github.spannm.jackcess.impl;
 import io.github.spannm.jackcess.DataType;
 import io.github.spannm.jackcess.JackcessException;
 import io.github.spannm.jackcess.JackcessRuntimeException;
-import io.github.spannm.jackcess.expr.*;
+import io.github.spannm.jackcess.expr.EvalContext;
+import io.github.spannm.jackcess.expr.EvalException;
+import io.github.spannm.jackcess.expr.Expression;
+import io.github.spannm.jackcess.expr.Identifier;
+import io.github.spannm.jackcess.expr.LocaleContext;
+import io.github.spannm.jackcess.expr.NumericConfig;
+import io.github.spannm.jackcess.expr.TemporalConfig;
+import io.github.spannm.jackcess.expr.Value;
 import io.github.spannm.jackcess.impl.expr.Expressionator;
 import io.github.spannm.jackcess.impl.expr.ValueSupport;
 
@@ -192,7 +199,7 @@ public abstract class BaseEvalContext implements EvalContext {
 
     protected abstract String withErrorContext(String msg);
 
-    private class RawExpr implements Expression {
+    private final class RawExpr implements Expression {
         private final Expressionator.Type exprType;
         private final String              exprStr;
 

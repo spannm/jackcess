@@ -27,14 +27,18 @@ import io.github.spannm.jackcess.util.SimpleColumnMatcher;
 
 import java.io.IOException;
 import java.io.UncheckedIOException;
-import java.util.*;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
  * Cursor backed by an index with extended traversal options.
  */
-public class IndexCursorImpl extends CursorImpl implements IndexCursor {
+public final class IndexCursorImpl extends CursorImpl implements IndexCursor {
     private static final Logger         LOGGER             = Logger.getLogger(IndexCursorImpl.class.getName());
 
     /** IndexDirHandler for forward traversal */
@@ -69,7 +73,7 @@ public class IndexCursorImpl extends CursorImpl implements IndexCursor {
      * @param _endInclusive whether or not endRow is inclusive or exclusive
      */
     public static IndexCursorImpl createCursor(TableImpl _table, IndexImpl _index, Object[] _startRow, boolean _startInclusive, Object[] _endRow, boolean _endInclusive) throws IOException {
-        if (_table != _index.getTable()) {
+        if (_table != _index.getTable()) { // NOPMD CompareObjectsWithEquals - intentional identity check, must be the exact owning Table instance
             throw new IllegalArgumentException("Given index is not for given table: " + _index + ", " + _table);
         }
         if (!_index.getIndexData().isValid()) {
@@ -210,25 +214,6 @@ public class IndexCursorImpl extends CursorImpl implements IndexCursor {
         return currentRowMatchesImpl(columnPattern, valuePattern, columnMatcher);
     }
 
-    /**
-     * Moves to the first row (as defined by the cursor) where the index entries match the given values. Caller manages
-     * save/restore on failure.
-     *
-     * @param rowValues the column values built from the index column values
-     * @param requireMatch whether or not an exact match is desired
-     * @return {@code true} if a valid row was found with the given values, {@code false} if no row was found
-     */
-    protected boolean findFirstRowByEntryImpl(Object[] rowValues, boolean requireMatch, ColumnMatcher columnMatcher) throws IOException {
-        if (!findPotentialRow(rowValues, requireMatch)) {
-            return false;
-        } else if (!requireMatch) {
-            // nothing more to do, we have moved to the closest row
-            return true;
-        }
-
-        return currentRowMatchesEntryImpl(rowValues, columnMatcher);
-    }
-
     @Override
     protected boolean findAnotherRowImpl(Map<String, ?> rowPattern, boolean moveForward, ColumnMatcher columnMatcher, Object searchInfo) throws IOException {
         Object[] rowValues = (Object[]) searchInfo;
@@ -270,6 +255,25 @@ public class IndexCursorImpl extends CursorImpl implements IndexCursor {
 
         // none of the potential rows matched
         return false;
+    }
+
+    /**
+     * Moves to the first row (as defined by the cursor) where the index entries match the given values. Caller manages
+     * save/restore on failure.
+     *
+     * @param rowValues the column values built from the index column values
+     * @param requireMatch whether or not an exact match is desired
+     * @return {@code true} if a valid row was found with the given values, {@code false} if no row was found
+     */
+    protected boolean findFirstRowByEntryImpl(Object[] rowValues, boolean requireMatch, ColumnMatcher columnMatcher) throws IOException {
+        if (!findPotentialRow(rowValues, requireMatch)) {
+            return false;
+        } else if (!requireMatch) {
+            // nothing more to do, we have moved to the closest row
+            return true;
+        }
+
+        return currentRowMatchesEntryImpl(rowValues, columnMatcher);
     }
 
     private boolean currentRowMatchesEntryImpl(Object[] rowValues, ColumnMatcher columnMatcher) throws IOException {

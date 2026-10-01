@@ -42,6 +42,7 @@
     <module name="TreeWalker">
         <module name="ArrayTypeStyle"/>
         <module name="AvoidNestedBlocks"/>
+        <module name="AvoidStarImport"/>
         <module name="CatchParameterName">
             <property name="format" value="^_(ex[a-zA-Z0-9]*)|([a-z][a-zA-Z0-9]*Exception|ignored)$"/>
         </module>
@@ -51,10 +52,11 @@
         <module name="EmptyForInitializerPad"/>
         <module name="EmptyForIteratorPad"/>
         <module name="EmptyStatement"/>
-        <!--module name="EqualsAvoidNull"/-->
+        <module name="EqualsAvoidNull"/>
         <module name="EqualsHashCode"/>
+        <module name="FallThrough"/>
+        <module name="FinalClass"/>
         <module name="GenericWhitespace"/>
-        <!--module name="FinalClass"/-->
         <module name="HiddenField">
             <property name="ignoreConstructorParameter" value="true"/>
             <property name="ignoreSetter" value="true"/>
@@ -72,9 +74,9 @@
             <property name="staticGroups" value="/^(?!javaf?x?\.).+/,java,javax"/>
             <property name="sortStaticImportsAlphabetically" value="true"/>
         </module>
-        <!--module name="InnerAssignment"/-->
+        <module name="InnerAssignment"/>
         <!--module name="InnerTypeLast"/-->
-        <!--module name="InterfaceIsType"/-->
+        <module name="InterfaceIsType"/>
         <!--module name="JavadocStyle"/--> <!-- removed: not resolvable by every Checkstyle engine version (e.g. Eclipse's bundled eclipse-cs) -->
         <module name="LeftCurly"/>
         <module name="LocalFinalVariableName">
@@ -94,6 +96,7 @@
         <module name="MissingOverride"/>
         <module name="MissingSwitchDefault"/>
         <module name="ModifierOrder"/>
+        <module name="MultipleVariableDeclarations"/>
         <module name="MutableException"/>
         <module name="NeedBraces"/>
         <module name="NoClone"/>
@@ -104,6 +107,7 @@
         <module name="OneTopLevelClass"/>
         <module name="OperatorWrap"/>
         <module name="OuterTypeFilename"/>
+        <module name="OverloadMethodsDeclarationOrder"/>
         <module name="PackageName"/>
         <!--module name="ParameterAssignment"/-->
         <!--module name="ParameterName">

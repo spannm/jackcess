@@ -44,7 +44,7 @@ public class LongValue extends BaseNumericValue {
 
     @Override
     public boolean getAsBoolean(LocaleContext ctx) {
-        return val.longValue() != 0L;
+        return val != 0;
     }
 
     @Override

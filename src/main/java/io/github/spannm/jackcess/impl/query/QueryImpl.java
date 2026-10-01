@@ -16,8 +16,6 @@ limitations under the License.
 
 package io.github.spannm.jackcess.impl.query;
 
-import static io.github.spannm.jackcess.impl.query.QueryFormat.*;
-
 import io.github.spannm.jackcess.DataType;
 import io.github.spannm.jackcess.RowId;
 import io.github.spannm.jackcess.impl.DatabaseImpl;
@@ -26,7 +24,10 @@ import io.github.spannm.jackcess.impl.RowImpl;
 import io.github.spannm.jackcess.query.Query;
 import io.github.spannm.jackcess.util.ToStringBuilder;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -105,63 +106,97 @@ public abstract class QueryImpl implements Query {
         return getRowsByAttribute(getRows(), attribute);
     }
 
+    private static List<Row> getRowsByAttribute(List<Row> rows, Byte attribute) {
+        List<Row> result = new ArrayList<>();
+        for (Row row : rows) {
+            if (attribute.equals(row.attribute)) {
+                result.add(row);
+            }
+        }
+        return result;
+    }
+
     protected Row getRowByAttribute(Byte attribute) {
         return getUniqueRow(getRowsByAttribute(getRows(), attribute));
     }
 
     public Row getTypeRow() {
-        return getRowByAttribute(TYPE_ATTRIBUTE);
+        return getRowByAttribute(QueryFormat.TYPE_ATTRIBUTE);
     }
 
     protected List<Row> getParameterRows() {
-        return getRowsByAttribute(PARAMETER_ATTRIBUTE);
+        return getRowsByAttribute(QueryFormat.PARAMETER_ATTRIBUTE);
     }
 
     protected Row getFlagRow() {
-        return getRowByAttribute(FLAG_ATTRIBUTE);
+        return getRowByAttribute(QueryFormat.FLAG_ATTRIBUTE);
     }
 
     protected Row getRemoteDatabaseRow() {
-        return getRowByAttribute(REMOTEDB_ATTRIBUTE);
+        return getRowByAttribute(QueryFormat.REMOTEDB_ATTRIBUTE);
     }
 
     protected List<Row> getTableRows() {
-        return getRowsByAttribute(TABLE_ATTRIBUTE);
+        return getRowsByAttribute(QueryFormat.TABLE_ATTRIBUTE);
     }
 
     protected List<Row> getColumnRows() {
-        return getRowsByAttribute(COLUMN_ATTRIBUTE);
+        return getRowsByAttribute(QueryFormat.COLUMN_ATTRIBUTE);
     }
 
     protected List<Row> getJoinRows() {
-        return getRowsByAttribute(JOIN_ATTRIBUTE);
+        return getRowsByAttribute(QueryFormat.JOIN_ATTRIBUTE);
     }
 
     protected Row getWhereRow() {
-        return getRowByAttribute(WHERE_ATTRIBUTE);
+        return getRowByAttribute(QueryFormat.WHERE_ATTRIBUTE);
     }
 
     protected List<Row> getGroupByRows() {
-        return getRowsByAttribute(GROUPBY_ATTRIBUTE);
+        return getRowsByAttribute(QueryFormat.GROUPBY_ATTRIBUTE);
     }
 
     protected Row getHavingRow() {
-        return getRowByAttribute(HAVING_ATTRIBUTE);
+        return getRowByAttribute(QueryFormat.HAVING_ATTRIBUTE);
     }
 
     protected List<Row> getOrderByRows() {
-        return getRowsByAttribute(ORDERBY_ATTRIBUTE);
+        return getRowsByAttribute(QueryFormat.ORDERBY_ATTRIBUTE);
     }
 
     @SuppressWarnings("PMD.LinguisticNaming")
     protected abstract void toSQLString(StringBuilder builder);
+
+    /**
+     * Returns the actual SQL string which this query data represents.
+     */
+    @Override
+    public String toSQLString() {
+        StringBuilder builder = new StringBuilder();
+        if (supportsStandardClauses()) {
+            toSQLParameterString(builder);
+        }
+
+        toSQLString(builder);
+
+        if (supportsStandardClauses()) {
+
+            String accessType = getOwnerAccessType();
+            if (!QueryFormat.DEFAULT_TYPE.equals(accessType)) {
+                builder.append(QueryFormat.NEWLINE).append(accessType);
+            }
+
+            builder.append(';');
+        }
+        return builder.toString();
+    }
 
     @SuppressWarnings("PMD.LinguisticNaming")
     protected void toSQLParameterString(StringBuilder builder) {
         // handle any parameters
         List<String> params = getParameters();
         if (!params.isEmpty()) {
-            builder.append("PARAMETERS ").append(params).append(';').append(NEWLINE);
+            builder.append("PARAMETERS ").append(params).append(';').append(QueryFormat.NEWLINE);
         }
     }
 
@@ -176,7 +211,7 @@ public abstract class QueryImpl implements Query {
                 }
 
                 builder.append(row.name1).append(' ').append(typeName);
-                if (TEXT_FLAG.equals(row.flag) && getIntValue(row.extra, 0) > 0) {
+                if (QueryFormat.TEXT_FLAG.equals(row.flag) && getIntValue(row.extra, 0) > 0) {
                     builder.append('(').append(row.extra).append(')');
                 }
             }
@@ -190,7 +225,7 @@ public abstract class QueryImpl implements Query {
             StringBuilder builder = new StringBuilder();
 
             if (table.expression != null) {
-                toQuotedExpr(builder, table.expression).append(IDENTIFIER_SEP_CHAR);
+                toQuotedExpr(builder, table.expression).append(QueryFormat.IDENTIFIER_SEP_CHAR);
             }
             if (table.name1 != null) {
                 toOptionalQuotedExpr(builder, table.name1, true);
@@ -240,7 +275,7 @@ public abstract class QueryImpl implements Query {
                 toTs = new SimpleTable(toTable);
             }
 
-            if (fromTs == toTs) {
+            if (fromTs == toTs) { // NOPMD CompareObjectsWithEquals - intentional identity check: did both sides resolve to the same existing TableSource
 
                 if (fromTs.sameJoin(joinRow.flag, joinRow.expression)) {
                     // easy-peasy, we just added the join expression to existing join,
@@ -281,7 +316,7 @@ public abstract class QueryImpl implements Query {
             @Override
             protected void format(StringBuilder builder, Row row) {
                 builder.append(row.expression);
-                if (DESCENDING_FLAG.equalsIgnoreCase(row.name1)) {
+                if (QueryFormat.DESCENDING_FLAG.equalsIgnoreCase(row.name1)) {
                     builder.append(" DESC");
                 }
             }
@@ -290,39 +325,19 @@ public abstract class QueryImpl implements Query {
 
     @Override
     public String getOwnerAccessType() {
-        return hasFlag(OWNER_ACCESS_SELECT_TYPE) ? "WITH OWNERACCESS OPTION" : DEFAULT_TYPE;
+        return hasFlag(QueryFormat.OWNER_ACCESS_SELECT_TYPE) ? "WITH OWNERACCESS OPTION" : QueryFormat.DEFAULT_TYPE;
     }
 
     protected boolean hasFlag(int flagMask) {
         return hasFlag(getFlagRow(), flagMask);
     }
 
-    protected boolean supportsStandardClauses() {
-        return true;
+    protected static boolean hasFlag(Row row, int flagMask) {
+        return (getShortValue(row.flag, 0) & flagMask) != 0;
     }
 
-    /**
-     * Returns the actual SQL string which this query data represents.
-     */
-    @Override
-    public String toSQLString() {
-        StringBuilder builder = new StringBuilder();
-        if (supportsStandardClauses()) {
-            toSQLParameterString(builder);
-        }
-
-        toSQLString(builder);
-
-        if (supportsStandardClauses()) {
-
-            String accessType = getOwnerAccessType();
-            if (!DEFAULT_TYPE.equals(accessType)) {
-                builder.append(NEWLINE).append(accessType);
-            }
-
-            builder.append(';');
-        }
-        return builder.toString();
+    protected boolean supportsStandardClauses() {
+        return true;
     }
 
     @Override
@@ -342,12 +357,12 @@ public abstract class QueryImpl implements Query {
      */
     public static QueryImpl create(int objectFlag, String name, List<Row> rows, int objectId) {
         // remove other object flags before testing for query type
-        int objTypeFlag = objectFlag & OBJECT_FLAG_MASK;
+        int objTypeFlag = objectFlag & QueryFormat.OBJECT_FLAG_MASK;
 
         if (objTypeFlag == 0) {
             // sometimes the query rows tell a different story
             short rowTypeFlag = getShortValue(getQueryType(rows), objTypeFlag);
-            Type rowType = TYPE_MAP.get(rowTypeFlag);
+            Type rowType = QueryFormat.TYPE_MAP.get(rowTypeFlag);
             if (rowType != null && rowType.getObjectFlag() != objTypeFlag) {
                 // use row type instead of object flag type
                 objTypeFlag = rowType.getObjectFlag();
@@ -356,23 +371,23 @@ public abstract class QueryImpl implements Query {
 
         try {
             switch (objTypeFlag) {
-                case SELECT_QUERY_OBJECT_FLAG:
+                case QueryFormat.SELECT_QUERY_OBJECT_FLAG:
                     return new SelectQueryImpl(name, rows, objectId, objectFlag);
-                case MAKE_TABLE_QUERY_OBJECT_FLAG:
+                case QueryFormat.MAKE_TABLE_QUERY_OBJECT_FLAG:
                     return new MakeTableQueryImpl(name, rows, objectId, objectFlag);
-                case APPEND_QUERY_OBJECT_FLAG:
+                case QueryFormat.APPEND_QUERY_OBJECT_FLAG:
                     return new AppendQueryImpl(name, rows, objectId, objectFlag);
-                case UPDATE_QUERY_OBJECT_FLAG:
+                case QueryFormat.UPDATE_QUERY_OBJECT_FLAG:
                     return new UpdateQueryImpl(name, rows, objectId, objectFlag);
-                case DELETE_QUERY_OBJECT_FLAG:
+                case QueryFormat.DELETE_QUERY_OBJECT_FLAG:
                     return new DeleteQueryImpl(name, rows, objectId, objectFlag);
-                case CROSS_TAB_QUERY_OBJECT_FLAG:
+                case QueryFormat.CROSS_TAB_QUERY_OBJECT_FLAG:
                     return new CrossTabQueryImpl(name, rows, objectId, objectFlag);
-                case DATA_DEF_QUERY_OBJECT_FLAG:
+                case QueryFormat.DATA_DEF_QUERY_OBJECT_FLAG:
                     return new DataDefinitionQueryImpl(name, rows, objectId, objectFlag);
-                case PASSTHROUGH_QUERY_OBJECT_FLAG:
+                case QueryFormat.PASSTHROUGH_QUERY_OBJECT_FLAG:
                     return new PassthroughQueryImpl(name, rows, objectId, objectFlag);
-                case UNION_QUERY_OBJECT_FLAG:
+                case QueryFormat.UNION_QUERY_OBJECT_FLAG:
                     return new UnionQueryImpl(name, rows, objectId, objectFlag);
                 default:
                     // unknown querytype
@@ -387,17 +402,7 @@ public abstract class QueryImpl implements Query {
     }
 
     private static Short getQueryType(List<Row> rows) {
-        return getFirstRowByAttribute(rows, TYPE_ATTRIBUTE).flag;
-    }
-
-    private static List<Row> getRowsByAttribute(List<Row> rows, Byte attribute) {
-        List<Row> result = new ArrayList<>();
-        for (Row row : rows) {
-            if (attribute.equals(row.attribute)) {
-                result.add(row);
-            }
-        }
-        return result;
+        return getFirstRowByAttribute(rows, QueryFormat.TYPE_ATTRIBUTE).flag;
     }
 
     private static Row getFirstRowByAttribute(List<Row> rows, Byte attribute) {
@@ -437,10 +442,6 @@ public abstract class QueryImpl implements Query {
         }.filter(rows);
     }
 
-    protected static boolean hasFlag(Row row, int flagMask) {
-        return (getShortValue(row.flag, 0) & flagMask) != 0;
-    }
-
     protected static short getShortValue(Short s, int def) {
         return s != null ? (short) s : (short) def;
     }
@@ -450,16 +451,16 @@ public abstract class QueryImpl implements Query {
     }
 
     protected static StringBuilder toOptionalQuotedExpr(StringBuilder builder, String fullExpr, boolean isIdentifier) {
-        String[] exprs = isIdentifier ? IDENTIFIER_SEP_PAT.split(fullExpr) : new String[] {fullExpr};
+        String[] exprs = isIdentifier ? QueryFormat.IDENTIFIER_SEP_PAT.split(fullExpr) : new String[] {fullExpr};
         for (int i = 0; i < exprs.length; ++i) {
             String expr = exprs[i];
-            if (QUOTABLE_CHAR_PAT.matcher(expr).find()) {
+            if (QueryFormat.QUOTABLE_CHAR_PAT.matcher(expr).find()) {
                 toQuotedExpr(builder, expr);
             } else {
                 builder.append(expr);
             }
             if (i < exprs.length - 1) {
-                builder.append(IDENTIFIER_SEP_CHAR);
+                builder.append(QueryFormat.IDENTIFIER_SEP_CHAR);
             }
         }
         return builder;
@@ -541,8 +542,15 @@ public abstract class QueryImpl implements Query {
         }
 
         public Row(io.github.spannm.jackcess.Row tableRow) {
-            this(tableRow.getId(), tableRow.getByte(COL_ATTRIBUTE), tableRow.getString(COL_EXPRESSION), tableRow.getShort(COL_FLAG), tableRow.getInt(COL_EXTRA), tableRow.getString(COL_NAME1),
-                tableRow.getString(COL_NAME2), tableRow.getInt(COL_OBJECTID), tableRow.getBytes(COL_ORDER));
+            this(tableRow.getId(),
+                tableRow.getByte(QueryFormat.COL_ATTRIBUTE),
+                tableRow.getString(QueryFormat.COL_EXPRESSION),
+                tableRow.getShort(QueryFormat.COL_FLAG),
+                tableRow.getInt(QueryFormat.COL_EXTRA),
+                tableRow.getString(QueryFormat.COL_NAME1),
+                tableRow.getString(QueryFormat.COL_NAME2),
+                tableRow.getInt(QueryFormat.COL_OBJECTID),
+                tableRow.getBytes(QueryFormat.COL_ORDER));
         }
 
         public Row(RowId id, Byte attribute, String expression, Short flag, Integer extra, String name1, String name2, Integer objectId, byte[] order) {
@@ -560,14 +568,14 @@ public abstract class QueryImpl implements Query {
         public io.github.spannm.jackcess.Row toTableRow() {
             io.github.spannm.jackcess.Row tableRow = new RowImpl((RowIdImpl) id);
 
-            tableRow.put(COL_ATTRIBUTE, attribute);
-            tableRow.put(COL_EXPRESSION, expression);
-            tableRow.put(COL_FLAG, flag);
-            tableRow.put(COL_EXTRA, extra);
-            tableRow.put(COL_NAME1, name1);
-            tableRow.put(COL_NAME2, name2);
-            tableRow.put(COL_OBJECTID, objectId);
-            tableRow.put(COL_ORDER, order);
+            tableRow.put(QueryFormat.COL_ATTRIBUTE, attribute);
+            tableRow.put(QueryFormat.COL_EXPRESSION, expression);
+            tableRow.put(QueryFormat.COL_FLAG, flag);
+            tableRow.put(QueryFormat.COL_EXTRA, extra);
+            tableRow.put(QueryFormat.COL_NAME1, name1);
+            tableRow.put(QueryFormat.COL_NAME2, name2);
+            tableRow.put(QueryFormat.COL_OBJECTID, objectId);
+            tableRow.put(QueryFormat.COL_ORDER, order);
 
             return tableRow;
         }
@@ -718,7 +726,7 @@ public abstract class QueryImpl implements Query {
 
         @Override
         protected void toString(StringBuilder sb, boolean isTopLevel) {
-            String joinType = JOIN_TYPE_MAP.get(jType);
+            String joinType = QueryFormat.JOIN_TYPE_MAP.get(jType);
             if (joinType == null) {
                 throw new IllegalStateException(withErrorContext("Unknown join type " + jType));
             }

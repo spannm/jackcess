@@ -19,7 +19,11 @@ package io.github.spannm.jackcess.impl.complex;
 import io.github.spannm.jackcess.Column;
 import io.github.spannm.jackcess.Row;
 import io.github.spannm.jackcess.Table;
-import io.github.spannm.jackcess.complex.*;
+import io.github.spannm.jackcess.complex.ComplexDataType;
+import io.github.spannm.jackcess.complex.ComplexValue;
+import io.github.spannm.jackcess.complex.ComplexValueForeignKey;
+import io.github.spannm.jackcess.complex.Version;
+import io.github.spannm.jackcess.complex.VersionHistoryColumnInfo;
 import io.github.spannm.jackcess.impl.ColumnImpl;
 import io.github.spannm.jackcess.util.ToStringBuilder;
 
@@ -135,7 +139,7 @@ public final class VersionHistoryColumnInfoImpl extends ComplexColumnInfoImpl<Ve
         return new VersionImpl(INVALID_ID, complexValueFk, value, modifiedDate);
     }
 
-    private static class VersionImpl extends ComplexValueImpl implements Version {
+    private static final class VersionImpl extends ComplexValueImpl implements Version {
         private final String value;
         private final Object modifiedDate;
 

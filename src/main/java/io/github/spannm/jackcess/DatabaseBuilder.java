@@ -28,7 +28,12 @@ import java.nio.channels.FileChannel;
 import java.nio.charset.Charset;
 import java.nio.file.Path;
 import java.text.SimpleDateFormat;
-import java.util.*;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.GregorianCalendar;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.TimeZone;
 
 /**
  * Builder style class for opening/creating a {@link Database}.
@@ -250,30 +255,6 @@ public class DatabaseBuilder {
     }
 
     /**
-     * Creates a new Database using the configured information.
-     */
-    @SuppressWarnings("java:S2095") // suppress sonarcloud warning regarding try-with-resources
-    public Database create() throws IOException {
-        Database db = DatabaseImpl.create(fileFormat, mdbFile, channel, autoSync, charset, timeZone);
-        if (dbProps != null) {
-            PropertyMap props = db.getDatabaseProperties();
-            props.putAll(dbProps.values());
-            props.save();
-        }
-        if (summaryProps != null) {
-            PropertyMap props = db.getSummaryProperties();
-            props.putAll(summaryProps.values());
-            props.save();
-        }
-        if (userProps != null) {
-            PropertyMap props = db.getUserDefinedProperties();
-            props.putAll(userProps.values());
-            props.save();
-        }
-        return db;
-    }
-
-    /**
      * Open an existing Database. If the existing file is not writeable, the file will be opened read-only. Auto-syncing
      * is enabled for the returned Database.
      *
@@ -295,6 +276,30 @@ public class DatabaseBuilder {
      */
     public static Database open(Path mdbFile) throws IOException {
         return new DatabaseBuilder(mdbFile).open();
+    }
+
+    /**
+     * Creates a new Database using the configured information.
+     */
+    @SuppressWarnings("java:S2095") // suppress sonarcloud warning regarding try-with-resources
+    public Database create() throws IOException {
+        Database db = DatabaseImpl.create(fileFormat, mdbFile, channel, autoSync, charset, timeZone);
+        if (dbProps != null) {
+            PropertyMap props = db.getDatabaseProperties();
+            props.putAll(dbProps.values());
+            props.save();
+        }
+        if (summaryProps != null) {
+            PropertyMap props = db.getSummaryProperties();
+            props.putAll(summaryProps.values());
+            props.save();
+        }
+        if (userProps != null) {
+            PropertyMap props = db.getUserDefinedProperties();
+            props.putAll(userProps.values());
+            props.save();
+        }
+        return db;
     }
 
     /**

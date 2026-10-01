@@ -19,7 +19,11 @@ package io.github.spannm.jackcess.impl.complex;
 import io.github.spannm.jackcess.Column;
 import io.github.spannm.jackcess.Row;
 import io.github.spannm.jackcess.Table;
-import io.github.spannm.jackcess.complex.*;
+import io.github.spannm.jackcess.complex.ComplexDataType;
+import io.github.spannm.jackcess.complex.ComplexValue;
+import io.github.spannm.jackcess.complex.ComplexValueForeignKey;
+import io.github.spannm.jackcess.complex.MultiValueColumnInfo;
+import io.github.spannm.jackcess.complex.SingleValue;
 import io.github.spannm.jackcess.util.ToStringBuilder;
 
 import java.io.IOException;
@@ -68,7 +72,7 @@ public final class MultiValueColumnInfoImpl extends ComplexColumnInfoImpl<Single
         return new SingleValueImpl(INVALID_ID, complexValueFk, value);
     }
 
-    private static class SingleValueImpl extends ComplexValueImpl implements SingleValue {
+    private static final class SingleValueImpl extends ComplexValueImpl implements SingleValue {
         private Object value;
 
         private SingleValueImpl(Id id, ComplexValueForeignKey complexValueFk, Object value) {

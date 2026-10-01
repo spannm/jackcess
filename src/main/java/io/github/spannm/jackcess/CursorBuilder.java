@@ -16,7 +16,11 @@ limitations under the License.
 
 package io.github.spannm.jackcess;
 
-import io.github.spannm.jackcess.impl.*;
+import io.github.spannm.jackcess.impl.CursorImpl;
+import io.github.spannm.jackcess.impl.IndexCursorImpl;
+import io.github.spannm.jackcess.impl.IndexData;
+import io.github.spannm.jackcess.impl.IndexImpl;
+import io.github.spannm.jackcess.impl.TableImpl;
 import io.github.spannm.jackcess.util.CaseInsensitiveColumnMatcher;
 import io.github.spannm.jackcess.util.ColumnMatcher;
 
@@ -249,7 +253,7 @@ public class CursorBuilder {
      * Returns a new cursor for the table, constructed to the given specifications.
      */
     public Cursor toCursor() throws IOException {
-        CursorImpl cursor = null;
+        CursorImpl cursor;
         if (index == null) {
             cursor = CursorImpl.createCursor(table);
         } else {
@@ -297,15 +301,6 @@ public class CursorBuilder {
     }
 
     /**
-     * Creates an indexed cursor for the primary key cursor of the given table.
-     *
-     * @param table the table over which this cursor will traverse
-     */
-    public static IndexCursor createPrimaryKeyCursor(Table table) throws IOException {
-        return createCursor(table.getPrimaryKeyIndex());
-    }
-
-    /**
      * Creates an indexed cursor for the given table, narrowed to the given range.
      * <p>
      * Note, index based table traversal may not include all rows, as certain types of indexes do not include all
@@ -349,6 +344,15 @@ public class CursorBuilder {
     }
 
     /**
+     * Creates an indexed cursor for the primary key cursor of the given table.
+     *
+     * @param table the table over which this cursor will traverse
+     */
+    public static IndexCursor createPrimaryKeyCursor(Table table) throws IOException {
+        return createCursor(table.getPrimaryKeyIndex());
+    }
+
+    /**
      * Convenience method for finding a specific row in a table which matches a given row "pattern". See
      * {@link Cursor#findFirstRow(Map)} for details on the rowPattern.
      * <p>
@@ -361,6 +365,25 @@ public class CursorBuilder {
      */
     public static Row findRow(Table table, Map<String, ?> rowPattern) throws IOException {
         Cursor cursor = createCursor(table);
+        if (cursor.findFirstRow(rowPattern)) {
+            return cursor.getCurrentRow();
+        }
+        return null;
+    }
+
+    /**
+     * Convenience method for finding a specific row in an indexed table which matches a given row "pattern". See
+     * {@link Cursor#findFirstRow(Map)} for details on the rowPattern.
+     * <p>
+     * Warning, this method <i>always</i> starts searching from the beginning of the Table (you cannot use it to find
+     * successive matches).
+     *
+     * @param index index to assist the search
+     * @param rowPattern pattern to be used to find the row
+     * @return the matching row or {@code null} if a match could not be found.
+     */
+    public static Row findRow(Index index, Map<String, ?> rowPattern) throws IOException {
+        Cursor cursor = createCursor(index);
         if (cursor.findFirstRow(rowPattern)) {
             return cursor.getCurrentRow();
         }
@@ -410,25 +433,6 @@ public class CursorBuilder {
         Cursor cursor = createCursor(table);
         if (cursor.findFirstRow(columnPattern, valuePattern)) {
             return cursor.getCurrentRowValue(column);
-        }
-        return null;
-    }
-
-    /**
-     * Convenience method for finding a specific row in an indexed table which matches a given row "pattern". See
-     * {@link Cursor#findFirstRow(Map)} for details on the rowPattern.
-     * <p>
-     * Warning, this method <i>always</i> starts searching from the beginning of the Table (you cannot use it to find
-     * successive matches).
-     *
-     * @param index index to assist the search
-     * @param rowPattern pattern to be used to find the row
-     * @return the matching row or {@code null} if a match could not be found.
-     */
-    public static Row findRow(Index index, Map<String, ?> rowPattern) throws IOException {
-        Cursor cursor = createCursor(index);
-        if (cursor.findFirstRow(rowPattern)) {
-            return cursor.getCurrentRow();
         }
         return null;
     }

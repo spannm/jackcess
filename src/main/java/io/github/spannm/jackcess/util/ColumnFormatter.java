@@ -106,9 +106,6 @@ public class ColumnFormatter {
      * Database has been modified), this method may be called to reload the format for the underlying Column.
      */
     public final void reload() throws IOException {
-        fmt = null;
-        fmtStr = null;
-
         fmtStr = (String) col.getProperties().getValue(PropertyMap.FORMAT_PROP);
         fmt = FormatUtil.createStandaloneFormatter(ctx, fmtStr, 1, 1);
     }
@@ -116,7 +113,7 @@ public class ColumnFormatter {
     /**
      * Utility class to provide an EvalContext for the expression evaluation engine format support.
      */
-    private class FormatEvalContext extends ColEvalContext {
+    private final class FormatEvalContext extends ColEvalContext {
         private FormatEvalContext(ColumnImpl col) {
             super(col);
         }

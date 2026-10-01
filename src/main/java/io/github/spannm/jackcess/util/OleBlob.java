@@ -18,7 +18,13 @@ package io.github.spannm.jackcess.util;
 
 import io.github.spannm.jackcess.impl.OleUtil;
 
-import java.io.*;
+import java.io.Closeable;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.sql.Blob;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;

@@ -242,19 +242,6 @@ public interface Cursor extends Iterable<Row> {
     boolean findFirstRow(Column columnPattern, Object valuePattern) throws IOException;
 
     /**
-     * Moves to the next row (as defined by the cursor) where the given column has the given value. This may be more
-     * efficient on some cursors than others. If a match is not found (or an exception is thrown), the cursor is
-     * restored to its previous state.
-     *
-     * @param columnPattern column from the table for this cursor which is being matched by the valuePattern
-     * @param valuePattern value which is equal to the corresponding value in the matched row. If this object is an
-     *            instance of {@link java.util.function.Predicate}, it will be applied to the potential row value
-     *            instead (overriding any configured ColumnMatcher)
-     * @return {@code true} if a valid row was found with the given value, {@code false} if no row was found
-     */
-    boolean findNextRow(Column columnPattern, Object valuePattern) throws IOException;
-
-    /**
      * Moves to the first row (as defined by the cursor) where the given columns have the given values. This may be more
      * efficient on some cursors than others. If a match is not found (or an exception is thrown), the cursor is
      * restored to its previous state.
@@ -268,6 +255,19 @@ public interface Cursor extends Iterable<Row> {
      * @return {@code true} if a valid row was found with the given values, {@code false} if no row was found
      */
     boolean findFirstRow(Map<String, ?> rowPattern) throws IOException;
+
+    /**
+     * Moves to the next row (as defined by the cursor) where the given column has the given value. This may be more
+     * efficient on some cursors than others. If a match is not found (or an exception is thrown), the cursor is
+     * restored to its previous state.
+     *
+     * @param columnPattern column from the table for this cursor which is being matched by the valuePattern
+     * @param valuePattern value which is equal to the corresponding value in the matched row. If this object is an
+     *            instance of {@link java.util.function.Predicate}, it will be applied to the potential row value
+     *            instead (overriding any configured ColumnMatcher)
+     * @return {@code true} if a valid row was found with the given value, {@code false} if no row was found
+     */
+    boolean findNextRow(Column columnPattern, Object valuePattern) throws IOException;
 
     /**
      * Moves to the next row (as defined by the cursor) where the given columns have the given values. This may be more

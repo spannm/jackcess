@@ -16,14 +16,42 @@ limitations under the License.
 
 package io.github.spannm.jackcess.impl;
 
-import io.github.spannm.jackcess.*;
+import io.github.spannm.jackcess.ColumnBuilder;
+import io.github.spannm.jackcess.Cursor;
+import io.github.spannm.jackcess.CursorBuilder;
+import io.github.spannm.jackcess.DataType;
+import io.github.spannm.jackcess.Database;
+import io.github.spannm.jackcess.DatabaseBuilder;
+import io.github.spannm.jackcess.DateTimeType;
+import io.github.spannm.jackcess.Index;
+import io.github.spannm.jackcess.IndexBuilder;
+import io.github.spannm.jackcess.IndexCursor;
+import io.github.spannm.jackcess.PropertyMap;
+import io.github.spannm.jackcess.Relationship;
+import io.github.spannm.jackcess.Row;
+import io.github.spannm.jackcess.Table;
+import io.github.spannm.jackcess.TableBuilder;
+import io.github.spannm.jackcess.TableDefinition;
+import io.github.spannm.jackcess.TableMetaData;
 import io.github.spannm.jackcess.expr.EvalConfig;
 import io.github.spannm.jackcess.impl.IndexData.ColumnDescriptor;
 import io.github.spannm.jackcess.impl.query.QueryImpl;
 import io.github.spannm.jackcess.query.Query;
-import io.github.spannm.jackcess.util.*;
+import io.github.spannm.jackcess.util.CaseInsensitiveColumnMatcher;
+import io.github.spannm.jackcess.util.ColumnValidatorFactory;
+import io.github.spannm.jackcess.util.ErrorHandler;
+import io.github.spannm.jackcess.util.LinkResolver;
+import io.github.spannm.jackcess.util.ReadOnlyFileChannel;
+import io.github.spannm.jackcess.util.SimpleColumnValidatorFactory;
+import io.github.spannm.jackcess.util.StringUtil;
+import io.github.spannm.jackcess.util.TableIterableBuilder;
+import io.github.spannm.jackcess.util.ToStringBuilder;
 
-import java.io.*;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.UncheckedIOException;
 import java.lang.ref.ReferenceQueue;
 import java.lang.ref.WeakReference;
 import java.nio.ByteBuffer;
@@ -38,7 +66,23 @@ import java.nio.file.StandardOpenOption;
 import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Date;
+import java.util.EnumMap;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.NoSuchElementException;
+import java.util.Optional;
+import java.util.Set;
+import java.util.TimeZone;
+import java.util.TreeSet;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Pattern;
@@ -694,6 +738,13 @@ public class DatabaseImpl implements Database, DateTimeContext {
         return mname;
     }
 
+    private static String getName(Path file) {
+        if (file == null) {
+            return "<UNKNOWN.DB>";
+        }
+        return file.getFileName().toString();
+    }
+
     public boolean isReadOnly() {
         return mreadOnly;
     }
@@ -762,7 +813,7 @@ public class DatabaseImpl implements Database, DateTimeContext {
     @SuppressWarnings("PMD.SimplifyBooleanReturns")
     public boolean isLinkedTable(Table table) throws IOException {
 
-        if (table == null || this == table.getDatabase()) {
+        if (table == null || this == table.getDatabase()) { // NOPMD CompareObjectsWithEquals - intentional identity check: is this the exact Database instance that owns the table
             // if the table is null or this db owns the table, not linked
             return false;
         }
@@ -779,7 +830,8 @@ public class DatabaseImpl implements Database, DateTimeContext {
     }
 
     private boolean matchesLinkedTable(Table table, String linkedTableName, String linkedDbName) {
-        return table.getName().equalsIgnoreCase(linkedTableName) && mlinkedDbs != null && mlinkedDbs.get(linkedDbName) == table.getDatabase();
+        return table.getName().equalsIgnoreCase(linkedTableName) && mlinkedDbs != null
+            && mlinkedDbs.get(linkedDbName) == table.getDatabase(); // NOPMD CompareObjectsWithEquals - intentional identity check vs cached instance
     }
 
     @Override
@@ -1060,6 +1112,17 @@ public class DatabaseImpl implements Database, DateTimeContext {
         return getPropsHandler().read(propsBytes, objectId, rowId, null);
     }
 
+    private PropertyMaps readProperties(int objectId, Row objectRow, PropertyMaps.Owner owner) throws IOException {
+        byte[] propsBytes = null;
+        RowIdImpl rowId = null;
+        if (objectRow != null) {
+            propsBytes = objectRow.getBytes(CAT_COL_PROPS);
+            objectId = objectRow.getInt(CAT_COL_ID);
+            rowId = (RowIdImpl) objectRow.getId();
+        }
+        return getPropsHandler().read(propsBytes, objectId, rowId, owner);
+    }
+
     /**
      * Reads and initialises the system catalog ({@code MSysObjects}).
      * <p>
@@ -1176,15 +1239,15 @@ public class DatabaseImpl implements Database, DateTimeContext {
         return mtableNames;
     }
 
-    @Override
-    public Set<String> getSystemTableNames() throws IOException {
-        return getTableNames(false, true, false);
-    }
-
     private Set<String> getTableNames(boolean normalTables, boolean systemTables, boolean linkedTables) throws IOException {
         Set<String> tableNames = new TreeSet<>(String.CASE_INSENSITIVE_ORDER);
         mtableFinder.fillTableNames(tableNames, normalTables, systemTables, linkedTables);
         return tableNames;
+    }
+
+    @Override
+    public Set<String> getSystemTableNames() throws IOException {
+        return getTableNames(false, true, false);
     }
 
     @Override
@@ -1225,11 +1288,6 @@ public class DatabaseImpl implements Database, DateTimeContext {
         return getTable(name, false);
     }
 
-    @Override
-    public TableMetaData getTableMetaData(String name) throws IOException {
-        return getTableInfo(name, true);
-    }
-
     /**
      * @param tableDefPageNumber the page number of a table definition
      * @return The table, or null if it doesn't exist
@@ -1246,16 +1304,6 @@ public class DatabaseImpl implements Database, DateTimeContext {
     protected TableImpl getTable(String name, boolean includeSystemTables) throws IOException {
         TableInfo tableInfo = getTableInfo(name, includeSystemTables);
         return tableInfo != null ? getTable(tableInfo, includeSystemTables) : null;
-    }
-
-    private TableInfo getTableInfo(String name, boolean includeSystemTables) throws IOException {
-        TableInfo tableInfo = lookupTable(name);
-
-        if (tableInfo == null || tableInfo.pageNumber == null || !includeSystemTables && tableInfo.isSystem()) {
-            return null;
-        }
-
-        return tableInfo;
     }
 
     private TableImpl getTable(TableInfo tableInfo, boolean includeSystemTables) throws IOException {
@@ -1277,6 +1325,21 @@ public class DatabaseImpl implements Database, DateTimeContext {
         }
 
         return loadTable(tableInfo.tableName, tableInfo.pageNumber, tableInfo.flags, tableInfo.tableType);
+    }
+
+    @Override
+    public TableMetaData getTableMetaData(String name) throws IOException {
+        return getTableInfo(name, true);
+    }
+
+    private TableInfo getTableInfo(String name, boolean includeSystemTables) throws IOException {
+        TableInfo tableInfo = lookupTable(name);
+
+        if (tableInfo == null || tableInfo.pageNumber == null || !includeSystemTables && tableInfo.isSystem()) {
+            return null;
+        }
+
+        return tableInfo;
     }
 
     /**
@@ -1651,17 +1714,6 @@ public class DatabaseImpl implements Database, DateTimeContext {
         return readProperties(-1, mtableFinder.getObjectRow(getDbParentId(), dbName, SYSTEM_CATALOG_PROPS_COLUMNS), null);
     }
 
-    private PropertyMaps readProperties(int objectId, Row objectRow, PropertyMaps.Owner owner) throws IOException {
-        byte[] propsBytes = null;
-        RowIdImpl rowId = null;
-        if (objectRow != null) {
-            propsBytes = objectRow.getBytes(CAT_COL_PROPS);
-            objectId = objectRow.getInt(CAT_COL_ID);
-            rowId = (RowIdImpl) objectRow.getId();
-        }
-        return getPropsHandler().read(propsBytes, objectId, rowId, owner);
-    }
-
     @Override
     public String getDatabasePassword() throws IOException {
         ByteBuffer buffer = takeSharedBuffer();
@@ -1780,8 +1832,7 @@ public class DatabaseImpl implements Database, DateTimeContext {
         Object[] catalogRow = new Object[msystemCatalog.getColumnCount()];
         int idx = 0;
         Date creationTime = new Date();
-        for (Iterator<ColumnImpl> iter = msystemCatalog.getColumns().iterator(); iter.hasNext(); idx++) {
-            ColumnImpl col = iter.next();
+        for (ColumnImpl col : msystemCatalog.getColumns()) {
             if (CAT_COL_ID.equals(col.getName())) {
                 catalogRow[idx] = objectId;
             } else if (CAT_COL_NAME.equals(col.getName())) {
@@ -1801,6 +1852,7 @@ public class DatabaseImpl implements Database, DateTimeContext {
             } else if (CAT_COL_FOREIGN_NAME.equals(col.getName())) {
                 catalogRow[idx] = linkedTableName;
             }
+            idx++;
         }
         msystemCatalog.addRow(catalogRow);
     }
@@ -1918,7 +1970,7 @@ public class DatabaseImpl implements Database, DateTimeContext {
     @Override
     public void flush() throws IOException {
         if (mlinkedDbs != null) {
-            for (Database linkedDb : mlinkedDbs.values()) {
+            for (Database linkedDb : mlinkedDbs.values()) { // NOPMD CloseResource - linked db lifecycle is owned by this DatabaseImpl, closed in close()
                 linkedDb.flush();
             }
         }
@@ -1928,7 +1980,7 @@ public class DatabaseImpl implements Database, DateTimeContext {
     @Override
     public void close() throws IOException {
         if (mlinkedDbs != null) {
-            for (Database linkedDb : mlinkedDbs.values()) {
+            for (Database linkedDb : mlinkedDbs.values()) { // NOPMD CloseResource - explicitly closed via linkedDb.close() below
                 linkedDb.close();
             }
         }
@@ -2207,13 +2259,6 @@ public class DatabaseImpl implements Database, DateTimeContext {
         FILE_FORMAT_DETAILS.put(fileFormat, new FileFormatDetails(emptyFile, format));
     }
 
-    private static String getName(Path file) {
-        if (file == null) {
-            return "<UNKNOWN.DB>";
-        }
-        return file.getFileName().toString();
-    }
-
     private String withErrorContext(String msg) {
         return withErrorContext(msg, getName());
     }
@@ -2318,7 +2363,7 @@ public class DatabaseImpl implements Database, DateTimeContext {
     /**
      * Utility class for storing linked table info
      */
-    private static class LinkedTableInfo extends TableInfo {
+    private static final class LinkedTableInfo extends TableInfo {
         private final String linkedDbName;
         private final String linkedTableName;
 
@@ -2352,7 +2397,7 @@ public class DatabaseImpl implements Database, DateTimeContext {
     /**
      * Utility class for storing linked ODBC table info
      */
-    private static class LinkedODBCTableInfo extends TableInfo {
+    private static final class LinkedODBCTableInfo extends TableInfo {
         private final String linkedTableName;
         private final String connectionName;
 
@@ -2396,7 +2441,7 @@ public class DatabaseImpl implements Database, DateTimeContext {
     /**
      * Table iterator for this database, unmodifiable.
      */
-    private class TableIterator implements Iterator<Table> {
+    private final class TableIterator implements Iterator<Table> {
         private final Iterator<String> tableNameIter;
 
         private TableIterator(Set<String> tableNames) {
@@ -2746,7 +2791,7 @@ public class DatabaseImpl implements Database, DateTimeContext {
         }
 
         private void purgeOldRefs() {
-            WeakTableReference oldRef = null;
+            WeakTableReference oldRef;
             while ((oldRef = (WeakTableReference) queue.poll()) != null) {
                 tables.remove(oldRef.getPageNumber());
             }

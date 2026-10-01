@@ -33,9 +33,17 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.TemporalAccessor;
-import java.util.*;
+import java.util.AbstractMap;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.EnumMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
-class ExpressionTokenizer {
+final class ExpressionTokenizer {
     private static final int  EOF                    = -1;
     static final char         QUOTED_STR_CHAR        = '"';
     private static final char SINGLE_QUOTED_STR_CHAR = '\'';
@@ -199,7 +207,7 @@ class ExpressionTokenizer {
     }
 
     private static void consumeWhitespace(ExprBuf buf) {
-        int c = EOF;
+        int c;
         while ((c = buf.peekNext()) != EOF && hasFlag(getCharFlag((char) c), IS_SPACE_FLAG)) {
             buf.next();
         }
@@ -340,7 +348,7 @@ class ExpressionTokenizer {
 
         try {
 
-            int c = EOF;
+            int c;
             while ((c = buf.peekNext()) != EOF) {
                 if (isDigit(c)) {
                     hasDigit = true;
@@ -384,7 +392,7 @@ class ExpressionTokenizer {
                         // (this will handle the case of int overflow)
                         num = Integer.valueOf(numStr);
                         numType = Value.Type.LONG;
-                    } catch (NumberFormatException _ex) {
+                    } catch (NumberFormatException ignored) {
                         // fallback to decimal
                     }
                 }

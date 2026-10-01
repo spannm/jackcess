@@ -19,10 +19,22 @@ package io.github.spannm.jackcess.impl;
 import io.github.spannm.jackcess.DataType;
 import io.github.spannm.jackcess.JackcessRuntimeException;
 import io.github.spannm.jackcess.util.OleBlob;
-import io.github.spannm.jackcess.util.OleBlob.*; // NOPMD
+import io.github.spannm.jackcess.util.OleBlob.Builder;
+import io.github.spannm.jackcess.util.OleBlob.Content;
+import io.github.spannm.jackcess.util.OleBlob.ContentType;
+import io.github.spannm.jackcess.util.OleBlob.EmbeddedContent;
+import io.github.spannm.jackcess.util.OleBlob.LinkContent;
+import io.github.spannm.jackcess.util.OleBlob.OtherContent;
+import io.github.spannm.jackcess.util.OleBlob.PackageContent;
+import io.github.spannm.jackcess.util.OleBlob.SimplePackageContent;
 import io.github.spannm.jackcess.util.ToStringBuilder;
 
-import java.io.*;
+import java.io.ByteArrayInputStream;
+import java.io.Closeable;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
@@ -38,7 +50,7 @@ import java.util.regex.Pattern;
  * Utility code for working with OLE data.
  */
 @SuppressWarnings("PMD.FieldDeclarationsShouldBeAtStartOfClass")
-public class OleUtil {
+public final class OleUtil {
 
     /**
      * Interface used to allow optional inclusion of the poi library for working with compound ole data.
@@ -78,7 +90,7 @@ public class OleUtil {
         try {
             compoundFactory = (CompoundPackageFactory) Class.forName("io.github.spannm.jackcess.impl.CompoundOleUtil")
                 .getDeclaredConstructor().newInstance();
-        } catch (Throwable _ex) {
+        } catch (Throwable ignored) {
             // must not have poi, will load compound ole data as "other"
         }
         COMPOUND_FACTORY = compoundFactory;
@@ -107,7 +119,7 @@ public class OleUtil {
 
             long contentLen = oleBuilder.getContentLength();
             byte[] contentBytes = oleBuilder.getBytes();
-            InputStream contentStream = oleBuilder.getStream();
+            InputStream contentStream = oleBuilder.getStream(); // NOPMD CloseResource - caller-provided stream from the builder, not owned/opened here
             byte[] packageStreamHeader = NO_DATA;
             byte[] packageStreamFooter = NO_DATA;
 
@@ -150,7 +162,7 @@ public class OleUtil {
                     bb.put(contentBytes);
                 } else {
                     byte[] buf = new byte[8192];
-                    int numBytes = 0;
+                    int numBytes;
                     while ((numBytes = contentStream.read(buf)) >= 0) {
                         bb.put(buf, 0, numBytes);
                     }
@@ -394,6 +406,15 @@ public class OleUtil {
         return readStr(bb, off, len, OLE_CHARSET);
     }
 
+    private static String readStr(ByteBuffer bb, int off, int len, Charset charset) {
+        String str = new String(bb.array(), off, len, charset);
+        bb.position(off + len);
+        if (str.charAt(str.length() - 1) == '\0') {
+            str = str.substring(0, str.length() - 1);
+        }
+        return str;
+    }
+
     private static String readZeroTermStr(ByteBuffer bb) {
         int off = bb.position();
         while (bb.hasRemaining()) {
@@ -404,15 +425,6 @@ public class OleUtil {
         }
         int len = bb.position() - off;
         return readStr(bb, off, len);
-    }
-
-    private static String readStr(ByteBuffer bb, int off, int len, Charset charset) {
-        String str = new String(bb.array(), off, len, charset);
-        bb.position(off + len);
-        if (str.charAt(str.length() - 1) == '\0') {
-            str = str.substring(0, str.length() - 1);
-        }
-        return str;
     }
 
     private static byte[] getZeroTermStrBytes(String str) {

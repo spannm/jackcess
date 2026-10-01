@@ -16,14 +16,22 @@ limitations under the License.
 
 package io.github.spannm.jackcess.util;
 
-import io.github.spannm.jackcess.*;
+import io.github.spannm.jackcess.Column;
+import io.github.spannm.jackcess.Cursor;
+import io.github.spannm.jackcess.CursorBuilder;
+import io.github.spannm.jackcess.Database;
+import io.github.spannm.jackcess.Row;
 import io.github.spannm.jackcess.impl.ByteUtil;
 
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
 import java.util.regex.Pattern;
 
 /**
@@ -33,7 +41,7 @@ import java.util.regex.Pattern;
  *
  * @author Frank Gerbig
  */
-public class ExportUtil {
+public final class ExportUtil {
 
     public static final String DEFAULT_DELIMITER  = ",";
     public static final char   DEFAULT_QUOTE_CHAR = '"';
@@ -275,7 +283,7 @@ public class ExportUtil {
                 Object obj = rowData[i];
                 if (obj != null) {
 
-                    String value = null;
+                    String value;
                     if (obj instanceof byte[]) {
 
                         value = ByteUtil.toHexString((byte[]) obj);

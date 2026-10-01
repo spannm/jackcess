@@ -21,7 +21,11 @@ import io.github.spannm.jackcess.PropertyMap;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
-import java.util.*;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 /**
  * Map of properties for a database object.
@@ -128,17 +132,6 @@ public class PropertyMapImpl implements PropertyMap {
         return put(name, type, value, false);
     }
 
-    @Override
-    public void putAll(Iterable<? extends Property> newProps) {
-        if (newProps == null) {
-            return;
-        }
-
-        for (Property prop : newProps) {
-            put(prop);
-        }
-    }
-
     public PropertyImpl put(Property prop) {
         // keep the whole flag byte, not just the ddl bit, when the source property was read from a file
         byte flags = prop instanceof PropertyImpl ? ((PropertyImpl) prop).getFlags() : toFlags(prop.isDdl());
@@ -166,6 +159,17 @@ public class PropertyMapImpl implements PropertyMap {
         PropertyImpl prop = (PropertyImpl) createProperty(name, type, value, flags);
         props.put(DatabaseImpl.toLookupName(name), prop);
         return prop;
+    }
+
+    @Override
+    public void putAll(Iterable<? extends Property> newProps) {
+        if (newProps == null) {
+            return;
+        }
+
+        for (Property prop : newProps) {
+            put(prop);
+        }
     }
 
     @Override

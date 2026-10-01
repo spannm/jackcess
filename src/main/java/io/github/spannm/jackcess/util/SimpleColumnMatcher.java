@@ -47,12 +47,12 @@ public class SimpleColumnMatcher implements ColumnMatcher {
             // values and try again
             DataType dataType = table.getColumn(columnName).getType();
             try {
-                DatabaseImpl db = (DatabaseImpl) table.getDatabase();
+                DatabaseImpl db = (DatabaseImpl) table.getDatabase(); // NOPMD CloseResource - borrowed reference, lifecycle owned by the caller/Database itself
                 Object internalV1 = ColumnImpl.toInternalValue(dataType, value1, db);
                 Object internalV2 = ColumnImpl.toInternalValue(dataType, value2, db);
 
                 return equals(internalV1, internalV2);
-            } catch (IOException _ex) {
+            } catch (IOException ignored) {
                 // ignored, just go with the original result
             }
         }

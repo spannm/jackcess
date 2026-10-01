@@ -503,7 +503,7 @@ public class GeneralLegacyIndexCodes {
             int end = asUnsignedChar(lastChar);
             for (int i = start; i <= end; ++i) {
                 char c = (char) i;
-                CharHandler ch = null;
+                CharHandler ch;
                 if (Character.isHighSurrogate(c) || Character.isLowSurrogate(c)) {
                     // surrogate chars are not included in the codes files
                     ch = surrogates.get(c);
@@ -638,9 +638,9 @@ public class GeneralLegacyIndexCodes {
         int prevLength = bout.getLength();
 
         // now, convert each character to a "code" of one or more bytes
-        ExtraCodesStream extraCodes = null;
-        ByteStream unprintableCodes = null;
-        ByteStream crazyCodes = null;
+        ExtraCodesStream extraCodes = null; // NOPMD CloseResource - in-memory ByteStream subclass, close() is a no-op (no real resource)
+        ByteStream unprintableCodes = null; // NOPMD CloseResource - in-memory ByteStream subclass, close() is a no-op (no real resource)
+        ByteStream crazyCodes = null; // NOPMD CloseResource - in-memory ByteStream subclass, close() is a no-op (no real resource)
         int charOffset = 0;
         for (int i = 0; i < str.length(); ++i) {
 

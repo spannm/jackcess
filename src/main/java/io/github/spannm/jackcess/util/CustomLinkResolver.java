@@ -154,7 +154,7 @@ public abstract class CustomLinkResolver implements LinkResolver {
             boolean readOnly) throws IOException {
 
         Path dbFile = null;
-        FileChannel channel = null;
+        FileChannel channel = null; // NOPMD CloseResource - ownership passes to the returned TempDatabaseImpl on success; closed in finally on failure
         boolean success = false;
 
         try {
@@ -185,7 +185,9 @@ public abstract class CustomLinkResolver implements LinkResolver {
         if (dbFile != null && dbFile.getFileName().toString().startsWith(FILE_DB_PREFIX)) {
             try {
                 Files.deleteIfExists(dbFile);
-            } catch (IOException _ignored) {}
+            } catch (IOException ignored) {
+                // best-effort cleanup of temp db file
+            }
         }
     }
 

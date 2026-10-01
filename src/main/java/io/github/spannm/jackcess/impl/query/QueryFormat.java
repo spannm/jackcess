@@ -31,7 +31,7 @@ import java.util.stream.Collectors;
  * Constants used by the query data parsing.
  */
 @SuppressWarnings("PMD.FieldDeclarationsShouldBeAtStartOfClass")
-public class QueryFormat {
+public final class QueryFormat {
 
     private QueryFormat() {
     }

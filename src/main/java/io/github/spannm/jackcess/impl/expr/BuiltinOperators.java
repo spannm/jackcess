@@ -16,7 +16,12 @@
  */
 package io.github.spannm.jackcess.impl.expr;
 
-import static io.github.spannm.jackcess.impl.expr.ValueSupport.*;
+import static io.github.spannm.jackcess.impl.expr.ValueSupport.EMPTY_STR_VAL;
+import static io.github.spannm.jackcess.impl.expr.ValueSupport.FALSE_VAL;
+import static io.github.spannm.jackcess.impl.expr.ValueSupport.NULL_VAL;
+import static io.github.spannm.jackcess.impl.expr.ValueSupport.TRUE_VAL;
+import static io.github.spannm.jackcess.impl.expr.ValueSupport.toDateValueIfPossible;
+import static io.github.spannm.jackcess.impl.expr.ValueSupport.toValue;
 
 import io.github.spannm.jackcess.expr.EvalException;
 import io.github.spannm.jackcess.expr.LocaleContext;
@@ -25,7 +30,7 @@ import io.github.spannm.jackcess.expr.Value;
 import java.math.BigDecimal;
 import java.util.regex.Pattern;
 
-public class BuiltinOperators {
+public final class BuiltinOperators {
     private static final String DIV_BY_ZERO = "/ by zero";
 
     private static final double MIN_INT     = Integer.MIN_VALUE;
@@ -199,6 +204,10 @@ public class BuiltinOperators {
         }
     }
 
+    static BigDecimal divide(BigDecimal num, BigDecimal denom) {
+        return num.divide(denom, NumberFormatter.DEC_MATH_CONTEXT);
+    }
+
     public static Value intDivide(LocaleContext ctx, Value param1, Value param2) {
         if (anyParamIsNull(param1, param2)) {
             // null propagation
@@ -226,7 +235,7 @@ public class BuiltinOperators {
             try {
                 BigDecimal result = param1.getAsBigDecimal(ctx).pow(param2.getAsBigDecimal(ctx).intValueExact(), NumberFormatter.DEC_MATH_CONTEXT);
                 return toValue(result);
-            } catch (ArithmeticException _ex) {
+            } catch (ArithmeticException ignored) {
                 // fall back to general handling via doubles...
             }
         }
@@ -587,8 +596,8 @@ public class BuiltinOperators {
         Value.Type t1 = param1.getType();
         Value.Type t2 = param2.getType();
 
-        Value.Type prefType = null;
-        Value strParam = null;
+        Value.Type prefType;
+        Value strParam;
         if (t1.isNumeric()) {
             prefType = t1;
             strParam = param2;
@@ -624,10 +633,6 @@ public class BuiltinOperators {
 
     private static Value.Type max(Value.Type t1, Value.Type t2) {
         return t1.compareTo(t2) > 0 ? t1 : t2;
-    }
-
-    static BigDecimal divide(BigDecimal num, BigDecimal denom) {
-        return num.divide(denom, NumberFormatter.DEC_MATH_CONTEXT);
     }
 
     static boolean isIntegral(double d) {

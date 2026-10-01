@@ -88,7 +88,7 @@ public class RandomContext {
         protected abstract float getImpl();
     }
 
-    private class SimpleSource extends Source {
+    private final class SimpleSource extends Source {
         private final Random mrnd;
 
         private SimpleSource(Random _rnd) {
@@ -101,7 +101,7 @@ public class RandomContext {
         }
     }
 
-    private class ResetSource extends Source {
+    private final class ResetSource extends Source {
         private final float mval;
 
         private ResetSource(Random _rnd) {
@@ -115,7 +115,7 @@ public class RandomContext {
         }
     }
 
-    private class LastValSource extends Source {
+    private final class LastValSource extends Source {
 
         @Override
         protected float getImpl() {

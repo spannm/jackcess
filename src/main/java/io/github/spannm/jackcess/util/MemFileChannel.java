@@ -20,10 +20,19 @@ import io.github.spannm.jackcess.Database;
 import io.github.spannm.jackcess.DatabaseBuilder;
 import io.github.spannm.jackcess.impl.DatabaseImpl;
 
-import java.io.*;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.io.RandomAccessFile;
 import java.nio.ByteBuffer;
 import java.nio.MappedByteBuffer;
-import java.nio.channels.*;
+import java.nio.channels.Channels;
+import java.nio.channels.FileChannel;
+import java.nio.channels.FileLock;
+import java.nio.channels.NonWritableChannelException;
+import java.nio.channels.ReadableByteChannel;
+import java.nio.channels.WritableByteChannel;
 import java.nio.file.OpenOption;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
@@ -193,6 +202,18 @@ public class MemFileChannel extends FileChannel {
     }
 
     @Override
+    public long read(ByteBuffer[] dsts, int offset, int length) {
+        long numBytes = 0L;
+        for (int i = offset; i < offset + length; ++i) {
+            if (position >= size) {
+                return numBytes > 0L ? numBytes : -1L;
+            }
+            numBytes += read(dsts[i]);
+        }
+        return numBytes;
+    }
+
+    @Override
     public int write(ByteBuffer src) {
         int bytesWritten = write(src, position);
         position += bytesWritten;
@@ -219,6 +240,15 @@ public class MemFileChannel extends FileChannel {
             size = newSize;
         }
 
+        return numBytes;
+    }
+
+    @Override
+    public long write(ByteBuffer[] srcs, int offset, int length) {
+        long numBytes = 0L;
+        for (int i = offset; i < offset + length; ++i) {
+            numBytes += write(srcs[i]);
+        }
         return numBytes;
     }
 
@@ -360,7 +390,8 @@ public class MemFileChannel extends FileChannel {
     protected void implCloseChannel() {
         // release data
         data = EMPTY_DATA;
-        size = position = 0L;
+        size = 0L;
+        position = 0L;
     }
 
     private void ensureCapacity(long newSize) {
@@ -404,27 +435,6 @@ public class MemFileChannel extends FileChannel {
 
     private static int getNumChunks(long size) {
         return getChunkIndex(size + CHUNK_SIZE - 1);
-    }
-
-    @Override
-    public long write(ByteBuffer[] srcs, int offset, int length) {
-        long numBytes = 0L;
-        for (int i = offset; i < offset + length; ++i) {
-            numBytes += write(srcs[i]);
-        }
-        return numBytes;
-    }
-
-    @Override
-    public long read(ByteBuffer[] dsts, int offset, int length) {
-        long numBytes = 0L;
-        for (int i = offset; i < offset + length; ++i) {
-            if (position >= size) {
-                return numBytes > 0L ? numBytes : -1L;
-            }
-            numBytes += read(dsts[i]);
-        }
-        return numBytes;
     }
 
     @Override

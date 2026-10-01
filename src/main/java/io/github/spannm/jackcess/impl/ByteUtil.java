@@ -16,7 +16,13 @@ limitations under the License.
 
 package io.github.spannm.jackcess.impl;
 
-import java.io.*;
+import java.io.Closeable;
+import java.io.DataInputStream;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.io.PrintWriter;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.util.Arrays;
@@ -609,7 +615,7 @@ public final class ByteUtil {
      */
     public static void copy(InputStream in, OutputStream out) throws IOException {
         byte[] buf = new byte[8 * 1024];
-        int read = 0;
+        int read;
         while ((read = in.read(buf)) > -1) {
             out.write(buf, 0, read);
         }
@@ -723,7 +729,7 @@ public final class ByteUtil {
 
         public byte[] toByteArray() {
 
-            byte[] result = null;
+            byte[] result;
             if (length == bytes.length) {
                 result = bytes;
                 bytes = null;

@@ -72,7 +72,7 @@ public class DBEvalContext implements Expressionator.ParseContext, EvalConfig {
 
     @Override
     public void setTemporalConfig(TemporalConfig newTemporal) {
-        if (temporal != newTemporal) {
+        if (temporal != newTemporal) { // NOPMD CompareObjectsWithEquals - intentional identity check to detect config swap and invalidate cached formatters
             temporal = newTemporal;
             sdfs = null;
         }
@@ -90,7 +90,7 @@ public class DBEvalContext implements Expressionator.ParseContext, EvalConfig {
 
     @Override
     public void setNumericConfig(NumericConfig newNumeric) {
-        if (numeric != newNumeric) {
+        if (numeric != newNumeric) { // NOPMD CompareObjectsWithEquals - intentional identity check to detect config swap and invalidate cached formatters
             numeric = newNumeric;
             dfs = null;
         }

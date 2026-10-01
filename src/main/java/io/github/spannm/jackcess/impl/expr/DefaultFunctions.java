@@ -18,9 +18,20 @@ package io.github.spannm.jackcess.impl.expr;
 
 import static io.github.spannm.jackcess.impl.expr.FunctionSupport.getOptionalIntParam;
 
-import io.github.spannm.jackcess.expr.*;
+import io.github.spannm.jackcess.expr.EvalContext;
+import io.github.spannm.jackcess.expr.EvalException;
+import io.github.spannm.jackcess.expr.Function;
+import io.github.spannm.jackcess.expr.FunctionLookup;
+import io.github.spannm.jackcess.expr.LocaleContext;
+import io.github.spannm.jackcess.expr.NumericConfig;
+import io.github.spannm.jackcess.expr.TemporalConfig;
+import io.github.spannm.jackcess.expr.Value;
 import io.github.spannm.jackcess.impl.DatabaseImpl;
-import io.github.spannm.jackcess.impl.expr.FunctionSupport.*; // NOPMD
+import io.github.spannm.jackcess.impl.expr.FunctionSupport.Func1;
+import io.github.spannm.jackcess.impl.expr.FunctionSupport.Func1NullIsNull;
+import io.github.spannm.jackcess.impl.expr.FunctionSupport.Func3;
+import io.github.spannm.jackcess.impl.expr.FunctionSupport.FuncVar;
+import io.github.spannm.jackcess.impl.expr.FunctionSupport.StringFuncWrapper;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
@@ -35,7 +46,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
 
-public class DefaultFunctions {
+public final class DefaultFunctions {
     private static final Map<String, Function> FUNCS = new HashMap<>();
 
     static {
@@ -421,16 +432,16 @@ public class DefaultFunctions {
                 return ValueSupport.ZERO_D_VAL;
             }
 
-            Matcher m = null;
-
             if (str.charAt(0) == ValueSupport.NUMBER_BASE_PREFIX) {
 
                 // see if we can parse as a radix format
                 BigInteger bi = null;
-                if ((m = ValueSupport.HEX_PAT.matcher(str)).find()) {
-                    bi = ValueSupport.parseIntegerString(m.group(), 16);
-                } else if ((m = ValueSupport.OCTAL_PAT.matcher(str)).find()) {
-                    bi = ValueSupport.parseIntegerString(m.group(), 8);
+                Matcher hexM = ValueSupport.HEX_PAT.matcher(str);
+                Matcher octalM = ValueSupport.OCTAL_PAT.matcher(str);
+                if (hexM.find()) {
+                    bi = ValueSupport.parseIntegerString(hexM.group(), 16);
+                } else if (octalM.find()) {
+                    bi = ValueSupport.parseIntegerString(octalM.group(), 8);
                 }
 
                 if (bi != null) {
@@ -448,7 +459,8 @@ public class DefaultFunctions {
             } else {
 
                 // parse as normal "decimal" number.
-                if ((m = ValueSupport.NUMBER_PAT.matcher(str)).find()) {
+                Matcher m = ValueSupport.NUMBER_PAT.matcher(str);
+                if (m.find()) {
                     BigDecimal bd = new BigDecimal(m.group());
                     return ValueSupport.toValue(bd.doubleValue());
                 }
@@ -542,12 +554,6 @@ public class DefaultFunctions {
         return registerFunc(_func.getName(), _func);
     }
 
-    static Function registerStringFunc(Function _func) {
-        registerFunc(_func.getName(), _func);
-        registerFunc(new StringFuncWrapper(_func));
-        return _func;
-    }
-
     private static Function registerFunc(String _fname, Function _func) {
         Logger.getLogger(DefaultFunctions.class.getName()).log(Level.FINEST, "Registering function {0}", _fname);
         String lookupFname = DatabaseImpl.toLookupName(_fname);
@@ -556,4 +562,11 @@ public class DefaultFunctions {
         }
         return _func;
     }
+
+    static Function registerStringFunc(Function _func) {
+        registerFunc(_func.getName(), _func);
+        registerFunc(new StringFuncWrapper(_func));
+        return _func;
+    }
+
 }

@@ -56,7 +56,7 @@ public class ToStringBuilder {
     private final String                     contentEnd;
     private final String                     nullText;
     private final String                     implSuffix;
-    private boolean                          useIdentityHashCode = true;
+    private boolean                          useIdentityHashCode;
     private static final int                 MAX_BYTE_DETAIL_LEN = 20;
 
     ToStringBuilder(Object _object, String _fieldSeparator, boolean _fieldSeparatorAtStart, String _fieldNameValueSeparator, String _contentEnd, boolean _useIdentityHashCode) {

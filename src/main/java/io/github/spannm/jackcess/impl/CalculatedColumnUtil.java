@@ -29,7 +29,7 @@ import java.nio.ByteOrder;
  * These are the currently possible calculated types: FLOAT, DOUBLE, INT, LONG, BIG_INT, GUID, SHORT_DATE_TIME, MONEY,
  * BOOLEAN, NUMERIC, TEXT, MEMO.
  */
-class CalculatedColumnUtil {
+final class CalculatedColumnUtil {
 
     // offset to the int which specifies the length of the actual data
     private static final int    CALC_DATA_LEN_OFFSET = 16;
