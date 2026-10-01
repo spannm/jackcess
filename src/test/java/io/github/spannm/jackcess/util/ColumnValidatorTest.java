@@ -17,7 +17,6 @@
 package io.github.spannm.jackcess.util;
 
 import static io.github.spannm.jackcess.test.TestUtil.*;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import io.github.spannm.jackcess.*;
@@ -98,11 +97,11 @@ final class ColumnValidatorTest extends AbstractBaseTest {
             Column dataCol = table2.getColumn("data");
             Column numCol = table2.getColumn("num");
 
-            assertThrows(IllegalArgumentException.class, () -> idCol.setColumnValidator(cv));
+            assertThatThrownBy(() -> idCol.setColumnValidator(cv)).isInstanceOf(IllegalArgumentException.class);
 
             assertThat(idCol.getColumnValidator()).isSameAs(SimpleColumnValidator.INSTANCE);
 
-            assertThrows(IllegalArgumentException.class, () -> table2.addRow(Column.AUTO_NUMBER, "row4", -3));
+            assertThatThrownBy(() -> table2.addRow(Column.AUTO_NUMBER, "row4", -3)).isInstanceOf(IllegalArgumentException.class);
 
             table2.addRow(Column.AUTO_NUMBER, "row4", 4);
 
@@ -122,7 +121,7 @@ final class ColumnValidatorTest extends AbstractBaseTest {
 
             assertThat(pkCursor.getCurrentRow()).isEqualTo(createExpectedRow("id", 1, "data", "row1_mod", "num", -1));
 
-            assertThrows(IllegalArgumentException.class, () -> pkCursor.setCurrentRowValue(numCol, -2));
+            assertThatThrownBy(() -> pkCursor.setCurrentRowValue(numCol, -2)).isInstanceOf(IllegalArgumentException.class);
 
             assertThat(pkCursor.getCurrentRow()).isEqualTo(createExpectedRow("id", 1, "data", "row1_mod", "num", -1));
 
@@ -130,7 +129,7 @@ final class ColumnValidatorTest extends AbstractBaseTest {
 
             row3.put("num", -2);
 
-            assertThrows(IllegalArgumentException.class, () -> table2.updateRow(row3));
+            assertThatThrownBy(() -> table2.updateRow(row3)).isInstanceOf(IllegalArgumentException.class);
 
             assertThat(CursorBuilder.findRowByPrimaryKey(table2, 3)).isEqualTo(createExpectedRow("id", 3, "data", "row3", "num", 1));
 

@@ -16,7 +16,6 @@
 package io.github.spannm.jackcess.impl.complex;
 
 import static io.github.spannm.jackcess.test.Basename.COMPLEX_DATA;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import io.github.spannm.jackcess.*;
@@ -80,7 +79,7 @@ final class MultiValueColumnPropertyMapTest extends AbstractBaseTest {
                 count++;
             }
             assertThat(count).isEqualTo(props.getSize());
-            assertThrows(NoSuchElementException.class, iter::next);
+            assertThatThrownBy(iter::next).isInstanceOf(NoSuchElementException.class);
 
             // remove via iterator
             Iterator<PropertyMap.Property> iter2 = props.iterator();

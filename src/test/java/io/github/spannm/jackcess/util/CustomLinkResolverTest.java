@@ -16,7 +16,6 @@
  */
 package io.github.spannm.jackcess.util;
 
-import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.assertj.core.api.Assertions.assertThat;
 import io.github.spannm.jackcess.*;
 import io.github.spannm.jackcess.Database.FileFormat;
@@ -64,7 +63,8 @@ final class CustomLinkResolverTest extends AbstractBaseTest {
 
             assertThat(db.getTable("Table4")).isNull();
 
-            assertThrows(AccessDeniedException.class, () -> db.getTable("Table3"));
+            assertThatThrownBy(() -> db.getTable("Table3"))
+                .isInstanceOf(AccessDeniedException.class);
         }
     }
 

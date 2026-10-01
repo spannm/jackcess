@@ -15,7 +15,6 @@
  */
 package io.github.spannm.jackcess.util;
 
-import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.assertj.core.api.Assertions.assertThat;
 import io.github.spannm.jackcess.test.AbstractBaseTest;
 import io.github.spannm.jackcess.test.TestUtil;
@@ -74,14 +73,14 @@ final class FileChannelTest extends AbstractBaseTest {
             target.close();
 
             ByteBuffer src = ByteBuffer.wrap(DATA);
-            assertThrows(NonWritableChannelException.class, () -> ch.truncate(1L));
-            assertThrows(NonWritableChannelException.class, () -> ch.write(src));
-            assertThrows(NonWritableChannelException.class, () -> ch.write(src, 0L));
-            assertThrows(NonWritableChannelException.class, () -> ch.write(new ByteBuffer[] {src}, 0, 1));
-            assertThrows(NonWritableChannelException.class, () -> ch.transferFrom(delegate, 0L, 1L));
-            assertThrows(UnsupportedOperationException.class, () -> ch.map(FileChannel.MapMode.READ_ONLY, 0L, 1L));
-            assertThrows(UnsupportedOperationException.class, () -> ch.lock(0L, 1L, true));
-            assertThrows(UnsupportedOperationException.class, () -> ch.tryLock(0L, 1L, true));
+            assertThatThrownBy(() -> ch.truncate(1L)).isInstanceOf(NonWritableChannelException.class);
+            assertThatThrownBy(() -> ch.write(src)).isInstanceOf(NonWritableChannelException.class);
+            assertThatThrownBy(() -> ch.write(src, 0L)).isInstanceOf(NonWritableChannelException.class);
+            assertThatThrownBy(() -> ch.write(new ByteBuffer[] {src}, 0, 1)).isInstanceOf(NonWritableChannelException.class);
+            assertThatThrownBy(() -> ch.transferFrom(delegate, 0L, 1L)).isInstanceOf(NonWritableChannelException.class);
+            assertThatThrownBy(() -> ch.map(FileChannel.MapMode.READ_ONLY, 0L, 1L)).isInstanceOf(UnsupportedOperationException.class);
+            assertThatThrownBy(() -> ch.lock(0L, 1L, true)).isInstanceOf(UnsupportedOperationException.class);
+            assertThatThrownBy(() -> ch.tryLock(0L, 1L, true)).isInstanceOf(UnsupportedOperationException.class);
         }
     }
 
@@ -97,7 +96,7 @@ final class FileChannelTest extends AbstractBaseTest {
         }
         try (MemFileChannel ch = MemFileChannel.newChannel(f.toPath(), StandardOpenOption.READ)) {
             assertThat(ch.size()).isEqualTo(DATA.length);
-            assertThrows(NonWritableChannelException.class, () -> ch.write(ByteBuffer.wrap(DATA)));
+            assertThatThrownBy(() -> ch.write(ByteBuffer.wrap(DATA))).isInstanceOf(NonWritableChannelException.class);
         }
         try (MemFileChannel ch = MemFileChannel.newChannel(f.toPath(), StandardOpenOption.WRITE)) {
             assertThat(ch.write(ByteBuffer.wrap(DATA), 0L)).isEqualTo(DATA.length);
@@ -131,9 +130,9 @@ final class FileChannelTest extends AbstractBaseTest {
                 assertThat(ch.transferTo(ch.size() + 10, 10L, target)).isEqualTo(0L);
             }
 
-            assertThrows(UnsupportedOperationException.class, () -> ch.map(FileChannel.MapMode.READ_ONLY, 0L, 1L));
-            assertThrows(UnsupportedOperationException.class, () -> ch.lock(0L, 1L, true));
-            assertThrows(UnsupportedOperationException.class, () -> ch.tryLock(0L, 1L, true));
+            assertThatThrownBy(() -> ch.map(FileChannel.MapMode.READ_ONLY, 0L, 1L)).isInstanceOf(UnsupportedOperationException.class);
+            assertThatThrownBy(() -> ch.lock(0L, 1L, true)).isInstanceOf(UnsupportedOperationException.class);
+            assertThatThrownBy(() -> ch.tryLock(0L, 1L, true)).isInstanceOf(UnsupportedOperationException.class);
         }
     }
 

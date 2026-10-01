@@ -15,7 +15,6 @@
  */
 package io.github.spannm.jackcess;
 
-import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.assertj.core.api.Assertions.assertThat;
 import io.github.spannm.jackcess.Database.FileFormat;
 import io.github.spannm.jackcess.Relationship.JoinType;
@@ -110,19 +109,19 @@ final class BuilderTest extends AbstractBaseTest {
         JetFormat fmt = JetFormat.VERSION_4;
         Set<String> colNames = new HashSet<>(Arrays.asList("A", "B"));
 
-        assertThrows(IllegalArgumentException.class,
-            () -> new IndexBuilder("idx").validate(colNames, fmt));
+        assertThatThrownBy(() -> new IndexBuilder("idx").validate(colNames, fmt))
+            .isInstanceOf(IllegalArgumentException.class);
 
         IndexBuilder tooMany = new IndexBuilder("idx");
         for (int i = 0; i < 20; i++) {
             tooMany.withColumns("c" + i);
         }
-        assertThrows(IllegalArgumentException.class, () -> tooMany.validate(colNames, fmt));
+        assertThatThrownBy(() -> tooMany.validate(colNames, fmt)).isInstanceOf(IllegalArgumentException.class);
 
-        assertThrows(IllegalArgumentException.class,
-            () -> new IndexBuilder("idx").withColumns("a", "A").validate(colNames, fmt));
-        assertThrows(IllegalArgumentException.class,
-            () -> new IndexBuilder("idx").withColumns("zz").validate(colNames, fmt));
+        assertThatThrownBy(() -> new IndexBuilder("idx").withColumns("a", "A").validate(colNames, fmt))
+            .isInstanceOf(IllegalArgumentException.class);
+        assertThatThrownBy(() -> new IndexBuilder("idx").withColumns("zz").validate(colNames, fmt))
+            .isInstanceOf(IllegalArgumentException.class);
 
         new IndexBuilder("idx").withColumns("a", "b").validate(colNames, fmt);
     }

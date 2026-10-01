@@ -18,10 +18,8 @@ package io.github.spannm.jackcess;
 
 import static io.github.spannm.jackcess.test.Basename.*;
 import static io.github.spannm.jackcess.test.TestUtil.*;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.assertj.core.api.Assertions.assertThat;
 
-import org.assertj.core.api.Assertions;
 import io.github.spannm.jackcess.Database.FileFormat;
 import io.github.spannm.jackcess.impl.*;
 import io.github.spannm.jackcess.test.AbstractBaseTest;
@@ -60,7 +58,7 @@ final class DatabaseTest extends AbstractBaseTest {
         try (Database db = createDbMem(fileFormat)) {
             try {
                 DatabaseBuilder.newTable("test").toTable(db);
-                Assertions.fail("created table with no columns?");
+                fail("created table with no columns?");
             } catch (IllegalArgumentException _ex) {
                 // success
             }
@@ -70,7 +68,7 @@ final class DatabaseTest extends AbstractBaseTest {
                     .addColumn(DatabaseBuilder.newColumn("A", DataType.TEXT))
                     .addColumn(DatabaseBuilder.newColumn("a", DataType.MEMO))
                     .toTable(db);
-                Assertions.fail("created table with duplicate column names?");
+                fail("created table with duplicate column names?");
             } catch (IllegalArgumentException _ex) {
                 // success
             }
@@ -80,7 +78,7 @@ final class DatabaseTest extends AbstractBaseTest {
                     .addColumn(DatabaseBuilder.newColumn("A", DataType.TEXT)
                         .withLengthInUnits(352))
                     .toTable(db);
-                Assertions.fail("created table with invalid column length?");
+                fail("created table with invalid column length?");
             } catch (IllegalArgumentException _ex) {
                 // success
             }
@@ -89,7 +87,7 @@ final class DatabaseTest extends AbstractBaseTest {
                 DatabaseBuilder.newTable("test")
                     .addColumn(DatabaseBuilder.newColumn("A_" + createString(70), DataType.TEXT))
                     .toTable(db);
-                Assertions.fail("created table with too long column name?");
+                fail("created table with too long column name?");
             } catch (IllegalArgumentException _ex) {
                 // success
             }
@@ -102,7 +100,7 @@ final class DatabaseTest extends AbstractBaseTest {
                 DatabaseBuilder.newTable("Test")
                     .addColumn(DatabaseBuilder.newColumn("A", DataType.TEXT))
                     .toTable(db);
-                Assertions.fail("create duplicate tables?");
+                fail("create duplicate tables?");
             } catch (IllegalArgumentException _ex) {
                 // success
             }
@@ -281,10 +279,10 @@ final class DatabaseTest extends AbstractBaseTest {
         File bogusFile = new File("fooby-dooby.mdb");
         assertThat(bogusFile.exists()).isFalse();
         DatabaseBuilder dbb = DatabaseBuilder.newDatabase(bogusFile).withReadOnly(true).withAutoSync(getTestAutoSync());
-        assertThrows(FileNotFoundException.class, () -> {
+        assertThatThrownBy(() -> {
             try (Database ignored = dbb.open()) {
             }
-        });
+        }).isInstanceOf(FileNotFoundException.class);
         assertThat(bogusFile.exists()).isFalse();
     }
 
@@ -308,7 +306,7 @@ final class DatabaseTest extends AbstractBaseTest {
                 } else if (rowNum == 1) {
                     assertThat(row).isEqualTo(expectedRow1);
                 } else if (rowNum >= 2) {
-                    Assertions.fail("should only have 2 rows");
+                    fail("should only have 2 rows");
                 }
                 rowNum++;
             }
@@ -359,7 +357,7 @@ final class DatabaseTest extends AbstractBaseTest {
                 } else if (rowNum == 2) {
                     assertThat(row).isEqualTo(newRow);
                 } else {
-                    Assertions.fail("should only have 3 rows");
+                    fail("should only have 3 rows");
                 }
                 rowNum++;
             }
@@ -392,7 +390,7 @@ final class DatabaseTest extends AbstractBaseTest {
                     new BigDecimal("37.0000"),
                     new BigDecimal("10000.4500")));
 
-            assertThrows(IOException.class, () -> table.addRow(new BigDecimal("342523234145343543.3453")));
+            assertThatThrownBy(() -> table.addRow(new BigDecimal("342523234145343543.3453"))).isInstanceOf(IOException.class);
         }
     }
 
@@ -426,7 +424,7 @@ final class DatabaseTest extends AbstractBaseTest {
                 "{FFFFFFFF-FFFF-FFFF-FFFF-FFFFFFFFFFFF}",
                 "{32A59F01-1234-3E29-4AAF-4523453CD2E6}"));
 
-        assertThrows(IOException.class, () -> table.addRow("3245234"));
+        assertThatThrownBy(() -> table.addRow("3245234")).isInstanceOf(IOException.class);
     }
 
     @ParameterizedTest(name = "[{index}] {0}")
@@ -468,8 +466,8 @@ final class DatabaseTest extends AbstractBaseTest {
                 new BigDecimal("37.00000000"),
                 new BigDecimal("-3452345321000.00000000")));
 
-        assertThrows(IOException.class, () -> table.addRow(new BigDecimal("3245234.234"),
-            new BigDecimal("3245234.234")));
+        assertThatThrownBy(() -> table.addRow(new BigDecimal("3245234.234"),
+            new BigDecimal("3245234.234"))).isInstanceOf(IOException.class);
     }
 
     @ParameterizedTest(name = "[{index}] {0}")
@@ -976,8 +974,9 @@ final class DatabaseTest extends AbstractBaseTest {
     @Test
     void addTableUnsupportedSortOrderCatalogByDefaultThrows() throws Exception {
         try (Database db = openCopy(FileFormat.V2007, UNSUPPORTED_SORT_ORDER_DB)) {
-            UnsupportedOperationException ex = assertThrows(UnsupportedOperationException.class,
-                () -> DatabaseBuilder.newTable("test2").addColumn(DatabaseBuilder.newColumn("A", DataType.TEXT)).toTable(db));
+            UnsupportedOperationException ex = catchThrowableOfType(
+                () -> DatabaseBuilder.newTable("test2").addColumn(DatabaseBuilder.newColumn("A", DataType.TEXT)).toTable(db),
+                UnsupportedOperationException.class);
             assertThat(ex.getMessage().contains("unsupported collating sort order")).isTrue();
         }
     }

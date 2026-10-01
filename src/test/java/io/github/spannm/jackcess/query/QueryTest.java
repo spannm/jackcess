@@ -18,7 +18,6 @@ package io.github.spannm.jackcess.query;
 
 import static io.github.spannm.jackcess.impl.query.QueryFormat.*;
 import static io.github.spannm.jackcess.test.Basename.QUERY;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import io.github.spannm.jackcess.DataType;
@@ -64,7 +63,7 @@ final class QueryTest extends AbstractBaseTest {
 
         removeRows(query, TABLE_ATTRIBUTE);
 
-        assertThrows(IllegalStateException.class, query::toSQLString);
+        assertThatThrownBy(query::toSQLString).isInstanceOf(IllegalStateException.class);
     }
 
     @Test
@@ -135,19 +134,19 @@ final class QueryTest extends AbstractBaseTest {
         List<Row> rowList = new ArrayList<>();
         rowList.add(newRow(TYPE_ATTRIBUTE, null, -1, null, null));
         QueryImpl query = QueryImpl.create(-1, "TestQuery", rowList, 13);
-        assertThrows(UnsupportedOperationException.class, query::toSQLString);
+        assertThatThrownBy(query::toSQLString).isInstanceOf(UnsupportedOperationException.class);
 
         addRows(query, newRow(TYPE_ATTRIBUTE, null, -1, null, null));
 
-        assertThrows(IllegalStateException.class, query::getTypeRow);
+        assertThatThrownBy(query::getTypeRow).isInstanceOf(IllegalStateException.class);
 
-        assertThrows(IllegalStateException.class, () -> new QueryImpl("TestQuery", rowList, 13, Query.Type.UNION.getObjectFlag(),
+        assertThatThrownBy(() -> new QueryImpl("TestQuery", rowList, 13, Query.Type.UNION.getObjectFlag(),
             Query.Type.UNION) {
             @Override
             protected void toSQLString(StringBuilder builder) {
                 throw new UnsupportedOperationException();
             }
-        });
+        }).isInstanceOf(IllegalStateException.class);
     }
 
     @ParameterizedTest(name = "[{index}] {0}")
@@ -274,7 +273,7 @@ final class QueryTest extends AbstractBaseTest {
 
         addRows(query, newRow(PARAMETER_ATTRIBUTE, null, -1, "BadVal", null));
 
-        assertThrows(IllegalStateException.class, query::toSQLString);
+        assertThatThrownBy(query::toSQLString).isInstanceOf(IllegalStateException.class);
 
         removeRows(query, PARAMETER_ATTRIBUTE);
     }
@@ -319,7 +318,7 @@ final class QueryTest extends AbstractBaseTest {
 
         addRows(query, newRow(JOIN_ATTRIBUTE, "(Table1.id = Table3Val.id)", 5, "Table1", "Table3Val"));
 
-        assertThrows(IllegalStateException.class, query::toSQLString);
+        assertThatThrownBy(query::toSQLString).isInstanceOf(IllegalStateException.class);
 
         removeLastRows(query, 1);
         query.toSQLString();
@@ -395,7 +394,7 @@ final class QueryTest extends AbstractBaseTest {
 
         addJoinRows(query, 1, 2, 1, 2, 1, 2);
 
-        assertThrows(IllegalStateException.class, query::toSQLString);
+        assertThatThrownBy(query::toSQLString).isInstanceOf(IllegalStateException.class);
 
         addJoinRows(query, 1, 2, 1,
             3, 4, 1,

@@ -16,7 +16,6 @@ limitations under the License.
 
 package io.github.spannm.jackcess.util;
 
-import static org.junit.jupiter.api.Assertions.*;
 import io.github.spannm.jackcess.*;
 import io.github.spannm.jackcess.Database.FileFormat;
 import io.github.spannm.jackcess.impl.ColumnImpl;
@@ -58,7 +57,7 @@ final class ErrorHandlerTest extends AbstractBaseTest {
 
             table.reset();
 
-            assertThrows(IOException.class, table::getNextRow);
+            assertThatThrownBy(table::getNextRow).isInstanceOf(IOException.class);
 
             table.reset();
             table.setErrorHandler(new ReplacementErrorHandler());
@@ -88,13 +87,13 @@ final class ErrorHandlerTest extends AbstractBaseTest {
                 TestUtil.createExpectedRow("col", "row3", "val", "#error")),
                 c2);
 
-            assertThrows(IOException.class, c3::getNextRow);
+            assertThatThrownBy(c3::getNextRow).isInstanceOf(IOException.class);
 
             table.setErrorHandler(null);
             c1.setErrorHandler(null);
             c1.reset();
 
-            assertThrows(IOException.class, c1::getNextRow);
+            assertThatThrownBy(c1::getNextRow).isInstanceOf(IOException.class);
         }
     }
 

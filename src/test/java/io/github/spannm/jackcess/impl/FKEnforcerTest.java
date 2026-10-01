@@ -18,14 +18,13 @@ package io.github.spannm.jackcess.impl;
 
 import static io.github.spannm.jackcess.test.Basename.INDEX;
 import static io.github.spannm.jackcess.test.TestUtil.*;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import io.github.spannm.jackcess.*;
 import io.github.spannm.jackcess.test.AbstractBaseTest;
 import io.github.spannm.jackcess.test.TestDb;
 import io.github.spannm.jackcess.test.source.TestDbSource;
-import org.junit.jupiter.api.function.Executable;
+import org.assertj.core.api.ThrowableAssert.ThrowingCallable;
 import org.junit.jupiter.params.ParameterizedTest;
 
 import java.io.IOException;
@@ -66,7 +65,7 @@ final class FKEnforcerTest extends AbstractBaseTest {
             Table t2 = db.getTable("Table2");
             Table t3 = db.getTable("Table3");
 
-            Map<Executable, String> tests = new LinkedHashMap<>();
+            Map<ThrowingCallable, String> tests = new LinkedHashMap<>();
             tests.put(() -> t1.addRow(20, 0, 20, "some data", 20), "Table1[otherfk2]");
             tests.put(() -> {
                 Cursor c = CursorBuilder.createCursor(t2);
@@ -79,7 +78,7 @@ final class FKEnforcerTest extends AbstractBaseTest {
                 c.deleteCurrentRow();
             }, "Table3[id]");
             tests.forEach((key, value) -> {
-                IOException ex = assertThrows(IOException.class, key);
+                IOException ex = catchThrowableOfType(key, IOException.class);
                 assertThat(ex.getMessage().contains(value)).isTrue();
 
             });

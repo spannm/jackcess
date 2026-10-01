@@ -16,7 +16,6 @@
  */
 package io.github.spannm.jackcess.impl.expr;
 
-import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.assertj.core.api.Assertions.assertThat;
 import io.github.spannm.jackcess.expr.EvalException;
 import io.github.spannm.jackcess.expr.Expression;
@@ -182,7 +181,7 @@ final class DefaultFunctionsTest extends AbstractBaseTest {
         assertThat(eval("StrConv('istanbul', 1, 1055)")).isEqualTo("İSTANBUL");
         assertThat(eval("StrConv('ISTANBUL', 2, 1055)")).isEqualTo("ıstanbul");
 
-        EvalException ex = assertThrows(EvalException.class, () -> eval("StrConv('foo', 1, 9999)"));
+        EvalException ex = catchThrowableOfType(() -> eval("StrConv('foo', 1, 9999)"), EvalException.class);
         assertThat(ex.getCause().getMessage().contains("Unsupported locale id")).isTrue();
     }
 
@@ -328,7 +327,7 @@ final class DefaultFunctionsTest extends AbstractBaseTest {
         "StrReverse(); Invalid function call"
     })
     void funcsException(String _exprStr, String _message) {
-        EvalException ex = assertThrows(EvalException.class, () -> eval(_exprStr));
+        EvalException ex = catchThrowableOfType(() -> eval(_exprStr), EvalException.class);
         assertThat(ex.getMessage().contains(_message)).isTrue();
     }
 

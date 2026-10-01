@@ -16,7 +16,6 @@
  */
 package io.github.spannm.jackcess.impl;
 
-import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.assertj.core.api.Assertions.assertThat;
 import io.github.spannm.jackcess.test.AbstractBaseTest;
 import org.junit.jupiter.api.Test;
@@ -35,13 +34,13 @@ final class TopoSorterTest extends AbstractBaseTest {
             "B", "C",
             "A", "B");
 
-        IllegalStateException ex1 = assertThrows(IllegalStateException.class, () -> doTopoTest(Arrays.asList("B", "A", "C"), Arrays.asList("C", "B", "A"), "B", "C", "A", "B", "C", "A"));
+        IllegalStateException ex1 = catchThrowableOfType(() -> doTopoTest(Arrays.asList("B", "A", "C"), Arrays.asList("C", "B", "A"), "B", "C", "A", "B", "C", "A"), IllegalStateException.class);
         assertThat(ex1.getMessage().startsWith("Cycle")).isTrue();
 
-        IllegalStateException ex2 = assertThrows(IllegalStateException.class, () -> doTopoTest(
+        IllegalStateException ex2 = catchThrowableOfType(() -> doTopoTest(
             Arrays.asList("B", "A", "C"),
             Arrays.asList("C", "B", "A"),
-            "B", "D"));
+            "B", "D"), IllegalStateException.class);
         assertThat(ex2.getMessage().startsWith("Unknown descendent")).isTrue();
 
         doTopoTest(Arrays.asList("B", "D", "A", "C"),

@@ -16,9 +16,8 @@
  */
 package io.github.spannm.jackcess.impl.expr;
 
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.SoftAssertions.assertSoftly;
 import io.github.spannm.jackcess.DataType;
 import io.github.spannm.jackcess.expr.*;
 import io.github.spannm.jackcess.impl.BaseEvalContext;
@@ -140,10 +139,10 @@ final class ExpressionatorTest extends AbstractBaseTest {
     @ParameterizedTest(name = "[{index}] {0}")
     @IntRangeSource(start = -10, end = 10, endInclusive = true)
     void simpleMathExpressions1(int i) {
-        assertAll("math1",
-            () -> assertThat(eval("-(" + i + ")")).isEqualTo(-i),
-            () -> assertThat(eval("+(" + i + ")")).isEqualTo(i)
-        );
+        assertSoftly(softly -> {
+            softly.assertThat(eval("-(" + i + ")")).isEqualTo(-i);
+            softly.assertThat(eval("+(" + i + ")")).isEqualTo(i);
+        });
     }
 
     @ParameterizedTest(name = "[{index}] {0}")
@@ -539,7 +538,7 @@ final class ExpressionatorTest extends AbstractBaseTest {
         "=(3 + 5) Rnd(); multiple expressions"
     })
     void invalidExpression(String exprStr, String msgStr) {
-        ParseException ex = assertThrows(ParseException.class, () -> eval(exprStr));
+        ParseException ex = catchThrowableOfType(() -> eval(exprStr), ParseException.class);
         assertThat(ex.getMessage().contains(msgStr)).isTrue();
     }
 
@@ -579,7 +578,7 @@ final class ExpressionatorTest extends AbstractBaseTest {
     private static void evalFail(String exprStr, Class<? extends Exception> failure) {
         TestContext tc = new TestContext();
         Expression expr = Expressionator.parse(Expressionator.Type.DEFAULT_VALUE, exprStr, null, tc);
-        assertThrows(failure, () -> expr.eval(tc));
+        assertThatThrownBy(() -> expr.eval(tc)).isInstanceOf(failure);
     }
 
     private static Boolean evalCondition(String exprStr, String thisVal) {

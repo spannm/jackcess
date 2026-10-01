@@ -15,7 +15,6 @@
  */
 package io.github.spannm.jackcess.util;
 
-import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.assertj.core.api.Assertions.assertThat;
 import io.github.spannm.jackcess.test.AbstractBaseTest;
 import org.junit.jupiter.api.Test;
@@ -113,7 +112,7 @@ final class OleBlobBuilderTest extends AbstractBaseTest {
     @Test
     void unsupportedContentType() {
         OleBlob.Builder b = new OleBlob.Builder();
-        assertThrows(IllegalArgumentException.class, b::toBlob);
+        assertThatThrownBy(b::toBlob).isInstanceOf(IllegalArgumentException.class);
     }
 
     @Test
@@ -151,10 +150,10 @@ final class OleBlobBuilderTest extends AbstractBaseTest {
                 assertThat(blob.position(other, 1L) != 0L).isTrue();
             }
 
-            assertThrows(SQLFeatureNotSupportedException.class, () -> blob.setBinaryStream(1L));
-            assertThrows(SQLFeatureNotSupportedException.class, () -> blob.truncate(1L));
-            assertThrows(SQLFeatureNotSupportedException.class, () -> blob.setBytes(1L, DATA));
-            assertThrows(SQLFeatureNotSupportedException.class, () -> blob.setBytes(1L, DATA, 0, 2));
+            assertThatThrownBy(() -> blob.setBinaryStream(1L)).isInstanceOf(SQLFeatureNotSupportedException.class);
+            assertThatThrownBy(() -> blob.truncate(1L)).isInstanceOf(SQLFeatureNotSupportedException.class);
+            assertThatThrownBy(() -> blob.setBytes(1L, DATA)).isInstanceOf(SQLFeatureNotSupportedException.class);
+            assertThatThrownBy(() -> blob.setBytes(1L, DATA, 0, 2)).isInstanceOf(SQLFeatureNotSupportedException.class);
 
             ByteArrayOutputStream bout = new ByteArrayOutputStream();
             blob.writeTo(bout);
@@ -162,7 +161,7 @@ final class OleBlobBuilderTest extends AbstractBaseTest {
             assertThat(blob.toString()).isNotNull();
 
             blob.free();
-            assertThrows(Exception.class, () -> blob.getBytes(1L, 1));
+            assertThatThrownBy(() -> blob.getBytes(1L, 1)).isInstanceOf(Exception.class);
         }
     }
 

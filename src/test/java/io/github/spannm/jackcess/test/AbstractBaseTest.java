@@ -21,7 +21,7 @@ import io.github.spannm.jackcess.DatabaseBuilder;
 import io.github.spannm.jackcess.impl.ByteUtil;
 import io.github.spannm.jackcess.impl.DatabaseImpl;
 import io.github.spannm.jackcess.util.MemFileChannel;
-import org.junit.jupiter.api.Assertions;
+import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.TestInfo;
 import org.junit.jupiter.params.provider.Arguments;
@@ -41,7 +41,7 @@ import java.util.stream.StreamSupport;
  * Base class for JUnit test cases.<p>
  *
  * Logs entry and exit to/from all test methods.<br>
- * This class extends JUnit assertions to avoid the need for static imports in subclasses.
+ * This class extends AssertJ assertions to avoid the need for static imports in subclasses.
  *
  * @author Markus Spann
  */
