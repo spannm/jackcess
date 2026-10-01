@@ -2218,9 +2218,8 @@ public class TableImpl implements Table, PropertyMaps.Owner {
 
             // ensure that the relevant row state is up-to-date
             ByteBuffer rowBuffer = positionAtRowData(rowState, rowId);
-            int oldRowSize = rowBuffer.remaining();
-
             requireNonDeletedRow(rowState, rowId);
+            int oldRowSize = rowBuffer.remaining();
 
             // we need to make sure the row is the right length & type (fill with
             // null if too short).

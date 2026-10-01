@@ -114,7 +114,7 @@ final class ComplexColumnTest extends AbstractBaseTest {
             assertThat(row8ValFkAgain).isEqualTo(row8ValFk);
             assertThat(row8ValFkAgain.hashCode()).isEqualTo(row8ValFk.hashCode());
             assertThat(row8ValFk).isNotEqualTo(null);
-            assertThat(row8ValFk).isNotEqualTo("not a complex value fk");
+            assertThat((Object) row8ValFk).isNotEqualTo("not a complex value fk");
 
             assertThatThrownBy(row8ValFk::getAttachments).isInstanceOf(UnsupportedOperationException.class);
             assertThatThrownBy(row8ValFk::getMultiValues).isInstanceOf(UnsupportedOperationException.class);

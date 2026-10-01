@@ -755,7 +755,11 @@ public class GeneralLegacyIndexCodes {
     protected static String toIndexCharSequence(Object value) throws IOException {
 
         // first, convert to string
-        String str = ColumnImpl.toCharSequence(value).toString();
+        CharSequence cs = ColumnImpl.toCharSequence(value);
+        if (cs == null) {
+            throw new IOException("Cannot index a null text value");
+        }
+        String str = cs.toString();
 
         // all text columns (including memos) are only indexed up to the max
         // number of chars in a VARCHAR column

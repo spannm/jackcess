@@ -38,6 +38,7 @@ import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Queue;
 import java.util.RandomAccess;
 
@@ -328,11 +329,13 @@ public class IndexPageCache {
 
         switch (upType) {
             case ADD:
+                Objects.requireNonNull(newEntry, "Missing entry for add");
                 dpExtra.entryView.add(entryIdx, newEntry);
                 entrySizeDiff += newEntry.size();
                 break;
 
             case REPLACE:
+                Objects.requireNonNull(newEntry, "Missing entry for replace");
                 oldEntry = dpExtra.entryView.set(entryIdx, newEntry);
                 entrySizeDiff += newEntry.size() - oldEntry.size();
                 break;

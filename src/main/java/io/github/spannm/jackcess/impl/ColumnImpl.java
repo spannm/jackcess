@@ -973,7 +973,7 @@ public class ColumnImpl implements Column, Comparable<ColumnImpl>, DateTimeConte
         long val = 0L;
         for (int i = 0; i < numChars; ++i) {
             char digit = (char) buffer.get();
-            long inc = digit - '0';
+            long inc = (long) digit - '0';
             val = val * 10L + inc;
         }
         return val;
@@ -1576,6 +1576,9 @@ public class ColumnImpl implements Column, Comparable<ColumnImpl>, DateTimeConte
      */
     ByteBuffer encodeTextValue(Object obj, int minChars, int maxChars, boolean forceUncompressed) throws IOException {
         CharSequence text = toCharSequence(obj);
+        if (text == null) {
+            throw new InvalidValueException(withErrorContext("Text value cannot be null"));
+        }
         if (text.length() > maxChars || text.length() < minChars) {
             throw new InvalidValueException(withErrorContext("Text is wrong length for " + getType() + " column, max " + maxChars + ", min " + minChars + ", got " + text.length()));
         }
