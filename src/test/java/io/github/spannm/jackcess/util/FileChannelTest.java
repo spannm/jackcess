@@ -50,7 +50,7 @@ final class FileChannelTest extends AbstractBaseTest {
              ReadOnlyFileChannel ch = new ReadOnlyFileChannel(delegate)) {
 
             assertThat(ch.size()).isEqualTo(DATA.length);
-            assertThat(ch.position()).isEqualTo(0L);
+            assertThat(ch.position()).isZero();
 
             ByteBuffer buf = ByteBuffer.allocate(4);
             assertThat(ch.read(buf)).isEqualTo(4);
@@ -64,7 +64,7 @@ final class FileChannelTest extends AbstractBaseTest {
             assertThat(ch.read(posBuf, 0L)).isEqualTo(2);
 
             assertThat(ch.position(0L)).isSameAs(ch);
-            assertThat(ch.position()).isEqualTo(0L);
+            assertThat(ch.position()).isZero();
 
             ch.force(true);
 
@@ -127,7 +127,7 @@ final class FileChannelTest extends AbstractBaseTest {
 
             // transfer from a position beyond the end yields nothing
             try (MemFileChannel target = MemFileChannel.newChannel()) {
-                assertThat(ch.transferTo(ch.size() + 10, 10L, target)).isEqualTo(0L);
+                assertThat(ch.transferTo(ch.size() + 10, 10L, target)).isZero();
             }
 
             assertThatThrownBy(() -> ch.map(FileChannel.MapMode.READ_ONLY, 0L, 1L)).isInstanceOf(UnsupportedOperationException.class);

@@ -40,7 +40,7 @@ final class MemFileChannelTest extends AbstractBaseTest {
     void readOnlyChannel(TestDb testDb) throws Exception {
         try (MemFileChannel ch = MemFileChannel.newChannel(testDb.getFile(), "r")) {
             assertThat(ch.size()).isEqualTo(testDb.getFile().length());
-            assertThat(ch.position()).isEqualTo(0L);
+            assertThat(ch.position()).isZero();
 
             assertThatThrownBy(() -> {
                 ByteBuffer bb = ByteBuffer.allocate(1024);
@@ -52,7 +52,7 @@ final class MemFileChannelTest extends AbstractBaseTest {
             assertThatThrownBy(() -> ch.transferFrom(null, 0L, 10L)).isInstanceOf(NonWritableChannelException.class);
 
             assertThat(ch.size()).isEqualTo(testDb.getFile().length());
-            assertThat(ch.position()).isEqualTo(0L);
+            assertThat(ch.position()).isZero();
         }
     }
 
@@ -63,8 +63,8 @@ final class MemFileChannelTest extends AbstractBaseTest {
 
         try (MemFileChannel ch = MemFileChannel.newChannel()) {
             assertThat(ch.isOpen()).isTrue();
-            assertThat(ch.size()).isEqualTo(0L);
-            assertThat(ch.position()).isEqualTo(0L);
+            assertThat(ch.size()).isZero();
+            assertThat(ch.position()).isZero();
             assertThat(ch.read(bb)).isEqualTo(-1);
         }
 
@@ -72,7 +72,7 @@ final class MemFileChannelTest extends AbstractBaseTest {
             MemFileChannel ch3 = MemFileChannel.newChannel()) {
 
             assertThat(ch2.size()).isEqualTo(testDb.getFile().length());
-            assertThat(ch2.position()).isEqualTo(0L);
+            assertThat(ch2.position()).isZero();
 
             assertThatThrownBy(() -> ch2.position(-1)).isInstanceOf(IllegalArgumentException.class);
 
@@ -96,14 +96,14 @@ final class MemFileChannelTest extends AbstractBaseTest {
                 ch3.transferTo(fc);
             }
 
-            assertThat(tempFile.length()).isEqualTo(testDb.getFile().length());
+            assertThat(tempFile).hasSize(testDb.getFile().length());
 
             assertThat(Files.readAllBytes(tempFile.toPath())).containsExactly(Files.readAllBytes(testDb.getFile().toPath()));
 
             ch3.truncate(0L);
             assertThat(ch3.isOpen()).isTrue();
-            assertThat(ch3.size()).isEqualTo(0L);
-            assertThat(ch3.position()).isEqualTo(0L);
+            assertThat(ch3.size()).isZero();
+            assertThat(ch3.position()).isZero();
             assertThat(ch3.read(bb)).isEqualTo(-1);
         }
     }

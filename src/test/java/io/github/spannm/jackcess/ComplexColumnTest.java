@@ -108,12 +108,12 @@ final class ComplexColumnTest extends AbstractBaseTest {
                 "row8-memo", upTime);
 
             assertThat(row8ValFk.countValues()).isEqualTo(1);
-            assertThat(((ComplexValueForeignKeyImpl) row8ValFk).getRawValues().size()).isEqualTo(1);
+            assertThat(((ComplexValueForeignKeyImpl) row8ValFk).getRawValues()).hasSize(1);
 
             ComplexValueForeignKey row8ValFkAgain = (ComplexValueForeignKey) verCol.getRowValue(row8);
             assertThat(row8ValFkAgain).isEqualTo(row8ValFk);
-            assertThat(row8ValFkAgain.hashCode()).isEqualTo(row8ValFk.hashCode());
-            assertThat(row8ValFk).isNotEqualTo(null);
+            assertThat(row8ValFkAgain).hasSameHashCodeAs(row8ValFk);
+            assertThat(row8ValFk).isNotNull();
             assertThat((Object) row8ValFk).isNotEqualTo("not a complex value fk");
 
             assertThatThrownBy(row8ValFk::getAttachments).isInstanceOf(UnsupportedOperationException.class);
@@ -126,7 +126,7 @@ final class ComplexColumnTest extends AbstractBaseTest {
             LocalDateTime ldtUpTime = LocalDateTime.now();
             row9ValFk.addVersion("row9-memo", ldtUpTime);
             List<Version> row9Versions = row9ValFk.getVersions();
-            assertThat(row9Versions.size()).isEqualTo(1);
+            assertThat(row9Versions).hasSize(1);
             assertThat(row9Versions.get(0).getValue()).isEqualTo("row9-memo");
             // db is configured for DateTimeType.DATE, so the value round-trips as a Date
             // regardless of which addVersion overload was used to write it
@@ -254,9 +254,9 @@ final class ComplexColumnTest extends AbstractBaseTest {
             assertThat(updated.getFileName()).isEqualTo("some_data.zip");
             assertThat(updated.getFileData()).containsExactly(newBytes);
             byte[] encBytes = updated.getEncodedFileData();
-            assertThat(encBytes.length).isEqualTo(newBytes.length + 28);
+            assertThat(encBytes).hasSize(newBytes.length + 28);
             ByteBuffer bb = PageChannel.wrap(encBytes);
-            assertThat(bb.getInt()).isEqualTo(0);
+            assertThat(bb.getInt()).isZero();
             assertThat(ByteUtil.matchesRange(bb, 28, newBytes)).isTrue();
 
             updated.delete();
@@ -376,7 +376,7 @@ final class ComplexColumnTest extends AbstractBaseTest {
             assertThatThrownBy(row3ValFk::getVersions).isInstanceOf(UnsupportedOperationException.class);
             assertThatThrownBy(row3ValFk::getAttachments).isInstanceOf(UnsupportedOperationException.class);
             assertThatThrownBy(row3ValFk::getMultiValues).isInstanceOf(UnsupportedOperationException.class);
-            assertThat(row3ValFk.countValues()).isEqualTo(0);
+            assertThat(row3ValFk.countValues()).isZero();
         }
     }
 
@@ -387,10 +387,10 @@ final class ComplexColumnTest extends AbstractBaseTest {
 
         List<Version> versions = complexValueFk.getVersions();
         if (versionInfos.length == 0) {
-            assertThat(versions.isEmpty()).isTrue();
+            assertThat(versions).isEmpty();
             assertThat(curValue).isNull();
         } else {
-            assertThat(versions.size()).isEqualTo(versionInfos.length / 2);
+            assertThat(versions).hasSize(versionInfos.length / 2);
             assertThat(versions.get(0).getValue()).isEqualTo(curValue);
             for (int i = 0; i < versionInfos.length; i += 2) {
                 String value = (String) versionInfos[i];
@@ -409,9 +409,9 @@ final class ComplexColumnTest extends AbstractBaseTest {
 
         List<Attachment> attachments = complexValueFk.getAttachments();
         if (fileNames.length == 0) {
-            assertThat(attachments.isEmpty()).isTrue();
+            assertThat(attachments).isEmpty();
         } else {
-            assertThat(attachments.size()).isEqualTo(fileNames.length);
+            assertThat(attachments).hasSize(fileNames.length);
             for (int i = 0; i < fileNames.length; i++) {
                 String fname = fileNames[i];
                 Attachment a = attachments.get(i);
@@ -430,9 +430,9 @@ final class ComplexColumnTest extends AbstractBaseTest {
 
         List<SingleValue> values = complexValueFk.getMultiValues();
         if (expectedValues.length == 0) {
-            assertThat(values.isEmpty()).isTrue();
+            assertThat(values).isEmpty();
         } else {
-            assertThat(values.size()).isEqualTo(expectedValues.length);
+            assertThat(values).hasSize(expectedValues.length);
             for (int i = 0; i < expectedValues.length; i++) {
                 Object value = expectedValues[i];
                 SingleValue v = values.get(i);
@@ -448,16 +448,16 @@ final class ComplexColumnTest extends AbstractBaseTest {
 
         List<UnsupportedValue> values = complexValueFk.getUnsupportedValues();
         if (expectedValues.length == 0) {
-            assertThat(values.isEmpty()).isTrue();
+            assertThat(values).isEmpty();
         } else {
-            assertThat(values.size()).isEqualTo(expectedValues.length);
+            assertThat(values).hasSize(expectedValues.length);
             for (int i = 0; i < expectedValues.length; i++) {
                 String value = expectedValues[i];
                 UnsupportedValue v = values.get(i);
-                assertThat(v.getValues().size()).isEqualTo(1);
+                assertThat(v.getValues()).hasSize(1);
                 Object rv = v.get("Value");
                 assertThat(ColumnImpl.isRawData(rv)).isTrue();
-                assertThat(rv.toString()).isEqualTo(value);
+                assertThat(rv).hasToString(value);
             }
         }
     }

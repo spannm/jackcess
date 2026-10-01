@@ -45,7 +45,7 @@ final class MultiValueColumnPropertyMapTest extends AbstractBaseTest {
 
             assertThat(props.getName()).isNotNull();
             assertThat(props.isEmpty()).isFalse();
-            assertThat(props.getSize() > 1).isTrue();
+            assertThat(props.getSize()).isGreaterThan(1);
 
             assertThat(props.getValue(PropertyMap.ALLOW_MULTI_VALUE_PROP)).isEqualTo(Boolean.TRUE);
             assertThat(props.get(PropertyMap.ROW_SOURCE_TYPE_PROP)).isNotNull();

@@ -23,8 +23,8 @@ final class StringUtilTest extends AbstractBaseTest {
 
     @Test
     void length() {
-        assertThat(StringUtil.length(null)).isEqualTo(0);
-        assertThat(StringUtil.length("")).isEqualTo(0);
+        assertThat(StringUtil.length(null)).isZero();
+        assertThat(StringUtil.length("")).isZero();
         assertThat(StringUtil.length("A")).isEqualTo(1);
         assertThat(StringUtil.length(" ")).isEqualTo(1);
         assertThat(StringUtil.length("sman")).isEqualTo(4);
@@ -58,7 +58,7 @@ final class StringUtilTest extends AbstractBaseTest {
     @Test
     void capitalize() {
         assertThat(StringUtil.capitalize(null)).isNull();
-        assertThat(StringUtil.capitalize("")).isEqualTo("");
+        assertThat(StringUtil.capitalize("")).isEmpty();
         assertThat(StringUtil.capitalize("hello")).isEqualTo("Hello");
         assertThat(StringUtil.capitalize("foo bar")).isEqualTo("Foo bar");
         assertThat(StringUtil.capitalize("Boo far")).isEqualTo("Boo far");
@@ -77,10 +77,10 @@ final class StringUtilTest extends AbstractBaseTest {
         assertThat(StringUtil.remove(null, null)).isNull();
         assertThat(StringUtil.remove(null, "")).isNull();
         assertThat(StringUtil.remove(null, "remove")).isNull();
-        assertThat(StringUtil.remove("", "remove")).isEqualTo("");
+        assertThat(StringUtil.remove("", "remove")).isEmpty();
         assertThat(StringUtil.remove("input", "remove")).isEqualTo("input");
         assertThat(StringUtil.remove("Removed", "remove")).isEqualTo("Removed");
-        assertThat(StringUtil.remove("remove", "remove")).isEqualTo("");
+        assertThat(StringUtil.remove("remove", "remove")).isEmpty();
         assertThat(StringUtil.remove("long", "longer")).isEqualTo("long");
     }
 

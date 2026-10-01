@@ -202,7 +202,7 @@ final class ImportTest extends AbstractBaseTest {
 
         Table t = db.getTable("Test1");
         List<? extends Column> columns = t.getColumns();
-        assertThat(columns.size()).isEqualTo(7);
+        assertThat(columns).hasSize(7);
 
         Column c = columns.get(0);
         assertThat(c.getName()).isEqualTo("col1");

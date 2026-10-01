@@ -177,7 +177,7 @@ final class PropertyExpressionTest extends AbstractBaseTest {
             setProp(t, "data2", PropertyMap.VALIDATION_TEXT_PROP, "Too big");
 
             InvalidValueException ex = catchThrowableOfType(() -> t.addRow(Column.AUTO_NUMBER, 42, 200), InvalidValueException.class);
-            assertThat(ex.getMessage().contains("Too big")).isTrue();
+            assertThat(ex.getMessage()).contains("Too big");
 
             t.addRow(Column.AUTO_NUMBER, 1, 9);
 
@@ -292,12 +292,12 @@ final class PropertyExpressionTest extends AbstractBaseTest {
 
             Row row = t.iterator().next();
 
-            assertThat(row.get("id")).isEqualTo(1);
-            assertThat(row.get("data1")).isEqualTo("FOO_someVal");
-            assertThat(((String) row.get("data2"))
-                    .matches("\\d{4}/\\d{1,2}/\\d{1,2}")).isTrue();
-            assertThat(((String) row.get("data3"))
-                    .matches("\\d{2}.\\d{2}.\\d{2} (AM|PM)")).isTrue();
+            assertThat(row).containsEntry("id", 1);
+            assertThat(row).containsEntry("data1", "FOO_someVal");
+            assertThat((String) row.get("data2"))
+                    .matches("\\d{4}/\\d{1,2}/\\d{1,2}");
+            assertThat((String) row.get("data3"))
+                    .matches("\\d{2}.\\d{2}.\\d{2} (AM|PM)");
         }
     }
 

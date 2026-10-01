@@ -131,8 +131,8 @@ final class CodecHandlerTest extends AbstractBaseTest {
         int id = row.getInt("id");
         String value = row.getString("data");
         String valuePrefix = "rowdata-" + id;
-        assertThat(value.startsWith(valuePrefix)).isTrue();
-        assertThat(value.length()).isEqualTo(valuePrefix.length() + 100);
+        assertThat(value).startsWith(valuePrefix);
+        assertThat(value).hasSize(valuePrefix.length() + 100);
     }
 
     private static void encodeFile(File dbFile, int pageSize, boolean simple) throws IOException {
@@ -252,7 +252,7 @@ final class CodecHandlerTest extends AbstractBaseTest {
         @Override
         public ByteBuffer encodePage(ByteBuffer page, int pageNumber,
             int pageOffset) {
-            assertThat(pageOffset).isEqualTo(0);
+            assertThat(pageOffset).isZero();
             assertThat(page.limit()).isEqualTo(_channel.getFormat().PAGE_SIZE);
 
             ByteBuffer bb = _bufH.getPageBuffer(_channel);

@@ -55,10 +55,10 @@ final class IndexTest extends AbstractBaseTest {
         byte b4 = (byte) 0x80;
         byte b5 = (byte) 0xFF;
 
-        assertThat(ByteUtil.asUnsignedByte(b1) < ByteUtil.asUnsignedByte(b2)).isTrue();
-        assertThat(ByteUtil.asUnsignedByte(b2) < ByteUtil.asUnsignedByte(b3)).isTrue();
-        assertThat(ByteUtil.asUnsignedByte(b3) < ByteUtil.asUnsignedByte(b4)).isTrue();
-        assertThat(ByteUtil.asUnsignedByte(b4) < ByteUtil.asUnsignedByte(b5)).isTrue();
+        assertThat(ByteUtil.asUnsignedByte(b1)).isLessThan(ByteUtil.asUnsignedByte(b2));
+        assertThat(ByteUtil.asUnsignedByte(b2)).isLessThan(ByteUtil.asUnsignedByte(b3));
+        assertThat(ByteUtil.asUnsignedByte(b3)).isLessThan(ByteUtil.asUnsignedByte(b4));
+        assertThat(ByteUtil.asUnsignedByte(b4)).isLessThan(ByteUtil.asUnsignedByte(b5));
     }
 
     @Test
@@ -112,7 +112,7 @@ final class IndexTest extends AbstractBaseTest {
             for (IndexImpl idx : table.getIndexes()) {
                 idx.initialize();
             }
-            assertThat(table.getIndexes().size()).isEqualTo(4);
+            assertThat(table.getIndexes()).hasSize(4);
             assertThat(table.getLogicalIndexCount()).isEqualTo(4);
             checkIndexColumns(table,
                 "id", "id",
@@ -124,8 +124,8 @@ final class IndexTest extends AbstractBaseTest {
             for (IndexImpl idx : table.getIndexes()) {
                 idx.initialize();
             }
-            assertThat(table.getIndexes().size()).isEqualTo(3);
-            assertThat(table.getIndexDatas().size()).isEqualTo(2);
+            assertThat(table.getIndexes()).hasSize(3);
+            assertThat(table.getIndexDatas()).hasSize(2);
             assertThat(table.getLogicalIndexCount()).isEqualTo(3);
             checkIndexColumns(table,
                 "id", "id",
@@ -145,8 +145,8 @@ final class IndexTest extends AbstractBaseTest {
             for (IndexImpl idx : table.getIndexes()) {
                 idx.initialize();
             }
-            assertThat(table.getIndexes().size()).isEqualTo(3);
-            assertThat(table.getIndexDatas().size()).isEqualTo(2);
+            assertThat(table.getIndexes()).hasSize(3);
+            assertThat(table.getIndexDatas()).hasSize(2);
             assertThat(table.getLogicalIndexCount()).isEqualTo(3);
             checkIndexColumns(table,
                 "id", "id",
@@ -323,7 +323,7 @@ final class IndexTest extends AbstractBaseTest {
                 assertThat(failure).isNull();
             } else {
                 assertThat(failure).isNotNull();
-                assertThat(failure.getMessage().contains("uniqueness")).isTrue();
+                assertThat(failure.getMessage()).contains("uniqueness");
             }
         }
     }
@@ -410,11 +410,11 @@ final class IndexTest extends AbstractBaseTest {
                 .withPrimaryKey("id")
                 .toTable(db);
 
-            assertThat(t.getIndexes().size()).isEqualTo(1);
+            assertThat(t.getIndexes()).hasSize(1);
             IndexImpl idx = (IndexImpl) t.getIndexes().get(0);
 
             assertThat(idx.getName()).isEqualTo(IndexBuilder.PRIMARY_KEY_NAME);
-            assertThat(idx.getColumns().size()).isEqualTo(1);
+            assertThat(idx.getColumns()).hasSize(1);
             assertThat(idx.getColumns().get(0).getName()).isEqualTo("id");
             assertThat(idx.getColumns().get(0).isAscending()).isTrue();
             assertThat(idx.isPrimaryKey()).isTrue();
@@ -431,8 +431,8 @@ final class IndexTest extends AbstractBaseTest {
 
             for (int i = 1; i <= 3; i++) {
                 Map<String, Object> row = c.getNextRow();
-                assertThat(row.get("id")).isEqualTo(i);
-                assertThat(row.get("data")).isEqualTo("row" + i);
+                assertThat(row).containsEntry("id", i);
+                assertThat(row).containsEntry("data", "row" + i);
             }
             assertThat(c.moveToNextRow()).isFalse();
         }
@@ -451,11 +451,11 @@ final class IndexTest extends AbstractBaseTest {
                 .addIndex(DatabaseBuilder.newIndex("Index3").withColumns(false, "id"))
                 .toTable(db);
 
-            assertThat(t.getIndexes().size()).isEqualTo(4);
+            assertThat(t.getIndexes()).hasSize(4);
             IndexImpl idx = (IndexImpl) t.getIndexes().get(0);
 
             assertThat(idx.getName()).isEqualTo(IndexBuilder.PRIMARY_KEY_NAME);
-            assertThat(idx.getColumns().size()).isEqualTo(1);
+            assertThat(idx.getColumns()).hasSize(1);
             assertThat(idx.getColumns().get(0).getName()).isEqualTo("id");
             assertThat(idx.getColumns().get(0).isAscending()).isTrue();
             assertThat(idx.isPrimaryKey()).isTrue();
@@ -480,8 +480,8 @@ final class IndexTest extends AbstractBaseTest {
 
             for (int i = 1; i <= 3; i++) {
                 Map<String, Object> row = c.getNextRow();
-                assertThat(row.get("id")).isEqualTo(i);
-                assertThat(row.get("data")).isEqualTo("row" + i);
+                assertThat(row).containsEntry("id", i);
+                assertThat(row).containsEntry("data", "row" + i);
             }
             assertThat(c.moveToNextRow()).isFalse();
         }
@@ -697,7 +697,7 @@ final class IndexTest extends AbstractBaseTest {
 
         for (Index idx : table.getIndexes()) {
             String colName = expectedIndexes.get(idx.getName());
-            assertThat(idx.getColumns().size()).isEqualTo(1);
+            assertThat(idx.getColumns()).hasSize(1);
             assertThat(idx.getColumns().get(0).getName()).isEqualTo(colName);
             if ("PrimaryKey".equals(idx.getName())) {
                 assertThat(idx.isPrimaryKey()).isTrue();

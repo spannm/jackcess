@@ -110,11 +110,11 @@ final class TableUpdaterTest extends AbstractBaseTest {
         assertThat(rel.cascadeUpdates()).isFalse();
         assertThat(rel.getJoinType()).isEqualTo(Relationship.JoinType.INNER);
 
-        assertThat(t1.getIndexes().size()).isEqualTo(t1idxs);
-        assertThat(((TableImpl) t1).getIndexDatas().size()).isEqualTo(1);
+        assertThat(t1.getIndexes()).hasSize(t1idxs);
+        assertThat(((TableImpl) t1).getIndexDatas()).hasSize(1);
 
-        assertThat(t2.getIndexes().size()).isEqualTo(t2idxs);
-        assertThat(((TableImpl) t2).getIndexDatas().size()).isEqualTo(t2idxs > 0 ? 1 : 0);
+        assertThat(t2.getIndexes()).hasSize(t2idxs);
+        assertThat(((TableImpl) t2).getIndexDatas()).hasSize(t2idxs > 0 ? 1 : 0);
 
         ((DatabaseImpl) db).getPageChannel().startWrite();
         try {
@@ -141,7 +141,7 @@ final class TableUpdaterTest extends AbstractBaseTest {
 
         int id = 0;
         for (Row r : t1) {
-            assertThat(r.get("id")).isEqualTo(id);
+            assertThat(r).containsEntry("id", id);
             id++;
             if (id == 5) {
                 id++;
@@ -150,7 +150,7 @@ final class TableUpdaterTest extends AbstractBaseTest {
 
         id = 0;
         for (Row r : t2) {
-            assertThat(r.get("id2")).isEqualTo(id);
+            assertThat(r).containsEntry("id2", id);
             id++;
             if (enforce && id == 5) {
                 id++;

@@ -104,7 +104,7 @@ final class OleBlobBuilderTest extends AbstractBaseTest {
         try (OleBlob blob = lb.toBlob()) {
             OleBlob.LinkContent lc = (OleBlob.LinkContent) blob.getContent();
             try (InputStream in = lc.getLinkStream()) {
-                assertThat(in.read() >= 0).isTrue();
+                assertThat(in.read()).isGreaterThanOrEqualTo(0);
             }
         }
     }
@@ -123,13 +123,13 @@ final class OleBlobBuilderTest extends AbstractBaseTest {
             .withPackageTypeName("TextFile")
             .withOtherBytes(DATA).toBlob()) {
             long len = blob.length();
-            assertThat(len > DATA.length).isTrue();
+            assertThat(len).isGreaterThan(DATA.length);
 
             byte[] all = blob.getBytes(1L, (int) len);
-            assertThat(all.length).isEqualTo(len);
+            assertThat(all).hasSize((int) len);
 
             byte[] part = blob.getBytes(2L, 4);
-            assertThat(part.length).isEqualTo(4);
+            assertThat(part).hasSize(4);
 
             try (InputStream in = blob.getBinaryStream()) {
                 assertThat((byte) in.read()).isEqualTo(all[0]);
@@ -147,7 +147,7 @@ final class OleBlobBuilderTest extends AbstractBaseTest {
                 .withPackageClassName("Text.File")
                 .withPackageTypeName("TextFile")
                 .withOtherBytes(part).toBlob()) {
-                assertThat(blob.position(other, 1L) != 0L).isTrue();
+                assertThat(blob.position(other, 1L)).isNotZero();
             }
 
             assertThatThrownBy(() -> blob.setBinaryStream(1L)).isInstanceOf(SQLFeatureNotSupportedException.class);
@@ -157,7 +157,7 @@ final class OleBlobBuilderTest extends AbstractBaseTest {
 
             ByteArrayOutputStream bout = new ByteArrayOutputStream();
             blob.writeTo(bout);
-            assertThat(bout.toByteArray().length).isEqualTo(len);
+            assertThat(bout.toByteArray()).hasSize((int) len);
             assertThat(blob.toString()).isNotNull();
 
             blob.free();

@@ -166,7 +166,7 @@ public final class TestUtil {
         for (Map<String, Object> row : cursor) {
             foundTable.add(row);
         }
-        assertThat(foundTable.size()).isEqualTo(expectedTable.size());
+        assertThat(foundTable).hasSameSizeAs(expectedTable);
         for (int i = 0; i < expectedTable.size(); i++) {
             assertThat(foundTable.get(i)).isEqualTo(expectedTable.get(i));
         }
@@ -299,41 +299,41 @@ public final class TestUtil {
     }
 
     public static void checkTestDBTable1RowABCDEFG(TestDb testDB, Table table, Row row) {
-        assertThat(row.get("A")).as("testDB: " + testDB + "; table: " + table).isEqualTo("abcdefg");
-        assertThat(row.get("B")).isEqualTo("hijklmnop");
-        assertThat(row.get("C")).isEqualTo((byte) 2);
-        assertThat(row.get("D")).isEqualTo((short) 222);
-        assertThat(row.get("E")).isEqualTo(333333333);
-        assertThat(row.get("F")).isEqualTo(444.555d);
+        assertThat(row).as("testDB: " + testDB + "; table: " + table).containsEntry("A", "abcdefg");
+        assertThat(row).containsEntry("B", "hijklmnop");
+        assertThat(row).containsEntry("C", (byte) 2);
+        assertThat(row).containsEntry("D", (short) 222);
+        assertThat(row).containsEntry("E", 333333333);
+        assertThat(row).containsEntry("F", 444.555d);
         Calendar cal = Calendar.getInstance();
         cal.setTime(row.getDate("G"));
         assertThat(cal.get(Calendar.MONTH)).isEqualTo(Calendar.SEPTEMBER);
         assertThat(cal.get(Calendar.DAY_OF_MONTH)).isEqualTo(21);
         assertThat(cal.get(Calendar.YEAR)).isEqualTo(1974);
-        assertThat(cal.get(Calendar.HOUR_OF_DAY)).isEqualTo(0);
-        assertThat(cal.get(Calendar.MINUTE)).isEqualTo(0);
-        assertThat(cal.get(Calendar.SECOND)).isEqualTo(0);
-        assertThat(cal.get(Calendar.MILLISECOND)).isEqualTo(0);
-        assertThat(row.get("I")).isEqualTo(Boolean.TRUE);
+        assertThat(cal.get(Calendar.HOUR_OF_DAY)).isZero();
+        assertThat(cal.get(Calendar.MINUTE)).isZero();
+        assertThat(cal.get(Calendar.SECOND)).isZero();
+        assertThat(cal.get(Calendar.MILLISECOND)).isZero();
+        assertThat(row).containsEntry("I", Boolean.TRUE);
     }
 
     public static void checkTestDBTable1RowA(TestDb testDB, Table table, Row row) {
-        assertThat(row.get("A")).as("testDB: " + testDB + "; table: " + table).isEqualTo("a");
-        assertThat(row.get("B")).isEqualTo("b");
-        assertThat(row.get("C")).isEqualTo((byte) 0);
-        assertThat(row.get("D")).isEqualTo((short) 0);
-        assertThat(row.get("E")).isEqualTo(0);
-        assertThat(row.get("F")).isEqualTo(0d);
+        assertThat(row).as("testDB: " + testDB + "; table: " + table).containsEntry("A", "a");
+        assertThat(row).containsEntry("B", "b");
+        assertThat(row).containsEntry("C", (byte) 0);
+        assertThat(row).containsEntry("D", (short) 0);
+        assertThat(row).containsEntry("E", 0);
+        assertThat(row).containsEntry("F", 0d);
         Calendar cal = Calendar.getInstance();
         cal.setTime(row.getDate("G"));
         assertThat(cal.get(Calendar.MONTH)).isEqualTo(Calendar.DECEMBER);
         assertThat(cal.get(Calendar.DAY_OF_MONTH)).isEqualTo(12);
         assertThat(cal.get(Calendar.YEAR)).isEqualTo(1981);
-        assertThat(cal.get(Calendar.HOUR_OF_DAY)).isEqualTo(0);
-        assertThat(cal.get(Calendar.MINUTE)).isEqualTo(0);
-        assertThat(cal.get(Calendar.SECOND)).isEqualTo(0);
-        assertThat(cal.get(Calendar.MILLISECOND)).isEqualTo(0);
-        assertThat(row.get("I")).isEqualTo(Boolean.FALSE);
+        assertThat(cal.get(Calendar.HOUR_OF_DAY)).isZero();
+        assertThat(cal.get(Calendar.MINUTE)).isZero();
+        assertThat(cal.get(Calendar.SECOND)).isZero();
+        assertThat(cal.get(Calendar.MILLISECOND)).isZero();
+        assertThat(row).containsEntry("I", Boolean.FALSE);
     }
 
     /**

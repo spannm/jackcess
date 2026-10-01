@@ -72,7 +72,7 @@ final class ExportTest extends AbstractBaseTest {
             + "\"crazy'data\"\"here\",-345,-3.45E-4,61 62 63 64  65 66 67,true," + NL
             + "C:\\temp\\some_file.txt,25,0.0,,false," + NL;
 
-        assertThat(out.toString()).isEqualTo(expected);
+        assertThat(out).hasToString(expected);
 
         out = new StringWriter();
 
@@ -87,7 +87,7 @@ final class ExportTest extends AbstractBaseTest {
             + "'some text||some more'||13||13.25||'61 62 63 64  65 66 67 68  69 6A 6B 6C  6D 6E 6F 70  71 72 73 74  75 76 77 78\n79 7A 61 62  63 64'||true||" + testDate + NL
             + "'crazy''data\"here'||-345||-3.45E-4||61 62 63 64  65 66 67||true||" + NL
             + "C:\\temp\\some_file.txt||25||0.0||||false||" + NL;
-        assertThat(out.toString()).isEqualTo(expected);
+        assertThat(out).hasToString(expected);
 
         ExportFilter oddFilter = new SimpleExportFilter() {
             private int _num;
@@ -112,7 +112,7 @@ final class ExportTest extends AbstractBaseTest {
             + "79 7A 61 62  63 64\",true," + testDate + NL
             + "C:\\temp\\some_file.txt,25,0.0,,false," + NL;
 
-        assertThat(out.toString()).isEqualTo(expected);
+        assertThat(out).hasToString(expected);
     }
 
 }

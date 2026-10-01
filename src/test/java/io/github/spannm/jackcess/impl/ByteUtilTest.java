@@ -107,7 +107,7 @@ final class ByteUtilTest extends AbstractBaseTest {
     void hexString() throws Exception {
         ByteBuffer bb = buffer(0x01, 0x02, 0x03, 0x04);
         String hex = ByteUtil.toHexString(bb, 4);
-        assertThat(hex.contains("01")).isTrue();
+        assertThat(hex).contains("01");
         assertThat(ByteUtil.toHexString(new byte[]{1, 2, 3})).isNotNull();
 
         ByteBuffer target = ByteBuffer.allocate(2);
@@ -119,7 +119,7 @@ final class ByteUtilTest extends AbstractBaseTest {
 
         File out = TestUtil.createTempFile(getShortTestMethodName(), ".hex", false);
         ByteUtil.toHexFile(out.getAbsolutePath(), bb, 0, 4);
-        assertThat(new String(Files.readAllBytes(out.toPath()), StandardCharsets.UTF_8).contains("01")).isTrue();
+        assertThat(new String(Files.readAllBytes(out.toPath()), StandardCharsets.UTF_8)).contains("01");
     }
 
     @Test
@@ -143,9 +143,9 @@ final class ByteUtilTest extends AbstractBaseTest {
         try (ByteUtil.ByteStream bs = new ByteUtil.ByteStream()) {
             bs.write("abc".getBytes(StandardCharsets.US_ASCII));
             assertThat(bs.getLength()).isEqualTo(3);
-            assertThat(bs.toByteArray().length).isEqualTo(3);
+            assertThat(bs.toByteArray()).hasSize(3);
             bs.reset();
-            assertThat(bs.getLength()).isEqualTo(0);
+            assertThat(bs.getLength()).isZero();
         }
     }
 

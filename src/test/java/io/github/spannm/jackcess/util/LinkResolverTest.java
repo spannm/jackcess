@@ -46,7 +46,7 @@ final class LinkResolverTest extends AbstractBaseTest {
                 () -> LinkResolver.DEFAULT.resolveLinkedDatabase(linkerDb, linkedDbName), AccessDeniedException.class);
 
             assertThat(ex.getFile()).isEqualTo(linkedDbName);
-            assertThat(ex.getReason().contains("LinkResolver.UNRESTRICTED")).isTrue();
+            assertThat(ex.getReason()).contains("LinkResolver.UNRESTRICTED");
         }
     }
 
@@ -72,7 +72,7 @@ final class LinkResolverTest extends AbstractBaseTest {
 
             AccessDeniedException ex = catchThrowableOfType(() -> db.getTable("RemoteTable"), AccessDeniedException.class);
             assertThat(ex.getFile()).isEqualTo(linkedDbName);
-            assertThat(db.getLinkedDatabases().isEmpty()).isTrue();
+            assertThat(db.getLinkedDatabases()).isEmpty();
         }
     }
 }

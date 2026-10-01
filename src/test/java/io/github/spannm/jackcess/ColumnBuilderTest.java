@@ -189,8 +189,8 @@ final class ColumnBuilderTest extends AbstractBaseTest {
         assertThat(cb.escapeName().getName()).isEqualTo("xvalue");
         assertThat(cb.toColumn()).isSameAs(cb);
         String str = cb.toString();
-        assertThat(str.startsWith("ColumnBuilder[")).isTrue();
-        assertThat(str.contains("type=TEXT")).isTrue();
+        assertThat(str).startsWith("ColumnBuilder[");
+        assertThat(str).contains("type=TEXT");
     }
 
 }

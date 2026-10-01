@@ -37,11 +37,11 @@ final class PropertyMapEnumTest extends AbstractBaseTest {
             PropertyMap.IMESentenceMode.values());
 
         for (EnumValue[] values : allValues) {
-            assertThat(values.length > 0).isTrue();
+            assertThat(values.length).isGreaterThan(0);
             for (EnumValue ev : values) {
                 assertThat(ev.getValue()).isNotNull();
                 String name = ((Enum<?>) ev).name();
-                assertThat(ev.toString()).isEqualTo(name + "[" + ev.getValue() + "]");
+                assertThat(ev).hasToString(name + "[" + ev.getValue() + "]");
             }
         }
     }

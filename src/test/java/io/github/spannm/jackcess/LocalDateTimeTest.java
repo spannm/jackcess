@@ -93,7 +93,7 @@ final class LocalDateTimeTest extends AbstractBaseTest {
                 foundDates.add(row.getLocalDateTime("date"));
             }
 
-            assertThat(foundDates.size()).isEqualTo(dates.size());
+            assertThat(foundDates).hasSameSizeAs(dates);
             for (int i = 0; i < dates.size(); i++) {
                 Date expected = dates.get(i);
                 LocalDateTime found = foundDates.get(i);

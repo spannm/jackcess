@@ -44,13 +44,13 @@ final class LongValueTest extends AbstractBaseTest {
         try (Database db = testDb.openMem()) {
             Table table = db.getTable("MSP_PROJECTS");
             Row row = table.getNextRow();
-            assertThat(row.get("PROJ_PROP_AUTHOR")).isEqualTo("Jon Iles this is a a vawesrasoih aksdkl fas dlkjflkasjd flkjaslkdjflkajlksj dfl lkasjdf lkjaskldfj "
+            assertThat(row).containsEntry("PROJ_PROP_AUTHOR", "Jon Iles this is a a vawesrasoih aksdkl fas dlkjflkasjd flkjaslkdjflkajlksj dfl lkasjdf lkjaskldfj "
                     + "lkas dlk lkjsjdfkl; aslkdf lkasjkldjf lka skldf lka sdkjfl;kasjd falksjdfljaslkdjf laskjdfk jalskjd "
                     + "flkj aslkdjflkjkjasljdflkjas jf;lkasjd fjkas dasdf asd fasdf asdf asdmhf lksaiyudfoi jasodfj902384jsdf9 "
                     + "aw90se fisajldkfj lkasj dlkfslkd jflksjadf as");
-            assertThat(row.get("PROJ_PROP_COMPANY")).isEqualTo("T");
-            assertThat(row.get("PROJ_INFO_CAL_NAME")).isEqualTo("Standard");
-            assertThat(row.get("PROJ_PROP_TITLE")).isEqualTo("Project1");
+            assertThat(row).containsEntry("PROJ_PROP_COMPANY", "T");
+            assertThat(row).containsEntry("PROJ_INFO_CAL_NAME", "Standard");
+            assertThat(row).containsEntry("PROJ_PROP_TITLE", "Project1");
             byte[] foundBinaryData = row.getBytes("RESERVED_BINARY_DATA");
             byte[] expectedBinaryData = Files.readAllBytes(new File(DIR_TEST_DATA, "test2BinData.dat").toPath());
             assertThat(foundBinaryData).containsExactly(expectedBinaryData);
@@ -82,20 +82,20 @@ final class LongValueTest extends AbstractBaseTest {
 
             Row row = table.getNextRow();
 
-            assertThat(row.get("A")).isEqualTo(testStr);
-            assertThat(row.get("B")).isEqualTo(testStr);
+            assertThat(row).containsEntry("A", testStr);
+            assertThat(row).containsEntry("B", testStr);
             assertThat(row.get("C")).isNull();
 
             row = table.getNextRow();
 
-            assertThat(row.get("A")).isEqualTo(testStr);
-            assertThat(row.get("B")).isEqualTo(longMemo);
+            assertThat(row).containsEntry("A", testStr);
+            assertThat(row).containsEntry("B", longMemo);
             assertThat(row.getBytes("C")).containsExactly(oleValue);
 
             row = table.getNextRow();
 
-            assertThat(row.get("A")).isEqualTo("");
-            assertThat(row.get("B")).isEqualTo("");
+            assertThat(row).containsEntry("A", "");
+            assertThat(row).containsEntry("B", "");
             assertThat(row.getBytes("C")).containsExactly(new byte[0]);
 
             row = table.getNextRow();
@@ -182,9 +182,9 @@ final class LongValueTest extends AbstractBaseTest {
 
             newTable = db.getTable("NewTable");
             Map<String, Object> readRow = newTable.getNextRow();
-            assertThat(readRow.get("a")).isEqualTo(1);
-            assertThat(readRow.get("b")).isEqualTo(lval);
-            assertThat(readRow.get("c")).isEqualTo(tval);
+            assertThat(readRow).containsEntry("a", 1);
+            assertThat(readRow).containsEntry("b", lval);
+            assertThat(readRow).containsEntry("c", tval);
         }
     }
 

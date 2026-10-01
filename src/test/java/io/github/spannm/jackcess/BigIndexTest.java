@@ -57,8 +57,8 @@ final class BigIndexTest extends AbstractBaseTest {
             TableImpl t = (TableImpl) db.getTable("Table1");
             IndexImpl i = t.getIndex("col1");
             assertThat(i.isInitialized()).isFalse();
-            assertThat(TestUtil.countRows(t)).isEqualTo(0);
-            assertThat(i.getIndexData().getEntryCount()).isEqualTo(0);
+            assertThat(TestUtil.countRows(t)).isZero();
+            assertThat(i.getIndexData().getEntryCount()).isZero();
         }
 
         setTestAutoSync(false);
@@ -118,7 +118,7 @@ final class BigIndexTest extends AbstractBaseTest {
                 if (val == null) {
                     val = firstValue;
                 }
-                assertThat(prevValue.compareTo(val) <= 0).as(prevValue + " <= " + val + " " + rowCount).isTrue();
+                assertThat(prevValue).as(prevValue + " <= " + val + " " + rowCount).isLessThanOrEqualTo(val);
                 if (firstTwo.size() < 2) {
                     firstTwo.add(origVal);
                 }

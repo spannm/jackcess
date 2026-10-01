@@ -43,18 +43,18 @@ final class PropertiesTest extends AbstractBaseTest {
     void propertyMaps() {
         PropertyMaps maps = new PropertyMaps(10, null, null, null);
         assertThat(maps.isEmpty()).isTrue();
-        assertThat(maps.getSize()).isEqualTo(0);
+        assertThat(maps.getSize()).isZero();
         assertThat(maps.iterator().hasNext()).isFalse();
         assertThat(maps.getObjectId()).isEqualTo(10);
 
         PropertyMapImpl defMap = maps.getDefault();
         assertThat(defMap.isEmpty()).isTrue();
-        assertThat(defMap.getSize()).isEqualTo(0);
+        assertThat(defMap.getSize()).isZero();
         assertThat(defMap.iterator().hasNext()).isFalse();
 
         PropertyMapImpl colMap = maps.get("testcol");
         assertThat(colMap.isEmpty()).isTrue();
-        assertThat(colMap.getSize()).isEqualTo(0);
+        assertThat(colMap.getSize()).isZero();
         assertThat(colMap.iterator().hasNext()).isFalse();
 
         assertThat(maps.isEmpty()).isFalse();
@@ -148,7 +148,7 @@ final class PropertiesTest extends AbstractBaseTest {
             assertThat(colProps.getValue("IMESentenceMode")).isEqualTo((byte) 3);
 
             PropertyMap dbProps = db.getDatabaseProperties();
-            assertThat(((String) dbProps.getValue(PropertyMap.ACCESS_VERSION_PROP)).matches("[0-9]{2}[.][0-9]{2}")).isTrue();
+            assertThat((String) dbProps.getValue(PropertyMap.ACCESS_VERSION_PROP)).matches("[0-9]{2}[.][0-9]{2}");
 
             PropertyMap sumProps = db.getSummaryProperties();
             assertThat(sumProps.getSize()).isEqualTo(3);
@@ -175,7 +175,7 @@ final class PropertiesTest extends AbstractBaseTest {
             try (Database db = TestUtil.openDb(ff, f)) {
                 PropertyMap dbProps = db.getDatabaseProperties();
                 assertThat(dbProps.isEmpty()).isFalse();
-                assertThat(((String) dbProps.getValue(PropertyMap.ACCESS_VERSION_PROP)).matches("[0-9]{2}[.][0-9]{2}")).isTrue();
+                assertThat((String) dbProps.getValue(PropertyMap.ACCESS_VERSION_PROP)).matches("[0-9]{2}[.][0-9]{2}");
 
                 for (Row row : ((DatabaseImpl) db).getSystemCatalog()) {
                     int id = row.getInt("Id");
@@ -185,9 +185,9 @@ final class PropertiesTest extends AbstractBaseTest {
                     if (byteLen == 0) {
                         assertThat(propMaps.isEmpty()).isTrue();
                     } else if (propMaps.isEmpty()) {
-                        assertThat(byteLen < 80).isTrue();
+                        assertThat(byteLen).isLessThan(80);
                     } else {
-                        assertThat(byteLen > 0).isTrue();
+                        assertThat(byteLen).isGreaterThan(0);
                     }
                 }
             }

@@ -237,7 +237,7 @@ final class CursorTest extends AbstractBaseTest {
         assertThat(cursor.isBeforeFirst()).isFalse();
         assertThat(cursor.isAfterLast()).isTrue();
 
-        assertThat(cursor.moveNextRows(3)).isEqualTo(0);
+        assertThat(cursor.moveNextRows(3)).isZero();
 
         cursor.beforeFirst();
         assertThat(cursor.isBeforeFirst()).isTrue();
@@ -762,7 +762,7 @@ final class CursorTest extends AbstractBaseTest {
         rows = toList(
             cursor.newIterable().withMatchPattern(valCol, "data9"));
 
-        assertThat(rows.isEmpty()).isTrue();
+        assertThat(rows).isEmpty();
 
         rows = toList(
             cursor.newIterable().withMatchPattern(
@@ -785,7 +785,7 @@ final class CursorTest extends AbstractBaseTest {
                 }
             }
             expectedRows = tmpRows;
-            assertThat(expectedRows.isEmpty()).isFalse();
+            assertThat(expectedRows).isNotEmpty();
 
             rows = toList(cursor.newIterable().withMatchPattern(row));
 
@@ -795,7 +795,7 @@ final class CursorTest extends AbstractBaseTest {
         rows = toList(
             cursor.newIterable().addMatchPattern("id", 8)
                 .addMatchPattern("value", "data13"));
-        assertThat(rows.isEmpty()).isTrue();
+        assertThat(rows).isEmpty();
     }
 
     @ParameterizedTest(name = "[{index}] {0}")
@@ -933,13 +933,13 @@ final class CursorTest extends AbstractBaseTest {
 
             assertThat(cursor.findFirstRowByEntry(-1)).isFalse();
             cursor.findClosestRowByEntry(-1);
-            assertThat(cursor.getCurrentRow().get("id")).isEqualTo(0);
+            assertThat(cursor.getCurrentRow()).containsEntry("id", 0);
 
             assertThat(cursor.findFirstRowByEntry(1)).isTrue();
-            assertThat(cursor.getCurrentRow().get("id")).isEqualTo(1);
+            assertThat(cursor.getCurrentRow()).containsEntry("id", 1);
 
             cursor.findClosestRowByEntry(2);
-            assertThat(cursor.getCurrentRow().get("id")).isEqualTo(2);
+            assertThat(cursor.getCurrentRow()).containsEntry("id", 2);
 
             assertThat(cursor.findFirstRowByEntry(4)).isFalse();
             cursor.findClosestRowByEntry(4);
@@ -1001,7 +1001,7 @@ final class CursorTest extends AbstractBaseTest {
                 expectedData.add(row.getString("data"));
             }
 
-            assertThat(expectedData.isEmpty()).isTrue();
+            assertThat(expectedData).isEmpty();
         }
     }
 
@@ -1044,7 +1044,7 @@ final class CursorTest extends AbstractBaseTest {
                 }
             }
 
-            assertThat(expectedData.isEmpty()).isTrue();
+            assertThat(expectedData).isEmpty();
         }
     }
 
@@ -1094,21 +1094,21 @@ final class CursorTest extends AbstractBaseTest {
         cursor.reset();
         assertThat(cursor.findRow(row.getId())).isTrue();
         Row rFound = cursor.getCurrentRow();
-        assertThat(rFound.get("id")).isEqualTo(id);
+        assertThat(rFound).containsEntry("id", id);
         assertThat(rFound).isEqualTo(row);
         Cursor.Savepoint save = cursor.getSavepoint();
 
         assertThat(cursor.moveToNextRow()).isTrue();
-        assertThat(cursor.getCurrentRow().get("id")).isEqualTo(id + 1);
+        assertThat(cursor.getCurrentRow()).containsEntry("id", id + 1);
 
         cursor.restoreSavepoint(save);
 
         assertThat(cursor.moveToPreviousRow()).isTrue();
-        assertThat(cursor.getCurrentRow().get("id")).isEqualTo(id - 1);
+        assertThat(cursor.getCurrentRow()).containsEntry("id", id - 1);
 
         assertThat(cursor.findRow(RowIdImpl.FIRST_ROW_ID)).isFalse();
 
-        assertThat(cursor.getCurrentRow().get("id")).isEqualTo(id - 1);
+        assertThat(cursor.getCurrentRow()).containsEntry("id", id - 1);
     }
 
     @ParameterizedTest(name = "[{index}] {0}")
@@ -1321,7 +1321,7 @@ final class CursorTest extends AbstractBaseTest {
         Object... entry) throws IOException {
         if (expectedId != null) {
             assertThat(c.findFirstRowByEntry(entry)).isTrue();
-            assertThat(c.getCurrentRow().get("id")).isEqualTo(expectedId);
+            assertThat(c.getCurrentRow()).containsEntry("id", expectedId);
         } else {
             assertThat(c.findFirstRowByEntry(entry)).isFalse();
         }
@@ -1359,7 +1359,7 @@ final class CursorTest extends AbstractBaseTest {
             rowPairs);
         Row r = CursorBuilder.findRow(idx, map);
         if (id != null) {
-            assertThat(r.get("id")).isEqualTo(id);
+            assertThat(r).containsEntry("id", id);
         } else {
             assertThat(r).isNull();
         }
