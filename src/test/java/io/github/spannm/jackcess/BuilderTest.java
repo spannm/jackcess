@@ -107,7 +107,8 @@ final class BuilderTest extends AbstractBaseTest {
         JetFormat fmt = JetFormat.VERSION_4;
         Set<String> colNames = new HashSet<>(Arrays.asList("A", "B"));
 
-        assertThatThrownBy(() -> new IndexBuilder("idx").validate(colNames, fmt))
+        IndexBuilder empty = new IndexBuilder("idx");
+        assertThatThrownBy(() -> empty.validate(colNames, fmt))
             .isInstanceOf(IllegalArgumentException.class);
 
         IndexBuilder tooMany = new IndexBuilder("idx");
@@ -116,9 +117,11 @@ final class BuilderTest extends AbstractBaseTest {
         }
         assertThatThrownBy(() -> tooMany.validate(colNames, fmt)).isInstanceOf(IllegalArgumentException.class);
 
-        assertThatThrownBy(() -> new IndexBuilder("idx").withColumns("a", "A").validate(colNames, fmt))
+        IndexBuilder dupeCol = new IndexBuilder("idx").withColumns("a", "A");
+        assertThatThrownBy(() -> dupeCol.validate(colNames, fmt))
             .isInstanceOf(IllegalArgumentException.class);
-        assertThatThrownBy(() -> new IndexBuilder("idx").withColumns("zz").validate(colNames, fmt))
+        IndexBuilder unknownCol = new IndexBuilder("idx").withColumns("zz");
+        assertThatThrownBy(() -> unknownCol.validate(colNames, fmt))
             .isInstanceOf(IllegalArgumentException.class);
 
         new IndexBuilder("idx").withColumns("a", "b").validate(colNames, fmt);

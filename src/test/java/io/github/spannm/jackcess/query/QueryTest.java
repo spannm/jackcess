@@ -139,7 +139,8 @@ final class QueryTest extends AbstractBaseTest {
 
         assertThatThrownBy(query::getTypeRow).isInstanceOf(IllegalStateException.class);
 
-        assertThatThrownBy(() -> new QueryImpl("TestQuery", rowList, 13, Query.Type.UNION.getObjectFlag(),
+        int unionObjectFlag = Query.Type.UNION.getObjectFlag();
+        assertThatThrownBy(() -> new QueryImpl("TestQuery", rowList, 13, unionObjectFlag,
             Query.Type.UNION) {
             @Override
             protected void toSQLString(StringBuilder builder) {

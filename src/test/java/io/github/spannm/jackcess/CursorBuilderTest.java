@@ -48,7 +48,8 @@ final class CursorBuilderTest extends AbstractBaseTest {
                 .toCursor();
             assertCursor(expected, found);
 
-            assertThatThrownBy(() -> table.newCursor().withIndexByName("foo"))
+            CursorBuilder byNameBuilder = table.newCursor();
+            assertThatThrownBy(() -> byNameBuilder.withIndexByName("foo"))
                 .isInstanceOf(IllegalArgumentException.class);
 
             expected = CursorBuilder.createCursor(idx);
@@ -57,12 +58,14 @@ final class CursorBuilderTest extends AbstractBaseTest {
                 .toCursor();
             assertCursor(expected, found);
 
-            assertThatThrownBy(() -> table.newCursor()
-                .withIndexByColumns(table.getColumn("value")))
+            CursorBuilder byValueColBuilder = table.newCursor();
+            Column valueCol = table.getColumn("value");
+            assertThatThrownBy(() -> byValueColBuilder.withIndexByColumns(valueCol))
                 .isInstanceOf(IllegalArgumentException.class);
 
-            assertThatThrownBy(() -> table.newCursor()
-                .withIndexByColumns(table.getColumn("id"), table.getColumn("value")))
+            CursorBuilder byIdValueColsBuilder = table.newCursor();
+            Column idCol = table.getColumn("id");
+            assertThatThrownBy(() -> byIdValueColsBuilder.withIndexByColumns(idCol, valueCol))
                 .isInstanceOf(IllegalArgumentException.class);
 
             expected = CursorBuilder.createCursor(table);

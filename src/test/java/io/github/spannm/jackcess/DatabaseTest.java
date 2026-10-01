@@ -55,54 +55,30 @@ final class DatabaseTest extends AbstractBaseTest {
     @FileFormatSource
     void invalidTableDefs(FileFormat fileFormat) throws Exception {
         try (Database db = createDbMem(fileFormat)) {
-            try {
-                DatabaseBuilder.newTable("test").toTable(db);
-                fail("created table with no columns?");
-            } catch (IllegalArgumentException _ex) {
-                // success
-            }
+            TableBuilder noColumns = DatabaseBuilder.newTable("test");
+            assertThatThrownBy(() -> noColumns.toTable(db)).isInstanceOf(IllegalArgumentException.class);
 
-            try {
-                DatabaseBuilder.newTable("test")
-                    .addColumn(DatabaseBuilder.newColumn("A", DataType.TEXT))
-                    .addColumn(DatabaseBuilder.newColumn("a", DataType.MEMO))
-                    .toTable(db);
-                fail("created table with duplicate column names?");
-            } catch (IllegalArgumentException _ex) {
-                // success
-            }
+            TableBuilder dupeColNames = DatabaseBuilder.newTable("test")
+                .addColumn(DatabaseBuilder.newColumn("A", DataType.TEXT))
+                .addColumn(DatabaseBuilder.newColumn("a", DataType.MEMO));
+            assertThatThrownBy(() -> dupeColNames.toTable(db)).isInstanceOf(IllegalArgumentException.class);
 
-            try {
-                DatabaseBuilder.newTable("test")
-                    .addColumn(DatabaseBuilder.newColumn("A", DataType.TEXT)
-                        .withLengthInUnits(352))
-                    .toTable(db);
-                fail("created table with invalid column length?");
-            } catch (IllegalArgumentException _ex) {
-                // success
-            }
+            TableBuilder badColLength = DatabaseBuilder.newTable("test")
+                .addColumn(DatabaseBuilder.newColumn("A", DataType.TEXT)
+                    .withLengthInUnits(352));
+            assertThatThrownBy(() -> badColLength.toTable(db)).isInstanceOf(IllegalArgumentException.class);
 
-            try {
-                DatabaseBuilder.newTable("test")
-                    .addColumn(DatabaseBuilder.newColumn("A_" + createString(70), DataType.TEXT))
-                    .toTable(db);
-                fail("created table with too long column name?");
-            } catch (IllegalArgumentException _ex) {
-                // success
-            }
+            TableBuilder longColName = DatabaseBuilder.newTable("test")
+                .addColumn(DatabaseBuilder.newColumn("A_" + createString(70), DataType.TEXT));
+            assertThatThrownBy(() -> longColName.toTable(db)).isInstanceOf(IllegalArgumentException.class);
 
             DatabaseBuilder.newTable("test")
                 .addColumn(DatabaseBuilder.newColumn("A", DataType.TEXT))
                 .toTable(db);
 
-            try {
-                DatabaseBuilder.newTable("Test")
-                    .addColumn(DatabaseBuilder.newColumn("A", DataType.TEXT))
-                    .toTable(db);
-                fail("create duplicate tables?");
-            } catch (IllegalArgumentException _ex) {
-                // success
-            }
+            TableBuilder dupeTable = DatabaseBuilder.newTable("Test")
+                .addColumn(DatabaseBuilder.newColumn("A", DataType.TEXT));
+            assertThatThrownBy(() -> dupeTable.toTable(db)).isInstanceOf(IllegalArgumentException.class);
         }
     }
 
@@ -973,8 +949,9 @@ final class DatabaseTest extends AbstractBaseTest {
     @Test
     void addTableUnsupportedSortOrderCatalogByDefaultThrows() throws Exception {
         try (Database db = openCopy(FileFormat.V2007, UNSUPPORTED_SORT_ORDER_DB)) {
+            TableBuilder tableBuilder = DatabaseBuilder.newTable("test2").addColumn(DatabaseBuilder.newColumn("A", DataType.TEXT));
             UnsupportedOperationException ex = catchThrowableOfType(
-                () -> DatabaseBuilder.newTable("test2").addColumn(DatabaseBuilder.newColumn("A", DataType.TEXT)).toTable(db),
+                () -> tableBuilder.toTable(db),
                 UnsupportedOperationException.class);
             assertThat(ex.getMessage()).contains("unsupported collating sort order");
         }
