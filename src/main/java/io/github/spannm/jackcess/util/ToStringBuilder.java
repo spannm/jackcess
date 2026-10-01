@@ -43,7 +43,7 @@ public class ToStringBuilder {
      * This is required because {@code hashCode()} on a self-referencing collection
      * (e.g. {@code list.add(list)}) would itself cause a {@link StackOverflowError}.
      */
-    private static final ThreadLocal<Set<Object>> OBJ_REGISTRY =
+    private static final ThreadLocal<Set<Object>> OBJ_REGISTRY = // NOSONAR S5164 - remove() is called in appendInternal's finally block once the registry empties
         ThreadLocal.withInitial(() -> Collections.newSetFromMap(new IdentityHashMap<>()));
 
     private final StringBuilder              buffer;

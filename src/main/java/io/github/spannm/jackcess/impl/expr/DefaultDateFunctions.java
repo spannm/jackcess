@@ -97,7 +97,7 @@ public class DefaultDateFunctions {
             }
 
             // we have to construct incrementally to handle out of range values
-            LocalDate ld = LocalDate.of(year, 1, 1).plusMonths(month - 1).plusDays(day - 1);
+            LocalDate ld = LocalDate.of(year, 1, 1).plusMonths((long) month - 1).plusDays((long) day - 1);
 
             return ValueSupport.toValue(ld);
         }
@@ -162,7 +162,7 @@ public class DefaultDateFunctions {
             if (INTV_YEAR.equalsIgnoreCase(intv)) {
                 ldt = ldt.plusYears(val);
             } else if (INTV_QUARTER.equalsIgnoreCase(intv)) {
-                ldt = ldt.plusMonths(val * 3);
+                ldt = ldt.plusMonths((long) val * 3);
             } else if (INTV_MONTH.equalsIgnoreCase(intv)) {
                 ldt = ldt.plusMonths(val);
             } else if (INTV_DAY_OF_YEAR.equalsIgnoreCase(intv)
@@ -526,7 +526,7 @@ public class DefaultDateFunctions {
     }
 
     private static DayOfWeek dayOfWeek(int dayOfWeek) {
-        return DayOfWeek.SUNDAY.plus(dayOfWeek - 1);
+        return DayOfWeek.SUNDAY.plus((long) dayOfWeek - 1);
     }
 
     private static TextStyle getTextStyle(EvalContext ctx, Value[] params,
