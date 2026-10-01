@@ -16,7 +16,6 @@
 package io.github.spannm.jackcess.impl.complex;
 
 import static io.github.spannm.jackcess.test.Basename.COMPLEX_DATA;
-import static org.assertj.core.api.Assertions.assertThat;
 
 import io.github.spannm.jackcess.*;
 import io.github.spannm.jackcess.test.AbstractBaseTest;
@@ -26,7 +25,6 @@ import org.junit.jupiter.params.ParameterizedTest;
 
 import java.util.Arrays;
 import java.util.Iterator;
-import java.util.List;
 import java.util.NoSuchElementException;
 
 /**

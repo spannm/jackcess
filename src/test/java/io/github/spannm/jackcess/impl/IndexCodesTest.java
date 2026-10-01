@@ -18,7 +18,6 @@ package io.github.spannm.jackcess.impl;
 
 import static io.github.spannm.jackcess.test.Basename.EMOTICONS;
 import static io.github.spannm.jackcess.test.Basename.INDEX_CODES;
-import static org.assertj.core.api.Assertions.assertThat;
 
 import org.assertj.core.api.Assertions;
 import io.github.spannm.jackcess.*;

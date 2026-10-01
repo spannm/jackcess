@@ -20,7 +20,6 @@ import static io.github.spannm.jackcess.test.Basename.COMMON2;
 import static io.github.spannm.jackcess.test.Basename.UNICODE_COMP;
 import static io.github.spannm.jackcess.test.TestUtil.createString;
 import static io.github.spannm.jackcess.test.TestUtil.openDb;
-import static org.assertj.core.api.Assertions.assertThat;
 
 import io.github.spannm.jackcess.*;
 import io.github.spannm.jackcess.Database.FileFormat;

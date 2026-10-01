@@ -17,7 +17,6 @@ limitations under the License.
 package io.github.spannm.jackcess;
 
 import static io.github.spannm.jackcess.test.Basename.INDEX_CURSOR;
-import static org.assertj.core.api.Assertions.assertThat;
 
 import io.github.spannm.jackcess.impl.IndexImpl;
 import io.github.spannm.jackcess.test.AbstractBaseTest;

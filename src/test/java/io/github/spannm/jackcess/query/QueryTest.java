@@ -18,7 +18,6 @@ package io.github.spannm.jackcess.query;
 
 import static io.github.spannm.jackcess.impl.query.QueryFormat.*;
 import static io.github.spannm.jackcess.test.Basename.QUERY;
-import static org.assertj.core.api.Assertions.assertThat;
 
 import io.github.spannm.jackcess.DataType;
 import io.github.spannm.jackcess.Database;

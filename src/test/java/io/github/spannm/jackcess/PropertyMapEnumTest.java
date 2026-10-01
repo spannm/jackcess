@@ -15,7 +15,6 @@
  */
 package io.github.spannm.jackcess;
 
-import static org.assertj.core.api.Assertions.assertThat;
 import io.github.spannm.jackcess.PropertyMap.EnumValue;
 import io.github.spannm.jackcess.test.AbstractBaseTest;
 import org.junit.jupiter.api.Test;

@@ -19,7 +19,6 @@ package io.github.spannm.jackcess;
 import static io.github.spannm.jackcess.test.Basename.INDEX;
 import static io.github.spannm.jackcess.test.Basename.INDEX_CURSOR;
 import static io.github.spannm.jackcess.test.TestUtil.*;
-import static org.assertj.core.api.Assertions.assertThat;
 
 import io.github.spannm.jackcess.Database.FileFormat;
 import io.github.spannm.jackcess.impl.ColumnImpl;

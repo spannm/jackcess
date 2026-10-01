@@ -18,7 +18,6 @@ package io.github.spannm.jackcess;
 
 import static io.github.spannm.jackcess.test.Basename.LINKED;
 import static io.github.spannm.jackcess.test.Basename.LINKED_ODBC;
-import static org.assertj.core.api.Assertions.assertThat;
 
 import io.github.spannm.jackcess.impl.DatabaseImpl;
 import io.github.spannm.jackcess.test.AbstractBaseTest;

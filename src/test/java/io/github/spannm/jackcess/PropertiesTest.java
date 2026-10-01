@@ -17,7 +17,6 @@
 package io.github.spannm.jackcess;
 
 import static io.github.spannm.jackcess.test.Basename.COMMON1;
-import static org.assertj.core.api.Assertions.assertThat;
 
 import io.github.spannm.jackcess.Database.FileFormat;
 import io.github.spannm.jackcess.impl.DatabaseImpl;

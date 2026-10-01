@@ -16,7 +16,6 @@
  */
 package io.github.spannm.jackcess.impl.expr;
 
-import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.SoftAssertions.assertSoftly;
 import io.github.spannm.jackcess.DataType;
 import io.github.spannm.jackcess.expr.*;
