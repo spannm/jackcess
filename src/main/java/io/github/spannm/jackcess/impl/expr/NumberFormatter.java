@@ -96,6 +96,7 @@ public class NumberFormatter {
             return f < 0f ? NEG_INF_STR : POS_INF_STR;
         }
 
+        // NOSONAR S2111 - the exact binary value of f must survive before rounding; a String-based ctor would alter it
         return fltFmt.format(new BigDecimal(f, FLT_MATH_CONTEXT));
     }
 
@@ -109,6 +110,7 @@ public class NumberFormatter {
             return d < 0d ? NEG_INF_STR : POS_INF_STR;
         }
 
+        // NOSONAR S2111 - the exact binary value of d must survive before rounding; a String-based ctor would alter it
         return dblFmt.format(new BigDecimal(d, DBL_MATH_CONTEXT));
     }
 
