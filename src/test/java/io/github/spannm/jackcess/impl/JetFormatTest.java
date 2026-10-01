@@ -17,7 +17,6 @@
 package io.github.spannm.jackcess.impl;
 
 import static io.github.spannm.jackcess.test.Basename.COMMON1;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import io.github.spannm.jackcess.DataType;
@@ -43,7 +42,8 @@ final class JetFormatTest extends AbstractBaseTest {
 
     @Test
     void getFormatNull() {
-        assertThrows(NullPointerException.class, () -> JetFormat.getFormat(null));
+        assertThatThrownBy(() -> JetFormat.getFormat(null))
+            .isInstanceOf(NullPointerException.class);
     }
 
     @ParameterizedTest(name = "[{index}] {0}")

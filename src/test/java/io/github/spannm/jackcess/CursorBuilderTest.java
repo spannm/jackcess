@@ -17,7 +17,6 @@ limitations under the License.
 package io.github.spannm.jackcess;
 
 import static io.github.spannm.jackcess.test.Basename.INDEX_CURSOR;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import io.github.spannm.jackcess.impl.IndexImpl;
@@ -50,7 +49,8 @@ final class CursorBuilderTest extends AbstractBaseTest {
                 .toCursor();
             assertCursor(expected, found);
 
-            assertThrows(IllegalArgumentException.class, () -> table.newCursor().withIndexByName("foo"));
+            assertThatThrownBy(() -> table.newCursor().withIndexByName("foo"))
+                .isInstanceOf(IllegalArgumentException.class);
 
             expected = CursorBuilder.createCursor(idx);
             found = table.newCursor()
@@ -58,11 +58,13 @@ final class CursorBuilderTest extends AbstractBaseTest {
                 .toCursor();
             assertCursor(expected, found);
 
-            assertThrows(IllegalArgumentException.class, () -> table.newCursor()
-                .withIndexByColumns(table.getColumn("value")));
+            assertThatThrownBy(() -> table.newCursor()
+                .withIndexByColumns(table.getColumn("value")))
+                .isInstanceOf(IllegalArgumentException.class);
 
-            assertThrows(IllegalArgumentException.class, () -> table.newCursor()
-                .withIndexByColumns(table.getColumn("id"), table.getColumn("value")));
+            assertThatThrownBy(() -> table.newCursor()
+                .withIndexByColumns(table.getColumn("id"), table.getColumn("value")))
+                .isInstanceOf(IllegalArgumentException.class);
 
             expected = CursorBuilder.createCursor(table);
             expected.beforeFirst();

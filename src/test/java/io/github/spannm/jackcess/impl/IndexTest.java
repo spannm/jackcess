@@ -17,7 +17,6 @@ limitations under the License.
 package io.github.spannm.jackcess.impl;
 
 import static io.github.spannm.jackcess.test.Basename.*;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import io.github.spannm.jackcess.*;
@@ -538,7 +537,7 @@ final class IndexTest extends AbstractBaseTest {
                 t.addRow(i, "row" + i);
             }
 
-            assertThrows(ConstraintViolationException.class, () -> t.addRow(3, "badrow"));
+            assertThatThrownBy(() -> t.addRow(3, "badrow")).isInstanceOf(ConstraintViolationException.class);
 
             assertThat(t.getRowCount()).isEqualTo(5);
 
@@ -561,7 +560,7 @@ final class IndexTest extends AbstractBaseTest {
             batch.add(new Object[] {7, "row2"});
             batch.add(new Object[] {8, "row8"});
 
-            BatchUpdateException buex = assertThrows(BatchUpdateException.class, () -> t.addRows(batch));
+            BatchUpdateException buex = catchThrowableOfType(() -> t.addRows(batch), BatchUpdateException.class);
             assertThat(buex.getCause()).isInstanceOf(ConstraintViolationException.class);
             assertThat(buex.getUpdateCount()).isEqualTo(2);
 
@@ -580,7 +579,7 @@ final class IndexTest extends AbstractBaseTest {
 
             row4.put("id", 3);
 
-            assertThrows(ConstraintViolationException.class, () -> t.updateRow(row4));
+            assertThatThrownBy(() -> t.updateRow(row4)).isInstanceOf(ConstraintViolationException.class);
 
             TestUtil.assertTable(expectedRows, t);
 
@@ -606,7 +605,7 @@ final class IndexTest extends AbstractBaseTest {
                 t.addRow(null, "row" + i);
             }
 
-            assertThrows(ConstraintViolationException.class, () -> t.addRow(null, "row1"));
+            assertThatThrownBy(() -> t.addRow(null, "row1")).isInstanceOf(ConstraintViolationException.class);
 
             t.addRow(null, "row3");
 
@@ -629,7 +628,7 @@ final class IndexTest extends AbstractBaseTest {
             batch.add(new Object[] {null, "row5"});
             batch.add(new Object[] {null, "row3"});
 
-            BatchUpdateException buex = assertThrows(BatchUpdateException.class, () -> t.addRows(batch));
+            BatchUpdateException buex = catchThrowableOfType(() -> t.addRows(batch), BatchUpdateException.class);
             assertThat(buex.getCause()).isInstanceOf(ConstraintViolationException.class);
             assertThat(buex.getUpdateCount()).isEqualTo(2);
 

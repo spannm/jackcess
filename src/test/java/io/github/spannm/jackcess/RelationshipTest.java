@@ -17,7 +17,6 @@ limitations under the License.
 package io.github.spannm.jackcess;
 
 import static io.github.spannm.jackcess.test.Basename.INDEX;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import io.github.spannm.jackcess.impl.RelationshipImpl;
@@ -74,7 +73,8 @@ final class RelationshipTest extends AbstractBaseTest {
             assertThat(rel.cascadeUpdates()).isTrue();
             assertSameRelationships(rels, db.getRelationships(t3, t1), true);
 
-            assertThrows(IllegalArgumentException.class, () -> db.getRelationships(t1, t1));
+            assertThatThrownBy(() -> db.getRelationships(t1, t1))
+                .isInstanceOf(IllegalArgumentException.class);
         }
     }
 

@@ -19,7 +19,6 @@ package io.github.spannm.jackcess;
 import static io.github.spannm.jackcess.test.Basename.INDEX;
 import static io.github.spannm.jackcess.test.Basename.INDEX_CURSOR;
 import static io.github.spannm.jackcess.test.TestUtil.*;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import io.github.spannm.jackcess.Database.FileFormat;
@@ -815,9 +814,9 @@ final class CursorTest extends AbstractBaseTest {
             tCursor.restoreSavepoint(tSave);
             iCursor.restoreSavepoint(iSave);
 
-            assertThrows(IllegalArgumentException.class, () -> tCursor.restoreSavepoint(iSave));
+            assertThatThrownBy(() -> tCursor.restoreSavepoint(iSave)).isInstanceOf(IllegalArgumentException.class);
 
-            assertThrows(IllegalArgumentException.class, () -> iCursor.restoreSavepoint(tSave));
+            assertThatThrownBy(() -> iCursor.restoreSavepoint(tSave)).isInstanceOf(IllegalArgumentException.class);
 
             Cursor tCursor2 = CursorBuilder.createCursor(table);
             Cursor iCursor2 = CursorBuilder.createCursor(idx);
@@ -988,10 +987,10 @@ final class CursorTest extends AbstractBaseTest {
                 cursor.newEntryIterable(1).iterator(); iter.hasNext();) {
                 expectedData.add(iter.next().getString("data"));
                 iter.remove();
-                assertThrows(IllegalStateException.class, iter::remove);
+                assertThatThrownBy(iter::remove).isInstanceOf(IllegalStateException.class);
 
                 if (!iter.hasNext()) {
-                    assertThrows(NoSuchElementException.class, iter::next);
+                    assertThatThrownBy(iter::next).isInstanceOf(NoSuchElementException.class);
                 }
             }
 
@@ -1027,11 +1026,11 @@ final class CursorTest extends AbstractBaseTest {
                 if (row.get("otherfk1").equals(1)) {
                     expectedData.add(row.getString("data"));
                     iter.remove();
-                    assertThrows(IllegalStateException.class, iter::remove);
+                    assertThatThrownBy(iter::remove).isInstanceOf(IllegalStateException.class);
                 }
 
                 if (!iter.hasNext()) {
-                    assertThrows(NoSuchElementException.class, iter::next);
+                    assertThatThrownBy(iter::next).isInstanceOf(NoSuchElementException.class);
                 }
             }
 
@@ -1136,10 +1135,10 @@ final class CursorTest extends AbstractBaseTest {
 
             IndexCursor cursor = CursorBuilder.createCursor(table.getIndex("value_idx"));
 
-            assertThrows(UncheckedIOException.class, () -> cursor.newIterable()
+            assertThatThrownBy(() -> cursor.newIterable()
                 .addMatchPattern("value", "val-9")
                 .addMatchPattern("memo", "anything")
-                .iterator().hasNext());
+                .iterator().hasNext()).isInstanceOf(UncheckedIOException.class);
 
             List<Row> rows = new ArrayList<>();
             for (Row row : cursor.newIterable()
@@ -1272,7 +1271,7 @@ final class CursorTest extends AbstractBaseTest {
             doFindFirstByEntry(c, null, "C", 4, "K3");
         }
 
-        assertThrows(IllegalArgumentException.class, () -> {
+        assertThatThrownBy(() -> {
             if (colCount > 2) {
                 c.findFirstRowByEntry("C", 4, "K1", 14);
             } else if (colCount > 1) {
@@ -1280,7 +1279,7 @@ final class CursorTest extends AbstractBaseTest {
             } else {
                 c.findFirstRowByEntry("C", 4);
             }
-        });
+        }).isInstanceOf(IllegalArgumentException.class);
 
         doFindByEntryRange(c, 11, 20, "B");
         doFindByEntry(c, new int[] {}, "Z");

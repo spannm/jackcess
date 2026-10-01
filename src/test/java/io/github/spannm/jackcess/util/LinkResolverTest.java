@@ -15,7 +15,6 @@
  */
 package io.github.spannm.jackcess.util;
 
-import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.assertj.core.api.Assertions.assertThat;
 import io.github.spannm.jackcess.Database;
 import io.github.spannm.jackcess.Database.FileFormat;
@@ -43,8 +42,8 @@ final class LinkResolverTest extends AbstractBaseTest {
     })
     void defaultRejectsAutomaticLinks(String linkedDbName) throws Exception {
         try (Database linkerDb = createDbMem(FileFormat.V2010)) {
-            AccessDeniedException ex = assertThrows(AccessDeniedException.class,
-                () -> LinkResolver.DEFAULT.resolveLinkedDatabase(linkerDb, linkedDbName));
+            AccessDeniedException ex = catchThrowableOfType(
+                () -> LinkResolver.DEFAULT.resolveLinkedDatabase(linkerDb, linkedDbName), AccessDeniedException.class);
 
             assertThat(ex.getFile()).isEqualTo(linkedDbName);
             assertThat(ex.getReason().contains("LinkResolver.UNRESTRICTED")).isTrue();
@@ -71,7 +70,7 @@ final class LinkResolverTest extends AbstractBaseTest {
         try (Database db = createDbMem(FileFormat.V2010)) {
             db.createLinkedTable("RemoteTable", linkedDbName, "Table1");
 
-            AccessDeniedException ex = assertThrows(AccessDeniedException.class, () -> db.getTable("RemoteTable"));
+            AccessDeniedException ex = catchThrowableOfType(() -> db.getTable("RemoteTable"), AccessDeniedException.class);
             assertThat(ex.getFile()).isEqualTo(linkedDbName);
             assertThat(db.getLinkedDatabases().isEmpty()).isTrue();
         }

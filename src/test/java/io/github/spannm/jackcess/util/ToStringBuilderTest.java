@@ -18,9 +18,9 @@
  */
 package io.github.spannm.jackcess.util;
 
-import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
-import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatCode;
+import static org.assertj.core.api.SoftAssertions.assertSoftly;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -51,11 +51,11 @@ final class ToStringBuilderTest {
                 .append("field", "value")
                 .toString();
 
-            assertAll(
-                () -> assertThat(result.startsWith("SampleObject[")).as("Should start with class name + '['").isTrue(),
-                () -> assertThat(result.contains("@")).as("No identity hash code for valueBuilder").isFalse(),
-                () -> assertThat(result.contains("field=value")).as("Field name and value must be present").isTrue()
-            );
+            assertSoftly(softly -> {
+                softly.assertThat(result.startsWith("SampleObject[")).as("Should start with class name + '['").isTrue();
+                softly.assertThat(result.contains("@")).as("No identity hash code for valueBuilder").isFalse();
+                softly.assertThat(result.contains("field=value")).as("Field name and value must be present").isTrue();
+            });
         }
 
         @Test
@@ -107,10 +107,10 @@ final class ToStringBuilderTest {
                 .append("num", 42)
                 .toString();
 
-            assertAll(
-                () -> assertThat(result.contains("foo: bar")).as("First field").isTrue(),
-                () -> assertThat(result.contains("num: 42")).as("Second field").isTrue()
-            );
+            assertSoftly(softly -> {
+                softly.assertThat(result.contains("foo: bar")).as("First field").isTrue();
+                softly.assertThat(result.contains("num: 42")).as("Second field").isTrue();
+            });
         }
 
         @Test
@@ -157,12 +157,12 @@ final class ToStringBuilderTest {
             String result = ToStringBuilder.valueBuilder("T")
                 .append("arr", new String[]{"a", "b", "c"})
                 .toString();
-            assertAll(
-                () -> assertThat(result.contains("{")).as("Array opening '{'").isTrue(),
-                () -> assertThat(result.contains("a")).as("First element").isTrue(),
-                () -> assertThat(result.contains("c")).as("Last element").isTrue(),
-                () -> assertThat(result.contains("}")).as("Array closing '}'").isTrue()
-            );
+            assertSoftly(softly -> {
+                softly.assertThat(result.contains("{")).as("Array opening '{'").isTrue();
+                softly.assertThat(result.contains("a")).as("First element").isTrue();
+                softly.assertThat(result.contains("c")).as("Last element").isTrue();
+                softly.assertThat(result.contains("}")).as("Array closing '}'").isTrue();
+            });
         }
 
         @Test
@@ -188,11 +188,11 @@ final class ToStringBuilderTest {
         void appendCollection() {
             List<String> list = Arrays.asList("x", "y");
             String result = ToStringBuilder.valueBuilder("T").append("list", list).toString();
-            assertAll(
-                () -> assertThat(result.contains("[")).as("Collection wrapped in '['").isTrue(),
-                () -> assertThat(result.contains("x")).as("Element x").isTrue(),
-                () -> assertThat(result.contains("y")).as("Element y").isTrue()
-            );
+            assertSoftly(softly -> {
+                softly.assertThat(result.contains("[")).as("Collection wrapped in '['").isTrue();
+                softly.assertThat(result.contains("x")).as("Element x").isTrue();
+                softly.assertThat(result.contains("y")).as("Element y").isTrue();
+            });
         }
 
         @Test
@@ -212,10 +212,10 @@ final class ToStringBuilderTest {
             map.put("k1", "v1");
             map.put("k2", "v2");
             String result = ToStringBuilder.valueBuilder("T").append("map", map).toString();
-            assertAll(
-                () -> assertThat(result.contains("k1=v1")).isTrue(),
-                () -> assertThat(result.contains("k2=v2")).isTrue()
-            );
+            assertSoftly(softly -> {
+                softly.assertThat(result.contains("k1=v1")).isTrue();
+                softly.assertThat(result.contains("k2=v2")).isTrue();
+            });
         }
 
         @Test
@@ -233,11 +233,11 @@ final class ToStringBuilderTest {
             String result = ToStringBuilder.valueBuilder("T")
                 .append("nums", new int[]{1, 2, 3})
                 .toString();
-            assertAll(
-                () -> assertThat(result.contains("{")).as("Array braces present").isTrue(),
-                () -> assertThat(result.contains("1")).isTrue(),
-                () -> assertThat(result.contains("3")).isTrue()
-            );
+            assertSoftly(softly -> {
+                softly.assertThat(result.contains("{")).as("Array braces present").isTrue();
+                softly.assertThat(result.contains("1")).isTrue();
+                softly.assertThat(result.contains("3")).isTrue();
+            });
         }
     }
 
@@ -261,11 +261,11 @@ final class ToStringBuilderTest {
                 .appendIgnoreNull("skip", null)
                 .append("keep", "yes")
                 .toString();
-            assertAll(
-                () -> assertThat(result.contains("skip")).as("Null field must not appear").isFalse(),
-                () -> assertThat(result.contains("keep=yes")).as("Non-null field must appear").isTrue(),
-                () -> assertThat(result.contains("<null>")).as("No '<null>' for appendIgnoreNull").isFalse()
-            );
+            assertSoftly(softly -> {
+                softly.assertThat(result.contains("skip")).as("Null field must not appear").isFalse();
+                softly.assertThat(result.contains("keep=yes")).as("Non-null field must appear").isTrue();
+                softly.assertThat(result.contains("<null>")).as("No '<null>' for appendIgnoreNull").isFalse();
+            });
         }
 
         @Test
@@ -292,10 +292,9 @@ final class ToStringBuilderTest {
             List<Object> circular = new ArrayList<>();
             circular.add(circular);
 
-            assertDoesNotThrow(
-                () -> ToStringBuilder.valueBuilder("T").append("self", circular).toString(),
-                "Cycle detection should prevent StackOverflowError"
-            );
+            assertThatCode(() -> ToStringBuilder.valueBuilder("T").append("self", circular).toString())
+                .as("Cycle detection should prevent StackOverflowError")
+                .doesNotThrowAnyException();
         }
     }
 
@@ -362,7 +361,7 @@ final class ToStringBuilderTest {
         @DisplayName("Empty buffer – no exception")
         void emptyBuffer_noException() {
             StringBuilder sb = new StringBuilder();
-            assertDoesNotThrow(() -> ToStringBuilder.removeLastFieldSeparator(sb, ","));
+            assertThatCode(() -> ToStringBuilder.removeLastFieldSeparator(sb, ",")).doesNotThrowAnyException();
             assertThat(sb.toString()).isEqualTo("");
         }
 

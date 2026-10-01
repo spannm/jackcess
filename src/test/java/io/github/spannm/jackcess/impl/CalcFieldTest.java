@@ -17,7 +17,6 @@
 package io.github.spannm.jackcess.impl;
 
 import static io.github.spannm.jackcess.test.Basename.CALC_FIELD;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import io.github.spannm.jackcess.*;
@@ -43,7 +42,8 @@ final class CalcFieldTest extends AbstractBaseTest {
         ColumnBuilder cb = new ColumnBuilder("calc_data", DataType.TEXT)
             .withCalculatedInfo("[id] & \"_\" & [data]");
 
-        assertThrows(IllegalArgumentException.class, () -> cb.validate(JetFormat.VERSION_12));
+        assertThatThrownBy(() -> cb.validate(JetFormat.VERSION_12))
+            .isInstanceOf(IllegalArgumentException.class);
 
         cb.validate(JetFormat.VERSION_14);
     }

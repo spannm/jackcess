@@ -18,7 +18,6 @@ package io.github.spannm.jackcess;
 
 import static io.github.spannm.jackcess.test.Basename.LINKED;
 import static io.github.spannm.jackcess.test.Basename.LINKED_ODBC;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import io.github.spannm.jackcess.impl.DatabaseImpl;
@@ -40,7 +39,7 @@ final class LinkedTableTest extends AbstractBaseTest {
     void linkedTables(TestDb testDb) throws Exception {
 
         try (Database db = testDb.openCopy()) {
-            assertThrows(AccessDeniedException.class, () -> db.getTable("Table2"));
+            assertThatThrownBy(() -> db.getTable("Table2")).isInstanceOf(AccessDeniedException.class);
 
             TableMetaData tmd = db.getTableMetaData("Table2");
             assertThat(tmd.getName()).isEqualTo("Table2");
@@ -167,9 +166,9 @@ final class LinkedTableTest extends AbstractBaseTest {
 
             Table tbl = db.getTable("Ordrar");
 
-            assertThrows(UnsupportedOperationException.class, tbl::iterator);
+            assertThatThrownBy(tbl::iterator).isInstanceOf(UnsupportedOperationException.class);
 
-            assertThrows(UnsupportedOperationException.class, () -> tbl.addRow(1L, "bar"));
+            assertThatThrownBy(() -> tbl.addRow(1L, "bar")).isInstanceOf(UnsupportedOperationException.class);
         }
     }
 

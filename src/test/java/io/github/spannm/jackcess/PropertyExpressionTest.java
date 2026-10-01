@@ -19,7 +19,6 @@ package io.github.spannm.jackcess;
 import static io.github.spannm.jackcess.DatabaseBuilder.newColumn;
 import static io.github.spannm.jackcess.DatabaseBuilder.newTable;
 import static io.github.spannm.jackcess.test.TestUtil.*;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import io.github.spannm.jackcess.Database.FileFormat;
@@ -167,9 +166,9 @@ final class PropertyExpressionTest extends AbstractBaseTest {
 
             t.addRow(Column.AUTO_NUMBER, 42, 8);
 
-            assertThrows(InvalidValueException.class, () -> t.addRow(Column.AUTO_NUMBER, 42, 20));
+            assertThatThrownBy(() -> t.addRow(Column.AUTO_NUMBER, 42, 20)).isInstanceOf(InvalidValueException.class);
 
-            assertThrows(InvalidValueException.class, () -> t.addRow(Column.AUTO_NUMBER, 3, 8));
+            assertThatThrownBy(() -> t.addRow(Column.AUTO_NUMBER, 3, 8)).isInstanceOf(InvalidValueException.class);
 
             t.addRow(Column.AUTO_NUMBER, 54, 9);
 
@@ -177,7 +176,7 @@ final class PropertyExpressionTest extends AbstractBaseTest {
             setProp(t, "data2", PropertyMap.VALIDATION_RULE_PROP, "<100");
             setProp(t, "data2", PropertyMap.VALIDATION_TEXT_PROP, "Too big");
 
-            InvalidValueException ex = assertThrows(InvalidValueException.class, () -> t.addRow(Column.AUTO_NUMBER, 42, 200));
+            InvalidValueException ex = catchThrowableOfType(() -> t.addRow(Column.AUTO_NUMBER, 42, 200), InvalidValueException.class);
             assertThat(ex.getMessage().contains("Too big")).isTrue();
 
             t.addRow(Column.AUTO_NUMBER, 1, 9);
@@ -219,14 +218,14 @@ final class PropertyExpressionTest extends AbstractBaseTest {
 
             t.addRow(Column.AUTO_NUMBER, 42, 8);
 
-            assertThrows(InvalidValueException.class, () -> t.addRow(Column.AUTO_NUMBER, 1, 20));
+            assertThatThrownBy(() -> t.addRow(Column.AUTO_NUMBER, 1, 20)).isInstanceOf(InvalidValueException.class);
 
             t.addRow(Column.AUTO_NUMBER, 54, 9);
 
             setTableProp(t, PropertyMap.VALIDATION_RULE_PROP, "[data2]<100");
             setTableProp(t, PropertyMap.VALIDATION_TEXT_PROP, "Too big");
 
-            assertThrows(InvalidValueException.class, () -> t.addRow(Column.AUTO_NUMBER, 42, 200));
+            assertThatThrownBy(() -> t.addRow(Column.AUTO_NUMBER, 42, 200)).isInstanceOf(InvalidValueException.class);
 
             t.addRow(Column.AUTO_NUMBER, 1, 9);
 

@@ -15,7 +15,6 @@
  */
 package io.github.spannm.jackcess.impl;
 
-import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.assertj.core.api.Assertions.assertThat;
 import io.github.spannm.jackcess.test.AbstractBaseTest;
 import io.github.spannm.jackcess.test.TestUtil;
@@ -62,7 +61,8 @@ final class ByteUtilTest extends AbstractBaseTest {
         assertThat(ByteUtil.getUnsignedVarInt(bb, 0, 2)).isEqualTo(0x0201);
         assertThat(ByteUtil.getUnsignedVarInt(bb, 0, 3)).isEqualTo(0x030201);
         assertThat(ByteUtil.getUnsignedVarInt(bb, 0, 4)).isEqualTo(0x04030201);
-        assertThrows(IllegalArgumentException.class, () -> ByteUtil.getUnsignedVarInt(bb, 0, 5));
+        assertThatThrownBy(() -> ByteUtil.getUnsignedVarInt(bb, 0, 5))
+            .isInstanceOf(IllegalArgumentException.class);
 
         assertThat(ByteUtil.getUnsignedVarInt(bb, 2)).isEqualTo(0x0201);
         assertThat(bb.position()).isEqualTo(2);
@@ -113,7 +113,8 @@ final class ByteUtilTest extends AbstractBaseTest {
         ByteUtil.writeHexString(target, "0A1B");
         assertThat(target.get(0)).isEqualTo((byte) 0x0A);
         assertThat(target.get(1)).isEqualTo((byte) 0x1B);
-        assertThrows(IOException.class, () -> ByteUtil.writeHexString(ByteBuffer.allocate(2), "0A1"));
+        assertThatThrownBy(() -> ByteUtil.writeHexString(ByteBuffer.allocate(2), "0A1"))
+            .isInstanceOf(IOException.class);
 
         File out = TestUtil.createTempFile(getShortTestMethodName(), ".hex", false);
         ByteUtil.toHexFile(out.getAbsolutePath(), bb, 0, 4);

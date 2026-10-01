@@ -17,13 +17,10 @@
 package io.github.spannm.jackcess;
 
 import static io.github.spannm.jackcess.DatabaseBuilder.*;
-import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static io.github.spannm.jackcess.test.Basename.DEL_COL;
 
-import org.assertj.core.api.Assertions;
 import io.github.spannm.jackcess.Database.FileFormat;
 import io.github.spannm.jackcess.impl.ColumnImpl;
 import io.github.spannm.jackcess.impl.DatabaseImpl;
@@ -142,9 +139,9 @@ final class TableUpdaterTest extends AbstractBaseTest {
         }
 
         if (enforce) {
-            assertThrows(ConstraintViolationException.class, () -> t2.addRow(10, "row10", "row-data10"));
+            assertThatThrownBy(() -> t2.addRow(10, "row10", "row-data10")).isInstanceOf(ConstraintViolationException.class);
         } else {
-            assertDoesNotThrow(() -> t2.addRow(10, "row10", "row-data10"));
+            assertThatCode(() -> t2.addRow(10, "row10", "row-data10")).doesNotThrowAnyException();
         }
 
         Row r1 = CursorBuilder.findRowByPrimaryKey(t1, 5);
@@ -180,7 +177,7 @@ final class TableUpdaterTest extends AbstractBaseTest {
             try {
                 newColumn("ID", DataType.TEXT)
                     .addToTable(t1);
-                Assertions.fail("created table with no columns?");
+                fail("created table with no columns?");
             } catch (IllegalArgumentException _ex) {
                 // success
             }
@@ -192,7 +189,7 @@ final class TableUpdaterTest extends AbstractBaseTest {
             try {
                 newRelationship(t1, t2)
                     .toRelationship(db);
-                Assertions.fail("created rel with no columns?");
+                fail("created rel with no columns?");
             } catch (IllegalArgumentException _ex) {
                 // success
             }
@@ -201,7 +198,7 @@ final class TableUpdaterTest extends AbstractBaseTest {
                 newRelationship("TestTable", "TestTable2")
                     .addColumns("id", "id")
                     .toRelationship(db);
-                Assertions.fail("created rel with wrong columns?");
+                fail("created rel with wrong columns?");
             } catch (IllegalArgumentException _ex) {
                 // success
             }
@@ -238,16 +235,16 @@ final class TableUpdaterTest extends AbstractBaseTest {
                 .toRelationship(db);
 
             // closing the loop, TestTable3 -(cascade delete)-> TestTable1, would create an infinite cascade cycle
-            assertThrows(IllegalArgumentException.class,
+            assertThatThrownBy(
                 () -> newRelationship(t3, t1).addColumns("id", "id")
                     .withReferentialIntegrity().withCascadeDeletes()
-                    .toRelationship(db));
+                    .toRelationship(db)).isInstanceOf(IllegalArgumentException.class);
 
             // a non-cascading relationship closing the same loop is fine, since it does not participate in cascading
-            assertDoesNotThrow(
+            assertThatCode(
                 () -> newRelationship(t3, t1).addColumns("id", "id")
                     .withReferentialIntegrity()
-                    .toRelationship(db));
+                    .toRelationship(db)).doesNotThrowAnyException();
         }
     }
 
@@ -262,16 +259,16 @@ final class TableUpdaterTest extends AbstractBaseTest {
             newPrimaryKey("id").addToTable(t1);
 
             // a table cascading to itself is a (degenerate) cascade cycle
-            assertThrows(IllegalArgumentException.class,
+            assertThatThrownBy(
                 () -> newRelationship(t1, t1).addColumns("id", "parentId")
                     .withReferentialIntegrity().withCascadeDeletes()
-                    .toRelationship(db));
+                    .toRelationship(db)).isInstanceOf(IllegalArgumentException.class);
 
             // without cascading, a self-referencing relationship is fine
-            assertDoesNotThrow(
+            assertThatCode(
                 () -> newRelationship(t1, t1).addColumns("id", "parentId")
                     .withReferentialIntegrity()
-                    .toRelationship(db));
+                    .toRelationship(db)).doesNotThrowAnyException();
         }
     }
 

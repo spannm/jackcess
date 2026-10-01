@@ -20,7 +20,6 @@ import static io.github.spannm.jackcess.DatabaseBuilder.newColumn;
 import static io.github.spannm.jackcess.DatabaseBuilder.newTable;
 import static io.github.spannm.jackcess.test.Basename.COMMON1;
 import static io.github.spannm.jackcess.test.Basename.COMPLEX_DATA;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import io.github.spannm.jackcess.*;
@@ -208,7 +207,7 @@ final class AutoNumberTest extends AbstractBaseTest {
 
         assertThat(((TableImpl) table).getLastLongAutoNumber()).isEqualTo(13);
 
-        assertThrows(NumberFormatException.class, () -> table.addRow("not a number", "nope"));
+        assertThatThrownBy(() -> table.addRow("not a number", "nope")).isInstanceOf(NumberFormatException.class);
 
         assertThat(((TableImpl) table).getLastLongAutoNumber()).isEqualTo(13);
 
@@ -281,18 +280,18 @@ final class AutoNumberTest extends AbstractBaseTest {
 
             assertThat(((TableImpl) t1).getLastComplexTypeAutoNumber()).isEqualTo(13);
 
-            assertThrows(NumberFormatException.class, () ->
-                t1.addRow("nope", "not a number"));
+            assertThatThrownBy(() ->
+                t1.addRow("nope", "not a number")).isInstanceOf(NumberFormatException.class);
 
             assertThat(((TableImpl) t1).getLastComplexTypeAutoNumber()).isEqualTo(13);
 
-            assertThrows(IOException.class, () ->
-                t1.addRow("uh-uh", -10));
+            assertThatThrownBy(() ->
+                t1.addRow("uh-uh", -10)).isInstanceOf(IOException.class);
 
             assertThat(((TableImpl) t1).getLastComplexTypeAutoNumber()).isEqualTo(13);
 
-            assertThrows(IOException.class, () ->
-                t1.addRow("wut", 6, null, null, 40, 42));
+            assertThatThrownBy(() ->
+                t1.addRow("wut", 6, null, null, 40, 42)).isInstanceOf(IOException.class);
 
             row = t1.addRow("morerows");
             checkAllComplexAutoNums(14, row);
@@ -312,13 +311,13 @@ final class AutoNumberTest extends AbstractBaseTest {
 
             row13b.put("attach-data", -1);
 
-            assertThrows(IOException.class, () -> t1.updateRow(row13b));
+            assertThatThrownBy(() -> t1.updateRow(row13b)).isInstanceOf(IOException.class);
 
             assertThat(((TableImpl) t1).getLastComplexTypeAutoNumber()).isEqualTo(45);
 
             row13b.put("attach-data", 55);
 
-            assertThrows(IOException.class, () -> t1.updateRow(row13b));
+            assertThatThrownBy(() -> t1.updateRow(row13b)).isInstanceOf(IOException.class);
 
             assertThat(((TableImpl) t1).getLastComplexTypeAutoNumber()).isEqualTo(45);
 
@@ -387,7 +386,7 @@ final class AutoNumberTest extends AbstractBaseTest {
             row2 = CursorBuilder.findRow(table, Collections.singletonMap("a", row2Guid));
             assertThat(row2.getString("b")).isEqualTo("row2-redux");
 
-            assertThrows(IOException.class, () -> table.addRow("not a guid", "nope"));
+            assertThatThrownBy(() -> table.addRow("not a guid", "nope")).isInstanceOf(IOException.class);
 
             row = table.addRow(Column.AUTO_NUMBER, "row5");
             assertThat(ColumnImpl.isGUIDValue(row[0])).isTrue();
@@ -400,7 +399,7 @@ final class AutoNumberTest extends AbstractBaseTest {
 
             row2b.put("a", "not a guid");
 
-            assertThrows(IOException.class, () -> table.updateRow(row2b));
+            assertThatThrownBy(() -> table.updateRow(row2b)).isInstanceOf(IOException.class);
 
             table.setAllowAutoNumberInsert(false);
 

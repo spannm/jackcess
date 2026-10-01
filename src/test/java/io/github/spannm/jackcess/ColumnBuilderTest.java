@@ -15,7 +15,6 @@
  */
 package io.github.spannm.jackcess;
 
-import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.assertj.core.api.Assertions.assertThat;
 import io.github.spannm.jackcess.Database.FileFormat;
 import io.github.spannm.jackcess.impl.ColumnImpl;
@@ -136,24 +135,24 @@ final class ColumnBuilderTest extends AbstractBaseTest {
     void validate() {
         JetFormat fmt = JetFormat.VERSION_4;
 
-        assertThrows(IllegalArgumentException.class,
-            () -> new ColumnBuilder("c").validate(fmt));
-        assertThrows(IllegalArgumentException.class,
-            () -> new ColumnBuilder("c", DataType.UNSUPPORTED_FIXEDLEN).validate(fmt));
-        assertThrows(IllegalArgumentException.class,
-            () -> new ColumnBuilder("c", DataType.BIG_INT).validate(fmt));
-        assertThrows(IllegalArgumentException.class,
-            () -> new ColumnBuilder("c", DataType.LONG).withLength(1).validate(fmt));
-        assertThrows(IllegalArgumentException.class,
-            () -> new ColumnBuilder("c", DataType.NUMERIC).withScale(99).validate(fmt));
-        assertThrows(IllegalArgumentException.class,
-            () -> new ColumnBuilder("c", DataType.NUMERIC).withScale(1).withPrecision(99).validate(fmt));
-        assertThrows(IllegalArgumentException.class,
-            () -> new ColumnBuilder("c", DataType.TEXT).withAutoNumber(true).validate(fmt));
-        assertThrows(IllegalArgumentException.class,
-            () -> new ColumnBuilder("c", DataType.LONG).withCompressedUnicode(true).validate(fmt));
-        assertThrows(IllegalArgumentException.class,
-            () -> new ColumnBuilder("c", DataType.TEXT).withHyperlink(true).validate(fmt));
+        assertThatThrownBy(() -> new ColumnBuilder("c").validate(fmt))
+            .isInstanceOf(IllegalArgumentException.class);
+        assertThatThrownBy(() -> new ColumnBuilder("c", DataType.UNSUPPORTED_FIXEDLEN).validate(fmt))
+            .isInstanceOf(IllegalArgumentException.class);
+        assertThatThrownBy(() -> new ColumnBuilder("c", DataType.BIG_INT).validate(fmt))
+            .isInstanceOf(IllegalArgumentException.class);
+        assertThatThrownBy(() -> new ColumnBuilder("c", DataType.LONG).withLength(1).validate(fmt))
+            .isInstanceOf(IllegalArgumentException.class);
+        assertThatThrownBy(() -> new ColumnBuilder("c", DataType.NUMERIC).withScale(99).validate(fmt))
+            .isInstanceOf(IllegalArgumentException.class);
+        assertThatThrownBy(() -> new ColumnBuilder("c", DataType.NUMERIC).withScale(1).withPrecision(99).validate(fmt))
+            .isInstanceOf(IllegalArgumentException.class);
+        assertThatThrownBy(() -> new ColumnBuilder("c", DataType.TEXT).withAutoNumber(true).validate(fmt))
+            .isInstanceOf(IllegalArgumentException.class);
+        assertThatThrownBy(() -> new ColumnBuilder("c", DataType.LONG).withCompressedUnicode(true).validate(fmt))
+            .isInstanceOf(IllegalArgumentException.class);
+        assertThatThrownBy(() -> new ColumnBuilder("c", DataType.TEXT).withHyperlink(true).validate(fmt))
+            .isInstanceOf(IllegalArgumentException.class);
 
         // valid definitions
         new ColumnBuilder("c", DataType.TEXT).withMaxLength().validate(fmt);
@@ -166,12 +165,12 @@ final class ColumnBuilderTest extends AbstractBaseTest {
         JetFormat fmt14 = JetFormat.VERSION_14;
 
         // calculated not supported in older format
-        assertThrows(IllegalArgumentException.class,
-            () -> new ColumnBuilder("c", DataType.LONG).withCalculated(true).validate(JetFormat.VERSION_4));
+        assertThatThrownBy(() -> new ColumnBuilder("c", DataType.LONG).withCalculated(true).validate(JetFormat.VERSION_4))
+            .isInstanceOf(IllegalArgumentException.class);
 
         // no expression
-        assertThrows(IllegalArgumentException.class,
-            () -> new ColumnBuilder("c", DataType.LONG).withCalculated(true).validate(fmt14));
+        assertThatThrownBy(() -> new ColumnBuilder("c", DataType.LONG).withCalculated(true).validate(fmt14))
+            .isInstanceOf(IllegalArgumentException.class);
 
         ColumnBuilder cb = new ColumnBuilder("c", DataType.LONG)
             .withCalculated(true)

@@ -18,10 +18,8 @@ package io.github.spannm.jackcess;
 
 import static io.github.spannm.jackcess.test.Basename.COMPLEX_DATA;
 import static io.github.spannm.jackcess.test.Basename.UNSUPPORTED_FIELDS;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.assertj.core.api.Assertions.assertThat;
 
-import org.assertj.core.api.Assertions;
 import io.github.spannm.jackcess.complex.*;
 import io.github.spannm.jackcess.impl.ByteUtil;
 import io.github.spannm.jackcess.impl.ColumnImpl;
@@ -97,7 +95,7 @@ final class ComplexColumnTest extends AbstractBaseTest {
                     checkVersions(4, complexValueFk, curValue,
                         "row4-memo", new Date(1315876945758L));
                 } else {
-                    Assertions.fail();
+                    fail();
                 }
             }
 
@@ -119,9 +117,9 @@ final class ComplexColumnTest extends AbstractBaseTest {
             assertThat(row8ValFk).isNotEqualTo(null);
             assertThat(row8ValFk).isNotEqualTo("not a complex value fk");
 
-            assertThrows(UnsupportedOperationException.class, row8ValFk::getAttachments);
-            assertThrows(UnsupportedOperationException.class, row8ValFk::getMultiValues);
-            assertThrows(UnsupportedOperationException.class, row8ValFk::getUnsupportedValues);
+            assertThatThrownBy(row8ValFk::getAttachments).isInstanceOf(UnsupportedOperationException.class);
+            assertThatThrownBy(row8ValFk::getMultiValues).isInstanceOf(UnsupportedOperationException.class);
+            assertThatThrownBy(row8ValFk::getUnsupportedValues).isInstanceOf(UnsupportedOperationException.class);
 
             Object[] row9 = {"row9", Column.AUTO_NUMBER, "some-data", "row9-memo", Column.AUTO_NUMBER, Column.AUTO_NUMBER};
             t1.addRow(row9);
@@ -154,7 +152,7 @@ final class ComplexColumnTest extends AbstractBaseTest {
                 "row3-memo-revised", new Date(1315876953077L),
                 "row3-memo", new Date(1315876879126L));
 
-            assertThrows(UnsupportedOperationException.class, v::update);
+            assertThatThrownBy(v::update).isInstanceOf(UnsupportedOperationException.class);
 
             checkVersions(3, row3ValFk, "new-value",
                 "new-value", upTime,
@@ -162,7 +160,7 @@ final class ComplexColumnTest extends AbstractBaseTest {
                 "row3-memo-revised", new Date(1315876953077L),
                 "row3-memo", new Date(1315876879126L));
 
-            assertThrows(UnsupportedOperationException.class, v::delete);
+            assertThatThrownBy(v::delete).isInstanceOf(UnsupportedOperationException.class);
 
             checkVersions(3, row3ValFk, "new-value",
                 "new-value", upTime,
@@ -170,7 +168,7 @@ final class ComplexColumnTest extends AbstractBaseTest {
                 "row3-memo-revised", new Date(1315876953077L),
                 "row3-memo", new Date(1315876879126L));
 
-            assertThrows(UnsupportedOperationException.class, v.getComplexValueForeignKey()::deleteAllValues);
+            assertThatThrownBy(v.getComplexValueForeignKey()::deleteAllValues).isInstanceOf(UnsupportedOperationException.class);
 
             checkVersions(3, row3ValFk, "new-value",
                 "new-value", upTime,
@@ -202,7 +200,7 @@ final class ComplexColumnTest extends AbstractBaseTest {
                 } else if (rowId.equals("row4")) {
                     checkAttachments(4, complexValueFk, "test_data2.txt");
                 } else {
-                    Assertions.fail();
+                    fail();
                 }
             }
 
@@ -219,9 +217,9 @@ final class ComplexColumnTest extends AbstractBaseTest {
             checkAttachments(row8ValFk.get(), row8ValFk, "test_data.txt",
                 "test_data2.txt");
 
-            assertThrows(UnsupportedOperationException.class, row8ValFk::getVersions);
-            assertThrows(UnsupportedOperationException.class, row8ValFk::getMultiValues);
-            assertThrows(UnsupportedOperationException.class, row8ValFk::getUnsupportedValues);
+            assertThatThrownBy(row8ValFk::getVersions).isInstanceOf(UnsupportedOperationException.class);
+            assertThatThrownBy(row8ValFk::getMultiValues).isInstanceOf(UnsupportedOperationException.class);
+            assertThatThrownBy(row8ValFk::getUnsupportedValues).isInstanceOf(UnsupportedOperationException.class);
 
             Object[] row10 = {"row10", Column.AUTO_NUMBER, "some-data", "row10-memo", Column.AUTO_NUMBER, Column.AUTO_NUMBER};
             t1.addRow(row10);
@@ -298,7 +296,7 @@ final class ComplexColumnTest extends AbstractBaseTest {
                 } else if (rowId.equals("row4")) {
                     checkMultiValues(4, complexValueFk);
                 } else {
-                    Assertions.fail();
+                    fail();
                 }
             }
 
@@ -310,9 +308,9 @@ final class ComplexColumnTest extends AbstractBaseTest {
             row8ValFk.addMultiValue("value2");
             checkMultiValues(row8ValFk.get(), row8ValFk, "value1", "value2");
 
-            assertThrows(UnsupportedOperationException.class, row8ValFk::getVersions);
-            assertThrows(UnsupportedOperationException.class, row8ValFk::getAttachments);
-            assertThrows(UnsupportedOperationException.class, row8ValFk::getUnsupportedValues);
+            assertThatThrownBy(row8ValFk::getVersions).isInstanceOf(UnsupportedOperationException.class);
+            assertThatThrownBy(row8ValFk::getAttachments).isInstanceOf(UnsupportedOperationException.class);
+            assertThatThrownBy(row8ValFk::getUnsupportedValues).isInstanceOf(UnsupportedOperationException.class);
 
             Cursor cursor = CursorBuilder.createCursor(t1);
             assertThat(cursor.findFirstRow(t1.getColumn("id"), "row2")).isTrue();
@@ -421,7 +419,7 @@ final class ComplexColumnTest extends AbstractBaseTest {
                 } else if (rowId.equals(3)) {
                     checkUnsupportedValues(3, complexValueFk);
                 } else {
-                    Assertions.fail();
+                    fail();
                 }
             }
 
@@ -429,9 +427,9 @@ final class ComplexColumnTest extends AbstractBaseTest {
             assertThat(cursor.findFirstRow(t1.getColumn("ID"), 3)).isTrue();
             ComplexValueForeignKey row3ValFk = (ComplexValueForeignKey) cursor.getCurrentRowValue(col);
 
-            assertThrows(UnsupportedOperationException.class, row3ValFk::getVersions);
-            assertThrows(UnsupportedOperationException.class, row3ValFk::getAttachments);
-            assertThrows(UnsupportedOperationException.class, row3ValFk::getMultiValues);
+            assertThatThrownBy(row3ValFk::getVersions).isInstanceOf(UnsupportedOperationException.class);
+            assertThatThrownBy(row3ValFk::getAttachments).isInstanceOf(UnsupportedOperationException.class);
+            assertThatThrownBy(row3ValFk::getMultiValues).isInstanceOf(UnsupportedOperationException.class);
             assertThat(row3ValFk.countValues()).isEqualTo(0);
         }
     }

@@ -17,7 +17,6 @@
 package io.github.spannm.jackcess;
 
 import static io.github.spannm.jackcess.test.Basename.COMMON1;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import io.github.spannm.jackcess.Database.FileFormat;
@@ -363,7 +362,7 @@ final class PropertiesTest extends AbstractBaseTest {
 
             t.addRow(Column.AUTO_NUMBER, "v1");
 
-            assertThrows(InvalidValueException.class, () -> t.addRow(Column.AUTO_NUMBER, null));
+            assertThatThrownBy(() -> t.addRow(Column.AUTO_NUMBER, null)).isInstanceOf(InvalidValueException.class);
 
             t.addRow(Column.AUTO_NUMBER, "");
 
@@ -381,7 +380,7 @@ final class PropertiesTest extends AbstractBaseTest {
 
             t2.addRow(Column.AUTO_NUMBER, "v1");
 
-            assertThrows(InvalidValueException.class, () -> t2.addRow(Column.AUTO_NUMBER, ""));
+            assertThatThrownBy(() -> t2.addRow(Column.AUTO_NUMBER, "")).isInstanceOf(InvalidValueException.class);
 
             t2.addRow(Column.AUTO_NUMBER, null);
 
@@ -404,9 +403,9 @@ final class PropertiesTest extends AbstractBaseTest {
 
             t3.addRow(Column.AUTO_NUMBER, "v1");
 
-            assertThrows(InvalidValueException.class, () -> t3.addRow(Column.AUTO_NUMBER, ""));
+            assertThatThrownBy(() -> t3.addRow(Column.AUTO_NUMBER, "")).isInstanceOf(InvalidValueException.class);
 
-            assertThrows(InvalidValueException.class, () -> t3.addRow(Column.AUTO_NUMBER, null));
+            assertThatThrownBy(() -> t3.addRow(Column.AUTO_NUMBER, null)).isInstanceOf(InvalidValueException.class);
 
             t3.addRow(Column.AUTO_NUMBER, "v2");
 

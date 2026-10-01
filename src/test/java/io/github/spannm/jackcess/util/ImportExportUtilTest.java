@@ -15,7 +15,6 @@
  */
 package io.github.spannm.jackcess.util;
 
-import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.assertj.core.api.Assertions.assertThat;
 import io.github.spannm.jackcess.*;
 import io.github.spannm.jackcess.Database.FileFormat;
@@ -184,8 +183,9 @@ final class ImportExportUtilTest extends AbstractBaseTest {
             assertThat(ImportUtil.importReader(new BufferedReader(new StringReader("")), db, "rx", "\\t")).isNull();
 
             // unterminated quoted value
-            assertThrows(EOFException.class, () -> ImportUtil.importReader(
-                new BufferedReader(new StringReader("c1\tc2\n\"unterminated\tvalue\n")), db, "ry", "\\t"));
+            assertThatThrownBy(() -> ImportUtil.importReader(
+                new BufferedReader(new StringReader("c1\tc2\n\"unterminated\tvalue\n")), db, "ry", "\\t"))
+                .isInstanceOf(EOFException.class);
         }
     }
 

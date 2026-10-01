@@ -17,7 +17,6 @@
 package io.github.spannm.jackcess.util;
 
 import static io.github.spannm.jackcess.test.Basename.COMP_INDEX;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import io.github.spannm.jackcess.test.AbstractBaseTest;
@@ -43,14 +42,14 @@ final class MemFileChannelTest extends AbstractBaseTest {
             assertThat(ch.size()).isEqualTo(testDb.getFile().length());
             assertThat(ch.position()).isEqualTo(0L);
 
-            assertThrows(NonWritableChannelException.class, () -> {
+            assertThatThrownBy(() -> {
                 ByteBuffer bb = ByteBuffer.allocate(1024);
                 ch.write(bb);
-            });
+            }).isInstanceOf(NonWritableChannelException.class);
 
-            assertThrows(NonWritableChannelException.class, () -> ch.truncate(0L));
+            assertThatThrownBy(() -> ch.truncate(0L)).isInstanceOf(NonWritableChannelException.class);
 
-            assertThrows(NonWritableChannelException.class, () -> ch.transferFrom(null, 0L, 10L));
+            assertThatThrownBy(() -> ch.transferFrom(null, 0L, 10L)).isInstanceOf(NonWritableChannelException.class);
 
             assertThat(ch.size()).isEqualTo(testDb.getFile().length());
             assertThat(ch.position()).isEqualTo(0L);
@@ -75,14 +74,14 @@ final class MemFileChannelTest extends AbstractBaseTest {
             assertThat(ch2.size()).isEqualTo(testDb.getFile().length());
             assertThat(ch2.position()).isEqualTo(0L);
 
-            assertThrows(IllegalArgumentException.class, () -> ch2.position(-1));
+            assertThatThrownBy(() -> ch2.position(-1)).isInstanceOf(IllegalArgumentException.class);
 
             ch2.transferTo(ch3);
             ch3.force(true);
             assertThat(ch3.size()).isEqualTo(testDb.getFile().length());
             assertThat(ch3.position()).isEqualTo(testDb.getFile().length());
 
-            assertThrows(IllegalArgumentException.class, () -> ch3.truncate(-1L));
+            assertThatThrownBy(() -> ch3.truncate(-1L)).isInstanceOf(IllegalArgumentException.class);
 
             long trucSize = ch3.size() / 3;
             ch3.truncate(trucSize);
