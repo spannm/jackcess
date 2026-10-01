@@ -32,7 +32,7 @@ import java.nio.file.Files;
 /**
  * Tests for {@link ByteUtil}.
  */
-class ByteUtilTest extends AbstractBaseTest {
+final class ByteUtilTest extends AbstractBaseTest {
 
     private static ByteBuffer buffer(int... values) {
         byte[] bytes = new byte[values.length];

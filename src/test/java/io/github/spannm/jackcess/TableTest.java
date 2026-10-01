@@ -33,7 +33,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.TimeZone;
 
-class TableTest extends AbstractBaseTest {
+final class TableTest extends AbstractBaseTest {
 
     private final PageChannel      pageChannel = new PageChannel(true) {
                                                 };
@@ -50,7 +50,7 @@ class TableTest extends AbstractBaseTest {
     }
 
     @Test
-    void testCreateRow() throws Exception {
+    void createRow() throws Exception {
         reset();
         newTestColumn(DataType.INT, false);
         newTestColumn(DataType.TEXT, false);

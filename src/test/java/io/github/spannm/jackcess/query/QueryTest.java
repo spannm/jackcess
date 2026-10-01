@@ -34,7 +34,7 @@ import org.junit.jupiter.params.ParameterizedTest;
 import java.util.*;
 
 @SuppressWarnings("checkstyle:LineLengthCheck")
-class QueryTest extends AbstractBaseTest {
+final class QueryTest extends AbstractBaseTest {
 
     @Test
     void unionQuery() {

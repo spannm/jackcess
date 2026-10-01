@@ -32,7 +32,7 @@ import org.junit.jupiter.params.ParameterizedTest;
 import java.io.IOException;
 import java.util.*;
 
-class TableUpdaterTest extends AbstractBaseTest {
+final class TableUpdaterTest extends AbstractBaseTest {
 
     @ParameterizedTest(name = "[{index}] {0}")
     @FileFormatSource

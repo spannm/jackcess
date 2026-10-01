@@ -36,7 +36,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
-class ImportTest extends AbstractBaseTest {
+final class ImportTest extends AbstractBaseTest {
 
     @ParameterizedTest(name = "[{index}] {0}")
     @FileFormatSource

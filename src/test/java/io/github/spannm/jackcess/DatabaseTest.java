@@ -44,7 +44,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 @SuppressWarnings("deprecation")
-class DatabaseTest extends AbstractBaseTest {
+final class DatabaseTest extends AbstractBaseTest {
 
     private static Map<String, Object> mapOf(Object... kv) {
         Map<String, Object> map = new LinkedHashMap<>();
@@ -892,7 +892,7 @@ class DatabaseTest extends AbstractBaseTest {
     }
 
     @Test
-    void testToString() {
+    void toStringReturnsExpectedRepresentation() {
         RowImpl row = new RowImpl(new RowIdImpl(1, 1));
         row.put("id", 37);
         row.put("data", null);

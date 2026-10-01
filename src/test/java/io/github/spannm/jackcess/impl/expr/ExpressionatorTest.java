@@ -44,7 +44,7 @@ import java.util.Optional;
 import javax.script.Bindings;
 import javax.script.SimpleBindings;
 
-class ExpressionatorTest extends AbstractBaseTest {
+final class ExpressionatorTest extends AbstractBaseTest {
 
     static double[] getDoublesTestData() {
         return new double[] {

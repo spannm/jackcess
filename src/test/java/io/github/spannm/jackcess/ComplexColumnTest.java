@@ -41,7 +41,7 @@ import java.util.Date;
 import java.util.List;
 
 @SuppressWarnings("deprecation")
-class ComplexColumnTest extends AbstractBaseTest {
+final class ComplexColumnTest extends AbstractBaseTest {
 
     private static final byte[] TEST_ENC_BYTES  =
         {b(0x01), b(0x00), b(0x00), b(0x00), b(0x3A), b(0x00), b(0x00), b(0x00), b(0x78), b(0x5E), b(0x13), b(0x61), b(0x60), b(0x60), b(0x60), b(0x04), b(0x62), b(0x16), b(0x20), b(

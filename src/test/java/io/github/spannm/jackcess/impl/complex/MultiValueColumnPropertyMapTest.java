@@ -33,7 +33,7 @@ import java.util.NoSuchElementException;
 /**
  * Tests for {@link MultiValueColumnPropertyMap}.
  */
-class MultiValueColumnPropertyMapTest extends AbstractBaseTest {
+final class MultiValueColumnPropertyMapTest extends AbstractBaseTest {
 
     @ParameterizedTest(name = "[{index}] {0}")
     @TestDbSource(COMPLEX_DATA)

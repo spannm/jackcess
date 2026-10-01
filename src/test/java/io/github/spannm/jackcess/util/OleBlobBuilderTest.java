@@ -30,7 +30,7 @@ import java.sql.SQLFeatureNotSupportedException;
 /**
  * Tests for {@link OleBlob.Builder} and the {@code OleBlob} implementation.
  */
-class OleBlobBuilderTest extends AbstractBaseTest {
+final class OleBlobBuilderTest extends AbstractBaseTest {
 
     private static final byte[] DATA = "some ole content".getBytes(StandardCharsets.US_ASCII);
 

@@ -36,7 +36,7 @@ import java.nio.file.Files;
 import java.sql.Types;
 import java.util.*;
 
-class LongValueTest extends AbstractBaseTest {
+final class LongValueTest extends AbstractBaseTest {
 
     @ParameterizedTest(name = "[{index}] {0}")
     @TestDbReadOnlySource(COMMON2)

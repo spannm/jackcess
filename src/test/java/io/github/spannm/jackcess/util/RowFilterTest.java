@@ -27,7 +27,7 @@ import org.junit.jupiter.api.Test;
 import java.util.Arrays;
 import java.util.List;
 
-class RowFilterTest extends AbstractBaseTest {
+final class RowFilterTest extends AbstractBaseTest {
     private static final String ID_COL = "id";
     private static final String COL1   = "col1";
     private static final String COL2   = "col2";

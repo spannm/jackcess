@@ -23,7 +23,7 @@ import org.junit.jupiter.api.Test;
 
 import java.util.*;
 
-class TopoSorterTest extends AbstractBaseTest {
+final class TopoSorterTest extends AbstractBaseTest {
 
     @Test
     void topoSort() {

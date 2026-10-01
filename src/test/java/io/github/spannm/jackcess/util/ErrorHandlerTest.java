@@ -32,7 +32,7 @@ import java.lang.reflect.Modifier;
 import java.nio.ByteOrder;
 import java.util.List;
 
-class ErrorHandlerTest extends AbstractBaseTest {
+final class ErrorHandlerTest extends AbstractBaseTest {
 
     @ParameterizedTest(name = "[{index}] {0}")
     @FileFormatSource

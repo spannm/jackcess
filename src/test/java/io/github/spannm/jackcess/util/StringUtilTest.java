@@ -19,7 +19,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import io.github.spannm.jackcess.test.AbstractBaseTest;
 import org.junit.jupiter.api.Test;
 
-class StringUtilTest extends AbstractBaseTest {
+final class StringUtilTest extends AbstractBaseTest {
 
     @Test
     void length() {

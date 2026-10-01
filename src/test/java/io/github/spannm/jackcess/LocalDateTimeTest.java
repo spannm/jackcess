@@ -40,7 +40,7 @@ import java.time.*;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 
-class LocalDateTimeTest extends AbstractBaseTest {
+final class LocalDateTimeTest extends AbstractBaseTest {
 
     @ParameterizedTest(name = "[{index}] {0}")
     @FileFormatSource

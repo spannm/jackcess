@@ -26,7 +26,7 @@ import java.util.List;
 /**
  * Tests the enum value constants declared in {@link PropertyMap}.
  */
-class PropertyMapEnumTest extends AbstractBaseTest {
+final class PropertyMapEnumTest extends AbstractBaseTest {
 
     @Test
     void enumValues() {

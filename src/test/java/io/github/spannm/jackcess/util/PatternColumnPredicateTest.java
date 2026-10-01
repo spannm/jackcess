@@ -29,7 +29,7 @@ import java.util.List;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
-class PatternColumnPredicateTest extends AbstractBaseTest {
+final class PatternColumnPredicateTest extends AbstractBaseTest {
 
     @ParameterizedTest(name = "[{index}] {0}")
     @FileFormatSource

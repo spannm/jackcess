@@ -36,7 +36,7 @@ import org.junit.jupiter.params.ParameterizedTest;
 import java.io.IOException;
 import java.util.*;
 
-class IndexTest extends AbstractBaseTest {
+final class IndexTest extends AbstractBaseTest {
 
     @BeforeEach
     void setAutoSyncOff() {

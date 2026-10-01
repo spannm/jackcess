@@ -38,7 +38,7 @@ import org.junit.jupiter.params.provider.EnumSource;
 import java.io.File;
 import java.util.*;
 
-class PropertiesTest extends AbstractBaseTest {
+final class PropertiesTest extends AbstractBaseTest {
 
     @Test
     void propertyMaps() {

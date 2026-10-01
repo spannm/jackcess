@@ -37,7 +37,7 @@ import org.junit.jupiter.params.ParameterizedTest;
 import java.io.*;
 import java.nio.file.Files;
 
-class OleBlobTest extends AbstractBaseTest {
+final class OleBlobTest extends AbstractBaseTest {
 
     @ParameterizedTest(name = "[{index}] {0}")
     @FileFormatSource

@@ -24,7 +24,7 @@ import java.time.LocalDateTime;
 import java.util.Date;
 
 @SuppressWarnings("deprecation")
-class AttachmentColumnInfoImplTest extends AbstractBaseTest {
+final class AttachmentColumnInfoImplTest extends AbstractBaseTest {
 
     private static final byte[] DATA = getAsciiBytes("standalone attachment test data");
 
@@ -121,7 +121,7 @@ class AttachmentColumnInfoImplTest extends AbstractBaseTest {
     }
 
     @Test
-    void testToString() {
+    void toStringContainsAttachmentDetails() {
         Attachment a = AttachmentColumnInfoImpl.newAttachment(
             "http://example.com", "some.txt", "txt", DATA, new Date(), 1);
         String str = a.toString();

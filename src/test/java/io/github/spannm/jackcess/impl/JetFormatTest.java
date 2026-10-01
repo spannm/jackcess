@@ -39,7 +39,7 @@ import java.nio.channels.FileChannel;
 import java.nio.channels.NonWritableChannelException;
 
 @SuppressWarnings("PMD.FieldDeclarationsShouldBeAtStartOfClass")
-class JetFormatTest extends AbstractBaseTest {
+final class JetFormatTest extends AbstractBaseTest {
 
     @Test
     void getFormatNull() {

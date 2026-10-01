@@ -44,7 +44,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 @SuppressWarnings("checkstyle:MethodNameCheck")
-public class IndexCodesTest extends AbstractBaseTest {
+final class IndexCodesTest extends AbstractBaseTest {
 
     private static final Map<Character, String> SPECIAL_CHARS = new HashMap<>();
     static {
