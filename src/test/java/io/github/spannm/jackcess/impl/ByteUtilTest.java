@@ -16,6 +16,7 @@
 package io.github.spannm.jackcess.impl;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatCode;
 import io.github.spannm.jackcess.test.AbstractBaseTest;
 import io.github.spannm.jackcess.test.TestUtil;
 import org.junit.jupiter.api.Test;
@@ -123,8 +124,8 @@ final class ByteUtilTest extends AbstractBaseTest {
 
     @Test
     void closeQuietly() {
-        ByteUtil.closeQuietly(null);
-        ByteUtil.closeQuietly(new InputStream() {
+        assertThatCode(() -> ByteUtil.closeQuietly(null)).doesNotThrowAnyException();
+        assertThatCode(() -> ByteUtil.closeQuietly(new InputStream() {
             @Override
             public int read() {
                 return -1;
@@ -134,7 +135,7 @@ final class ByteUtilTest extends AbstractBaseTest {
             public void close() throws IOException {
                 throw new IOException("boom");
             }
-        });
+        })).doesNotThrowAnyException();
     }
 
     @Test
