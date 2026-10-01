@@ -1134,10 +1134,11 @@ final class CursorTest extends AbstractBaseTest {
 
             IndexCursor cursor = CursorBuilder.createCursor(table.getIndex("value_idx"));
 
-            assertThatThrownBy(() -> cursor.newIterable()
+            Iterator<Row> badMemoIter = cursor.newIterable()
                 .addMatchPattern("value", "val-9")
                 .addMatchPattern("memo", "anything")
-                .iterator().hasNext()).isInstanceOf(UncheckedIOException.class);
+                .iterator();
+            assertThatThrownBy(badMemoIter::hasNext).isInstanceOf(UncheckedIOException.class);
 
             List<Row> rows = new ArrayList<>();
             for (Row row : cursor.newIterable()
