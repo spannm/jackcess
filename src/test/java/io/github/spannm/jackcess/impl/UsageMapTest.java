@@ -91,9 +91,13 @@ final class UsageMapTest extends AbstractBaseTest {
                         rows.clear();
                     }
                 }
+                if (!rows.isEmpty()) {
+                    t.addRows(rows);
+                }
             } finally {
                 ((DatabaseImpl) db).getPageChannel().finishWrite();
             }
+            assertThat(t.getRowCount()).isEqualTo(300000);
         }
     }
 

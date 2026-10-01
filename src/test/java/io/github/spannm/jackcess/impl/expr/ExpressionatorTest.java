@@ -517,8 +517,9 @@ final class ExpressionatorTest extends AbstractBaseTest {
         Value.Type resultType = Optional.ofNullable(_dType).map(BaseEvalContext::toValueType).orElse(null);
 
         Expression expr = Expressionator.parse(_type, _exprStr, resultType, tc);
+        assertThat(expr).isNotNull();
 
-        expr.eval(tc);
+        assertThatCode(() -> expr.eval(tc)).doesNotThrowAnyException();
     }
 
     @ParameterizedTest(name = "[{index}] {0} --> {1}")
