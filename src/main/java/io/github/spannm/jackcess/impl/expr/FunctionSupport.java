@@ -16,11 +16,15 @@
  */
 package io.github.spannm.jackcess.impl.expr;
 
-import io.github.spannm.jackcess.expr.*;
+import io.github.spannm.jackcess.expr.EvalContext;
+import io.github.spannm.jackcess.expr.EvalException;
+import io.github.spannm.jackcess.expr.Function;
+import io.github.spannm.jackcess.expr.LocaleContext;
+import io.github.spannm.jackcess.expr.Value;
 
 import java.util.Arrays;
 
-public class FunctionSupport {
+public final class FunctionSupport {
     private static final char NON_VAR_SUFFIX = '$';
 
     private FunctionSupport() {

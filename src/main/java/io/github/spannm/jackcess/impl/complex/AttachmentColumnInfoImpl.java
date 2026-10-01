@@ -19,14 +19,22 @@ package io.github.spannm.jackcess.impl.complex;
 import io.github.spannm.jackcess.Column;
 import io.github.spannm.jackcess.Row;
 import io.github.spannm.jackcess.Table;
-import io.github.spannm.jackcess.complex.*;
+import io.github.spannm.jackcess.complex.Attachment;
+import io.github.spannm.jackcess.complex.AttachmentColumnInfo;
+import io.github.spannm.jackcess.complex.ComplexDataType;
+import io.github.spannm.jackcess.complex.ComplexValue;
+import io.github.spannm.jackcess.complex.ComplexValueForeignKey;
 import io.github.spannm.jackcess.impl.ByteUtil;
 import io.github.spannm.jackcess.impl.ColumnImpl;
 import io.github.spannm.jackcess.impl.JetFormat;
 import io.github.spannm.jackcess.impl.PageChannel;
 import io.github.spannm.jackcess.util.ToStringBuilder;
 
-import java.io.*;
+import java.io.ByteArrayInputStream;
+import java.io.DataInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.nio.ByteBuffer;
 import java.time.LocalDateTime;
 import java.util.Arrays;
@@ -200,7 +208,7 @@ public final class AttachmentColumnInfoImpl extends ComplexColumnInfoImpl<Attach
         return new AttachmentImpl(INVALID_ID, complexValueFk, url, name, type, null, timeStamp, flags, encodedData);
     }
 
-    private static class AttachmentImpl extends ComplexValueImpl implements Attachment {
+    private static final class AttachmentImpl extends ComplexValueImpl implements Attachment {
         private String  url;
         private String  name;
         private String  type;
@@ -357,7 +365,7 @@ public final class AttachmentColumnInfoImpl extends ComplexColumnInfoImpl<Attach
             int typeFlag = bb.getInt();
             int dataLen = bb.getInt();
 
-            DataInputStream contentStream = null;
+            DataInputStream contentStream = null; // NOPMD CloseResource - closed in the finally block below via ByteUtil.closeQuietly
             try {
                 InputStream bin = new ByteArrayInputStream(encodedData, WRAPPER_HEADER_SIZE, encodedData.length - WRAPPER_HEADER_SIZE);
 
@@ -406,7 +414,7 @@ public final class AttachmentColumnInfoImpl extends ComplexColumnInfoImpl<Attach
             int headerLen = typeBytes.remaining() + CONTENT_HEADER_SIZE;
 
             int dataLen = data.length;
-            ByteUtil.ByteStream dataStream = new ByteUtil.ByteStream(WRAPPER_HEADER_SIZE + headerLen + dataLen);
+            ByteUtil.ByteStream dataStream = new ByteUtil.ByteStream(WRAPPER_HEADER_SIZE + headerLen + dataLen); // NOPMD CloseResource - in-memory ByteStream, close() is a no-op
 
             // write the wrapper header info
             ByteBuffer bb = PageChannel.wrap(dataStream.getBytes());
@@ -414,12 +422,13 @@ public final class AttachmentColumnInfoImpl extends ComplexColumnInfoImpl<Attach
             bb.putInt(dataLen + headerLen);
             dataStream.skip(WRAPPER_HEADER_SIZE);
 
-            OutputStream contentStream = dataStream;
+            OutputStream contentStream = dataStream; // NOPMD CloseResource - closed explicitly (or via closeQuietly in finally) below
             Deflater deflater = null;
             try {
 
                 if (shouldCompress) {
-                    contentStream = new DeflaterOutputStream(contentStream, deflater = new Deflater(3));
+                    deflater = new Deflater(3);
+                    contentStream = new DeflaterOutputStream(contentStream, deflater);
                 }
 
                 // write the header w/ the file extension

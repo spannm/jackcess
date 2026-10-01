@@ -16,7 +16,9 @@ limitations under the License.
 
 package io.github.spannm.jackcess.impl.query;
 
-import static io.github.spannm.jackcess.impl.query.QueryFormat.*;
+import static io.github.spannm.jackcess.impl.query.QueryFormat.CROSSTAB_NORMAL_FLAG;
+import static io.github.spannm.jackcess.impl.query.QueryFormat.CROSSTAB_PIVOT_FLAG;
+import static io.github.spannm.jackcess.impl.query.QueryFormat.NEWLINE;
 
 import io.github.spannm.jackcess.query.CrossTabQuery;
 

@@ -266,6 +266,14 @@ public enum DataType {
         return typeName;
     }
 
+    public static String getTypeName(short value) {
+        if (value == 0) {
+            return "Value";
+        }
+        DataType dt = DATA_TYPES_BY_VALUE.get((byte) value);
+        return dt == null ? null : dt.getTypeName();
+    }
+
     public boolean isVariableLength() {
         return variableLength;
     }
@@ -425,14 +433,6 @@ public enum DataType {
             return rtn;
         }
         throw new IOException("Unrecognized data type: " + b);
-    }
-
-    public static String getTypeName(short value) {
-        if (value == 0) {
-            return "Value";
-        }
-        DataType dt = DATA_TYPES_BY_VALUE.get((byte) value);
-        return dt == null ? null : dt.getTypeName();
     }
 
     public static DataType fromSQLType(int sqlType) throws IOException {

@@ -16,7 +16,15 @@
  */
 package io.github.spannm.jackcess.impl.expr;
 
-import io.github.spannm.jackcess.expr.*;
+import io.github.spannm.jackcess.expr.EvalContext;
+import io.github.spannm.jackcess.expr.EvalException;
+import io.github.spannm.jackcess.expr.Expression;
+import io.github.spannm.jackcess.expr.Function;
+import io.github.spannm.jackcess.expr.FunctionLookup;
+import io.github.spannm.jackcess.expr.Identifier;
+import io.github.spannm.jackcess.expr.LocaleContext;
+import io.github.spannm.jackcess.expr.ParseException;
+import io.github.spannm.jackcess.expr.Value;
 import io.github.spannm.jackcess.impl.expr.ExpressionTokenizer.Token;
 import io.github.spannm.jackcess.impl.expr.ExpressionTokenizer.TokenType;
 import io.github.spannm.jackcess.util.StringUtil;
@@ -24,13 +32,24 @@ import io.github.spannm.jackcess.util.ToStringBuilder;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Deque;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 import java.util.stream.Stream;
 
 @SuppressWarnings({"PMD.UnnecessaryFullyQualifiedName", "PMD.FieldDeclarationsShouldBeAtStartOfClass"})
-public class Expressionator {
+public final class Expressionator {
 
     // Useful links:
     // - syntax:
@@ -623,7 +642,7 @@ public class Expressionator {
         Deque<String> objNames = new LinkedList<>();
         objNames.add(firstTok.getValueStr());
 
-        Token t = null;
+        Token t;
         boolean atSep = false;
         while ((t = buf.peekNext()) != null) {
             if (!atSep) {
@@ -950,7 +969,7 @@ public class Expressionator {
     }
 
     private static void parseConstExpression(Token firstTok, TokBuf buf) {
-        Expr constExpr = null;
+        Expr constExpr;
         String tokStr = firstTok.getValueStr().toLowerCase();
         if (TRUE_STRS.contains(tokStr)) {
             constExpr = TRUE_VALUE;
@@ -1392,7 +1411,7 @@ public class Expressionator {
                 // incorrect). note, we only need to check precedence against "this",
                 // as all other precedence has been resolved in previous parsing
                 // rounds.
-                if (leftOp.getRight() == this && !isHigherPrecendence(thisExpr.getOp(), leftOp.getOp())) {
+                if (leftOp.getRight() == this && !isHigherPrecendence(thisExpr.getOp(), leftOp.getOp())) { // NOPMD CompareObjectsWithEquals - identity check against "this" node
 
                     // doh, "this" is lower (or the same) precedence, restore the
                     // original order of things
@@ -1531,7 +1550,7 @@ public class Expressionator {
         }
     }
 
-    private static class EParen extends Expr {
+    private static final class EParen extends Expr {
         private final Expr expr;
 
         private EParen(Expr expr) {
@@ -1566,7 +1585,7 @@ public class Expressionator {
         }
     }
 
-    private static class EFunc extends Expr {
+    private static final class EFunc extends Expr {
         private final Function   func;
         private final List<Expr> params;
 
@@ -1658,7 +1677,7 @@ public class Expressionator {
         }
     }
 
-    private static class EBinaryOp extends EBaseBinaryOp {
+    private static final class EBinaryOp extends EBaseBinaryOp {
         private EBinaryOp(BinaryOp op, Expr left, Expr right) {
             super(op, left, right);
         }
@@ -1669,7 +1688,7 @@ public class Expressionator {
         }
     }
 
-    private static class EUnaryOp extends Expr implements RightAssocExpr {
+    private static final class EUnaryOp extends Expr implements RightAssocExpr {
         private final OpType op;
         private Expr         expr;
 
@@ -1734,7 +1753,7 @@ public class Expressionator {
         }
     }
 
-    private static class EImplicitCompOp extends ECompOp {
+    private static final class EImplicitCompOp extends ECompOp {
         private EImplicitCompOp(Expr right) {
             super(CompOp.EQ, THIS_COL_VALUE, right);
         }
@@ -1751,7 +1770,7 @@ public class Expressionator {
         }
     }
 
-    private static class ELogicalOp extends EBaseBinaryOp {
+    private static final class ELogicalOp extends EBaseBinaryOp {
         private ELogicalOp(LogOp op, Expr left, Expr right) {
             super(op, left, right);
         }
@@ -1766,7 +1785,7 @@ public class Expressionator {
 
             // logical operations do short circuit evaluation, so we need to delay
             // computing results until necessary
-            return ((LogOp) op).eval(ctx, new DelayedValue(left, ctx), new DelayedValue(right, ctx));
+            return ((LogOp) op).eval(ctx, new DelayedValue(left, ctx), new DelayedValue(right, ctx)); // NOPMD - cast required, op is typed as marker OpType
         }
     }
 
@@ -1810,7 +1829,7 @@ public class Expressionator {
         }
     }
 
-    private static class ENullOp extends ESpecOp {
+    private static final class ENullOp extends ESpecOp {
         private ENullOp(SpecOp op, Expr expr) {
             super(op, expr);
         }
@@ -1826,7 +1845,7 @@ public class Expressionator {
         }
     }
 
-    private static class ELikeOp extends ESpecOp {
+    private static final class ELikeOp extends ESpecOp {
         private final String patternStr;
         private Pattern      pattern;
 
@@ -1857,7 +1876,7 @@ public class Expressionator {
         }
     }
 
-    private static class EInOp extends ESpecOp {
+    private static final class EInOp extends ESpecOp {
         private final List<Expr> exprs;
 
         private EInOp(SpecOp op, Expr expr, List<Expr> exprs) {
@@ -1890,7 +1909,7 @@ public class Expressionator {
         }
     }
 
-    private static class EBetweenOp extends ESpecOp implements RightAssocExpr {
+    private static final class EBetweenOp extends ESpecOp implements RightAssocExpr {
         private final Expr startRangeExpr;
         private Expr       endRangeExpr;
 

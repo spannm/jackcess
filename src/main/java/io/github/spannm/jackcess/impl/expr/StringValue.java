@@ -121,7 +121,7 @@ public class StringValue extends BaseValue {
 
                     // fall through to NaN
                 }
-            } catch (NumberFormatException _ex) {
+            } catch (NumberFormatException ignored) {
                 // fall through to NaN...
             }
             num = NOT_A_NUMBER;

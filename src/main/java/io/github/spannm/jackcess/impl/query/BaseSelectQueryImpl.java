@@ -16,7 +16,13 @@ limitations under the License.
 
 package io.github.spannm.jackcess.impl.query;
 
-import static io.github.spannm.jackcess.impl.query.QueryFormat.*;
+import static io.github.spannm.jackcess.impl.query.QueryFormat.DEFAULT_TYPE;
+import static io.github.spannm.jackcess.impl.query.QueryFormat.DISTINCT_ROW_SELECT_TYPE;
+import static io.github.spannm.jackcess.impl.query.QueryFormat.DISTINCT_SELECT_TYPE;
+import static io.github.spannm.jackcess.impl.query.QueryFormat.NEWLINE;
+import static io.github.spannm.jackcess.impl.query.QueryFormat.PERCENT_SELECT_TYPE;
+import static io.github.spannm.jackcess.impl.query.QueryFormat.SELECT_STAR_SELECT_TYPE;
+import static io.github.spannm.jackcess.impl.query.QueryFormat.TOP_SELECT_TYPE;
 
 import io.github.spannm.jackcess.query.BaseSelectQuery;
 

@@ -16,7 +16,12 @@
  */
 package io.github.spannm.jackcess.impl;
 
-import io.github.spannm.jackcess.*;
+import io.github.spannm.jackcess.Column;
+import io.github.spannm.jackcess.CursorBuilder;
+import io.github.spannm.jackcess.DataType;
+import io.github.spannm.jackcess.IndexCursor;
+import io.github.spannm.jackcess.Row;
+import io.github.spannm.jackcess.Table;
 import io.github.spannm.jackcess.complex.ComplexColumnInfo;
 import io.github.spannm.jackcess.complex.ComplexValue;
 import io.github.spannm.jackcess.impl.complex.AttachmentColumnInfoImpl;
@@ -35,7 +40,7 @@ import java.util.logging.Logger;
 /**
  * Utility code for loading complex columns.
  */
-public class ComplexColumnSupport {
+public final class ComplexColumnSupport {
     private static final Logger        LOGGER                     = Logger.getLogger(ComplexColumnSupport.class.getName());
 
     private static final String        COL_COMPLEX_TYPE_OBJECT_ID = "ComplexTypeObjectID";
@@ -56,7 +61,7 @@ public class ComplexColumnSupport {
     public static ComplexColumnInfo<? extends ComplexValue> create(ColumnImpl column, ByteBuffer buffer, int offset) throws IOException {
         int complexTypeId = buffer.getInt(offset + column.getFormat().OFFSET_COLUMN_COMPLEX_ID);
 
-        DatabaseImpl db = column.getDatabase();
+        DatabaseImpl db = column.getDatabase(); // NOPMD CloseResource - borrowed reference, lifecycle owned by the caller/Database itself
         TableImpl complexColumns = db.getSystemComplexColumns();
         IndexCursor cursor = CursorBuilder.createCursor(complexColumns.getPrimaryKeyIndex());
         if (!cursor.findFirstRowByEntry(complexTypeId)) {

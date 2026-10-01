@@ -16,10 +16,19 @@
  */
 package io.github.spannm.jackcess;
 
-import io.github.spannm.jackcess.impl.*;
+import io.github.spannm.jackcess.impl.DatabaseImpl;
+import io.github.spannm.jackcess.impl.IndexData;
+import io.github.spannm.jackcess.impl.IndexImpl;
+import io.github.spannm.jackcess.impl.JetFormat;
+import io.github.spannm.jackcess.impl.TableImpl;
+import io.github.spannm.jackcess.impl.TableUpdater;
 
 import java.io.IOException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 /**
  * Builder style class for constructing an {@link Index}. See {@link TableBuilder} for example usage. Additionally, an
@@ -210,7 +219,7 @@ public class IndexBuilder {
     /**
      * Information about a column in this index (name and ordering).
      */
-    public static class Column {
+    public static final class Column {
         /** name of the column to be indexed */
         private       String name;
         /** column flags (ordering) */

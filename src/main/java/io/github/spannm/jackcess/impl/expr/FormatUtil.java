@@ -16,7 +16,11 @@
  */
 package io.github.spannm.jackcess.impl.expr;
 
-import io.github.spannm.jackcess.expr.*;
+import io.github.spannm.jackcess.expr.EvalContext;
+import io.github.spannm.jackcess.expr.EvalException;
+import io.github.spannm.jackcess.expr.NumericConfig;
+import io.github.spannm.jackcess.expr.TemporalConfig;
+import io.github.spannm.jackcess.expr.Value;
 import io.github.spannm.jackcess.impl.SimpleCache;
 import io.github.spannm.jackcess.impl.expr.ExpressionTokenizer.ExprBuf;
 import io.github.spannm.jackcess.util.StringUtil;
@@ -30,11 +34,21 @@ import java.time.format.DateTimeFormatterBuilder;
 import java.time.temporal.ChronoField;
 import java.time.temporal.TemporalField;
 import java.time.temporal.WeekFields;
-import java.util.*;
+import java.util.AbstractMap;
+import java.util.AbstractSet;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
 import java.util.function.BiConsumer;
 
 @SuppressWarnings("PMD.FieldDeclarationsShouldBeAtStartOfClass")
-public class FormatUtil {
+public final class FormatUtil {
     public enum NumPatternType {
         GENERAL,
         CURRENCY {
@@ -280,9 +294,11 @@ public class FormatUtil {
             if (!expr.getType().isTemporal()) {
 
                 // format coerces boolean strings to numbers
-                Value boolExpr = null;
-                if (expr.getType().isString() && (boolExpr = maybeGetStringAsBooleanValue()) != null) {
-                    expr = boolExpr;
+                if (expr.getType().isString()) {
+                    Value boolExpr = maybeGetStringAsBooleanValue();
+                    if (boolExpr != null) {
+                        expr = boolExpr;
+                    }
                 }
 
                 // StringValue already handles most String -> Number -> Date/Time, so
@@ -380,7 +396,7 @@ public class FormatUtil {
     /**
      * Utility for leveraging format support outside of expression evaluation.
      */
-    public static class StandaloneFormatter {
+    public static final class StandaloneFormatter {
         private final Fmt  mfmt;
         private final Args margs;
 
@@ -686,9 +702,8 @@ public class FormatUtil {
 
         char firstChar = c;
         int firstPos = buf.curPos();
-        String bestMatchPat = sb.toString();
 
-        DateFormatBuilder bestMatch = DATE_FMT_BUILDERS.get(bestMatchPat);
+        DateFormatBuilder bestMatch = DATE_FMT_BUILDERS.get(sb.toString());
         int bestPos = firstPos;
         while (buf.hasNext()) {
             sb.append(buf.next());
@@ -702,7 +717,6 @@ public class FormatUtil {
                 // this is the longest, valid pattern we have seen so far
                 bestMatch = dfb;
                 bestPos = buf.curPos();
-                bestMatchPat = tmpPat;
             }
         }
 
@@ -1089,7 +1103,7 @@ public class FormatUtil {
 
         flushPendingTextLiteral(pendingLiteral, subFmts);
 
-        Fmt emptyFmt = null;
+        Fmt emptyFmt;
         if (fmt == null) {
             fmt = new CharSourceFmt(subFmts, numPlaceholders, rightAligned, textCase);
             emptyFmt = NULL_FMT;

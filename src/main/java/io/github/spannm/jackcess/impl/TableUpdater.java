@@ -22,7 +22,11 @@ import io.github.spannm.jackcess.IndexBuilder;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.EnumSet;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 /**
  * Helper class used to maintain state during table mutation.
@@ -74,12 +78,12 @@ public class TableUpdater extends TableMutator {
 
     @Override
     public ColumnState getColumnState(ColumnBuilder col) {
-        return col == column ? colState : null;
+        return col == column ? colState : null; // NOPMD CompareObjectsWithEquals - intentional identity lookup for the exact builder instance
     }
 
     @Override
     public IndexDataState getIndexDataState(IndexBuilder idx) {
-        return idx == index ? idxDataState : null;
+        return idx == index ? idxDataState : null; // NOPMD CompareObjectsWithEquals - intentional identity lookup for the exact builder instance
     }
 
     void setForeignKey(IndexImpl.ForeignKeyReference newFkReference) {
@@ -88,7 +92,7 @@ public class TableUpdater extends TableMutator {
 
     @Override
     public IndexImpl.ForeignKeyReference getForeignKey(IndexBuilder idx) {
-        return idx == index ? fkReference : null;
+        return idx == index ? fkReference : null; // NOPMD CompareObjectsWithEquals - intentional identity lookup for the exact builder instance
     }
 
     int getAddedTdefLen() {

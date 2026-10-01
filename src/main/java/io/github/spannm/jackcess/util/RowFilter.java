@@ -62,6 +62,20 @@ public abstract class RowFilter implements Predicate<Row> {
     }
 
     /**
+     * Returns an iterable which filters the given iterable based on the given rowFilter.
+     *
+     * @param rowFilter the filter criteria, may be {@code null}
+     * @param iterable row iterable to filter
+     *
+     * @return a filtering iterable (or the given iterable if a {@code null} filter was given)
+     */
+    @SuppressWarnings("unchecked")
+    public static Iterable<Row> apply(RowFilter rowFilter,
+        Iterable<? extends Row> iterable) {
+        return rowFilter != null ? rowFilter.apply(iterable) : (Iterable<Row>) iterable;
+    }
+
+    /**
      * Convenience method to apply this filter to the given iterable and return it as a Stream.
      */
     public Stream<Row> filter(Iterable<? extends Row> iterable) {
@@ -126,23 +140,9 @@ public abstract class RowFilter implements Predicate<Row> {
     }
 
     /**
-     * Returns an iterable which filters the given iterable based on the given rowFilter.
-     *
-     * @param rowFilter the filter criteria, may be {@code null}
-     * @param iterable row iterable to filter
-     *
-     * @return a filtering iterable (or the given iterable if a {@code null} filter was given)
-     */
-    @SuppressWarnings("unchecked")
-    public static Iterable<Row> apply(RowFilter rowFilter,
-        Iterable<? extends Row> iterable) {
-        return rowFilter != null ? rowFilter.apply(iterable) : (Iterable<Row>) iterable;
-    }
-
-    /**
      * Iterable which creates a filtered view of a another row iterable.
      */
-    private class FilterIterable implements Iterable<Row> {
+    private final class FilterIterable implements Iterable<Row> {
         private final Iterable<? extends Row> iterable;
 
         private FilterIterable(Iterable<? extends Row> iterable) {

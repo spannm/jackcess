@@ -16,11 +16,24 @@
  */
 package io.github.spannm.jackcess.impl;
 
-import io.github.spannm.jackcess.*;
+import io.github.spannm.jackcess.ConstraintViolationException;
+import io.github.spannm.jackcess.IndexBuilder;
+import io.github.spannm.jackcess.IndexCursor;
+import io.github.spannm.jackcess.Relationship;
+import io.github.spannm.jackcess.RelationshipBuilder;
+import io.github.spannm.jackcess.Row;
 import io.github.spannm.jackcess.util.ToStringBuilder;
 
 import java.io.IOException;
-import java.util.*;
+import java.util.ArrayDeque;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Deque;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * Helper class used to maintain state during relationship creation.
@@ -111,9 +124,9 @@ public class RelationshipCreator extends DBMutator {
     }
 
     private IndexImpl.ForeignKeyReference createFKReference(boolean isPrimary) {
-        byte tableType = 0;
-        int otherTableNum = 0;
-        int otherIdxNum = 0;
+        byte tableType;
+        int otherTableNum;
+        int otherIdxNum;
         if (isPrimary) {
             tableType = IndexImpl.FK_PRIMARY_TABLE_TYPE;
             otherTableNum = secondaryTable.getTableDefPageNumber();

@@ -16,7 +16,11 @@ limitations under the License.
 
 package io.github.spannm.jackcess.impl.query;
 
-import static io.github.spannm.jackcess.impl.query.QueryFormat.*;
+import static io.github.spannm.jackcess.impl.query.QueryFormat.DEFAULT_TYPE;
+import static io.github.spannm.jackcess.impl.query.QueryFormat.NEWLINE;
+import static io.github.spannm.jackcess.impl.query.QueryFormat.UNION_FLAG;
+import static io.github.spannm.jackcess.impl.query.QueryFormat.UNION_PART1;
+import static io.github.spannm.jackcess.impl.query.QueryFormat.UNION_PART2;
 
 import io.github.spannm.jackcess.query.UnionQuery;
 

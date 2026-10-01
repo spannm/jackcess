@@ -20,7 +20,11 @@ import static io.github.spannm.jackcess.impl.expr.DefaultFunctions.registerFunc;
 import static io.github.spannm.jackcess.impl.expr.DefaultFunctions.registerStringFunc;
 import static io.github.spannm.jackcess.impl.expr.FunctionSupport.getOptionalIntParam;
 
-import io.github.spannm.jackcess.expr.*;
+import io.github.spannm.jackcess.expr.EvalContext;
+import io.github.spannm.jackcess.expr.EvalException;
+import io.github.spannm.jackcess.expr.Function;
+import io.github.spannm.jackcess.expr.LocaleContext;
+import io.github.spannm.jackcess.expr.Value;
 import io.github.spannm.jackcess.impl.expr.FunctionSupport.Func1;
 import io.github.spannm.jackcess.impl.expr.FunctionSupport.Func1NullIsNull;
 import io.github.spannm.jackcess.impl.expr.FunctionSupport.Func2;
@@ -117,7 +121,7 @@ public class DefaultTextFunctions {
             if (s1Len == 0) {
                 return ValueSupport.ZERO_VAL;
             }
-            Value param2 = params[idx++];
+            Value param2 = params[idx];
             if (param2.isNull()) {
                 return param2;
             }

@@ -16,9 +16,17 @@ limitations under the License.
 
 package io.github.spannm.jackcess.util;
 
-import io.github.spannm.jackcess.*;
+import io.github.spannm.jackcess.ColumnBuilder;
+import io.github.spannm.jackcess.DataType;
+import io.github.spannm.jackcess.Database;
+import io.github.spannm.jackcess.Table;
+import io.github.spannm.jackcess.TableBuilder;
 
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.EOFException;
+import java.io.File;
+import java.io.FileReader;
+import java.io.IOException;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
@@ -32,7 +40,7 @@ import java.util.regex.Pattern;
  * configuration of the import functionality. Note that most scenarios for customizing input data can be handled by
  * implementing a custom {@link ImportFilter}.
  */
-public class ImportUtil {
+public final class ImportUtil {
     /** Batch commit size for copying other result sets into this database */
     private static final int COPY_TABLE_BATCH_SIZE = 200;
 
@@ -134,8 +142,8 @@ public class ImportUtil {
         ResultSetMetaData md = source.getMetaData();
 
         name = TableBuilder.escapeIdentifier(name);
-        Table table = null;
-        if (!useExistingTable || (table = db.getTable(name)) == null) {
+        Table table = useExistingTable ? db.getTable(name) : null;
+        if (table == null) {
             List<ColumnBuilder> columns = toColumns(md);
             table = createUniqueTable(db, name, columns, md, filter);
         }
@@ -371,8 +379,8 @@ public class ImportUtil {
         Pattern delimPat = Pattern.compile(delim);
 
         name = TableBuilder.escapeIdentifier(name);
-        Table table = null;
-        if (!useExistingTable || (table = db.getTable(name)) == null) {
+        Table table = useExistingTable ? db.getTable(name) : null;
+        if (table == null) {
 
             List<ColumnBuilder> columns = new ArrayList<>();
             Object[] columnNames = splitLine(line, delimPat, quote, in, 0);

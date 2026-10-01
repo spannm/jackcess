@@ -21,7 +21,11 @@ import io.github.spannm.jackcess.PropertyMap;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
-import java.util.*;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 /**
  * Map of properties for a database object.
@@ -116,17 +120,6 @@ public class PropertyMapImpl implements PropertyMap {
         return put(name, type, value, false);
     }
 
-    @Override
-    public void putAll(Iterable<? extends Property> newProps) {
-        if (newProps == null) {
-            return;
-        }
-
-        for (Property prop : newProps) {
-            put(prop);
-        }
-    }
-
     public PropertyImpl put(Property prop) {
         return put(prop.getName(), prop.getType(), prop.getValue(), prop.isDdl());
     }
@@ -139,6 +132,17 @@ public class PropertyMapImpl implements PropertyMap {
         PropertyImpl prop = (PropertyImpl) createProperty(name, type, value, isDdl);
         props.put(DatabaseImpl.toLookupName(name), prop);
         return prop;
+    }
+
+    @Override
+    public void putAll(Iterable<? extends Property> newProps) {
+        if (newProps == null) {
+            return;
+        }
+
+        for (Property prop : newProps) {
+            put(prop);
+        }
     }
 
     @Override

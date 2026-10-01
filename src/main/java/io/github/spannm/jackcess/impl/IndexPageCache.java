@@ -16,7 +16,10 @@ limitations under the License.
 
 package io.github.spannm.jackcess.impl;
 
-import static io.github.spannm.jackcess.impl.IndexData.*;
+import static io.github.spannm.jackcess.impl.IndexData.EMPTY_PREFIX;
+import static io.github.spannm.jackcess.impl.IndexData.FIRST_ENTRY;
+import static io.github.spannm.jackcess.impl.IndexData.INVALID_INDEX_PAGE_NUMBER;
+import static io.github.spannm.jackcess.impl.IndexData.missingIndexToInsertionPoint;
 
 import io.github.spannm.jackcess.JackcessRuntimeException;
 import io.github.spannm.jackcess.impl.IndexData.DataPage;
@@ -26,7 +29,17 @@ import io.github.spannm.jackcess.util.ToStringBuilder;
 import java.io.IOException;
 import java.lang.ref.Reference;
 import java.lang.ref.SoftReference;
-import java.util.*;
+import java.util.AbstractList;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.LinkedHashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Queue;
+import java.util.RandomAccess;
 
 /**
  * Manager of the index pages for a IndexData.
@@ -133,7 +146,7 @@ public class IndexPageCache {
      * @throws IOException if an error occurs during page access or validation
      */
     private void preparePagesForWriting() throws IOException {
-        boolean splitPages = false;
+        boolean splitPages;
         int maxPageEntrySize = getIndexData().getMaxPageEntrySize();
 
         // we need to continue looping through all the pages until we do not split
@@ -143,7 +156,7 @@ public class IndexPageCache {
 
             // we might be adding to this list while iterating, so we can't use an
             // iterator
-            for (int i = 0; i < modifiedPages.size(); ++i) {
+            for (int i = 0; i < modifiedPages.size(); ++i) { // NOPMD ForLoopCanBeForeach - list is mutated during iteration, a foreach would throw ConcurrentModificationException
 
                 CacheDataPage cacheDataPage = modifiedPages.get(i);
 
@@ -322,7 +335,7 @@ public class IndexPageCache {
                 throw new JackcessRuntimeException(withErrorContext("unknown update type " + upType));
         }
 
-        boolean updateLast = oldLastEntry != dpExtra.entryView.getLast();
+        boolean updateLast = oldLastEntry != dpExtra.entryView.getLast(); // NOPMD CompareObjectsWithEquals - identity check for whether the last entry object was structurally displaced
 
         // child tail entry updates do not modify the page
         if (!updateLast || !dpMain.hasChildTail()) {
@@ -908,7 +921,7 @@ public class IndexPageCache {
         while (iter.hasNext()) {
             DataPageMain dpMain = iter.next();
             // note, we never purge the root page
-            if (dpMain != rootPage) {
+            if (dpMain != rootPage) { // NOPMD CompareObjectsWithEquals - intentional identity check against the singleton root page instance
                 iter.remove();
                 if (dataPages.size() <= MAX_CACHE_SIZE) {
                     break;
@@ -929,7 +942,7 @@ public class IndexPageCache {
     /**
      * Keeps track of the main info for an index page.
      */
-    private class DataPageMain {
+    private final class DataPageMain {
         public final int                 pageNumber;
         public Integer                   prevPageNumber;
         public Integer                   nextPageNumber;
@@ -948,7 +961,7 @@ public class IndexPageCache {
         }
 
         public boolean isRoot() {
-            return this == rootPage;
+            return this == rootPage; // NOPMD CompareObjectsWithEquals - intentional identity check against the singleton root page instance
         }
 
         public boolean isTail() throws IOException {
@@ -994,10 +1007,6 @@ public class IndexPageCache {
             return getChildPage(childPageNumber, isChildTailPageNumber(childPageNumber));
         }
 
-        public DataPageMain getChildTailPage() throws IOException {
-            return getChildPage(childTailPageNumber, true);
-        }
-
         /**
          * Returns a child page for the given page number, updating its parent info if necessary.
          */
@@ -1008,6 +1017,10 @@ public class IndexPageCache {
                 child.initParentPage(pageNumber, isTail);
             }
             return child;
+        }
+
+        public DataPageMain getChildTailPage() throws IOException {
+            return getChildPage(childTailPageNumber, true);
         }
 
         public DataPageExtra getExtra() throws IOException {
@@ -1045,7 +1058,7 @@ public class IndexPageCache {
     /**
      * Keeps track of the extra info for an index page. This info (if unmodified) may be re-read from disk as necessary.
      */
-    private static class DataPageExtra {
+    private static final class DataPageExtra {
         /**
          * sorted collection of index entries. this is kept in a list instead of a SortedSet because the SortedSet has lame traversal utilities
          */
@@ -1178,7 +1191,7 @@ public class IndexPageCache {
     /**
      * A view of an index page's entries which combines the normal entries and tail entry into one collection.
      */
-    private static class EntryListView extends AbstractList<Entry> implements RandomAccess {
+    private static final class EntryListView extends AbstractList<Entry> implements RandomAccess {
         private final DataPageExtra extra;
         private Entry               childTailEntry;
 
@@ -1277,7 +1290,7 @@ public class IndexPageCache {
         }
 
         void validate() throws IOException {
-            DataPageMain dpMain = null;
+            DataPageMain dpMain;
             while ((dpMain = pendingPages.poll()) != null) {
                 DataPageExtra dpExtra = dpMain.getExtra();
                 validateEntries(dpExtra);

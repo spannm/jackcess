@@ -19,7 +19,11 @@ package io.github.spannm.jackcess.impl.complex;
 import io.github.spannm.jackcess.Column;
 import io.github.spannm.jackcess.Row;
 import io.github.spannm.jackcess.Table;
-import io.github.spannm.jackcess.complex.*;
+import io.github.spannm.jackcess.complex.ComplexDataType;
+import io.github.spannm.jackcess.complex.ComplexValue;
+import io.github.spannm.jackcess.complex.ComplexValueForeignKey;
+import io.github.spannm.jackcess.complex.UnsupportedColumnInfo;
+import io.github.spannm.jackcess.complex.UnsupportedValue;
 import io.github.spannm.jackcess.util.ToStringBuilder;
 
 import java.io.IOException;
@@ -77,7 +81,7 @@ public class UnsupportedColumnInfoImpl extends ComplexColumnInfoImpl<Unsupported
         return new UnsupportedValueImpl(INVALID_ID, complexValueFk, new LinkedHashMap<>(values));
     }
 
-    private static class UnsupportedValueImpl extends ComplexValueImpl implements UnsupportedValue {
+    private static final class UnsupportedValueImpl extends ComplexValueImpl implements UnsupportedValue {
         private final Map<String, Object> values;
 
         private UnsupportedValueImpl(Id id, ComplexValueForeignKey complexValueFk, Map<String, Object> values) {

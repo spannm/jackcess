@@ -235,7 +235,7 @@ class LongValueColumnImpl extends ColumnImpl {
         }
 
         // determine which type to write
-        byte type = 0;
+        byte type;
         int lvalDefLen = getFormat().SIZE_LONG_VALUE_DEF;
         if (getFormat().SIZE_LONG_VALUE_DEF + value.length <= remainingRowLength && value.length <= getFormat().MAX_INLINE_LONG_VALUE_SIZE) {
             type = LONG_VALUE_TYPE_THIS_PAGE;
@@ -258,7 +258,7 @@ class LongValueColumnImpl extends ColumnImpl {
             def.put(value);
         } else {
 
-            ByteBuffer lvalPage = null;
+            ByteBuffer lvalPage;
             int firstLvalPageNum = PageChannel.INVALID_PAGE_NUMBER;
             byte firstLvalRow = 0;
 
@@ -281,9 +281,9 @@ class LongValueColumnImpl extends ColumnImpl {
                     firstLvalPageNum = lvalBufferH.getPageNumber();
                     firstLvalRow = (byte) TableImpl.getRowsOnDataPage(lvalPage, getFormat());
                     int lvalPageNum = firstLvalPageNum;
-                    ByteBuffer nextLvalPage = null;
-                    int nextLvalPageNum = 0;
-                    int nextLvalRowNum = 0;
+                    ByteBuffer nextLvalPage;
+                    int nextLvalPageNum;
+                    int nextLvalRowNum;
                     while (remainingLen > 0) {
                         lvalPage.clear();
 
@@ -367,7 +367,7 @@ class LongValueColumnImpl extends ColumnImpl {
             TempPageHolder pageHolder = getBufferHolder();
             dataLength = Math.min(dataLength, getFormat().MAX_LONG_VALUE_ROW_SIZE);
 
-            ByteBuffer lvalPage = null;
+            ByteBuffer lvalPage;
             if (pageHolder.getPageNumber() != PageChannel.INVALID_PAGE_NUMBER) {
                 lvalPage = pageHolder.getPage(getPageChannel());
                 if (TableImpl.rowFitsOnDataPage(dataLength, lvalPage, getFormat())) {

@@ -19,7 +19,7 @@ package io.github.spannm.jackcess.impl;
 /**
  * Various constants used for creating index entries.
  */
-public class IndexCodes {
+public final class IndexCodes {
 
     static final byte ASC_START_FLAG     = (byte) 0x7F;
     static final byte ASC_NULL_FLAG      = (byte) 0x00;

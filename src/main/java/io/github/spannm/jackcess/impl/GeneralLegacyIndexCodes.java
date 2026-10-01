@@ -430,7 +430,7 @@ public class GeneralLegacyIndexCodes {
                                                                  // its location in a 1024 character block.
                                                                  int charOffset = (asUnsignedChar(c) - 0xdc00) % 1024;
 
-                                                                 int idxOffset = 0;
+                                                                 int idxOffset;
                                                                  if (charOffset < 8) {
                                                                      idxOffset = 9992;
                                                                  } else if (charOffset < (8 + 254)) {
@@ -501,7 +501,7 @@ public class GeneralLegacyIndexCodes {
             int end = asUnsignedChar(lastChar);
             for (int i = start; i <= end; ++i) {
                 char c = (char) i;
-                CharHandler ch = null;
+                CharHandler ch;
                 if (Character.isHighSurrogate(c)) {
                     // surrogate chars are not included in the codes files
                     ch = HIGH_SURROGATE_CHAR_HANDLER;
@@ -639,9 +639,9 @@ public class GeneralLegacyIndexCodes {
         int prevLength = bout.getLength();
 
         // now, convert each character to a "code" of one or more bytes
-        ExtraCodesStream extraCodes = null;
-        ByteStream unprintableCodes = null;
-        ByteStream crazyCodes = null;
+        ExtraCodesStream extraCodes = null; // NOPMD CloseResource - in-memory ByteStream subclass, close() is a no-op (no real resource)
+        ByteStream unprintableCodes = null; // NOPMD CloseResource - in-memory ByteStream subclass, close() is a no-op (no real resource)
+        ByteStream crazyCodes = null; // NOPMD CloseResource - in-memory ByteStream subclass, close() is a no-op (no real resource)
         int charOffset = 0;
         for (int i = 0; i < str.length(); ++i) {
 

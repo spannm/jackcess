@@ -306,14 +306,12 @@ public class DefaultFinancialFunctions {
 
     public static double calculateRate(double nper, double pmt, double pv, double fv, int pmtType, double guess) {
 
-        double y = 0;
+        double y;
         double f = 0;
         double rate = guess;
-        if (Math.abs(rate) < RATE_PRECISION) {
-            y = pv * (1 + nper * rate) + pmt * (1 + rate * pmtType) * nper + fv;
-        } else {
+        if (Math.abs(rate) >= RATE_PRECISION) {
+            // for the initial guess, the "y" value itself is not needed (only y0/y1 below are compared for convergence)
             f = Math.exp(nper * Math.log(1 + rate));
-            y = pv * f + pmt * (1 / rate + pmtType) * (f - 1) + fv;
         }
         double y0 = pv + pmt * nper + fv;
         double y1 = pv * f + pmt * (1 / rate + pmtType) * (f - 1) + fv;

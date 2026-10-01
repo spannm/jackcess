@@ -16,7 +16,19 @@ limitations under the License.
 
 package io.github.spannm.jackcess.impl;
 
-import io.github.spannm.jackcess.*;
+import io.github.spannm.jackcess.BatchUpdateException;
+import io.github.spannm.jackcess.Column;
+import io.github.spannm.jackcess.ColumnBuilder;
+import io.github.spannm.jackcess.ConstraintViolationException;
+import io.github.spannm.jackcess.CursorBuilder;
+import io.github.spannm.jackcess.Index;
+import io.github.spannm.jackcess.IndexBuilder;
+import io.github.spannm.jackcess.InvalidValueException;
+import io.github.spannm.jackcess.JackcessException;
+import io.github.spannm.jackcess.PropertyMap;
+import io.github.spannm.jackcess.Row;
+import io.github.spannm.jackcess.RowId;
+import io.github.spannm.jackcess.Table;
 import io.github.spannm.jackcess.expr.Identifier;
 import io.github.spannm.jackcess.util.ErrorHandler;
 import io.github.spannm.jackcess.util.ExportUtil;
@@ -30,7 +42,19 @@ import java.nio.BufferUnderflowException;
 import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
 import java.time.LocalDateTime;
-import java.util.*;
+import java.util.AbstractMap;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.TreeSet;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -640,7 +664,7 @@ public class TableImpl implements Table, PropertyMaps.Owner {
      * Reads a single column from the given row.
      */
     public Object getRowValue(RowState rowState, RowIdImpl rowId, ColumnImpl column) throws IOException {
-        if (this != column.getTable()) {
+        if (this != column.getTable()) { // NOPMD CompareObjectsWithEquals - intentional identity check, must be the exact owning Table instance
             throw new IllegalArgumentException(withErrorContext("Given column " + column + " is not from this table"));
         }
         requireValidRowId(rowId);
@@ -713,8 +737,8 @@ public class TableImpl implements Table, PropertyMaps.Owner {
 
             // locate the column data bytes
             int rowStart = rowBuffer.position();
-            int colDataPos = 0;
-            int colDataLen = 0;
+            int colDataPos;
+            int colDataLen;
             if (!column.isVariableLength()) {
 
                 // read fixed length value (non-boolean at this point)
@@ -996,7 +1020,7 @@ public class TableImpl implements Table, PropertyMaps.Owner {
         buffer.rewind();
         int totalTableDefSize = buffer.remaining();
         JetFormat format = mutator.getFormat();
-        PageChannel pageChannel = mutator.getPageChannel();
+        PageChannel pageChannel = mutator.getPageChannel(); // NOPMD CloseResource - borrowed from Database, not owned/closed here
 
         // write table buffer to database
         if (totalTableDefSize <= format.PAGE_SIZE) {
@@ -1084,7 +1108,7 @@ public class TableImpl implements Table, PropertyMaps.Owner {
         // load current table definition and add space for new info
         ByteBuffer tableBuffer = loadCompleteTableDefinitionBufferForUpdate(mutator);
 
-        ColumnImpl newCol = null;
+        ColumnImpl newCol;
         int umapPos = -1;
         boolean success = false;
         try {
@@ -1241,7 +1265,7 @@ public class TableImpl implements Table, PropertyMaps.Owner {
         // load current table definition and add space for new info
         ByteBuffer tableBuffer = loadCompleteTableDefinitionBufferForUpdate(mutator);
 
-        IndexData newIdxData = null;
+        IndexData newIdxData;
         boolean success = false;
         try {
 
@@ -1354,7 +1378,7 @@ public class TableImpl implements Table, PropertyMaps.Owner {
         // load current table definition and add space for new info
         ByteBuffer tableBuffer = loadCompleteTableDefinitionBufferForUpdate(mutator);
 
-        IndexImpl newIdx = null;
+        IndexImpl newIdx;
         boolean success = false;
         try {
 
@@ -1472,7 +1496,7 @@ public class TableImpl implements Table, PropertyMaps.Owner {
      */
     private Map.Entry<Integer, Integer> addUsageMaps(int numMaps, Integer firstUsedPage) throws IOException {
         JetFormat format = getFormat();
-        PageChannel pageChannel = getPageChannel();
+        PageChannel pageChannel = getPageChannel(); // NOPMD CloseResource - borrowed from Database, not owned/closed here
         int umapRowLength = format.OFFSET_USAGE_MAP_START + format.USAGE_MAP_TABLE_BYTE_LENGTH;
         int totalUmapSpaceUsage = getRowSpaceUsage(umapRowLength, format) * numMaps;
         int umapPageNumber = PageChannel.INVALID_PAGE_NUMBER;
@@ -1616,7 +1640,7 @@ public class TableImpl implements Table, PropertyMaps.Owner {
         JetFormat format = creator.getFormat();
         int umapRowLength = format.OFFSET_USAGE_MAP_START + format.USAGE_MAP_TABLE_BYTE_LENGTH;
         int umapSpaceUsage = getRowSpaceUsage(umapRowLength, format);
-        PageChannel pageChannel = creator.getPageChannel();
+        PageChannel pageChannel = creator.getPageChannel(); // NOPMD CloseResource - borrowed from Database, not owned/closed here
         int umapPageNumber = PageChannel.INVALID_PAGE_NUMBER;
         ByteBuffer umapBuf = null;
         int freeSpace = 0;
@@ -1823,8 +1847,8 @@ public class TableImpl implements Table, PropertyMaps.Owner {
         }
 
         int pos = tableBuffer.position();
-        UsageMap colOwnedPages = null;
-        UsageMap colFreeSpacePages = null;
+        UsageMap colOwnedPages;
+        UsageMap colFreeSpacePages;
         try {
             colOwnedPages = UsageMap.read(getDatabase(), tableBuffer);
             colFreeSpacePages = UsageMap.read(getDatabase(), tableBuffer);
@@ -1885,28 +1909,6 @@ public class TableImpl implements Table, PropertyMaps.Owner {
     }
 
     /**
-     * Converts a map of columnName -&gt; columnValue to an array of row values appropriate for a call to
-     * {@link #addRow(Object...)}, where the generated RowId will be an extra value at the end of the array.
-     *
-     * @see ColumnImpl#RETURN_ROW_ID
-     */
-    public Object[] asRowWithRowId(Map<String, ?> rowMap) {
-        return asRow(rowMap, null, true);
-    }
-
-    @Override
-    public Object[] asUpdateRow(Map<String, ?> rowMap) {
-        return asRow(rowMap, Column.KEEP_VALUE, false);
-    }
-
-    /**
-     * @return the generated RowId added to a row of values created via {@link #asRowWithRowId}
-     */
-    public RowId getRowId(Object[] row) {
-        return (RowId) row[columns.size()];
-    }
-
-    /**
      * Converts a map of columnName -&gt; columnValue to an array of row values.
      */
     private Object[] asRow(Map<String, ?> rowMap, Object defaultValue, boolean returnRowId) {
@@ -1932,6 +1934,28 @@ public class TableImpl implements Table, PropertyMaps.Owner {
         return row;
     }
 
+    /**
+     * Converts a map of columnName -&gt; columnValue to an array of row values appropriate for a call to
+     * {@link #addRow(Object...)}, where the generated RowId will be an extra value at the end of the array.
+     *
+     * @see ColumnImpl#RETURN_ROW_ID
+     */
+    public Object[] asRowWithRowId(Map<String, ?> rowMap) {
+        return asRow(rowMap, null, true);
+    }
+
+    @Override
+    public Object[] asUpdateRow(Map<String, ?> rowMap) {
+        return asRow(rowMap, Column.KEEP_VALUE, false);
+    }
+
+    /**
+     * @return the generated RowId added to a row of values created via {@link #asRowWithRowId}
+     */
+    public RowId getRowId(Object[] row) {
+        return (RowId) row[columns.size()];
+    }
+
     @Override
     public Object[] addRow(Object... row) throws IOException {
         return addRows(Collections.singletonList(row), false).get(0);
@@ -1950,29 +1974,6 @@ public class TableImpl implements Table, PropertyMaps.Owner {
     @Override
     public List<? extends Object[]> addRows(List<? extends Object[]> rows) throws IOException {
         return addRows(rows, true);
-    }
-
-    @Override
-    public <M extends Map<String, Object>> List<M> addRowsFromMaps(List<M> rows) throws IOException {
-        List<Object[]> rowValuesList = new ArrayList<>(rows.size());
-        for (Map<String, Object> row : rows) {
-            rowValuesList.add(asRow(row));
-        }
-
-        addRows(rowValuesList);
-
-        for (int i = 0; i < rowValuesList.size(); ++i) {
-            Map<String, Object> row = rows.get(i);
-            Object[] rowValues = rowValuesList.get(i);
-            returnRowValues(row, rowValues, columns);
-        }
-        return rows;
-    }
-
-    private static void returnRowValues(Map<String, Object> row, Object[] rowValues, List<ColumnImpl> cols) {
-        for (ColumnImpl col : cols) {
-            col.setRowValue(row, col.getRowValue(rowValues));
-        }
     }
 
     /**
@@ -2157,6 +2158,29 @@ public class TableImpl implements Table, PropertyMaps.Owner {
         return rows;
     }
 
+    @Override
+    public <M extends Map<String, Object>> List<M> addRowsFromMaps(List<M> rows) throws IOException {
+        List<Object[]> rowValuesList = new ArrayList<>(rows.size());
+        for (Map<String, Object> row : rows) {
+            rowValuesList.add(asRow(row));
+        }
+
+        addRows(rowValuesList);
+
+        for (int i = 0; i < rowValuesList.size(); ++i) {
+            Map<String, Object> row = rows.get(i);
+            Object[] rowValues = rowValuesList.get(i);
+            returnRowValues(row, rowValues, columns);
+        }
+        return rows;
+    }
+
+    private static void returnRowValues(Map<String, Object> row, Object[] rowValues, List<ColumnImpl> cols) {
+        for (ColumnImpl col : cols) {
+            col.setRowValue(row, col.getRowValue(rowValues));
+        }
+    }
+
     private static boolean isWriteFailure(Throwable t) {
         while (t != null) {
             if (t instanceof IOException && !(t instanceof JackcessException)) {
@@ -2181,26 +2205,6 @@ public class TableImpl implements Table, PropertyMaps.Owner {
      */
     public Object[] updateRow(RowId rowId, Object... row) throws IOException {
         return updateRow(getDefaultCursor().getRowState(), (RowIdImpl) rowId, row);
-    }
-
-    /**
-     * Update the given column's value for the given row id. Provided RowId must have previously been returned from this
-     * Table.
-     *
-     * @throws IllegalStateException if the given row is not valid, or deleted.
-     */
-    public void updateValue(Column column, RowId rowId, Object value) throws IOException {
-        Object[] row = new Object[columns.size()];
-        Arrays.fill(row, Column.KEEP_VALUE);
-        column.setRowValue(row, value);
-
-        updateRow(rowId, row);
-    }
-
-    public <M extends Map<String, Object>> M updateRowFromMap(RowState rowState, RowIdImpl rowId, M row) throws IOException {
-        Object[] rowValues = updateRow(rowState, rowId, asUpdateRow(row));
-        returnRowValues(row, rowValues, columns);
-        return row;
     }
 
     /**
@@ -2255,7 +2259,7 @@ public class TableImpl implements Table, PropertyMaps.Owner {
                 } else {
 
                     // set oldValue to something that could not possibly be a real value
-                    Object oldValue = Column.KEEP_VALUE;
+                    Object oldValue;
                     if (indexColumns.contains(column)) {
                         // read (old) row value to help update indexes
                         oldValue = getRowColumn(getFormat(), rowBuffer, column, rowState, null);
@@ -2264,7 +2268,7 @@ public class TableImpl implements Table, PropertyMaps.Owner {
                     }
 
                     // if the old value was passed back in, we don't need to validate
-                    if (oldValue != rowValue) {
+                    if (oldValue != rowValue) { // NOPMD CompareObjectsWithEquals - intentional identity check: caller echoed back the exact same (unchanged) reference
                         // pass input value through column validator
                         rowValue = column.validate(rowValue);
                     }
@@ -2320,8 +2324,8 @@ public class TableImpl implements Table, PropertyMaps.Owner {
             rowBuffer.reset();
             int rowSize = newRowData.remaining();
 
-            ByteBuffer dataPage = null;
-            int pageNumber = PageChannel.INVALID_PAGE_NUMBER;
+            ByteBuffer dataPage;
+            int pageNumber;
 
             if (oldRowSize >= rowSize) {
 
@@ -2373,6 +2377,26 @@ public class TableImpl implements Table, PropertyMaps.Owner {
             getPageChannel().finishWrite();
         }
 
+        return row;
+    }
+
+    /**
+     * Update the given column's value for the given row id. Provided RowId must have previously been returned from this
+     * Table.
+     *
+     * @throws IllegalStateException if the given row is not valid, or deleted.
+     */
+    public void updateValue(Column column, RowId rowId, Object value) throws IOException {
+        Object[] row = new Object[columns.size()];
+        Arrays.fill(row, Column.KEEP_VALUE);
+        column.setRowValue(row, value);
+
+        updateRow(rowId, row);
+    }
+
+    public <M extends Map<String, Object>> M updateRowFromMap(RowState rowState, RowIdImpl rowId, M row) throws IOException {
+        Object[] rowValues = updateRow(rowState, rowId, asUpdateRow(row));
+        returnRowValues(row, rowValues, columns);
         return row;
     }
 
@@ -2588,9 +2612,9 @@ public class TableImpl implements Table, PropertyMaps.Owner {
                     // we have a value
                     nullMask.markNotNull(varCol);
 
-                    byte[] rawValue = null;
-                    ByteBuffer varDataBuf = null;
-                    if ((rawValue = rawVarValues.get(varCol)) != null && rawValue.length <= maxRowSize) {
+                    byte[] rawValue = rawVarValues.get(varCol);
+                    ByteBuffer varDataBuf;
+                    if (rawValue != null && rawValue.length <= maxRowSize) {
                         // save time and potentially db space, re-use raw value
                         varDataBuf = ByteBuffer.wrap(rawValue);
                     } else {
@@ -3235,7 +3259,7 @@ public class TableImpl implements Table, PropertyMaps.Owner {
     /**
      * Utility for managing calculated columns. Calculated columns need to be evaluated in dependency order.
      */
-    private class CalcColEvaluator {
+    private final class CalcColEvaluator {
         /**
          * List of calculated columns in this table, ordered by calculation dependency
          */

@@ -44,7 +44,7 @@ public final class ThisLib {
      * @param args command-line arguments (unused)
      */
     public static void main(String[] args) {
-        readManifest().ifPresent(m -> System.out.print(buildInfo(m)));
+        readManifest().ifPresent(m -> System.out.print(buildInfo(m))); // NOPMD SystemPrintln - intentional CLI stdout output, not debug leftover
     }
 
     /**

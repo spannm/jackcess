@@ -16,7 +16,12 @@ limitations under the License.
 
 package io.github.spannm.jackcess.impl;
 
-import static io.github.spannm.jackcess.impl.IndexCodes.*;
+import static io.github.spannm.jackcess.impl.IndexCodes.ASC_BOOLEAN_FALSE;
+import static io.github.spannm.jackcess.impl.IndexCodes.ASC_BOOLEAN_TRUE;
+import static io.github.spannm.jackcess.impl.IndexCodes.DESC_BOOLEAN_FALSE;
+import static io.github.spannm.jackcess.impl.IndexCodes.DESC_BOOLEAN_TRUE;
+import static io.github.spannm.jackcess.impl.IndexCodes.getNullEntryFlag;
+import static io.github.spannm.jackcess.impl.IndexCodes.getStartEntryFlag;
 
 import io.github.spannm.jackcess.ConstraintViolationException;
 import io.github.spannm.jackcess.Index;
@@ -28,7 +33,14 @@ import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -166,7 +178,7 @@ public final class IndexData {
     }
 
     public static final Comparator<byte[]> BYTE_CODE_COMPARATOR = (left, right) -> {
-                                                                    if (left == right) {
+                                                                    if (left == right) { // NOPMD CompareObjectsWithEquals - fast-path identity check, byte[] has no meaningful equals()
                                                                         return 0;
                                                                     } else if (left == null) {
                                                                         return -1;
@@ -803,15 +815,16 @@ public final class IndexData {
             // case, just search for the page/row numbers
             // TODO, we could force caller to get relevant values?
             EntryCursor cursor = cursor();
-            Position tmpPos = null;
             Position endPos = cursor.lastPos;
-            while (!endPos.equals(tmpPos = cursor.getAnotherPosition(CursorImpl.MOVE_FORWARD))) {
+            Position tmpPos = cursor.getAnotherPosition(CursorImpl.MOVE_FORWARD);
+            while (!endPos.equals(tmpPos)) {
                 if (tmpPos.getEntry().getRowId().equals(oldEntry.getRowId())) {
                     dataPage = tmpPos.getDataPage();
                     idx = tmpPos.getIndex();
                     doRemove = true;
                     break;
                 }
+                tmpPos = cursor.getAnotherPosition(CursorImpl.MOVE_FORWARD);
             }
         } else {
             doRemove = true;
@@ -867,7 +880,7 @@ public final class IndexData {
         if (endRow != null) {
             // reuse startEntryBytes if startRow and endRow are same array. this is
             // common for "lookup" code
-            byte[] endEntryBytes = startRow == endRow ? startEntryBytes : createEntryBytes(endRow);
+            byte[] endEntryBytes = startRow == endRow ? startEntryBytes : createEntryBytes(endRow); // NOPMD CompareObjectsWithEquals - intentional identity check, reuse only if same array instance
             endEntry = new Entry(endEntryBytes, endInclusive ? RowIdImpl.LAST_ROW_ID : RowIdImpl.FIRST_ROW_ID);
         }
         return new EntryCursor(findEntryPosition(startEntry), findEntryPosition(endEntry));
@@ -996,16 +1009,6 @@ public final class IndexData {
     }
 
     /**
-     * Constructs an array of values appropriate for this index from the given column value, which must be the first column of the index. Any missing, trailing index entry values will use the given
-     * filler value.
-     *
-     * @return the appropriate sparse array of data or {@code null} if no prefix list of columns for this index were provided
-     */
-    public Object[] constructPartialIndexRow(Object filler, String colName, Object value) {
-        return constructPartialIndexRow(filler, Collections.singletonMap(colName, value));
-    }
-
-    /**
      * Constructs an array of values appropriate for this index from the given column values.
      *
      * @return the appropriate sparse array of data or {@code null} if not all columns for this index were provided
@@ -1022,6 +1025,16 @@ public final class IndexData {
             idxRow[col.getColumnIndex()] = row.get(col.getName());
         }
         return idxRow;
+    }
+
+    /**
+     * Constructs an array of values appropriate for this index from the given column value, which must be the first column of the index. Any missing, trailing index entry values will use the given
+     * filler value.
+     *
+     * @return the appropriate sparse array of data or {@code null} if no prefix list of columns for this index were provided
+     */
+    public Object[] constructPartialIndexRow(Object filler, String colName, Object value) {
+        return constructPartialIndexRow(filler, Collections.singletonMap(colName, value));
     }
 
     /**
@@ -2288,7 +2301,7 @@ public final class IndexData {
 
         @Override
         public int compareTo(Entry other) {
-            if (this == other) {
+            if (this == other) {  // NOPMD CompareObjectsWithEquals - self-reference fast path in compareTo
                 return 0;
             }
 
@@ -2467,17 +2480,17 @@ public final class IndexData {
             beforeFirst();
         }
 
+        protected void reset(boolean moveForward) {
+            curPos = getDirHandler(moveForward).getBeginningPosition();
+            prevPos = curPos;
+        }
+
         public void beforeFirst() {
             reset(CursorImpl.MOVE_FORWARD);
         }
 
         public void afterLast() {
             reset(CursorImpl.MOVE_REVERSE);
-        }
-
-        protected void reset(boolean moveForward) {
-            curPos = getDirHandler(moveForward).getBeginningPosition();
-            prevPos = curPos;
         }
 
         /**
@@ -2719,7 +2732,7 @@ public final class IndexData {
 
         @Override
         public int compareTo(Position other) {
-            if (this == other) {
+            if (this == other) {  // NOPMD CompareObjectsWithEquals - self-reference fast path in compareTo
                 return 0;
             }
 
@@ -2984,7 +2997,7 @@ public final class IndexData {
     /**
      * PendingChange for a row update (which is essentially a deletion followed by an addition).
      */
-    private class UpdateRowPendingChange extends AddRowPendingChange {
+    private final class UpdateRowPendingChange extends AddRowPendingChange {
         private UpdateRowPendingChange(PendingChange next) {
             super(next);
         }

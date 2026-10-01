@@ -86,7 +86,7 @@ public abstract class TopoSorter<E> {
 
     private Node<E> findDescendent(E val) {
         for (Node<E> node : nodes) {
-            if (node.val == val) {
+            if (node.val == val) { // NOPMD CompareObjectsWithEquals - descendants are always the same object references from the source values list
                 return node;
             }
         }
@@ -95,7 +95,7 @@ public abstract class TopoSorter<E> {
 
     protected abstract void fillDescendents(E from, List<E> descendents);
 
-    private static class Node<E> {
+    private static final class Node<E> {
         private final E       val;
         private final List<E> descs = new ArrayList<>();
         private int           mark  = UNMARKED;

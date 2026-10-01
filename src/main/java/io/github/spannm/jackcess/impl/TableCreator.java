@@ -16,10 +16,21 @@
  */
 package io.github.spannm.jackcess.impl;
 
-import io.github.spannm.jackcess.*;
+import io.github.spannm.jackcess.ColumnBuilder;
+import io.github.spannm.jackcess.DataType;
+import io.github.spannm.jackcess.IndexBuilder;
+import io.github.spannm.jackcess.PropertyMap;
+import io.github.spannm.jackcess.TableBuilder;
 
 import java.io.IOException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.EnumSet;
+import java.util.HashSet;
+import java.util.IdentityHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * Helper class used to maintain state during table creation.
@@ -82,7 +93,7 @@ public class TableCreator extends TableMutator {
     public IndexDataState getIndexDataState(IndexBuilder idx) {
         for (IndexDataState idxDataState : indexDataStates) {
             for (IndexBuilder curIdx : idxDataState.getIndexes()) {
-                if (idx == curIdx) {
+                if (idx == curIdx) { // NOPMD CompareObjectsWithEquals - intentional identity check for the exact IndexBuilder instance
                     return idxDataState;
                 }
             }

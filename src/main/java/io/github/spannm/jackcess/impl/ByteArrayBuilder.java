@@ -50,22 +50,6 @@ public class ByteArrayBuilder {
         return put(new ByteData(pos, val));
     }
 
-    public ByteArrayBuilder putInt(int val) {
-        return putInt(pos, val);
-    }
-
-    public ByteArrayBuilder putInt(int atPos, int val) {
-        return put(new IntData(atPos, val));
-    }
-
-    public ByteArrayBuilder putShort(short val) {
-        return putShort(pos, val);
-    }
-
-    public ByteArrayBuilder putShort(int atPos, short val) {
-        return put(new ShortData(atPos, val));
-    }
-
     public ByteArrayBuilder put(byte[] val) {
         return put(new BytesData(pos, val));
     }
@@ -81,6 +65,22 @@ public class ByteArrayBuilder {
             pos = endPos;
         }
         return this;
+    }
+
+    public ByteArrayBuilder putInt(int val) {
+        return putInt(pos, val);
+    }
+
+    public ByteArrayBuilder putInt(int atPos, int val) {
+        return put(new IntData(atPos, val));
+    }
+
+    public ByteArrayBuilder putShort(short val) {
+        return putShort(pos, val);
+    }
+
+    public ByteArrayBuilder putShort(int atPos, short val) {
+        return put(new ShortData(atPos, val));
     }
 
     public ByteBuffer toBuffer() {

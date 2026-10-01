@@ -56,7 +56,7 @@ abstract class DBMutator {
     protected ColumnImpl.SortOrder getDbSortOrder() {
         try {
             return database.getDefaultSortOrder();
-        } catch (IOException _ex) {
+        } catch (IOException ignored) {
             // ignored, just use the jet format default
         }
         return null;

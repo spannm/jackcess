@@ -20,14 +20,26 @@ import static io.github.spannm.jackcess.impl.expr.DefaultFunctions.registerFunc;
 import static io.github.spannm.jackcess.impl.expr.FunctionSupport.getOptionalBooleanParam;
 import static io.github.spannm.jackcess.impl.expr.FunctionSupport.getOptionalIntParam;
 
-import io.github.spannm.jackcess.expr.*;
+import io.github.spannm.jackcess.expr.EvalContext;
+import io.github.spannm.jackcess.expr.EvalException;
+import io.github.spannm.jackcess.expr.Function;
+import io.github.spannm.jackcess.expr.LocaleContext;
+import io.github.spannm.jackcess.expr.TemporalConfig;
+import io.github.spannm.jackcess.expr.Value;
 import io.github.spannm.jackcess.impl.ColumnImpl;
 import io.github.spannm.jackcess.impl.expr.FunctionSupport.Func0;
 import io.github.spannm.jackcess.impl.expr.FunctionSupport.Func1NullIsNull;
 import io.github.spannm.jackcess.impl.expr.FunctionSupport.Func3;
 import io.github.spannm.jackcess.impl.expr.FunctionSupport.FuncVar;
 
-import java.time.*;
+import java.time.DateTimeException;
+import java.time.DayOfWeek;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.time.Month;
+import java.time.MonthDay;
+import java.time.Year;
 import java.time.format.DateTimeFormatter;
 import java.time.format.TextStyle;
 import java.time.temporal.ChronoField;
@@ -103,28 +115,28 @@ public class DefaultDateFunctions {
             int firstWeekType = getFirstWeekTypeParam(ctx, params, 3);
 
             String intv = params[0].getAsString(ctx).trim();
-            int result = -1;
-            if (intv.equalsIgnoreCase(INTV_YEAR)) {
+            int result;
+            if (INTV_YEAR.equalsIgnoreCase(intv)) {
                 result = param2.getAsLocalDateTime(ctx).getYear();
-            } else if (intv.equalsIgnoreCase(INTV_QUARTER)) {
+            } else if (INTV_QUARTER.equalsIgnoreCase(intv)) {
                 result = getQuarter(param2.getAsLocalDateTime(ctx));
-            } else if (intv.equalsIgnoreCase(INTV_MONTH)) {
+            } else if (INTV_MONTH.equalsIgnoreCase(intv)) {
                 result = param2.getAsLocalDateTime(ctx).getMonthValue();
-            } else if (intv.equalsIgnoreCase(INTV_DAY_OF_YEAR)) {
+            } else if (INTV_DAY_OF_YEAR.equalsIgnoreCase(intv)) {
                 result = param2.getAsLocalDateTime(ctx).getDayOfYear();
-            } else if (intv.equalsIgnoreCase(INTV_DAY)) {
+            } else if (INTV_DAY.equalsIgnoreCase(intv)) {
                 result = param2.getAsLocalDateTime(ctx).getDayOfMonth();
-            } else if (intv.equalsIgnoreCase(INTV_WEEKDAY)) {
+            } else if (INTV_WEEKDAY.equalsIgnoreCase(intv)) {
                 int dayOfWeek = param2.getAsLocalDateTime(ctx)
                     .get(SUNDAY_FIRST.dayOfWeek());
                 result = dayOfWeekToWeekDay(dayOfWeek, firstDay);
-            } else if (intv.equalsIgnoreCase(INTV_WEEK)) {
+            } else if (INTV_WEEK.equalsIgnoreCase(intv)) {
                 result = weekOfYear(ctx, param2, firstDay, firstWeekType);
-            } else if (intv.equalsIgnoreCase(INTV_HOUR)) {
+            } else if (INTV_HOUR.equalsIgnoreCase(intv)) {
                 result = param2.getAsLocalDateTime(ctx).getHour();
-            } else if (intv.equalsIgnoreCase(INTV_MINUTE)) {
+            } else if (INTV_MINUTE.equalsIgnoreCase(intv)) {
                 result = param2.getAsLocalDateTime(ctx).getMinute();
-            } else if (intv.equalsIgnoreCase(INTV_SECOND)) {
+            } else if (INTV_SECOND.equalsIgnoreCase(intv)) {
                 result = param2.getAsLocalDateTime(ctx).getSecond();
             } else {
                 throw new EvalException("Invalid interval " + intv);
@@ -147,23 +159,23 @@ public class DefaultDateFunctions {
 
             LocalDateTime ldt = param3.getAsLocalDateTime(ctx);
 
-            if (intv.equalsIgnoreCase(INTV_YEAR)) {
+            if (INTV_YEAR.equalsIgnoreCase(intv)) {
                 ldt = ldt.plusYears(val);
-            } else if (intv.equalsIgnoreCase(INTV_QUARTER)) {
+            } else if (INTV_QUARTER.equalsIgnoreCase(intv)) {
                 ldt = ldt.plusMonths(val * 3);
-            } else if (intv.equalsIgnoreCase(INTV_MONTH)) {
+            } else if (INTV_MONTH.equalsIgnoreCase(intv)) {
                 ldt = ldt.plusMonths(val);
-            } else if (intv.equalsIgnoreCase(INTV_DAY_OF_YEAR)
-                || intv.equalsIgnoreCase(INTV_DAY)
-                || intv.equalsIgnoreCase(INTV_WEEKDAY)) {
+            } else if (INTV_DAY_OF_YEAR.equalsIgnoreCase(intv)
+                || INTV_DAY.equalsIgnoreCase(intv)
+                || INTV_WEEKDAY.equalsIgnoreCase(intv)) {
                 ldt = ldt.plusDays(val);
-            } else if (intv.equalsIgnoreCase(INTV_WEEK)) {
+            } else if (INTV_WEEK.equalsIgnoreCase(intv)) {
                 ldt = ldt.plusWeeks(val);
-            } else if (intv.equalsIgnoreCase(INTV_HOUR)) {
+            } else if (INTV_HOUR.equalsIgnoreCase(intv)) {
                 ldt = ldt.plusHours(val);
-            } else if (intv.equalsIgnoreCase(INTV_MINUTE)) {
+            } else if (INTV_MINUTE.equalsIgnoreCase(intv)) {
                 ldt = ldt.plusMinutes(val);
-            } else if (intv.equalsIgnoreCase(INTV_SECOND)) {
+            } else if (INTV_SECOND.equalsIgnoreCase(intv)) {
                 ldt = ldt.plusSeconds(val);
             } else {
                 throw new EvalException("Invalid interval " + intv);
@@ -205,10 +217,10 @@ public class DefaultDateFunctions {
             // time
             // based calculations assume 24 hour days.
 
-            int result = -1;
-            if (intv.equalsIgnoreCase(INTV_YEAR)) {
+            int result;
+            if (INTV_YEAR.equalsIgnoreCase(intv)) {
                 result = ldt2.getYear() - ldt1.getYear();
-            } else if (intv.equalsIgnoreCase(INTV_QUARTER)) {
+            } else if (INTV_QUARTER.equalsIgnoreCase(intv)) {
                 int y1 = ldt1.getYear();
                 int q1 = getQuarter(ldt1);
                 int y2 = ldt2.getYear();
@@ -218,7 +230,7 @@ public class DefaultDateFunctions {
                     y2--;
                 }
                 result = q2 - q1;
-            } else if (intv.equalsIgnoreCase(INTV_MONTH)) {
+            } else if (INTV_MONTH.equalsIgnoreCase(intv)) {
                 int y1 = ldt1.getYear();
                 int m1 = ldt1.getMonthValue();
                 int y2 = ldt2.getYear();
@@ -228,13 +240,13 @@ public class DefaultDateFunctions {
                     y2--;
                 }
                 result = m2 - m1;
-            } else if (intv.equalsIgnoreCase(INTV_DAY_OF_YEAR)
-                || intv.equalsIgnoreCase(INTV_DAY)) {
+            } else if (INTV_DAY_OF_YEAR.equalsIgnoreCase(intv)
+                || INTV_DAY.equalsIgnoreCase(intv)) {
                 result = getDayDiff(ldt1, ldt2);
-            } else if (intv.equalsIgnoreCase(INTV_WEEKDAY)) {
+            } else if (INTV_WEEKDAY.equalsIgnoreCase(intv)) {
                 // this calculates number of 7 day periods between two dates
                 result = getDayDiff(ldt1, ldt2) / 7;
-            } else if (intv.equalsIgnoreCase(INTV_WEEK)) {
+            } else if (INTV_WEEK.equalsIgnoreCase(intv)) {
                 // this counts number of "week of year" intervals between two
                 // dates
                 WeekFields weekFields = weekFields(firstDay, firstWeekType);
@@ -247,11 +259,11 @@ public class DefaultDateFunctions {
                     w2 += weeksInYear(y2, weekFields);
                 }
                 result = w2 - w1;
-            } else if (intv.equalsIgnoreCase(INTV_HOUR)) {
+            } else if (INTV_HOUR.equalsIgnoreCase(intv)) {
                 result = getHourDiff(ldt1, ldt2);
-            } else if (intv.equalsIgnoreCase(INTV_MINUTE)) {
+            } else if (INTV_MINUTE.equalsIgnoreCase(intv)) {
                 result = getMinuteDiff(ldt1, ldt2);
-            } else if (intv.equalsIgnoreCase(INTV_SECOND)) {
+            } else if (INTV_SECOND.equalsIgnoreCase(intv)) {
                 int s1 = ldt1.getSecond();
                 int s2 = ldt2.getSecond();
                 int minuteDiff = getMinuteDiff(ldt1, ldt2);
@@ -441,7 +453,7 @@ public class DefaultDateFunctions {
                 }
 
                 return ValueSupport.toValue(LocalDateTime.of(ld, lt));
-            } catch (DateTimeException _ex) {
+            } catch (DateTimeException ignored) {
                 // note a valid date/time
             }
         }

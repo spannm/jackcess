@@ -16,7 +16,13 @@
  */
 package io.github.spannm.jackcess.impl.complex;
 
-import io.github.spannm.jackcess.*;
+import io.github.spannm.jackcess.Column;
+import io.github.spannm.jackcess.DataType;
+import io.github.spannm.jackcess.Database;
+import io.github.spannm.jackcess.IndexCursor;
+import io.github.spannm.jackcess.Row;
+import io.github.spannm.jackcess.RowId;
+import io.github.spannm.jackcess.Table;
 import io.github.spannm.jackcess.complex.ComplexColumnInfo;
 import io.github.spannm.jackcess.complex.ComplexDataType;
 import io.github.spannm.jackcess.complex.ComplexValue;
@@ -26,7 +32,13 @@ import io.github.spannm.jackcess.impl.TableImpl;
 import io.github.spannm.jackcess.util.ToStringBuilder;
 
 import java.io.IOException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 
 /**
  * Base class for the additional information tracked for complex columns.
@@ -109,14 +121,6 @@ public abstract class ComplexColumnInfoImpl<V extends ComplexValue> implements C
         return getRawValues(complexValueFk, null);
     }
 
-    private Iterator<Row> getComplexValFkIter(int complexValueFk, Collection<String> columnNames) throws IOException {
-        if (momplexValIdCursor == null) {
-            momplexValIdCursor = mflatTable.newCursor().withIndexByColumns(mcomplexValFkCol).toIndexCursor();
-        }
-
-        return momplexValIdCursor.newEntryIterable(complexValueFk).withColumnNames(columnNames).iterator();
-    }
-
     @Override
     public List<Row> getRawValues(int complexValueFk, Collection<String> columnNames) throws IOException {
         Iterator<Row> entryIter = getComplexValFkIter(complexValueFk, columnNames);
@@ -130,6 +134,14 @@ public abstract class ComplexColumnInfoImpl<V extends ComplexValue> implements C
         }
 
         return values;
+    }
+
+    private Iterator<Row> getComplexValFkIter(int complexValueFk, Collection<String> columnNames) throws IOException {
+        if (momplexValIdCursor == null) {
+            momplexValIdCursor = mflatTable.newCursor().withIndexByColumns(mcomplexValFkCol).toIndexCursor();
+        }
+
+        return momplexValIdCursor.newEntryIterable(complexValueFk).withColumnNames(columnNames).iterator();
     }
 
     @Override

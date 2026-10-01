@@ -144,7 +144,7 @@ public class MultiValueColumnPropertyMap implements PropertyMap {
                         return cur.next();
                     }
                     iters.remove(0);
-                    cur = null;
+                    cur = null; // NOPMD UnusedAssignment - not dead: persists as final state if the loop then exits, so remove() sees no current iterator
                 }
                 return null;
             }

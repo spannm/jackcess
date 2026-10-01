@@ -68,19 +68,19 @@ public class EntryIterableBuilder implements Iterable<Row> {
         return this;
     }
 
-    public EntryIterableBuilder addColumns(Iterable<? extends Column> cols) {
-        if (cols != null) {
-            for (Column col : cols) {
-                addColumnName(col.getName());
+    public EntryIterableBuilder addColumnNames(String... newColumnNames) {
+        if (newColumnNames != null) {
+            for (String name : newColumnNames) {
+                addColumnName(name);
             }
         }
         return this;
     }
 
-    public EntryIterableBuilder addColumnNames(String... newColumnNames) {
-        if (newColumnNames != null) {
-            for (String name : newColumnNames) {
-                addColumnName(name);
+    public EntryIterableBuilder addColumns(Iterable<? extends Column> cols) {
+        if (cols != null) {
+            for (Column col : cols) {
+                addColumnName(col.getName());
             }
         }
         return this;

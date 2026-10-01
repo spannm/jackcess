@@ -16,7 +16,14 @@ limitations under the License.
 
 package io.github.spannm.jackcess.impl;
 
-import io.github.spannm.jackcess.*;
+import io.github.spannm.jackcess.Column;
+import io.github.spannm.jackcess.ColumnBuilder;
+import io.github.spannm.jackcess.DataType;
+import io.github.spannm.jackcess.DateTimeType;
+import io.github.spannm.jackcess.InvalidValueException;
+import io.github.spannm.jackcess.JackcessRuntimeException;
+import io.github.spannm.jackcess.PropertyMap;
+import io.github.spannm.jackcess.Table;
 import io.github.spannm.jackcess.complex.ComplexColumnInfo;
 import io.github.spannm.jackcess.complex.ComplexValue;
 import io.github.spannm.jackcess.complex.ComplexValueForeignKey;
@@ -28,18 +35,37 @@ import io.github.spannm.jackcess.util.ColumnValidator;
 import io.github.spannm.jackcess.util.SimpleColumnValidator;
 import io.github.spannm.jackcess.util.ToStringBuilder;
 
-import java.io.*;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.ObjectOutputStream;
+import java.io.ObjectStreamException;
+import java.io.Reader;
+import java.io.Serializable;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.CharBuffer;
 import java.nio.charset.Charset;
-import java.time.*;
+import java.time.DateTimeException;
+import java.time.Duration;
+import java.time.Instant;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.time.temporal.ChronoUnit;
 import java.time.temporal.TemporalAccessor;
 import java.time.temporal.TemporalQueries;
-import java.util.*;
+import java.util.Calendar;
+import java.util.Collection;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
+import java.util.TimeZone;
+import java.util.UUID;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
@@ -484,6 +510,10 @@ public class ColumnImpl implements Column, Comparable<ColumnImpl>, DateTimeConte
         return getDatabase().getDateTimeFactory();
     }
 
+    protected static DateTimeFactory getDateTimeFactory(DateTimeType type) {
+        return type == DateTimeType.LOCAL_DATE_TIME ? LDT_DATE_TIME_FACTORY : DEF_DATE_TIME_FACTORY;
+    }
+
     @Override
     public boolean isAppendOnly() {
         return getVersionHistoryColumn() != null;
@@ -827,6 +857,38 @@ public class ColumnImpl implements Column, Comparable<ColumnImpl>, DateTimeConte
     }
 
     /**
+     * @return an appropriate BigDecimal representation of the given object. {@code null} is returned as 0 and
+     *         Numbers are converted using their double representation.
+     */
+    BigDecimal toBigDecimal(Object value) {
+        return toBigDecimal(value, getDatabase());
+    }
+
+    /**
+     * @return an appropriate BigDecimal representation of the given object. {@code null} is returned as 0 and
+     *         Numbers are converted using their double representation.
+     */
+    static BigDecimal toBigDecimal(Object value, DatabaseImpl db) {
+        if (value == null) {
+            return BigDecimal.ZERO;
+        } else if (value instanceof BigDecimal) {
+            return (BigDecimal) value;
+        } else if (value instanceof BigInteger) {
+            return new BigDecimal((BigInteger) value);
+        } else if (value instanceof Number) {
+            return BigDecimal.valueOf(((Number) value).doubleValue());
+        } else if (value instanceof Boolean) {
+            // access seems to like -1 for true and 0 for false
+            return (Boolean) value ? BigDecimal.valueOf(-1) : BigDecimal.ZERO;
+        } else if (value instanceof Date) {
+            return BigDecimal.valueOf(toDateDouble(value, db));
+        } else if (value instanceof LocalDateTime) {
+            return BigDecimal.valueOf(toDateDouble((LocalDateTime) value));
+        }
+        return new BigDecimal(value.toString());
+    }
+
+    /**
      * Writes a numeric value.
      */
     private void writeNumericValue(ByteBuffer buffer, Object value) throws IOException {
@@ -1038,6 +1100,11 @@ public class ColumnImpl implements Column, Comparable<ColumnImpl>, DateTimeConte
         return dtc.getDateTimeFactory().toDateDouble(value, dtc);
     }
 
+    public static double toDateDouble(LocalDateTime ldt) {
+        Duration dateTimeOffset = Duration.between(BASE_LDT, ldt);
+        return toLocalDateDouble(dateTimeOffset);
+    }
+
     static LocalDateTime toLocalDateTime(Object value, DateTimeContext dtc) {
         if (value instanceof TemporalAccessor) {
             return temporalToLocalDateTime((TemporalAccessor) value, dtc);
@@ -1116,11 +1183,6 @@ public class ColumnImpl implements Column, Comparable<ColumnImpl>, DateTimeConte
         }
 
         return time / (double) MILLISECONDS_PER_DAY;
-    }
-
-    public static double toDateDouble(LocalDateTime ldt) {
-        Duration dateTimeOffset = Duration.between(BASE_LDT, ldt);
-        return toLocalDateDouble(dateTimeOffset);
     }
 
     private static double toLocalDateDouble(Duration time) {
@@ -1501,6 +1563,15 @@ public class ColumnImpl implements Column, Comparable<ColumnImpl>, DateTimeConte
     }
 
     /**
+     * @param textBytes bytes of text to decode
+     * @param charset relevant charset
+     * @return the decoded string
+     */
+    public static String decodeUncompressedText(byte[] textBytes, Charset charset) {
+        return decodeUncompressedText(textBytes, 0, textBytes.length, charset).toString();
+    }
+
+    /**
      * Encodes a text value, possibly compressing.
      */
     ByteBuffer encodeTextValue(Object obj, int minChars, int maxChars, boolean forceUncompressed) throws IOException {
@@ -1602,15 +1673,6 @@ public class ColumnImpl implements Column, Comparable<ColumnImpl>, DateTimeConte
     }
 
     /**
-     * @param textBytes bytes of text to decode
-     * @param charset relevant charset
-     * @return the decoded string
-     */
-    public static String decodeUncompressedText(byte[] textBytes, Charset charset) {
-        return decodeUncompressedText(textBytes, 0, textBytes.length, charset).toString();
-    }
-
-    /**
      * @param text Text to encode
      * @param charset database charset
      * @return A buffer with the text encoded
@@ -1640,38 +1702,6 @@ public class ColumnImpl implements Column, Comparable<ColumnImpl>, DateTimeConte
             }
         }
         return rtn;
-    }
-
-    /**
-     * @return an appropriate BigDecimal representation of the given object. {@code null} is returned as 0 and
-     *         Numbers are converted using their double representation.
-     */
-    BigDecimal toBigDecimal(Object value) {
-        return toBigDecimal(value, getDatabase());
-    }
-
-    /**
-     * @return an appropriate BigDecimal representation of the given object. {@code null} is returned as 0 and
-     *         Numbers are converted using their double representation.
-     */
-    static BigDecimal toBigDecimal(Object value, DatabaseImpl db) {
-        if (value == null) {
-            return BigDecimal.ZERO;
-        } else if (value instanceof BigDecimal) {
-            return (BigDecimal) value;
-        } else if (value instanceof BigInteger) {
-            return new BigDecimal((BigInteger) value);
-        } else if (value instanceof Number) {
-            return BigDecimal.valueOf(((Number) value).doubleValue());
-        } else if (value instanceof Boolean) {
-            // access seems to like -1 for true and 0 for false
-            return (Boolean) value ? BigDecimal.valueOf(-1) : BigDecimal.ZERO;
-        } else if (value instanceof Date) {
-            return BigDecimal.valueOf(toDateDouble(value, db));
-        } else if (value instanceof LocalDateTime) {
-            return BigDecimal.valueOf(toDateDouble((LocalDateTime) value));
-        }
-        return new BigDecimal(value.toString());
     }
 
     /**
@@ -1716,7 +1746,7 @@ public class ColumnImpl implements Column, Comparable<ColumnImpl>, DateTimeConte
             char[] buf = new char[8 * 1024];
             StringBuilder sout = new StringBuilder();
             Reader in = (Reader) value;
-            int read = 0;
+            int read;
             while ((read = in.read(buf)) != -1) {
                 sout.append(buf, 0, read);
             }
@@ -2055,20 +2085,16 @@ public class ColumnImpl implements Column, Comparable<ColumnImpl>, DateTimeConte
         }
     }
 
-    protected static DateTimeFactory getDateTimeFactory(DateTimeType type) {
-        return type == DateTimeType.LOCAL_DATE_TIME ? LDT_DATE_TIME_FACTORY : DEF_DATE_TIME_FACTORY;
-    }
-
     String withErrorContext(String msg) {
         return withErrorContext(msg, getDatabase(), getTable().getName(), getName());
     }
 
-    boolean isThisColumn(Identifier identifier) {
-        return getTable().isThisTable(identifier) && getName().equalsIgnoreCase(identifier.getObjectName());
-    }
-
     private static String withErrorContext(String msg, DatabaseImpl db, String tableName, String colName) {
         return msg + " (Db=" + db.getName() + ";Table=" + tableName + ";Column=" + colName + ")";
+    }
+
+    boolean isThisColumn(Identifier identifier) {
+        return getTable().isThisTable(identifier) && getName().equalsIgnoreCase(identifier.getObjectName());
     }
 
     /**
@@ -2297,14 +2323,14 @@ public class ColumnImpl implements Column, Comparable<ColumnImpl>, DateTimeConte
 
         @Override
         public Object handleInsert(TableImpl.WriteRowState writeRowState, Object inRowValue) throws IOException {
-            ComplexValueForeignKey inComplexFK = null;
+            ComplexValueForeignKey inComplexFK;
             if (inRowValue instanceof ComplexValueForeignKey) {
                 inComplexFK = (ComplexValueForeignKey) inRowValue;
             } else {
                 inComplexFK = new ComplexValueForeignKeyImpl(ColumnImpl.this, toNumber(inRowValue).intValue());
             }
 
-            if (inComplexFK.getColumn() != ColumnImpl.this) {
+            if (inComplexFK.getColumn() != ColumnImpl.this) { // NOPMD CompareObjectsWithEquals - intentional identity check against enclosing Column instance
                 throw new InvalidValueException(withErrorContext("Wrong column for complex value foreign key, found " + inComplexFK.getColumn().getName()));
             }
             if (inComplexFK.get() < 1) {
@@ -2556,7 +2582,7 @@ public class ColumnImpl implements Column, Comparable<ColumnImpl>, DateTimeConte
             // ZoneId and TimeZone have different rules for older timezones, so we
             // need to consistently use one or the other depending on the date/time
             // type
-            long time = 0L;
+            long time;
             if (value instanceof TemporalAccessor) {
                 time = toInstant((TemporalAccessor) value, dtc).toEpochMilli();
             } else {

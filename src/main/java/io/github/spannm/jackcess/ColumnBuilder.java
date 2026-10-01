@@ -17,7 +17,12 @@ limitations under the License.
 package io.github.spannm.jackcess;
 
 import io.github.spannm.jackcess.Database.FileFormat;
-import io.github.spannm.jackcess.impl.*;
+import io.github.spannm.jackcess.impl.ColumnImpl;
+import io.github.spannm.jackcess.impl.DatabaseImpl;
+import io.github.spannm.jackcess.impl.JetFormat;
+import io.github.spannm.jackcess.impl.PropertyMapImpl;
+import io.github.spannm.jackcess.impl.TableImpl;
+import io.github.spannm.jackcess.impl.TableUpdater;
 import io.github.spannm.jackcess.util.ToStringBuilder;
 
 import java.io.IOException;

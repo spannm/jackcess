@@ -24,7 +24,11 @@ import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
-import java.util.*;
+import java.util.Collections;
+import java.util.EnumSet;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * Encapsulates constants describing a specific version of the Access Jet format
@@ -606,7 +610,7 @@ public abstract class JetFormat {
         return name;
     }
 
-    private static class Jet3Format extends JetFormat {
+    private static final class Jet3Format extends JetFormat {
 
         private Jet3Format() {
             super("VERSION_3");

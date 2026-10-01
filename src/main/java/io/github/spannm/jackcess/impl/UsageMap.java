@@ -29,7 +29,7 @@ import java.util.List;
  *
  * @author Tim McCune
  */
-public class UsageMap {
+public final class UsageMap {
     /** Inline map type */
     public static final byte   MAP_TYPE_INLINE             = 0x0;
     /** Reference map type, for maps that are too large to fit inline */
@@ -118,7 +118,7 @@ public class UsageMap {
         }
 
         JetFormat format = database.getFormat();
-        PageChannel pageChannel = database.getPageChannel();
+        PageChannel pageChannel = database.getPageChannel(); // NOPMD CloseResource - borrowed from Database, not owned/closed here
         ByteBuffer tableBuffer = pageChannel.createPageBuffer();
         pageChannel.readPage(tableBuffer, pageNum);
         short rowStart = TableImpl.findRowStart(tableBuffer, rowNum, format);
@@ -550,7 +550,7 @@ public class UsageMap {
      * Note, this UsageMap does not implement all the methods "correctly". Only addPageNumber and removePageNumber
      * should be called by PageChannel.
      */
-    private class GlobalInlineHandler extends InlineHandler {
+    private final class GlobalInlineHandler extends InlineHandler {
 
         @Override
         public boolean containsPageNumber(int pageNumber) {
@@ -654,7 +654,7 @@ public class UsageMap {
             }
             int pageIndex = pageNumber / getMaxPagesPerUsagePage();
             int mapPageNum = getTableBuffer().getInt(calculateMapPagePointerOffset(pageIndex));
-            ByteBuffer mapPageBuffer = null;
+            ByteBuffer mapPageBuffer;
             if (mapPageNum > 0) {
                 mapPageBuffer = mapPageHolder.withPage(getPageChannel(), mapPageNum);
             } else {
@@ -702,7 +702,7 @@ public class UsageMap {
      * Note, this UsageMap does not implement all the methods "correctly". Only addPageNumber and removePageNumber
      * should be called by PageChannel.
      */
-    private class GlobalReferenceHandler extends ReferenceHandler {
+    private final class GlobalReferenceHandler extends ReferenceHandler {
         private boolean allocatingPage;
         private Integer pendingPage;
 
@@ -859,6 +859,15 @@ public class UsageMap {
         }
 
         /**
+         * Resets this page cursor for traversing the given direction.
+         */
+        protected void reset(boolean moveForward) {
+            curPageNumber = getDirHandler(moveForward).getBeginningPageNumber();
+            prevPageNumber = curPageNumber;
+            lastModCount = modCount;
+        }
+
+        /**
          * After calling this method, {@link #getNextPage} will return the first page in the map
          */
         public void beforeFirst() {
@@ -870,15 +879,6 @@ public class UsageMap {
          */
         public void afterLast() {
             reset(CursorImpl.MOVE_REVERSE);
-        }
-
-        /**
-         * Resets this page cursor for traversing the given direction.
-         */
-        protected void reset(boolean moveForward) {
-            curPageNumber = getDirHandler(moveForward).getBeginningPageNumber();
-            prevPageNumber = curPageNumber;
-            lastModCount = modCount;
         }
 
         /**

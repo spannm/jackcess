@@ -110,7 +110,7 @@ public class General97IndexCodes extends GeneralLegacyIndexCodes {
         int prevLength = bout.getLength();
 
         // now, convert each character to a "code" of one or more bytes
-        NibbleStream extraCodes = null;
+        NibbleStream extraCodes = null; // NOPMD CloseResource - in-memory ByteStream subclass, close() is a no-op (no real resource)
         int sigCharCount = 0;
         for (int i = 0; i < str.length(); ++i) {
 
@@ -185,7 +185,7 @@ public class General97IndexCodes extends GeneralLegacyIndexCodes {
 
         try (BufferedReader reader = new BufferedReader(new InputStreamReader(DatabaseImpl.getResourceAsStream(mappingsFilePath), StandardCharsets.US_ASCII))) {
             // this is a sparse file with entries like <fromCode>,<toCode>
-            String mappingLine = null;
+            String mappingLine;
             while ((mappingLine = reader.readLine()) != null) {
                 mappingLine = mappingLine.trim();
                 if (mappingLine.isEmpty()) {

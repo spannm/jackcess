@@ -21,7 +21,12 @@ import io.github.spannm.jackcess.Cursor;
 import io.github.spannm.jackcess.Row;
 import io.github.spannm.jackcess.impl.CursorImpl;
 
-import java.util.*;
+import java.util.AbstractMap;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.Map;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
@@ -103,19 +108,19 @@ public class IterableBuilder implements Iterable<Row> {
         return this;
     }
 
-    public IterableBuilder addColumns(Iterable<? extends Column> cols) {
-        if (cols != null) {
-            for (Column col : cols) {
-                addColumnName(col.getName());
+    public IterableBuilder addColumnNames(String... newColumnNames) {
+        if (newColumnNames != null) {
+            for (String name : newColumnNames) {
+                addColumnName(name);
             }
         }
         return this;
     }
 
-    public IterableBuilder addColumnNames(String... newColumnNames) {
-        if (newColumnNames != null) {
-            for (String name : newColumnNames) {
-                addColumnName(name);
+    public IterableBuilder addColumns(Iterable<? extends Column> cols) {
+        if (cols != null) {
+            for (Column col : cols) {
+                addColumnName(col.getName());
             }
         }
         return this;

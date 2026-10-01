@@ -20,7 +20,18 @@ import io.github.spannm.jackcess.Column;
 import io.github.spannm.jackcess.Database;
 import io.github.spannm.jackcess.DateTimeType;
 import io.github.spannm.jackcess.Row;
-import io.github.spannm.jackcess.complex.*;
+import io.github.spannm.jackcess.complex.Attachment;
+import io.github.spannm.jackcess.complex.AttachmentColumnInfo;
+import io.github.spannm.jackcess.complex.ComplexColumnInfo;
+import io.github.spannm.jackcess.complex.ComplexDataType;
+import io.github.spannm.jackcess.complex.ComplexValue;
+import io.github.spannm.jackcess.complex.ComplexValueForeignKey;
+import io.github.spannm.jackcess.complex.MultiValueColumnInfo;
+import io.github.spannm.jackcess.complex.SingleValue;
+import io.github.spannm.jackcess.complex.UnsupportedColumnInfo;
+import io.github.spannm.jackcess.complex.UnsupportedValue;
+import io.github.spannm.jackcess.complex.Version;
+import io.github.spannm.jackcess.complex.VersionHistoryColumnInfo;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
@@ -288,7 +299,7 @@ public class ComplexValueForeignKeyImpl extends ComplexValueForeignKey {
     }
 
     private Object now() {
-        Database db = getColumn().getDatabase();
+        Database db = getColumn().getDatabase(); // NOPMD CloseResource - borrowed reference, lifecycle owned by the caller/Database itself
         if (db.getDateTimeType() == DateTimeType.DATE) {
             return new Date();
         }

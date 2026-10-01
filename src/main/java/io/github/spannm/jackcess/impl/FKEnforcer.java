@@ -16,13 +16,23 @@
  */
 package io.github.spannm.jackcess.impl;
 
-import io.github.spannm.jackcess.*;
+import io.github.spannm.jackcess.Column;
+import io.github.spannm.jackcess.ConstraintViolationException;
+import io.github.spannm.jackcess.Index;
+import io.github.spannm.jackcess.IndexCursor;
+import io.github.spannm.jackcess.Row;
+import io.github.spannm.jackcess.Table;
 import io.github.spannm.jackcess.util.CaseInsensitiveColumnMatcher;
 import io.github.spannm.jackcess.util.ColumnMatcher;
 import io.github.spannm.jackcess.util.Joiner;
 
 import java.io.IOException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+import java.util.Set;
+import java.util.TreeSet;
 
 /**
  * Utility class used by Table to enforce foreign-key relationships (if enabled).
@@ -239,8 +249,7 @@ final class FKEnforcer {
         List<? extends Index.Column> toCols = joiner.getToIndex().getColumns();
         Object[] toRow = new Object[joiner.getToTable().getColumnCount()];
 
-        for (Iterator<Row> iter = joiner.findRows(oldFromRow).withColumnNames(Collections.emptySet()).iterator(); iter.hasNext();) {
-            iter.next();
+        for (Row ignored : joiner.findRows(oldFromRow).withColumnNames(Collections.emptySet())) {
 
             // create update row for "to" table
             Arrays.fill(toRow, Column.KEEP_VALUE);
@@ -259,8 +268,7 @@ final class FKEnforcer {
         List<? extends Index.Column> toCols = joiner.getToIndex().getColumns();
         Object[] toRow = new Object[joiner.getToTable().getColumnCount()];
 
-        for (Iterator<Row> iter = joiner.findRows(oldFromRow).withColumnNames(Collections.emptySet()).iterator(); iter.hasNext();) {
-            iter.next();
+        for (Row ignored : joiner.findRows(oldFromRow).withColumnNames(Collections.emptySet())) {
 
             // create update row for "to" table
             Arrays.fill(toRow, Column.KEEP_VALUE);
