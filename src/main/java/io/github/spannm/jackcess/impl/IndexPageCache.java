@@ -303,6 +303,10 @@ public class IndexPageCache {
         DataPageMain dpMain = cacheDataPage.main;
         DataPageExtra dpExtra = cacheDataPage.extra;
 
+        if (dpMain == null) {
+            throw new IllegalStateException(withErrorContext("Missing data page for update"));
+        }
+
         if (newEntry != null) {
             validateEntryForPage(dpMain, newEntry);
         }

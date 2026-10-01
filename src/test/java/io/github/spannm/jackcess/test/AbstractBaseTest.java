@@ -82,7 +82,7 @@ public abstract class AbstractBaseTest extends Assertions {
         return testMethod.map(Method::getName).orElse(null);
     }
 
-    @BeforeEach
+    @BeforeEach // NOSONAR S8745 - final base hook; subclasses add their own @BeforeEach, JUnit5 runs superclass hooks first
     public final void beforeEachTest(TestInfo _testInfo) {
         lastTestInfo = _testInfo;
         if (!_testInfo.getTestMethod().isPresent() || _testInfo.getDisplayName().startsWith(_testInfo.getTestMethod().get().getName())) {

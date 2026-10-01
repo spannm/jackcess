@@ -316,7 +316,7 @@ public class MemFileChannel extends FileChannel {
         long numBytes = 0L;
         while (count > 0L) {
 
-            int chunkBytes = (int) Math.min(count, CHUNK_SIZE - chunkOffset);
+            int chunkBytes = (int) Math.min(count, (long) CHUNK_SIZE - chunkOffset);
             ByteBuffer src = ByteBuffer.wrap(data[chunkIndex], chunkOffset,
                 chunkBytes);
 
@@ -365,7 +365,7 @@ public class MemFileChannel extends FileChannel {
 
             ensureCapacity(dstPos + numBytes + 1);
 
-            int chunkBytes = (int) Math.min(count, CHUNK_SIZE - chunkOffset);
+            int chunkBytes = (int) Math.min(count, (long) CHUNK_SIZE - chunkOffset);
             ByteBuffer dst = ByteBuffer.wrap(data[chunkIndex], chunkOffset,
                 chunkBytes);
             do {

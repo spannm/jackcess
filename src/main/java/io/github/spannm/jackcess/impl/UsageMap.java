@@ -312,7 +312,7 @@ public final class UsageMap {
 
         // Apply the bitmask
         if (add) {
-            b = (byte) (b | bitmask);
+            b = (byte) (b & 0xff | bitmask);
             pageNumbers.set(pageNumberOffset);
         } else {
             b = (byte) (b & ~bitmask);
