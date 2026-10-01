@@ -45,14 +45,18 @@ final class FKEnforcerTest extends AbstractBaseTest {
             Table t3 = db.getTable("Table3");
 
             t1.addRow(20, 0, 20, "some data", 20);
+            assertThat(t1.getRowCount()).isGreaterThan(0);
 
             Cursor c = CursorBuilder.createCursor(t2);
             c.moveToNextRow();
             c.updateCurrentRow(30, "foo30");
+            assertThat(c.getCurrentRow().values()).contains(30, "foo30");
 
             c = CursorBuilder.createCursor(t3);
             c.moveToNextRow();
+            int rowCountBeforeDelete = t3.getRowCount();
             c.deleteCurrentRow();
+            assertThat(t3.getRowCount()).isEqualTo(rowCountBeforeDelete - 1);
         }
     }
 

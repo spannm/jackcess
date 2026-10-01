@@ -64,12 +64,15 @@ final class IndexCodesTest extends AbstractBaseTest {
         try (Database db = testDb.openMem()) {
             db.setDateTimeType(DateTimeType.DATE);
 
+            int checkedIndexes = 0;
             for (Table t : db) {
                 for (Index index : t.getIndexes()) {
                     // getLogger().log(Level.FINE, "Checking {0}.{1}", new Object[] {t.getName(), index.getName()});
                     checkIndexEntries(testDb, t, index);
+                    ++checkedIndexes;
                 }
             }
+            assertThat(checkedIndexes).isGreaterThan(0);
         }
     }
 
@@ -81,6 +84,7 @@ final class IndexCodesTest extends AbstractBaseTest {
     void internationalExtCodes() throws Exception {
         try (Database db = createDbMem(FileFormat.V2010, true)) {
             IndexData.ColumnDescriptor col = getTextIndexColumn(db);
+            assertThat(col).isNotNull();
 
             // one suffix repeat covers up to 7 chars, so these are the two boundaries either side of the first extra repeat
             assertIndexKey("7f7f02010101a0ff0280ff8000", col, repeatChar('ぁ', 1));
