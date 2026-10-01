@@ -53,16 +53,16 @@ final class ImportExportUtilTest extends AbstractBaseTest {
         try (Database db = createTestDb()) {
             File dir = TestUtil.createTempDir("export1");
             ExportUtil.exportAll(db, dir);
-            assertThat(new File(dir, "test.csv").isFile()).isTrue();
+            assertThat(new File(dir, "test.csv")).isFile();
 
             File dir2 = TestUtil.createTempDir("export2");
             ExportUtil.exportAll(db, dir2, "txt", true);
             File exported = new File(dir2, "test.txt");
-            assertThat(exported.isFile()).isTrue();
+            assertThat(exported).isFile();
 
             File dir3 = TestUtil.createTempDir("export3");
             ExportUtil.exportAll(db, dir3, "dat", true, ";", '\'', SimpleExportFilter.INSTANCE);
-            assertThat(new File(dir3, "test.dat").isFile()).isTrue();
+            assertThat(new File(dir3, "test.dat")).isFile();
 
             File dir4 = TestUtil.createTempDir("export4");
             new ExportUtil.Builder(db)
@@ -72,7 +72,7 @@ final class ImportExportUtilTest extends AbstractBaseTest {
                 .withQuote('"')
                 .withFilter(SimpleExportFilter.INSTANCE)
                 .exportAll(dir4);
-            assertThat(new File(dir4, "test.out").isFile()).isTrue();
+            assertThat(new File(dir4, "test.out")).isFile();
         }
     }
 
@@ -81,25 +81,25 @@ final class ImportExportUtilTest extends AbstractBaseTest {
         try (Database db = createTestDb()) {
             File f = TestUtil.createTempFile(getShortTestMethodName(), ".csv", false);
             ExportUtil.exportFile(db, "test", f);
-            assertThat(f.length() > 0).isTrue();
+            assertThat(f.length()).isGreaterThan(0);
 
             File f2 = TestUtil.createTempFile(getShortTestMethodName(), ".csv", false);
             ExportUtil.exportFile(db, "test", f2, true, ";", '"', SimpleExportFilter.INSTANCE);
-            assertThat(f2.length() > 0).isTrue();
+            assertThat(f2.length()).isGreaterThan(0);
 
             File f3 = TestUtil.createTempFile(getShortTestMethodName(), ".csv", false);
             new ExportUtil.Builder(db).withTableName("test").exportFile(f3);
-            assertThat(f3.length() > 0).isTrue();
+            assertThat(f3.length()).isGreaterThan(0);
 
             StringWriter sw = new StringWriter();
             ExportUtil.exportWriter(db, "test", new BufferedWriter(sw));
-            assertThat(sw.toString().contains("a")).isTrue();
+            assertThat(sw.toString()).contains("a");
 
             // export from an explicit cursor via builder
             StringWriter sw2 = new StringWriter();
             Cursor cursor = CursorBuilder.createCursor(db.getTable("test"));
             new ExportUtil.Builder(cursor).withHeader(true).exportWriter(new BufferedWriter(sw2));
-            assertThat(sw2.toString().contains("col1")).isTrue();
+            assertThat(sw2.toString()).contains("col1");
 
             // builder using the "no-arg-ish" constructors
             StringWriter sw3 = new StringWriter();
@@ -108,7 +108,7 @@ final class ImportExportUtilTest extends AbstractBaseTest {
                 .withTableName("test")
                 .withCursor(null)
                 .exportWriter(new BufferedWriter(sw3));
-            assertThat(sw3.toString().contains("b")).isTrue();
+            assertThat(sw3.toString()).contains("b");
         }
     }
 
@@ -128,8 +128,8 @@ final class ImportExportUtilTest extends AbstractBaseTest {
             ExportUtil.exportWriter(CursorBuilder.createCursor(db.getTable("test")),
                 new BufferedWriter(sw), true, null, '"', filter);
             String out = sw.toString();
-            assertThat(out.contains("col1")).isTrue();
-            assertThat(out.contains("col2")).isFalse();
+            assertThat(out).contains("col1");
+            assertThat(out).doesNotContain("col2");
         }
     }
 

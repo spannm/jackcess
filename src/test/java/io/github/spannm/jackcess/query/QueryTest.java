@@ -200,7 +200,7 @@ final class QueryTest extends AbstractBaseTest {
                 assertThat(q.toSQLString()).isEqualTo(expectedQueries.remove(q.getName()));
             }
 
-            assertThat(expectedQueries.isEmpty()).isTrue();
+            assertThat(expectedQueries).isEmpty();
         }
     }
 

@@ -50,7 +50,7 @@ final class FKEnforcerTest extends AbstractBaseTest {
             Cursor c = CursorBuilder.createCursor(t2);
             c.moveToNextRow();
             c.updateCurrentRow(30, "foo30");
-            assertThat(c.getCurrentRow().values()).contains(30, "foo30");
+            assertThat(c.getCurrentRow()).containsValues(30, "foo30");
 
             c = CursorBuilder.createCursor(t3);
             c.moveToNextRow();
@@ -83,7 +83,7 @@ final class FKEnforcerTest extends AbstractBaseTest {
             }, "Table3[id]");
             tests.forEach((key, value) -> {
                 IOException ex = catchThrowableOfType(key, IOException.class);
-                assertThat(ex.getMessage().contains(value)).isTrue();
+                assertThat(ex.getMessage()).contains(value);
 
             });
 

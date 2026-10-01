@@ -136,7 +136,7 @@ final class UsageMapTest extends AbstractBaseTest {
         try (Database db2 = DatabaseBuilder.open(dbFile)) {
             UsageMap gmap = UsageMap.read((DatabaseImpl) db2, PageChannel.PAGE_GLOBAL_USAGE_MAP, PageChannel.ROW_GLOBAL_USAGE_MAP, true);
             assertThat(getHandlerName(gmap)).as("global usage map should be promoted to a reference map").isEqualTo("GlobalReferenceHandler");
-            assertThat(gmap.getStartPage()).as("global reference map should start at page 0").isEqualTo(0);
+            assertThat(gmap.getStartPage()).as("global reference map should start at page 0").isZero();
 
             int count = 0;
             for (@SuppressWarnings("unused")

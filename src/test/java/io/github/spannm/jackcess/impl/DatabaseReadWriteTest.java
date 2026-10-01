@@ -68,14 +68,14 @@ final class DatabaseReadWriteTest extends AbstractBaseTest {
         }
         for (int i = 0; i < count; i++) {
             Map<String, Object> readRow = table.getNextRow();
-            assertThat(readRow.get("A")).isEqualTo(row[0]);
-            assertThat(readRow.get("B")).isEqualTo(row[1]);
-            assertThat(readRow.get("C")).isEqualTo(row[2]);
-            assertThat(readRow.get("D")).isEqualTo(row[3]);
-            assertThat(readRow.get("E")).isEqualTo(row[4]);
-            assertThat(readRow.get("F")).isEqualTo(row[5]);
-            assertThat(readRow.get("G")).isEqualTo(row[6]);
-            assertThat(readRow.get("H")).isEqualTo(row[7]);
+            assertThat(readRow).containsEntry("A", row[0]);
+            assertThat(readRow).containsEntry("B", row[1]);
+            assertThat(readRow).containsEntry("C", row[2]);
+            assertThat(readRow).containsEntry("D", row[3]);
+            assertThat(readRow).containsEntry("E", row[4]);
+            assertThat(readRow).containsEntry("F", row[5]);
+            assertThat(readRow).containsEntry("G", row[6]);
+            assertThat(readRow).containsEntry("H", row[7]);
         }
     }
 
@@ -94,14 +94,14 @@ final class DatabaseReadWriteTest extends AbstractBaseTest {
             table.addRows(rows);
             for (int i = 0; i < count; i++) {
                 Map<String, Object> readRow = table.getNextRow();
-                assertThat(readRow.get("A")).isEqualTo(row[0]);
-                assertThat(readRow.get("B")).isEqualTo(row[1]);
-                assertThat(readRow.get("C")).isEqualTo(row[2]);
-                assertThat(readRow.get("D")).isEqualTo(row[3]);
-                assertThat(readRow.get("E")).isEqualTo(row[4]);
-                assertThat(readRow.get("F")).isEqualTo(row[5]);
-                assertThat(readRow.get("G")).isEqualTo(row[6]);
-                assertThat(readRow.get("H")).isEqualTo(row[7]);
+                assertThat(readRow).containsEntry("A", row[0]);
+                assertThat(readRow).containsEntry("B", row[1]);
+                assertThat(readRow).containsEntry("C", row[2]);
+                assertThat(readRow).containsEntry("D", row[3]);
+                assertThat(readRow).containsEntry("E", row[4]);
+                assertThat(readRow).containsEntry("F", row[5]);
+                assertThat(readRow).containsEntry("G", row[6]);
+                assertThat(readRow).containsEntry("H", row[7]);
             }
         }
     }
@@ -192,7 +192,7 @@ final class DatabaseReadWriteTest extends AbstractBaseTest {
                     "data", newText));
 
             List<Row> rows = toList(t);
-            assertThat(rows.size()).isEqualTo(50);
+            assertThat(rows).hasSize(50);
 
             for (Row r : rows) {
                 r.put("data", "final data " + r.get("id"));
@@ -205,7 +205,7 @@ final class DatabaseReadWriteTest extends AbstractBaseTest {
             t.reset();
 
             for (Row r : t) {
-                assertThat(r.get("data")).isEqualTo("final data " + r.get("id"));
+                assertThat(r).containsEntry("data", "final data " + r.get("id"));
             }
         }
 

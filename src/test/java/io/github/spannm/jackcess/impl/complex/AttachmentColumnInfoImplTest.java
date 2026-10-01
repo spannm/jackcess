@@ -125,9 +125,9 @@ final class AttachmentColumnInfoImplTest extends AbstractBaseTest {
         Attachment a = AttachmentColumnInfoImpl.newAttachment(
             "http://example.com", "some.txt", "txt", DATA, new Date(), 1);
         String str = a.toString();
-        assertThat(str.contains("some.txt")).isTrue();
-        assertThat(str.contains("http://example.com")).isTrue();
-        assertThat(str.contains("txt")).isTrue();
+        assertThat(str).contains("some.txt");
+        assertThat(str).contains("http://example.com");
+        assertThat(str).contains("txt");
     }
 
     private static byte[] getAsciiBytes(String str) {

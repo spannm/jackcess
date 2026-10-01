@@ -54,7 +54,7 @@ final class LinkedTableTest extends AbstractBaseTest {
             tmd = db.getTableMetaData("FooTable");
             assertThat(tmd).isNull();
 
-            assertThat(db.getLinkedDatabases().isEmpty()).isTrue();
+            assertThat(db.getLinkedDatabases()).isEmpty();
 
             String linkeeDbName = "Z:\\jackcess_test\\linkeeTest.accdb";
             File linkeeFile = new File(DIR_TEST_DATA, "linkeeTest.accdb");
@@ -65,7 +65,7 @@ final class LinkedTableTest extends AbstractBaseTest {
 
             Table t2 = db.getTable("Table2");
 
-            assertThat(db.getLinkedDatabases().size()).isEqualTo(1);
+            assertThat(db.getLinkedDatabases()).hasSize(1);
             Database linkeeDb = db.getLinkedDatabases().get(linkeeDbName);
             assertThat(linkeeDb).isNotNull();
             assertThat(linkeeDb.getFile()).isEqualTo(linkeeFile);
@@ -90,7 +90,7 @@ final class LinkedTableTest extends AbstractBaseTest {
 
             Table t3 = db.getTable("FooTable");
 
-            assertThat(db.getLinkedDatabases().size()).isEqualTo(1);
+            assertThat(db.getLinkedDatabases()).hasSize(1);
 
             expectedRows =
                 TestUtil.createExpectedTable(
@@ -115,32 +115,32 @@ final class LinkedTableTest extends AbstractBaseTest {
             assertThat(db.isLinkedTable(t1)).isFalse();
 
             List<Table> tables = DatabaseTest.getTables(db.newIterable());
-            assertThat(tables.size()).isEqualTo(3);
-            assertThat(tables.contains(t1)).isTrue();
-            assertThat(tables.contains(t2)).isTrue();
-            assertThat(tables.contains(t3)).isTrue();
-            assertThat(tables.contains(((DatabaseImpl) db).getSystemCatalog())).isFalse();
+            assertThat(tables).hasSize(3);
+            assertThat(tables).contains(t1);
+            assertThat(tables).contains(t2);
+            assertThat(tables).contains(t3);
+            assertThat(tables).doesNotContain(((DatabaseImpl) db).getSystemCatalog());
 
             tables = DatabaseTest.getTables(db.newIterable().withIncludeNormalTables(false));
-            assertThat(tables.size()).isEqualTo(2);
-            assertThat(tables.contains(t1)).isFalse();
-            assertThat(tables.contains(t2)).isTrue();
-            assertThat(tables.contains(t3)).isTrue();
-            assertThat(tables.contains(((DatabaseImpl) db).getSystemCatalog())).isFalse();
+            assertThat(tables).hasSize(2);
+            assertThat(tables).doesNotContain(t1);
+            assertThat(tables).contains(t2);
+            assertThat(tables).contains(t3);
+            assertThat(tables).doesNotContain(((DatabaseImpl) db).getSystemCatalog());
 
             tables = DatabaseTest.getTables(db.newIterable().withLocalUserTablesOnly());
-            assertThat(tables.size()).isEqualTo(1);
-            assertThat(tables.contains(t1)).isTrue();
-            assertThat(tables.contains(t2)).isFalse();
-            assertThat(tables.contains(t3)).isFalse();
-            assertThat(tables.contains(((DatabaseImpl) db).getSystemCatalog())).isFalse();
+            assertThat(tables).hasSize(1);
+            assertThat(tables).contains(t1);
+            assertThat(tables).doesNotContain(t2);
+            assertThat(tables).doesNotContain(t3);
+            assertThat(tables).doesNotContain(((DatabaseImpl) db).getSystemCatalog());
 
             tables = DatabaseTest.getTables(db.newIterable().withSystemTablesOnly());
-            assertThat(tables.size() > 5).isTrue();
-            assertThat(tables.contains(t1)).isFalse();
-            assertThat(tables.contains(t2)).isFalse();
-            assertThat(tables.contains(t3)).isFalse();
-            assertThat(tables.contains(((DatabaseImpl) db).getSystemCatalog())).isTrue();
+            assertThat(tables.size()).isGreaterThan(5);
+            assertThat(tables).doesNotContain(t1);
+            assertThat(tables).doesNotContain(t2);
+            assertThat(tables).doesNotContain(t3);
+            assertThat(tables).contains(((DatabaseImpl) db).getSystemCatalog());
         }
     }
 
@@ -154,15 +154,15 @@ final class LinkedTableTest extends AbstractBaseTest {
             assertThat(tmd.getLinkedTableName()).isEqualTo("dbo.Ordrar");
             assertThat(tmd.getLinkedDbName()).isNull();
             assertThat(tmd.getConnectionName()).isEqualTo("DSN=Magnapinna;Description=Safexit;UID=safexit;PWD=DummyPassword;APP=Microsoft Office;DATABASE=safexit");
-            assertThat(tmd.toString().contains("DummyPassword")).isFalse();
+            assertThat(tmd.toString()).doesNotContain("DummyPassword");
 
             TableDefinition t = tmd.getTableDefinition(db);
 
             List<? extends Column> cols = t.getColumns();
-            assertThat(cols.size()).isEqualTo(20);
+            assertThat(cols).hasSize(20);
 
             List<? extends Index> idxs = t.getIndexes();
-            assertThat(idxs.size()).isEqualTo(5);
+            assertThat(idxs).hasSize(5);
 
             Table tbl = db.getTable("Ordrar");
 

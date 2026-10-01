@@ -130,7 +130,7 @@ final class JoinerTest extends AbstractBaseTest {
 
         assertThat(countRows(t2t1Join.getToTable())).isEqualTo(2);
         for (Row t1Row : t2t1Join.getToTable()) {
-            assertThat(t1Row.get("otherfk1")).isNotEqualTo(1);
+            assertThat(t1Row).doesNotContainEntry("otherfk1", 1);
         }
     }
 

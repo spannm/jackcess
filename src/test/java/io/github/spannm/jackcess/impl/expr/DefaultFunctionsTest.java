@@ -182,7 +182,7 @@ final class DefaultFunctionsTest extends AbstractBaseTest {
         assertThat(eval("StrConv('ISTANBUL', 2, 1055)")).isEqualTo("ıstanbul");
 
         EvalException ex = catchThrowableOfType(() -> eval("StrConv('foo', 1, 9999)"), EvalException.class);
-        assertThat(ex.getCause().getMessage().contains("Unsupported locale id")).isTrue();
+        assertThat(ex.getCause().getMessage()).contains("Unsupported locale id");
     }
 
     @Test
@@ -328,7 +328,7 @@ final class DefaultFunctionsTest extends AbstractBaseTest {
     })
     void funcsException(String _exprStr, String _message) {
         EvalException ex = catchThrowableOfType(() -> eval(_exprStr), EvalException.class);
-        assertThat(ex.getMessage().contains(_message)).isTrue();
+        assertThat(ex.getMessage()).contains(_message);
     }
 
     @ParameterizedTest(name = "[{index}] {0} --> {1}")

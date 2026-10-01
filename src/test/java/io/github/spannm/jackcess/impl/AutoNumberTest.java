@@ -222,7 +222,7 @@ final class AutoNumberTest extends AbstractBaseTest {
 
         row13.put("a", "45");
         row13 = table.updateRow(row13);
-        assertThat(row13.get("a")).isEqualTo(45);
+        assertThat(row13).containsEntry("a", 45);
 
         assertThat(((TableImpl) table).getLastLongAutoNumber()).isEqualTo(45);
 
@@ -237,7 +237,7 @@ final class AutoNumberTest extends AbstractBaseTest {
         table.setAllowAutoNumberInsert(null);
 
         row13 = table.updateRow(row13); // no change, as confirmed by...
-        assertThat(row13.get("a")).isEqualTo(-1);
+        assertThat(row13).containsEntry("a", -1);
 
         assertThat(((TableImpl) table).getLastLongAutoNumber()).isEqualTo(45);
 
@@ -395,7 +395,7 @@ final class AutoNumberTest extends AbstractBaseTest {
             row2.put("a", row2Guid);
 
             Row row2b = table.updateRow(row2);
-            assertThat(row2b.get("a")).isEqualTo(row2Guid);
+            assertThat(row2b).containsEntry("a", row2Guid);
 
             row2b.put("a", "not a guid");
 
@@ -405,7 +405,7 @@ final class AutoNumberTest extends AbstractBaseTest {
 
             Row row2c = table.updateRow(row2b);
             assertThat(ColumnImpl.isGUIDValue(row2c.get("a"))).isTrue();
-            assertThat(row2c.get("a")).isNotEqualTo(row2Guid);
+            assertThat(row2c).doesNotContainEntry("a", row2Guid);
         }
     }
 

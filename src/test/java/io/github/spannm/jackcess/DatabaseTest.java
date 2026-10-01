@@ -125,7 +125,7 @@ final class DatabaseTest extends AbstractBaseTest {
     void getColumns(TestDb testDb) throws Exception {
         try (Database db = testDb.open()) {
             List<? extends Column> columns = db.getTable("Table1").getColumns();
-            assertThat(columns.size()).isEqualTo(9);
+            assertThat(columns).hasSize(9);
             checkColumn(columns, 0, "A", DataType.TEXT);
             checkColumn(columns, 1, "B", DataType.TEXT);
             checkColumn(columns, 2, "C", DataType.BYTE);
@@ -150,7 +150,7 @@ final class DatabaseTest extends AbstractBaseTest {
         try (Database db = testDb.open()) {
             db.setDateTimeType(DateTimeType.DATE);
 
-            assertThat(db.getTableNames().size()).isEqualTo(4);
+            assertThat(db.getTableNames()).hasSize(4);
             final Table table = db.getTable("Table1");
 
             Row row1 = table.getNextRow();
@@ -171,7 +171,7 @@ final class DatabaseTest extends AbstractBaseTest {
     @FileFormatSource
     void create(FileFormat fileFormat) throws Exception {
         try (Database db = createDbMem(fileFormat)) {
-            assertThat(db.getTableNames().size()).isEqualTo(0);
+            assertThat(db.getTableNames()).isEmpty();
         }
     }
 
@@ -197,9 +197,9 @@ final class DatabaseTest extends AbstractBaseTest {
             table.reset();
 
             Map<String, Object> outRow = table.getNextRow();
-            assertThat(outRow.get("A")).isEqualTo("Tim1");
+            assertThat(outRow).containsEntry("A", "Tim1");
             outRow = table.getNextRow();
-            assertThat(outRow.get("A")).isEqualTo("Tim3");
+            assertThat(outRow).containsEntry("A", "Tim3");
             assertRowCount(2, table);
         }
 
@@ -236,7 +236,7 @@ final class DatabaseTest extends AbstractBaseTest {
             table.getDefaultCursor().deleteCurrentRow();
             assertRowCount(7, table);
             table.reset();
-            assertThat(table.getNextRow().get("D")).isEqualTo(2);
+            assertThat(table.getNextRow()).containsEntry("D", 2);
         }
     }
 
@@ -259,7 +259,7 @@ final class DatabaseTest extends AbstractBaseTest {
 
             Row r1 = rows.remove(7);
             Row r2 = rows.remove(3);
-            assertThat(rows.size()).isEqualTo(8);
+            assertThat(rows).hasSize(8);
 
             assertThat(table.deleteRow(r2)).isSameAs(r2);
             assertThat(table.deleteRow(r1)).isSameAs(r1);
@@ -277,13 +277,13 @@ final class DatabaseTest extends AbstractBaseTest {
     @SuppressWarnings({"EmptyBlock", "try"})
     void missingFile() {
         File bogusFile = new File("fooby-dooby.mdb");
-        assertThat(bogusFile.exists()).isFalse();
+        assertThat(bogusFile).doesNotExist();
         DatabaseBuilder dbb = DatabaseBuilder.newDatabase(bogusFile).withReadOnly(true).withAutoSync(getTestAutoSync());
         assertThatThrownBy(() -> {
             try (Database ignored = dbb.open()) {
             }
         }).isInstanceOf(FileNotFoundException.class);
-        assertThat(bogusFile.exists()).isFalse();
+        assertThat(bogusFile).doesNotExist();
     }
 
     @ParameterizedTest(name = "[{index}] {0}")
@@ -490,13 +490,13 @@ final class DatabaseTest extends AbstractBaseTest {
             }
 
             Map<String, Object> row = t.getNextRow();
-            assertThat(row.get("col1")).isEqualTo("some data");
-            assertThat(row.get("col2")).isEqualTo(BigDecimal.ONE);
-            assertThat(row.get("col3")).isEqualTo(BigDecimal.ZERO);
-            assertThat(row.get("col4")).isEqualTo(BigDecimal.ZERO);
-            assertThat(row.get("col5")).isEqualTo(new BigDecimal("4"));
-            assertThat(row.get("col6")).isEqualTo(new BigDecimal("-1"));
-            assertThat(row.get("col7")).isEqualTo(BigDecimal.ONE);
+            assertThat(row).containsEntry("col1", "some data");
+            assertThat(row).containsEntry("col2", BigDecimal.ONE);
+            assertThat(row).containsEntry("col3", BigDecimal.ZERO);
+            assertThat(row).containsEntry("col4", BigDecimal.ZERO);
+            assertThat(row).containsEntry("col5", new BigDecimal("4"));
+            assertThat(row).containsEntry("col6", new BigDecimal("-1"));
+            assertThat(row).containsEntry("col7", BigDecimal.ONE);
 
             Object[] tmpRow = {"foo", BigDecimal.ONE, new BigDecimal(3), new BigDecimal("13"), new BigDecimal("-17"), BigDecimal.ZERO, new BigDecimal("8734")};
             t.addRow(tmpRow);
@@ -504,13 +504,13 @@ final class DatabaseTest extends AbstractBaseTest {
 
             t.getNextRow();
             row = t.getNextRow();
-            assertThat(row.get("col1")).isEqualTo(tmpRow[0]);
-            assertThat(row.get("col2")).isEqualTo(tmpRow[1]);
-            assertThat(row.get("col3")).isEqualTo(tmpRow[2]);
-            assertThat(row.get("col4")).isEqualTo(tmpRow[3]);
-            assertThat(row.get("col5")).isEqualTo(tmpRow[4]);
-            assertThat(row.get("col6")).isEqualTo(tmpRow[5]);
-            assertThat(row.get("col7")).isEqualTo(tmpRow[6]);
+            assertThat(row).containsEntry("col1", tmpRow[0]);
+            assertThat(row).containsEntry("col2", tmpRow[1]);
+            assertThat(row).containsEntry("col3", tmpRow[2]);
+            assertThat(row).containsEntry("col4", tmpRow[3]);
+            assertThat(row).containsEntry("col5", tmpRow[4]);
+            assertThat(row).containsEntry("col6", tmpRow[5]);
+            assertThat(row).containsEntry("col7", tmpRow[6]);
         }
     }
 
@@ -519,7 +519,7 @@ final class DatabaseTest extends AbstractBaseTest {
     void multiPageTableDef(TestDb testDb) throws Exception {
         try (Database db = testDb.open()) {
             List<? extends Column> columns = db.getTable("Table2").getColumns();
-            assertThat(columns.size()).isEqualTo(89);
+            assertThat(columns).hasSize(89);
         }
     }
 
@@ -553,8 +553,8 @@ final class DatabaseTest extends AbstractBaseTest {
         try (Database db = testDb.openMem()) {
             Table t = db.getTable("jobDB1");
 
-            assertThat(((TableImpl) t).getOwnedPagesCursor().getUsageMap().toString()
-                    .startsWith("InlineHandler")).isTrue();
+            assertThat(((TableImpl) t).getOwnedPagesCursor().getUsageMap().toString())
+                    .startsWith("InlineHandler");
 
             String lval = createNonAsciiString(255); // "--255 chars long text--";
 
@@ -570,10 +570,10 @@ final class DatabaseTest extends AbstractBaseTest {
             Set<Integer> ids = t.stream()
                 .map(r -> r.getInt("ID"))
                 .collect(Collectors.toSet());
-            assertThat(ids.size()).isEqualTo(1000);
+            assertThat(ids).hasSize(1000);
 
-            assertThat(((TableImpl) t).getOwnedPagesCursor().getUsageMap().toString()
-                    .startsWith("ReferenceHandler")).isTrue();
+            assertThat(((TableImpl) t).getOwnedPagesCursor().getUsageMap().toString())
+                    .startsWith("ReferenceHandler");
         }
     }
 
@@ -660,7 +660,7 @@ final class DatabaseTest extends AbstractBaseTest {
                 .map(r -> r.getDate("date"))
                 .collect(Collectors.toList());
 
-            assertThat(foundDates.size()).isEqualTo(dates.size());
+            assertThat(foundDates).hasSameSizeAs(dates);
             for (int i = 0; i < dates.size(); i++) {
                 Date expected = dates.get(i);
                 Date found = foundDates.get(i);
@@ -785,15 +785,15 @@ final class DatabaseTest extends AbstractBaseTest {
             assertThat(c.getLength()).isEqualTo((short) 2);
 
             Map<String, Object> row = t.getNextRow();
-            assertThat(row.get("c_flag_")).isEqualTo("N");
+            assertThat(row).containsEntry("c_flag_", "N");
 
             t.addRow(3, "testFixedText", "boo", "foo", "bob", 3, 5, 9, "Y",
                 new Date());
 
             t.getNextRow();
             row = t.getNextRow();
-            assertThat(row.get("c_user_login")).isEqualTo("testFixedText");
-            assertThat(row.get("c_flag_")).isEqualTo("Y");
+            assertThat(row).containsEntry("c_user_login", "testFixedText");
+            assertThat(row).containsEntry("c_flag_", "Y");
         }
     }
 
@@ -894,7 +894,7 @@ final class DatabaseTest extends AbstractBaseTest {
         RowImpl row = new RowImpl(new RowIdImpl(1, 1));
         row.put("id", 37);
         row.put("data", null);
-        assertThat(row.toString()).isEqualTo("Row[1:1][{id=37,data=<null>}]");
+        assertThat(row).hasToString("Row[1:1][{id=37,data=<null>}]");
     }
 
     @ParameterizedTest(name = "[{index}] {0}")
@@ -914,7 +914,7 @@ final class DatabaseTest extends AbstractBaseTest {
                 names.add(tmd.getName());
             }
 
-            assertThat(sysCount > 4).isTrue();
+            assertThat(sysCount).isGreaterThan(4);
             assertThat(names).isEqualTo(new HashSet<>(Arrays.asList("Table1", "Table2", "Table3", "Table4")));
         }
     }
@@ -958,8 +958,8 @@ final class DatabaseTest extends AbstractBaseTest {
                 expectedCreateDate = "2004-05-28T17:51:48.701";
                 expectedUpdateDate = "2006-07-24T09:56:19.701";
             }
-            assertThat(table.getCreatedDate().toString()).isEqualTo(expectedCreateDate);
-            assertThat(table.getUpdatedDate().toString()).isEqualTo(expectedUpdateDate);
+            assertThat(table.getCreatedDate()).hasToString(expectedCreateDate);
+            assertThat(table.getUpdatedDate()).hasToString(expectedUpdateDate);
         }
     }
 
@@ -977,7 +977,7 @@ final class DatabaseTest extends AbstractBaseTest {
             UnsupportedOperationException ex = catchThrowableOfType(
                 () -> DatabaseBuilder.newTable("test2").addColumn(DatabaseBuilder.newColumn("A", DataType.TEXT)).toTable(db),
                 UnsupportedOperationException.class);
-            assertThat(ex.getMessage().contains("unsupported collating sort order")).isTrue();
+            assertThat(ex.getMessage()).contains("unsupported collating sort order");
         }
     }
 
@@ -1024,7 +1024,7 @@ final class DatabaseTest extends AbstractBaseTest {
     private static void checkRawValue(String expected, Object val) {
         if (expected != null) {
             assertThat(ColumnImpl.isRawData(val)).isTrue();
-            assertThat(val.toString()).isEqualTo(expected);
+            assertThat(val).hasToString(expected);
         } else {
             assertThat(val).isNull();
         }

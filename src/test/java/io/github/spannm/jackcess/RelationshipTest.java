@@ -44,7 +44,7 @@ final class RelationshipTest extends AbstractBaseTest {
             Table t3 = db.getTable("Table3");
 
             List<Relationship> rels = db.getRelationships(t1, t2);
-            assertThat(rels.size()).isEqualTo(1);
+            assertThat(rels).hasSize(1);
             Relationship rel = rels.get(0);
             assertThat(rel.getName()).isEqualTo("Table2Table1");
             assertThat(rel.getFromTable()).isEqualTo(t2);
@@ -57,11 +57,11 @@ final class RelationshipTest extends AbstractBaseTest {
             assertSameRelationships(rels, db.getRelationships(t2, t1), true);
 
             rels = db.getRelationships(t2, t3);
-            assertThat(db.getRelationships(t2, t3).isEmpty()).isTrue();
+            assertThat(db.getRelationships(t2, t3)).isEmpty();
             assertSameRelationships(rels, db.getRelationships(t3, t2), true);
 
             rels = db.getRelationships(t1, t3);
-            assertThat(rels.size()).isEqualTo(1);
+            assertThat(rels).hasSize(1);
             rel = rels.get(0);
             assertThat(rel.getName()).isEqualTo("Table3Table1");
             assertThat(rel.getFromTable()).isEqualTo(t3);
@@ -113,7 +113,7 @@ final class RelationshipTest extends AbstractBaseTest {
 
     private static void assertSameRelationships(
         List<Relationship> expected, List<Relationship> found, boolean ordered) {
-        assertThat(found.size()).isEqualTo(expected.size());
+        assertThat(found).hasSameSizeAs(expected);
         if (!ordered) {
             expected.sort(REL_COMP);
             found.sort(REL_COMP);

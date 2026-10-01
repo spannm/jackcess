@@ -60,8 +60,8 @@ final class BuilderTest extends AbstractBaseTest {
             .addColumns(Arrays.asList(new ColumnBuilder("a", DataType.LONG), new ColumnBuilder("b", DataType.TEXT)))
             .addIndexes(null)
             .addIndexes(Arrays.asList(new IndexBuilder("idx").withColumns("a")));
-        assertThat(tb.getColumns().size()).isEqualTo(2);
-        assertThat(tb.getIndexes().size()).isEqualTo(1);
+        assertThat(tb.getColumns()).hasSize(2);
+        assertThat(tb.getIndexes()).hasSize(1);
 
         assertThat(tb.getProperties()).isNull();
         tb.putProperty("p1", "v1").putProperty("p2", DataType.LONG, 7);
@@ -69,8 +69,8 @@ final class BuilderTest extends AbstractBaseTest {
         assertThat(tb.getProperties().get("p2").getValue()).isEqualTo(7);
 
         String str = tb.toString();
-        assertThat(str.startsWith("TableBuilder[")).isTrue();
-        assertThat(str.contains("name=t")).isTrue();
+        assertThat(str).startsWith("TableBuilder[");
+        assertThat(str).contains("name=t");
     }
 
     @Test
@@ -84,7 +84,7 @@ final class BuilderTest extends AbstractBaseTest {
         assertThat(ib.getName()).isEqualTo("idx2");
         assertThat(ib.isUnique()).isTrue();
         assertThat(ib.isIgnoreNulls()).isTrue();
-        assertThat(ib.getColumns().size()).isEqualTo(2);
+        assertThat(ib.getColumns()).hasSize(2);
         assertThat(ib.getColumns().get(0).isAscending()).isTrue();
 
         IndexBuilder.Column col = ib.getColumns().get(0);
@@ -95,8 +95,8 @@ final class BuilderTest extends AbstractBaseTest {
         IndexBuilder desc = new IndexBuilder("d").withColumns(false, "x");
         assertThat(desc.getColumns().get(0).isAscending()).isFalse();
 
-        assertThat(new IndexBuilder("n").withColumns((String[]) null).getColumns().size()).isEqualTo(0);
-        assertThat(new IndexBuilder("n").withColumns(Arrays.asList("q")).getColumns().size()).isEqualTo(1);
+        assertThat(new IndexBuilder("n").withColumns((String[]) null).getColumns()).isEmpty();
+        assertThat(new IndexBuilder("n").withColumns(Arrays.asList("q")).getColumns()).hasSize(1);
 
         IndexBuilder pk = new IndexBuilder(IndexBuilder.PRIMARY_KEY_NAME).withColumns("a").withPrimaryKey();
         assertThat(pk.isPrimaryKey()).isTrue();
@@ -138,16 +138,16 @@ final class BuilderTest extends AbstractBaseTest {
         assertThat(rb.getName()).isEqualTo("rel");
         assertThat(rb.getFromTable()).isEqualTo("from");
         assertThat(rb.getToTable()).isEqualTo("to");
-        assertThat(rb.getFlags() & RelationshipImpl.CASCADE_UPDATES_FLAG).isNotEqualTo(0);
-        assertThat(rb.getFlags() & RelationshipImpl.CASCADE_NULL_FLAG).isNotEqualTo(0);
+        assertThat(rb.getFlags() & RelationshipImpl.CASCADE_UPDATES_FLAG).isNotZero();
+        assertThat(rb.getFlags() & RelationshipImpl.CASCADE_NULL_FLAG).isNotZero();
 
         rb.withJoinType(JoinType.LEFT_OUTER);
-        assertThat(rb.getFlags() & RelationshipImpl.LEFT_OUTER_JOIN_FLAG).isNotEqualTo(0);
+        assertThat(rb.getFlags() & RelationshipImpl.LEFT_OUTER_JOIN_FLAG).isNotZero();
         rb.withJoinType(JoinType.RIGHT_OUTER);
-        assertThat(rb.getFlags() & RelationshipImpl.RIGHT_OUTER_JOIN_FLAG).isNotEqualTo(0);
-        assertThat(rb.getFlags() & RelationshipImpl.LEFT_OUTER_JOIN_FLAG).isEqualTo(0);
+        assertThat(rb.getFlags() & RelationshipImpl.RIGHT_OUTER_JOIN_FLAG).isNotZero();
+        assertThat(rb.getFlags() & RelationshipImpl.LEFT_OUTER_JOIN_FLAG).isZero();
         rb.withJoinType(JoinType.INNER);
-        assertThat(rb.getFlags() & RelationshipImpl.RIGHT_OUTER_JOIN_FLAG).isEqualTo(0);
+        assertThat(rb.getFlags() & RelationshipImpl.RIGHT_OUTER_JOIN_FLAG).isZero();
 
         try (Database db = createDbMem(FileFormat.V2000)) {
             TestUtil.createTestTable(db);
@@ -204,7 +204,7 @@ final class BuilderTest extends AbstractBaseTest {
     void databaseBuilderCreateStatic() throws Exception {
         File file = TestUtil.createTempFile(getShortTestMethodName(), Database.FILE_EXT_MDB, false);
         try (Database db = DatabaseBuilder.create(FileFormat.V2000, file)) {
-            assertThat(Arrays.asList(FileFormat.values()).contains(db.getFileFormat())).isTrue();
+            assertThat(Arrays.asList(FileFormat.values())).contains(db.getFileFormat());
         }
     }
 

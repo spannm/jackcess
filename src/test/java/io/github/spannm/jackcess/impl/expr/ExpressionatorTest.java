@@ -540,7 +540,7 @@ final class ExpressionatorTest extends AbstractBaseTest {
     })
     void invalidExpression(String exprStr, String msgStr) {
         ParseException ex = catchThrowableOfType(() -> eval(exprStr), ParseException.class);
-        assertThat(ex.getMessage().contains(msgStr)).isTrue();
+        assertThat(ex.getMessage()).contains(msgStr);
     }
 
     private static void validateExpr(String exprStr, String debugStr) {
