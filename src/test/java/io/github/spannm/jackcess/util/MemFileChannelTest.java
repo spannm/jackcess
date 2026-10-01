@@ -41,10 +41,8 @@ final class MemFileChannelTest extends AbstractBaseTest {
             assertThat(ch.size()).isEqualTo(testDb.getFile().length());
             assertThat(ch.position()).isZero();
 
-            assertThatThrownBy(() -> {
-                ByteBuffer bb = ByteBuffer.allocate(1024);
-                ch.write(bb);
-            }).isInstanceOf(NonWritableChannelException.class);
+            ByteBuffer bb = ByteBuffer.allocate(1024);
+            assertThatThrownBy(() -> ch.write(bb)).isInstanceOf(NonWritableChannelException.class);
 
             assertThatThrownBy(() -> ch.truncate(0L)).isInstanceOf(NonWritableChannelException.class);
 

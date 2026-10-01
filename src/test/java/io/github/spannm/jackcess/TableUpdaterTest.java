@@ -165,34 +165,19 @@ final class TableUpdaterTest extends AbstractBaseTest {
                 .addColumn(newColumn("id", DataType.LONG))
                 .toTable(db);
 
-            try {
-                newColumn("ID", DataType.TEXT)
-                    .addToTable(t1);
-                fail("created table with no columns?");
-            } catch (IllegalArgumentException _ex) {
-                // success
-            }
+            ColumnBuilder dupeIdCol = newColumn("ID", DataType.TEXT);
+            assertThatThrownBy(() -> dupeIdCol.addToTable(t1)).isInstanceOf(IllegalArgumentException.class);
 
             Table t2 = newTable("TestTable2")
                 .addColumn(newColumn("id2", DataType.LONG))
                 .toTable(db);
 
-            try {
-                newRelationship(t1, t2)
-                    .toRelationship(db);
-                fail("created rel with no columns?");
-            } catch (IllegalArgumentException _ex) {
-                // success
-            }
+            RelationshipBuilder noColsRel = newRelationship(t1, t2);
+            assertThatThrownBy(() -> noColsRel.toRelationship(db)).isInstanceOf(IllegalArgumentException.class);
 
-            try {
-                newRelationship("TestTable", "TestTable2")
-                    .addColumns("id", "id")
-                    .toRelationship(db);
-                fail("created rel with wrong columns?");
-            } catch (IllegalArgumentException _ex) {
-                // success
-            }
+            RelationshipBuilder wrongColsRel = newRelationship("TestTable", "TestTable2")
+                .addColumns("id", "id");
+            assertThatThrownBy(() -> wrongColsRel.toRelationship(db)).isInstanceOf(IllegalArgumentException.class);
         }
     }
 
@@ -226,10 +211,9 @@ final class TableUpdaterTest extends AbstractBaseTest {
                 .toRelationship(db);
 
             // closing the loop, TestTable3 -(cascade delete)-> TestTable1, would create an infinite cascade cycle
-            assertThatThrownBy(
-                () -> newRelationship(t3, t1).addColumns("id", "id")
-                    .withReferentialIntegrity().withCascadeDeletes()
-                    .toRelationship(db)).isInstanceOf(IllegalArgumentException.class);
+            RelationshipBuilder cycleRel = newRelationship(t3, t1).addColumns("id", "id")
+                .withReferentialIntegrity().withCascadeDeletes();
+            assertThatThrownBy(() -> cycleRel.toRelationship(db)).isInstanceOf(IllegalArgumentException.class);
 
             // a non-cascading relationship closing the same loop is fine, since it does not participate in cascading
             assertThatCode(
@@ -250,10 +234,9 @@ final class TableUpdaterTest extends AbstractBaseTest {
             newPrimaryKey("id").addToTable(t1);
 
             // a table cascading to itself is a (degenerate) cascade cycle
-            assertThatThrownBy(
-                () -> newRelationship(t1, t1).addColumns("id", "parentId")
-                    .withReferentialIntegrity().withCascadeDeletes()
-                    .toRelationship(db)).isInstanceOf(IllegalArgumentException.class);
+            RelationshipBuilder selfCycleRel = newRelationship(t1, t1).addColumns("id", "parentId")
+                .withReferentialIntegrity().withCascadeDeletes();
+            assertThatThrownBy(() -> selfCycleRel.toRelationship(db)).isInstanceOf(IllegalArgumentException.class);
 
             // without cascading, a self-referencing relationship is fine
             assertThatCode(

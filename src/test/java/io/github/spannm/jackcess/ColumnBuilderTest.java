@@ -134,23 +134,32 @@ final class ColumnBuilderTest extends AbstractBaseTest {
     void validate() {
         JetFormat fmt = JetFormat.VERSION_4;
 
-        assertThatThrownBy(() -> new ColumnBuilder("c").validate(fmt))
+        ColumnBuilder noType = new ColumnBuilder("c");
+        assertThatThrownBy(() -> noType.validate(fmt))
             .isInstanceOf(IllegalArgumentException.class);
-        assertThatThrownBy(() -> new ColumnBuilder("c", DataType.UNSUPPORTED_FIXEDLEN).validate(fmt))
+        ColumnBuilder unsupported = new ColumnBuilder("c", DataType.UNSUPPORTED_FIXEDLEN);
+        assertThatThrownBy(() -> unsupported.validate(fmt))
             .isInstanceOf(IllegalArgumentException.class);
-        assertThatThrownBy(() -> new ColumnBuilder("c", DataType.BIG_INT).validate(fmt))
+        ColumnBuilder bigInt = new ColumnBuilder("c", DataType.BIG_INT);
+        assertThatThrownBy(() -> bigInt.validate(fmt))
             .isInstanceOf(IllegalArgumentException.class);
-        assertThatThrownBy(() -> new ColumnBuilder("c", DataType.LONG).withLength(1).validate(fmt))
+        ColumnBuilder badLength = new ColumnBuilder("c", DataType.LONG).withLength(1);
+        assertThatThrownBy(() -> badLength.validate(fmt))
             .isInstanceOf(IllegalArgumentException.class);
-        assertThatThrownBy(() -> new ColumnBuilder("c", DataType.NUMERIC).withScale(99).validate(fmt))
+        ColumnBuilder badScale = new ColumnBuilder("c", DataType.NUMERIC).withScale(99);
+        assertThatThrownBy(() -> badScale.validate(fmt))
             .isInstanceOf(IllegalArgumentException.class);
-        assertThatThrownBy(() -> new ColumnBuilder("c", DataType.NUMERIC).withScale(1).withPrecision(99).validate(fmt))
+        ColumnBuilder badPrecision = new ColumnBuilder("c", DataType.NUMERIC).withScale(1).withPrecision(99);
+        assertThatThrownBy(() -> badPrecision.validate(fmt))
             .isInstanceOf(IllegalArgumentException.class);
-        assertThatThrownBy(() -> new ColumnBuilder("c", DataType.TEXT).withAutoNumber(true).validate(fmt))
+        ColumnBuilder textAutoNumber = new ColumnBuilder("c", DataType.TEXT).withAutoNumber(true);
+        assertThatThrownBy(() -> textAutoNumber.validate(fmt))
             .isInstanceOf(IllegalArgumentException.class);
-        assertThatThrownBy(() -> new ColumnBuilder("c", DataType.LONG).withCompressedUnicode(true).validate(fmt))
+        ColumnBuilder longCompressed = new ColumnBuilder("c", DataType.LONG).withCompressedUnicode(true);
+        assertThatThrownBy(() -> longCompressed.validate(fmt))
             .isInstanceOf(IllegalArgumentException.class);
-        assertThatThrownBy(() -> new ColumnBuilder("c", DataType.TEXT).withHyperlink(true).validate(fmt))
+        ColumnBuilder textHyperlink = new ColumnBuilder("c", DataType.TEXT).withHyperlink(true);
+        assertThatThrownBy(() -> textHyperlink.validate(fmt))
             .isInstanceOf(IllegalArgumentException.class);
 
         // valid definitions
@@ -164,11 +173,13 @@ final class ColumnBuilderTest extends AbstractBaseTest {
         JetFormat fmt14 = JetFormat.VERSION_14;
 
         // calculated not supported in older format
-        assertThatThrownBy(() -> new ColumnBuilder("c", DataType.LONG).withCalculated(true).validate(JetFormat.VERSION_4))
+        ColumnBuilder calcOldFmt = new ColumnBuilder("c", DataType.LONG).withCalculated(true);
+        assertThatThrownBy(() -> calcOldFmt.validate(JetFormat.VERSION_4))
             .isInstanceOf(IllegalArgumentException.class);
 
         // no expression
-        assertThatThrownBy(() -> new ColumnBuilder("c", DataType.LONG).withCalculated(true).validate(fmt14))
+        ColumnBuilder calcNoExpr = new ColumnBuilder("c", DataType.LONG).withCalculated(true);
+        assertThatThrownBy(() -> calcNoExpr.validate(fmt14))
             .isInstanceOf(IllegalArgumentException.class);
 
         ColumnBuilder cb = new ColumnBuilder("c", DataType.LONG)

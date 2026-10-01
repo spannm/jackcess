@@ -95,7 +95,8 @@ final class FileChannelTest extends AbstractBaseTest {
         }
         try (MemFileChannel ch = MemFileChannel.newChannel(f.toPath(), StandardOpenOption.READ)) {
             assertThat(ch.size()).isEqualTo(DATA.length);
-            assertThatThrownBy(() -> ch.write(ByteBuffer.wrap(DATA))).isInstanceOf(NonWritableChannelException.class);
+            ByteBuffer writeBuf = ByteBuffer.wrap(DATA);
+            assertThatThrownBy(() -> ch.write(writeBuf)).isInstanceOf(NonWritableChannelException.class);
         }
         try (MemFileChannel ch = MemFileChannel.newChannel(f.toPath(), StandardOpenOption.WRITE)) {
             assertThat(ch.write(ByteBuffer.wrap(DATA), 0L)).isEqualTo(DATA.length);

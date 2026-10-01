@@ -1270,15 +1270,13 @@ final class CursorTest extends AbstractBaseTest {
             doFindFirstByEntry(c, null, "C", 4, "K3");
         }
 
-        assertThatThrownBy(() -> {
-            if (colCount > 2) {
-                c.findFirstRowByEntry("C", 4, "K1", 14);
-            } else if (colCount > 1) {
-                c.findFirstRowByEntry("C", 4, "K1");
-            } else {
-                c.findFirstRowByEntry("C", 4);
-            }
-        }).isInstanceOf(IllegalArgumentException.class);
+        if (colCount > 2) {
+            assertThatThrownBy(() -> c.findFirstRowByEntry("C", 4, "K1", 14)).isInstanceOf(IllegalArgumentException.class);
+        } else if (colCount > 1) {
+            assertThatThrownBy(() -> c.findFirstRowByEntry("C", 4, "K1")).isInstanceOf(IllegalArgumentException.class);
+        } else {
+            assertThatThrownBy(() -> c.findFirstRowByEntry("C", 4)).isInstanceOf(IllegalArgumentException.class);
+        }
 
         doFindByEntryRange(c, 11, 20, "B");
         doFindByEntry(c, new int[] {}, "Z");
