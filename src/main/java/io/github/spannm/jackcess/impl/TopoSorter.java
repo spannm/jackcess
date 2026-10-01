@@ -29,11 +29,11 @@ public abstract class TopoSorter<E> {
 
     private final List<E>       values;
     private final List<Node<E>> nodes    = new ArrayList<>();
-    private final boolean       reverse;
+    private final boolean       reversed;
 
     protected TopoSorter(List<E> values, boolean reverse) {
         this.values = values;
-        this.reverse = reverse;
+        reversed = reverse;
     }
 
     public void sort() {
@@ -77,7 +77,7 @@ public abstract class TopoSorter<E> {
 
         node.mark = PERM_MARK;
 
-        if (reverse) {
+        if (reversed) {
             values.add(node.val);
         } else {
             values.add(0, node.val);
