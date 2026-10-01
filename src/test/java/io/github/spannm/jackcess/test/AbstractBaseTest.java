@@ -70,11 +70,6 @@ public abstract class AbstractBaseTest extends Assertions {
         return Logger.getLogger(AbstractBaseTest.class.getName());
     }
 
-    @BeforeEach
-    public final void setTestMethodName(TestInfo _testInfo) {
-        lastTestInfo = _testInfo;
-    }
-
     protected final String getTestMethodName() {
         if (lastTestInfo != null && lastTestInfo.getTestClass().isPresent()) {
             return lastTestInfo.getTestClass().get().getName() + '.' + lastTestInfo.getTestMethod().get().getName();
@@ -88,7 +83,8 @@ public abstract class AbstractBaseTest extends Assertions {
     }
 
     @BeforeEach
-    public final void logTestBegin(TestInfo _testInfo) {
+    public final void beforeEachTest(TestInfo _testInfo) {
+        lastTestInfo = _testInfo;
         if (!_testInfo.getTestMethod().isPresent() || _testInfo.getDisplayName().startsWith(_testInfo.getTestMethod().get().getName())) {
             getLogger().log(Level.FINE, ">>>> TEST: {0} <<<<", _testInfo.getDisplayName());
         } else {

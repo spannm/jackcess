@@ -172,6 +172,10 @@ public class ToStringBuilder {
             }
         } finally {
             registry.remove(_value); // unregister object
+            if (registry.isEmpty()) {
+                // avoid retaining an (empty) Set in this thread's ThreadLocal storage once unwound
+                OBJ_REGISTRY.remove();
+            }
         }
     }
 

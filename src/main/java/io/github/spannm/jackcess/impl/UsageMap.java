@@ -256,7 +256,7 @@ public final class UsageMap {
             byte b = buffer.get();
             if (b != (byte) 0) {
                 for (int i = 0; i < 8; i++) {
-                    if ((b & 1 << i) != 0) {
+                    if ((b & 0xFF & 1 << i) != 0) {
                         int pageNumberOffset = byteCount * 8 + i + bufferStartPage;
                         int pageNumber = bitIndexToPageNumber(pageNumberOffset, PageChannel.INVALID_PAGE_NUMBER);
                         if (!isPageWithinRange(pageNumber)) {
