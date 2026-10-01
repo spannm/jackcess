@@ -17,7 +17,6 @@
 package io.github.spannm.jackcess.util;
 
 import static io.github.spannm.jackcess.test.Basename.COMP_INDEX;
-import static org.assertj.core.api.Assertions.assertThat;
 
 import io.github.spannm.jackcess.test.AbstractBaseTest;
 import io.github.spannm.jackcess.test.TestDb;

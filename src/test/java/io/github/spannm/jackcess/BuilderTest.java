@@ -15,7 +15,6 @@
  */
 package io.github.spannm.jackcess;
 
-import static org.assertj.core.api.Assertions.assertThat;
 import io.github.spannm.jackcess.Database.FileFormat;
 import io.github.spannm.jackcess.Relationship.JoinType;
 import io.github.spannm.jackcess.impl.JetFormat;
@@ -27,7 +26,6 @@ import org.junit.jupiter.api.Test;
 import java.io.File;
 import java.util.Arrays;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 /**

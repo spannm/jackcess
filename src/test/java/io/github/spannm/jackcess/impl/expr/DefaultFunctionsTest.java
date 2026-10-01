@@ -16,7 +16,6 @@
  */
 package io.github.spannm.jackcess.impl.expr;
 
-import static org.assertj.core.api.Assertions.assertThat;
 import io.github.spannm.jackcess.expr.EvalException;
 import io.github.spannm.jackcess.expr.Expression;
 import io.github.spannm.jackcess.impl.expr.DefaultFunctionsTest.CustomFormatSource.CustomFormatArgumentsProvider;
@@ -39,7 +38,6 @@ import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeFormatterBuilder;
 import java.util.Calendar;
 import java.util.Collections;
-import java.util.List;
 import java.util.Locale;
 import java.util.function.Supplier;
 import java.util.stream.IntStream;

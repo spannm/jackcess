@@ -18,7 +18,6 @@ package io.github.spannm.jackcess;
 
 import static io.github.spannm.jackcess.test.Basename.BIG_INDEX;
 import static io.github.spannm.jackcess.test.Basename.COMP_INDEX;
-import static org.assertj.core.api.Assertions.assertThat;
 
 import io.github.spannm.jackcess.impl.IndexImpl;
 import io.github.spannm.jackcess.impl.TableImpl;

@@ -16,7 +16,6 @@ limitations under the License.
 
 package io.github.spannm.jackcess;
 
-import static org.assertj.core.api.Assertions.assertThat;
 import io.github.spannm.jackcess.impl.ColumnImpl;
 import io.github.spannm.jackcess.impl.JetFormat;
 import io.github.spannm.jackcess.impl.PageChannel;

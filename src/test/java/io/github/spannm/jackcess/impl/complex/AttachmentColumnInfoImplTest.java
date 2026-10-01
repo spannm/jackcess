@@ -15,7 +15,6 @@
  */
 package io.github.spannm.jackcess.impl.complex;
 
-import static org.assertj.core.api.Assertions.assertThat;
 import io.github.spannm.jackcess.complex.Attachment;
 import io.github.spannm.jackcess.test.AbstractBaseTest;
 import org.junit.jupiter.api.Test;

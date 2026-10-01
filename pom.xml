@@ -599,6 +599,13 @@
 
                 <!-- sonar.token>YOUR_TOKEN_HERE</sonar.token -->
 
+                <!-- JetFormat's public fields (PAGE_SIZE, OFFSET_PASSWORD, ...) are long-standing public
+                     API; renaming them to satisfy S116's camelCase convention would break every
+                     downstream consumer (jackcess-encrypt, UCanAccess, ...) for no functional gain. -->
+                <sonar.issue.ignore.multicriteria>e1</sonar.issue.ignore.multicriteria>
+                <sonar.issue.ignore.multicriteria.e1.ruleKey>java:S116</sonar.issue.ignore.multicriteria.e1.ruleKey>
+                <sonar.issue.ignore.multicriteria.e1.resourceKey>**/JetFormat.java</sonar.issue.ignore.multicriteria.e1.resourceKey>
+
                 <basepom.test.skip>true</basepom.test.skip>
                 <basepom.check.skip-all>true</basepom.check.skip-all>
             </properties>

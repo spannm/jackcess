@@ -17,8 +17,6 @@
 package io.github.spannm.jackcess;
 
 import static io.github.spannm.jackcess.DatabaseBuilder.*;
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static io.github.spannm.jackcess.test.Basename.DEL_COL;
 
 import io.github.spannm.jackcess.Database.FileFormat;

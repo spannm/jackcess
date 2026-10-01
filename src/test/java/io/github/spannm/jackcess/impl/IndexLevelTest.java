@@ -17,7 +17,6 @@
 package io.github.spannm.jackcess.impl;
 
 import static io.github.spannm.jackcess.test.Basename.BIG_INDEX;
-import static org.assertj.core.api.Assertions.assertThat;
 
 import io.github.spannm.jackcess.Database;
 import io.github.spannm.jackcess.test.AbstractBaseTest;
