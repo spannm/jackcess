@@ -31,7 +31,7 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 
-class BigIntTest extends AbstractBaseTest {
+final class BigIntTest extends AbstractBaseTest {
 
     @ParameterizedTest(name = "[{index}] {0}")
     @FileFormatSource

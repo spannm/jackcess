@@ -34,7 +34,7 @@ import java.nio.channels.FileChannel;
 import java.nio.channels.NonWritableChannelException;
 import java.nio.file.Files;
 
-class MemFileChannelTest extends AbstractBaseTest {
+final class MemFileChannelTest extends AbstractBaseTest {
 
     @ParameterizedTest(name = "[{index}] {0}")
     @TestDbReadOnlySource(COMP_INDEX)

@@ -27,7 +27,7 @@ import org.junit.jupiter.api.Test;
 /**
  * Tests for {@link ColumnBuilder}.
  */
-class ColumnBuilderTest extends AbstractBaseTest {
+final class ColumnBuilderTest extends AbstractBaseTest {
 
     @Test
     void maxPrecisionAndScale() {

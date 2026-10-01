@@ -27,7 +27,7 @@ import org.junit.jupiter.params.provider.ValueSource;
 import java.io.File;
 import java.nio.file.AccessDeniedException;
 
-class LinkResolverTest extends AbstractBaseTest {
+final class LinkResolverTest extends AbstractBaseTest {
 
     @ParameterizedTest
     @ValueSource(strings = {

@@ -46,7 +46,7 @@ import java.util.function.Supplier;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
-class DefaultFunctionsTest extends AbstractBaseTest {
+final class DefaultFunctionsTest extends AbstractBaseTest {
 
     @ParameterizedTest(name = "[{index}] {0} --> {1}")
     @CsvSource(delimiter = ';', quoteCharacter = '\"', value = {

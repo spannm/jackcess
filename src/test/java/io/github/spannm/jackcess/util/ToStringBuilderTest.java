@@ -29,7 +29,7 @@ import org.junit.jupiter.api.Test;
 import java.util.*;
 
 @SuppressWarnings("checkstyle:MethodName")
-class ToStringBuilderTest {
+final class ToStringBuilderTest {
 
     // Helper types  (must be static top-level or static members of the
     // outermost class; non-static nested @Nested classes cannot own static types)

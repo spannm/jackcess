@@ -33,7 +33,7 @@ import javax.script.SimpleBindings;
  * Verifies that caching of custom (non-predefined) {@code Format()} patterns in {@link FormatUtil} does not return
  * stale results when a context's {@link NumericConfig}/{@link TemporalConfig} changes.
  */
-class FormatUtilTest extends AbstractBaseTest {
+final class FormatUtilTest extends AbstractBaseTest {
 
     @Test
     void customFormatCacheReflectsConfigChanges() {

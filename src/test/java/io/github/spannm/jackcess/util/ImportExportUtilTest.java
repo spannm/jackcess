@@ -36,7 +36,7 @@ import java.util.List;
 /**
  * Additional tests for {@link ExportUtil} and {@link ImportUtil}.
  */
-class ImportExportUtilTest extends AbstractBaseTest {
+final class ImportExportUtilTest extends AbstractBaseTest {
 
     private Database createTestDb() throws IOException {
         Database db = createDbMem(FileFormat.V2000);

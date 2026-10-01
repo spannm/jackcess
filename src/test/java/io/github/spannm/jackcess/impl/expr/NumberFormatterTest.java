@@ -26,7 +26,7 @@ import org.junit.jupiter.params.provider.MethodSource;
 import java.math.BigDecimal;
 import java.util.stream.Stream;
 
-class NumberFormatterTest extends AbstractBaseTest {
+final class NumberFormatterTest extends AbstractBaseTest {
     private final NumberFormatter numFmt = new NumberFormatter(NumericConfig.US_NUMERIC_CONFIG.getDecimalFormatSymbols());
 
     static Stream<Arguments> getDoubleFormatData() {

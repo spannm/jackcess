@@ -40,7 +40,7 @@ import java.util.Locale;
 import javax.script.Bindings;
 import javax.script.SimpleBindings;
 
-class PropertyExpressionTest extends AbstractBaseTest {
+final class PropertyExpressionTest extends AbstractBaseTest {
 
     @ParameterizedTest(name = "[{index}] {0}")
     @FileFormatSource

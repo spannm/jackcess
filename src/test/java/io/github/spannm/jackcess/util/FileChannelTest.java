@@ -34,7 +34,7 @@ import java.nio.file.StandardOpenOption;
 /**
  * Tests for {@link ReadOnlyFileChannel} and additional {@link MemFileChannel} functionality.
  */
-class FileChannelTest extends AbstractBaseTest {
+final class FileChannelTest extends AbstractBaseTest {
 
     private static final byte[] DATA = "0123456789abcdef".getBytes(StandardCharsets.US_ASCII);
 

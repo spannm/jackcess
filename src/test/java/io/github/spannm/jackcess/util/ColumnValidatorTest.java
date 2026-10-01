@@ -30,7 +30,7 @@ import org.junit.jupiter.params.ParameterizedTest;
 import java.util.List;
 import java.util.Map;
 
-class ColumnValidatorTest extends AbstractBaseTest {
+final class ColumnValidatorTest extends AbstractBaseTest {
 
     @ParameterizedTest(name = "[{index}] {0}")
     @FileFormatSource

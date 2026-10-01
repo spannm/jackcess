@@ -30,7 +30,7 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
-class ExportTest extends AbstractBaseTest {
+final class ExportTest extends AbstractBaseTest {
     private static final String NL = System.lineSeparator();
 
     @ParameterizedTest(name = "[{index}] {0}")

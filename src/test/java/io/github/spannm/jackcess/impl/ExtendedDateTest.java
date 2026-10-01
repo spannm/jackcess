@@ -35,7 +35,7 @@ import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 
-class ExtendedDateTest extends AbstractBaseTest {
+final class ExtendedDateTest extends AbstractBaseTest {
 
     @ParameterizedTest(name = "[{index}] {0}")
     @TestDbSource(EXT_DATE)

@@ -36,7 +36,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-class CalcFieldTest extends AbstractBaseTest {
+final class CalcFieldTest extends AbstractBaseTest {
 
     @Test
     void columnBuilder() {

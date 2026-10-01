@@ -34,7 +34,7 @@ import java.util.Set;
 /**
  * Tests for {@link TableBuilder}, {@link IndexBuilder}, {@link RelationshipBuilder} and {@link DatabaseBuilder}.
  */
-class BuilderTest extends AbstractBaseTest {
+final class BuilderTest extends AbstractBaseTest {
 
     @Test
     void tableBuilderEscaping() {

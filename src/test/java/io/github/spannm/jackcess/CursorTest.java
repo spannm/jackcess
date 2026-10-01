@@ -44,7 +44,7 @@ import java.io.UncheckedIOException;
 import java.util.*;
 import java.util.stream.Collectors;
 
-class CursorTest extends AbstractBaseTest {
+final class CursorTest extends AbstractBaseTest {
 
     @BeforeEach
     void setUp() {

@@ -33,7 +33,7 @@ import java.nio.file.AccessDeniedException;
 import java.util.List;
 import java.util.Map;
 
-class LinkedTableTest extends AbstractBaseTest {
+final class LinkedTableTest extends AbstractBaseTest {
 
     @ParameterizedTest(name = "[{index}] {0}")
     @TestDbSource(LINKED)
