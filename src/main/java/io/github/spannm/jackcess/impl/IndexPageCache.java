@@ -1267,7 +1267,13 @@ public class IndexPageCache {
 
         @SuppressWarnings("PMD.MissingOverride")
         public Entry getLast() {
-            return hasChildTail() ? childTailEntry : !getEntries().isEmpty() ? getEntries().get(getEntries().size() - 1) : null;
+            if (hasChildTail()) {
+                return childTailEntry;
+            }
+            if (!getEntries().isEmpty()) {
+                return getEntries().get(getEntries().size() - 1);
+            }
+            return null;
         }
 
         public Entry demoteTail() {
