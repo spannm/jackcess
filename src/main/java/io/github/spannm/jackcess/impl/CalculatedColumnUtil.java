@@ -89,17 +89,6 @@ final class CalculatedColumnUtil {
     }
 
     /**
-     * Wraps the given data bytes with the extra calculated value data and returns a new ByteBuffer containing the final
-     * data.
-     */
-    private static ByteBuffer wrapCalculatedValue(ByteBuffer buffer) {
-        ByteBuffer newBuf = prepareWrappedCalcValue(buffer.remaining(), buffer.order());
-        newBuf.put(buffer);
-        newBuf.rewind();
-        return newBuf;
-    }
-
-    /**
      * Wraps the given data bytes with the extra calculated value data and returns a new byte[] containing the final
      * data.
      */
@@ -235,6 +224,17 @@ final class CalculatedColumnUtil {
         @Override
         protected ByteBuffer writeRealData(Object obj, int remainingRowLength, ByteOrder order) throws IOException {
             return wrapCalculatedValue(super.writeRealData(obj, remainingRowLength, order));
+        }
+
+        /**
+         * Wraps the given data bytes with the extra calculated value data and returns a new ByteBuffer containing the
+         * final data.
+         */
+        private static ByteBuffer wrapCalculatedValue(ByteBuffer buffer) {
+            ByteBuffer newBuf = prepareWrappedCalcValue(buffer.remaining(), buffer.order());
+            newBuf.put(buffer);
+            newBuf.rewind();
+            return newBuf;
         }
     }
 
