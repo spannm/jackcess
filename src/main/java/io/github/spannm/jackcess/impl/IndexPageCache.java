@@ -863,42 +863,6 @@ public class IndexPageCache {
     }
 
     /**
-     * Finds the valid entry prefix given the first/last entries on an index page.
-     *
-     * @param e1 the first entry on the page
-     * @param e2 the last entry on the page
-     *
-     * @return a valid entry prefix for the page
-     */
-    private static byte[] findCommonPrefix(Entry e1, Entry e2) {
-        byte[] b1 = e1.getEntryBytes();
-        byte[] b2 = e2.getEntryBytes();
-
-        int maxLen = b1.length;
-        byte[] prefix = b1;
-        if (b1.length > b2.length) {
-            maxLen = b2.length;
-            prefix = b2;
-        }
-
-        int len = 0;
-        while (len < maxLen && b1[len] == b2[len]) {
-            len++;
-        }
-
-        if (len < prefix.length) {
-            if (len == 0) {
-                return EMPTY_PREFIX;
-            }
-
-            // need new prefix
-            prefix = ByteUtil.copyOf(prefix, len);
-        }
-
-        return prefix;
-    }
-
-    /**
      * Used by unit tests to validate the internal status of the index.
      */
     void validate(boolean forceLoad) throws IOException {
@@ -1096,6 +1060,42 @@ public class IndexPageCache {
         @Override
         public String toString() {
             return ToStringBuilder.builder("DPExtra").append(null, entryView).toString();
+        }
+
+        /**
+         * Finds the valid entry prefix given the first/last entries on an index page.
+         *
+         * @param e1 the first entry on the page
+         * @param e2 the last entry on the page
+         *
+         * @return a valid entry prefix for the page
+         */
+        private static byte[] findCommonPrefix(Entry e1, Entry e2) {
+            byte[] b1 = e1.getEntryBytes();
+            byte[] b2 = e2.getEntryBytes();
+
+            int maxLen = b1.length;
+            byte[] prefix = b1;
+            if (b1.length > b2.length) {
+                maxLen = b2.length;
+                prefix = b2;
+            }
+
+            int len = 0;
+            while (len < maxLen && b1[len] == b2[len]) {
+                len++;
+            }
+
+            if (len < prefix.length) {
+                if (len == 0) {
+                    return EMPTY_PREFIX;
+                }
+
+                // need new prefix
+                prefix = ByteUtil.copyOf(prefix, len);
+            }
+
+            return prefix;
         }
     }
 
