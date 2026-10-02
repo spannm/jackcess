@@ -1812,7 +1812,14 @@ public final class IndexData {
 
         @Override
         protected void writeNonNullValue(Object value, ByteStream bout) {
-            bout.write(ColumnImpl.toBooleanValue(value) ? isAscending() ? ASC_BOOLEAN_TRUE : DESC_BOOLEAN_TRUE : isAscending() ? ASC_BOOLEAN_FALSE : DESC_BOOLEAN_FALSE);
+            boolean boolValue = ColumnImpl.toBooleanValue(value);
+            byte encodedValue;
+            if (boolValue) {
+                encodedValue = isAscending() ? ASC_BOOLEAN_TRUE : DESC_BOOLEAN_TRUE;
+            } else {
+                encodedValue = isAscending() ? ASC_BOOLEAN_FALSE : DESC_BOOLEAN_FALSE;
+            }
+            bout.write(encodedValue);
         }
     }
 
@@ -2134,7 +2141,10 @@ public final class IndexData {
          */
         private static EntryType determineEntryType(byte[] entryBytes, RowIdImpl rowId) {
             if (entryBytes != null) {
-                return rowId.getType() == RowIdImpl.Type.NORMAL ? EntryType.NORMAL : rowId.getType() == RowIdImpl.Type.ALWAYS_FIRST ? EntryType.FIRST_VALID : EntryType.LAST_VALID;
+                if (rowId.getType() == RowIdImpl.Type.NORMAL) {
+                    return EntryType.NORMAL;
+                }
+                return rowId.getType() == RowIdImpl.Type.ALWAYS_FIRST ? EntryType.FIRST_VALID : EntryType.LAST_VALID;
             } else if (!rowId.isValid()) {
                 // this is a "special" entry (first/last)
                 return rowId.getType() == RowIdImpl.Type.ALWAYS_FIRST ? EntryType.ALWAYS_FIRST : EntryType.ALWAYS_LAST;
@@ -2703,7 +2713,7 @@ public final class IndexData {
 
             if (dataPage.equals(other.dataPage)) {
                 // "simple" index comparison (handle between-ness)
-                int idxCmp = idx < other.idx ? -1 : idx > other.idx ? 1 : between == other.between ? 0 : between ? -1 : 1;
+                int idxCmp = getIndexComparison(other);
                 if (idxCmp != 0) {
                     return idxCmp;
                 }
@@ -2711,6 +2721,19 @@ public final class IndexData {
 
             // compare the entries.
             return entry.compareTo(other.entry);
+        }
+
+        private int getIndexComparison(Position other) {
+            if (idx < other.idx) {
+                return -1;
+            }
+            if (idx > other.idx) {
+                return 1;
+            }
+            if (between == other.between) {
+                return 0;
+            }
+            return between ? -1 : 1;
         }
 
         @Override
