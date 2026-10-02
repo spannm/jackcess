@@ -574,9 +574,11 @@ public final class BuiltinOperators {
 
         // for "simple" math, keep as date/times
         if (cType.preferTemporal && (t1.isTemporal() || t2.isTemporal())) {
-            return t1.isTemporal() ? t2.isTemporal()
-                // for mixed temporal types, always go to date/time
-                ? Value.Type.DATE_TIME : t1 : t2;
+            if (!t1.isTemporal()) {
+                return t2;
+            }
+            // for mixed temporal types, always go to date/time
+            return t2.isTemporal() ? Value.Type.DATE_TIME : t1;
         }
 
         return getPreferredNumericType(t1.getPreferredNumericType(), t2.getPreferredNumericType());
