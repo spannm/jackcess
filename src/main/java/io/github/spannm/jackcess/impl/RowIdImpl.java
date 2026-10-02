@@ -71,7 +71,17 @@ public class RowIdImpl implements RowId, Serializable {
     public RowIdImpl(int pageNumber, int rowNumber) {
         this.pageNumber = pageNumber;
         this.rowNumber = rowNumber;
-        type = this.pageNumber == FIRST_PAGE_NUMBER ? Type.ALWAYS_FIRST : this.pageNumber == LAST_PAGE_NUMBER ? Type.ALWAYS_LAST : Type.NORMAL;
+        type = typeForPageNumber(this.pageNumber);
+    }
+
+    private static Type typeForPageNumber(int pageNumber) {
+        if (pageNumber == FIRST_PAGE_NUMBER) {
+            return Type.ALWAYS_FIRST;
+        }
+        if (pageNumber == LAST_PAGE_NUMBER) {
+            return Type.ALWAYS_LAST;
+        }
+        return Type.NORMAL;
     }
 
     public int getPageNumber() {
