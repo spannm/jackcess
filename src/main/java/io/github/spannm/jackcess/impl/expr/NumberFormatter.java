@@ -61,6 +61,12 @@ public class NumberFormatter {
         };
 
         protected abstract void format(StringBuffer sb, int idx);
+
+        private static void maybeInsertExpPlus(StringBuffer sb, int eIdx) {
+            if (sb.charAt(eIdx + 1) != '-') {
+                sb.insert(eIdx + 1, '+');
+            }
+        }
     }
 
     private static final int        FLT_SIG_DIGITS   = 7;
@@ -116,14 +122,6 @@ public class NumberFormatter {
         return decFmt.format(bd.round(DEC_MATH_CONTEXT));
     }
 
-    private static ScientificFormat createScientificFormat(int prec, DecimalFormatSymbols syms) {
-        DecimalFormat df = new DecimalFormat("0.#E00", syms);
-        df.setMaximumIntegerDigits(1);
-        df.setMaximumFractionDigits(prec);
-        df.setRoundingMode(ROUND_MODE);
-        return new ScientificFormat(df);
-    }
-
     private static final class TypeFormatter {
         private final DecimalFormat    df;
         private final ScientificFormat dfS;
@@ -152,11 +150,13 @@ public class NumberFormatter {
 
             return sigDigits > prec ? dfS.format(bd) : df.format(bd);
         }
-    }
 
-    private static void maybeInsertExpPlus(StringBuffer sb, int eIdx) {
-        if (sb.charAt(eIdx + 1) != '-') {
-            sb.insert(eIdx + 1, '+');
+        private static ScientificFormat createScientificFormat(int prec, DecimalFormatSymbols syms) {
+            DecimalFormat df = new DecimalFormat("0.#E00", syms);
+            df.setMaximumIntegerDigits(1);
+            df.setMaximumFractionDigits(prec);
+            df.setRoundingMode(ROUND_MODE);
+            return new ScientificFormat(df);
         }
     }
 
