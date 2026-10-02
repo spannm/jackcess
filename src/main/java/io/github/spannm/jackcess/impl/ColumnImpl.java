@@ -1161,16 +1161,6 @@ public class ColumnImpl implements Column, Comparable<ColumnImpl>, DateTimeConte
         }
     }
 
-    private static Instant toInstant(TemporalAccessor value, DateTimeContext dtc) {
-        if (value instanceof ZonedDateTime) {
-            return ((ZonedDateTime) value).toInstant();
-        }
-        if (value instanceof Instant) {
-            return (Instant) value;
-        }
-        return temporalToLocalDateTime(value, dtc).atZone(dtc.getZoneId()).toInstant();
-    }
-
     static double toLocalDateDouble(long time) {
         time += MILLIS_BETWEEN_EPOCH_AND_1900;
 
@@ -1234,13 +1224,6 @@ public class ColumnImpl implements Column, Comparable<ColumnImpl>, DateTimeConte
      */
     private static long toDateLong(Object value) {
         return value instanceof Date ? ((Date) value).getTime() : value instanceof Calendar ? ((Calendar) value).getTimeInMillis() : ((Number) value).longValue();
-    }
-
-    /**
-     * Gets the timezone offset from UTC to local time for the given time (including DST).
-     */
-    private static long getToLocalTimeZoneOffset(long time, TimeZone tz) {
-        return tz.getOffset(time);
     }
 
     /**
@@ -2600,6 +2583,23 @@ public class ColumnImpl implements Column, Comparable<ColumnImpl>, DateTimeConte
         @Override
         public Object toInternalValue(DatabaseImpl db, Object value) {
             return value instanceof Date ? value : new Date(toDateLong(value));
+        }
+
+        private static Instant toInstant(TemporalAccessor value, DateTimeContext dtc) {
+            if (value instanceof ZonedDateTime) {
+                return ((ZonedDateTime) value).toInstant();
+            }
+            if (value instanceof Instant) {
+                return (Instant) value;
+            }
+            return temporalToLocalDateTime(value, dtc).atZone(dtc.getZoneId()).toInstant();
+        }
+
+        /**
+         * Gets the timezone offset from UTC to local time for the given time (including DST).
+         */
+        private static long getToLocalTimeZoneOffset(long time, TimeZone tz) {
+            return tz.getOffset(time);
         }
     }
 
