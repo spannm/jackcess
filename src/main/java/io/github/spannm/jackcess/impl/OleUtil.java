@@ -280,60 +280,6 @@ public final class OleUtil {
         return footerBytes;
     }
 
-    /**
-     * creates the appropriate ContentImpl for the given blob.
-     */
-    private static ContentImpl parseContent(OleBlobImpl blob) throws IOException {
-        ByteBuffer bb = PageChannel.wrap(blob.getBytes());
-
-        if (bb.remaining() < 2 || bb.getShort() != PACKAGE_SIGNATURE) {
-            return new UnknownContentImpl(blob);
-        }
-
-        // read outer package header
-        int headerSize = bb.getShort();
-        /* int objType = */ bb.getInt();
-        int prettyNameLen = bb.getShort();
-        int classNameLen = bb.getShort();
-        int prettyNameOff = bb.getShort();
-        int classNameOff = bb.getShort();
-        /* int objSize = */ bb.getInt();
-        String prettyName = readStr(bb, prettyNameOff, prettyNameLen);
-        String className = readStr(bb, classNameOff, classNameLen);
-        bb.position(headerSize);
-
-        // read ole header
-        int oleVer = bb.getInt();
-        /* int format = */ bb.getInt();
-
-        if (oleVer != OLE_VERSION) {
-            return new UnknownContentImpl(blob);
-        }
-
-        int typeNameLen = bb.getInt();
-        String typeName = readStr(bb, bb.position(), typeNameLen);
-        bb.getLong(); // unused
-        int dataBlockLen = bb.getInt();
-        int dataBlockPos = bb.position();
-
-        if (SIMPLE_PACKAGE_TYPE.equalsIgnoreCase(typeName)) {
-            return createSimplePackageContent(blob, prettyName, className, typeName, bb, dataBlockLen);
-        }
-
-        // if COMPOUND_FACTORY is null, the poi library isn't available, so just
-        // load compound data as "other"
-        if (COMPOUND_FACTORY != null
-            && bb.remaining() >= COMPOUND_STORAGE_SIGNATURE.length
-            && ByteUtil.matchesRange(bb, bb.position(), COMPOUND_STORAGE_SIGNATURE)) {
-            return COMPOUND_FACTORY.createCompoundPackageContent(
-                blob, prettyName, className, typeName, bb, dataBlockLen);
-        }
-
-        // this is either some other "special" (as yet unhandled) format, or it is
-        // simply an embedded file (or it is compound data and poi isn't available)
-        return new OtherContentImpl(blob, prettyName, className, typeName, dataBlockPos, dataBlockLen);
-    }
-
     private static ContentImpl createSimplePackageContent(OleBlobImpl blob, String prettyName, String className, String typeName, ByteBuffer blobBb, int dataBlockLen) {
 
         int dataBlockPos = blobBb.position();
@@ -458,9 +404,63 @@ public final class OleUtil {
         @Override
         public Content getContent() throws IOException {
             if (content == null) {
-                content = parseContent(this);
+                content = parseContent();
             }
             return content;
+        }
+
+        /**
+         * creates the appropriate ContentImpl for this blob.
+         */
+        private ContentImpl parseContent() throws IOException {
+            ByteBuffer bb = PageChannel.wrap(getBytes());
+
+            if (bb.remaining() < 2 || bb.getShort() != PACKAGE_SIGNATURE) {
+                return new UnknownContentImpl(this);
+            }
+
+            // read outer package header
+            int headerSize = bb.getShort();
+            /* int objType = */ bb.getInt();
+            int prettyNameLen = bb.getShort();
+            int classNameLen = bb.getShort();
+            int prettyNameOff = bb.getShort();
+            int classNameOff = bb.getShort();
+            /* int objSize = */ bb.getInt();
+            String prettyName = readStr(bb, prettyNameOff, prettyNameLen);
+            String className = readStr(bb, classNameOff, classNameLen);
+            bb.position(headerSize);
+
+            // read ole header
+            int oleVer = bb.getInt();
+            /* int format = */ bb.getInt();
+
+            if (oleVer != OLE_VERSION) {
+                return new UnknownContentImpl(this);
+            }
+
+            int typeNameLen = bb.getInt();
+            String typeName = readStr(bb, bb.position(), typeNameLen);
+            bb.getLong(); // unused
+            int dataBlockLen = bb.getInt();
+            int dataBlockPos = bb.position();
+
+            if (SIMPLE_PACKAGE_TYPE.equalsIgnoreCase(typeName)) {
+                return createSimplePackageContent(this, prettyName, className, typeName, bb, dataBlockLen);
+            }
+
+            // if COMPOUND_FACTORY is null, the poi library isn't available, so just
+            // load compound data as "other"
+            if (COMPOUND_FACTORY != null
+                && bb.remaining() >= COMPOUND_STORAGE_SIGNATURE.length
+                && ByteUtil.matchesRange(bb, bb.position(), COMPOUND_STORAGE_SIGNATURE)) {
+                return COMPOUND_FACTORY.createCompoundPackageContent(
+                    this, prettyName, className, typeName, bb, dataBlockLen);
+            }
+
+            // this is either some other "special" (as yet unhandled) format, or it is
+            // simply an embedded file (or it is compound data and poi isn't available)
+            return new OtherContentImpl(this, prettyName, className, typeName, dataBlockPos, dataBlockLen);
         }
 
         @Override
