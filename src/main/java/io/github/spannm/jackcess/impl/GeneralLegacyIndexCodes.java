@@ -180,6 +180,72 @@ public class GeneralLegacyIndexCodes {
         }
 
         public abstract CharHandler parseCodes(String[] codeStrings);
+
+        /**
+         * Returns a SimpleCharHandler parsed from the given index code strings.
+         */
+        private static CharHandler parseSimpleCodes(String[] codeStrings) {
+            if (codeStrings.length != 1) {
+                throw new IllegalStateException("Unexpected code strings " + Arrays.toString(codeStrings));
+            }
+            return new SimpleCharHandler(codesToBytes(codeStrings[0], true));
+        }
+
+        /**
+         * Returns an InternationalCharHandler parsed from the given index code strings.
+         */
+        private static CharHandler parseInternationalCodes(String[] codeStrings) {
+            if (codeStrings.length != 2) {
+                throw new IllegalStateException("Unexpected code strings " + Arrays.toString(codeStrings));
+            }
+            return new InternationalCharHandler(codesToBytes(codeStrings[0], true), codesToBytes(codeStrings[1], true));
+        }
+
+        /**
+         * Returns a UnprintableCharHandler parsed from the given index code strings.
+         */
+        private static CharHandler parseUnprintableCodes(String[] codeStrings) {
+            if (codeStrings.length != 1) {
+                throw new IllegalStateException("Unexpected code strings " + Arrays.toString(codeStrings));
+            }
+            return new UnprintableCharHandler(codesToBytes(codeStrings[0], true));
+        }
+
+        /**
+         * Returns a UnprintableExtCharHandler parsed from the given index code strings.
+         */
+        private static CharHandler parseUnprintableExtCodes(String[] codeStrings) {
+            if (codeStrings.length != 1) {
+                throw new IllegalStateException("Unexpected code strings " + Arrays.toString(codeStrings));
+            }
+            byte[] bytes = codesToBytes(codeStrings[0], true);
+            if (bytes.length != 1) {
+                throw new IllegalStateException("Unexpected code strings " + Arrays.toString(codeStrings));
+            }
+            return new UnprintableExtCharHandler(bytes[0]);
+        }
+
+        /**
+         * Returns a InternationalExtCharHandler parsed from the given index code strings.
+         */
+        private static CharHandler parseInternationalExtCodes(String[] codeStrings) {
+            if (codeStrings.length != 3) {
+                throw new IllegalStateException("Unexpected code strings " + Arrays.toString(codeStrings));
+            }
+
+            byte crazyFlag = "1".equals(codeStrings[2]) ? CRAZY_CODE_1 : CRAZY_CODE_2;
+            return new InternationalExtCharHandler(codesToBytes(codeStrings[0], true), codesToBytes(codeStrings[1], false), crazyFlag);
+        }
+
+        /**
+         * Returns a SignificantCharHandler parsed from the given index code strings.
+         */
+        private static CharHandler parseSignificantCodes(String[] codeStrings) {
+            if (codeStrings.length != 1) {
+                throw new IllegalStateException("Unexpected code strings " + Arrays.toString(codeStrings));
+            }
+            return new SignificantCharHandler(codesToBytes(codeStrings[0], true));
+        }
     }
 
     /**
@@ -529,72 +595,6 @@ public class GeneralLegacyIndexCodes {
         String prefix = codeLine.substring(0, 1);
         String suffix = codeLine.length() > 1 ? codeLine.substring(1) : "";
         return prefixMap.get(prefix).parseCodes(suffix.split(",", -1));
-    }
-
-    /**
-     * Returns a SimpleCharHandler parsed from the given index code strings.
-     */
-    private static CharHandler parseSimpleCodes(String[] codeStrings) {
-        if (codeStrings.length != 1) {
-            throw new IllegalStateException("Unexpected code strings " + Arrays.toString(codeStrings));
-        }
-        return new SimpleCharHandler(codesToBytes(codeStrings[0], true));
-    }
-
-    /**
-     * Returns an InternationalCharHandler parsed from the given index code strings.
-     */
-    private static CharHandler parseInternationalCodes(String[] codeStrings) {
-        if (codeStrings.length != 2) {
-            throw new IllegalStateException("Unexpected code strings " + Arrays.toString(codeStrings));
-        }
-        return new InternationalCharHandler(codesToBytes(codeStrings[0], true), codesToBytes(codeStrings[1], true));
-    }
-
-    /**
-     * Returns a UnprintableCharHandler parsed from the given index code strings.
-     */
-    private static CharHandler parseUnprintableCodes(String[] codeStrings) {
-        if (codeStrings.length != 1) {
-            throw new IllegalStateException("Unexpected code strings " + Arrays.toString(codeStrings));
-        }
-        return new UnprintableCharHandler(codesToBytes(codeStrings[0], true));
-    }
-
-    /**
-     * Returns a UnprintableExtCharHandler parsed from the given index code strings.
-     */
-    private static CharHandler parseUnprintableExtCodes(String[] codeStrings) {
-        if (codeStrings.length != 1) {
-            throw new IllegalStateException("Unexpected code strings " + Arrays.toString(codeStrings));
-        }
-        byte[] bytes = codesToBytes(codeStrings[0], true);
-        if (bytes.length != 1) {
-            throw new IllegalStateException("Unexpected code strings " + Arrays.toString(codeStrings));
-        }
-        return new UnprintableExtCharHandler(bytes[0]);
-    }
-
-    /**
-     * Returns a InternationalExtCharHandler parsed from the given index code strings.
-     */
-    private static CharHandler parseInternationalExtCodes(String[] codeStrings) {
-        if (codeStrings.length != 3) {
-            throw new IllegalStateException("Unexpected code strings " + Arrays.toString(codeStrings));
-        }
-
-        byte crazyFlag = "1".equals(codeStrings[2]) ? CRAZY_CODE_1 : CRAZY_CODE_2;
-        return new InternationalExtCharHandler(codesToBytes(codeStrings[0], true), codesToBytes(codeStrings[1], false), crazyFlag);
-    }
-
-    /**
-     * Returns a SignificantCharHandler parsed from the given index code strings.
-     */
-    private static CharHandler parseSignificantCodes(String[] codeStrings) {
-        if (codeStrings.length != 1) {
-            throw new IllegalStateException("Unexpected code strings " + Arrays.toString(codeStrings));
-        }
-        return new SignificantCharHandler(codesToBytes(codeStrings[0], true));
     }
 
     /**
