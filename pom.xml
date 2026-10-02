@@ -446,6 +446,30 @@
                 <artifactId>cyclonedx-maven-plugin</artifactId>
             </plugin>
 
+            <plugin>
+                <!-- basepom already wires jacoco:prepare-agent by default (into basepom.coverage.test-args,
+                     which the surefire configuration below appends to its argLine); only the XML report
+                     generation is missing, needed so SonarCloud can read coverage from the default
+                     target/site/jacoco path during `mvn verify` (not just `mvn site`). -->
+                <groupId>org.jacoco</groupId>
+                <artifactId>jacoco-maven-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>jacoco-report</id>
+                        <phase>test</phase>
+                        <goals>
+                            <goal>report</goal>
+                        </goals>
+                        <configuration>
+                            <formats>
+                                <format>XML</format>
+                                <format>HTML</format>
+                            </formats>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+
         </plugins>
 
     </build>
@@ -606,8 +630,12 @@
                 <sonar.issue.ignore.multicriteria.e1.ruleKey>java:S116</sonar.issue.ignore.multicriteria.e1.ruleKey>
                 <sonar.issue.ignore.multicriteria.e1.resourceKey>**/JetFormat.java</sonar.issue.ignore.multicriteria.e1.resourceKey>
 
-                <basepom.test.skip>true</basepom.test.skip>
+                <!-- tests must run (not skipped) so jacoco produces real coverage data for Sonar's
+                     new-code coverage gate; static-analysis checks are still skipped since Sonar
+                     covers that itself, but skip-coverage is pinned back to false since it also
+                     cascades from skip-all and would otherwise disable jacoco's prepare-agent. -->
                 <basepom.check.skip-all>true</basepom.check.skip-all>
+                <basepom.check.skip-coverage>false</basepom.check.skip-coverage>
             </properties>
             <build>
                 <plugins>
