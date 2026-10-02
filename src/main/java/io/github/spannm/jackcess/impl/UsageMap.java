@@ -321,42 +321,6 @@ public final class UsageMap {
         buffer.put(startOffset + offset, b);
     }
 
-    /**
-     * Promotes and inline usage map to a reference usage map.
-     */
-    private void promoteInlineHandlerToReferenceHandler(int newPageNumber) throws IOException {
-        // copy current page number info to new references and then clear old
-        int oldStartPage = startPage;
-        BitSet oldPageNumbers = (BitSet) pageNumbers.clone();
-
-        // clear out the main table (inline usage map data and start page)
-        clearTableAndPages();
-
-        // set the new map type
-        tableBuffer.put(getRowStart(), MAP_TYPE_REFERENCE);
-
-        // write the new table data
-        writeTable();
-
-        // set new handler
-        handler = new ReferenceHandler();
-
-        // update new handler with old data
-        reAddPages(oldStartPage, oldPageNumbers, newPageNumber);
-    }
-
-    private void reAddPages(int oldStartPage, BitSet oldPageNumbers, int newPageNumber) throws IOException {
-        // add all the old pages back in
-        for (int i = oldPageNumbers.nextSetBit(0); i >= 0; i = oldPageNumbers.nextSetBit(i + 1)) {
-            addPageNumber(oldStartPage + i);
-        }
-
-        if (newPageNumber > PageChannel.INVALID_PAGE_NUMBER) {
-            // and then add the new page
-            addPageNumber(newPageNumber);
-        }
-    }
-
     @Override
     public String toString() {
 
@@ -538,6 +502,42 @@ public final class UsageMap {
             // put the pages back in
             reAddPages(oldStartPage, oldPageNumbers, newPageNumber);
         }
+
+        /**
+         * Promotes and inline usage map to a reference usage map.
+         */
+        private void promoteInlineHandlerToReferenceHandler(int newPageNumber) throws IOException {
+            // copy current page number info to new references and then clear old
+            int oldStartPage = startPage;
+            BitSet oldPageNumbers = (BitSet) pageNumbers.clone();
+
+            // clear out the main table (inline usage map data and start page)
+            clearTableAndPages();
+
+            // set the new map type
+            tableBuffer.put(getRowStart(), MAP_TYPE_REFERENCE);
+
+            // write the new table data
+            writeTable();
+
+            // set new handler
+            handler = new ReferenceHandler();
+
+            // update new handler with old data
+            reAddPages(oldStartPage, oldPageNumbers, newPageNumber);
+        }
+
+        private void reAddPages(int oldStartPage, BitSet oldPageNumbers, int newPageNumber) throws IOException {
+            // add all the old pages back in
+            for (int i = oldPageNumbers.nextSetBit(0); i >= 0; i = oldPageNumbers.nextSetBit(i + 1)) {
+                addPageNumber(oldStartPage + i);
+            }
+
+            if (newPageNumber > PageChannel.INVALID_PAGE_NUMBER) {
+                // and then add the new page
+                addPageNumber(newPageNumber);
+            }
+        }
     }
 
     /**
@@ -569,39 +569,39 @@ public final class UsageMap {
                 // a page is being allocated outside the inline range. the inline
                 // global map (anchored at page 0) can no longer describe the extent
                 // of the database, so promote it to a reference usage map.
-                promoteGlobalInlineHandlerToReferenceHandler(pageNumber);
+                promoteToReferenceHandler(pageNumber);
             }
         }
-    }
 
-    /**
-     * Promotes the global usage map from an inline map to a reference map. This is done once the database grows
-     * beyond what an inline global usage map can represent (i.e. a page is allocated outside the inline map's range).
-     * The new reference map is seeded so that every page up to the current allocation frontier is marked "used" and
-     * all higher pages remain "free" (the append-only global inline map only ever tracked free pages ahead of the
-     * allocation frontier).
-     *
-     * @param frontierPageNumber the page currently being allocated, which is the highest page in the database
-     */
-    private void promoteGlobalInlineHandlerToReferenceHandler(int frontierPageNumber) throws IOException {
-        // clear out the main table (inline usage map data and start page) and
-        // switch the map type to reference. note, the existing usage map row is
-        // large enough to hold the reference page pointers, so it does not need
-        // to be resized.
-        clearTableAndPages();
-        tableBuffer.put(getRowStart(), MAP_TYPE_REFERENCE);
-        writeTable();
+        /**
+         * Promotes the global usage map from an inline map to a reference map. This is done once the database grows
+         * beyond what an inline global usage map can represent (i.e. a page is allocated outside the inline map's range).
+         * The new reference map is seeded so that every page up to the current allocation frontier is marked "used" and
+         * all higher pages remain "free" (the append-only global inline map only ever tracked free pages ahead of the
+         * allocation frontier).
+         *
+         * @param frontierPageNumber the page currently being allocated, which is the highest page in the database
+         */
+        private void promoteToReferenceHandler(int frontierPageNumber) throws IOException {
+            // clear out the main table (inline usage map data and start page) and
+            // switch the map type to reference. note, the existing usage map row is
+            // large enough to hold the reference page pointers, so it does not need
+            // to be resized.
+            clearTableAndPages();
+            tableBuffer.put(getRowStart(), MAP_TYPE_REFERENCE);
+            writeTable();
 
-        // install the global reference handler (which starts with no backing
-        // pages, so all pages are initially "free")
-        handler = new GlobalReferenceHandler();
+            // install the global reference handler (which starts with no backing
+            // pages, so all pages are initially "free")
+            handler = new GlobalReferenceHandler();
 
-        // seed the new map: mark every page from 0 up to (and including) the
-        // current frontier as "used". all higher pages remain "free". note, this
-        // may re-mark a few previously freed pages as used, but (as with the prior
-        // inline behavior) leaving small holes behind is acceptable.
-        for (int pageNumber = 0; pageNumber <= frontierPageNumber; ++pageNumber) {
-            handler.addOrRemovePageNumber(pageNumber, false, true);
+            // seed the new map: mark every page from 0 up to (and including) the
+            // current frontier as "used". all higher pages remain "free". note, this
+            // may re-mark a few previously freed pages as used, but (as with the prior
+            // inline behavior) leaving small holes behind is acceptable.
+            for (int pageNumber = 0; pageNumber <= frontierPageNumber; ++pageNumber) {
+                handler.addOrRemovePageNumber(pageNumber, false, true);
+            }
         }
     }
 
