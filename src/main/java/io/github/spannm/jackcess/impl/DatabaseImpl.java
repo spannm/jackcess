@@ -680,7 +680,12 @@ public class DatabaseImpl implements Database, DateTimeContext {
      *             does not denote an existing, writable regular file and a new regular file of that name cannot be created, or if some other error occurs while opening or creating the file
      */
     static FileChannel openChannel(Path mdbFile, boolean readOnly, boolean create) throws IOException {
-        OpenOption[] opts = readOnly ? RO_CHANNEL_OPTS : create ? RWC_CHANNEL_OPTS : RW_CHANNEL_OPTS;
+        OpenOption[] opts;
+        if (readOnly) {
+            opts = RO_CHANNEL_OPTS;
+        } else {
+            opts = create ? RWC_CHANNEL_OPTS : RW_CHANNEL_OPTS;
+        }
         return FileChannel.open(mdbFile, opts);
     }
 
