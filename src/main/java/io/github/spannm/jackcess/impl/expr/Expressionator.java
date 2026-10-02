@@ -1138,14 +1138,6 @@ public final class Expressionator {
         }
     }
 
-    private static boolean isHigherPrecendence(OpType op1, OpType op2) {
-        int prec1 = PRECENDENCE.get(op1);
-        int prec2 = PRECENDENCE.get(op2);
-
-        // higher preceendence ops have lower numbers
-        return prec1 < prec2;
-    }
-
     private static Map<OpType, Integer> buildPrecedenceMap(OpType[]... opArrs) {
         Map<OpType, Integer> prec = new HashMap<>();
 
@@ -1167,22 +1159,6 @@ public final class Expressionator {
             sb.append(sep);
             iter.next().toString(ctx, sb, isDebug);
         }
-    }
-
-    private static Value[] exprListToValues(List<Expr> exprs, EvalContext ctx) {
-        Value[] paramVals = new Value[exprs.size()];
-        for (int i = 0; i < exprs.size(); ++i) {
-            paramVals[i] = exprs.get(i).eval(ctx);
-        }
-        return paramVals;
-    }
-
-    private static Value[] exprListToDelayedValues(List<Expr> exprs, EvalContext ctx) {
-        Value[] paramVals = new Value[exprs.size()];
-        for (int i = 0; i < exprs.size(); ++i) {
-            paramVals[i] = new DelayedValue(exprs.get(i), ctx);
-        }
-        return paramVals;
     }
 
     private static boolean areConstant(List<Expr> exprs) {
@@ -1273,25 +1249,6 @@ public final class Expressionator {
 
     public static boolean isRegexSpecialChar(char c) {
         return REGEX_SPEC_CHARS.contains(c);
-    }
-
-    private static Value toLiteralValue(Value.Type valType, Object value) {
-        switch (valType) {
-            case STRING:
-                return ValueSupport.toValue((String) value);
-            case DATE:
-            case TIME:
-            case DATE_TIME:
-                return ValueSupport.toValue(valType, (LocalDateTime) value);
-            case LONG:
-                return ValueSupport.toValue((Integer) value);
-            case DOUBLE:
-                return ValueSupport.toValue((Double) value);
-            case BIG_DEC:
-                return ValueSupport.toValue((BigDecimal) value);
-            default:
-                throw new ParseException("unexpected literal type " + valType);
-        }
     }
 
     private static boolean isLiteralDefaultValue(TokBuf buf, Value.Type resultType, String exprStr) {
@@ -1432,6 +1389,14 @@ public final class Expressionator {
 
         @SuppressWarnings("PMD.LinguisticNaming")
         protected abstract void toExprString(LocaleContext ctx, StringBuilder sb, boolean isDebug);
+
+        private static boolean isHigherPrecendence(OpType op1, OpType op2) {
+            int prec1 = PRECENDENCE.get(op1);
+            int prec2 = PRECENDENCE.get(op2);
+
+            // higher preceendence ops have lower numbers
+            return prec1 < prec2;
+        }
     }
 
     private static final class EConstValue extends Expr {
@@ -1493,6 +1458,25 @@ public final class Expressionator {
 
         private ELiteralValue(Value.Type valType, Object value) {
             val = toLiteralValue(valType, value);
+        }
+
+        private static Value toLiteralValue(Value.Type valType, Object value) {
+            switch (valType) {
+                case STRING:
+                    return ValueSupport.toValue((String) value);
+                case DATE:
+                case TIME:
+                case DATE_TIME:
+                    return ValueSupport.toValue(valType, (LocalDateTime) value);
+                case LONG:
+                    return ValueSupport.toValue((Integer) value);
+                case DOUBLE:
+                    return ValueSupport.toValue((Double) value);
+                case BIG_DEC:
+                    return ValueSupport.toValue((BigDecimal) value);
+                default:
+                    throw new ParseException("unexpected literal type " + valType);
+            }
         }
 
         @Override
@@ -1620,6 +1604,14 @@ public final class Expressionator {
             }
 
             sb.append(')');
+        }
+
+        private static Value[] exprListToValues(List<Expr> exprs, EvalContext ctx) {
+            Value[] paramVals = new Value[exprs.size()];
+            for (int i = 0; i < exprs.size(); ++i) {
+                paramVals[i] = exprs.get(i).eval(ctx);
+            }
+            return paramVals;
         }
     }
 
@@ -1906,6 +1898,14 @@ public final class Expressionator {
             appendLeadingExpr(expr, ctx, sb, isDebug).append(op).append(" (");
             exprListToString(exprs, ",", ctx, sb, isDebug);
             sb.append(')');
+        }
+
+        private static Value[] exprListToDelayedValues(List<Expr> exprs, EvalContext ctx) {
+            Value[] paramVals = new Value[exprs.size()];
+            for (int i = 0; i < exprs.size(); ++i) {
+                paramVals[i] = new DelayedValue(exprs.get(i), ctx);
+            }
+            return paramVals;
         }
     }
 

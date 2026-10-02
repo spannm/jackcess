@@ -64,17 +64,6 @@ public class RandomContext {
         return rnd.get();
     }
 
-    private float withLast(float _lastVal) {
-        lastVal = _lastVal;
-        return _lastVal;
-    }
-
-    private void reset() {
-        if (rnds != null) {
-            rnds.clear();
-        }
-    }
-
     private static Random createRandom(long seed) {
         // TODO, support SecureRandom?
         return new Random(seed);
@@ -86,6 +75,11 @@ public class RandomContext {
         }
 
         protected abstract float getImpl();
+
+        private float withLast(float _lastVal) {
+            lastVal = _lastVal;
+            return _lastVal;
+        }
     }
 
     private final class SimpleSource extends Source {
@@ -112,6 +106,12 @@ public class RandomContext {
         protected float getImpl() {
             reset();
             return mval;
+        }
+
+        private void reset() {
+            if (rnds != null) {
+                rnds.clear();
+            }
         }
     }
 
