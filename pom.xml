@@ -117,7 +117,7 @@
 
         <!-- additional plugins not defined in parent -->
         <dep.plugin.sortpom.version>4.0.0</dep.plugin.sortpom.version>
-        <dep.plugin.sonar.version>5.5.0.6356</dep.plugin.sonar.version>
+        <dep.plugin.sonar.version>5.8.0.7211</dep.plugin.sonar.version>
         <dep.plugin.cyclonedx.version>2.9.3</dep.plugin.cyclonedx.version>
         <dep.plugin.versions.version>2.22.0</dep.plugin.versions.version>
         <dep.plugin.figlet.version>1.0.0</dep.plugin.figlet.version>
