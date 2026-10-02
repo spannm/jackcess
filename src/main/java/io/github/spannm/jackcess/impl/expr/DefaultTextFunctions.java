@@ -348,7 +348,10 @@ public class DefaultTextFunctions {
             boolean ignoreCase = getIgnoreCase(ctx, params, 2);
             int cmp = ignoreCase ? s1.compareToIgnoreCase(s2) : s1.compareTo(s2);
             // stupid java doesn't return 1, -1, 0...
-            return cmp < 0 ? ValueSupport.NEG_ONE_VAL : cmp > 0 ? ValueSupport.ONE_VAL : ValueSupport.ZERO_VAL;
+            if (cmp < 0) {
+                return ValueSupport.NEG_ONE_VAL;
+            }
+            return cmp > 0 ? ValueSupport.ONE_VAL : ValueSupport.ZERO_VAL;
         }
     });
 
