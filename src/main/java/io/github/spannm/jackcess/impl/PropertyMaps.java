@@ -174,6 +174,8 @@ public class PropertyMaps implements Iterable<PropertyMapImpl> {
      * Utility class for reading/writing property blocks.
      */
     static final class Handler {
+        /** read() treats a null byte[] and an empty one identically, so write() can safely use this for "nothing to write". */
+        private static final byte[]             NO_PROPS = new byte[0];
         /** the current database */
         private final DatabaseImpl              database;
         /** the system table "property" column */
@@ -238,7 +240,7 @@ public class PropertyMaps implements Iterable<PropertyMapImpl> {
          */
         public byte[] write(PropertyMaps maps) throws IOException {
             if (maps == null) {
-                return null;
+                return NO_PROPS;
             }
 
             ByteArrayBuilder bab = new ByteArrayBuilder();
@@ -254,7 +256,7 @@ public class PropertyMaps implements Iterable<PropertyMapImpl> {
             }
 
             if (propNames.isEmpty()) {
-                return null;
+                return NO_PROPS;
             }
 
             // write the full set of property names
