@@ -147,7 +147,10 @@ public class DefaultNumberFunctions {
             } else {
                 val = param1.getAsBigDecimal(ctx).signum();
             }
-            return val > 0 ? ValueSupport.ONE_VAL : val < 0 ? ValueSupport.NEG_ONE_VAL : ValueSupport.ZERO_VAL;
+            if (val > 0) {
+                return ValueSupport.ONE_VAL;
+            }
+            return val < 0 ? ValueSupport.NEG_ONE_VAL : ValueSupport.ZERO_VAL;
         }
     });
 

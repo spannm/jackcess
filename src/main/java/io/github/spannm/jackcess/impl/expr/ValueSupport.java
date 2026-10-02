@@ -128,7 +128,10 @@ public final class ValueSupport {
         boolean hasDate = !ColumnImpl.BASE_LD.equals(ldt.toLocalDate());
         boolean hasTime = !ColumnImpl.BASE_LT.equals(ldt.toLocalTime());
 
-        return hasDate ? hasTime ? Value.Type.DATE_TIME : Value.Type.DATE : Value.Type.TIME;
+        if (!hasDate) {
+            return Value.Type.TIME;
+        }
+        return hasTime ? Value.Type.DATE_TIME : Value.Type.DATE;
     }
 
     public static DateTimeFormatter getDateFormatForType(LocaleContext ctx, Value.Type type) {

@@ -1450,7 +1450,10 @@ public final class FormatUtil {
             BigDecimal bd = args.getAsBigDecimal();
             int cmp = BigDecimal.ZERO.compareTo(bd);
 
-            return cmp < 0 ? formatPos(bd, args) : cmp > 0 ? formatNeg(bd, args) : formatZero(bd, args);
+            if (cmp < 0) {
+                return formatPos(bd, args);
+            }
+            return cmp > 0 ? formatNeg(bd, args) : formatZero(bd, args);
         }
 
         protected abstract Value formatNull(Args args);
