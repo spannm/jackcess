@@ -163,7 +163,10 @@ public class ColumnBuilder {
     }
 
     public short getLength() {
-        return length != null ? length : (short) (!type.isVariableLength() ? type.getFixedSize() : type.getDefaultSize());
+        if (length != null) {
+            return length;
+        }
+        return (short) (type.isVariableLength() ? type.getDefaultSize() : type.getFixedSize());
     }
 
     /**
