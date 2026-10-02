@@ -1223,7 +1223,13 @@ public class ColumnImpl implements Column, Comparable<ColumnImpl>, DateTimeConte
      * @return an appropriate Date long value for the given object
      */
     private static long toDateLong(Object value) {
-        return value instanceof Date ? ((Date) value).getTime() : value instanceof Calendar ? ((Calendar) value).getTimeInMillis() : ((Number) value).longValue();
+        if (value instanceof Date) {
+            return ((Date) value).getTime();
+        }
+        if (value instanceof Calendar) {
+            return ((Calendar) value).getTimeInMillis();
+        }
+        return ((Number) value).longValue();
     }
 
     /**
