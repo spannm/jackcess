@@ -175,8 +175,8 @@ final class LongValueTest extends AbstractBaseTest {
                 .addColumn(new ColumnBuilder("c").withSqlType(Types.VARCHAR))
                 .toTable(db);
 
-            String lval = createString(2000); // "--2000 chars long text--";
-            String tval = createString(40); // "--40chars long text--";
+            String lval = createString(2000);
+            String tval = createString(40);
             newTable.addRow(1, lval, tval);
 
             newTable = db.getTable("NewTable");

@@ -1230,7 +1230,6 @@ final class CursorTest extends AbstractBaseTest {
             int id = 1;
             for (String str : Arrays.asList("A", "B", "C", "D")) {
                 for (int i = 4; i >= 0; --i) {
-                    // for(int i = 0; i < 5; i++) {
                     for (int j = 1; j < 3; j++) {
                         t.addRow(id, str, i, "K" + j, "value" + id);
                         id++;

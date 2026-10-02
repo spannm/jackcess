@@ -531,7 +531,7 @@ final class DatabaseTest extends AbstractBaseTest {
             assertThat(((TableImpl) t).getOwnedPagesCursor().getUsageMap().toString())
                     .startsWith("InlineHandler");
 
-            String lval = createNonAsciiString(255); // "--255 chars long text--";
+            String lval = createNonAsciiString(255);
 
             ((DatabaseImpl) db).getPageChannel().startWrite();
             try {

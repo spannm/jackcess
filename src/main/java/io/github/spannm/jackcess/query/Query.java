@@ -89,11 +89,6 @@ public interface Query {
 
     int getObjectFlag();
 
-    /**
-     * Returns the rows from the system query table from which the query information was derived.
-     */
-    // public List<Row> getRows();
-
     List<String> getParameters();
 
     String getOwnerAccessType();

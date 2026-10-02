@@ -66,7 +66,6 @@ final class IndexCodesTest extends AbstractBaseTest {
             int checkedIndexes = 0;
             for (Table t : db) {
                 for (Index index : t.getIndexes()) {
-                    // getLogger().log(Level.FINE, "Checking {0}.{1}", new Object[] {t.getName(), index.getName()});
                     checkIndexEntries(testDb, t, index);
                     ++checkedIndexes;
                 }
@@ -163,9 +162,6 @@ final class IndexCodesTest extends AbstractBaseTest {
     }
 
     static void checkIndexEntries(TestDb testDB, Table t, Index index) throws Exception {
-        // index.initialize();
-        // getStaticLogger().log(Level.FINE, "Ind {0}", index);
-
         Cursor cursor = CursorBuilder.createCursor(index);
         while (cursor.moveToNextRow()) {
 
@@ -274,36 +270,7 @@ final class IndexCodesTest extends AbstractBaseTest {
                 c2,
                 c9};
             addCombos(t, 0, "", cs, 5);
-
-            // t = new TableBuilder("Table2")
-            // .addColumn(new ColumnBuilder("data", DataType.TEXT))
-            // .toTable(db);
-
-            // writeChars(0x0000, t);
-
-            // t = new TableBuilder("Table3")
-            // .addColumn(new ColumnBuilder("data", DataType.TEXT))
-            // .toTable(db);
-
-            // writeChars(0x0400, t);
         }
-
-        // Table t = new TableBuilder("Table1")
-        // .addColumn(new ColumnBuilder("key", DataType.TEXT))
-        // .addColumn(new ColumnBuilder("data", DataType.TEXT))
-        // .toTable(db);
-
-        // for(int i = 0; i <= 0xFFFF; i++) {
-        // // skip non-char chars
-        // char c = (char)i;
-        // if(Character.isHighSurrogate(c) || Character.isLowSurrogate(c)) {
-        // continue;
-        // }
-        // String key = toUnicodeStr(c);
-        // String str = "AA" + c + "AA";
-        // t.addRow(key, str);
-        // }
-
     }
 
     @Test
@@ -395,9 +362,6 @@ final class IndexCodesTest extends AbstractBaseTest {
 
             Cursor cursor = CursorBuilder.createCursor(index);
             while (cursor.moveToNextRow()) {
-                // getLogger().log(Level.FINE, "=======");
-                // getLogger().log(Level.FINE, "Savepoint: {0}", cursor.getSavepoint());
-                // getLogger().log(Level.FINE, "Value: {0}", cursor.getCurrentRow());
                 Cursor.Savepoint savepoint = cursor.getSavepoint();
                 String entryStr = entryToString(savepoint.getCurrentPosition());
 
@@ -453,8 +417,6 @@ final class IndexCodesTest extends AbstractBaseTest {
                     handleInternational2Entry(m.group(1), m.group(3), m.group(4), c, inat2Codes, inat2ExtraCodes, inat2CrazyCodes);
 
                 } else {
-
-                    // throw new JackcessRuntimeException("Unhandled " + entryStr);
                     getLogger().log(Level.WARNING, "unhandled {0}", entryStr);
                 }
 
@@ -575,7 +537,6 @@ final class IndexCodesTest extends AbstractBaseTest {
                 getLogger().log(Level.FINE, "=======");
                 getLogger().log(Level.FINE, "RowId: {0}", savepoint.getCurrentPosition().getRowId());
                 getLogger().log(Level.FINE, "Entry: {0}", entryStr);
-                // getLogger().log(Level.FINE, "Row: {0}", row);
                 getLogger().log(Level.FINE, "Value: ({0}) {1}", new Object[] {key, value});
                 getLogger().log(Level.FINE, "Char: {0}, {1}, {2}", new Object[] {c, (int) c, toUnicodeStr(c)});
 
