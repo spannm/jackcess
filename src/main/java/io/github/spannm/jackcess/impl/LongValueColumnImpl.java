@@ -341,21 +341,6 @@ class LongValueColumnImpl extends ColumnImpl {
     }
 
     /**
-     * Writes the header info for a long value page.
-     */
-    private void writeLongValueHeader(ByteBuffer lvalPage) {
-        lvalPage.put(PageTypes.DATA); // Page type
-        lvalPage.put((byte) 1); // Unknown
-        lvalPage.putShort((short) getFormat().DATA_PAGE_INITIAL_FREE_SPACE); // Free space
-        lvalPage.put((byte) 'L');
-        lvalPage.put((byte) 'V');
-        lvalPage.put((byte) 'A');
-        lvalPage.put((byte) 'L');
-        lvalPage.putInt(0); // unknown
-        lvalPage.putShort((short) 0); // num rows in page
-    }
-
-    /**
      * Manages secondary page buffers for long value writing.
      */
     private abstract class LongValueBufferHolder {
@@ -384,6 +369,21 @@ class LongValueColumnImpl extends ColumnImpl {
             ByteBuffer lvalPage = getBufferHolder().withNewPage(getPageChannel());
             writeLongValueHeader(lvalPage);
             return lvalPage;
+        }
+
+        /**
+         * Writes the header info for a long value page.
+         */
+        private void writeLongValueHeader(ByteBuffer lvalPage) {
+            lvalPage.put(PageTypes.DATA); // Page type
+            lvalPage.put((byte) 1); // Unknown
+            lvalPage.putShort((short) getFormat().DATA_PAGE_INITIAL_FREE_SPACE); // Free space
+            lvalPage.put((byte) 'L');
+            lvalPage.put((byte) 'V');
+            lvalPage.put((byte) 'A');
+            lvalPage.put((byte) 'L');
+            lvalPage.putInt(0); // unknown
+            lvalPage.putShort((short) 0); // num rows in page
         }
 
         public int getOwnedPageCount() {
