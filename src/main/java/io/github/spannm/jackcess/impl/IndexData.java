@@ -716,23 +716,6 @@ public final class IndexData {
     }
 
     /**
-     * Completes a prepared row addition.
-     */
-    private void commitAddRow(Entry newEntry, DataPage dataPage, int idx, boolean isDupeEntry, Entry oldEntry) throws IOException {
-        if (newEntry != null) {
-            dataPage.addEntry(idx, newEntry);
-            // if we are adding a duplicate entry, or replacing an existing entry,
-            // then the unique entry count doesn't change
-            if (!isDupeEntry && oldEntry == null) {
-                ++uniqueEntryCount;
-            }
-            ++modCount;
-        } else {
-            LOGGER.log(Level.WARNING, withErrorContext("Added duplicate index entry " + oldEntry));
-        }
-    }
-
-    /**
      * Prepares to update a row in this index. All constraints are checked before this method returns. <p> Forces index initialization.
      *
      * @param oldRow Row to be removed
@@ -783,24 +766,6 @@ public final class IndexData {
             LOGGER.log(Level.WARNING, withErrorContext("Failed removing index entry " + oldEntry + " for row: " + Arrays.toString(row)));
         }
         return removedEntry;
-    }
-
-    /**
-     * Undoes a previous row deletion.
-     */
-    private void rollbackDeletedRow(Entry removedEntry) throws IOException {
-        if (removedEntry == null) {
-            // no change was made
-            return;
-        }
-
-        // unfortunately, stuff might have shuffled around when we first removed
-        // the row, so in order to re-insert it, we need to re-find and insert it.
-        DataPage dataPage = findDataPage(removedEntry);
-        int idx = dataPage.findEntry(removedEntry);
-        if (idx < 0) {
-            dataPage.addEntry(missingIndexToInsertionPoint(idx), removedEntry);
-        }
     }
 
     /**
@@ -1568,19 +1533,6 @@ public final class IndexData {
     }
 
     /**
-     * Returns the EntryType based on the given entry info.
-     */
-    private static EntryType determineEntryType(byte[] entryBytes, RowIdImpl rowId) {
-        if (entryBytes != null) {
-            return rowId.getType() == RowIdImpl.Type.NORMAL ? EntryType.NORMAL : rowId.getType() == RowIdImpl.Type.ALWAYS_FIRST ? EntryType.FIRST_VALID : EntryType.LAST_VALID;
-        } else if (!rowId.isValid()) {
-            // this is a "special" entry (first/last)
-            return rowId.getType() == RowIdImpl.Type.ALWAYS_FIRST ? EntryType.ALWAYS_FIRST : EntryType.ALWAYS_LAST;
-        }
-        throw new IllegalArgumentException("Values was null for valid entry");
-    }
-
-    /**
      * Returns the maximum amount of entry data which can be encoded on any index page.
      */
     private static int calcMaxPageEntrySize(JetFormat format) {
@@ -2175,6 +2127,19 @@ public final class IndexData {
          */
         private Entry(byte[] entryBytes, RowIdImpl rowId) {
             this(entryBytes, rowId, determineEntryType(entryBytes, rowId));
+        }
+
+        /**
+         * Returns the EntryType based on the given entry info.
+         */
+        private static EntryType determineEntryType(byte[] entryBytes, RowIdImpl rowId) {
+            if (entryBytes != null) {
+                return rowId.getType() == RowIdImpl.Type.NORMAL ? EntryType.NORMAL : rowId.getType() == RowIdImpl.Type.ALWAYS_FIRST ? EntryType.FIRST_VALID : EntryType.LAST_VALID;
+            } else if (!rowId.isValid()) {
+                // this is a "special" entry (first/last)
+                return rowId.getType() == RowIdImpl.Type.ALWAYS_FIRST ? EntryType.ALWAYS_FIRST : EntryType.ALWAYS_LAST;
+            }
+            throw new IllegalArgumentException("Values was null for valid entry");
         }
 
         /**
@@ -2983,7 +2948,17 @@ public final class IndexData {
 
         @Override
         public void commit() throws IOException {
-            commitAddRow(maddEntry, maddDataPage, maddIdx, misDupe, moldEntry);
+            if (maddEntry != null) {
+                maddDataPage.addEntry(maddIdx, maddEntry);
+                // if we are adding a duplicate entry, or replacing an existing entry,
+                // then the unique entry count doesn't change
+                if (!misDupe && moldEntry == null) {
+                    ++uniqueEntryCount;
+                }
+                ++modCount;
+            } else {
+                LOGGER.log(Level.WARNING, withErrorContext("Added duplicate index entry " + moldEntry));
+            }
         }
 
         @Override
@@ -3005,7 +2980,18 @@ public final class IndexData {
         @Override
         public void rollback() throws IOException {
             super.rollback();
-            rollbackDeletedRow(moldEntry);
+            if (moldEntry == null) {
+                // no change was made
+                return;
+            }
+
+            // unfortunately, stuff might have shuffled around when we first removed
+            // the row, so in order to re-insert it, we need to re-find and insert it.
+            DataPage dataPage = findDataPage(moldEntry);
+            int idx = dataPage.findEntry(moldEntry);
+            if (idx < 0) {
+                dataPage.addEntry(missingIndexToInsertionPoint(idx), moldEntry);
+            }
         }
     }
 
