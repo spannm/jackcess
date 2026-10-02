@@ -603,7 +603,7 @@ public class TableImpl implements Table, PropertyMaps.Owner {
         try {
 
             // ensure that the relevant row state is up-to-date
-            ByteBuffer rowBuffer = positionAtRowHeader(rowState, rowId);
+            ByteBuffer rowBuffer = rowState.positionAtRowHeader(rowId);
 
             if (rowState.isDeleted()) {
                 // don't care about duplicate deletion
@@ -634,7 +634,7 @@ public class TableImpl implements Table, PropertyMaps.Owner {
                 fkEnforcer.deleteRow(rowValues);
 
                 // move back to the header
-                rowBuffer = positionAtRowHeader(rowState, rowId);
+                rowBuffer = rowState.positionAtRowHeader(rowId);
             }
 
             // finally, pull the trigger
@@ -863,50 +863,13 @@ public class TableImpl implements Table, PropertyMaps.Owner {
     }
 
     /**
-     * Sets a new buffer to the correct row header page using the given rowState according to the given rowId. Deleted
-     * state is determined, but overflow row pointers are not followed.
-     *
-     * @return a ByteBuffer of the relevant page, or null if row was invalid
-     */
-    public static ByteBuffer positionAtRowHeader(RowState rowState, RowIdImpl rowId) throws IOException {
-        ByteBuffer rowBuffer = rowState.withHeaderRow(rowId);
-
-        if (rowState.isAtHeaderRow()) {
-            // this task has already been accomplished
-            return rowBuffer;
-        }
-
-        if (!rowState.isValid()) {
-            // this was an invalid page/row
-            rowState.setStatus(RowStateStatus.AT_HEADER);
-            return null;
-        }
-
-        // note, we don't use findRowStart here cause we need the unmasked value
-        short rowStart = rowBuffer.getShort(getRowStartOffset(rowId.getRowNumber(), rowState.getTable().getFormat()));
-
-        // check the deleted, overflow flags for the row (the "real" flags are
-        // always set on the header row)
-        RowStatus rowStatus = RowStatus.NORMAL;
-        if (isDeletedRow(rowStart)) {
-            rowStatus = RowStatus.DELETED;
-        } else if (isOverflowRow(rowStart)) {
-            rowStatus = RowStatus.OVERFLOW;
-        }
-
-        rowState.setRowStatus(rowStatus);
-        rowState.setStatus(RowStateStatus.AT_HEADER);
-        return rowBuffer;
-    }
-
-    /**
      * Sets the position and limit in a new buffer using the given rowState according to the given row number and row
      * end, following overflow row pointers as necessary.
      *
      * @return a ByteBuffer narrowed to the actual row data, or null if row was invalid or deleted
      */
     public static ByteBuffer positionAtRowData(RowState rowState, RowIdImpl rowId) throws IOException {
-        positionAtRowHeader(rowState, rowId);
+        rowState.positionAtRowHeader(rowId);
         if (!rowState.isValid() || rowState.isDeleted()) {
             // row is invalid or deleted
             rowState.setStatus(RowStateStatus.AT_FINAL);
@@ -3247,6 +3210,43 @@ public class TableImpl implements Table, PropertyMaps.Owner {
 
         private Object handleRowError(ColumnImpl column, byte[] columnData, Exception error) throws IOException {
             return getErrorHandler().handleRowError(column, columnData, this, error);
+        }
+
+        /**
+         * Sets a new buffer to the correct row header page according to the given rowId. Deleted state is
+         * determined, but overflow row pointers are not followed.
+         *
+         * @return a ByteBuffer of the relevant page, or null if row was invalid
+         */
+        public ByteBuffer positionAtRowHeader(RowIdImpl rowId) throws IOException {
+            ByteBuffer rowBuffer = withHeaderRow(rowId);
+
+            if (isAtHeaderRow()) {
+                // this task has already been accomplished
+                return rowBuffer;
+            }
+
+            if (!isValid()) {
+                // this was an invalid page/row
+                setStatus(RowStateStatus.AT_HEADER);
+                return null;
+            }
+
+            // note, we don't use findRowStart here cause we need the unmasked value
+            short rowStart = rowBuffer.getShort(getRowStartOffset(rowId.getRowNumber(), getTable().getFormat()));
+
+            // check the deleted, overflow flags for the row (the "real" flags are
+            // always set on the header row)
+            RowStatus newRowStatus = RowStatus.NORMAL;
+            if (isDeletedRow(rowStart)) {
+                newRowStatus = RowStatus.DELETED;
+            } else if (isOverflowRow(rowStart)) {
+                newRowStatus = RowStatus.OVERFLOW;
+            }
+
+            setRowStatus(newRowStatus);
+            setStatus(RowStateStatus.AT_HEADER);
+            return rowBuffer;
         }
 
         @Override

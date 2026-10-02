@@ -78,7 +78,7 @@ public class TableScanCursor extends CursorImpl {
         // figure out how many rows are left on this page so we can find the
         // next row
         RowIdImpl curRowId = curPos.getRowId();
-        TableImpl.positionAtRowHeader(rowState, curRowId);
+        rowState.positionAtRowHeader(curRowId);
         int currentRowNumber = curRowId.getRowNumber();
 
         // loop until we find the next valid row or run out of pages
@@ -86,13 +86,13 @@ public class TableScanCursor extends CursorImpl {
 
             currentRowNumber = handler.getAnotherRowNumber(currentRowNumber);
             curRowId = new RowIdImpl(curRowId.getPageNumber(), currentRowNumber);
-            TableImpl.positionAtRowHeader(rowState, curRowId);
+            rowState.positionAtRowHeader(curRowId);
 
             if (!rowState.isValid()) {
 
                 // load next page
                 curRowId = new RowIdImpl(handler.getAnotherPageNumber(), RowIdImpl.INVALID_ROW_NUMBER);
-                TableImpl.positionAtRowHeader(rowState, curRowId);
+                rowState.positionAtRowHeader(curRowId);
 
                 if (!rowState.isHeaderPageNumberValid()) {
                     // No more owned pages. No more rows.

@@ -375,7 +375,7 @@ public abstract class CursorImpl implements Cursor {
         mrowState.reset();
         mprevPos = mcurPos;
         mcurPos = findAnotherPosition(mrowState, mcurPos, moveForward);
-        TableImpl.positionAtRowHeader(mrowState, mcurPos.getRowId());
+        mrowState.positionAtRowHeader(mcurPos.getRowId());
         return !mcurPos.equals(getDirHandler(moveForward).getEndPosition());
     }
 
@@ -387,7 +387,7 @@ public abstract class CursorImpl implements Cursor {
         boolean found = false;
         try {
             reset(MOVE_FORWARD);
-            if (TableImpl.positionAtRowHeader(mrowState, rowIdImpl) == null) {
+            if (mrowState.positionAtRowHeader(rowIdImpl) == null) {
                 return false;
             }
             restorePosition(getRowPosition(rowIdImpl));
