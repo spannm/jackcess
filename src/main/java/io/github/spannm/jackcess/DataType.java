@@ -127,28 +127,29 @@ public enum DataType {
      * the database. Jet4 only, since Jet3 used {@link #BINARY} for that column and the ACE engine dropped the table.
      * Handled like a fixed length BINARY/OLE.
      */
-    BIG_BINARY((byte) 0x11, "TYPENAME", null, 3992),
+    BIG_BINARY((byte) 0x11, "BigBinary", null, 3992),
     /**
      * Complex type corresponds to a special {@link #LONG} autonumber field which is the key for a secondary table which
      * holds the "real" data.
      */
-    COMPLEX_TYPE((byte) 0x12, "TYPENAME", null, 4),
+    COMPLEX_TYPE((byte) 0x12, "ComplexType", null, 4),
     /**
      * Corresponds to a java {@link Long}. Accepts any {@link Number} (using {@link Number#longValue}), Boolean as 1 or
      * 0, any Object converted to a String and parsed as Double, or {@code null}. Equivalent to SQL
      * {@link Types#BIGINT}.
      */
-    BIG_INT((byte) 0x13, "TYPENAME", Types.BIGINT, 8),
+    BIG_INT((byte) 0x13, "BigInt", Types.BIGINT, 8),
     /**
      * Corresponds to a java {@link LocalDateTime} (with 7 digits of nanosecond precision). Accepts a Date,
      * LocalDateTime (or related types), any {@link Number} (using {@link Number#longValue}), or {@code null}.
      * Equivalent to SQL {@link Types#TIMESTAMP}, {@link Types#DATE}, {@link Types#TIME}.
      */
+    // TODO: the engine's actual internal name for this type is unknown; using a placeholder
     EXT_DATE_TIME((byte) 0x14, "TYPENAME", null, 42),
     /**
      * Dummy type for a fixed length type which is not currently supported. Handled like a fixed length {@link #BINARY}.
      */
-    UNSUPPORTED_FIXEDLEN((byte) 0xFE, "TYPENAME", null, null),
+    UNSUPPORTED_FIXEDLEN((byte) 0xFE, null, null, null),
     /**
      * Placeholder type for a variable length type which is not currently supported. Handled like {@link #BINARY}.
      */
