@@ -90,12 +90,7 @@ public class PropertyMaps implements Iterable<PropertyMapImpl> {
      */
     private PropertyMapImpl get(String name, short type) {
         String lookupName = DatabaseImpl.toLookupName(name);
-        PropertyMapImpl map = maps.get(lookupName);
-        if (map == null) {
-            map = new PropertyMapImpl(name, type, this);
-            maps.put(lookupName, map);
-        }
-        return map;
+        return maps.computeIfAbsent(lookupName, k -> new PropertyMapImpl(name, type, this));
     }
 
     @Override

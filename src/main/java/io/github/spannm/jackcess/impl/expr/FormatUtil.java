@@ -455,12 +455,7 @@ public final class FormatUtil {
             args.ctx.put(CUSTOM_FMT_CACHE_KEY, cache);
         }
 
-        Fmt fmt = cache.get(cacheKey);
-        if (fmt == null) {
-            fmt = parseCustomFormat(fmtStr, args);
-            cache.put(cacheKey, fmt);
-        }
-        return fmt;
+        return cache.computeIfAbsent(cacheKey, k -> parseCustomFormat(fmtStr, args));
     }
 
     /**
