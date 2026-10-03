@@ -2012,7 +2012,7 @@ public class TableImpl implements Table, PropertyMaps.Owner {
 
                     int rowSize = rowData.remaining();
                     if (rowSize > getFormat().MAX_ROW_SIZE) {
-                        throw new InvalidValueException(withErrorContext("Row size " + rowSize + " is too large (" + getFormat().MAX_ROW_SIZE + ")"));
+                        throw new InvalidValueException(withErrorContext(String.format("Row size %s is too large (%s)", rowSize, getFormat().MAX_ROW_SIZE)));
                     }
 
                     // get page with space
@@ -2258,7 +2258,7 @@ public class TableImpl implements Table, PropertyMaps.Owner {
             ByteBuffer newRowData = createRow(row, writeRowBufferH.getPageBuffer(getPageChannel()), oldRowSize, keepRawVarValues);
 
             if (newRowData.limit() > getFormat().MAX_ROW_SIZE) {
-                throw new InvalidValueException(withErrorContext("Row size " + newRowData.limit() + " is too large (" + getFormat().MAX_ROW_SIZE + ")"));
+                throw new InvalidValueException(withErrorContext(String.format("Row size %s is too large (%s)", newRowData.limit(), getFormat().MAX_ROW_SIZE)));
             }
 
             if (!indexDatas.isEmpty()) {
@@ -2598,7 +2598,7 @@ public class TableImpl implements Table, PropertyMaps.Owner {
                     } catch (BufferOverflowException _ex) {
                         // if the data is too big for the buffer, then we have gone over
                         // the max row size
-                        throw new InvalidValueException(withErrorContext("Row size " + buffer.limit() + " is too large"));
+                        throw new InvalidValueException(withErrorContext(String.format("Row size %s is too large", buffer.limit())));
                     }
                 }
 
@@ -2630,7 +2630,7 @@ public class TableImpl implements Table, PropertyMaps.Owner {
                 buffer.putShort(maxVarColumnCount); // Number of var length columns
             } catch (BufferOverflowException _ex) {
                 // if the data is too big for the buffer, then we have gone over the max row size
-                throw new InvalidValueException(withErrorContext("Row size " + buffer.limit() + " is too large"));
+                throw new InvalidValueException(withErrorContext(String.format("Row size %s is too large", buffer.limit())));
             }
 
         } else {

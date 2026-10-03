@@ -394,21 +394,20 @@ public class ColumnBuilder {
             }
         } else if (!getType().isLongValue() && !getType().isValidSize(getLength())) {
             throw new IllegalArgumentException(withErrorContext(
-                "Var length must be from " + getType().getMinSize() + " to "
-                    + getType().getMaxSize() + " inclusive, found " + getLength()));
+                String.format("Var length must be from %s to %s inclusive, found %s",
+                    getType().getMinSize(), getType().getMaxSize(), getLength())));
         }
 
         if (getType().getHasScalePrecision()) {
             if (!getType().isValidScale(getScale())) {
                 throw new IllegalArgumentException(withErrorContext(
-                    "Scale must be from " + getType().getMinScale() + " to "
-                        + getType().getMaxScale() + " inclusive, found " + getScale()));
+                    String.format("Scale must be from %s to %s inclusive, found %s",
+                        getType().getMinScale(), getType().getMaxScale(), getScale())));
             }
             if (!getType().isValidPrecision(getPrecision())) {
                 throw new IllegalArgumentException(withErrorContext(
-                    "Precision must be from " + getType().getMinPrecision() + " to "
-                        + getType().getMaxPrecision() + " inclusive, found "
-                        + getPrecision()));
+                    String.format("Precision must be from %s to %s inclusive, found %s",
+                        getType().getMinPrecision(), getType().getMaxPrecision(), getPrecision())));
             }
         }
 

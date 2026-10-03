@@ -1202,15 +1202,15 @@ public class DatabaseImpl implements Database, DateTimeContext {
                 if (SYSTEM_OBJECT_NAME_TABLES.equalsIgnoreCase(name) && mtableParentId == null) {
                     mtableParentId = row.getInt(CAT_COL_ID);
                     LOGGER.log(Level.FINE, () -> withErrorContext(
-                        "Resolved mtableParentId=" + mtableParentId + " from '" + SYSTEM_OBJECT_NAME_TABLES + "' row"));
+                        String.format("Resolved mtableParentId=%s from '%s' row", mtableParentId, SYSTEM_OBJECT_NAME_TABLES)));
                 } else if (SYSTEM_OBJECT_NAME_DATABASES.equalsIgnoreCase(name) && dynamicDbParentId == null) {
                     dynamicDbParentId = row.getInt(CAT_COL_ID);
                     LOGGER.log(Level.FINE, () -> withErrorContext(
-                        "Resolved dynamicDbParentId=" + dynamicDbParentId + " from '" + SYSTEM_OBJECT_NAME_DATABASES + "' row"));
+                        String.format("Resolved dynamicDbParentId=%s from '%s' row", dynamicDbParentId, SYSTEM_OBJECT_NAME_DATABASES)));
                 } else if (TABLE_SYSTEM_CATALOG.equalsIgnoreCase(name) && msysParentId == null) {
                     msysParentId = row.getInt(CAT_COL_PARENT_ID);
                     LOGGER.log(Level.FINE, () -> withErrorContext(
-                        "Resolved msysParentId=" + msysParentId + " from '" + TABLE_SYSTEM_CATALOG + "' row"));
+                        String.format("Resolved msysParentId=%s from '%s' row", msysParentId, TABLE_SYSTEM_CATALOG)));
                 }
                 if (mtableParentId != null && dynamicDbParentId != null && msysParentId != null) {
                     break; // all IDs resolved, no need to scan further
