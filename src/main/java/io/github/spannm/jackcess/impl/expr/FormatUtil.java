@@ -87,9 +87,11 @@ public final class FormatUtil {
         };
 
         protected void appendPrefix(StringBuilder fmt) {
+            // no-op: default hook, overridden only by notations needing a prefix (e.g. EURO)
         }
 
         protected void appendSuffix(StringBuilder fmt) {
+            // no-op: default hook, overridden only by notations needing a suffix (e.g. PERCENT, SCIENTIFIC)
         }
 
         protected boolean useParensForNegatives(NumericConfig cfg) {
