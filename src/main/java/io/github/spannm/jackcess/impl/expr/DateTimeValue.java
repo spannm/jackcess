@@ -45,7 +45,7 @@ public class DateTimeValue extends BaseValue {
         return val;
     }
 
-    protected Double getNumber(LocaleContext ctx) {
+    protected Double getNumber() {
         return ColumnImpl.toDateDouble(val);
     }
 
@@ -77,11 +77,11 @@ public class DateTimeValue extends BaseValue {
 
     @Override
     public Double getAsDouble(LocaleContext ctx) {
-        return getNumber(ctx);
+        return getNumber();
     }
 
     @Override
     public BigDecimal getAsBigDecimal(LocaleContext ctx) {
-        return BigDecimal.valueOf(getNumber(ctx));
+        return BigDecimal.valueOf(getNumber());
     }
 }
