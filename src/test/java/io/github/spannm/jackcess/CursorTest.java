@@ -18,7 +18,10 @@ package io.github.spannm.jackcess;
 
 import static io.github.spannm.jackcess.test.Basename.INDEX;
 import static io.github.spannm.jackcess.test.Basename.INDEX_CURSOR;
-import static io.github.spannm.jackcess.test.TestUtil.*;
+import static io.github.spannm.jackcess.test.TestUtil.assertTable;
+import static io.github.spannm.jackcess.test.TestUtil.createExpectedRow;
+import static io.github.spannm.jackcess.test.TestUtil.createExpectedTable;
+import static io.github.spannm.jackcess.test.TestUtil.createTestTable;
 
 import io.github.spannm.jackcess.Database.FileFormat;
 import io.github.spannm.jackcess.impl.ColumnImpl;
@@ -39,7 +42,14 @@ import org.junit.jupiter.params.ParameterizedTest;
 
 import java.io.IOException;
 import java.io.UncheckedIOException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.NoSuchElementException;
+import java.util.TreeSet;
 import java.util.stream.Collectors;
 
 final class CursorTest extends AbstractBaseTest {

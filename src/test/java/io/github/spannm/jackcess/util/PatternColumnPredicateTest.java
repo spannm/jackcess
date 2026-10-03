@@ -16,8 +16,13 @@
  */
 package io.github.spannm.jackcess.util;
 
-import io.github.spannm.jackcess.*;
+import io.github.spannm.jackcess.Column;
+import io.github.spannm.jackcess.ColumnBuilder;
+import io.github.spannm.jackcess.DataType;
+import io.github.spannm.jackcess.Database;
 import io.github.spannm.jackcess.Database.FileFormat;
+import io.github.spannm.jackcess.Table;
+import io.github.spannm.jackcess.TableBuilder;
 import io.github.spannm.jackcess.test.AbstractBaseTest;
 import io.github.spannm.jackcess.test.source.FileFormatSource;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -38,7 +43,8 @@ final class PatternColumnPredicateTest extends AbstractBaseTest {
 
             assertThat(findRowsByPattern(t, PatternColumnPredicate.forJavaRegex(".*o.*"))).isEqualTo(Arrays.asList("Foo", "some row", "aNoThEr row", "nonsense"));
 
-            assertThat(findRowsByPattern(t, PatternColumnPredicate.forJavaRegex(".*o.*").negate())).isEqualTo(Arrays.asList("Bar", "0102", "FOO", "BAR", "67", "bunch_13_data", "42 is the ANSWER", "[try] matching t.h+i}s"));
+            assertThat(findRowsByPattern(t, PatternColumnPredicate.forJavaRegex(".*o.*").negate()))
+                .isEqualTo(Arrays.asList("Bar", "0102", "FOO", "BAR", "67", "bunch_13_data", "42 is the ANSWER", "[try] matching t.h+i}s"));
 
             assertThat(findRowsByPattern(t, PatternColumnPredicate.forAccessLike("*o*"))).isEqualTo(Arrays.asList("Foo", "some row", "FOO", "aNoThEr row", "nonsense"));
 

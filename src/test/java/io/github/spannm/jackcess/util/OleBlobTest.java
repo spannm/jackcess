@@ -18,8 +18,14 @@ package io.github.spannm.jackcess.util;
 
 import static io.github.spannm.jackcess.test.Basename.BLOB;
 
-import io.github.spannm.jackcess.*;
+import io.github.spannm.jackcess.ColumnBuilder;
+import io.github.spannm.jackcess.DataType;
+import io.github.spannm.jackcess.Database;
 import io.github.spannm.jackcess.Database.FileFormat;
+import io.github.spannm.jackcess.JackcessRuntimeException;
+import io.github.spannm.jackcess.Row;
+import io.github.spannm.jackcess.Table;
+import io.github.spannm.jackcess.TableBuilder;
 import io.github.spannm.jackcess.complex.Attachment;
 import io.github.spannm.jackcess.impl.ByteUtil;
 import io.github.spannm.jackcess.impl.CompoundOleUtil;
@@ -33,7 +39,12 @@ import org.apache.poi.poifs.filesystem.DocumentInputStream;
 import org.apache.poi.poifs.filesystem.POIFSFileSystem;
 import org.junit.jupiter.params.ParameterizedTest;
 
-import java.io.*;
+import java.io.DataInputStream;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.nio.file.Files;
 
 final class OleBlobTest extends AbstractBaseTest {

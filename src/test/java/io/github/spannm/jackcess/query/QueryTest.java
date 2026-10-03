@@ -16,7 +16,20 @@ limitations under the License.
 
 package io.github.spannm.jackcess.query;
 
-import static io.github.spannm.jackcess.impl.query.QueryFormat.*;
+import static io.github.spannm.jackcess.impl.query.QueryFormat.APPEND_VALUE_FLAG;
+import static io.github.spannm.jackcess.impl.query.QueryFormat.COLUMN_ATTRIBUTE;
+import static io.github.spannm.jackcess.impl.query.QueryFormat.FLAG_ATTRIBUTE;
+import static io.github.spannm.jackcess.impl.query.QueryFormat.GROUPBY_ATTRIBUTE;
+import static io.github.spannm.jackcess.impl.query.QueryFormat.HAVING_ATTRIBUTE;
+import static io.github.spannm.jackcess.impl.query.QueryFormat.JOIN_ATTRIBUTE;
+import static io.github.spannm.jackcess.impl.query.QueryFormat.ORDERBY_ATTRIBUTE;
+import static io.github.spannm.jackcess.impl.query.QueryFormat.PARAMETER_ATTRIBUTE;
+import static io.github.spannm.jackcess.impl.query.QueryFormat.REMOTEDB_ATTRIBUTE;
+import static io.github.spannm.jackcess.impl.query.QueryFormat.TABLE_ATTRIBUTE;
+import static io.github.spannm.jackcess.impl.query.QueryFormat.TYPE_ATTRIBUTE;
+import static io.github.spannm.jackcess.impl.query.QueryFormat.UNION_PART1;
+import static io.github.spannm.jackcess.impl.query.QueryFormat.UNION_PART2;
+import static io.github.spannm.jackcess.impl.query.QueryFormat.WHERE_ATTRIBUTE;
 import static io.github.spannm.jackcess.test.Basename.QUERY;
 
 import io.github.spannm.jackcess.DataType;
@@ -29,7 +42,11 @@ import io.github.spannm.jackcess.test.source.TestDbReadOnlySource;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 @SuppressWarnings("checkstyle:LineLengthCheck")
 final class QueryTest extends AbstractBaseTest {

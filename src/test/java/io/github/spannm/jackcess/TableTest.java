@@ -69,6 +69,10 @@ final class TableTest extends AbstractBaseTest {
         assertThat(buffer.get(30)).isEqualTo((byte) 7);
     }
 
+    private ByteBuffer createRow(Object... row) throws IOException {
+        return testTable.createRow(row);
+    }
+
     @Test
     void unicodeCompression() throws Exception {
         reset();
@@ -102,10 +106,6 @@ final class TableTest extends AbstractBaseTest {
         assertThat(Arrays.asList(decodeColumns(bufCmp1))).isEqualTo(Arrays.asList(small, large));
         assertThat(Arrays.asList(decodeColumns(bufCmp2))).isEqualTo(Arrays.asList(smallNotAscii, largeNotAscii));
 
-    }
-
-    private ByteBuffer createRow(Object... row) throws IOException {
-        return testTable.createRow(row);
     }
 
     private ByteBuffer[] encodeColumns(Object... row) throws IOException {
@@ -187,7 +187,7 @@ final class TableTest extends AbstractBaseTest {
         columns.add(col);
     }
 
-    private class TestTable extends TableImpl {
+    private final class TestTable extends TableImpl {
         private TestTable() {
             super(true, columns);
         }

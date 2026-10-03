@@ -17,7 +17,9 @@
 package io.github.spannm.jackcess.util;
 
 import static io.github.spannm.jackcess.test.Basename.INDEX;
-import static io.github.spannm.jackcess.test.TestUtil.*;
+import static io.github.spannm.jackcess.test.TestUtil.countRows;
+import static io.github.spannm.jackcess.test.TestUtil.createExpectedRow;
+import static io.github.spannm.jackcess.test.TestUtil.createExpectedTable;
 
 import io.github.spannm.jackcess.Database;
 import io.github.spannm.jackcess.Index;
@@ -30,7 +32,13 @@ import io.github.spannm.jackcess.test.source.TestDbSource;
 import org.junit.jupiter.params.ParameterizedTest;
 
 import java.io.IOException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 final class JoinerTest extends AbstractBaseTest {

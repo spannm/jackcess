@@ -16,10 +16,27 @@ limitations under the License.
 
 package io.github.spannm.jackcess.impl;
 
-import static io.github.spannm.jackcess.test.Basename.*;
+import static io.github.spannm.jackcess.test.Basename.BINARY_INDEX;
+import static io.github.spannm.jackcess.test.Basename.COMMON1;
+import static io.github.spannm.jackcess.test.Basename.COMP_INDEX;
+import static io.github.spannm.jackcess.test.Basename.INDEX;
+import static io.github.spannm.jackcess.test.Basename.INDEX_PROPERTIES;
 
-import io.github.spannm.jackcess.*;
+import io.github.spannm.jackcess.BatchUpdateException;
+import io.github.spannm.jackcess.Column;
+import io.github.spannm.jackcess.ConstraintViolationException;
+import io.github.spannm.jackcess.Cursor;
+import io.github.spannm.jackcess.CursorBuilder;
+import io.github.spannm.jackcess.DataType;
+import io.github.spannm.jackcess.Database;
 import io.github.spannm.jackcess.Database.FileFormat;
+import io.github.spannm.jackcess.DatabaseBuilder;
+import io.github.spannm.jackcess.DateTimeType;
+import io.github.spannm.jackcess.Index;
+import io.github.spannm.jackcess.IndexBuilder;
+import io.github.spannm.jackcess.IndexCursor;
+import io.github.spannm.jackcess.Row;
+import io.github.spannm.jackcess.Table;
 import io.github.spannm.jackcess.test.AbstractBaseTest;
 import io.github.spannm.jackcess.test.TestDb;
 import io.github.spannm.jackcess.test.TestUtil;
@@ -32,7 +49,13 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 
 import java.io.IOException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.SortedSet;
+import java.util.TreeSet;
 
 final class IndexTest extends AbstractBaseTest {
 

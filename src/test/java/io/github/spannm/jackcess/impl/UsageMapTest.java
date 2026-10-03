@@ -19,8 +19,14 @@ package io.github.spannm.jackcess.impl;
 import static io.github.spannm.jackcess.test.Basename.COMMON1;
 import static io.github.spannm.jackcess.test.Basename.REF_GLOBAL;
 
-import io.github.spannm.jackcess.*;
+import io.github.spannm.jackcess.ColumnBuilder;
+import io.github.spannm.jackcess.DataType;
+import io.github.spannm.jackcess.Database;
 import io.github.spannm.jackcess.Database.FileFormat;
+import io.github.spannm.jackcess.DatabaseBuilder;
+import io.github.spannm.jackcess.Row;
+import io.github.spannm.jackcess.Table;
+import io.github.spannm.jackcess.TableBuilder;
 import io.github.spannm.jackcess.test.AbstractBaseTest;
 import io.github.spannm.jackcess.test.TestDb;
 import io.github.spannm.jackcess.test.TestUtil;

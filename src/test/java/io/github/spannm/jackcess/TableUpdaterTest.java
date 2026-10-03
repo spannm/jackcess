@@ -16,7 +16,10 @@
  */
 package io.github.spannm.jackcess;
 
-import static io.github.spannm.jackcess.DatabaseBuilder.*;
+import static io.github.spannm.jackcess.DatabaseBuilder.newColumn;
+import static io.github.spannm.jackcess.DatabaseBuilder.newPrimaryKey;
+import static io.github.spannm.jackcess.DatabaseBuilder.newRelationship;
+import static io.github.spannm.jackcess.DatabaseBuilder.newTable;
 
 import io.github.spannm.jackcess.Database.FileFormat;
 import io.github.spannm.jackcess.impl.DatabaseImpl;
@@ -26,7 +29,11 @@ import io.github.spannm.jackcess.test.source.FileFormatSource;
 import org.junit.jupiter.params.ParameterizedTest;
 
 import java.io.IOException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 
 final class TableUpdaterTest extends AbstractBaseTest {
 

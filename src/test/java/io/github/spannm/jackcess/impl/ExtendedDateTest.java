@@ -16,11 +16,19 @@
  */
 package io.github.spannm.jackcess.impl;
 
-import static io.github.spannm.jackcess.DatabaseBuilder.*;
+import static io.github.spannm.jackcess.DatabaseBuilder.newColumn;
+import static io.github.spannm.jackcess.DatabaseBuilder.newIndex;
+import static io.github.spannm.jackcess.DatabaseBuilder.newTable;
 import static io.github.spannm.jackcess.test.Basename.EXT_DATE;
 
-import io.github.spannm.jackcess.*;
+import io.github.spannm.jackcess.Column;
+import io.github.spannm.jackcess.Cursor;
+import io.github.spannm.jackcess.DataType;
+import io.github.spannm.jackcess.Database;
 import io.github.spannm.jackcess.Database.FileFormat;
+import io.github.spannm.jackcess.Index;
+import io.github.spannm.jackcess.Row;
+import io.github.spannm.jackcess.Table;
 import io.github.spannm.jackcess.test.AbstractBaseTest;
 import io.github.spannm.jackcess.test.TestDb;
 import io.github.spannm.jackcess.test.TestUtil;
@@ -32,7 +40,11 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
 
 final class ExtendedDateTest extends AbstractBaseTest {
 

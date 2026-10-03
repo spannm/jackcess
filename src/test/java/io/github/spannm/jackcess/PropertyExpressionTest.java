@@ -18,10 +18,17 @@ package io.github.spannm.jackcess;
 
 import static io.github.spannm.jackcess.DatabaseBuilder.newColumn;
 import static io.github.spannm.jackcess.DatabaseBuilder.newTable;
-import static io.github.spannm.jackcess.test.TestUtil.*;
+import static io.github.spannm.jackcess.test.TestUtil.assertTable;
+import static io.github.spannm.jackcess.test.TestUtil.createExpectedRow;
+import static io.github.spannm.jackcess.test.TestUtil.createExpectedTable;
 
 import io.github.spannm.jackcess.Database.FileFormat;
-import io.github.spannm.jackcess.expr.*;
+import io.github.spannm.jackcess.expr.EvalConfig;
+import io.github.spannm.jackcess.expr.EvalContext;
+import io.github.spannm.jackcess.expr.Function;
+import io.github.spannm.jackcess.expr.FunctionLookup;
+import io.github.spannm.jackcess.expr.TemporalConfig;
+import io.github.spannm.jackcess.expr.Value;
 import io.github.spannm.jackcess.impl.expr.DefaultFunctions;
 import io.github.spannm.jackcess.impl.expr.FunctionSupport;
 import io.github.spannm.jackcess.impl.expr.ValueSupport;

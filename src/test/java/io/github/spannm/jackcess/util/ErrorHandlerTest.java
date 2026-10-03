@@ -16,8 +16,15 @@ limitations under the License.
 
 package io.github.spannm.jackcess.util;
 
-import io.github.spannm.jackcess.*;
+import io.github.spannm.jackcess.Column;
+import io.github.spannm.jackcess.ColumnBuilder;
+import io.github.spannm.jackcess.Cursor;
+import io.github.spannm.jackcess.CursorBuilder;
+import io.github.spannm.jackcess.DataType;
+import io.github.spannm.jackcess.Database;
 import io.github.spannm.jackcess.Database.FileFormat;
+import io.github.spannm.jackcess.Table;
+import io.github.spannm.jackcess.TableBuilder;
 import io.github.spannm.jackcess.impl.ColumnImpl;
 import io.github.spannm.jackcess.impl.TableImpl;
 import io.github.spannm.jackcess.test.AbstractBaseTest;
@@ -123,7 +130,7 @@ final class ErrorHandlerTest extends AbstractBaseTest {
 
     }
 
-    private static class BogusColumn extends ColumnImpl {
+    private static final class BogusColumn extends ColumnImpl {
         private BogusColumn(Table table, String name) {
             super((TableImpl) table, name, DataType.LONG, 1, 0, 0);
         }

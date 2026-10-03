@@ -231,6 +231,7 @@
                     <artifactId>maven-checkstyle-plugin</artifactId>
                     <configuration>
                         <configLocation>${check.checkstyle.ruleset}</configLocation>
+                        <includeTestSourceDirectory>true</includeTestSourceDirectory>
                     </configuration>
                     <dependencies>
                         <dependency>

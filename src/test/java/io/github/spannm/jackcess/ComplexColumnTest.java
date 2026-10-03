@@ -19,7 +19,12 @@ package io.github.spannm.jackcess;
 import static io.github.spannm.jackcess.test.Basename.COMPLEX_DATA;
 import static io.github.spannm.jackcess.test.Basename.UNSUPPORTED_FIELDS;
 
-import io.github.spannm.jackcess.complex.*;
+import io.github.spannm.jackcess.complex.Attachment;
+import io.github.spannm.jackcess.complex.ComplexDataType;
+import io.github.spannm.jackcess.complex.ComplexValueForeignKey;
+import io.github.spannm.jackcess.complex.SingleValue;
+import io.github.spannm.jackcess.complex.UnsupportedValue;
+import io.github.spannm.jackcess.complex.Version;
 import io.github.spannm.jackcess.impl.ByteUtil;
 import io.github.spannm.jackcess.impl.ColumnImpl;
 import io.github.spannm.jackcess.impl.PageChannel;
@@ -79,17 +84,17 @@ final class ComplexColumnTest extends AbstractBaseTest {
 
                 String curValue = (String) col.getRowValue(row);
 
-                if (rowId.equals("row1")) {
+                if ("row1".equals(rowId)) {
                     checkVersions(1, complexValueFk, curValue);
-                } else if (rowId.equals("row2")) {
+                } else if ("row2".equals(rowId)) {
                     checkVersions(2, complexValueFk, curValue,
                         "row2-memo", new Date(1315876862334L));
-                } else if (rowId.equals("row3")) {
+                } else if ("row3".equals(rowId)) {
                     checkVersions(3, complexValueFk, curValue,
                         "row3-memo-again", new Date(1315876965382L),
                         "row3-memo-revised", new Date(1315876953077L),
                         "row3-memo", new Date(1315876879126L));
-                } else if (rowId.equals("row4")) {
+                } else if ("row4".equals(rowId)) {
                     checkVersions(4, complexValueFk, curValue,
                         "row4-memo", new Date(1315876945758L));
                 } else {
@@ -189,13 +194,13 @@ final class ComplexColumnTest extends AbstractBaseTest {
                 ComplexValueForeignKey complexValueFk =
                     (ComplexValueForeignKey) col.getRowValue(row);
 
-                if (rowId.equals("row1")) {
+                if ("row1".equals(rowId)) {
                     checkAttachments(1, complexValueFk);
-                } else if (rowId.equals("row2")) {
+                } else if ("row2".equals(rowId)) {
                     checkAttachments(2, complexValueFk, "test_data.txt", "test_data2.txt");
-                } else if (rowId.equals("row3")) {
+                } else if ("row3".equals(rowId)) {
                     checkAttachments(3, complexValueFk);
-                } else if (rowId.equals("row4")) {
+                } else if ("row4".equals(rowId)) {
                     checkAttachments(4, complexValueFk, "test_data2.txt");
                 } else {
                     fail();
@@ -284,14 +289,14 @@ final class ComplexColumnTest extends AbstractBaseTest {
                 ComplexValueForeignKey complexValueFk =
                     (ComplexValueForeignKey) col.getRowValue(row);
 
-                if (rowId.equals("row1")) {
+                if ("row1".equals(rowId)) {
                     checkMultiValues(1, complexValueFk);
-                } else if (rowId.equals("row2")) {
+                } else if ("row2".equals(rowId)) {
                     checkMultiValues(2, complexValueFk, "value1", "value4");
-                } else if (rowId.equals("row3")) {
+                } else if ("row3".equals(rowId)) {
                     checkMultiValues(3, complexValueFk,
                         "value1", "value2", "value3", "value4");
-                } else if (rowId.equals("row4")) {
+                } else if ("row4".equals(rowId)) {
                     checkMultiValues(4, complexValueFk);
                 } else {
                     fail();
