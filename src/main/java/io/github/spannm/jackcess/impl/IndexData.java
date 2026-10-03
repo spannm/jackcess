@@ -2849,6 +2849,7 @@ public final class IndexData {
 
         @Override
         public void setLeaf(boolean isLeaf) {
+            // no-op: RootDataPage is an immutable sentinel for page 0
         }
 
         @Override
@@ -2858,6 +2859,7 @@ public final class IndexData {
 
         @Override
         public void setPrevPageNumber(int pageNumber) {
+            // no-op: RootDataPage is an immutable sentinel for page 0
         }
 
         @Override
@@ -2867,6 +2869,7 @@ public final class IndexData {
 
         @Override
         public void setNextPageNumber(int pageNumber) {
+            // no-op: RootDataPage is an immutable sentinel for page 0
         }
 
         @Override
@@ -2876,6 +2879,7 @@ public final class IndexData {
 
         @Override
         public void setChildTailPageNumber(int pageNumber) {
+            // no-op: RootDataPage is an immutable sentinel for page 0
         }
 
         @Override
@@ -2885,6 +2889,7 @@ public final class IndexData {
 
         @Override
         public void setTotalEntrySize(int totalSize) {
+            // no-op: RootDataPage is an immutable sentinel for page 0
         }
 
         @Override
@@ -2894,6 +2899,7 @@ public final class IndexData {
 
         @Override
         public void setEntryPrefix(byte[] entryPrefix) {
+            // no-op: RootDataPage is an immutable sentinel for page 0
         }
 
         @Override
@@ -2903,10 +2909,12 @@ public final class IndexData {
 
         @Override
         public void setEntries(List<Entry> entries) {
+            // no-op: RootDataPage is an immutable sentinel for page 0
         }
 
         @Override
         public void addEntry(int idx, Entry entry) {
+            // no-op: RootDataPage is an immutable sentinel for page 0
         }
 
         @Override
