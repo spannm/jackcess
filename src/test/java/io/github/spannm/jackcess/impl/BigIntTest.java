@@ -16,10 +16,16 @@
  */
 package io.github.spannm.jackcess.impl;
 
-import static io.github.spannm.jackcess.DatabaseBuilder.*;
+import static io.github.spannm.jackcess.DatabaseBuilder.newColumn;
+import static io.github.spannm.jackcess.DatabaseBuilder.newIndex;
+import static io.github.spannm.jackcess.DatabaseBuilder.newTable;
 
-import io.github.spannm.jackcess.*;
+import io.github.spannm.jackcess.Column;
+import io.github.spannm.jackcess.Cursor;
+import io.github.spannm.jackcess.DataType;
+import io.github.spannm.jackcess.Database;
 import io.github.spannm.jackcess.Database.FileFormat;
+import io.github.spannm.jackcess.Table;
 import io.github.spannm.jackcess.test.AbstractBaseTest;
 import io.github.spannm.jackcess.test.TestUtil;
 import io.github.spannm.jackcess.test.source.FileFormatSource;

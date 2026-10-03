@@ -16,11 +16,34 @@ limitations under the License.
 
 package io.github.spannm.jackcess;
 
-import static io.github.spannm.jackcess.test.Basename.*;
-import static io.github.spannm.jackcess.test.TestUtil.*;
+import static io.github.spannm.jackcess.test.Basename.COMMON1;
+import static io.github.spannm.jackcess.test.Basename.DEL;
+import static io.github.spannm.jackcess.test.Basename.DEL_COL;
+import static io.github.spannm.jackcess.test.Basename.FIXED_NUMERIC;
+import static io.github.spannm.jackcess.test.Basename.FIXED_TEXT;
+import static io.github.spannm.jackcess.test.Basename.LINKED;
+import static io.github.spannm.jackcess.test.Basename.OLD_DATES;
+import static io.github.spannm.jackcess.test.Basename.OVERFLOW;
+import static io.github.spannm.jackcess.test.Basename.PROMOTION;
+import static io.github.spannm.jackcess.test.Basename.UNSUPPORTED_FIELDS;
+import static io.github.spannm.jackcess.test.TestUtil.assertRowCount;
+import static io.github.spannm.jackcess.test.TestUtil.assertSameDate;
+import static io.github.spannm.jackcess.test.TestUtil.assertTable;
+import static io.github.spannm.jackcess.test.TestUtil.checkTestDBTable1RowA;
+import static io.github.spannm.jackcess.test.TestUtil.checkTestDBTable1RowABCDEFG;
+import static io.github.spannm.jackcess.test.TestUtil.createNonAsciiString;
+import static io.github.spannm.jackcess.test.TestUtil.createString;
+import static io.github.spannm.jackcess.test.TestUtil.createTestRow;
+import static io.github.spannm.jackcess.test.TestUtil.createTestRowMap;
+import static io.github.spannm.jackcess.test.TestUtil.createTestTable;
+import static io.github.spannm.jackcess.test.TestUtil.openCopy;
 
 import io.github.spannm.jackcess.Database.FileFormat;
-import io.github.spannm.jackcess.impl.*;
+import io.github.spannm.jackcess.impl.ColumnImpl;
+import io.github.spannm.jackcess.impl.DatabaseImpl;
+import io.github.spannm.jackcess.impl.RowIdImpl;
+import io.github.spannm.jackcess.impl.RowImpl;
+import io.github.spannm.jackcess.impl.TableImpl;
 import io.github.spannm.jackcess.test.AbstractBaseTest;
 import io.github.spannm.jackcess.test.TestDb;
 import io.github.spannm.jackcess.test.source.FileFormatSource;
@@ -37,7 +60,18 @@ import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.ZoneId;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.HashSet;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.TimeZone;
+import java.util.TreeSet;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 @SuppressWarnings("deprecation")

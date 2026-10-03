@@ -16,8 +16,12 @@
  */
 package io.github.spannm.jackcess.util;
 
-import io.github.spannm.jackcess.*;
+import io.github.spannm.jackcess.ColumnBuilder;
+import io.github.spannm.jackcess.DataType;
+import io.github.spannm.jackcess.Database;
 import io.github.spannm.jackcess.Database.FileFormat;
+import io.github.spannm.jackcess.Table;
+import io.github.spannm.jackcess.TableBuilder;
 import io.github.spannm.jackcess.test.AbstractBaseTest;
 import io.github.spannm.jackcess.test.TestUtil;
 import io.github.spannm.jackcess.test.source.FileFormatSource;
@@ -67,7 +71,7 @@ final class CustomLinkResolverTest extends AbstractBaseTest {
         }
     }
 
-    private static class TestLinkResolver extends CustomLinkResolver {
+    private static final class TestLinkResolver extends CustomLinkResolver {
         private TestLinkResolver() {
             super(DEFAULT_FORMAT, true, DEFAULT_TEMP_DIR);
         }

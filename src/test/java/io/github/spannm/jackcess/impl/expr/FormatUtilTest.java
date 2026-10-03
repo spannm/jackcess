@@ -15,8 +15,11 @@
  */
 package io.github.spannm.jackcess.impl.expr;
 
-
-import io.github.spannm.jackcess.expr.*;
+import io.github.spannm.jackcess.expr.EvalContext;
+import io.github.spannm.jackcess.expr.Identifier;
+import io.github.spannm.jackcess.expr.NumericConfig;
+import io.github.spannm.jackcess.expr.TemporalConfig;
+import io.github.spannm.jackcess.expr.Value;
 import io.github.spannm.jackcess.test.AbstractBaseTest;
 import org.junit.jupiter.api.Test;
 

@@ -17,13 +17,28 @@ package io.github.spannm.jackcess.test;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import org.assertj.core.api.Assertions;
-import io.github.spannm.jackcess.*;
+import io.github.spannm.jackcess.Column;
+import io.github.spannm.jackcess.ColumnBuilder;
+import io.github.spannm.jackcess.Cursor;
+import io.github.spannm.jackcess.CursorBuilder;
+import io.github.spannm.jackcess.DataType;
+import io.github.spannm.jackcess.Database;
 import io.github.spannm.jackcess.Database.FileFormat;
+import io.github.spannm.jackcess.DatabaseBuilder;
+import io.github.spannm.jackcess.Index;
+import io.github.spannm.jackcess.Row;
+import io.github.spannm.jackcess.Table;
+import io.github.spannm.jackcess.TableBuilder;
 import io.github.spannm.jackcess.complex.ComplexValueForeignKey;
-import io.github.spannm.jackcess.impl.*;
+import io.github.spannm.jackcess.impl.ByteUtil;
+import io.github.spannm.jackcess.impl.DatabaseImpl;
+import io.github.spannm.jackcess.impl.IndexData;
+import io.github.spannm.jackcess.impl.IndexImpl;
+import io.github.spannm.jackcess.impl.RowIdImpl;
+import io.github.spannm.jackcess.impl.RowImpl;
 import io.github.spannm.jackcess.util.MemFileChannel;
 import io.github.spannm.jackcess.util.StringUtil;
+import org.assertj.core.api.Assertions;
 
 import java.io.File;
 import java.io.IOException;
@@ -38,7 +53,13 @@ import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -73,20 +94,6 @@ public final class TestUtil {
         return openDb(fileFormat, file, inMem, charset, true);
     }
 
-    public static Database openCopy(FileFormat fileFormat, File file) throws IOException {
-        return openCopy(fileFormat, file, false);
-    }
-
-    public static Database openCopy(FileFormat fileFormat, File file, boolean keep) throws IOException {
-        // split file name into prefix and suffix
-        int fnLastDot = file.getName().lastIndexOf('.');
-        File tempFile = createTempFile(file.getName().substring(0, fnLastDot), file.getName().substring(fnLastDot), keep);
-
-        Files.copy(file.toPath(), tempFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
-
-        return openDb(fileFormat, tempFile, false, null, false);
-    }
-
     static Database openDb(FileFormat fileFormat, File file, boolean inMem, Charset charset, boolean readOnly) throws IOException {
         FileChannel channel = inMem ? MemFileChannel.newChannel(file, MemFileChannel.RW_CHANNEL_MODE) : null;
         Database db = new DatabaseBuilder()
@@ -101,6 +108,20 @@ public final class TestUtil {
             assertThat(db.getFileFormat()).as("Wrong file format").isEqualTo(fileFormat);
         }
         return db;
+    }
+
+    public static Database openCopy(FileFormat fileFormat, File file) throws IOException {
+        return openCopy(fileFormat, file, false);
+    }
+
+    public static Database openCopy(FileFormat fileFormat, File file, boolean keep) throws IOException {
+        // split file name into prefix and suffix
+        int fnLastDot = file.getName().lastIndexOf('.');
+        File tempFile = createTempFile(file.getName().substring(0, fnLastDot), file.getName().substring(fnLastDot), keep);
+
+        Files.copy(file.toPath(), tempFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
+
+        return openDb(fileFormat, tempFile, false, null, false);
     }
 
     static Object[] createTestRow(String col1Val) {
@@ -135,16 +156,16 @@ public final class TestUtil {
         return createString(len, 'a');
     }
 
-    public static String createNonAsciiString(int len) {
-        return createString(len, '\u0CC0');
-    }
-
     private static String createString(int len, char firstChar) {
         StringBuilder sb = new StringBuilder(len);
         for (int i = 0; i < len; i++) {
             sb.append((char) (firstChar + i % 26));
         }
         return sb.toString();
+    }
+
+    public static String createNonAsciiString(int len) {
+        return createString(len, '\u0CC0');
     }
 
     public static void assertRowCount(int expectedRowCount, Table table) throws IOException {
@@ -192,17 +213,6 @@ public final class TestUtil {
         dumpDatabase(mdb, systemTables, new PrintWriter(System.out, true));
     }
 
-    public static void dumpTable(Table table) throws IOException {
-        dumpTable(table, new PrintWriter(System.out, true));
-    }
-
-    public static void dumpProperties(Table table) throws IOException {
-        getLogger().log(Level.FINE, "TABLE_PROPS: {0}: {1}", new Object[] {table.getName(), table.getProperties()});
-        for (Column c : table.getColumns()) {
-            getLogger().log(Level.FINE, "COL_PROPS: {0}: {1}", new Object[] {c.getName(), c.getProperties()});
-        }
-    }
-
     static void dumpDatabase(Database mdb, boolean systemTables, PrintWriter writer) throws IOException {
         writer.println("DATABASE:");
         for (Table table : mdb) {
@@ -213,6 +223,10 @@ public final class TestUtil {
                 dumpTable(mdb.getSystemTable(sysTableName), writer);
             }
         }
+    }
+
+    public static void dumpTable(Table table) throws IOException {
+        dumpTable(table, new PrintWriter(System.out, true));
     }
 
     static void dumpTable(Table table, PrintWriter writer) throws IOException {
@@ -229,6 +243,13 @@ public final class TestUtil {
         writer.println("COLUMNS: " + colNames);
         for (Map<String, Object> row : CursorBuilder.createCursor(table)) {
             writer.println(massageRow(row));
+        }
+    }
+
+    public static void dumpProperties(Table table) throws IOException {
+        getLogger().log(Level.FINE, "TABLE_PROPS: {0}: {1}", new Object[] {table.getName(), table.getProperties()});
+        for (Column c : table.getColumns()) {
+            getLogger().log(Level.FINE, "COL_PROPS: {0}: {1}", new Object[] {c.getName(), c.getProperties()});
         }
     }
 

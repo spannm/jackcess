@@ -16,7 +16,10 @@
  */
 package io.github.spannm.jackcess;
 
-import static io.github.spannm.jackcess.DatabaseBuilder.*;
+import static io.github.spannm.jackcess.DatabaseBuilder.newColumn;
+import static io.github.spannm.jackcess.DatabaseBuilder.newPrimaryKey;
+import static io.github.spannm.jackcess.DatabaseBuilder.newRelationship;
+import static io.github.spannm.jackcess.DatabaseBuilder.newTable;
 import static io.github.spannm.jackcess.test.Basename.DEL_COL;
 
 import io.github.spannm.jackcess.Database.FileFormat;
@@ -33,8 +36,15 @@ import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
+@SuppressWarnings({"checkstyle:MethodName", "PMD.LinguisticNaming"})
 final class TableUpdaterTest extends AbstractBaseTest {
 
     @ParameterizedTest(name = "[{index}] {0}")

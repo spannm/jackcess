@@ -16,8 +16,13 @@ limitations under the License.
 
 package io.github.spannm.jackcess.util;
 
-import io.github.spannm.jackcess.*;
+import io.github.spannm.jackcess.Column;
+import io.github.spannm.jackcess.ColumnBuilder;
+import io.github.spannm.jackcess.DataType;
+import io.github.spannm.jackcess.Database;
 import io.github.spannm.jackcess.Database.FileFormat;
+import io.github.spannm.jackcess.Table;
+import io.github.spannm.jackcess.TableBuilder;
 import io.github.spannm.jackcess.test.AbstractBaseTest;
 import io.github.spannm.jackcess.test.TestUtil;
 import io.github.spannm.jackcess.test.source.FileFormatSource;
@@ -240,7 +245,7 @@ final class ImportTest extends AbstractBaseTest {
         assertThat(c.getLength()).isEqualTo((short) 0);
     }
 
-    private static class TestResultSet implements InvocationHandler {
+    private static final class TestResultSet implements InvocationHandler {
         private final List<Integer> _types        = new ArrayList<>();
         private final List<String>  _names        = new ArrayList<>();
         private final List<Integer> _displaySizes = new ArrayList<>();
@@ -250,21 +255,21 @@ final class ImportTest extends AbstractBaseTest {
         @Override
         public Object invoke(Object proxy, Method method, Object[] args) {
             String methodName = method.getName();
-            if (methodName.equals("getMetaData")) {
+            if ("getMetaData".equals(methodName)) {
                 return Proxy.newProxyInstance(Thread.currentThread().getContextClassLoader(), new Class<?>[] {ResultSetMetaData.class}, this);
-            } else if (methodName.equals("next")) {
+            } else if ("next".equals(methodName)) {
                 return Boolean.FALSE;
-            } else if (methodName.equals("getColumnCount")) {
+            } else if ("getColumnCount".equals(methodName)) {
                 return _types.size();
-            } else if (methodName.equals("getColumnName") || methodName.equals("getColumnLabel")) {
+            } else if ("getColumnName".equals(methodName) || "getColumnLabel".equals(methodName)) {
                 return getValue(_names, args[0]);
-            } else if (methodName.equals("getColumnDisplaySize")) {
+            } else if ("getColumnDisplaySize".equals(methodName)) {
                 return getValue(_displaySizes, args[0]);
-            } else if (methodName.equals("getColumnType")) {
+            } else if ("getColumnType".equals(methodName)) {
                 return getValue(_types, args[0]);
-            } else if (methodName.equals("getScale")) {
+            } else if ("getScale".equals(methodName)) {
                 return getValue(_scales, args[0]);
-            } else if (methodName.equals("getPrecision")) {
+            } else if ("getPrecision".equals(methodName)) {
                 return getValue(_precisions, args[0]);
             } else {
                 throw new UnsupportedOperationException(methodName);
