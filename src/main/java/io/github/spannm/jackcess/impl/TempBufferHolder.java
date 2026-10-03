@@ -98,14 +98,14 @@ public abstract class TempBufferHolder {
      * byteOrder. Will be rewound iff autoRewind is enabled for this buffer.
      */
     public final ByteBuffer getPageBuffer(PageChannel pageChannel) {
-        return getBuffer(pageChannel, pageChannel.getFormat().PAGE_SIZE);
+        return getBuffer(pageChannel.getFormat().PAGE_SIZE);
     }
 
     /**
      * Returns a ByteBuffer of at least the given size, with the limit set to the given size, and the predefined
      * byteOrder. Will be rewound iff autoRewind is enabled for this buffer.
      */
-    public final ByteBuffer getBuffer(PageChannel pageChannel, int size) {
+    public final ByteBuffer getBuffer(int size) {
         ByteBuffer buffer = getExistingBuffer();
         if (buffer == null || buffer.capacity() < size) {
             buffer = PageChannel.createBuffer(size, order);

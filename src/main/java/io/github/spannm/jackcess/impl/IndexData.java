@@ -1188,7 +1188,7 @@ public final class IndexData {
      * Returns an entry buffer containing the relevant data for an entry given the valuePrefix.
      */
     private ByteBuffer getTempEntryBuffer(ByteBuffer indexPage, int entryLen, byte[] valuePrefix, TempBufferHolder tmpEntryBufferH) {
-        ByteBuffer tmpEntryBuffer = tmpEntryBufferH.getBuffer(getPageChannel(), valuePrefix.length + entryLen);
+        ByteBuffer tmpEntryBuffer = tmpEntryBufferH.getBuffer(valuePrefix.length + entryLen);
 
         // combine valuePrefix and rest of entry from indexPage, then prep for
         // reading
