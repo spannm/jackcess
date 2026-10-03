@@ -1446,10 +1446,8 @@ public class IndexPageCache {
             if (dpMain.leaf != peerMain.leaf) {
                 throw new IllegalStateException(withErrorContext("Mismatched peer status " + dpMain.leaf + " " + peerMain.leaf));
             }
-            if (!dpMain.leaf) {
-                if (dpMain.parentPageNumber != null && peerMain.parentPageNumber != null && !dpMain.parentPageNumber.equals(peerMain.parentPageNumber)) {
-                    throw new IllegalStateException(withErrorContext("Mismatched node parents " + dpMain.parentPageNumber + " " + peerMain.parentPageNumber));
-                }
+            if (!dpMain.leaf && dpMain.parentPageNumber != null && peerMain.parentPageNumber != null && !dpMain.parentPageNumber.equals(peerMain.parentPageNumber)) {
+                throw new IllegalStateException(withErrorContext("Mismatched node parents " + dpMain.parentPageNumber + " " + peerMain.parentPageNumber));
             }
         }
 

@@ -392,12 +392,10 @@ public class ColumnBuilder {
                 throw new IllegalArgumentException(withErrorContext(
                     "Invalid fixed length size " + getLength()));
             }
-        } else if (!getType().isLongValue()) {
-            if (!getType().isValidSize(getLength())) {
-                throw new IllegalArgumentException(withErrorContext(
-                    "Var length must be from " + getType().getMinSize() + " to "
-                        + getType().getMaxSize() + " inclusive, found " + getLength()));
-            }
+        } else if (!getType().isLongValue() && !getType().isValidSize(getLength())) {
+            throw new IllegalArgumentException(withErrorContext(
+                "Var length must be from " + getType().getMinSize() + " to "
+                    + getType().getMaxSize() + " inclusive, found " + getLength()));
         }
 
         if (getType().getHasScalePrecision()) {
@@ -414,25 +412,19 @@ public class ColumnBuilder {
             }
         }
 
-        if (isAutoNumber()) {
-            if (!getType().mayBeAutoNumber()) {
-                throw new IllegalArgumentException(withErrorContext(
-                    "Auto number column must be long integer or guid"));
-            }
+        if (isAutoNumber() && !getType().mayBeAutoNumber()) {
+            throw new IllegalArgumentException(withErrorContext(
+                "Auto number column must be long integer or guid"));
         }
 
-        if (isCompressedUnicode()) {
-            if (!getType().isTextual()) {
-                throw new IllegalArgumentException(withErrorContext(
-                    "Only textual columns allow unicode compression (text/memo)"));
-            }
+        if (isCompressedUnicode() && !getType().isTextual()) {
+            throw new IllegalArgumentException(withErrorContext(
+                "Only textual columns allow unicode compression (text/memo)"));
         }
 
-        if (isHyperlink()) {
-            if (getType() != DataType.MEMO) {
-                throw new IllegalArgumentException(withErrorContext(
-                    "Only memo columns can be hyperlinks"));
-            }
+        if (isHyperlink() && getType() != DataType.MEMO) {
+            throw new IllegalArgumentException(withErrorContext(
+                "Only memo columns can be hyperlinks"));
         }
 
         if (isCalculated()) {

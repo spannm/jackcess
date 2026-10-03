@@ -1414,12 +1414,10 @@ public final class FormatUtil {
                 if (rightAligned) {
                     prefLen = len - strLen;
                 }
-            } else if (len < strLen) {
+            } else if (len < strLen && !rightAligned) {
                 // it doesn't make sense to me, but the meaning of "right aligned"
                 // seems to flip when the string is longer than the format length
-                if (!rightAligned) {
-                    strPos = strLen - len;
-                }
+                strPos = strLen - len;
             }
         }
 
