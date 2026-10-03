@@ -17,6 +17,7 @@
 package io.github.spannm.jackcess.impl.complex;
 
 import io.github.spannm.jackcess.Column;
+import io.github.spannm.jackcess.DateTimeType;
 import io.github.spannm.jackcess.Row;
 import io.github.spannm.jackcess.Table;
 import io.github.spannm.jackcess.complex.ComplexDataType;
@@ -154,6 +155,9 @@ public final class VersionHistoryColumnInfoImpl extends ComplexColumnInfoImpl<Ve
             return value;
         }
 
+        /**
+         * @deprecated see {@link DateTimeType} for details
+         */
         @Override
         @Deprecated
         public Date getModifiedDate() {

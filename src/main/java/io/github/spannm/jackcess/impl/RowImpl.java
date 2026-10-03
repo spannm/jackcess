@@ -16,6 +16,7 @@
  */
 package io.github.spannm.jackcess.impl;
 
+import io.github.spannm.jackcess.DateTimeType;
 import io.github.spannm.jackcess.Row;
 import io.github.spannm.jackcess.complex.ComplexValueForeignKey;
 import io.github.spannm.jackcess.util.OleBlob;
@@ -96,6 +97,9 @@ public class RowImpl extends LinkedHashMap<String, Object> implements Row {
         return (Double) get(name);
     }
 
+    /**
+     * @deprecated see {@link DateTimeType} for details
+     */
     @Override
     @Deprecated
     public Date getDate(String name) {

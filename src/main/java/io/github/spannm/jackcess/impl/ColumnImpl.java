@@ -2108,36 +2108,54 @@ public class ColumnImpl implements Column, Comparable<ColumnImpl>, DateTimeConte
             return dateBits;
         }
 
+        /**
+         * @deprecated inherited deprecated {@link Date} mutator; unsupported since this instance is immutable
+         */
         @Override
         @Deprecated
         public void setDate(int time) {
             throw new UnsupportedOperationException();
         }
 
+        /**
+         * @deprecated inherited deprecated {@link Date} mutator; unsupported since this instance is immutable
+         */
         @Override
         @Deprecated
         public void setHours(int time) {
             throw new UnsupportedOperationException();
         }
 
+        /**
+         * @deprecated inherited deprecated {@link Date} mutator; unsupported since this instance is immutable
+         */
         @Override
         @Deprecated
         public void setMinutes(int time) {
             throw new UnsupportedOperationException();
         }
 
+        /**
+         * @deprecated inherited deprecated {@link Date} mutator; unsupported since this instance is immutable
+         */
         @Override
         @Deprecated
         public void setMonth(int time) {
             throw new UnsupportedOperationException();
         }
 
+        /**
+         * @deprecated inherited deprecated {@link Date} mutator; unsupported since this instance is immutable
+         */
         @Override
         @Deprecated
         public void setSeconds(int time) {
             throw new UnsupportedOperationException();
         }
 
+        /**
+         * @deprecated inherited deprecated {@link Date} mutator; unsupported since this instance is immutable
+         */
         @Override
         @Deprecated
         public void setYear(int time) {

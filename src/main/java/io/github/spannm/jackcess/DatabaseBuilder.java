@@ -84,11 +84,17 @@ public class DatabaseBuilder {
         this((Path) null);
     }
 
+    /**
+     * @deprecated use {@link #DatabaseBuilder(Path)} instead
+     */
     @Deprecated
     public DatabaseBuilder(File mdbFile) {
         this(toPath(mdbFile));
     }
 
+    /**
+     * @deprecated use {@link #DatabaseBuilder()} with {@link #withPath} instead
+     */
     @Deprecated
     public DatabaseBuilder(Path mdbFile) {
         this.mdbFile = mdbFile;

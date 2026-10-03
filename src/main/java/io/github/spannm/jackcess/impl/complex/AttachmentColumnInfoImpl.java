@@ -17,6 +17,7 @@
 package io.github.spannm.jackcess.impl.complex;
 
 import io.github.spannm.jackcess.Column;
+import io.github.spannm.jackcess.DateTimeType;
 import io.github.spannm.jackcess.Row;
 import io.github.spannm.jackcess.Table;
 import io.github.spannm.jackcess.complex.Attachment;
@@ -287,12 +288,18 @@ public final class AttachmentColumnInfoImpl extends ComplexColumnInfoImpl<Attach
             type = fileType;
         }
 
+        /**
+         * @deprecated see {@link DateTimeType} for details
+         */
         @Override
         @Deprecated
         public Date getFileTimeStamp() {
             return (Date) timeStamp;
         }
 
+        /**
+         * @deprecated see {@link DateTimeType} for details
+         */
         @Override
         @Deprecated
         public void setFileTimeStamp(Date fileTimeStamp) {
