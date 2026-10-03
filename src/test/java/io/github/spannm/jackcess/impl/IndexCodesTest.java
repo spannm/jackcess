@@ -238,7 +238,7 @@ final class IndexCodesTest extends AbstractBaseTest {
             Cursor.Position curPos = cursor.getSavepoint().getCurrentPosition();
             boolean success = false;
             try {
-                findRow(testDB, t, index, row, curPos);
+                findRow(testDB, index, row, curPos);
                 success = true;
             } finally {
                 if (!success) {
@@ -250,7 +250,7 @@ final class IndexCodesTest extends AbstractBaseTest {
 
     }
 
-    private static void findRow(final TestDb testDB, Table t, Index index, Row expectedRow, Cursor.Position expectedPos) throws Exception {
+    private static void findRow(final TestDb testDB, Index index, Row expectedRow, Cursor.Position expectedPos) throws Exception {
         Object[] idxRow = ((IndexImpl) index).constructIndexRow(expectedRow);
         Cursor cursor = CursorBuilder.createCursor(index, idxRow, idxRow);
 
