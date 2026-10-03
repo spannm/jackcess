@@ -1484,10 +1484,8 @@ public class IndexPageCache {
             if (dpMain.getLevel() != peerMain.getLevel()) {
                 throw new IllegalStateException(withErrorContext(String.format("Mismatched peer level %d %d", dpMain.getLevel(), peerMain.getLevel())));
             }
-            if (!dpMain.leaf) {
-                if (dpMain.parentPageNumber != null && peerMain.parentPageNumber != null && !dpMain.parentPageNumber.equals(peerMain.parentPageNumber)) {
-                    throw new IllegalStateException(withErrorContext("Mismatched node parents " + dpMain.parentPageNumber + " " + peerMain.parentPageNumber));
-                }
+            if (!dpMain.leaf && dpMain.parentPageNumber != null && peerMain.parentPageNumber != null && !dpMain.parentPageNumber.equals(peerMain.parentPageNumber)) {
+                throw new IllegalStateException(withErrorContext("Mismatched node parents " + dpMain.parentPageNumber + " " + peerMain.parentPageNumber));
             }
         }
 

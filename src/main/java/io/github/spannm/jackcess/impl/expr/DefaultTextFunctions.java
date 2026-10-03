@@ -395,11 +395,9 @@ public class DefaultTextFunctions {
                     // do nothing
             }
 
-            if (charConv != 0) {
-                // 64 = vbUnicode, all java strings are already unicode, so nothing to do
-                if (charConv != 64) {
-                    throw new EvalException("Unsupported character conversion " + charConv);
-                }
+            // 64 = vbUnicode, all java strings are already unicode, so nothing to do
+            if (charConv != 0 && charConv != 64) {
+                throw new EvalException("Unsupported character conversion " + charConv);
             }
 
             return ValueSupport.toValue(str);

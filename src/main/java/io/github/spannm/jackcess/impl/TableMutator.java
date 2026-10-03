@@ -75,10 +75,8 @@ public abstract class TableMutator extends DBMutator {
                 throw new IllegalArgumentException(withErrorContext("found second primary key index: " + index.getName()));
             }
             foundPk[0] = true;
-        } else if (index.getType() == IndexImpl.FOREIGN_KEY_INDEX_TYPE) {
-            if (getForeignKey(index) == null) {
-                throw new IllegalArgumentException(withErrorContext("missing foreign key info for " + index.getName()));
-            }
+        } else if (index.getType() == IndexImpl.FOREIGN_KEY_INDEX_TYPE && getForeignKey(index) == null) {
+            throw new IllegalArgumentException(withErrorContext("missing foreign key info for " + index.getName()));
         }
     }
 
