@@ -102,13 +102,7 @@ public class PropertyMaps implements Iterable<PropertyMapImpl> {
      * @return the PropertyMap with the given name and type in this group, creating if necessary
      */
     private PropertyMapImpl get(String name, short type) {
-        Key key = new Key(name, type);
-        PropertyMapImpl map = maps.get(key);
-        if (map == null) {
-            map = new PropertyMapImpl(name, type, this);
-            maps.put(key, map);
-        }
-        return map;
+        return maps.computeIfAbsent(new Key(name, type), k -> new PropertyMapImpl(name, type, this));
     }
 
     /**

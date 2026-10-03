@@ -121,12 +121,7 @@ public class DBEvalContext implements Expressionator.ParseContext, EvalConfig {
         if (sdfs == null) {
             sdfs = new SimpleCache<>(MAX_CACHE_SIZE);
         }
-        DateTimeFormatter sdf = sdfs.get(formatStr);
-        if (sdf == null) {
-            sdf = DateTimeFormatter.ofPattern(formatStr, temporal.getLocale());
-            sdfs.put(formatStr, sdf);
-        }
-        return sdf;
+        return sdfs.computeIfAbsent(formatStr, s -> DateTimeFormatter.ofPattern(s, temporal.getLocale()));
     }
 
     @Override
@@ -134,13 +129,11 @@ public class DBEvalContext implements Expressionator.ParseContext, EvalConfig {
         if (dfs == null) {
             dfs = new SimpleCache<>(MAX_CACHE_SIZE);
         }
-        DecimalFormat df = dfs.get(formatStr);
-        if (df == null) {
-            df = new DecimalFormat(formatStr, numeric.getDecimalFormatSymbols());
+        return dfs.computeIfAbsent(formatStr, s -> {
+            DecimalFormat df = new DecimalFormat(s, numeric.getDecimalFormatSymbols());
             df.setRoundingMode(NumberFormatter.ROUND_MODE);
-            dfs.put(formatStr, df);
-        }
-        return df;
+            return df;
+        });
     }
 
     public float getRandom(Integer seed) {

@@ -490,12 +490,7 @@ final class ExpressionTokenizer {
         }
 
         public DateTimeFormatter getParseDateTimeFormat(TemporalConfig.Type type) {
-            DateTimeFormatter df = dateTimeFmts.get(type);
-            if (df == null) {
-                df = ctx.createDateFormatter(ctx.getTemporalConfig().getDateTimeFormat(type));
-                dateTimeFmts.put(type, df);
-            }
-            return df;
+            return dateTimeFmts.computeIfAbsent(type, t -> ctx.createDateFormatter(ctx.getTemporalConfig().getDateTimeFormat(t)));
         }
 
         @Override
