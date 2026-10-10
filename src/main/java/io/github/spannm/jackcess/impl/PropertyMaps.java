@@ -30,6 +30,7 @@ import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 
 /**
@@ -42,11 +43,14 @@ public class PropertyMaps implements Iterable<PropertyMapImpl> {
     private static final short                 PROPERTY_NAME_LIST          = 0x80;
     private static final short                 DEFAULT_PROPERTY_VALUE_LIST = 0x00;
     private static final short                 COLUMN_PROPERTY_VALUE_LIST  = 0x01;
+    private static final short                 INDEX_PROPERTY_VALUE_LIST   = 0x02;
 
     /**
-     * maps the PropertyMap name (case-insensitive) to the PropertyMap instance
+     * maps the PropertyMap name (case-insensitive) and block type to the PropertyMap instance. The type belongs in the
+     * key because a block of type 0x02 holds the properties of an index, and access names an index after its column by
+     * default, so a table can hold a column block and an index block with the same name
      */
-    private final Map<String, PropertyMapImpl> maps                       = new LinkedHashMap<>();
+    private final Map<Key, PropertyMapImpl>    maps                       = new LinkedHashMap<>();
     private final int                          objectId;
     private final RowIdImpl                    rowId;
     private final Handler                      handler;
@@ -79,6 +83,15 @@ public class PropertyMaps implements Iterable<PropertyMapImpl> {
     }
 
     /**
+     * @return the PropertyMap for the index with the given name in this group, creating if necessary. An index has its
+     *         own block, and access names an index after its column by default, so this is a separate map from the one
+     *         {@link #get} returns for the same name.
+     */
+    public PropertyMapImpl getIndex(String name) {
+        return get(name, INDEX_PROPERTY_VALUE_LIST);
+    }
+
+    /**
      * @return the PropertyMap with the given name in this group, creating if necessary
      */
     public PropertyMapImpl get(String name) {
@@ -89,8 +102,41 @@ public class PropertyMaps implements Iterable<PropertyMapImpl> {
      * @return the PropertyMap with the given name and type in this group, creating if necessary
      */
     private PropertyMapImpl get(String name, short type) {
-        String lookupName = DatabaseImpl.toLookupName(name);
-        return maps.computeIfAbsent(lookupName, k -> new PropertyMapImpl(name, type, this));
+        return maps.computeIfAbsent(new Key(name, type), k -> new PropertyMapImpl(name, type, this));
+    }
+
+    /**
+     * The name and block type which together identify a PropertyMap within one group.
+     */
+    private static final class Key {
+        private final String lookupName;
+        private final short  type;
+
+        private Key(String name, short type) {
+            lookupName = DatabaseImpl.toLookupName(name);
+            this.type = type;
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(lookupName, type);
+        }
+
+        @Override
+        public boolean equals(Object obj) {
+            if (this == obj) {
+                return true;
+            } else if (!(obj instanceof Key)) {
+                return false;
+            }
+            Key other = (Key) obj;
+            return type == other.type && lookupName.equals(other.lookupName);
+        }
+
+        @Override
+        public String toString() {
+            return String.format("%s[%d]", lookupName, type);
+        }
     }
 
     @Override

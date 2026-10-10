@@ -18,6 +18,7 @@ package io.github.spannm.jackcess.impl;
 
 import static io.github.spannm.jackcess.test.Basename.COMMON1;
 
+import io.github.spannm.jackcess.DataType;
 import io.github.spannm.jackcess.Database;
 import io.github.spannm.jackcess.PropertyMap;
 import io.github.spannm.jackcess.test.AbstractBaseTest;
@@ -68,6 +69,31 @@ final class PropertyMapsTest extends AbstractBaseTest {
 
         assertThat(getFlags(map.put("plain", "value"))).isZero();
         assertThat(getFlags(map.put("ddl", null, "value", true))).isEqualTo(PropertyMapImpl.DDL_FLAG);
+    }
+
+    /**
+     * A property map is identified by its name and its block type together. Access names an index after its column by
+     * default, so a table commonly holds a column block and an index block with the same name.
+     */
+    @ParameterizedTest(name = "[{index}] {0}")
+    @TestDbReadOnlySource(COMMON1)
+    void write_sameNameColumnAndIndexBlock_keepsBothSeparate(TestDb testDb) throws Exception {
+        try (Database db = testDb.open()) {
+            PropertyMaps maps = ((PropertyMapImpl) db.getTable("Table1").getProperties()).getOwner();
+            int origSize = maps.getSize();
+
+            maps.get("Shared").put("ColProp", DataType.TEXT, "column");
+            maps.getIndex("Shared").put("IdxProp", DataType.TEXT, "index");
+
+            assertThat(maps.getSize()).isEqualTo(origSize + 2);
+
+            PropertyMaps maps2 = ((DatabaseImpl) db).readProperties(maps.write(), maps.getObjectId(), null);
+
+            assertThat(maps2.get("Shared").getValue("ColProp")).isEqualTo("column");
+            assertThat(maps2.get("Shared").getValue("IdxProp")).isNull();
+            assertThat(maps2.getIndex("Shared").getValue("IdxProp")).isEqualTo("index");
+            assertThat(maps2.getIndex("Shared").getValue("ColProp")).isNull();
+        }
     }
 
     /**

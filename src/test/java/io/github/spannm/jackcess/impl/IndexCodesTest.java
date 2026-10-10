@@ -40,6 +40,7 @@ import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 
 import java.io.File;
 import java.io.IOException;
@@ -109,6 +110,67 @@ final class IndexCodesTest extends AbstractBaseTest {
      * Tests that a key longer than the maximum is truncated the way Access truncates it, with a digest of the discarded bytes. The expected key was read
      * back out of the index page Access built.
      */
+    /**
+     * Tests the surrogate chars in the general collation. The weight table gives the high surrogates four runs, one of
+     * which has no weight at all, and the low surrogates one piecewise run. The expected keys were read back out of the
+     * index Access built.
+     */
+    @Test
+    void generalSurrogates() throws Exception {
+        try (Database db = createDbMem(FileFormat.V2010, true)) {
+            IndexData.ColumnDescriptor col = getTextIndexColumn(db);
+
+            // U+D800 to U+D83F, primary = cp - 10238, extra byte 0x3f
+            assertIndexKey("7fb002b4f80e020e02013f3f00", col, pair(0x10000) + "aa");
+            assertIndexKey("7fb03fb6fc0e020e02013f3f00", col, pair(0x1F600) + "aa");
+
+            // U+D840 to U+D87F, primary = cp + 9666, extra byte 0x3e
+            assertIndexKey("7ffe02b4f80e020e02013e3f00", col, pair(0x20000) + "aa");
+            assertIndexKey("7ffe41b8ff0e020e02013e3f00", col, pair(0x2FFFF) + "aa");
+
+            // U+D880 to U+DB7F, no weight, so the high surrogate writes nothing at all and the tail carries one extra
+            // byte rather than two
+            assertIndexKey("7fb4f80e020e02013f00", col, pair(0x30000) + "aa");
+            assertIndexKey("7fb8ff0e020e02013f00", col, pair(0xEFFFF) + "aa");
+
+            // U+DB80 to U+DBFF, primary = cp + 9090, extra byte 0x3e
+            assertIndexKey("7fff02b4f80e020e02013e3f00", col, pair(0xF0000) + "aa");
+            assertIndexKey("7fff81b8ff0e020e02013e3f00", col, pair(0x10FFFF) + "aa");
+
+            // the pair in the other positions, which moves the separator
+            assertIndexKey("7f0e02fe02b4f80e0201023e3f00", col, "a" + pair(0x20000) + "a");
+            assertIndexKey("7f0e020e02b4f80e020102023f00", col, "aa" + pair(0x30000) + "a");
+        }
+    }
+
+    /**
+     * Tests the surrogate chars in the general legacy collation, which gives them no weight at all, so both halves of a
+     * pair are ignored. The expected keys were read back out of the index Access built.
+     */
+    @ParameterizedTest(name = "[{index}] U+{0}")
+    @ValueSource(ints = {0x10000, 0x20000, 0x30000, 0xF0000, 0x10FFFF})
+    void generalLegacySurrogates(int codePoint) throws Exception {
+        try (Database db = createDbMem(FileFormat.V2003, true)) {
+            IndexData.ColumnDescriptor col = getTextIndexColumn(db);
+
+            // 4a is the legacy code for 'a'. Every one of these is the key for "aa", wherever the pair sits
+            assertIndexKey("7f4a4a0100", col, pair(codePoint) + "aa");
+            assertIndexKey("7f4a4a0100", col, "a" + pair(codePoint) + "a");
+            assertIndexKey("7f4a4a0100", col, "aa" + pair(codePoint));
+            assertIndexKey("7f4a4a4a0100", col, "aa" + pair(codePoint) + "a");
+        }
+    }
+
+    /**
+     * Returns the surrogate pair of the given code point.
+     *
+     * @param codePoint a supplementary code point
+     * @return the code point as string
+     */
+    private static String pair(int codePoint) {
+        return new String(Character.toChars(codePoint));
+    }
+
     @Test
     void truncatedKey() throws Exception {
         try (Database db = createDbMem(FileFormat.V2010, true)) {
