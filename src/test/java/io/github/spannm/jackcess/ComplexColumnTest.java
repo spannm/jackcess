@@ -28,6 +28,7 @@ import io.github.spannm.jackcess.complex.Version;
 import io.github.spannm.jackcess.impl.ByteUtil;
 import io.github.spannm.jackcess.impl.ColumnImpl;
 import io.github.spannm.jackcess.impl.PageChannel;
+import io.github.spannm.jackcess.impl.complex.ComplexColumnInfoImpl;
 import io.github.spannm.jackcess.impl.complex.ComplexValueForeignKeyImpl;
 import io.github.spannm.jackcess.test.AbstractBaseTest;
 import io.github.spannm.jackcess.test.TestDb;
@@ -42,7 +43,7 @@ import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.List;
 
-@SuppressWarnings("deprecation")
+@SuppressWarnings({"deprecation", "checkstyle:MethodName", "PMD.LinguisticNaming"})
 final class ComplexColumnTest extends AbstractBaseTest {
 
     private static final byte[] TEST_ENC_BYTES  =
@@ -345,6 +346,59 @@ final class ComplexColumnTest extends AbstractBaseTest {
             assertThat(props.getValue(PropertyMap.ALLOW_MULTI_VALUE_PROP)).isEqualTo(Boolean.TRUE);
             assertThat(props.getValue(PropertyMap.ROW_SOURCE_TYPE_PROP)).isEqualTo("Value List");
             assertThat(props.getValue(PropertyMap.ROW_SOURCE_PROP)).isEqualTo("\"value1\";\"value2\";\"value3\";\"value4\"");
+        }
+    }
+
+    /**
+     * Every complex column's flat table marks its foreign key column with an ext flag, and that column is the one the
+     * complex info picks out.
+     */
+    @ParameterizedTest(name = "[{index}] {0}")
+    @TestDbSource(COMPLEX_DATA)
+    void complexInfo_flatTable_usesFlaggedForeignKeyColumn(TestDb testDb) throws Exception {
+        try (Database db = testDb.openCopy()) {
+            Table t1 = db.getTable("Table1");
+            int numComplexCols = 0;
+
+            for (Column col : t1.getColumns()) {
+                if (col.getType() != DataType.COMPLEX_TYPE) {
+                    continue;
+                }
+                numComplexCols++;
+
+                ComplexColumnInfoImpl<?> complexInfo = (ComplexColumnInfoImpl<?>) col.getComplexInfo();
+                Column fkCol = complexInfo.getComplexValueForeignKeyColumn();
+                assertThat(((ColumnImpl) fkCol).isComplexValueForeignKey()).as(col.getName()).isTrue();
+
+                // and it is the only column of the flat table which is marked
+                for (Column flatCol : fkCol.getTable().getColumns()) {
+                    assertThat(((ColumnImpl) flatCol).isComplexValueForeignKey()).as(flatCol.getName())
+                        .isEqualTo(flatCol.getName().equals(fkCol.getName()));
+                }
+
+                // the primary key is a different column, and is the autonumber
+                Column pkCol = complexInfo.getPrimaryKeyColumn();
+                assertThat(pkCol.getName()).isNotEqualTo(fkCol.getName());
+                assertThat(pkCol.isAutoNumber()).isTrue();
+            }
+
+            assertThat(numComplexCols).isEqualTo(3);
+        }
+    }
+
+    /**
+     * The kind of complex column comes from the name of the type table, which access reserves.
+     */
+    @ParameterizedTest(name = "[{index}] {0}")
+    @TestDbSource(COMPLEX_DATA)
+    void complexInfo_typeTableName_determinesType(TestDb testDb) throws Exception {
+        try (Database db = testDb.openCopy()) {
+            Table t1 = db.getTable("Table1");
+
+            assertThat(t1.getColumn("multi-value-data").getComplexInfo().getType()).isEqualTo(ComplexDataType.MULTI_VALUE);
+            assertThat(t1.getColumn("attach-data").getComplexInfo().getType()).isEqualTo(ComplexDataType.ATTACHMENT);
+            assertThat(t1.getColumn("append-memo-data").getVersionHistoryColumn().getComplexInfo().getType())
+                .isEqualTo(ComplexDataType.VERSION_HISTORY);
         }
     }
 
