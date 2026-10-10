@@ -31,7 +31,19 @@ import java.util.Map;
  * Map of properties for a database object.
  */
 public class PropertyMapImpl implements PropertyMap {
-    private static final Map<String, PropDef> DEFAULT_TYPES = new HashMap<>();
+    /**
+     * property flag bit for the DDL argument of the DAO CreateProperty method. A user cannot change or delete a DDL
+     * property without dbSecWriteDef permission
+     */
+    static final byte                         DDL_FLAG          = (byte) 0x01;
+    /**
+     * property flag bit which tells the engine to store the value without running the handler bound to the property
+     * name, so that writing the property records a state instead of bringing it about. The engine sets it on its own
+     * account and no DAO call produces it
+     */
+    static final byte                         SKIP_HANDLER_FLAG = (byte) 0x80;
+
+    private static final Map<String, PropDef> DEFAULT_TYPES     = new HashMap<>();
     static {
         DEFAULT_TYPES.put(ACCESS_VERSION_PROP, new PropDef(DataType.TEXT, false));
         DEFAULT_TYPES.put(TITLE_PROP, new PropDef(DataType.TEXT, false));
@@ -121,7 +133,9 @@ public class PropertyMapImpl implements PropertyMap {
     }
 
     public PropertyImpl put(Property prop) {
-        return put(prop.getName(), prop.getType(), prop.getValue(), prop.isDdl());
+        // keep the whole flag byte, not just the ddl bit, when the source property was read from a file
+        byte flags = prop instanceof PropertyImpl ? ((PropertyImpl) prop).getFlags() : toFlags(prop.isDdl());
+        return put(prop.getName(), prop.getType(), prop.getValue(), flags);
     }
 
     /**
@@ -129,7 +143,20 @@ public class PropertyMapImpl implements PropertyMap {
      */
     @Override
     public PropertyImpl put(String name, DataType type, Object value, boolean isDdl) {
-        PropertyImpl prop = (PropertyImpl) createProperty(name, type, value, isDdl);
+        return put(name, type, value, toFlags(isDdl));
+    }
+
+    /**
+     * Puts a property into this map with the given flag byte as stored in the file.
+     *
+     * @param name  property name
+     * @param type  property type
+     * @param value property value
+     * @param flags flag byte as stored in the file
+     * @return the new property
+     */
+    PropertyImpl put(String name, DataType type, Object value, byte flags) {
+        PropertyImpl prop = (PropertyImpl) createProperty(name, type, value, flags);
         props.put(DatabaseImpl.toLookupName(name), prop);
         return prop;
     }
@@ -181,6 +208,19 @@ public class PropertyMapImpl implements PropertyMap {
     }
 
     public static Property createProperty(String name, DataType type, Object value, boolean isDdl) {
+        return createProperty(name, type, value, toFlags(isDdl));
+    }
+
+    /**
+     * Creates a property with the given flag byte as stored in the file.
+     *
+     * @param name  property name
+     * @param type  property type, or {@code null} to derive it from the default info or the value
+     * @param value property value
+     * @param flags flag byte as stored in the file
+     * @return the new property
+     */
+    static Property createProperty(String name, DataType type, Object value, byte flags) {
         // see if this is a builtin property that we already understand
         PropDef pd = DEFAULT_TYPES.get(name);
 
@@ -192,7 +232,9 @@ public class PropertyMapImpl implements PropertyMap {
         if (pd != null) {
             // update according to the default info
             type = type == null ? pd.type : type;
-            isDdl |= pd.isDdl;
+            if (pd.isDdl) {
+                flags |= DDL_FLAG;
+            }
         } else if (type == null) {
             // choose the type based on the value
             if (value instanceof String) {
@@ -220,7 +262,17 @@ public class PropertyMapImpl implements PropertyMap {
             }
         }
 
-        return new PropertyImpl(name, type, value, isDdl);
+        return new PropertyImpl(name, type, value, flags);
+    }
+
+    /**
+     * Converts the given ddl state into a flag byte.
+     *
+     * @param isDdl whether the property is a DDL property
+     * @return the flag byte
+     */
+    private static byte toFlags(boolean isDdl) {
+        return isDdl ? DDL_FLAG : 0;
     }
 
     /**
@@ -229,13 +281,14 @@ public class PropertyMapImpl implements PropertyMap {
     static final class PropertyImpl implements PropertyMap.Property {
         private final String   name;
         private final DataType type;
-        private final boolean  ddl;
+        /** the flag byte exactly as it is stored in the file */
+        private final byte     flags;
         private Object         value;
 
-        private PropertyImpl(String name, DataType type, Object value, boolean ddl) {
+        private PropertyImpl(String name, DataType type, Object value, byte flags) {
             this.name = name;
             this.type = type;
-            this.ddl = ddl;
+            this.flags = flags;
             this.value = value;
         }
 
@@ -261,7 +314,17 @@ public class PropertyMapImpl implements PropertyMap {
 
         @Override
         public boolean isDdl() {
-            return ddl;
+            return (flags & DDL_FLAG) != 0;
+        }
+
+        /**
+         * Returns the flag byte as stored in the file. Access uses more of it than the one bit {@link #isDdl} reports,
+         * so the whole byte has to be written back unchanged.
+         *
+         * @return the flag byte
+         */
+        byte getFlags() {
+            return flags;
         }
 
         @Override
@@ -270,7 +333,8 @@ public class PropertyMapImpl implements PropertyMap {
             if (val instanceof byte[]) {
                 val = ByteUtil.toHexString((byte[]) val);
             }
-            return getName() + "[" + getType() + (ddl ? ":ddl" : "") + "]=" + val;
+            String flagStr = (isDdl() ? ":ddl" : "") + ((flags & SKIP_HANDLER_FLAG) != 0 ? ":nohandler" : "");
+            return String.format("%s[%s%s]=%s", getName(), getType(), flagStr, val);
         }
     }
 

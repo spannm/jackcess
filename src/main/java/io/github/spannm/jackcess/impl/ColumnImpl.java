@@ -244,6 +244,8 @@ public class ColumnImpl implements Column, Comparable<ColumnImpl>, DateTimeConte
     private final short                  mcolumnLength;
     /** 0-based column number */
     private final short                  mcolumnNumber;
+    /** id assigned to this column when it was created. Access never renumbers it, so it stays put while the column number shifts */
+    private final short                  mcolumnId;
     /** index of the data for this column within a list of row data */
     private int                          mcolumnIndex;
     /** display index of the data for this column */
@@ -281,6 +283,7 @@ public class ColumnImpl implements Column, Comparable<ColumnImpl>, DateTimeConte
         mcomplexValueForeignKey = false;
         mautoNumberGenerator = null;
         mcolumnNumber = (short) _colNumber;
+        mcolumnId = (short) _colNumber;
         mcolumnIndex = _colNumber;
         mdisplayIndex = _colNumber;
         mfixedDataOffset = _fixedOffset;
@@ -297,6 +300,7 @@ public class ColumnImpl implements Column, Comparable<ColumnImpl>, DateTimeConte
         mtype = args.type;
 
         mcolumnNumber = args.buffer.getShort(args.offset + getFormat().OFFSET_COLUMN_NUMBER);
+        mcolumnId = args.buffer.getShort(args.offset + getFormat().OFFSET_COLUMN_ID);
         mcolumnLength = args.buffer.getShort(args.offset + getFormat().OFFSET_COLUMN_LENGTH);
 
         mvariableLength = (args.flags & FIXED_LEN_FLAG_MASK) == 0;
@@ -418,6 +422,16 @@ public class ColumnImpl implements Column, Comparable<ColumnImpl>, DateTimeConte
 
     public short getColumnNumber() {
         return mcolumnNumber;
+    }
+
+    /**
+     * Returns the id the engine gave this column when it was created. The engine never renumbers an id, so a table
+     * which has had a column deleted has gaps in its ids.
+     *
+     * @return the column id
+     */
+    public short getColumnId() {
+        return mcolumnId;
     }
 
     @Override
@@ -1657,7 +1671,7 @@ public class ColumnImpl implements Column, Comparable<ColumnImpl>, DateTimeConte
     @Override
     public String toString() {
         ToStringBuilder sb = ToStringBuilder.builder(this).append("name", "(" + mtable.getName() + ") " + mname).append("type", "0x" + Integer.toHexString(getOriginalDataType()) + " (" + mtype + ")")
-            .append("number", mcolumnNumber).append("length", mcolumnLength).append("variableLength", mvariableLength);
+            .append("number", mcolumnNumber).append("id", mcolumnId).append("length", mcolumnLength).append("variableLength", mvariableLength);
         if (mcalculated) {
             sb.append("calculated", mcalculated).appendIgnoreNull("expression", getCalculationContext());
         }
@@ -1881,7 +1895,7 @@ public class ColumnImpl implements Column, Comparable<ColumnImpl>, DateTimeConte
 
         buffer.putShort(colOffsets.getNextVariableOffset(col));
 
-        buffer.putShort(col.getColumnNumber()); // Column Number again
+        buffer.putShort(col.getColumnId()); // Column Id
 
         if (col.getType().isTextual()) {
             // this will write 4 bytes (note we don't support writing dbs which
@@ -2031,7 +2045,10 @@ public class ColumnImpl implements Column, Comparable<ColumnImpl>, DateTimeConte
         }
         buffer.putShort(sortOrder.getValue());
         if (format.SIZE_SORT_ORDER == 4) {
-            buffer.put((byte) 0x00); // unknown
+            // the sort order field is the engine's own sort id: the LCID in the low half, the collation variant here,
+            // and the weight table family in the version byte. Jackcess has no variants, so this is always the plain
+            // collation for the LCID
+            buffer.put((byte) 0x00); // collation variant
             buffer.put((byte) sortOrder.getVersion());
         }
     }

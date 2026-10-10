@@ -219,6 +219,7 @@ public abstract class JetFormat {
 
     public final int                  OFFSET_COLUMN_TYPE;
     public final int                  OFFSET_COLUMN_NUMBER;
+    public final int                  OFFSET_COLUMN_ID;
     public final int                  OFFSET_COLUMN_PRECISION;
     public final int                  OFFSET_COLUMN_SCALE;
     public final int                  OFFSET_COLUMN_SORT_ORDER;
@@ -358,6 +359,7 @@ public abstract class JetFormat {
 
         OFFSET_COLUMN_TYPE = defineOffsetColumnType();
         OFFSET_COLUMN_NUMBER = defineOffsetColumnNumber();
+        OFFSET_COLUMN_ID = defineOffsetColumnId();
         OFFSET_COLUMN_PRECISION = defineOffsetColumnPrecision();
         OFFSET_COLUMN_SCALE = defineOffsetColumnScale();
         OFFSET_COLUMN_SORT_ORDER = defineOffsetColumnSortOrder();
@@ -490,6 +492,8 @@ public abstract class JetFormat {
     protected abstract int defineOffsetColumnType();
 
     protected abstract int defineOffsetColumnNumber();
+
+    protected abstract int defineOffsetColumnId();
 
     protected abstract int defineOffsetColumnPrecision();
 
@@ -779,6 +783,11 @@ public abstract class JetFormat {
         @Override
         protected int defineOffsetColumnNumber() {
             return 1;
+        }
+
+        @Override
+        protected int defineOffsetColumnId() {
+            return 5;
         }
 
         @Override
@@ -1240,6 +1249,11 @@ public abstract class JetFormat {
         @Override
         protected int defineOffsetColumnNumber() {
             return 5;
+        }
+
+        @Override
+        protected int defineOffsetColumnId() {
+            return 9;
         }
 
         @Override

@@ -124,6 +124,15 @@ public class TableCreator extends TableMutator {
         return IndexData.COLUMN_UNUSED;
     }
 
+    @Override
+    boolean isComplexColumn(String colName) {
+        return columns.stream()
+            .filter(col -> col.getName().equalsIgnoreCase(colName))
+            .findFirst()
+            .map(col -> col.getType() == DataType.COMPLEX_TYPE)
+            .orElse(false);
+    }
+
     /**
      * @return The number of variable length columns which are not long values found in the list
      */

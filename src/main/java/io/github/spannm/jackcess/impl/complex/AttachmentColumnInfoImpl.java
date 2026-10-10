@@ -52,8 +52,11 @@ import java.util.zip.InflaterInputStream;
  */
 public final class AttachmentColumnInfoImpl extends ComplexColumnInfoImpl<Attachment> implements AttachmentColumnInfo {
 
-    /** some file formats which may not be worth re-compressing */
-    private static final Set<String> COMPRESSED_FORMATS   = Collections.unmodifiableSet(new HashSet<>(Arrays.asList("jpg", "zip", "gz", "bz2", "z", "7z", "cab", "rar", "mp3", "mpg")));
+    /**
+     * the file formats which Access stores raw. It deflates everything else, including formats which are compressed
+     * already, such as gz and mp3
+     */
+    private static final Set<String> COMPRESSED_FORMATS   = Collections.unmodifiableSet(new HashSet<>(Arrays.asList("jpg", "jpeg", "gif", "png", "zip", "cab", "docx", "xlsx", "xlsb", "pptx")));
 
     private static final String      FILE_NAME_COL_NAME   = "FileName";
     private static final String      FILE_TYPE_COL_NAME   = "FileType";
@@ -61,7 +64,8 @@ public final class AttachmentColumnInfoImpl extends ComplexColumnInfoImpl<Attach
     private static final int         DATA_TYPE_RAW        = 0;
     private static final int         DATA_TYPE_COMPRESSED = 1;
 
-    private static final int         UNKNOWN_HEADER_VAL   = 1;
+    /** the second int of the content header. Access always writes a 1 */
+    private static final int         CONTENT_HEADER_FLAG  = 1;
     private static final int         WRAPPER_HEADER_SIZE  = 8;
     private static final int         CONTENT_HEADER_SIZE  = 12;
 
@@ -385,9 +389,9 @@ public final class AttachmentColumnInfoImpl extends ComplexColumnInfoImpl<Attach
 
                 contentStream = new DataInputStream(bin);
 
-                // header is an unknown flag followed by the "file extension" of the
-                // data (no clue why we need that again since it's already a separate
-                // field in the attachment table). just skip all of it
+                // the content header is the header length, the CONTENT_HEADER_FLAG, the character count of the string
+                // which follows, and then the "file extension" of the data with a null terminator. The extension is
+                // already a separate field in the attachment table, so skip it all
                 byte[] tmpBytes = new byte[4];
                 contentStream.readFully(tmpBytes);
                 int headerLen = PageChannel.wrap(tmpBytes).getInt();
@@ -442,7 +446,7 @@ public final class AttachmentColumnInfoImpl extends ComplexColumnInfoImpl<Attach
                 byte[] tmpBytes = new byte[CONTENT_HEADER_SIZE];
                 PageChannel.wrap(tmpBytes)
                     .putInt(headerLen)
-                    .putInt(UNKNOWN_HEADER_VAL)
+                    .putInt(CONTENT_HEADER_FLAG)
                     .putInt(lcType.length());
                 contentStream.write(tmpBytes);
                 contentStream.write(typeBytes.array(), 0, typeBytes.remaining());

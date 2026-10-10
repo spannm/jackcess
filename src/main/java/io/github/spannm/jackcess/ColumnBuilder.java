@@ -36,6 +36,9 @@ import java.util.Map;
  */
 public class ColumnBuilder {
 
+    /** marks a column id which has not been assigned yet */
+    private static final short                UNSET_COLUMN_ID = (short) -1;
+
     /** name of the new column */
     private String                            name;
     /** the type of the new column */
@@ -56,6 +59,8 @@ public class ColumnBuilder {
     private boolean                           hyperlink;
     /** 0-based column number */
     private short                             columnNumber;
+    /** id for the new column, or {@link #UNSET_COLUMN_ID} to use the column number */
+    private short                             columnId        = UNSET_COLUMN_ID;
     /** the collating sort order for a text field */
     private ColumnImpl.SortOrder              sortOrder;
     /** table properties (if any) */
@@ -352,6 +357,24 @@ public class ColumnBuilder {
 
     public void setColumnNumber(short newColumnNumber) {
         columnNumber = newColumnNumber;
+    }
+
+    /**
+     * Returns the id of the new column, which defaults to the column number.
+     *
+     * @return the column id
+     */
+    public short getColumnId() {
+        return columnId != UNSET_COLUMN_ID ? columnId : columnNumber;
+    }
+
+    /**
+     * Sets the id of the new column. Access never reuses or renumbers column ids.
+     *
+     * @param newColumnId the column id
+     */
+    public void setColumnId(short newColumnId) {
+        columnId = newColumnId;
     }
 
     public ColumnImpl.SortOrder getTextSortOrder() {
