@@ -10,7 +10,7 @@
 
     <!--rule ref="category/java/bestpractices.xml/CheckResultSet" /-->
     <rule ref="category/java/bestpractices.xml/ForLoopCanBeForeach" />
-    <rule ref="category/java/bestpractices.xml/JUnit5TestShouldBePackagePrivate" />
+    <rule ref="category/java/bestpractices.xml/JUnitJupiterTestShouldBePackagePrivate" />
     <rule ref="category/java/bestpractices.xml/LiteralsFirstInComparisons" />
     <rule ref="category/java/bestpractices.xml/MissingOverride" />
     <rule ref="category/java/bestpractices.xml/OneDeclarationPerLine" />
@@ -90,7 +90,7 @@
     <rule ref="category/java/errorprone.xml/AvoidMultipleUnaryOperators" />
     <rule ref="category/java/errorprone.xml/AvoidUsingOctalValues" />
     <rule ref="category/java/errorprone.xml/BrokenNullCheck" />
-    <rule ref="category/java/errorprone.xml/CheckSkipResult" />
+    <rule ref="category/java/errorprone.xml/UnusedReturnValue" />
     <rule ref="category/java/errorprone.xml/ClassCastExceptionWithToArray" />
     <rule ref="category/java/errorprone.xml/CloseResource" />
     <rule ref="category/java/errorprone.xml/CompareObjectsWithEquals" />
