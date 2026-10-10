@@ -246,6 +246,7 @@ public abstract class JetFormat {
     public final int                  MAX_NUM_ROWS_ON_DATA_PAGE;
 
     public final int                  OFFSET_INDEX_COMPRESSED_BYTE_COUNT;
+    public final int                  OFFSET_INDEX_LEVEL;
     public final int                  OFFSET_INDEX_ENTRY_MASK;
     public final int                  OFFSET_PREV_INDEX_PAGE;
     public final int                  OFFSET_NEXT_INDEX_PAGE;
@@ -386,6 +387,7 @@ public abstract class JetFormat {
         MAX_NUM_ROWS_ON_DATA_PAGE = defineMaxNumRowsOnDataPage();
 
         OFFSET_INDEX_COMPRESSED_BYTE_COUNT = defineOffsetIndexCompressedByteCount();
+        OFFSET_INDEX_LEVEL = defineOffsetIndexLevel();
         OFFSET_INDEX_ENTRY_MASK = defineOffsetIndexEntryMask();
         OFFSET_PREV_INDEX_PAGE = defineOffsetPrevIndexPage();
         OFFSET_NEXT_INDEX_PAGE = defineOffsetNextIndexPage();
@@ -534,6 +536,9 @@ public abstract class JetFormat {
     protected abstract int defineMaxNumRowsOnDataPage();
 
     protected abstract int defineOffsetIndexCompressedByteCount();
+
+    /** -1 for a format which has no index level byte */
+    protected abstract int defineOffsetIndexLevel();
 
     protected abstract int defineOffsetIndexEntryMask();
 
@@ -888,6 +893,11 @@ public abstract class JetFormat {
         @Override
         protected int defineOffsetIndexCompressedByteCount() {
             return 20;
+        }
+
+        @Override
+        protected int defineOffsetIndexLevel() {
+            return -1;
         }
 
         @Override
@@ -1354,6 +1364,11 @@ public abstract class JetFormat {
         @Override
         protected int defineOffsetIndexCompressedByteCount() {
             return 24;
+        }
+
+        @Override
+        protected int defineOffsetIndexLevel() {
+            return 26;
         }
 
         @Override
