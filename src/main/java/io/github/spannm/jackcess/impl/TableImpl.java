@@ -171,6 +171,11 @@ public class TableImpl implements Table, PropertyMaps.Owner {
     private final FKEnforcer                    fkEnforcer;
     /** table validator if any (and enabled) */
     private RowValidatorEvalContext             rowValidator;
+    /**
+     * description of an inconsistency between the table definition and the column definitions, {@code null} if they
+     * agree. Rows cannot be written to such a table, but they can still be read.
+     */
+    private String                              writeDefError;
 
     /**
      * default cursor for iterating through the table, kept here for basic table traversal
@@ -245,6 +250,8 @@ public class TableImpl implements Table, PropertyMaps.Owner {
         }
 
         readColumnDefinitions(tableBuffer, columnCount);
+
+        validateColumnDefs();
 
         readIndexDefinitions(tableBuffer);
 
@@ -1779,6 +1786,46 @@ public class TableImpl implements Table, PropertyMaps.Owner {
         varColumns.sort(VAR_LEN_COLUMN_COMPARATOR);
     }
 
+    /**
+     * Verifies that the column counts and sizes in the table definition cover the columns which are actually defined.
+     * A damaged table definition can disagree, in which case writing a row would run off the end of the null mask, the
+     * variable length offset table or the row buffer.
+     * <p>
+     * Rows can still be read from such a table, so this only records the problem, which is reported when a row write
+     * is attempted.
+     */
+    private void validateColumnDefs() {
+        int maxRowSize = getFormat().MAX_ROW_SIZE;
+
+        for (ColumnImpl col : columns) {
+            if (col.getColumnNumber() >= maxColumnCount) {
+                setWriteDefError(String.format("column %s has number %d, which is outside the table column count %d",
+                    col.getName(), col.getColumnNumber(), maxColumnCount));
+            } else if (col.isVariableLength()) {
+                if (col.getVarLenTableIndex() >= maxVarColumnCount) {
+                    setWriteDefError(String.format("variable length column %s has offset index %d, which is outside the table variable length column count %d",
+                        col.getName(), col.getVarLenTableIndex(), maxVarColumnCount));
+                }
+            } else if (col.getFixedDataOffset() + col.getLength() > maxRowSize) {
+                setWriteDefError(String.format("fixed length column %s ends at offset %d, which is beyond the maximum row size %d",
+                    col.getName(), col.getFixedDataOffset() + col.getLength(), maxRowSize));
+            }
+        }
+    }
+
+    /**
+     * Records the first inconsistency found by {@link #validateColumnDefs}.
+     *
+     * @param reason description of the inconsistency
+     */
+    private void setWriteDefError(String reason) {
+        if (writeDefError != null) {
+            return;
+        }
+        writeDefError = String.format("Table definition is corrupt, %s", reason);
+        LOGGER.log(Level.WARNING, () -> withErrorContext(String.format("%s. Table is read-only", writeDefError)));
+    }
+
     private void readIndexDefinitions(ByteBuffer tableBuffer) throws IOException {
         // read index column information
         for (int i = 0; i < indexCount; i++) {
@@ -2488,6 +2535,11 @@ public class TableImpl implements Table, PropertyMaps.Owner {
      * @return the given buffer, filled with the row data
      */
     private ByteBuffer createRow(Object[] rowArray, ByteBuffer buffer, int minRowSize, Map<ColumnImpl, byte[]> rawVarValues) throws IOException {
+        if (writeDefError != null) {
+            // we cannot lay out a row without a table definition which matches the columns
+            throw new JackcessException(withErrorContext(writeDefError));
+        }
+
         buffer.putShort(maxColumnCount);
         NullMask nullMask = new NullMask(maxColumnCount);
 
