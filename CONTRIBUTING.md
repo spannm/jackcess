@@ -26,7 +26,7 @@ For security vulnerabilities, please follow [SECURITY.md](SECURITY.md) instead o
 ./mvnw verify
 ```
 
-This runs the build, unit tests, and static analysis (Checkstyle, PMD, SpotBugs). Please make sure it passes locally before opening a pull request — the same checks run in CI.
+This runs the build, unit tests, and static analysis (Checkstyle, PMD). Please make sure it passes locally before opening a pull request. The same checks run in CI.
 
 ## Making Changes
 
