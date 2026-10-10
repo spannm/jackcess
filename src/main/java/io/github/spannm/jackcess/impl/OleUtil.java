@@ -44,6 +44,8 @@ import java.sql.SQLFeatureNotSupportedException;
 import java.text.Normalizer;
 import java.util.EnumSet;
 import java.util.Set;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.util.regex.Pattern;
 
 /**
@@ -60,6 +62,8 @@ public final class OleUtil {
             OleBlobImpl blob, String prettyName, String className, String typeName,
             ByteBuffer blobBb, int dataBlockLen);
     }
+
+    private static final Logger                 LOGGER                     = Logger.getLogger(OleUtil.class.getName());
 
     private static final int                    PACKAGE_SIGNATURE          = 0x1C15;
     private static final Charset                OLE_CHARSET                = StandardCharsets.US_ASCII;
@@ -83,18 +87,9 @@ public final class OleUtil {
     private static final Pattern                UNICODE_ACCENT_PATTERN     =
         Pattern.compile("[\\p{InCombiningDiacriticalMarks}\\p{IsLm}\\p{IsSk}]+");
 
-    private static final CompoundPackageFactory COMPOUND_FACTORY;
-
-    static {
-        CompoundPackageFactory compoundFactory = null;
-        try {
-            compoundFactory = (CompoundPackageFactory) Class.forName("io.github.spannm.jackcess.impl.CompoundOleUtil")
-                .getDeclaredConstructor().newInstance();
-        } catch (Throwable ignored) {
-            // must not have poi, will load compound ole data as "other"
-        }
-        COMPOUND_FACTORY = compoundFactory;
-    }
+    private static final String                 POI_COORDINATES            = "org.apache.poi:poi";
+    private static final String                 POI_PROBE_CLASS            = "org.apache.poi.poifs.filesystem.POIFSFileSystem";
+    private static final String                 COMPOUND_OLE_UTIL_CLASS    = "io.github.spannm.jackcess.impl.CompoundOleUtil";
 
     private OleUtil() {
     }
@@ -449,12 +444,11 @@ public final class OleUtil {
                 return createSimplePackageContent(this, prettyName, className, typeName, bb, dataBlockLen);
             }
 
-            // if COMPOUND_FACTORY is null, the poi library isn't available, so just
-            // load compound data as "other"
-            if (COMPOUND_FACTORY != null
-                && bb.remaining() >= COMPOUND_STORAGE_SIGNATURE.length
-                && ByteUtil.matchesRange(bb, bb.position(), COMPOUND_STORAGE_SIGNATURE)) {
-                return COMPOUND_FACTORY.createCompoundPackageContent(
+            // without the poi library there is no compound factory, so compound data is loaded as "other"
+            if (bb.remaining() >= COMPOUND_STORAGE_SIGNATURE.length
+                && ByteUtil.matchesRange(bb, bb.position(), COMPOUND_STORAGE_SIGNATURE)
+                && CompoundSupport.FACTORY != null) {
+                return CompoundSupport.FACTORY.createCompoundPackageContent(
                     this, prettyName, className, typeName, bb, dataBlockLen);
             }
 
@@ -761,6 +755,40 @@ public final class OleUtil {
         @Override
         public String toString() {
             return toString(ToStringBuilder.builder(this)).append("content", blob.bytes).toString();
+        }
+    }
+
+    /**
+     * Initialization-on-demand holder for the compound storage support. The classpath is only probed for the optional
+     * POI library when the first compound storage blob is read, once, without explicit synchronization.
+     */
+    private static final class CompoundSupport {
+
+        /** the factory backed by POI, {@code null} if POI is not on the classpath */
+        static final CompoundPackageFactory FACTORY = createFactory();
+
+        /**
+         * Creates the factory backed by POI, so that no POI class is touched unless POI can be loaded.
+         *
+         * @return the factory, or {@code null} if POI is not available
+         */
+        private static CompoundPackageFactory createFactory() {
+            try {
+                Class.forName(POI_PROBE_CLASS, false, OleUtil.class.getClassLoader());
+            } catch (ClassNotFoundException | LinkageError ignored) {
+                LOGGER.log(Level.INFO, () -> String.format(
+                    "Compound OLE data is read as plain content, its entries require the optional library %s on the classpath (class %s not found)",
+                    POI_COORDINATES, POI_PROBE_CLASS));
+                return null;
+            }
+
+            try {
+                return (CompoundPackageFactory) Class.forName(COMPOUND_OLE_UTIL_CLASS).getDeclaredConstructor().newInstance();
+            } catch (ReflectiveOperationException | LinkageError _ex) {
+                LOGGER.log(Level.WARNING, _ex, () -> String.format(
+                    "Compound OLE data is read as plain content, %s could not be loaded", COMPOUND_OLE_UTIL_CLASS));
+                return null;
+            }
         }
     }
 
