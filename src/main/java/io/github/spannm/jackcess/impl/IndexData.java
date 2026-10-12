@@ -2392,7 +2392,7 @@ public final class IndexData {
         public int hashCode() {
             int hashCode = super.hashCode();
             if (isValid()) {
-                hashCode += Objects.hash(getEntryBytes());
+                hashCode += Arrays.hashCode(getEntryBytes());
             } else {
                 hashCode += Objects.hash(getType());
             }
