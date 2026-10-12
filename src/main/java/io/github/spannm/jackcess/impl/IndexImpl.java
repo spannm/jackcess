@@ -35,7 +35,7 @@ import java.util.logging.Logger;
  * @author Tim McCune
  */
 public final class IndexImpl implements Index, Comparable<IndexImpl> {
-    protected static final Logger     LOGGER                  = Logger.getLogger(IndexImpl.class.getName());
+    static final Logger     LOGGER                  = Logger.getLogger(IndexImpl.class.getName());
 
     /** index type for primary key indexes */
     public static final byte          PRIMARY_KEY_INDEX_TYPE  = (byte) 1;
@@ -73,7 +73,7 @@ public final class IndexImpl implements Index, Comparable<IndexImpl> {
     /** foreign key reference info, if any */
     private final ForeignKeyReference reference;
 
-    protected IndexImpl(ByteBuffer tableBuffer, List<IndexData> indexDatas, JetFormat format) {
+    IndexImpl(ByteBuffer tableBuffer, List<IndexData> indexDatas, JetFormat format) {
         ByteUtil.forward(tableBuffer, format.SKIP_BEFORE_INDEX_SLOT); // Forward past Unknown
         indexNumber = tableBuffer.getInt();
         int indexDataNumber = tableBuffer.getInt();
@@ -346,7 +346,7 @@ public final class IndexImpl implements Index, Comparable<IndexImpl> {
      * @param creator description of the indexes to write
      * @param buffer Buffer to write to
      */
-    protected static void writeDefinitions(TableCreator creator, ByteBuffer buffer) {
+    static void writeDefinitions(TableCreator creator, ByteBuffer buffer) {
         // write logical index information
         for (IndexBuilder idx : creator.getIndexes()) {
             writeDefinition(creator, idx, buffer);
@@ -358,7 +358,7 @@ public final class IndexImpl implements Index, Comparable<IndexImpl> {
         }
     }
 
-    protected static void writeDefinition(TableMutator mutator, IndexBuilder idx, ByteBuffer buffer) {
+    static void writeDefinition(TableMutator mutator, IndexBuilder idx, ByteBuffer buffer) {
         TableMutator.IndexDataState idxDataState = mutator.getIndexDataState(idx);
 
         // write logical index information

@@ -42,6 +42,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashSet;
+import java.util.Locale;
 import java.util.Set;
 import java.util.zip.Deflater;
 import java.util.zip.DeflaterOutputStream;
@@ -416,7 +417,7 @@ public final class AttachmentColumnInfoImpl extends ComplexColumnInfoImpl<Attach
         private byte[] encodeData() throws IOException {
 
             // possibly compress data based on file type
-            String lcType = type != null ? type.toLowerCase() : "";
+            String lcType = type != null ? type.toLowerCase(Locale.ROOT) : "";
             boolean shouldCompress = !COMPRESSED_FORMATS.contains(lcType);
 
             // encode extension, which ends w/ a null byte

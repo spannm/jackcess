@@ -174,6 +174,8 @@ public interface Table extends Iterable<Row>, TableDefinition {
     Object[] asUpdateRow(Map<String, ?> rowMap);
 
     /**
+     * Returns the number of rows currently stored in this table.
+     *
      * @return the number of rows currently stored in this table
      */
     int getRowCount();
@@ -265,6 +267,8 @@ public interface Table extends Iterable<Row>, TableDefinition {
     Iterator<Row> iterator();
 
     /**
+     * Returns a Stream using the default Iterator.
+     *
      * @return a Stream using the default Iterator.
      */
     default Stream<Row> stream() {
@@ -278,12 +282,18 @@ public interface Table extends Iterable<Row>, TableDefinition {
     void reset();
 
     /**
+     * Returns the next row in this table (Column name -&gt; Column value) (uses the {@link #getDefaultCursor default
+     * cursor}).
+     *
      * @return The next row in this table (Column name -&gt; Column value) (uses the {@link #getDefaultCursor default
      *         cursor})
      */
     Row getNextRow() throws IOException;
 
     /**
+     * Returns a simple Cursor, initialized on demand and held by this table. This cursor backs the row traversal
+     * methods available on the Table interface. For advanced Table traversal and manipulation, use the Cursor directly.
+     *
      * @return a simple Cursor, initialized on demand and held by this table. This cursor backs the row traversal
      *         methods available on the Table interface. For advanced Table traversal and manipulation, use the Cursor
      *         directly.

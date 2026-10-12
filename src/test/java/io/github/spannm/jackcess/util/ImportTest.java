@@ -258,7 +258,7 @@ final class ImportTest extends AbstractBaseTest {
             if ("getMetaData".equals(methodName)) {
                 return Proxy.newProxyInstance(Thread.currentThread().getContextClassLoader(), new Class<?>[] {ResultSetMetaData.class}, this);
             } else if ("next".equals(methodName)) {
-                return Boolean.FALSE;
+                return false;
             } else if ("getColumnCount".equals(methodName)) {
                 return _types.size();
             } else if ("getColumnName".equals(methodName) || "getColumnLabel".equals(methodName)) {

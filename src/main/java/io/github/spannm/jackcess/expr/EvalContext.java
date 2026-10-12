@@ -24,34 +24,48 @@ import javax.script.Bindings;
  */
 public interface EvalContext extends LocaleContext {
     /**
+     * Returns a random value for the given seed following the statefulness rules for the "Rnd" function.
+     *
      * @param seed the seed for the random value, following the rules for the "Rnd" function
      * @return a random value for the given seed following the statefulness rules for the "Rnd" function
      */
     float getRandom(Integer seed);
 
     /**
+     * Returns the expected type of the result value for the current expression evaluation (for "default value" and
+     * "calculated" expressions).
+     *
      * @return the expected type of the result value for the current expression evaluation (for "default value" and
      *         "calculated" expressions)
      */
     Value.Type getResultType();
 
     /**
+     * Returns the value of the "current" column (for "field validator" expressions).
+     *
      * @return the value of the "current" column (for "field validator" expressions)
      */
     Value getThisColumnValue();
 
     /**
+     * Returns the value of the entity identified by the given identifier (for "calculated" and "row validator"
+     * expressions).
+     *
      * @return the value of the entity identified by the given identifier (for "calculated" and "row validator"
      *         expressions)
      */
     Value getIdentifierValue(Identifier identifier);
 
     /**
+     * Returns the currently configured Bindings (from the {@link EvalConfig}).
+     *
      * @return the currently configured Bindings (from the {@link EvalConfig})
      */
     Bindings getBindings();
 
     /**
+     * Returns the value of the current key from the currently configured {@link Bindings}.
+     *
      * @return the value of the current key from the currently configured {@link Bindings}
      */
     Object get(String key);

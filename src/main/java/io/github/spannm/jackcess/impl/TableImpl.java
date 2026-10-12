@@ -256,9 +256,10 @@ public class TableImpl implements Table, PropertyMaps.Owner {
         readIndexDefinitions(tableBuffer);
 
         // read column usage map info
-        while (tableBuffer.remaining() >= 2 && readColumnUsageMaps(tableBuffer)) {
-            continue; // keep reading ...
-        }
+        boolean keepReading;
+        do {
+            keepReading = tableBuffer.remaining() >= 2 && readColumnUsageMaps(tableBuffer);
+        } while (keepReading);
 
         // re-sort columns if necessary
         if (getDatabase().getColumnOrder() != ColumnOrder.DATA) {
@@ -448,6 +449,8 @@ public class TableImpl implements Table, PropertyMaps.Owner {
     }
 
     /**
+     * Returns all PropertyMaps for this table (and columns).
+     *
      * @return all PropertyMaps for this table (and columns)
      */
     public PropertyMaps getPropertyMaps() throws IOException {
@@ -507,6 +510,8 @@ public class TableImpl implements Table, PropertyMaps.Owner {
     }
 
     /**
+     * Returns all of the IndexData on this table (unmodifiable List).
+     *
      * @return All of the IndexData on this table (unmodifiable List)
      */
     public List<IndexData> getIndexDatas() {
@@ -986,6 +991,7 @@ public class TableImpl implements Table, PropertyMaps.Owner {
         writeTableDefinitionBuffer(buffer, creator.getTdefPageNumber(), creator, Collections.emptyList());
     }
 
+    @SuppressWarnings("ListRemoveAmbiguous") // reservedPages.remove(0) takes the first page by index
     private static void writeTableDefinitionBuffer(ByteBuffer buffer, int tdefPageNumber, TableMutator mutator, List<Integer> reservedPages) throws IOException {
         buffer.rewind();
         int totalTableDefSize = buffer.remaining();
@@ -1960,6 +1966,8 @@ public class TableImpl implements Table, PropertyMaps.Owner {
     }
 
     /**
+     * Returns the generated RowId added to a row of values created via {@link #asRowWithRowId}.
+     *
      * @return the generated RowId added to a row of values created via {@link #asRowWithRowId}
      */
     public RowId getRowId(Object[] row) {
@@ -2836,6 +2844,8 @@ public class TableImpl implements Table, PropertyMaps.Owner {
     }
 
     /**
+     * Returns a simple String representation of the entire table in tab-delimited format.
+     *
      * @return A simple String representation of the entire table in tab-delimited format
      */
     public String display() throws IOException {
@@ -2843,6 +2853,8 @@ public class TableImpl implements Table, PropertyMaps.Owner {
     }
 
     /**
+     * Returns a simple String representation of the entire table in tab-delimited format.
+     *
      * @param limit Maximum number of rows to display
      * @return A simple String representation of the entire table in tab-delimited format
      */

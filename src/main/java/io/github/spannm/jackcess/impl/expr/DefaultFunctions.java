@@ -41,6 +41,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -79,7 +80,7 @@ public final class DefaultFunctions {
                 return ValueSupport.ZERO_VAL;
             }
             int lv = param1.getAsLongInt(ctx);
-            return ValueSupport.toValue(Integer.toHexString(lv).toUpperCase());
+            return ValueSupport.toValue(Integer.toHexString(lv).toUpperCase(Locale.ROOT));
         }
     });
 

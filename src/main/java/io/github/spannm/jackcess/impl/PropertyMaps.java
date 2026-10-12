@@ -76,6 +76,8 @@ public class PropertyMaps implements Iterable<PropertyMapImpl> {
     }
 
     /**
+     * Returns the unnamed "default" PropertyMap in this group, creating if necessary.
+     *
      * @return the unnamed "default" PropertyMap in this group, creating if necessary.
      */
     public PropertyMapImpl getDefault() {
@@ -83,6 +85,10 @@ public class PropertyMaps implements Iterable<PropertyMapImpl> {
     }
 
     /**
+     * Returns the PropertyMap for the index with the given name in this group, creating if necessary. An index has its
+     * own block, and access names an index after its column by default, so this is a separate map from the one {@link
+     * #get} returns for the same name.
+     *
      * @return the PropertyMap for the index with the given name in this group, creating if necessary. An index has its
      *         own block, and access names an index after its column by default, so this is a separate map from the one
      *         {@link #get} returns for the same name.
@@ -92,6 +98,8 @@ public class PropertyMaps implements Iterable<PropertyMapImpl> {
     }
 
     /**
+     * Returns the PropertyMap with the given name in this group, creating if necessary.
+     *
      * @return the PropertyMap with the given name in this group, creating if necessary
      */
     public PropertyMapImpl get(String name) {
@@ -183,6 +191,8 @@ public class PropertyMaps implements Iterable<PropertyMapImpl> {
         }
 
         /**
+         * Returns a PropertyMaps instance decoded from the given bytes (always returns non-{@code null} result).
+         *
          * @return a PropertyMaps instance decoded from the given bytes (always returns non-{@code null} result).
          */
         public PropertyMaps read(byte[] propBytes, int objectId, RowIdImpl rowId, Owner owner) throws IOException {
@@ -230,6 +240,8 @@ public class PropertyMaps implements Iterable<PropertyMapImpl> {
         }
 
         /**
+         * Returns a byte[] encoded from the given PropertyMaps instance.
+         *
          * @return a byte[] encoded from the given PropertyMaps instance
          */
         public byte[] write(PropertyMaps maps) throws IOException {
@@ -450,7 +462,7 @@ public class PropertyMaps implements Iterable<PropertyMapImpl> {
 
         private static boolean isPseudoGuidColumn(DataType dataType, String propName, int dataSize, Object value) throws IOException {
             // guids seem to be marked as "binary" fields
-            return dataType == DataType.BINARY && (dataSize == DataType.GUID.getFixedSize() || dataSize == -1 && ColumnImpl.isGUIDValue(value)) && PropertyMap.GUID_PROP.equalsIgnoreCase(propName);
+            return dataType == DataType.BINARY && (dataSize == DataType.GUID.getFixedSize() || (dataSize == -1 && ColumnImpl.isGUIDValue(value))) && PropertyMap.GUID_PROP.equalsIgnoreCase(propName);
         }
 
         /**

@@ -115,6 +115,8 @@ public class NumericConfig {
     }
 
     /**
+     * Returns the given float formatted according to the current locale config.
+     *
      * @return the given float formatted according to the current locale config
      */
     public String format(float f) {
@@ -122,6 +124,8 @@ public class NumericConfig {
     }
 
     /**
+     * Returns the given double formatted according to the current locale config.
+     *
      * @return the given double formatted according to the current locale config
      */
     public String format(double d) {
@@ -129,6 +133,8 @@ public class NumericConfig {
     }
 
     /**
+     * Returns the given BigDecimal formatted according to the current locale config.
+     *
      * @return the given BigDecimal formatted according to the current locale config
      */
     public String format(BigDecimal bd) {

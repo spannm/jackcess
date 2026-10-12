@@ -279,7 +279,7 @@ public final class FormatUtil {
         }
 
         public boolean isNullOrEmptyString() {
-            return expr.isNull() || expr.getType().isString() && getAsString().isEmpty();
+            return expr.isNull() || (expr.getType().isString() && getAsString().isEmpty());
         }
 
         public boolean maybeCoerceToEmptyString() {
@@ -1151,15 +1151,15 @@ public final class FormatUtil {
     }
 
     private static byte getFormatCodeType(char c) {
-        if (c >= 0 && c < 127) {
+        if (c < 127) {
             return FORMAT_CODE_TYPES[c];
         }
         return FCT_UNKNOWN;
     }
 
     private static void setFormatCodeTypes(String chars, byte type) {
-        for (char c : chars.toCharArray()) {
-            FORMAT_CODE_TYPES[c] = type;
+        for (int i = 0; i < chars.length(); i++) {
+            FORMAT_CODE_TYPES[chars.charAt(i)] = type;
         }
     }
 

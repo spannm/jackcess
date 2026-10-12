@@ -221,6 +221,8 @@ public interface OleBlob extends Blob, Closeable {
         Entry getContentsEntry() throws IOException;
 
         /**
+         * Returns a Stream using the default Iterator.
+         *
          * @return a Stream using the default Iterator.
          */
         default Stream<CompoundContent.Entry> stream() {

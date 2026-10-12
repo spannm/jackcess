@@ -582,7 +582,7 @@ final class IndexTest extends AbstractBaseTest {
             batch.add(new Object[] {7, "row2"});
             batch.add(new Object[] {8, "row8"});
 
-            BatchUpdateException buex = catchThrowableOfType(() -> t.addRows(batch), BatchUpdateException.class);
+            BatchUpdateException buex = catchThrowableOfType(BatchUpdateException.class, () -> t.addRows(batch));
             assertThat(buex.getCause()).isInstanceOf(ConstraintViolationException.class);
             assertThat(buex.getUpdateCount()).isEqualTo(2);
 
@@ -650,7 +650,7 @@ final class IndexTest extends AbstractBaseTest {
             batch.add(new Object[] {null, "row5"});
             batch.add(new Object[] {null, "row3"});
 
-            BatchUpdateException buex = catchThrowableOfType(() -> t.addRows(batch), BatchUpdateException.class);
+            BatchUpdateException buex = catchThrowableOfType(BatchUpdateException.class, () -> t.addRows(batch));
             assertThat(buex.getCause()).isInstanceOf(ConstraintViolationException.class);
             assertThat(buex.getUpdateCount()).isEqualTo(2);
 

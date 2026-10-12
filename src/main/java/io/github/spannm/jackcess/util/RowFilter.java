@@ -57,6 +57,7 @@ public abstract class RowFilter implements Predicate<Row> {
      *
      * @return a filtering iterable
      */
+    @SuppressWarnings("AmbiguousMethodReference") // overloads with the static apply() of the public API
     public Iterable<Row> apply(Iterable<? extends Row> iterable) {
         return new FilterIterable(iterable);
     }
@@ -69,7 +70,7 @@ public abstract class RowFilter implements Predicate<Row> {
      *
      * @return a filtering iterable (or the given iterable if a {@code null} filter was given)
      */
-    @SuppressWarnings("unchecked")
+    @SuppressWarnings({"unchecked", "AmbiguousMethodReference"}) // see the instance apply()
     public static Iterable<Row> apply(RowFilter rowFilter,
         Iterable<? extends Row> iterable) {
         return rowFilter != null ? rowFilter.apply(iterable) : (Iterable<Row>) iterable;

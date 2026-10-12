@@ -108,10 +108,8 @@ public final class StringUtil {
             } else if (i == 0) {
                 sb.append(Character.toLowerCase(c));
             } else if (nextUpper) {
-                if ('_' != c) {
-                    sb.append(Character.toTitleCase(c));
-                    nextUpper = false;
-                } // else skip underscore, next char upper
+                sb.append(Character.toTitleCase(c));
+                nextUpper = false;
             } else {
                 sb.append(Character.toLowerCase(c));
             }

@@ -625,14 +625,14 @@ public class ColumnImpl implements Column, Comparable<ColumnImpl>, DateTimeConte
         PropertyMap colProps = getProperties();
 
         // if the "required" property is enabled, add appropriate validator
-        boolean required = (Boolean) colProps.getValue(PropertyMap.REQUIRED_PROP, Boolean.FALSE);
+        boolean required = (Boolean) colProps.getValue(PropertyMap.REQUIRED_PROP, false);
         if (required) {
             validator = new RequiredColValidator(validator);
         }
 
         // if the "allow zero len" property is disabled (textual columns only),
         // add appropriate validator
-        boolean allowZeroLen = !getType().isTextual() || (Boolean) colProps.getValue(PropertyMap.ALLOW_ZERO_LEN_PROP, Boolean.TRUE);
+        boolean allowZeroLen = !getType().isTextual() || (Boolean) colProps.getValue(PropertyMap.ALLOW_ZERO_LEN_PROP, true);
         if (!allowZeroLen) {
             validator = new NoZeroLenColValidator(validator);
         }
@@ -890,6 +890,9 @@ public class ColumnImpl implements Column, Comparable<ColumnImpl>, DateTimeConte
     }
 
     /**
+     * Returns an appropriate BigDecimal representation of the given object. {@code null} is returned as 0 and Numbers
+     * are converted using their double representation.
+     *
      * @return an appropriate BigDecimal representation of the given object. {@code null} is returned as 0 and
      *         Numbers are converted using their double representation.
      */
@@ -898,6 +901,9 @@ public class ColumnImpl implements Column, Comparable<ColumnImpl>, DateTimeConte
     }
 
     /**
+     * Returns an appropriate BigDecimal representation of the given object. {@code null} is returned as 0 and Numbers
+     * are converted using their double representation.
+     *
      * @return an appropriate BigDecimal representation of the given object. {@code null} is returned as 0 and
      *         Numbers are converted using their double representation.
      */
@@ -1025,7 +1031,7 @@ public class ColumnImpl implements Column, Comparable<ColumnImpl>, DateTimeConte
     }
 
     static long fromLocalDateDouble(double value) {
-        long datePart = (long) value * MILLISECONDS_PER_DAY;
+        long datePart = ((long) value) * MILLISECONDS_PER_DAY;
 
         // the fractional part of the double represents the time. it is always
         // a positive fraction of the day (even if the double is negative),
@@ -1044,7 +1050,7 @@ public class ColumnImpl implements Column, Comparable<ColumnImpl>, DateTimeConte
     }
 
     private static Duration durationFromLocalDateDouble(double value) {
-        long dateSeconds = (long) value * SECONDS_PER_DAY;
+        long dateSeconds = ((long) value) * SECONDS_PER_DAY;
 
         // the fractional part of the double represents the time. it is always
         // a positive fraction of the day (even if the double is negative),
@@ -1077,6 +1083,7 @@ public class ColumnImpl implements Column, Comparable<ColumnImpl>, DateTimeConte
     /**
      * Writes an "extended" date/time value.
      */
+    @SuppressWarnings("JavaLocalTimeGetNano") // the whole seconds are in numSeconds
     private void writeExtendedDateValue(ByteBuffer buffer, Object value) {
         LocalDateTime ldt = BASE_EXT_LDT;
         if (value != null) {
@@ -1585,6 +1592,8 @@ public class ColumnImpl implements Column, Comparable<ColumnImpl>, DateTimeConte
     }
 
     /**
+     * Returns the decoded string.
+     *
      * @param textBytes bytes of text to decode
      * @param charset relevant charset
      * @return the decoded string
@@ -1698,6 +1707,8 @@ public class ColumnImpl implements Column, Comparable<ColumnImpl>, DateTimeConte
     }
 
     /**
+     * Returns a buffer with the text encoded.
+     *
      * @param text Text to encode
      * @param charset database charset
      * @return A buffer with the text encoded
@@ -1716,6 +1727,8 @@ public class ColumnImpl implements Column, Comparable<ColumnImpl>, DateTimeConte
     }
 
     /**
+     * Returns the number of variable length columns found in the list.
+     *
      * @param columns A list of columns in a table definition
      * @return The number of variable length columns found in the list
      */
@@ -1758,6 +1771,8 @@ public class ColumnImpl implements Column, Comparable<ColumnImpl>, DateTimeConte
     }
 
     /**
+     * Returns an appropriate CharSequence representation of the given object.
+     *
      * @return an appropriate CharSequence representation of the given object.
      */
     public static CharSequence toCharSequence(Object value) throws IOException {
@@ -1782,6 +1797,8 @@ public class ColumnImpl implements Column, Comparable<ColumnImpl>, DateTimeConte
     }
 
     /**
+     * Returns an appropriate byte[] representation of the given object.
+     *
      * @return an appropriate byte[] representation of the given object.
      */
     public static byte[] toByteArray(Object value) throws IOException {
@@ -2315,7 +2332,7 @@ public class ColumnImpl implements Column, Comparable<ColumnImpl>, DateTimeConte
         }
     }
 
-    private final class GuidAutoNumberGenerator extends AutoNumberGenerator {
+    private static final class GuidAutoNumberGenerator extends AutoNumberGenerator {
         private Object lastAutoNumber;
 
         @Override
@@ -2409,7 +2426,7 @@ public class ColumnImpl implements Column, Comparable<ColumnImpl>, DateTimeConte
         }
     }
 
-    private final class UnsupportedAutoNumberGenerator extends AutoNumberGenerator {
+    private static final class UnsupportedAutoNumberGenerator extends AutoNumberGenerator {
         private final DataType genType;
 
         private UnsupportedAutoNumberGenerator(DataType genType) {
@@ -2506,10 +2523,10 @@ public class ColumnImpl implements Column, Comparable<ColumnImpl>, DateTimeConte
 
         @Override
         public boolean equals(Object o) {
-            return this == o || o != null
+            return this == o || (o != null
                 && getClass() == o.getClass()
                 && mvalue == ((SortOrder) o).mvalue
-                && mversion == ((SortOrder) o).mversion;
+                && mversion == ((SortOrder) o).mversion);
         }
 
         @Override

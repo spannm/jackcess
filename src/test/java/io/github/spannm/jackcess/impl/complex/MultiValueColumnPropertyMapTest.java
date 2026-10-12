@@ -49,7 +49,7 @@ final class MultiValueColumnPropertyMapTest extends AbstractBaseTest {
             assertThat(props.isEmpty()).isFalse();
             assertThat(props.getSize()).isGreaterThan(1);
 
-            assertThat(props.getValue(PropertyMap.ALLOW_MULTI_VALUE_PROP)).isEqualTo(Boolean.TRUE);
+            assertThat(props.getValue(PropertyMap.ALLOW_MULTI_VALUE_PROP)).isEqualTo(true);
             assertThat(props.get(PropertyMap.ROW_SOURCE_TYPE_PROP)).isNotNull();
             assertThat(props.get("bogusProperty")).isNull();
             assertThat(props.getValue("bogusProperty")).isNull();
@@ -59,7 +59,7 @@ final class MultiValueColumnPropertyMapTest extends AbstractBaseTest {
             assertThat(props.stream().count()).isEqualTo(size);
 
             // "put" of the multi-value property goes to the primary map, everything else to the complex map
-            props.put(PropertyMap.ALLOW_MULTI_VALUE_PROP, Boolean.TRUE);
+            props.put(PropertyMap.ALLOW_MULTI_VALUE_PROP, true);
             props.put("newTextProp", "newVal");
             props.put("newLongProp", DataType.LONG, 42);
             assertThat(props.getValue("newTextProp")).isEqualTo("newVal");
@@ -67,7 +67,7 @@ final class MultiValueColumnPropertyMapTest extends AbstractBaseTest {
 
             props.putAll(null);
             props.putAll(Arrays.asList(props.get(PropertyMap.ALLOW_MULTI_VALUE_PROP), props.get("newTextProp")));
-            assertThat(props.getValue(PropertyMap.ALLOW_MULTI_VALUE_PROP)).isEqualTo(Boolean.TRUE);
+            assertThat(props.getValue(PropertyMap.ALLOW_MULTI_VALUE_PROP)).isEqualTo(true);
 
             props.save();
 

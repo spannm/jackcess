@@ -19,7 +19,6 @@ package io.github.spannm.jackcess.impl;
 import io.github.spannm.jackcess.DataType;
 import io.github.spannm.jackcess.JackcessRuntimeException;
 import io.github.spannm.jackcess.util.OleBlob;
-import io.github.spannm.jackcess.util.OleBlob.Builder;
 import io.github.spannm.jackcess.util.OleBlob.Content;
 import io.github.spannm.jackcess.util.OleBlob.ContentType;
 import io.github.spannm.jackcess.util.OleBlob.EmbeddedContent;
@@ -105,7 +104,7 @@ public final class OleUtil {
      * Creates a new OlBlob instance using the given information.
      */
     @SuppressWarnings("PMD.UseTryWithResources")
-    public static OleBlob createBlob(Builder oleBuilder) throws IOException {
+    public static OleBlob createBlob(OleBlob.Builder oleBuilder) throws IOException {
         try {
 
             if (!WRITEABLE_TYPES.contains(oleBuilder.getType())) {
@@ -174,7 +173,7 @@ public final class OleUtil {
         }
     }
 
-    private static byte[] writePackageHeader(Builder oleBuilder, long contentLen) {
+    private static byte[] writePackageHeader(OleBlob.Builder oleBuilder, long contentLen) {
 
         byte[] prettyNameBytes = getZeroTermStrBytes(oleBuilder.getPrettyName());
         String className = oleBuilder.getClassName();
@@ -219,7 +218,7 @@ public final class OleUtil {
         return headerBytes;
     }
 
-    private static byte[] writePackageStreamHeader(Builder oleBuilder) {
+    private static byte[] writePackageStreamHeader(OleBlob.Builder oleBuilder) {
 
         byte[] fileNameBytes = getZeroTermStrBytes(oleBuilder.getFileName());
         byte[] filePathBytes = getZeroTermStrBytes(oleBuilder.getFilePath());
@@ -254,7 +253,7 @@ public final class OleUtil {
         return headerBytes;
     }
 
-    private static byte[] writePackageStreamFooter(Builder oleBuilder) {
+    private static byte[] writePackageStreamFooter(OleBlob.Builder oleBuilder) {
 
         // note, these are _not_ zero terminated
         byte[] fileNameBytes = oleBuilder.getFileName().getBytes(OLE_UTF_CHARSET);
@@ -783,7 +782,7 @@ public final class OleUtil {
             }
 
             try {
-                return (CompoundPackageFactory) Class.forName(COMPOUND_OLE_UTIL_CLASS).getDeclaredConstructor().newInstance();
+                return Class.forName(COMPOUND_OLE_UTIL_CLASS).asSubclass(CompoundPackageFactory.class).getDeclaredConstructor().newInstance();
             } catch (ReflectiveOperationException | LinkageError _ex) {
                 LOGGER.log(Level.WARNING, _ex, () -> String.format(
                     "Compound OLE data is read as plain content, %s could not be loaded", COMPOUND_OLE_UTIL_CLASS));

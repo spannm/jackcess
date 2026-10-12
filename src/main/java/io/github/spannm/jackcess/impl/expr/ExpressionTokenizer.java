@@ -23,7 +23,6 @@ import io.github.spannm.jackcess.expr.TemporalConfig;
 import io.github.spannm.jackcess.expr.Value;
 import io.github.spannm.jackcess.impl.ColumnImpl;
 import io.github.spannm.jackcess.impl.expr.Expressionator.ParseContext;
-import io.github.spannm.jackcess.impl.expr.Expressionator.Type;
 import io.github.spannm.jackcess.util.StringUtil;
 
 import java.math.BigDecimal;
@@ -84,7 +83,7 @@ final class ExpressionTokenizer {
     /**
      * Tokenizes an expression string of the given type and (optionally) in the context of the relevant database.
      */
-    static List<Token> tokenize(Type exprType, String exprStr, ParseContext context) {
+    static List<Token> tokenize(Expressionator.Type exprType, String exprStr, ParseContext context) {
 
         if (exprStr != null) {
             exprStr = exprStr.trim();
@@ -115,7 +114,7 @@ final class ExpressionTokenizer {
                     case IS_COMP_FLAG:
 
                         // special case for default values
-                        if (exprType == Type.DEFAULT_VALUE && c == EQUALS_CHAR && buf.prevPos() == 0) {
+                        if (exprType == Expressionator.Type.DEFAULT_VALUE && c == EQUALS_CHAR && buf.prevPos() == 0) {
                             // a leading equals sign indicates how a default value should be
                             // evaluated
                             tokens.add(new Token(TokenType.OP, String.valueOf(c)));
@@ -213,11 +212,11 @@ final class ExpressionTokenizer {
         }
     }
 
-    private static String parseBareString(char firstChar, ExprBuf buf, Type exprType) {
+    private static String parseBareString(char firstChar, ExprBuf buf, Expressionator.Type exprType) {
         StringBuilder sb = buf.getScratchBuffer().append(firstChar);
 
         byte stopFlags = IS_OP_FLAG | IS_DELIM_FLAG | IS_SPACE_FLAG;
-        if (exprType == Type.FIELD_VALIDATOR) {
+        if (exprType == Expressionator.Type.FIELD_VALIDATOR) {
             stopFlags |= IS_COMP_FLAG;
         }
 

@@ -262,14 +262,17 @@ public class DatabaseImpl implements Database, DateTimeContext {
     /**
      * read-only channel access mode
      */
+    @SuppressWarnings("MutablePublicArray") // only passed to FileChannel.open, never modified
     public static final OpenOption[]        RO_CHANNEL_OPTS                     = {StandardOpenOption.READ};
     /**
      * read/write channel access mode for existing files
      */
+    @SuppressWarnings("MutablePublicArray") // only passed to FileChannel.open, never modified
     public static final OpenOption[]        RW_CHANNEL_OPTS                     = {StandardOpenOption.READ, StandardOpenOption.WRITE};
     /**
      * read/write/create channel access mode for new files
      */
+    @SuppressWarnings("MutablePublicArray") // only passed to FileChannel.open, never modified
     public static final OpenOption[]        RWC_CHANNEL_OPTS                    = {StandardOpenOption.READ, StandardOpenOption.WRITE, StandardOpenOption.CREATE};
 
     /**
@@ -763,6 +766,8 @@ public class DatabaseImpl implements Database, DateTimeContext {
     }
 
     /**
+     * Returns the system catalog table.
+     *
      * @return The system catalog table
      */
     public TableImpl getSystemCatalog() {
@@ -770,6 +775,8 @@ public class DatabaseImpl implements Database, DateTimeContext {
     }
 
     /**
+     * Returns the system Access Control Entries table (loaded on demand).
+     *
      * @return The system Access Control Entries table (loaded on demand)
      */
     public TableImpl getAccessControlEntries() throws IOException {
@@ -780,6 +787,8 @@ public class DatabaseImpl implements Database, DateTimeContext {
     }
 
     /**
+     * Returns the complex column system table (loaded on demand).
+     *
      * @return the complex column system table (loaded on demand)
      */
     public TableImpl getSystemComplexColumns() throws IOException {
@@ -1075,6 +1084,8 @@ public class DatabaseImpl implements Database, DateTimeContext {
     }
 
     /**
+     * Returns the currently configured database default language sort order for textual columns.
+     *
      * @return the currently configured database default language sort order for textual columns
      */
     public ColumnImpl.SortOrder getDefaultSortOrder() throws IOException {
@@ -1086,6 +1097,9 @@ public class DatabaseImpl implements Database, DateTimeContext {
     }
 
     /**
+     * Returns the currently configured database default code page for textual data (may not be relevant to all database
+     * versions).
+     *
      * @return the currently configured database default code page for textual data (may not be relevant to all database versions)
      */
     public short getDefaultCodePage() throws IOException {
@@ -1111,6 +1125,8 @@ public class DatabaseImpl implements Database, DateTimeContext {
     }
 
     /**
+     * Returns a PropertyMaps instance decoded from the given bytes (always returns non-{@code null} result).
+     *
      * @return a PropertyMaps instance decoded from the given bytes (always returns non-{@code null} result).
      */
     public PropertyMaps readProperties(byte[] propsBytes, int objectId, RowIdImpl rowId) throws IOException {
@@ -1294,6 +1310,8 @@ public class DatabaseImpl implements Database, DateTimeContext {
     }
 
     /**
+     * Returns the table, or null if it doesn't exist.
+     *
      * @param tableDefPageNumber the page number of a table definition
      * @return The table, or null if it doesn't exist
      */
@@ -1302,6 +1320,8 @@ public class DatabaseImpl implements Database, DateTimeContext {
     }
 
     /**
+     * Returns the table, or null if it doesn't exist.
+     *
      * @param name Table name
      * @param includeSystemTables whether to consider returning a system table
      * @return The table, or null if it doesn't exist
@@ -1340,7 +1360,7 @@ public class DatabaseImpl implements Database, DateTimeContext {
     private TableInfo getTableInfo(String name, boolean includeSystemTables) throws IOException {
         TableInfo tableInfo = lookupTable(name);
 
-        if (tableInfo == null || tableInfo.pageNumber == null || !includeSystemTables && tableInfo.isSystem()) {
+        if (tableInfo == null || tableInfo.pageNumber == null || (!includeSystemTables && tableInfo.isSystem())) {
             return null;
         }
 
@@ -1561,7 +1581,8 @@ public class DatabaseImpl implements Database, DateTimeContext {
         String name = baseName;
         int i = 0;
         while (names.contains(name)) {
-            name = baseName + (++i);
+            i++;
+            name = baseName + i;
         }
 
         return i == 0 ? origName : origName + i;
@@ -1657,6 +1678,8 @@ public class DatabaseImpl implements Database, DateTimeContext {
     }
 
     /**
+     * Returns the PropertyMaps for the object with the given id.
+     *
      * @return the PropertyMaps for the object with the given id
      */
     public PropertyMaps getPropertiesForObject(int objectId, PropertyMaps.Owner owner) throws IOException {
@@ -1881,7 +1904,7 @@ public class DatabaseImpl implements Database, DateTimeContext {
         for (byte[] sid : sids) {
             Object[] aceRow = new Object[acEntries.getColumnCount()];
             acmCol.setRowValue(aceRow, SYS_FULL_ACCESS_ACM);
-            inheritCol.setRowValue(aceRow, Boolean.FALSE);
+            inheritCol.setRowValue(aceRow, false);
             objIdCol.setRowValue(aceRow, objectId);
             sidCol.setRowValue(aceRow, sid);
             aceRows.add(aceRow);
@@ -2106,8 +2129,8 @@ public class DatabaseImpl implements Database, DateTimeContext {
      * <p>
      * {@link Locale#ROOT} is used deliberately so that the result is locale-independent.  Using the JVM default
      * locale would produce incorrect results when the JVM locale is Turkish (or Azerbaijani): in those locales
-     * {@link String#toUpperCase()} maps the dotless {@code i} ({@code \u0131}) and the dotted {@code I}
-     * ({@code \u0049}) differently from all other locales, which would cause table lookups to fail for names
+     * {@link String#toUpperCase()} maps the dotless {@code i} (U+0131) and the dotted {@code I}
+     * (U+0049) differently from all other locales, which would cause table lookups to fail for names
      * containing the letter 'i'.
      *
      * @param name the object name to normalise; may be {@code null}
@@ -2172,7 +2195,7 @@ public class DatabaseImpl implements Database, DateTimeContext {
      * {@value io.github.spannm.jackcess.Database#FK_ENFORCE_PROPERTY}.
      */
     public static boolean getDefaultEnforceForeignKeys() {
-        return Optional.ofNullable(System.getProperty(FK_ENFORCE_PROPERTY)).map(p -> Boolean.TRUE.toString().equalsIgnoreCase(p)).orElse(true);
+        return Optional.ofNullable(System.getProperty(FK_ENFORCE_PROPERTY)).map(p -> "true".equalsIgnoreCase(p)).orElse(true);
     }
 
     /**
@@ -2180,7 +2203,7 @@ public class DatabaseImpl implements Database, DateTimeContext {
      * {@value io.github.spannm.jackcess.Database#ALLOW_AUTONUM_INSERT_PROPERTY}.
      */
     public static boolean getDefaultAllowAutoNumberInsert() {
-        return Boolean.TRUE.toString().equalsIgnoreCase(System.getProperty(ALLOW_AUTONUM_INSERT_PROPERTY));
+        return "true".equalsIgnoreCase(System.getProperty(ALLOW_AUTONUM_INSERT_PROPERTY));
     }
 
     /**
@@ -2188,7 +2211,7 @@ public class DatabaseImpl implements Database, DateTimeContext {
      * {@value io.github.spannm.jackcess.Database#ENABLE_EXPRESSION_EVALUATION_PROPERTY}.
      */
     public static boolean getDefaultEvaluateExpressions() {
-        return Optional.ofNullable(System.getProperty(ENABLE_EXPRESSION_EVALUATION_PROPERTY)).map(p -> Boolean.TRUE.toString().equalsIgnoreCase(p)).orElse(true);
+        return Optional.ofNullable(System.getProperty(ENABLE_EXPRESSION_EVALUATION_PROPERTY)).map(p -> "true".equalsIgnoreCase(p)).orElse(true);
     }
 
     /**
@@ -2196,7 +2219,7 @@ public class DatabaseImpl implements Database, DateTimeContext {
      * {@value io.github.spannm.jackcess.Database#WRITE_BROKEN_INDEX_PROPERTY}.
      */
     public static boolean getDefaultWriteBrokenIndex() {
-        return Boolean.TRUE.toString().equalsIgnoreCase(System.getProperty(WRITE_BROKEN_INDEX_PROPERTY));
+        return "true".equalsIgnoreCase(System.getProperty(WRITE_BROKEN_INDEX_PROPERTY));
     }
 
     /**
@@ -2275,7 +2298,7 @@ public class DatabaseImpl implements Database, DateTimeContext {
     private static <E extends Enum<E>> E getEnumSystemProperty(Class<E> enumClass, String propName, E defaultValue) {
         String prop = System.getProperty(propName);
         if (prop != null) {
-            prop = prop.trim().toUpperCase();
+            prop = prop.trim().toUpperCase(Locale.ROOT);
             if (!prop.isEmpty()) {
                 return Enum.valueOf(enumClass, prop);
             }

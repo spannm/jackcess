@@ -62,6 +62,8 @@ public interface ErrorHandler {
      */
     interface Location {
         /**
+         * Returns the table in which the error occurred.
+         *
          * @return the table in which the error occurred
          */
         Table getTable();

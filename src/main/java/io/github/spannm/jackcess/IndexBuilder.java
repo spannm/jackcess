@@ -29,6 +29,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Locale;
 import java.util.Set;
 
 /**
@@ -187,7 +188,7 @@ public class IndexBuilder {
 
         Set<String> idxColNames = new HashSet<>();
         for (Column col : getColumns()) {
-            String idxColName = col.getName().toUpperCase();
+            String idxColName = col.getName().toUpperCase(Locale.ROOT);
             if (!idxColNames.add(idxColName)) {
                 throw new IllegalArgumentException(withErrorContext(
                     "duplicate column name " + col.getName() + " in index"));

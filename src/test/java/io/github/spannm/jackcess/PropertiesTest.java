@@ -38,6 +38,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
@@ -78,7 +79,7 @@ final class PropertiesTest extends AbstractBaseTest {
         assertThat(defMap.get("foo").isDdl()).isFalse();
         assertThat(defMap.get("baz").isDdl()).isTrue();
 
-        colMap.put("buzz", DataType.BOOLEAN, Boolean.TRUE, true);
+        colMap.put("buzz", DataType.BOOLEAN, true, true);
 
         assertThat(colMap.isEmpty()).isFalse();
         assertThat(colMap.getSize()).isEqualTo(1);
@@ -87,7 +88,7 @@ final class PropertiesTest extends AbstractBaseTest {
         assertThat(defMap.getValue("FOO")).isEqualTo("bar");
         assertThat(colMap.getValue("foo")).isNull();
         assertThat(defMap.get("baz").getValue()).isEqualTo(13);
-        assertThat(colMap.getValue("Buzz")).isEqualTo(Boolean.TRUE);
+        assertThat(colMap.getValue("Buzz")).isEqualTo(true);
 
         assertThat(defMap.getValue("foo", "blah")).isEqualTo("bar");
         assertThat(defMap.getValue("bogus", "blah")).isEqualTo("blah");
@@ -131,7 +132,7 @@ final class PropertiesTest extends AbstractBaseTest {
             }
             assertThat(tProps.getSize()).isEqualTo(expectedNumProps);
             assertThat(tProps.getValue("Orientation")).isEqualTo((byte) 0);
-            assertThat(tProps.getValue("OrderByOn")).isEqualTo(Boolean.FALSE);
+            assertThat(tProps.getValue("OrderByOn")).isEqualTo(false);
             assertThat(tProps.getValue("DefaultView")).isEqualTo((byte) 2);
 
             PropertyMap colProps = t.getColumn("A").getProperties();
@@ -144,11 +145,11 @@ final class PropertiesTest extends AbstractBaseTest {
             assertThat(colProps.getSize()).isEqualTo(expectedNumProps);
             assertThat(colProps.getValue("ColumnWidth")).isEqualTo((short) -1);
             assertThat(colProps.getValue("ColumnOrder")).isEqualTo((short) 0);
-            assertThat(colProps.getValue("ColumnHidden")).isEqualTo(Boolean.FALSE);
-            assertThat(colProps.getValue(PropertyMap.REQUIRED_PROP)).isEqualTo(Boolean.FALSE);
-            assertThat(colProps.getValue(PropertyMap.ALLOW_ZERO_LEN_PROP)).isEqualTo(Boolean.FALSE);
+            assertThat(colProps.getValue("ColumnHidden")).isEqualTo(false);
+            assertThat(colProps.getValue(PropertyMap.REQUIRED_PROP)).isEqualTo(false);
+            assertThat(colProps.getValue(PropertyMap.ALLOW_ZERO_LEN_PROP)).isEqualTo(false);
             assertThat(colProps.getValue("DisplayControl")).isEqualTo((short) 109);
-            assertThat(colProps.getValue("UnicodeCompression")).isEqualTo(Boolean.TRUE);
+            assertThat(colProps.getValue("UnicodeCompression")).isEqualTo(true);
             assertThat(colProps.getValue("IMEMode")).isEqualTo((byte) 0);
             assertThat(colProps.getValue("IMESentenceMode")).isEqualTo((byte) 3);
 
@@ -163,7 +164,7 @@ final class PropertiesTest extends AbstractBaseTest {
 
             PropertyMap userProps = db.getUserDefinedProperties();
             assertThat(userProps.getSize()).isEqualTo(1);
-            assertThat(userProps.getValue("ReplicateProject")).isEqualTo(Boolean.TRUE);
+            assertThat(userProps.getValue("ReplicateProject")).isEqualTo(true);
         }
     }
 
@@ -341,15 +342,15 @@ final class PropertiesTest extends AbstractBaseTest {
 
             Table t = db.getTable("Test");
 
-            assertThat(t.getProperties().getValue("awesome_table")).isEqualTo(Boolean.TRUE);
+            assertThat(t.getProperties().getValue("awesome_table")).isEqualTo(true);
 
             Column c = t.getColumn("id");
-            assertThat(c.getProperties().getValue(PropertyMap.REQUIRED_PROP)).isEqualTo(Boolean.TRUE);
-            assertThat(c.getProperties().getValue(PropertyMap.GUID_PROP)).isEqualTo("{" + u1.toString().toUpperCase() + "}");
+            assertThat(c.getProperties().getValue(PropertyMap.REQUIRED_PROP)).isEqualTo(true);
+            assertThat(c.getProperties().getValue(PropertyMap.GUID_PROP)).isEqualTo("{" + u1.toString().toUpperCase(Locale.ROOT) + "}");
 
             c = t.getColumn("data");
-            assertThat(c.getProperties().getValue(PropertyMap.ALLOW_ZERO_LEN_PROP)).isEqualTo(Boolean.FALSE);
-            assertThat(c.getProperties().getValue(PropertyMap.GUID_PROP)).isEqualTo("{" + u2.toString().toUpperCase() + "}");
+            assertThat(c.getProperties().getValue(PropertyMap.ALLOW_ZERO_LEN_PROP)).isEqualTo(false);
+            assertThat(c.getProperties().getValue(PropertyMap.GUID_PROP)).isEqualTo("{" + u2.toString().toUpperCase(Locale.ROOT) + "}");
         }
     }
 

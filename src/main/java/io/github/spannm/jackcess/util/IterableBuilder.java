@@ -175,6 +175,8 @@ public class IterableBuilder implements Iterable<Row> {
     }
 
     /**
+     * Returns a Stream using the default Iterator.
+     *
      * @return a Stream using the default Iterator.
      */
     public Stream<Row> stream() {

@@ -54,9 +54,10 @@ public class SqlHelper {
         // attempt to load the implementation of this class which works with
         // java.sql classes. if that fails, use this fallback instance instead.
         try {
-            return (SqlHelper) Class.forName("io.github.spannm.jackcess.impl.SqlHelperImpl")
+            return Class.forName("io.github.spannm.jackcess.impl.SqlHelperImpl").asSubclass(SqlHelper.class)
                 .getDeclaredConstructor().newInstance();
-        } catch (Throwable ignored) {}
-        return new SqlHelper();
+        } catch (Throwable ignored) {
+            return new SqlHelper();
+        }
     }
 }

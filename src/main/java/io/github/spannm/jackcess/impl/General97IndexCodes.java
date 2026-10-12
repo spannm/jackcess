@@ -212,7 +212,7 @@ public class General97IndexCodes extends GeneralLegacyIndexCodes {
     protected static final class NibbleStream extends ByteStream {
         private int nibbleLen;
 
-        protected NibbleStream(int length) {
+        NibbleStream(int length) {
             super(length);
         }
 

@@ -114,7 +114,7 @@ public class TableScanCursor extends CursorImpl {
     /**
      * Handles moving the table scan cursor in a given direction. Separates cursor logic from value storage.
      */
-    private abstract class ScanDirHandler extends DirHandler {
+    private abstract static class ScanDirHandler extends DirHandler {
         public abstract int getAnotherRowNumber(int curRowNumber);
 
         public abstract int getAnotherPageNumber();

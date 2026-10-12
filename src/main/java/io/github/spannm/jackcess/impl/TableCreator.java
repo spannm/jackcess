@@ -40,7 +40,7 @@ public class TableCreator extends TableMutator {
     private List<ColumnBuilder>                   columns;
     private List<IndexBuilder>                    indexes;
     private final List<IndexDataState>            indexDataStates = new ArrayList<>();
-    private final Map<ColumnBuilder, ColumnState> columnStates    = new IdentityHashMap<>();
+    private final IdentityHashMap<ColumnBuilder, ColumnState> columnStates = new IdentityHashMap<>();
     private final List<ColumnBuilder>             lvalCols        = new ArrayList<>();
     private int                                   tdefPageNumber  = PageChannel.INVALID_PAGE_NUMBER;
     private int                                   umapPageNumber  = PageChannel.INVALID_PAGE_NUMBER;
@@ -134,6 +134,8 @@ public class TableCreator extends TableMutator {
     }
 
     /**
+     * Returns the number of variable length columns which are not long values found in the list.
+     *
      * @return The number of variable length columns which are not long values found in the list
      */
     public short countNonLongVariableLength() {

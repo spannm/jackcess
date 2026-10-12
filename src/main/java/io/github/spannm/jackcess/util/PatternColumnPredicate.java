@@ -85,6 +85,9 @@ public class PatternColumnPredicate implements Predicate<Object> {
     }
 
     /**
+     * Returns a PatternColumnPredicate which tests values against the given ms access wildcard pattern (always case
+     * insensitive).
+     *
      * @return a PatternColumnPredicate which tests values against the given ms access wildcard pattern (always case
      *         insensitive)
      */
@@ -93,6 +96,9 @@ public class PatternColumnPredicate implements Predicate<Object> {
     }
 
     /**
+     * Returns a PatternColumnPredicate which tests values against the given sql like pattern (supports escape char
+     * '\').
+     *
      * @return a PatternColumnPredicate which tests values against the given sql like pattern (supports escape char '\')
      */
     public static PatternColumnPredicate forSqlLike(String pattern) {
@@ -100,6 +106,9 @@ public class PatternColumnPredicate implements Predicate<Object> {
     }
 
     /**
+     * Returns a PatternColumnPredicate which tests values against the given sql like pattern (supports escape char
+     * '\'), optionally case insensitive.
+     *
      * @return a PatternColumnPredicate which tests values against the given sql like pattern (supports escape char
      *         '\'), optionally case insensitive
      */
@@ -109,6 +118,8 @@ public class PatternColumnPredicate implements Predicate<Object> {
     }
 
     /**
+     * Returns a PatternColumnPredicate which tests values against the given java regex pattern.
+     *
      * @return a PatternColumnPredicate which tests values against the given java regex pattern
      */
     public static PatternColumnPredicate forJavaRegex(String pattern) {

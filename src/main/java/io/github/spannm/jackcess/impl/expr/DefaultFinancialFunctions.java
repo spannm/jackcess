@@ -256,10 +256,10 @@ public class DefaultFinancialFunctions {
 
     public static double calculateDoubleDecliningBalance(
         double cost, double salvage, double life, double period, double factor) {
-        if (cost < 0 || life == 2d && period > 1d) {
+        if (cost < 0 || (life == 2d && period > 1d)) {
             return 0;
         }
-        if (life < 2d || life == 2d && period <= 1d) {
+        if (life < 2d || (life == 2d && period <= 1d)) {
             return cost - salvage;
         }
 

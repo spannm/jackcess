@@ -47,6 +47,8 @@ public final class TempPageHolder {
     }
 
     /**
+     * Returns the currently set page number.
+     *
      * @return the currently set page number
      */
     public int getPageNumber() {
@@ -54,6 +56,8 @@ public final class TempPageHolder {
     }
 
     /**
+     * Returns the page for the current page number, reading as necessary, position and limit are unchanged.
+     *
      * @return the page for the current page number, reading as necessary, position and limit are unchanged
      */
     public ByteBuffer getPage(PageChannel pageChannel) throws IOException {

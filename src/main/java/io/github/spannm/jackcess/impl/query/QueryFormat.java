@@ -18,7 +18,6 @@ package io.github.spannm.jackcess.impl.query;
 
 import io.github.spannm.jackcess.DataType;
 import io.github.spannm.jackcess.query.Query;
-import io.github.spannm.jackcess.query.Query.Type;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -115,6 +114,6 @@ public final class QueryFormat {
         JOIN_TYPE_MAP = Collections.unmodifiableMap(joinTypeMap);
     }
 
-    public static final Map<Short, Query.Type> TYPE_MAP                      = Arrays.stream(Query.Type.values()).filter(Type::isUnknown).collect(Collectors.toMap(Type::getValue, v -> v));
+    public static final Map<Short, Query.Type> TYPE_MAP                      = Arrays.stream(Query.Type.values()).filter(Query.Type::isUnknown).collect(Collectors.toMap(Query.Type::getValue, v -> v));
 
 }

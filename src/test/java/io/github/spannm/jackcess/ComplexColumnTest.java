@@ -343,7 +343,7 @@ final class ComplexColumnTest extends AbstractBaseTest {
 
             // test multi-value col props
             PropertyMap props = col.getProperties();
-            assertThat(props.getValue(PropertyMap.ALLOW_MULTI_VALUE_PROP)).isEqualTo(Boolean.TRUE);
+            assertThat(props.getValue(PropertyMap.ALLOW_MULTI_VALUE_PROP)).isEqualTo(true);
             assertThat(props.getValue(PropertyMap.ROW_SOURCE_TYPE_PROP)).isEqualTo("Value List");
             assertThat(props.getValue(PropertyMap.ROW_SOURCE_PROP)).isEqualTo("\"value1\";\"value2\";\"value3\";\"value4\"");
         }

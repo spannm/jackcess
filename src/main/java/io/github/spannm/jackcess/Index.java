@@ -26,36 +26,50 @@ import java.util.List;
 public interface Index {
 
     /**
+     * Returns the table to which this index belongs.
+     *
      * @return the table to which this index belongs
      */
     Table getTable();
 
     /**
+     * Returns the name of this index.
+     *
      * @return the name of this index
      */
     String getName();
 
     /**
+     * Returns {@code true} if this index is the primary key index for its table.
+     *
      * @return {@code true} if this index is the primary key index for its table
      */
     boolean isPrimaryKey();
 
     /**
+     * Returns {@code true} if this index backs a foreign key relationship.
+     *
      * @return {@code true} if this index backs a foreign key relationship
      */
     boolean isForeignKey();
 
     /**
+     * Returns the number of columns covered by this index.
+     *
      * @return the number of columns covered by this index
      */
     int getColumnCount();
 
     /**
+     * Returns the Columns for this index (unmodifiable).
+     *
      * @return the Columns for this index (unmodifiable)
      */
     List<? extends Index.Column> getColumns();
 
     /**
+     * Returns the Index referenced by this Index's ForeignKeyReference (if it has one), otherwise {@code null}.
+     *
      * @return the Index referenced by this Index's ForeignKeyReference (if it has one), otherwise {@code null}.
      */
     Index getReferencedIndex() throws IOException;
@@ -93,22 +107,31 @@ public interface Index {
     interface Column {
 
         /**
+         * Returns the underlying table column referenced by this index column.
+         *
          * @return the underlying table column referenced by this index column
          */
         io.github.spannm.jackcess.Column getColumn();
 
         /**
+         * Returns {@code true} if this index column sorts in ascending order, {@code false} if descending.
+         *
          * @return {@code true} if this index column sorts in ascending order, {@code false} if descending
          */
         boolean isAscending();
 
         /**
+         * Returns the position of this column within the index (not to be confused with the underlying table column's
+         * own {@link io.github.spannm.jackcess.Column#getColumnIndex()}).
+         *
          * @return the position of this column within the index (not to be confused with the underlying table
          *         column's own {@link io.github.spannm.jackcess.Column#getColumnIndex()})
          */
         int getColumnIndex();
 
         /**
+         * Returns the name of the underlying table column, equivalent to {@code getColumn().getName()}.
+         *
          * @return the name of the underlying table column, equivalent to {@code getColumn().getName()}
          */
         String getName();

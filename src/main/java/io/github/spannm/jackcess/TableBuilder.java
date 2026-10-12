@@ -29,6 +29,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 
@@ -240,6 +241,8 @@ public class TableBuilder {
     }
 
     /**
+     * Returns a table or column name escaped for Access.
+     *
      * @return A table or column name escaped for Access
      */
     public static String escapeIdentifier(String s) {
@@ -250,10 +253,12 @@ public class TableBuilder {
     }
 
     /**
+     * Returns {@code true} if the given string is a reserved word, {@code false} otherwise.
+     *
      * @return {@code true} if the given string is a reserved word, {@code false} otherwise
      */
     public static boolean isReservedWord(String s) {
-        return ReservedWords.VALUES.contains(s.toLowerCase());
+        return ReservedWords.VALUES.contains(s.toLowerCase(Locale.ROOT));
     }
 
 }

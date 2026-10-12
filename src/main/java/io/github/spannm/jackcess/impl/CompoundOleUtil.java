@@ -104,6 +104,7 @@ public class CompoundOleUtil implements CompoundPackageFactory {
         return entry;
     }
 
+    @SuppressWarnings("JdkObsolete") // the Charset overload needs Java 10
     private static String decodeEntryName(String name) {
         try {
             return URLDecoder.decode(name, ENTRY_NAME_CHARSET.name());
@@ -171,6 +172,7 @@ public class CompoundOleUtil implements CompoundPackageFactory {
             return entries;
         }
 
+        @SuppressWarnings("JdkObsolete") // the Charset overload needs Java 10
         private static String encodeEntryName(String name) {
             try {
                 return URLEncoder.encode(name, ENTRY_NAME_CHARSET.name());

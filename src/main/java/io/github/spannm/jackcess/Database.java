@@ -143,11 +143,16 @@ public interface Database extends Iterable<Table>, Closeable, Flushable {
     Path getPath();
 
     /**
+     * Returns the names of all of the user tables.
+     *
      * @return The names of all of the user tables
      */
     Set<String> getTableNames() throws IOException;
 
     /**
+     * Returns the names of all of the system tables (String). Note, in order to read these tables, you must use {@link
+     * #getSystemTable}. <i>Extreme care should be taken if modifying these tables directly!</i>.
+     *
      * @return The names of all of the system tables (String). Note, in order to read these tables, you must use
      *         {@link #getSystemTable}. <i>Extreme care should be taken if modifying these tables directly!</i>.
      */
@@ -163,6 +168,8 @@ public interface Database extends Iterable<Table>, Closeable, Flushable {
     Iterator<Table> iterator();
 
     /**
+     * Returns a Stream using the default Iterator.
+     *
      * @return a Stream using the default Iterator.
      */
     default Stream<Table> stream() {
@@ -176,6 +183,9 @@ public interface Database extends Iterable<Table>, Closeable, Flushable {
     TableIterableBuilder newIterable();
 
     /**
+     * Returns an Iterable which returns an unmodifiable Iterator of the the TableMetaData for all tables in this
+     * Database.
+     *
      * @return an Iterable which returns an unmodifiable Iterator of the the TableMetaData for all tables in this
      *         Database.
      * @throws UncheckedIOException if an IOException is thrown by one of the operations, the actual exception will be
@@ -185,6 +195,8 @@ public interface Database extends Iterable<Table>, Closeable, Flushable {
     Iterable<TableMetaData> newTableMetaDataIterable();
 
     /**
+     * Returns a Stream using the {@link #newTableMetaDataIterable}.
+     *
      * @return a Stream using the {@link #newTableMetaDataIterable}
      */
     default Stream<TableMetaData> newTableMetaDataStream() {
@@ -192,12 +204,16 @@ public interface Database extends Iterable<Table>, Closeable, Flushable {
     }
 
     /**
+     * Returns the Table, or null if it doesn't exist (or is a system table).
+     *
      * @param name User table name (case-insensitive)
      * @return The Table, or null if it doesn't exist (or is a system table)
      */
     Table getTable(String name) throws IOException;
 
     /**
+     * Returns the meta data for the table, or null if it doesn't exist.
+     *
      * @param name Table name (case-insensitive), may be any table type (i.e. includes system or linked tables).
      * @return The meta data for the table, or null if it doesn't exist
      */
@@ -247,21 +263,29 @@ public interface Database extends Iterable<Table>, Closeable, Flushable {
     Table getSystemTable(String tableName) throws IOException;
 
     /**
+     * Returns the core properties for the database.
+     *
      * @return the core properties for the database
      */
     PropertyMap getDatabaseProperties() throws IOException;
 
     /**
+     * Returns the summary properties for the database.
+     *
      * @return the summary properties for the database
      */
     PropertyMap getSummaryProperties() throws IOException;
 
     /**
+     * Returns the user-defined properties for the database.
+     *
      * @return the user-defined properties for the database
      */
     PropertyMap getUserDefinedProperties() throws IOException;
 
     /**
+     * Returns the current database password, or {@code null} if none set.
+     *
      * @return the current database password, or {@code null} if none set.
      */
     String getDatabasePassword() throws IOException;
@@ -481,6 +505,8 @@ public interface Database extends Iterable<Table>, Closeable, Flushable {
         }
 
         /**
+         * Returns the file extension used for database files with this format.
+         *
          * @return the file extension used for database files with this format.
          */
         public String getFileExtension() {

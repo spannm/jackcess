@@ -319,7 +319,7 @@ final class TableUpdaterTest extends AbstractBaseTest {
         try (Database db = DatabaseBuilder.open(dbFile)) {
             TableImpl t = (TableImpl) db.getTable("Table1");
 
-            assertThat(((ColumnImpl) t.getColumn("newCol")).getColumnId()).isEqualTo((short) (maxId + 1));
+            assertThat(t.getColumn("newCol").getColumnId()).isEqualTo((short) (maxId + 1));
 
             Set<Short> ids = new HashSet<>();
             for (ColumnImpl col : t.getColumns()) {

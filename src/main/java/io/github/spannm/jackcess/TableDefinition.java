@@ -28,6 +28,8 @@ import java.util.List;
  */
 public interface TableDefinition {
     /**
+     * Returns the name of the table.
+     *
      * @return The name of the table
      */
     String getName();
@@ -43,31 +45,43 @@ public interface TableDefinition {
     boolean isSystem();
 
     /**
+     * Returns the number of columns in this table.
+     *
      * @return the number of columns in this table
      */
     int getColumnCount();
 
     /**
+     * Returns the database to which this table belongs.
+     *
      * @return the database to which this table belongs
      */
     Database getDatabase();
 
     /**
+     * Returns all of the columns in this table (unmodifiable List).
+     *
      * @return All of the columns in this table (unmodifiable List)
      */
     List<? extends Column> getColumns();
 
     /**
+     * Returns the column with the given name.
+     *
      * @return the column with the given name
      */
     Column getColumn(String name);
 
     /**
+     * Returns the properties for this table.
+     *
      * @return the properties for this table
      */
     PropertyMap getProperties() throws IOException;
 
     /**
+     * Returns the created date for this table if available.
+     *
      * @return the created date for this table if available
      */
     LocalDateTime getCreatedDate() throws IOException;
@@ -80,23 +94,31 @@ public interface TableDefinition {
     LocalDateTime getUpdatedDate() throws IOException;
 
     /**
+     * Returns all of the Indexes on this table (unmodifiable List).
+     *
      * @return All of the Indexes on this table (unmodifiable List)
      */
     List<? extends Index> getIndexes();
 
     /**
+     * Returns the index with the given name.
+     *
      * @return the index with the given name
      * @throws IllegalArgumentException if there is no index with the given name
      */
     Index getIndex(String name);
 
     /**
+     * Returns the primary key index for this table.
+     *
      * @return the primary key index for this table
      * @throws IllegalArgumentException if there is no primary key index on this table
      */
     Index getPrimaryKeyIndex();
 
     /**
+     * Returns the foreign key index joining this table to the given other table.
+     *
      * @return the foreign key index joining this table to the given other table
      * @throws IllegalArgumentException if there is no relationship between this table and the given table
      */

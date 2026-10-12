@@ -30,6 +30,7 @@ import org.junit.jupiter.params.ParameterizedTest;
 
 import java.io.BufferedWriter;
 import java.io.StringWriter;
+import java.nio.charset.StandardCharsets;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -57,10 +58,10 @@ final class ExportTest extends AbstractBaseTest {
             .toTable(db);
 
         Date testDate = df.parse("19801231 00:00:00");
-        t.addRow("some text||some more", 13, 13.25, TestUtil.createString(30).getBytes(),
+        t.addRow("some text||some more", 13, 13.25, TestUtil.createString(30).getBytes(StandardCharsets.UTF_8),
             true, testDate);
 
-        t.addRow("crazy'data\"here", -345, -0.000345, TestUtil.createString(7).getBytes(),
+        t.addRow("crazy'data\"here", -345, -0.000345, TestUtil.createString(7).getBytes(StandardCharsets.UTF_8),
             true, null);
 
         t.addRow("C:\\temp\\some_file.txt", 25, 0.0, null, false, null);

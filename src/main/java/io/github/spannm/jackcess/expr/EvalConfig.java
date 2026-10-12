@@ -29,6 +29,8 @@ import javax.script.Bindings;
  */
 public interface EvalConfig {
     /**
+     * Returns the currently configured Locale.
+     *
      * @return the currently configured Locale
      */
     Locale getLocale();
@@ -40,6 +42,8 @@ public interface EvalConfig {
     void setLocale(Locale locale);
 
     /**
+     * Returns the currently configured TemporalConfig.
+     *
      * @return the currently configured TemporalConfig
      */
     TemporalConfig getTemporalConfig();
@@ -51,6 +55,8 @@ public interface EvalConfig {
     void setTemporalConfig(TemporalConfig temporal);
 
     /**
+     * Returns the currently configured NumericConfig.
+     *
      * @return the currently configured NumericConfig
      */
     NumericConfig getNumericConfig();
@@ -62,6 +68,8 @@ public interface EvalConfig {
     void setNumericConfig(NumericConfig numeric);
 
     /**
+     * Returns the currently configured FunctionLookup.
+     *
      * @return the currently configured FunctionLookup
      */
     FunctionLookup getFunctionLookup();
@@ -76,6 +84,8 @@ public interface EvalConfig {
     void setFunctionLookup(FunctionLookup lookup);
 
     /**
+     * Returns the currently configured Bindings.
+     *
      * @return the currently configured Bindings
      */
     Bindings getBindings();

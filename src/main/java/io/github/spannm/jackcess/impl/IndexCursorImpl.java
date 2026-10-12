@@ -265,7 +265,7 @@ public final class IndexCursorImpl extends CursorImpl implements IndexCursor {
      * @param requireMatch whether or not an exact match is desired
      * @return {@code true} if a valid row was found with the given values, {@code false} if no row was found
      */
-    protected boolean findFirstRowByEntryImpl(Object[] rowValues, boolean requireMatch, ColumnMatcher columnMatcher) throws IOException {
+    boolean findFirstRowByEntryImpl(Object[] rowValues, boolean requireMatch, ColumnMatcher columnMatcher) throws IOException {
         if (!findPotentialRow(rowValues, requireMatch)) {
             return false;
         } else if (!requireMatch) {
@@ -361,7 +361,7 @@ public final class IndexCursorImpl extends CursorImpl implements IndexCursor {
     /**
      * Handles moving the table index cursor in a given direction. Separates cursor logic from value storage.
      */
-    private abstract class IndexDirHandler extends DirHandler {
+    private abstract static class IndexDirHandler extends DirHandler {
         public abstract IndexData.Entry getAnotherEntry() throws IOException;
     }
 

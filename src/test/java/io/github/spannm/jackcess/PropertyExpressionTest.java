@@ -182,7 +182,7 @@ final class PropertyExpressionTest extends AbstractBaseTest {
             setProp(t, "data2", PropertyMap.VALIDATION_RULE_PROP, "<100");
             setProp(t, "data2", PropertyMap.VALIDATION_TEXT_PROP, "Too big");
 
-            InvalidValueException ex = catchThrowableOfType(() -> t.addRow(Column.AUTO_NUMBER, 42, 200), InvalidValueException.class);
+            InvalidValueException ex = catchThrowableOfType(InvalidValueException.class, () -> t.addRow(Column.AUTO_NUMBER, 42, 200));
             assertThat(ex.getMessage()).contains("Too big");
 
             t.addRow(Column.AUTO_NUMBER, 1, 9);

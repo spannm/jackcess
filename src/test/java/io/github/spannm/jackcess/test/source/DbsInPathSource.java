@@ -32,6 +32,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
+import java.util.Locale;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -61,7 +62,7 @@ public @interface DbsInPathSource {
                     .filter(Files::isRegularFile)
                     .filter(Files::isReadable)
                     .filter(p -> {
-                        String nm = p.toString().toLowerCase();
+                        String nm = p.toString().toLowerCase(Locale.ROOT);
                         return nm.endsWith(".mdb") || nm.endsWith(".accdb");
                     })
                     .sorted()

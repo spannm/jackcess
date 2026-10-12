@@ -822,7 +822,7 @@ public abstract class CursorImpl implements Cursor {
         private final int tablePageNumber;
         private final int indexNumber;
 
-        protected IdImpl(TableImpl table, IndexImpl index) {
+        IdImpl(TableImpl table, IndexImpl index) {
             tablePageNumber = table.getTableDefPageNumber();
             indexNumber = index != null ? index.getIndexNumber() : -1;
         }
@@ -834,7 +834,7 @@ public abstract class CursorImpl implements Cursor {
 
         @Override
         public boolean equals(Object o) {
-            return this == o || o != null && getClass() == o.getClass() && tablePageNumber == ((IdImpl) o).tablePageNumber && indexNumber == ((IdImpl) o).indexNumber;
+            return this == o || (o != null && getClass() == o.getClass() && tablePageNumber == ((IdImpl) o).tablePageNumber && indexNumber == ((IdImpl) o).indexNumber);
         }
 
         @Override
@@ -855,7 +855,7 @@ public abstract class CursorImpl implements Cursor {
 
         @Override
         public final boolean equals(Object o) {
-            return this == o || o != null && getClass() == o.getClass() && equalsImpl(o);
+            return this == o || (o != null && getClass() == o.getClass() && equalsImpl(o));
         }
 
         /**

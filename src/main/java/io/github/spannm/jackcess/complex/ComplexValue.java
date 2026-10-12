@@ -52,6 +52,8 @@ public interface ComplexValue {
     void setComplexValueForeignKey(ComplexValueForeignKey complexValueFk);
 
     /**
+     * Returns the column in the main table with which this complex value is associated.
+     *
      * @return the column in the main table with which this complex value is associated
      */
     Column getColumn();
@@ -109,7 +111,7 @@ public interface ComplexValue {
 
         @Override
         public boolean equals(Object o) {
-            return this == o || o != null && getClass() == o.getClass() && get() == ((Id) o).get();
+            return this == o || (o != null && getClass() == o.getClass() && get() == ((Id) o).get());
         }
 
         @Override

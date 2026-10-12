@@ -18,13 +18,15 @@ package io.github.spannm.jackcess.impl;
 
 import java.io.Closeable;
 import java.io.DataInputStream;
-import java.io.FileWriter;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
+import java.nio.charset.Charset;
 import java.util.Arrays;
 
 /**
@@ -192,6 +194,8 @@ public final class ByteUtil {
     }
 
     /**
+     * Returns an int from the current position in the given buffer, read using the given ByteOrder.
+     *
      * @param buffer Buffer containing the bytes
      * @param order the order of the bytes of the int
      * @return an int from the current position in the given buffer, read using the given ByteOrder
@@ -204,6 +208,8 @@ public final class ByteUtil {
     }
 
     /**
+     * Returns an int from the given position in the given buffer, read using the given ByteOrder.
+     *
      * @param buffer Buffer containing the bytes
      * @param offset Offset at which to start reading the int
      * @param order the order of the bytes of the int
@@ -512,12 +518,14 @@ public final class ByteUtil {
      */
     @SuppressWarnings("PMD.LinguisticNaming")
     public static void toHexFile(String fileName, ByteBuffer buffer, int offset, int size) throws IOException {
-        try (PrintWriter writer = new PrintWriter(new FileWriter(fileName))) {
+        try (PrintWriter writer = new PrintWriter(new OutputStreamWriter(new FileOutputStream(fileName), Charset.defaultCharset()))) {
             writer.println(toHexString(buffer, offset, size));
         }
     }
 
     /**
+     * Returns the byte value converted to an unsigned int value.
+     *
      * @return the byte value converted to an unsigned int value
      */
     public static int asUnsignedByte(byte b) {
@@ -525,6 +533,8 @@ public final class ByteUtil {
     }
 
     /**
+     * Returns the short value converted to an unsigned int value.
+     *
      * @return the short value converted to an unsigned int value
      */
     public static int asUnsignedShort(short s) {

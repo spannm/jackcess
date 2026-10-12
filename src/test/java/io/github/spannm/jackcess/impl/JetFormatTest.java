@@ -97,10 +97,12 @@ final class JetFormatTest extends AbstractBaseTest {
     @EnumSource(DataType.class)
     void jet4SqlTypes(DataType dt) throws Exception {
         if (JetFormat.VERSION_4.isSupportedDataType(dt)) {
-            Integer sqlType = null;
+            Integer sqlType;
             try {
                 sqlType = dt.getSQLType();
-            } catch (JackcessException ignored) {}
+            } catch (JackcessException ignored) {
+                sqlType = null;
+            }
 
             if (sqlType != null) {
                 assertThat(DataType.fromSQLType(sqlType)).isEqualTo(dt);

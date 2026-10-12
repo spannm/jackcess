@@ -32,6 +32,7 @@ import io.github.spannm.jackcess.util.ToStringBuilder;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -40,8 +41,8 @@ import java.util.Deque;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
-import java.util.LinkedList;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import java.util.regex.Pattern;
@@ -502,11 +503,10 @@ public final class Expressionator {
         for (int i = 1; i < tokens.size() - 1; ++i) {
             Token t = tokens.get(i);
             if (t.getType() == TokenType.SPACE) {
-                if (tokens.get(i - 1).getType() == TokenType.STRING
-                    && isDelim(tokens.get(i + 1), FUNC_START_DELIM)) {
-                    // we want to keep this space
-                    continue;
-                } else {
+                // we want to keep a space between a string literal and '('
+                boolean keep = tokens.get(i - 1).getType() == TokenType.STRING
+                    && isDelim(tokens.get(i + 1), FUNC_START_DELIM);
+                if (!keep) {
                     tokens.remove(i);
                     i--;
                 }
@@ -639,7 +639,7 @@ public final class Expressionator {
         // and only use '.'. Apparently '!' is actually a special late-bind
         // operator (not sure it makes a difference for this code?), see:
         // http://bytecomb.com/the-bang-exclamation-operator-in-vba/
-        Deque<String> objNames = new LinkedList<>();
+        Deque<String> objNames = new ArrayDeque<>();
         objNames.add(firstTok.getValueStr());
 
         Token t;
@@ -727,7 +727,7 @@ public final class Expressionator {
             Token t = buf.peekNext();
             if (isDelim(t, CLOSE_PAREN)) {
                 buf.next();
-                return Collections.emptyList();
+                return new ArrayList<>();
             }
         }
 
@@ -929,7 +929,7 @@ public final class Expressionator {
     }
 
     private static SpecOp getSpecialOperator(Token firstTok, TokBuf buf) {
-        String opStr = firstTok.getValueStr().toLowerCase();
+        String opStr = firstTok.getValueStr().toLowerCase(Locale.ROOT);
 
         if ("is".equals(opStr)) {
             Token t = buf.peekNext();
@@ -970,7 +970,7 @@ public final class Expressionator {
 
     private static void parseConstExpression(Token firstTok, TokBuf buf) {
         Expr constExpr;
-        String tokStr = firstTok.getValueStr().toLowerCase();
+        String tokStr = firstTok.getValueStr().toLowerCase(Locale.ROOT);
         if (TRUE_STRS.contains(tokStr)) {
             constExpr = TRUE_VALUE;
         } else if (FALSE_STRS.contains(tokStr)) {
@@ -1004,7 +1004,7 @@ public final class Expressionator {
     }
 
     private static WordType getWordType(Token t) {
-        return WORD_TYPES.get(t.getValueStr().toLowerCase());
+        return WORD_TYPES.get(t.getValueStr().toLowerCase(Locale.ROOT));
     }
 
     private static <T extends Enum<T>> T getOpType(Token t, Class<T> opClazz) {

@@ -72,31 +72,43 @@ public interface Value {
     }
 
     /**
+     * Returns the type of this value.
+     *
      * @return the type of this value
      */
     Type getType();
 
     /**
+     * Returns the raw primitive value.
+     *
      * @return the raw primitive value
      */
     Object get();
 
     /**
+     * Returns {@code true} if this value represents a "Null" value, {@code false} otherwise.
+     *
      * @return {@code true} if this value represents a "Null" value, {@code false} otherwise.
      */
     boolean isNull();
 
     /**
+     * Returns this primitive value converted to a boolean.
+     *
      * @return this primitive value converted to a boolean
      */
     boolean getAsBoolean(LocaleContext ctx);
 
     /**
+     * Returns this primitive value converted to a String.
+     *
      * @return this primitive value converted to a String
      */
     String getAsString(LocaleContext ctx);
 
     /**
+     * Returns this primitive value converted to a LocalDateTime.
+     *
      * @return this primitive value converted to a LocalDateTime
      */
     LocalDateTime getAsLocalDateTime(LocaleContext ctx);
@@ -110,16 +122,22 @@ public interface Value {
     Value getAsDateTimeValue(LocaleContext ctx);
 
     /**
+     * Returns this primitive value converted (rounded) to an int.
+     *
      * @return this primitive value converted (rounded) to an int
      */
     Integer getAsLongInt(LocaleContext ctx);
 
     /**
+     * Returns this primitive value converted (rounded) to a double.
+     *
      * @return this primitive value converted (rounded) to a double
      */
     Double getAsDouble(LocaleContext ctx);
 
     /**
+     * Returns this primitive value converted to a BigDecimal.
+     *
      * @return this primitive value converted to a BigDecimal
      */
     BigDecimal getAsBigDecimal(LocaleContext ctx);

@@ -21,6 +21,9 @@ package io.github.spannm.jackcess.expr;
  */
 public interface FunctionLookup {
     /**
+     * Returns the function for the given function name, or {@code null} if none exists. Note that Access function names
+     * are treated in a case insensitive manner.
+     *
      * @return the function for the given function name, or {@code null} if none exists. Note that Access function names
      *         are treated in a case insensitive manner.
      */

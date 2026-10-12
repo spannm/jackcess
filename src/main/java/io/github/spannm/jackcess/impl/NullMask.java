@@ -56,6 +56,9 @@ public class NullMask {
     }
 
     /**
+     * Returns whether or not the value for that column is null. For boolean columns, returns the actual value of the
+     * column (where non-{@code null} == {@code true}).
+     *
      * @param column column to test for {@code null}
      * @return Whether or not the value for that column is null. For boolean columns, returns the actual value of the
      *         column (where non-{@code null} == {@code true})
@@ -79,6 +82,8 @@ public class NullMask {
     }
 
     /**
+     * Returns size in bytes of this mask.
+     *
      * @return Size in bytes of this mask
      */
     public int byteSize() {

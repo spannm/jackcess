@@ -88,7 +88,7 @@ final class FKEnforcerTest extends AbstractBaseTest {
                 c.deleteCurrentRow();
             }, "Table3[id]");
             tests.forEach((key, value) -> {
-                IOException ex = catchThrowableOfType(key, IOException.class);
+                IOException ex = catchThrowableOfType(IOException.class, key);
                 assertThat(ex.getMessage()).contains(value);
 
             });

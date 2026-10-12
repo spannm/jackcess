@@ -187,7 +187,7 @@ final class DefaultFunctionsTest extends AbstractBaseTest {
         assertThat(eval("StrConv('istanbul', 1, 1055)")).isEqualTo("İSTANBUL");
         assertThat(eval("StrConv('ISTANBUL', 2, 1055)")).isEqualTo("ıstanbul");
 
-        EvalException ex = catchThrowableOfType(() -> eval("StrConv('foo', 1, 9999)"), EvalException.class);
+        EvalException ex = catchThrowableOfType(EvalException.class, () -> eval("StrConv('foo', 1, 9999)"));
         assertThat(ex.getCause().getMessage()).contains("Unsupported locale id");
     }
 
@@ -333,7 +333,7 @@ final class DefaultFunctionsTest extends AbstractBaseTest {
         "StrReverse(); Invalid function call"
     })
     void funcsException(String _exprStr, String _message) {
-        EvalException ex = catchThrowableOfType(() -> eval(_exprStr), EvalException.class);
+        EvalException ex = catchThrowableOfType(EvalException.class, () -> eval(_exprStr));
         assertThat(ex.getMessage()).contains(_message);
     }
 

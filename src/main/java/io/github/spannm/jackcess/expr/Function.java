@@ -22,6 +22,8 @@ package io.github.spannm.jackcess.expr;
 public interface Function {
 
     /**
+     * Returns the name of this function.
+     *
      * @return the name of this function
      */
     String getName();
@@ -34,6 +36,9 @@ public interface Function {
     Value eval(EvalContext ctx, Value... params);
 
     /**
+     * Returns {@code true} if this function is a "pure" function, {@code false} otherwise. A pure function will always
+     * return the same result for a given set of parameters and has no side effects.
+     *
      * @return {@code true} if this function is a "pure" function, {@code false} otherwise. A pure function will always
      *         return the same result for a given set of parameters and has no side effects.
      */

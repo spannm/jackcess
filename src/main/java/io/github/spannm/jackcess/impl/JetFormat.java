@@ -288,6 +288,8 @@ public abstract class JetFormat {
     public final int                  SIZE_TEXT_FIELD_UNIT;
 
     /**
+     * Returns the Jet Format represented in the passed-in file.
+     *
      * @param channel the database file.
      * @return The Jet Format represented in the passed-in file
      * @throws IOException if the database file format is unsupported.

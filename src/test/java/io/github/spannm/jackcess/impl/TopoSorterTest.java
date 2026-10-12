@@ -40,12 +40,12 @@ final class TopoSorterTest extends AbstractBaseTest {
 
         List<String> cycleOriginal = Arrays.asList("B", "A", "C");
         List<String> cycleExpected = Arrays.asList("C", "B", "A");
-        IllegalStateException ex1 = catchThrowableOfType(() -> doTopoTest(cycleOriginal, cycleExpected, "B", "C", "A", "B", "C", "A"), IllegalStateException.class);
+        IllegalStateException ex1 = catchThrowableOfType(IllegalStateException.class, () -> doTopoTest(cycleOriginal, cycleExpected, "B", "C", "A", "B", "C", "A"));
         assertThat(ex1.getMessage()).startsWith("Cycle");
 
         List<String> unknownOriginal = Arrays.asList("B", "A", "C");
         List<String> unknownExpected = Arrays.asList("C", "B", "A");
-        IllegalStateException ex2 = catchThrowableOfType(() -> doTopoTest(unknownOriginal, unknownExpected, "B", "D"), IllegalStateException.class);
+        IllegalStateException ex2 = catchThrowableOfType(IllegalStateException.class, () -> doTopoTest(unknownOriginal, unknownExpected, "B", "D"));
         assertThat(ex2.getMessage()).startsWith("Unknown descendent");
 
         doTopoTest(Arrays.asList("B", "D", "A", "C"),

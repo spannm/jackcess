@@ -338,7 +338,7 @@ final class DatabaseTest extends AbstractBaseTest {
         }
 
         Map<String, Object> newRow = mapOf(
-            "id", 9, "id2", 9, "data", "baz", "data2", "baz2", "newCol", Boolean.TRUE);
+            "id", 9, "id2", 9, "data", "baz", "data2", "baz2", "newCol", true);
 
         try (Database db = DatabaseBuilder.open(dbFile)) {
             Table table = db.getTable("Table1");
@@ -347,11 +347,11 @@ final class DatabaseTest extends AbstractBaseTest {
 
         Map<String, Object> expectedRow0 = mapOf(
             "id", 0, "id2", 2, "data", "foo", "data2", "foo2");
-        expectedRow0.put("newCol", Boolean.FALSE);
+        expectedRow0.put("newCol", false);
 
         Map<String, Object> expectedRow1 = mapOf(
             "id", 3, "id2", 5, "data", "bar", "data2", "bar2");
-        expectedRow1.put("newCol", Boolean.FALSE);
+        expectedRow1.put("newCol", false);
 
         try (Database db = DatabaseBuilder.open(dbFile)) {
             Table table = db.getTable("Table1");
@@ -985,8 +985,7 @@ final class DatabaseTest extends AbstractBaseTest {
         try (Database db = openCopy(FileFormat.V2007, UNSUPPORTED_SORT_ORDER_DB)) {
             TableBuilder tableBuilder = DatabaseBuilder.newTable("test2").addColumn(DatabaseBuilder.newColumn("A", DataType.TEXT));
             UnsupportedOperationException ex = catchThrowableOfType(
-                () -> tableBuilder.toTable(db),
-                UnsupportedOperationException.class);
+                UnsupportedOperationException.class, () -> tableBuilder.toTable(db));
             assertThat(ex.getMessage()).contains("unsupported collating sort order");
         }
     }

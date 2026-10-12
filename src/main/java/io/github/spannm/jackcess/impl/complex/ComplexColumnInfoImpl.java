@@ -134,10 +134,6 @@ public abstract class ComplexColumnInfoImpl<V extends ComplexValue> implements C
     @Override
     public List<Row> getRawValues(int complexValueFk, Collection<String> columnNames) throws IOException {
         Iterator<Row> entryIter = getComplexValFkIter(complexValueFk, columnNames);
-        if (!entryIter.hasNext()) {
-            return Collections.emptyList();
-        }
-
         List<Row> values = new ArrayList<>();
         while (entryIter.hasNext()) {
             values.add(entryIter.next());
@@ -356,7 +352,7 @@ public abstract class ComplexColumnInfoImpl<V extends ComplexValue> implements C
 
         @Override
         public boolean equals(Object o) {
-            return this == o || o != null && getClass() == o.getClass() && Objects.equals(id, ((ComplexValueImpl) o).id) && complexValueFk.equals(((ComplexValueImpl) o).complexValueFk);
+            return this == o || (o != null && getClass() == o.getClass() && Objects.equals(id, ((ComplexValueImpl) o).id) && complexValueFk.equals(((ComplexValueImpl) o).complexValueFk));
         }
     }
 
@@ -369,7 +365,7 @@ public abstract class ComplexColumnInfoImpl<V extends ComplexValue> implements C
         private final int         value;
         private final RowId       rowId;
 
-        protected ComplexValueIdImpl(int value, RowId rowId) {
+        ComplexValueIdImpl(int value, RowId rowId) {
             this.value = value;
             this.rowId = rowId;
         }

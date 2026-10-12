@@ -25,8 +25,10 @@ import io.github.spannm.jackcess.impl.ByteUtil;
 
 import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileWriter;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.OutputStreamWriter;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
@@ -167,7 +169,7 @@ public final class ExportUtil {
     public static void exportFile(Database db, String tableName, File f, boolean header,
             String delim, char quote, ExportFilter filter) throws IOException {
 
-        try (BufferedWriter out = new BufferedWriter(new FileWriter(f))) {
+        try (BufferedWriter out = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(f), Charset.defaultCharset()))) {
             exportWriter(db, tableName, out, header, delim, quote, filter);
         }
     }
@@ -396,6 +398,8 @@ public final class ExportUtil {
         }
 
         /**
+         * Exports all tables of the database to the given directory, using the settings of this builder.
+         *
          * @see ExportUtil#exportAll(Database,File,String,boolean,String,char,ExportFilter)
          */
         public void exportAll(File dir) throws IOException {
@@ -403,6 +407,8 @@ public final class ExportUtil {
         }
 
         /**
+         * Exports the table to the given file, using the settings of this builder.
+         *
          * @see ExportUtil#exportFile(Database,String,File,boolean,String,char,ExportFilter)
          */
         public void exportFile(File f) throws IOException {
@@ -411,6 +417,8 @@ public final class ExportUtil {
         }
 
         /**
+         * Exports the table or cursor to the given writer, using the settings of this builder.
+         *
          * @see ExportUtil#exportWriter(Database,String,BufferedWriter,boolean,String,char,ExportFilter)
          * @see ExportUtil#exportWriter(Cursor,BufferedWriter,boolean,String,char,ExportFilter)
          */

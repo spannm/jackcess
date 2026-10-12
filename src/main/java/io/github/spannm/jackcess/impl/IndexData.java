@@ -90,7 +90,7 @@ import java.util.logging.Logger;
  */
 public final class IndexData {
 
-    protected static final Logger  LOGGER                    = Logger.getLogger(Index.class.getName());
+    static final Logger  LOGGER                    = Logger.getLogger(Index.class.getName());
 
     /** special entry which is less than any other entry */
     public static final Entry      FIRST_ENTRY               = createSpecialEntry(RowIdImpl.FIRST_ROW_ID);
@@ -110,12 +110,12 @@ public final class IndexData {
 
     private static final DataPage  NEW_ROOT_DATA_PAGE        = new RootDataPage();
 
-    protected static final int     INVALID_INDEX_PAGE_NUMBER = 0;
+    static final int     INVALID_INDEX_PAGE_NUMBER = 0;
 
     /** Max number of columns in an index */
     public static final int        MAX_COLUMNS               = 10;
 
-    protected static final byte[]  EMPTY_PREFIX              = new byte[0];
+    static final byte[]  EMPTY_PREFIX              = new byte[0];
 
     private static final byte[]    ASC_EXT_DATE_TRAILER      = {0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02};
     private static final byte[]    DESC_EXT_DATE_TRAILER     = flipBytes(ByteUtil.copyOf(ASC_EXT_DATE_TRAILER, ASC_EXT_DATE_TRAILER.length));
@@ -245,7 +245,7 @@ public final class IndexData {
     /** Cache which manages the index pages */
     private final IndexPageCache           pageCache;
 
-    protected IndexData(TableImpl table, int number, int uniqueEntryCount, int uniqueEntryCountOffset) {
+    IndexData(TableImpl table, int number, int uniqueEntryCount, int uniqueEntryCountOffset) {
         this.table = table;
         this.number = number;
         this.uniqueEntryCount = uniqueEntryCount;
@@ -294,6 +294,8 @@ public final class IndexData {
     }
 
     /**
+     * Returns the "main" logical index which is backed by this data.
+     *
      * @return the "main" logical index which is backed by this data.
      */
     public Index getPrimaryIndex() {
@@ -301,6 +303,8 @@ public final class IndexData {
     }
 
     /**
+     * Returns all of the Indexes backed by this data (unmodifiable List).
+     *
      * @return All of the Indexes backed by this data (unmodifiable List)
      */
     public List<Index> getIndexes() {
@@ -350,7 +354,7 @@ public final class IndexData {
         return uniqueEntryCountOffset;
     }
 
-    protected boolean isBackingPrimaryKey() {
+    boolean isBackingPrimaryKey() {
         return primaryKey;
     }
 
@@ -394,7 +398,7 @@ public final class IndexData {
         return initialized;
     }
 
-    protected int getRootPageNumber() {
+    int getRootPageNumber() {
         return rootPageNumber;
     }
 
@@ -459,7 +463,7 @@ public final class IndexData {
         return status == IndexStatus.READ_ONLY;
     }
 
-    protected int getMaxPageEntrySize() {
+    int getMaxPageEntrySize() {
         return maxPageEntrySize;
     }
 
@@ -569,7 +573,7 @@ public final class IndexData {
      * @param creator description of the indexes to write
      * @param buffer Buffer to write to
      */
-    protected static void writeRowCountDefinitions(TableCreator creator, ByteBuffer buffer) {
+    static void writeRowCountDefinitions(TableCreator creator, ByteBuffer buffer) {
         writeRowCountDefinitions(creator, buffer, creator.getIndexCount());
     }
 
@@ -580,7 +584,7 @@ public final class IndexData {
      * @param buffer Buffer to write to
      * @param idxCount num indexes to write
      */
-    protected static void writeRowCountDefinitions(TableMutator creator, ByteBuffer buffer, int idxCount) {
+    static void writeRowCountDefinitions(TableMutator creator, ByteBuffer buffer, int idxCount) {
         // index row counts (empty data)
         ByteUtil.forward(buffer, idxCount * creator.getFormat().SIZE_INDEX_DEFINITION);
     }
@@ -591,7 +595,7 @@ public final class IndexData {
      * @param creator description of the indexes to write
      * @param buffer Buffer to write to
      */
-    protected static void writeDefinitions(TableCreator creator, ByteBuffer buffer) throws IOException {
+    static void writeDefinitions(TableCreator creator, ByteBuffer buffer) throws IOException {
         ByteBuffer rootPageBuffer = createRootPageBuffer(creator);
 
         for (TableMutator.IndexDataState idxDataState : creator.getIndexDataStates()) {
@@ -606,7 +610,7 @@ public final class IndexData {
      * @param buffer Buffer to write to
      */
     @SuppressWarnings("resource")
-    protected static void writeDefinition(TableMutator creator, ByteBuffer buffer, TableMutator.IndexDataState idxDataState, ByteBuffer rootPageBuffer) throws IOException {
+    static void writeDefinition(TableMutator creator, ByteBuffer buffer, TableMutator.IndexDataState idxDataState, ByteBuffer rootPageBuffer) throws IOException {
         if (rootPageBuffer == null) {
             rootPageBuffer = createRootPageBuffer(creator);
         }
@@ -707,7 +711,7 @@ public final class IndexData {
             // determine if the addition of this entry would break the uniqueness
             // constraint. See isUnique() for some notes about uniqueness as
             // defined by Access.
-            boolean isDupeEntry = nextPos != null && newEntry.equalsEntryBytes(nextPos.getEntry()) || prevPos != null && newEntry.equalsEntryBytes(prevPos.getEntry());
+            boolean isDupeEntry = (nextPos != null && newEntry.equalsEntryBytes(nextPos.getEntry())) || (prevPos != null && newEntry.equalsEntryBytes(prevPos.getEntry()));
             if (isUnique() && !isNullEntry && isDupeEntry) {
                 throw new ConstraintViolationException(withErrorContext("New row " + Arrays.toString(row) + " violates uniqueness constraint for index"));
             }
@@ -925,7 +929,7 @@ public final class IndexData {
     /**
      * Returns the valid insertion point for an index indicating a missing entry.
      */
-    protected static int missingIndexToInsertionPoint(int idx) {
+    static int missingIndexToInsertionPoint(int idx) {
         return -(idx + 1);
     }
 
@@ -1056,7 +1060,7 @@ public final class IndexData {
     /**
      * Write the given index page out to a buffer
      */
-    protected void writeDataPage(DataPage dataPage) throws IOException {
+    void writeDataPage(DataPage dataPage) throws IOException {
         if (dataPage.getCompressedEntrySize() > maxPageEntrySize) {
             throw new IllegalStateException(withErrorContext("data page is too large"));
         }
@@ -1071,7 +1075,7 @@ public final class IndexData {
     /**
      * Writes the data page info to the given buffer.
      */
-    protected static void writeDataPage(ByteBuffer buffer, DataPage dataPage, int tdefPageNumber, JetFormat format) throws IOException {
+    static void writeDataPage(ByteBuffer buffer, DataPage dataPage, int tdefPageNumber, JetFormat format) throws IOException {
         buffer.put(dataPage.isLeaf() ? PageTypes.INDEX_LEAF : PageTypes.INDEX_NODE); // Page type
         buffer.put((byte) 0x01); // Unknown
         buffer.putShort((short) 0); // Free space
@@ -1092,7 +1096,7 @@ public final class IndexData {
         for (Entry entry : dataPage.getEntries()) {
             totalSize += entry.size() - entryPrefix.length;
             int idx = totalSize / 8;
-            entryMask[idx] = (byte) (entryMask[idx] & 0xff | 1 << totalSize % 8);
+            entryMask[idx] = (byte) ((entryMask[idx] & 0xff) | 1 << totalSize % 8);
         }
         buffer.put(entryMask);
 
@@ -1110,7 +1114,7 @@ public final class IndexData {
     /**
      * Reads an index page, populating the correct collection based on the page type (node or leaf).
      */
-    protected void readDataPage(DataPage dataPage) throws IOException {
+    void readDataPage(DataPage dataPage) throws IOException {
         ByteBuffer buffer = indexBufferH.getPageBuffer(getPageChannel());
         getPageChannel().readPage(buffer, dataPage.getPageNumber());
 
@@ -1307,7 +1311,7 @@ public final class IndexData {
         // every discarded byte feeds the digest except the very last one
         int digest = 0;
         for (int i = KEPT_KEY_LENGTH; i < entryBytes.length - 1; ++i) {
-            digest = (digest >>> 8 ^ KEY_DIGEST_TABLE[digest & 0xFF] ^ entryBytes[i] & 0xFF) & 0xFFFF;
+            digest = (digest >>> 8 ^ KEY_DIGEST_TABLE[digest & 0xFF] ^ (entryBytes[i] & 0xFF)) & 0xFFFF;
         }
 
         byte[] truncated = ByteUtil.copyOf(entryBytes, MAX_KEY_LENGTH);
@@ -1336,14 +1340,14 @@ public final class IndexData {
     /**
      * Finds the data page for the given entry.
      */
-    protected DataPage findDataPage(Entry entry) throws IOException {
+    DataPage findDataPage(Entry entry) throws IOException {
         return pageCache.findCacheDataPage(entry);
     }
 
     /**
      * Gets the data page for the pageNumber.
      */
-    protected DataPage getDataPage(int pageNumber) throws IOException {
+    DataPage getDataPage(int pageNumber) throws IOException {
         return pageCache.getCacheDataPage(pageNumber);
     }
 
@@ -2283,10 +2287,12 @@ public final class IndexData {
 
         @Override
         public boolean equals(Object o) {
-            return this == o || o != null && getClass() == o.getClass() && compareTo((Entry) o) == 0;
+            return this == o || (o != null && getClass() == o.getClass() && compareTo((Entry) o) == 0);
         }
 
         /**
+         * Returns {@code true} iff the entryBytes are equal between this Entry and the given Entry.
+         *
          * @return {@code true} iff the entryBytes are equal between this Entry and the given Entry
          */
         public boolean equalsEntryBytes(Entry o) {
@@ -2385,7 +2391,7 @@ public final class IndexData {
 
         @Override
         public boolean equals(Object o) {
-            return this == o || o != null && getClass() == o.getClass() && compareTo((Entry) o) == 0 && getSubPageNumber().equals(((Entry) o).getSubPageNumber());
+            return this == o || (o != null && getClass() == o.getClass() && compareTo((Entry) o) == 0 && getSubPageNumber().equals(((Entry) o).getSubPageNumber()));
         }
 
         @Override
@@ -2474,7 +2480,7 @@ public final class IndexData {
             beforeFirst();
         }
 
-        protected void reset(boolean moveForward) {
+        void reset(boolean moveForward) {
             curPos = getDirHandler(moveForward).getBeginningPosition();
             prevPos = curPos;
         }
@@ -2502,6 +2508,8 @@ public final class IndexData {
         }
 
         /**
+         * Returns valid entry if there was a next entry, {@code #getLastEntry} otherwise.
+         *
          * @return valid entry if there was a next entry, {@code #getLastEntry} otherwise
          */
         public Entry getNextEntry() throws IOException {
@@ -2509,6 +2517,8 @@ public final class IndexData {
         }
 
         /**
+         * Returns valid entry if there was a next entry, {@code #getFirstEntry} otherwise.
+         *
          * @return valid entry if there was a next entry, {@code #getFirstEntry} otherwise
          */
         public Entry getPreviousEntry() throws IOException {
@@ -2518,14 +2528,14 @@ public final class IndexData {
         /**
          * Restores a current position for the cursor (current position becomes previous position).
          */
-        protected void restorePosition(Entry curEntry) throws IOException {
+        void restorePosition(Entry curEntry) throws IOException {
             restorePosition(curEntry, curPos.getEntry());
         }
 
         /**
          * Restores a current and previous position for the cursor.
          */
-        protected void restorePosition(Entry curEntry, Entry prevEntry) throws IOException {
+        void restorePosition(Entry curEntry, Entry prevEntry) throws IOException {
             if (!curPos.equalsEntry(curEntry) || !prevPos.equalsEntry(prevEntry)) {
                 if (!isUpToDate()) {
                     updateBounds();
@@ -2762,7 +2772,7 @@ public final class IndexData {
 
         @Override
         public boolean equals(Object o) {
-            return this == o || o != null && getClass() == o.getClass() && compareTo((Position) o) == 0;
+            return this == o || (o != null && getClass() == o.getClass() && compareTo((Position) o) == 0);
         }
 
         @Override
@@ -2842,7 +2852,7 @@ public final class IndexData {
 
         @Override
         public final boolean equals(Object o) {
-            return this == o || o != null && getClass() == o.getClass() && getPageNumber() == ((DataPage) o).getPageNumber();
+            return this == o || (o != null && getClass() == o.getClass() && getPageNumber() == ((DataPage) o).getPageNumber());
         }
 
         @Override

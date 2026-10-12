@@ -208,6 +208,8 @@ public class PageChannel implements Channel, Flushable {
     }
 
     /**
+     * Reads the given page into the buffer, decoding it if necessary.
+     *
      * @param buffer Buffer to read the page into
      * @param pageNumber Number of the page to read in (starting at 0)
      */
@@ -237,6 +239,8 @@ public class PageChannel implements Channel, Flushable {
     }
 
     /**
+     * Reads the root page into the buffer; this works before the channel is fully initialized.
+     *
      * @param buffer Buffer to read the root page into
      */
     public void readRootPage(ByteBuffer buffer) throws IOException {
@@ -377,6 +381,8 @@ public class PageChannel implements Channel, Flushable {
     }
 
     /**
+     * Returns a newly-allocated buffer that can be passed to readPage.
+     *
      * @return A newly-allocated buffer that can be passed to readPage
      */
     public ByteBuffer createPageBuffer() {
@@ -384,6 +390,8 @@ public class PageChannel implements Channel, Flushable {
     }
 
     /**
+     * Returns a newly-allocated buffer of the given size and DEFAULT_BYTE_ORDER byte order.
+     *
      * @return A newly-allocated buffer of the given size and DEFAULT_BYTE_ORDER byte order
      */
     public static ByteBuffer createBuffer(int size) {
@@ -391,6 +399,8 @@ public class PageChannel implements Channel, Flushable {
     }
 
     /**
+     * Returns a newly-allocated buffer of the given size and byte order.
+     *
      * @return A newly-allocated buffer of the given size and byte order
      */
     public static ByteBuffer createBuffer(int size, ByteOrder order) {
@@ -429,6 +439,9 @@ public class PageChannel implements Channel, Flushable {
     }
 
     /**
+     * Returns a duplicate of the current buffer narrowed to the given position and limit. mark will be set at the
+     * current position.
+     *
      * @return a duplicate of the current buffer narrowed to the given position and limit. mark will be set at the current position.
      */
     public static ByteBuffer narrowBuffer(ByteBuffer buffer, int position, int limit) {

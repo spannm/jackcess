@@ -124,6 +124,8 @@ class LongValueColumnImpl extends ColumnImpl {
     }
 
     /**
+     * Returns the LVAL data.
+     *
      * @param lvalDefinition Column value that points to an LVAL record
      * @return The LVAL data
      */

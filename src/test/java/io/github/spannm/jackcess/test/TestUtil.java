@@ -42,6 +42,7 @@ import org.assertj.core.api.Assertions;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.io.UncheckedIOException;
 import java.nio.ByteBuffer;
@@ -210,7 +211,7 @@ public final class TestUtil {
     }
 
     public static void dumpDatabase(Database mdb, boolean systemTables) throws IOException {
-        dumpDatabase(mdb, systemTables, new PrintWriter(System.out, true));
+        dumpDatabase(mdb, systemTables, new PrintWriter(new OutputStreamWriter(System.out, Charset.defaultCharset()), true));
     }
 
     static void dumpDatabase(Database mdb, boolean systemTables, PrintWriter writer) throws IOException {
@@ -226,7 +227,7 @@ public final class TestUtil {
     }
 
     public static void dumpTable(Table table) throws IOException {
-        dumpTable(table, new PrintWriter(System.out, true));
+        dumpTable(table, new PrintWriter(new OutputStreamWriter(System.out, Charset.defaultCharset()), true));
     }
 
     static void dumpTable(Table table, PrintWriter writer) throws IOException {
@@ -275,7 +276,7 @@ public final class TestUtil {
       }
 
       static void dumpIndex(Index index, int limit) throws Exception {
-        dumpIndex(index, new PrintWriter(System.out, true), limit);
+        dumpIndex(index, new PrintWriter(new OutputStreamWriter(System.out, Charset.defaultCharset()), true), limit);
       }
 
     static void dumpIndex(Index index, PrintWriter writer, int limit) throws IOException {
@@ -286,7 +287,7 @@ public final class TestUtil {
         int count = 0;
         while ((e = ec.getNextEntry()) != lastE) {
             writer.println(e);
-            if ((count++) > limit) {
+            if (count++ > limit) {
                 break;
             }
         }
@@ -335,7 +336,7 @@ public final class TestUtil {
         assertThat(cal.get(Calendar.MINUTE)).isZero();
         assertThat(cal.get(Calendar.SECOND)).isZero();
         assertThat(cal.get(Calendar.MILLISECOND)).isZero();
-        assertThat(row).containsEntry("I", Boolean.TRUE);
+        assertThat(row).containsEntry("I", true);
     }
 
     public static void checkTestDBTable1RowA(TestDb testDB, Table table, Row row) {
@@ -354,7 +355,7 @@ public final class TestUtil {
         assertThat(cal.get(Calendar.MINUTE)).isZero();
         assertThat(cal.get(Calendar.SECOND)).isZero();
         assertThat(cal.get(Calendar.MILLISECOND)).isZero();
-        assertThat(row).containsEntry("I", Boolean.FALSE);
+        assertThat(row).containsEntry("I", false);
     }
 
     /**

@@ -178,7 +178,7 @@ final class CalculatedColumnUtil {
         public Object read(byte[] data, ByteOrder order) {
             data = unwrapCalculatedValue(data);
             if (data.length == 0) {
-                return Boolean.FALSE;
+                return false;
             }
             return data[0] != 0 ? Boolean.TRUE : Boolean.FALSE;
         }

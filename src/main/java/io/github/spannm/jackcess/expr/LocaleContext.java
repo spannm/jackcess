@@ -26,6 +26,8 @@ import java.util.Locale;
  */
 public interface LocaleContext {
     /**
+     * Returns the currently configured Locale.
+     *
      * @return the currently configured Locale
      */
     default Locale getLocale() {
@@ -33,26 +35,36 @@ public interface LocaleContext {
     }
 
     /**
+     * Returns the currently configured TemporalConfig (from the {@link EvalConfig}).
+     *
      * @return the currently configured TemporalConfig (from the {@link EvalConfig})
      */
     TemporalConfig getTemporalConfig();
 
     /**
+     * Returns an appropriately configured (i.e. locale) DateTimeFormatter for the given format.
+     *
      * @return an appropriately configured (i.e. locale) DateTimeFormatter for the given format.
      */
     DateTimeFormatter createDateFormatter(String formatStr);
 
     /**
+     * Returns the currently configured ZoneId.
+     *
      * @return the currently configured ZoneId
      */
     ZoneId getZoneId();
 
     /**
+     * Returns the currently configured NumericConfig (from the {@link EvalConfig}).
+     *
      * @return the currently configured NumericConfig (from the {@link EvalConfig})
      */
     NumericConfig getNumericConfig();
 
     /**
+     * Returns an appropriately configured (i.e. DecimalFormatSymbols) DecimalFormat for the given format.
+     *
      * @return an appropriately configured (i.e. DecimalFormatSymbols) DecimalFormat for the given format.
      */
     DecimalFormat createDecimalFormat(String formatStr);

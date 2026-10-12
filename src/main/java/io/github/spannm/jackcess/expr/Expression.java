@@ -36,23 +36,34 @@ public interface Expression {
     Object eval(EvalContext ctx);
 
     /**
+     * Returns a detailed string which indicates how the expression was interpreted by the expression evaluation engine.
+     *
      * @return a detailed string which indicates how the expression was interpreted by the expression evaluation engine.
      */
     String toDebugString(LocaleContext ctx);
 
     /**
+     * Returns a parsed and re-formated version of the expression. This may look slightly different than the original,
+     * raw string, although it should be an equivalent expression.
+     *
      * @return a parsed and re-formated version of the expression. This may look slightly different than the original,
      *         raw string, although it should be an equivalent expression.
      */
     String toCleanString(LocaleContext ctx);
 
     /**
+     * Returns the original, unparsed expression string. This is the same as the value which will be returned by {@link
+     * Object#toString}.
+     *
      * @return the original, unparsed expression string. This is the same as the value which will be returned by
      *         {@link Object#toString}.
      */
     String toRawString();
 
     /**
+     * Returns {@code true} if this is a constant expression. A constant expression will always return the same result
+     * when invoked and has no side effect.
+     *
      * @return {@code true} if this is a constant expression. A constant expression will always return the same result
      *         when invoked and has no side effect.
      */

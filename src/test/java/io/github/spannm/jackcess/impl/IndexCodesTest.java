@@ -48,6 +48,7 @@ import java.lang.reflect.Field;
 import java.nio.ByteBuffer;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
 import java.util.TreeMap;
 import java.util.logging.Level;
@@ -786,7 +787,7 @@ final class IndexCodesTest extends AbstractBaseTest {
             return specialStr;
         }
 
-        String digits = Integer.toHexString(c).toUpperCase();
+        String digits = Integer.toHexString(c).toUpperCase(Locale.ROOT);
         while (digits.length() < 4) {
             digits = "0" + digits;
         }

@@ -57,6 +57,9 @@ public abstract class TempBufferHolder {
     }
 
     /**
+     * Returns the modification count of the current buffer (this count is changed every time the buffer is
+     * reallocated).
+     *
      * @return the modification count of the current buffer (this count is changed every time the buffer is reallocated)
      */
     public int getModCount() {
@@ -121,6 +124,8 @@ public abstract class TempBufferHolder {
     }
 
     /**
+     * Returns the currently referenced buffer, {@code null} if none.
+     *
      * @return the currently referenced buffer, {@code null} if none
      */
     public abstract ByteBuffer getExistingBuffer();

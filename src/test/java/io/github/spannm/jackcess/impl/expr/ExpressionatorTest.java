@@ -546,7 +546,7 @@ final class ExpressionatorTest extends AbstractBaseTest {
         "=(3 + 5) Rnd(); multiple expressions"
     })
     void invalidExpression(String exprStr, String msgStr) {
-        ParseException ex = catchThrowableOfType(() -> eval(exprStr), ParseException.class);
+        ParseException ex = catchThrowableOfType(ParseException.class, () -> eval(exprStr));
         assertThat(ex.getMessage()).contains(msgStr);
     }
 

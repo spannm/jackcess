@@ -89,6 +89,8 @@ public class TableIterableBuilder implements Iterable<Table> {
     }
 
     /**
+     * Returns a Stream using the default Iterator.
+     *
      * @return a Stream using the default Iterator.
      */
     public Stream<Table> stream() {

@@ -42,7 +42,7 @@ final class LinkResolverTest extends AbstractBaseTest {
     void defaultRejectsAutomaticLinks(String linkedDbName) throws Exception {
         try (Database linkerDb = createDbMem(FileFormat.V2010)) {
             AccessDeniedException ex = catchThrowableOfType(
-                () -> LinkResolver.DEFAULT.resolveLinkedDatabase(linkerDb, linkedDbName), AccessDeniedException.class);
+                AccessDeniedException.class, () -> LinkResolver.DEFAULT.resolveLinkedDatabase(linkerDb, linkedDbName));
 
             assertThat(ex.getFile()).isEqualTo(linkedDbName);
             assertThat(ex.getReason()).contains("LinkResolver.UNRESTRICTED");
@@ -69,7 +69,7 @@ final class LinkResolverTest extends AbstractBaseTest {
         try (Database db = createDbMem(FileFormat.V2010)) {
             db.createLinkedTable("RemoteTable", linkedDbName, "Table1");
 
-            AccessDeniedException ex = catchThrowableOfType(() -> db.getTable("RemoteTable"), AccessDeniedException.class);
+            AccessDeniedException ex = catchThrowableOfType(AccessDeniedException.class, () -> db.getTable("RemoteTable"));
             assertThat(ex.getFile()).isEqualTo(linkedDbName);
             assertThat(db.getLinkedDatabases()).isEmpty();
         }

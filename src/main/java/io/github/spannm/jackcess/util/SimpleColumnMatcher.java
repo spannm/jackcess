@@ -64,7 +64,7 @@ public class SimpleColumnMatcher implements ColumnMatcher {
      */
     private static boolean equals(Object o1, Object o2) {
         return Objects.equals(o1, o2)
-            || o1 instanceof byte[] && o2 instanceof byte[] && Arrays.equals((byte[]) o1, (byte[]) o2);
+            || (o1 instanceof byte[] && o2 instanceof byte[] && Arrays.equals((byte[]) o1, (byte[]) o2));
     }
 
 }

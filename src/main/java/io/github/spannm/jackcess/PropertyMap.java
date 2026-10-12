@@ -51,31 +51,43 @@ public interface PropertyMap extends Iterable<PropertyMap.Property> {
     String IME_SENTENCE_MODE_PROP = "IMESentenceMode";
 
     /**
+     * Returns the name of the database object to which this property map belongs.
+     *
      * @return the name of the database object to which this property map belongs
      */
     String getName();
 
     /**
+     * Returns the number of properties currently in this map.
+     *
      * @return the number of properties currently in this map
      */
     int getSize();
 
     /**
+     * Returns {@code true} if this map has no properties.
+     *
      * @return {@code true} if this map has no properties
      */
     boolean isEmpty();
 
     /**
+     * Returns the property with the given name, if any.
+     *
      * @return the property with the given name, if any
      */
     Property get(String name);
 
     /**
+     * Returns the value of the property with the given name, if any.
+     *
      * @return the value of the property with the given name, if any
      */
     Object getValue(String name);
 
     /**
+     * Returns the value of the property with the given name, if any, otherwise the given defaultValue.
+     *
      * @return the value of the property with the given name, if any, otherwise the given defaultValue
      */
     Object getValue(String name, Object defaultValue);
@@ -130,6 +142,8 @@ public interface PropertyMap extends Iterable<PropertyMap.Property> {
     void save() throws IOException;
 
     /**
+     * Returns a Stream using the default Iterator.
+     *
      * @return a Stream using the default Iterator.
      */
     default Stream<PropertyMap.Property> stream() {
@@ -141,11 +155,15 @@ public interface PropertyMap extends Iterable<PropertyMap.Property> {
      */
     interface Property {
         /**
+         * Returns the name of this property.
+         *
          * @return the name of this property
          */
         String getName();
 
         /**
+         * Returns the data type of this property's value.
+         *
          * @return the data type of this property's value
          */
         DataType getType();
@@ -158,6 +176,8 @@ public interface PropertyMap extends Iterable<PropertyMap.Property> {
         boolean isDdl();
 
         /**
+         * Returns the current value of this property.
+         *
          * @return the current value of this property
          */
         Object getValue();
@@ -175,6 +195,8 @@ public interface PropertyMap extends Iterable<PropertyMap.Property> {
      */
     interface EnumValue {
         /**
+         * Returns the property value which should be stored in the db.
+         *
          * @return the property value which should be stored in the db
          */
         Object getValue();

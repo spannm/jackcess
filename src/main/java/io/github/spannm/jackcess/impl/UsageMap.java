@@ -94,6 +94,8 @@ public final class UsageMap {
     }
 
     /**
+     * Returns either an InlineUsageMap or a ReferenceUsageMap, depending on which type of map is found.
+     *
      * @param database database that contains this usage map
      * @param buf buffer which contains the usage map row info
      * @return Either an InlineUsageMap or a ReferenceUsageMap, depending on which type of map is found
@@ -105,6 +107,8 @@ public final class UsageMap {
     }
 
     /**
+     * Returns either an InlineUsageMap or a ReferenceUsageMap, depending on which type of map is found.
+     *
      * @param database database that contains this usage map
      * @param pageNum Page number that this usage map is contained in
      * @param rowNum Number of the row on the page that contains this usage map
@@ -148,72 +152,72 @@ public final class UsageMap {
         return pageNumbers.cardinality();
     }
 
-    protected short getRowStart() {
+    short getRowStart() {
         return rowStart;
     }
 
-    protected int getRowEnd() {
+    int getRowEnd() {
         return getTableBuffer().limit();
     }
 
-    protected void setStartOffset(int startOffset) {
+    void setStartOffset(int startOffset) {
         this.startOffset = startOffset;
     }
 
-    protected int getStartOffset() {
+    int getStartOffset() {
         return startOffset;
     }
 
-    protected ByteBuffer getTableBuffer() {
+    ByteBuffer getTableBuffer() {
         return tableBuffer;
     }
 
-    protected int getTablePageNumber() {
+    int getTablePageNumber() {
         return tablePageNum;
     }
 
-    protected int getStartPage() {
+    int getStartPage() {
         return startPage;
     }
 
-    protected int getEndPage() {
+    int getEndPage() {
         return endPage;
     }
 
-    protected BitSet getPageNumbers() {
+    BitSet getPageNumbers() {
         return pageNumbers;
     }
 
-    protected void setPageRange(int newStartPage, int newEndPage) {
+    void setPageRange(int newStartPage, int newEndPage) {
         startPage = newStartPage;
         endPage = newEndPage;
     }
 
-    protected boolean isPageWithinRange(int pageNumber) {
+    boolean isPageWithinRange(int pageNumber) {
         return pageNumber >= startPage && pageNumber < endPage;
     }
 
-    protected int getFirstPageNumber() {
+    int getFirstPageNumber() {
         return bitIndexToPageNumber(getNextBitIndex(-1), RowIdImpl.LAST_PAGE_NUMBER);
     }
 
-    protected int getNextPageNumber(int curPage) {
+    int getNextPageNumber(int curPage) {
         return bitIndexToPageNumber(getNextBitIndex(pageNumberToBitIndex(curPage)), RowIdImpl.LAST_PAGE_NUMBER);
     }
 
-    protected int getNextBitIndex(int curIndex) {
+    int getNextBitIndex(int curIndex) {
         return pageNumbers.nextSetBit(curIndex + 1);
     }
 
-    protected int getLastPageNumber() {
+    int getLastPageNumber() {
         return bitIndexToPageNumber(getPrevBitIndex(pageNumbers.length()), RowIdImpl.FIRST_PAGE_NUMBER);
     }
 
-    protected int getPrevPageNumber(int curPage) {
+    int getPrevPageNumber(int curPage) {
         return bitIndexToPageNumber(getPrevBitIndex(pageNumberToBitIndex(curPage)), RowIdImpl.FIRST_PAGE_NUMBER);
     }
 
-    protected int getPrevBitIndex(int curIndex) {
+    int getPrevBitIndex(int curIndex) {
         curIndex--;
         while (curIndex >= 0 && !pageNumbers.get(curIndex)) {
             curIndex--;
@@ -221,15 +225,15 @@ public final class UsageMap {
         return curIndex;
     }
 
-    protected int bitIndexToPageNumber(int bitIndex, int invalidPageNumber) {
+    int bitIndexToPageNumber(int bitIndex, int invalidPageNumber) {
         return bitIndex >= 0 ? startPage + bitIndex : invalidPageNumber;
     }
 
-    protected int pageNumberToBitIndex(int pageNumber) {
+    int pageNumberToBitIndex(int pageNumber) {
         return pageNumber >= 0 ? pageNumber - startPage : INVALID_BIT_INDEX;
     }
 
-    protected void clearTableAndPages() {
+    void clearTableAndPages() {
         // reset some values
         pageNumbers.clear();
         startPage = 0;
@@ -242,7 +246,7 @@ public final class UsageMap {
         ByteUtil.clearRange(tableBuffer, tableStart, tableEnd);
     }
 
-    protected void writeTable() throws IOException {
+    void writeTable() throws IOException {
         // note, we only want to write the row data with which we are working
         getPageChannel().writePage(tableBuffer, tablePageNum, rowStart);
     }
@@ -250,7 +254,7 @@ public final class UsageMap {
     /**
      * Read in the page numbers in this inline map
      */
-    protected void processMap(ByteBuffer buffer, int bufferStartPage) {
+    void processMap(ByteBuffer buffer, int bufferStartPage) {
         int byteCount = 0;
         while (buffer.hasRemaining()) {
             byte b = buffer.get();
@@ -297,7 +301,7 @@ public final class UsageMap {
         handler.addOrRemovePageNumber(pageNumber, false, force);
     }
 
-    protected void updateMap(int absolutePageNumber, int bufferRelativePageNumber, ByteBuffer buffer, boolean add, boolean force) throws IOException {
+    void updateMap(int absolutePageNumber, int bufferRelativePageNumber, ByteBuffer buffer, boolean add, boolean force) throws IOException {
         // Find the byte to which to apply the bitmask and create the bitmask
         int offset = bufferRelativePageNumber / 8;
         int bitmask = 1 << bufferRelativePageNumber % 8;
@@ -312,7 +316,7 @@ public final class UsageMap {
 
         // Apply the bitmask
         if (add) {
-            b = (byte) (b & 0xff | bitmask);
+            b = (byte) ((b & 0xff) | bitmask);
             pageNumbers.set(pageNumberOffset);
         } else {
             b = (byte) (b & ~bitmask);
@@ -816,6 +820,8 @@ public final class UsageMap {
         }
 
         /**
+         * Returns valid page number if there was another page to read, {@link RowIdImpl#LAST_PAGE_NUMBER} otherwise.
+         *
          * @return valid page number if there was another page to read, {@link RowIdImpl#LAST_PAGE_NUMBER} otherwise
          */
         public int getNextPage() {
@@ -823,6 +829,8 @@ public final class UsageMap {
         }
 
         /**
+         * Returns valid page number if there was another page to read, {@link RowIdImpl#FIRST_PAGE_NUMBER} otherwise.
+         *
          * @return valid page number if there was another page to read, {@link RowIdImpl#FIRST_PAGE_NUMBER} otherwise
          */
         public int getPreviousPage() {
@@ -861,7 +869,7 @@ public final class UsageMap {
         /**
          * Resets this page cursor for traversing the given direction.
          */
-        protected void reset(boolean moveForward) {
+        void reset(boolean moveForward) {
             curPageNumber = getDirHandler(moveForward).getBeginningPageNumber();
             prevPageNumber = curPageNumber;
             lastModCount = modCount;
@@ -891,7 +899,7 @@ public final class UsageMap {
         /**
          * Restores a current and previous position for the cursor.
          */
-        protected void restorePosition(int newCurPageNumber, int newPrevPageNumber) {
+        void restorePosition(int newCurPageNumber, int newPrevPageNumber) {
             if (newCurPageNumber != curPageNumber || newPrevPageNumber != prevPageNumber) {
                 prevPageNumber = updatePosition(newPrevPageNumber);
                 curPageNumber = updatePosition(newCurPageNumber);

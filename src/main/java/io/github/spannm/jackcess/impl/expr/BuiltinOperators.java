@@ -516,7 +516,7 @@ public final class BuiltinOperators {
         return param1.isNull() || param2.isNull() || param3.isNull();
     }
 
-    protected static int nonNullCompareTo(LocaleContext ctx, Value param1, Value param2) {
+    static int nonNullCompareTo(LocaleContext ctx, Value param1, Value param2) {
         // note that comparison does not do string to num coercion
         Value.Type compareType = getMathTypePrecedence(ctx, param1, param2, CoercionType.COMPARE);
 

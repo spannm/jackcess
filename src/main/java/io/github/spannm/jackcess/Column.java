@@ -42,27 +42,38 @@ public interface Column {
     Object KEEP_VALUE  = "<KEEP_VALUE>";
 
     /**
+     * Returns the table to which this column belongs.
+     *
      * @return the table to which this column belongs
      */
     Table getTable();
 
     /**
+     * Returns the database to which this column's table belongs.
+     *
      * @return the database to which this column's table belongs
      */
     Database getDatabase();
 
     /**
+     * Returns the name of this column.
+     *
      * @return the name of this column
      */
     String getName();
 
     /**
+     * Returns {@code true} if this column's values are variable-length (e.g. TEXT, MEMO, BINARY), {@code false} if
+     * fixed-length (e.g. LONG, DOUBLE).
+     *
      * @return {@code true} if this column's values are variable-length (e.g. TEXT, MEMO, BINARY), {@code false} if
      *         fixed-length (e.g. LONG, DOUBLE)
      */
     boolean isVariableLength();
 
     /**
+     * Returns {@code true} if this is an autonumber column, whose values are assigned automatically by the database.
+     *
      * @return {@code true} if this is an autonumber column, whose values are assigned automatically by the database
      */
     boolean isAutoNumber();
@@ -75,37 +86,53 @@ public interface Column {
     int getColumnIndex();
 
     /**
+     * Returns the data type of this column.
+     *
      * @return the data type of this column
      */
     DataType getType();
 
     /**
+     * Returns the {@link java.sql.Types} constant corresponding to this column's {@link DataType}.
+     *
      * @return the {@link java.sql.Types} constant corresponding to this column's {@link DataType}
      */
     int getSQLType() throws IOException;
 
     /**
+     * Returns {@code true} if this text column uses compressed unicode storage, {@code false} otherwise (not applicable
+     * to non-text columns).
+     *
      * @return {@code true} if this text column uses compressed unicode storage, {@code false} otherwise (not
      *         applicable to non-text columns)
      */
     boolean isCompressedUnicode();
 
     /**
+     * Returns the numeric precision of this column (only meaningful for DataTypes NUMERIC and MONEY).
+     *
      * @return the numeric precision of this column (only meaningful for DataTypes NUMERIC and MONEY)
      */
     byte getPrecision();
 
     /**
+     * Returns the numeric scale of this column (only meaningful for DataTypes NUMERIC and MONEY).
+     *
      * @return the numeric scale of this column (only meaningful for DataTypes NUMERIC and MONEY)
      */
     byte getScale();
 
     /**
+     * Returns the length of this column in bytes, as stored in the database.
+     *
      * @return the length of this column in bytes, as stored in the database
      */
     short getLength();
 
     /**
+     * Returns the length of this column in "units" appropriate for its type (e.g. characters for TEXT columns), which
+     * may differ from {@link #getLength()} for columns whose storage unit is wider than one byte.
+     *
      * @return the length of this column in "units" appropriate for its type (e.g. characters for TEXT columns),
      *         which may differ from {@link #getLength()} for columns whose storage unit is wider than one byte
      */
@@ -133,6 +160,8 @@ public interface Column {
     ComplexColumnInfo<? extends ComplexValue> getComplexInfo();
 
     /**
+     * Returns the properties for this column.
+     *
      * @return the properties for this column
      */
     PropertyMap getProperties() throws IOException;
@@ -178,12 +207,16 @@ public interface Column {
     Object setRowValue(Map<String, Object> rowMap, Object value);
 
     /**
+     * Returns this column's value at the position given by {@link #getColumnIndex()} within {@code rowArray}.
+     *
      * @param rowArray a row value array, indexed by {@link #getColumnIndex()}
      * @return this column's value at the position given by {@link #getColumnIndex()} within {@code rowArray}
      */
     Object getRowValue(Object[] rowArray);
 
     /**
+     * Returns this column's value, keyed by {@link #getName()}, within {@code rowMap}.
+     *
      * @param rowMap a row value map, keyed by column name
      * @return this column's value, keyed by {@link #getName()}, within {@code rowMap}
      */

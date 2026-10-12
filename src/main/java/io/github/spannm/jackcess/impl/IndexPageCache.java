@@ -30,12 +30,12 @@ import java.io.IOException;
 import java.lang.ref.Reference;
 import java.lang.ref.SoftReference;
 import java.util.AbstractList;
+import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -801,8 +801,8 @@ public class IndexPageCache {
      * accidentally treated as a tail page. It updates the parent references
      * and ensures the page is correctly positioned in the internal cache.
      *
-     * @param cachePage the cache data page being processed
-     * @param tailPage the main data page to be promoted
+     * @param cacheDataPage the cache data page being processed
+     * @param lastMain      the main data page to be promoted
      * @throws IOException if the promotion fails due to I/O errors
      */
     private void promoteTail(CacheDataPage cacheDataPage, DataPageMain lastMain) throws IOException {
@@ -1332,7 +1332,7 @@ public class IndexPageCache {
     private final class Validator {
         private final boolean                    forceLoad;
         private final Map<Integer, DataPageMain> knownPages   = new HashMap<>();
-        private final Queue<DataPageMain>        pendingPages = new LinkedList<>();
+        private final Queue<DataPageMain>        pendingPages = new ArrayDeque<>();
 
         private Validator(boolean forceLoad) {
             this.forceLoad = forceLoad;

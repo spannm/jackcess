@@ -25,8 +25,10 @@ import io.github.spannm.jackcess.TableBuilder;
 import java.io.BufferedReader;
 import java.io.EOFException;
 import java.io.File;
-import java.io.FileReader;
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.nio.charset.Charset;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
@@ -261,7 +263,7 @@ public final class ImportUtil {
     public static String importFile(File f, Database db, String name, String delim, char quote,
         ImportFilter filter, boolean useExistingTable, boolean header) throws IOException {
 
-        try (BufferedReader in = new BufferedReader(new FileReader(f))) {
+        try (BufferedReader in = new BufferedReader(new InputStreamReader(new FileInputStream(f), Charset.defaultCharset()))) {
             return importReader(in, db, name, delim, quote, filter, useExistingTable, header);
         }
     }
@@ -576,6 +578,8 @@ public final class ImportUtil {
         }
 
         /**
+         * Imports the given result set into a table, using the settings of this builder.
+         *
          * @see ImportUtil#importResultSet(ResultSet,Database,String,ImportFilter,boolean)
          */
         public String importResultSet(ResultSet source)
@@ -585,6 +589,8 @@ public final class ImportUtil {
         }
 
         /**
+         * Imports the given delimited file into a table, using the settings of this builder.
+         *
          * @see ImportUtil#importFile(File,Database,String,String,char,ImportFilter,boolean,boolean)
          */
         public String importFile(File f) throws IOException {
@@ -593,6 +599,8 @@ public final class ImportUtil {
         }
 
         /**
+         * Imports delimited data from the given reader into a table, using the settings of this builder.
+         *
          * @see ImportUtil#importReader(BufferedReader,Database,String,String,char,ImportFilter,boolean,boolean)
          */
         public String importReader(BufferedReader reader) throws IOException {

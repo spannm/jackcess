@@ -45,11 +45,15 @@ import java.util.stream.StreamSupport;
 public interface Cursor extends Iterable<Row> {
 
     /**
+     * Returns the unique identifier of this cursor, usable for validating a {@link Savepoint}.
+     *
      * @return the unique identifier of this cursor, usable for validating a {@link Savepoint}
      */
     Id getId();
 
     /**
+     * Returns the table over which this cursor iterates.
+     *
      * @return the table over which this cursor iterates
      */
     Table getTable();
@@ -134,6 +138,8 @@ public interface Cursor extends Iterable<Row> {
     Iterator<Row> iterator();
 
     /**
+     * Returns a Stream using the default Iterator.
+     *
      * @return a Stream using the default Iterator.
      */
     default Stream<Row> stream() {
@@ -362,12 +368,17 @@ public interface Cursor extends Iterable<Row> {
      */
     interface Savepoint {
         /**
+         * Returns the id of the cursor this savepoint was created from, used by {@link Cursor#restoreSavepoint} to
+         * validate that the savepoint is being restored on a compatible cursor.
+         *
          * @return the id of the cursor this savepoint was created from, used by {@link Cursor#restoreSavepoint} to
          *         validate that the savepoint is being restored on a compatible cursor
          */
         Id getCursorId();
 
         /**
+         * Returns the cursor position captured by this savepoint.
+         *
          * @return the cursor position captured by this savepoint
          */
         Position getCurrentPosition();
