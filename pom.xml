@@ -348,9 +348,9 @@
                 <version>${dep.plugin.figlet.version}</version>
                 <configuration>
                     <content><![CDATA[
-                         <lineBreak/><lineBreak/>
-                         <figletFont name="slant">${project.name}</figletFont>
-                         <preserveWhitespace>    v${project.version}</preserveWhitespace><lineBreak/>
+                         <lineBreak/>
+                         <figletFont name="slant"> ${project.name}</figletFont>
+                         <preserveWhitespace>        v${project.version}</preserveWhitespace><lineBreak/>
                      ]]></content>
                 </configuration>
                 <executions>
