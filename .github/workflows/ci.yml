@@ -20,31 +20,40 @@ permissions:
 jobs:
 
     build:
+        name: build (${{ matrix.os }}, ${{ matrix.test-java }})
         strategy:
             fail-fast: false
             matrix:
                 os: [ubuntu-latest, windows-latest]
-                java: ['21']
+                # the JDK the tests run on; the build itself always runs on JDK 21
+                test-java: ['8', '21']
+                include:
+                -   test-java: '8'
+                    jdks: |
+                        8
+                        21
+                    maven-args: --activate-profiles jdk8-tests
+                -   test-java: '21'
+                    jdks: '21'
+                    maven-args: ''
         runs-on: ${{ matrix.os }}
         steps:
         -   uses: actions/checkout@v7
 
-        -   name: Set up JDK ${{ matrix.java }} (build) and JDK 8 (test toolchain)
-            # installing 8 alongside matrix.java registers both in ~/.m2/toolchains.xml; the
-            # last version listed becomes JAVA_HOME/the JDK that runs Maven itself.
+        -   name: Set up JDK 21 (build) and JDK ${{ matrix.test-java }} (tests)
+            # all listed versions are registered in ~/.m2/toolchains.xml; the last version
+            # listed becomes JAVA_HOME/the JDK that runs Maven itself.
             uses: actions/setup-java@v6
             with:
-                java-version: |
-                    8
-                    ${{ matrix.java }}
+                java-version: ${{ matrix.jdks }}
                 distribution: temurin
                 cache: maven
 
-        -   name: Build with Maven/JDK ${{ matrix.java }} on ${{ matrix.os }}, tests forked onto JDK 8
-            # the jdk8-tests profile forks the test JVM onto the JDK 8 toolchain (see pom.xml) so we
-            # verify the targetJdk=8 bytecode actually runs on Java 8, without running the whole build
-            # (and its Java-11+-only plugins, e.g. git-commit-id) under JDK 8 itself.
-            run: mvn --batch-mode --file pom.xml --activate-profiles jdk8-tests clean verify
+        -   name: Build with Maven/JDK 21 on ${{ matrix.os }}, tests on JDK ${{ matrix.test-java }}
+            # for JDK 8 the jdk8-tests profile forks the test JVM onto the JDK 8 toolchain (see pom.xml)
+            # so we verify the targetJdk=8 bytecode actually runs on Java 8, without running the whole
+            # build (and its Java-11+-only plugins, e.g. git-commit-id) under JDK 8 itself.
+            run: mvn --batch-mode --file pom.xml ${{ matrix.maven-args }} clean verify
 
     deploy:
         needs: build
