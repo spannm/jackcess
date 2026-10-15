@@ -33,7 +33,7 @@ Jackcess is not an application. There is no GUI. It's a library, intended for ot
 
 ## 🛠 Tech Stack & Dependencies
 
-* **Java Version**: 8 or higher. As of 5.1.8 Jackcess runs on Java 8 again (versions 5.0.0 to 5.1.7 required Java 11). LTS versions like Java 17 and 21 are fully supported and tested.
+* **Java Version**: 8 or higher. As of 5.2.0 Jackcess runs on Java 8 again (versions 5.0.0 to 5.1.7 required Java 11). LTS versions like Java 17 and 21 are fully supported, the tests run on Java 8 and 21.
 
 * **Optional Dependency**:
   * [Apache POI](https://poi.apache.org/): only needed for compound OLE attachment data; everything else has zero runtime dependencies.
@@ -54,14 +54,14 @@ To use Jackcess in your project, add the following dependency.
 <dependency>
     <groupId>io.github.spannm</groupId>
     <artifactId>jackcess</artifactId>
-    <version>5.1.8</version>
+    <version>5.2.0</version>
 </dependency>
 ```
 
 ### Gradle (Groovy / `build.gradle`)
 
 ```groovy
-implementation 'io.github.spannm:jackcess:5.1.8'
+implementation 'io.github.spannm:jackcess:5.2.0'
 ```
 
 ## 🚦 Usage Example
