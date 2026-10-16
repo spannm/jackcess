@@ -21,8 +21,9 @@ jobs:
 
     build:
         runs-on: ubuntu-latest
-        # skip the analysis job for contributors/forks who lack the required sonar token
-        if: ${{ github.event_name == 'push' || github.event_name == 'workflow_dispatch' }}
+        # skip the analysis job on forks, which lack the SONAR_TOKEN secret and access
+        # to the spannm SonarCloud organization
+        if: ${{ github.repository == 'spannm/jackcess' && (github.event_name == 'push' || github.event_name == 'workflow_dispatch') }}
         steps:
         -   uses: actions/checkout@v7
             with:
@@ -36,9 +37,20 @@ jobs:
                 distribution: temurin
                 cache: maven
 
+        -   name: Cache SonarQube packages
+            uses: actions/cache@v6
+            with:
+                path: ~/.sonar/cache
+                key: ${{ runner.os }}-sonar
+                restore-keys: ${{ runner.os }}-sonar
+
         -   name: Build with Maven/JDK 21, test with SonarCloud
             env:
                 GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
                 SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-            run: |
-                mvn --batch-mode --file pom.xml --activate-profiles sonarcloud clean verify
+            run: >
+                mvn --batch-mode --file pom.xml clean verify
+                org.sonarsource.scanner.maven:sonar-maven-plugin:5.8.0.7211:sonar
+                -Dsonar.organization=spannm
+                -Dsonar.projectKey=io.github.spannm:jackcess
+                -Dsonar.host.url=https://sonarcloud.io

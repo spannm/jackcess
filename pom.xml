@@ -120,7 +120,6 @@
 
         <!-- additional plugins not defined in parent -->
         <dep.plugin.sortpom.version>4.0.0</dep.plugin.sortpom.version>
-        <dep.plugin.sonar.version>5.8.0.7211</dep.plugin.sonar.version>
         <dep.plugin.cyclonedx.version>2.9.3</dep.plugin.cyclonedx.version>
         <dep.plugin.versions.version>2.23.0</dep.plugin.versions.version>
         <dep.plugin.figlet.version>1.1.0</dep.plugin.figlet.version>
@@ -671,54 +670,6 @@
                     <url>https://maven.pkg.github.com/${developerId}/${project.artifactId}</url>
                 </snapshotRepository>
             </distributionManagement>
-        </profile>
-
-        <profile>
-            <!-- mvn verify -P sonarcloud -->
-            <id>sonarcloud</id>
-            <activation>
-                <activeByDefault>false</activeByDefault>
-            </activation>
-            <properties>
-                <sonar.skip>false</sonar.skip>
-                <sonar.host.url>https://sonarcloud.io</sonar.host.url>
-                <sonar.organization>${developerId}</sonar.organization>
-                <sonar.projectKey>${project.groupId}:${project.artifactId}</sonar.projectKey>
-
-                <!-- sonar.token>YOUR_TOKEN_HERE</sonar.token -->
-
-                <!-- JetFormat's public fields (PAGE_SIZE, OFFSET_PASSWORD, ...) are long-standing public
-                     API; renaming them to satisfy S116's camelCase convention would break every
-                     downstream consumer (jackcess-encrypt, UCanAccess, ...) for no functional gain. -->
-                <sonar.issue.ignore.multicriteria>e1</sonar.issue.ignore.multicriteria>
-                <sonar.issue.ignore.multicriteria.e1.ruleKey>java:S116</sonar.issue.ignore.multicriteria.e1.ruleKey>
-                <sonar.issue.ignore.multicriteria.e1.resourceKey>**/JetFormat.java</sonar.issue.ignore.multicriteria.e1.resourceKey>
-
-                <!-- tests must run (not skipped) so jacoco produces real coverage data for Sonar's
-                     new-code coverage gate; static-analysis checks are still skipped since Sonar
-                     covers that itself, but skip-coverage is pinned back to false since it also
-                     cascades from skip-all and would otherwise disable jacoco's prepare-agent. -->
-                <basepom.check.skip-all>true</basepom.check.skip-all>
-                <basepom.check.skip-coverage>false</basepom.check.skip-coverage>
-            </properties>
-            <build>
-                <plugins>
-                    <plugin>
-                        <groupId>org.sonarsource.scanner.maven</groupId>
-                        <artifactId>sonar-maven-plugin</artifactId>
-                        <version>${dep.plugin.sonar.version}</version>
-                        <executions>
-                            <execution>
-                                <id>sonar-verify</id>
-                                <goals>
-                                    <goal>sonar</goal>
-                                </goals>
-                                <phase>verify</phase>
-                            </execution>
-                        </executions>
-                    </plugin>
-                </plugins>
-            </build>
         </profile>
 
     </profiles>

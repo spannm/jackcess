@@ -35,7 +35,9 @@ import java.util.Set;
  *
  * @author Tim McCune
  */
-@SuppressWarnings("PMD.FieldDeclarationsShouldBeAtStartOfClass")
+// java:S116 - the public fields (PAGE_SIZE, OFFSET_PASSWORD, ...) are long-standing public API
+// used by downstream projects, renaming them to camelCase would break them for no gain
+@SuppressWarnings({"PMD.FieldDeclarationsShouldBeAtStartOfClass", "java:S116"})
 public abstract class JetFormat {
 
     /** Maximum size of a record minus OLE objects and Memo fields */
