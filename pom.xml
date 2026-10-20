@@ -134,6 +134,8 @@
         <basepom.check.skip-checkstyle>false</basepom.check.skip-checkstyle>
         <basepom.check.skip-pmd>false</basepom.check.skip-pmd>
         <dep.checkstyle.version>14.3.0</dep.checkstyle.version>
+        <!-- fail before lengthy test execution -->
+        <basepom.check.phase-checkstyle>test-compile</basepom.check.phase-checkstyle>
         <basepom.check.checkstyle-config-location>${project.rootDirectory}/build/checkstyle-rules.xml</basepom.check.checkstyle-config-location>
         <check.pmd.ruleset>${project.rootDirectory}/build/pmd-rules.xml</check.pmd.ruleset>
         <dep.pmd.version>7.28.0</dep.pmd.version>
@@ -149,6 +151,8 @@
 
         <basepom.check.skip-license>false</basepom.check.skip-license>
         <basepom.check.fail-license>true</basepom.check.fail-license>
+        <!-- checks only the text of the sources, so it can run first -->
+        <basepom.check.phase-license>validate</basepom.check.phase-license>
         <basepom.license.skip-existing>true</basepom.license.skip-existing>
         <basepom.license.header>src/license/header.txt</basepom.license.header>
     </properties>
@@ -259,6 +263,19 @@
 
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-enforcer-plugin</artifactId>
+                    <configuration>
+                        <rules combine.children="append">
+                            <requirePluginVersions>
+                                <message>Best practice is to always define Maven plugin versions</message>
+                                <banTimestamps>true</banTimestamps>
+                            </requirePluginVersions>
+                        </rules>
+                    </configuration>
+                </plugin>
+
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-release-plugin</artifactId>
                     <configuration>
                         <scmReleaseCommitComment>chore(release): prepare release @{releaseLabel}</scmReleaseCommitComment>
@@ -344,6 +361,18 @@
         </pluginManagement>
 
         <plugins>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-pmd-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>basepom.default</id>
+                        <!-- fail before lengthy test execution -->
+                        <phase>test-compile</phase>
+                    </execution>
+                </executions>
+            </plugin>
 
             <plugin>
                 <groupId>io.github.spannm</groupId>
