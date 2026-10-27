@@ -134,7 +134,7 @@ public class PropertyMapImpl implements PropertyMap {
 
     public PropertyImpl put(Property prop) {
         // keep the whole flag byte, not just the ddl bit, when the source property was read from a file
-        byte flags = prop instanceof PropertyImpl ? ((PropertyImpl) prop).getFlags() : toFlags(prop.isDdl());
+        byte flags = prop instanceof PropertyImpl ? ((PropertyImpl) prop).getFlags() : toFlags(prop.isDdl(), prop.isSkipHandler());
         return put(prop.getName(), prop.getType(), prop.getValue(), flags);
     }
 
@@ -143,7 +143,12 @@ public class PropertyMapImpl implements PropertyMap {
      */
     @Override
     public PropertyImpl put(String name, DataType type, Object value, boolean isDdl) {
-        return put(name, type, value, toFlags(isDdl));
+        return put(name, type, value, toFlags(isDdl, false));
+    }
+
+    @Override
+    public PropertyImpl put(String name, DataType type, Object value, boolean isDdl, boolean isSkipHandler) {
+        return put(name, type, value, toFlags(isDdl, isSkipHandler));
     }
 
     /**
@@ -208,7 +213,22 @@ public class PropertyMapImpl implements PropertyMap {
     }
 
     public static Property createProperty(String name, DataType type, Object value, boolean isDdl) {
-        return createProperty(name, type, value, toFlags(isDdl));
+        return createProperty(name, type, value, toFlags(isDdl, false));
+    }
+
+    /**
+     * Creates a property with the given flag bits.
+     *
+     * @param name          property name
+     * @param type          property type, or {@code null} to derive it from the default info or the value
+     * @param value         property value
+     * @param isDdl         whether the property is a DDL property
+     * @param isSkipHandler whether the engine stores the value without running its handler
+     * @return the new property
+     * @since 5.3.0
+     */
+    public static Property createProperty(String name, DataType type, Object value, boolean isDdl, boolean isSkipHandler) {
+        return createProperty(name, type, value, toFlags(isDdl, isSkipHandler));
     }
 
     /**
@@ -266,13 +286,14 @@ public class PropertyMapImpl implements PropertyMap {
     }
 
     /**
-     * Converts the given ddl state into a flag byte.
+     * Converts the given flag states into a flag byte.
      *
-     * @param isDdl whether the property is a DDL property
+     * @param isDdl         whether the property is a DDL property
+     * @param isSkipHandler whether the engine stores the value without running its handler
      * @return the flag byte
      */
-    private static byte toFlags(boolean isDdl) {
-        return isDdl ? DDL_FLAG : 0;
+    private static byte toFlags(boolean isDdl, boolean isSkipHandler) {
+        return (byte) ((isDdl ? DDL_FLAG : 0) | (isSkipHandler ? SKIP_HANDLER_FLAG : 0));
     }
 
     /**
@@ -317,6 +338,11 @@ public class PropertyMapImpl implements PropertyMap {
             return (flags & DDL_FLAG) != 0;
         }
 
+        @Override
+        public boolean isSkipHandler() {
+            return (flags & SKIP_HANDLER_FLAG) != 0;
+        }
+
         /**
          * Returns the flag byte as stored in the file. Access uses more of it than the one bit {@link #isDdl} reports,
          * so the whole byte has to be written back unchanged.
@@ -333,7 +359,7 @@ public class PropertyMapImpl implements PropertyMap {
             if (val instanceof byte[]) {
                 val = ByteUtil.toHexString((byte[]) val);
             }
-            String flagStr = (isDdl() ? ":ddl" : "") + ((flags & SKIP_HANDLER_FLAG) != 0 ? ":nohandler" : "");
+            String flagStr = (isDdl() ? ":ddl" : "") + (isSkipHandler() ? ":nohandler" : "");
             return String.format("%s[%s%s]=%s", getName(), getType(), flagStr, val);
         }
     }

@@ -123,6 +123,22 @@ public interface PropertyMap extends Iterable<PropertyMap.Property> {
     Property put(String name, DataType type, Object value, boolean isDdl);
 
     /**
+     * Creates a new (or updates an existing) property in the map, setting both of the flag bits the engine defines.
+     * <p>
+     * Note, this change will not be persisted until the {@link #save} method has been called.
+     *
+     * @param name          the property name
+     * @param type          the property type
+     * @param value         the property value
+     * @param isDdl         whether the property is a DDL property, see {@link Property#isDdl()}
+     * @param isSkipHandler whether the engine stores the value without running its handler, see
+     *                      {@link Property#isSkipHandler()}
+     * @return the newly created (or updated) property
+     * @since 5.3.0
+     */
+    Property put(String name, DataType type, Object value, boolean isDdl, boolean isSkipHandler);
+
+    /**
      * Puts all the given properties into this map.
      *
      * @param props the properties to put into this map ({@code null} is tolerated and ignored).
@@ -174,6 +190,16 @@ public interface PropertyMap extends Iterable<PropertyMap.Property> {
          * the access engine may not recognize them correctly.
          */
         boolean isDdl();
+
+        /**
+         * Whether or not the engine stores this property without running the handler bound to the property name, so
+         * that writing the property records a state rather than bringing it about. The engine sets the bit on its own
+         * account and no DAO call produces it.
+         *
+         * @return {@code true} if the engine skips the handler for this property
+         * @since 5.3.0
+         */
+        boolean isSkipHandler();
 
         /**
          * Returns the current value of this property.

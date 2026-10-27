@@ -43,6 +43,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 
+@SuppressWarnings({"checkstyle:MethodName", "PMD.LinguisticNaming"})
 final class PropertiesTest extends AbstractBaseTest {
 
     @Test
@@ -419,6 +420,52 @@ final class PropertiesTest extends AbstractBaseTest {
                 TestUtil.createExpectedRow("id", 1, "value", "v1"),
                 TestUtil.createExpectedRow("id", 2, "value", "v2"));
             TestUtil.assertTable(expectedRows, t3);
+        }
+    }
+
+    @ParameterizedTest(name = "[{index}] {0}")
+    @TestDbSource(COMMON1)
+    void getProperties_index_separateFromColumnProperties(TestDb testDb) throws Exception {
+        File dbFile;
+
+        try (Database db = testDb.openCopy()) {
+            dbFile = db.getFile();
+
+            // an index has a property block of its own, separate from the block of the column access named it after
+            PropertyMap idxProps = db.getTable("Table1").getIndex("B").getProperties();
+            assertThat(idxProps.isEmpty()).isTrue();
+
+            idxProps.put("Description", DataType.TEXT, "an index property", false, true);
+            idxProps.save();
+        }
+
+        try (Database db = DatabaseBuilder.open(dbFile)) {
+            Table t = db.getTable("Table1");
+
+            PropertyMap idxProps = t.getIndex("B").getProperties();
+            assertThat(idxProps.getValue("Description")).isEqualTo("an index property");
+
+            PropertyMap.Property prop = idxProps.get("Description");
+            assertThat(prop.isDdl()).isFalse();
+            assertThat(prop.isSkipHandler()).isTrue();
+
+            assertThat(t.getColumn("B").getProperties().getValue("Description")).isNull();
+        }
+    }
+
+    @ParameterizedTest(name = "[{index}] {0}")
+    @TestDbReadOnlySource(COMMON1)
+    void isSkipHandler_readProperties_reportsFlagBit(TestDb testDb) throws Exception {
+        try (Database db = testDb.open()) {
+            // access writes ColIsGuid with the bit which tells the engine to store the value instead of running the
+            // handler for the property name
+            PropertyMap.Property prop = db.getTable("Table4").getProperties().get("ColIsGuid");
+            assertThat(prop.isDdl()).isTrue();
+            assertThat(prop.isSkipHandler()).isTrue();
+
+            prop = db.getTable("Table1").getColumn("C").getProperties().get(PropertyMap.REQUIRED_PROP);
+            assertThat(prop.isDdl()).isTrue();
+            assertThat(prop.isSkipHandler()).isFalse();
         }
     }
 

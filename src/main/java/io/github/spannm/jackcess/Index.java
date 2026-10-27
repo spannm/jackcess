@@ -97,6 +97,15 @@ public interface Index {
     boolean isRequired();
 
     /**
+     * Returns the properties for this index. An index has a property block of its own, separate from the block of the
+     * column it is named after.
+     *
+     * @return the properties for this index
+     * @since 5.3.0
+     */
+    PropertyMap getProperties() throws IOException;
+
+    /**
      * Convenience method for constructing a new CursorBuilder for this Index.
      */
     CursorBuilder newCursor();

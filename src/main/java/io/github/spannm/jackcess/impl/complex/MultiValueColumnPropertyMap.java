@@ -90,12 +90,17 @@ public class MultiValueColumnPropertyMap implements PropertyMap {
 
     @Override
     public Property put(String name, DataType type, Object value, boolean isDdl) {
+        return put(name, type, value, isDdl, false);
+    }
+
+    @Override
+    public Property put(String name, DataType type, Object value, boolean isDdl, boolean isSkipHandler) {
         // the only property which seems to go in the "primary" is the "multi
         // value" property
         if (isPrimaryKey(name)) {
-            return primary.put(name, DataType.BOOLEAN, value, true);
+            return primary.put(name, DataType.BOOLEAN, value, true, isSkipHandler);
         }
-        return complex.put(name, type, value, isDdl);
+        return complex.put(name, type, value, isDdl, isSkipHandler);
     }
 
     @Override

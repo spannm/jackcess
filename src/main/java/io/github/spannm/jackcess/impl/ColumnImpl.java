@@ -142,8 +142,19 @@ public class ColumnImpl implements Column, Comparable<ColumnImpl>, DateTimeConte
      */
     public static final byte             UPDATABLE_FLAG_MASK              = (byte) 0x02;
 
-    // some other flags?
-    // 0x10: replication related field (or hidden?)
+    /**
+     * mask for the bit which marks a column the engine maintains and Access hides. The system catalog columns,
+     * {@code MSysComplexColumns} included, and the replication columns carry it, and nothing else does.
+     */
+    public static final byte             HIDDEN_FLAG_MASK                 = (byte) 0x10;
+
+    /**
+     * mask for the bit which marks a column holding a Windows security identifier. Only {@code MSysObjects.Owner} and
+     * {@code MSysACEs.SID} carry it.
+     */
+    public static final byte             SECURITY_IDENTIFIER_FLAG_MASK    = (byte) 0x20;
+
+    // flag bit 0x08 occurs in no known database
 
     protected static final byte          COMPRESSED_UNICODE_EXT_FLAG_MASK = (byte) 0x01;
     private static final byte            CALCULATED_EXT_FLAG_MASK         = (byte) 0xC0;
@@ -238,6 +249,10 @@ public class ColumnImpl implements Column, Comparable<ColumnImpl>, DateTimeConte
     private final boolean                mcalculated;
     /** Whether or not the column is the complex value foreign key of a complex column's flat table */
     private final boolean                mcomplexValueForeignKey;
+    /** Whether or not the engine maintains the column and Access hides it */
+    private final boolean                mhidden;
+    /** Whether or not the column holds a Windows security identifier */
+    private final boolean                msecurityIdentifier;
     /** Data type */
     private final DataType               mtype;
     /** Maximum column length */
@@ -281,6 +296,8 @@ public class ColumnImpl implements Column, Comparable<ColumnImpl>, DateTimeConte
         mautoNumber = false;
         mcalculated = false;
         mcomplexValueForeignKey = false;
+        mhidden = false;
+        msecurityIdentifier = false;
         mautoNumberGenerator = null;
         mcolumnNumber = (short) _colNumber;
         mcolumnId = (short) _colNumber;
@@ -307,6 +324,8 @@ public class ColumnImpl implements Column, Comparable<ColumnImpl>, DateTimeConte
         mautoNumber = (args.flags & (AUTO_NUMBER_FLAG_MASK | AUTO_NUMBER_GUID_FLAG_MASK)) != 0;
         mcalculated = (args.extFlags & CALCULATED_EXT_FLAG_MASK) != 0;
         mcomplexValueForeignKey = (args.extFlags & COMPLEX_FK_EXT_FLAG_MASK) != 0;
+        mhidden = (args.flags & HIDDEN_FLAG_MASK) != 0;
+        msecurityIdentifier = (args.flags & SECURITY_IDENTIFIER_FLAG_MASK) != 0;
 
         mautoNumberGenerator = createAutoNumberGenerator();
 
@@ -424,14 +443,19 @@ public class ColumnImpl implements Column, Comparable<ColumnImpl>, DateTimeConte
         return mcolumnNumber;
     }
 
-    /**
-     * Returns the id the engine gave this column when it was created. The engine never renumbers an id, so a table
-     * which has had a column deleted has gaps in its ids.
-     *
-     * @return the column id
-     */
+    @Override
     public short getColumnId() {
         return mcolumnId;
+    }
+
+    @Override
+    public boolean isHidden() {
+        return mhidden;
+    }
+
+    @Override
+    public boolean isSecurityIdentifier() {
+        return msecurityIdentifier;
     }
 
     @Override
@@ -1681,6 +1705,12 @@ public class ColumnImpl implements Column, Comparable<ColumnImpl>, DateTimeConte
     public String toString() {
         ToStringBuilder sb = ToStringBuilder.builder(this).append("name", "(" + mtable.getName() + ") " + mname).append("type", "0x" + Integer.toHexString(getOriginalDataType()) + " (" + mtype + ")")
             .append("number", mcolumnNumber).append("id", mcolumnId).append("length", mcolumnLength).append("variableLength", mvariableLength);
+        if (mhidden) {
+            sb.append("hidden", mhidden);
+        }
+        if (msecurityIdentifier) {
+            sb.append("securityIdentifier", msecurityIdentifier);
+        }
         if (mcalculated) {
             sb.append("calculated", mcalculated).appendIgnoreNull("expression", getCalculationContext());
         }

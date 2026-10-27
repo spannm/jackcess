@@ -19,6 +19,7 @@ package io.github.spannm.jackcess.impl;
 import io.github.spannm.jackcess.CursorBuilder;
 import io.github.spannm.jackcess.Index;
 import io.github.spannm.jackcess.IndexBuilder;
+import io.github.spannm.jackcess.PropertyMap;
 import io.github.spannm.jackcess.util.ToStringBuilder;
 
 import java.io.IOException;
@@ -72,6 +73,8 @@ public final class IndexImpl implements Index, Comparable<IndexImpl> {
     private String                    name;
     /** foreign key reference info, if any */
     private final ForeignKeyReference reference;
+    /** properties for this index, if any */
+    private PropertyMap               props;
 
     IndexImpl(ByteBuffer tableBuffer, List<IndexData> indexDatas, JetFormat format) {
         ByteUtil.forward(tableBuffer, format.SKIP_BEFORE_INDEX_SLOT); // Forward past Unknown
@@ -141,6 +144,14 @@ public final class IndexImpl implements Index, Comparable<IndexImpl> {
 
     void setName(String name) {
         this.name = name;
+    }
+
+    @Override
+    public PropertyMap getProperties() throws IOException {
+        if (props == null) {
+            props = getTable().getPropertyMaps().getIndex(getName());
+        }
+        return props;
     }
 
     @Override
