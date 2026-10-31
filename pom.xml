@@ -268,7 +268,6 @@
                         <rules combine.children="append">
                             <requirePluginVersions>
                                 <message>Best practice is to always define Maven plugin versions</message>
-                                <banTimestamps>true</banTimestamps>
                             </requirePluginVersions>
                         </rules>
                     </configuration>
@@ -511,7 +510,7 @@
     <profiles>
 
         <!-- profile to fail the build on Error Prone findings, active by default.
-             To disable: mvn clean compile -D check.skip-errorprone=true
+             To disable: mvn clean compile -Dcheck.skip-errorprone
              see: https://errorprone.info/ -->
         <profile>
             <id>errorprone-fatal</id>
