@@ -47,10 +47,10 @@ final class CalcFieldTest extends AbstractBaseTest {
         ColumnBuilder cb = new ColumnBuilder("calc_data", DataType.TEXT)
             .withCalculatedInfo("[id] & \"_\" & [data]");
 
-        assertThatThrownBy(() -> cb.validate(JetFormat.VERSION_12))
+        assertThatThrownBy(() -> cb.validate(JetFormat.VERSION_2007))
             .isInstanceOf(IllegalArgumentException.class);
 
-        cb.validate(JetFormat.VERSION_14);
+        cb.validate(JetFormat.VERSION_2010);
     }
 
     @ParameterizedTest(name = "[{index}] {0}")

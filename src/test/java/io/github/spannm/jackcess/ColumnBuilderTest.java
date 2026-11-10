@@ -170,7 +170,7 @@ final class ColumnBuilderTest extends AbstractBaseTest {
 
     @Test
     void validateCalculated() {
-        JetFormat fmt14 = JetFormat.VERSION_14;
+        JetFormat fmt14 = JetFormat.VERSION_2010;
 
         // calculated not supported in older format
         ColumnBuilder calcOldFmt = new ColumnBuilder("c", DataType.LONG).withCalculated(true);

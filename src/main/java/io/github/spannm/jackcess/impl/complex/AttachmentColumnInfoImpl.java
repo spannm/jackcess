@@ -422,7 +422,7 @@ public final class AttachmentColumnInfoImpl extends ComplexColumnInfoImpl<Attach
 
             // encode extension, which ends w/ a null byte
             lcType += '\0';
-            ByteBuffer typeBytes = ColumnImpl.encodeUncompressedText(lcType, JetFormat.VERSION_12.CHARSET);
+            ByteBuffer typeBytes = ColumnImpl.encodeUncompressedText(lcType, JetFormat.VERSION_2007.CHARSET);
             int headerLen = typeBytes.remaining() + CONTENT_HEADER_SIZE;
 
             int dataLen = data.length;

@@ -56,21 +56,32 @@ public abstract class JetFormat {
     }
 
     /**
-     * Offset in the file that holds the byte describing the Jet format version
+     * Offset in the file of the first byte of the file format version, which the engine stores as a 4 byte value. The
+     * second byte records whether the database was created in this format or was promoted into it from an older one,
+     * neither the engine nor jackcess reads the other two.
      */
     private static final int    OFFSET_VERSION      = 20;
-    /** Version code for Jet version 3 */
-    private static final byte   CODE_VERSION_3      = 0x0;
-    /** Version code for Jet version 4 */
-    private static final byte   CODE_VERSION_4      = 0x1;
-    /** Version code for Jet version 12.0 */
-    private static final byte   CODE_VERSION_12     = 0x2;
-    /** Version code for Jet version 14.0 */
-    private static final byte   CODE_VERSION_14     = 0x3;
-    /** Version code for Jet version 16.0 */
-    private static final byte   CODE_VERSION_16     = 0x5;
-    /** Version code for Jet version 17.0 */
-    private static final byte   CODE_VERSION_17     = 0x6;
+    /** Version code for the format Access 97 writes, which is Jet 3 */
+    private static final int    CODE_VERSION_3      = 0x0;
+    /**
+     * Version code for the format Access 2000 through 2003 write, which is Jet 4, the last Jet version. The ACE engine
+     * replaced Jet in Access 2007, so the codes below are named after the release which writes each format rather than
+     * after an engine version.
+     */
+    private static final int    CODE_VERSION_4      = 0x1;
+    /** Version code for the format Access 2007 writes */
+    private static final int    CODE_VERSION_2007   = 0x2;
+    /** Version code for the format Access 2010 writes */
+    private static final int    CODE_VERSION_2010   = 0x3;
+    // code 0x4 is the format Access 2013 writes. Access 2013 wrote what Access 2010 wrote, so no file has ever been
+    // seen carrying it and jackcess does not claim to read one
+    /** Version code for the format Access 2016 writes */
+    private static final int    CODE_VERSION_2016   = 0x5;
+    /**
+     * Version code for the format Access 2019 writes. Access 2019 and Access 2021 both report themselves as Access
+     * version 16, so there is no Access 17 which this code could name.
+     */
+    private static final int    CODE_VERSION_2019   = 0x6;
 
     /** location of the engine name in the header */
     public static final int     OFFSET_ENGINE_NAME  = 0x4;
@@ -119,13 +130,13 @@ public abstract class JetFormat {
 
         private static final Map<String, FileFormat> POSSIBLE_VERSION_4      = new HashMap<>();
 
-        private static final Map<String, FileFormat> POSSIBLE_VERSION_12     = Collections.singletonMap(null, FileFormat.V2007);
+        private static final Map<String, FileFormat> POSSIBLE_VERSION_2007     = Collections.singletonMap(null, FileFormat.V2007);
 
-        private static final Map<String, FileFormat> POSSIBLE_VERSION_14     = Collections.singletonMap(null, FileFormat.V2010);
+        private static final Map<String, FileFormat> POSSIBLE_VERSION_2010     = Collections.singletonMap(null, FileFormat.V2010);
 
-        private static final Map<String, FileFormat> POSSIBLE_VERSION_16     = Collections.singletonMap(null, FileFormat.V2016);
+        private static final Map<String, FileFormat> POSSIBLE_VERSION_2016     = Collections.singletonMap(null, FileFormat.V2016);
 
-        private static final Map<String, FileFormat> POSSIBLE_VERSION_17     = Collections.singletonMap(null, FileFormat.V2019);
+        private static final Map<String, FileFormat> POSSIBLE_VERSION_2019     = Collections.singletonMap(null, FileFormat.V2019);
 
         private static final Map<String, FileFormat> POSSIBLE_VERSION_MSISAM = Collections.singletonMap(null, FileFormat.MSISAM);
 
@@ -161,14 +172,30 @@ public abstract class JetFormat {
     public static final JetFormat     VERSION_4      = new Jet4Format();
     /** the JetFormat constants for the MSISAM database */
     public static final JetFormat     VERSION_MSISAM = new MSISAMFormat();
-    /** the JetFormat constants for the Jet database version "12.0" */
-    public static final JetFormat     VERSION_12     = new Jet12Format();
-    /** the JetFormat constants for the Jet database version "14.0" */
-    public static final JetFormat     VERSION_14     = new Jet14Format();
-    /** the JetFormat constants for the Jet database version "16.0" */
-    public static final JetFormat     VERSION_16     = new Jet16Format();
-    /** the JetFormat constants for the Jet database version "17.0" */
-    public static final JetFormat     VERSION_17     = new Jet17Format();
+    /** the JetFormat constants for the format Access 2007 writes */
+    public static final JetFormat     VERSION_2007   = new Jet2007Format();
+    /** the JetFormat constants for the format Access 2010 writes */
+    public static final JetFormat     VERSION_2010   = new Jet2010Format();
+    /** the JetFormat constants for the format Access 2016 writes */
+    public static final JetFormat     VERSION_2016   = new Jet2016Format();
+    /** the JetFormat constants for the format Access 2019 writes */
+    public static final JetFormat     VERSION_2019   = new Jet2019Format();
+
+    // the same four objects under their former names. Those were Access version numbers, which cannot tell these
+    // formats apart: Access 2016, Access 2019 and Access 2021 all report version 16, and there is no Access 17 at all
+
+    /** @deprecated renamed to {@link #VERSION_2007} */
+    @Deprecated
+    public static final JetFormat     VERSION_12     = VERSION_2007;
+    /** @deprecated renamed to {@link #VERSION_2010} */
+    @Deprecated
+    public static final JetFormat     VERSION_14     = VERSION_2010;
+    /** @deprecated renamed to {@link #VERSION_2016} */
+    @Deprecated
+    public static final JetFormat     VERSION_16     = VERSION_2016;
+    /** @deprecated renamed to {@link #VERSION_2019}, there is no Access 17 */
+    @Deprecated
+    public static final JetFormat     VERSION_17     = VERSION_2019;
 
     // These constants are populated by this class's constructor. They can't be
     // populated by the subclass's constructor because they are final, and Java
@@ -303,7 +330,7 @@ public abstract class JetFormat {
             throw new IOException("Empty database file");
         }
         buffer.flip();
-        byte version = buffer.get(OFFSET_VERSION);
+        int version = ByteUtil.getUnsignedByte(buffer, OFFSET_VERSION);
         if (version == CODE_VERSION_3) {
             return VERSION_3;
         } else if (version == CODE_VERSION_4) {
@@ -311,16 +338,16 @@ public abstract class JetFormat {
                 return VERSION_MSISAM;
             }
             return VERSION_4;
-        } else if (version == CODE_VERSION_12) {
-            return VERSION_12;
-        } else if (version == CODE_VERSION_14) {
-            return VERSION_14;
-        } else if (version == CODE_VERSION_16) {
-            return VERSION_16;
-        } else if (version == CODE_VERSION_17) {
-            return VERSION_17;
+        } else if (version == CODE_VERSION_2007) {
+            return VERSION_2007;
+        } else if (version == CODE_VERSION_2010) {
+            return VERSION_2010;
+        } else if (version == CODE_VERSION_2016) {
+            return VERSION_2016;
+        } else if (version == CODE_VERSION_2019) {
+            return VERSION_2019;
         }
-        throw new IOException("Unsupported " + (version < CODE_VERSION_3 ? "older" : "newer") + " version: " + version);
+        throw new IOException(String.format("Unsupported version: %d", version));
     }
 
     private JetFormat(String _name) {
@@ -1577,12 +1604,12 @@ public abstract class JetFormat {
         }
     }
 
-    private static class Jet12Format extends Jet4Format {
-        private Jet12Format() {
-            super("VERSION_12");
+    private static class Jet2007Format extends Jet4Format {
+        private Jet2007Format() {
+            super("VERSION_2007");
         }
 
-        private Jet12Format(String name) {
+        private Jet2007Format(String name) {
             super(name);
         }
 
@@ -1598,7 +1625,7 @@ public abstract class JetFormat {
 
         @Override
         protected Map<String, FileFormat> getPossibleFileFormats() {
-            return PossibleFileFormats.POSSIBLE_VERSION_12;
+            return PossibleFileFormats.POSSIBLE_VERSION_2007;
         }
 
         @Override
@@ -1618,12 +1645,12 @@ public abstract class JetFormat {
 
     }
 
-    private static class Jet14Format extends Jet12Format {
-        private Jet14Format() {
-            super("VERSION_14");
+    private static class Jet2010Format extends Jet2007Format {
+        private Jet2010Format() {
+            super("VERSION_2010");
         }
 
-        private Jet14Format(String name) {
+        private Jet2010Format(String name) {
             super(name);
         }
 
@@ -1634,7 +1661,7 @@ public abstract class JetFormat {
 
         @Override
         protected Map<String, FileFormat> getPossibleFileFormats() {
-            return PossibleFileFormats.POSSIBLE_VERSION_14;
+            return PossibleFileFormats.POSSIBLE_VERSION_2010;
         }
 
         @Override
@@ -1643,13 +1670,13 @@ public abstract class JetFormat {
         }
     }
 
-    private static class Jet16Format extends Jet14Format {
+    private static class Jet2016Format extends Jet2010Format {
 
-        private Jet16Format() {
-            super("VERSION_16");
+        private Jet2016Format() {
+            super("VERSION_2016");
         }
 
-        private Jet16Format(String name) {
+        private Jet2016Format(String name) {
             super(name);
         }
 
@@ -1660,7 +1687,7 @@ public abstract class JetFormat {
 
         @Override
         protected Map<String, FileFormat> getPossibleFileFormats() {
-            return PossibleFileFormats.POSSIBLE_VERSION_16;
+            return PossibleFileFormats.POSSIBLE_VERSION_2016;
         }
 
         @Override
@@ -1669,10 +1696,10 @@ public abstract class JetFormat {
         }
     }
 
-    private static final class Jet17Format extends Jet16Format {
+    private static final class Jet2019Format extends Jet2016Format {
 
-        private Jet17Format() {
-            super("VERSION_17");
+        private Jet2019Format() {
+            super("VERSION_2019");
         }
 
         @Override
@@ -1682,7 +1709,7 @@ public abstract class JetFormat {
 
         @Override
         protected Map<String, FileFormat> getPossibleFileFormats() {
-            return PossibleFileFormats.POSSIBLE_VERSION_17;
+            return PossibleFileFormats.POSSIBLE_VERSION_2019;
         }
     }
 
