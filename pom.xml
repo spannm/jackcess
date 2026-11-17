@@ -121,7 +121,7 @@
         <!-- additional plugins not defined in parent -->
         <dep.plugin.sortpom.version>4.0.0</dep.plugin.sortpom.version>
         <dep.plugin.cyclonedx.version>2.9.3</dep.plugin.cyclonedx.version>
-        <dep.plugin.versions.version>2.24.0</dep.plugin.versions.version>
+        <dep.plugin.versions.version>2.25.2</dep.plugin.versions.version>
         <dep.plugin.figlet.version>1.2.0</dep.plugin.figlet.version>
         <dep.plugin.error-prone.version>2.50.0</dep.plugin.error-prone.version>
 
@@ -133,12 +133,12 @@
 
         <basepom.check.skip-checkstyle>false</basepom.check.skip-checkstyle>
         <basepom.check.skip-pmd>false</basepom.check.skip-pmd>
-        <dep.checkstyle.version>14.3.0</dep.checkstyle.version>
+        <dep.checkstyle.version>14.4.0</dep.checkstyle.version>
         <!-- fail before lengthy test execution -->
         <basepom.check.phase-checkstyle>test-compile</basepom.check.phase-checkstyle>
         <basepom.check.checkstyle-config-location>${project.rootDirectory}/build/checkstyle-rules.xml</basepom.check.checkstyle-config-location>
         <check.pmd.ruleset>${project.rootDirectory}/build/pmd-rules.xml</check.pmd.ruleset>
-        <dep.pmd.version>7.28.0</dep.pmd.version>
+        <dep.pmd.version>7.29.0</dep.pmd.version>
         <basepom.check.skip-spotbugs>true</basepom.check.skip-spotbugs>
         <basepom.check.skip-dependency>false</basepom.check.skip-dependency>
         <basepom.check.fail-dependency>false</basepom.check.fail-dependency>
